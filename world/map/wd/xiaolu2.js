@@ -1,0 +1,4 @@
+﻿this.inherits(ROOM);
+this.name = "林间小径"
+this.desc = "你走在一条小径上，两旁种满了竹子，修篁森森，绿荫满地，除了竹叶声和鸟鸣声，听不到别的动静。北面似乎有一座简陋的小院。";
+this.exits = { "south": "wd/xiaolu", "north": "wd/xiaoyuan" };

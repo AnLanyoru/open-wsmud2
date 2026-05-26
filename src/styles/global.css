@@ -1,0 +1,840 @@
+/* ========================================
+   global.css - 全局基础样式
+   ======================================== */
+html,
+body {
+    margin: 0px;
+    height: 100%;
+    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
+    overflow: hidden;
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+}
+
+body {
+    background-color: black;
+    font-family: "Microsoft YaHei UI";
+    color: #008000;
+    font-size: 14px;
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+pre {
+    font-size: inherit;
+    font-family: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    display: none;
+}
+
+* {
+    box-sizing: border-box;
+    scrollbar-width: none;
+}
+
+.hide {
+    display: none;
+}
+
+@media(min-width: 768px) {
+    body {
+        width: 768px;
+        margin: auto;
+        position: relative;
+    }
+
+    .dialog-stats>.top-item>.top-title {
+        padding-left: 3em;
+        margin-right: 2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .dialog>.dialog-footer>.footer-item {
+        width: 4em;
+    }
+
+    .dialog>.dialog-footer>.eq-group {
+        margin-left: 0.5em;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5em;
+        margin-top: 0.5em;
+    }
+
+    .confirm-count>.btn {
+        width: 3em;
+    }
+
+    .dialog-fb>.fb-left {
+        width: 8em;
+    }
+
+    .stats-container-left>.stats-silder {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+
+    .dialog-list>.otype-list {
+        width: 2.5em;
+    }
+
+    .dialog-list>.otype-list>.otype-item {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+}
+
+.input-error {
+    color: red;
+}
+
+.textbox {
+    border-radius: 0.25rem;
+    padding: 6px 12px 6px 12px;
+    outline: none;
+    border: none;
+    border-bottom: solid 1px #888888;
+    width: 80%;
+    height: 1.5rem;
+    border-radius: 0px;
+    margin-right: 10px;
+}
+
+.loader {
+    margin: auto auto;
+    margin-top: 12.5rem;
+    width: 18.75rem;
+    text-align: center;
+    line-height: 2rem;
+    padding: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25em;
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    font-size: 0.875rem;
+}
+
+.loader>img {
+    vertical-align: middle;
+    border: 0;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-top: -4px;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-0 {
+    flex: none;
+}
+
+mem {
+    color: gray;
+    font-size: 0.8em;
+}
+
+/* ========================================
+   颜色类 (grade / color tags / glyphicon)
+   ======================================== */
+.grade0 {
+    --border-color: #C0C0C0;
+    border-color: var(--border-color);
+}
+
+.grade1 {
+    --border-color: #00FF00;
+    border-color: var(--border-color);
+}
+
+.grade2 {
+    --border-color: #00FFFF;
+    border-color: var(--border-color);
+}
+
+.grade3 {
+    --border-color: #FFFF00;
+    border-color: var(--border-color);
+}
+
+.grade4 {
+    --border-color: #912CEE;
+    border-color: var(--border-color);
+}
+
+.grade5 {
+    --border-color: #FFA500;
+    border-color: var(--border-color);
+}
+
+.grade6 {
+    --border-color: #FF4500;
+    border-color: var(--border-color);
+}
+
+CMD {
+    font-weight: bold;
+}
+
+NOR {
+    color: #008000;
+}
+
+GRE {
+    color: #008000;
+}
+
+BLK {
+    color: #505050;
+}
+
+BLU {
+    color: #000080;
+}
+
+CYN {
+    color: #008080;
+}
+
+RED {
+    color: #800000;
+}
+
+MAG {
+    color: #800080;
+}
+
+YEL {
+    color: #808000;
+}
+
+WHT {
+    color: #C0C0C0;
+}
+
+ORA {
+    color: #d26900;
+}
+
+opt {
+    opacity: 0.5
+}
+
+HIK {
+    color: #808080;
+}
+
+HIB {
+    color: #0000FF;
+}
+
+HIG {
+    color: #00FF00;
+}
+
+HIC {
+    color: #00FFFF;
+}
+
+HIR {
+    color: #FF0000;
+}
+
+HIM {
+    color: #FF00FF
+}
+
+HIY {
+    color: #FFFF00;
+}
+
+HIW {
+    color: #FFFFFF;
+}
+
+HIO {
+    color: #FFA500;
+}
+
+HIJ {
+    color: #FFD700;
+}
+
+HIZ {
+    color: #912CEE;
+}
+
+ORD {
+    color: #FF4500;
+}
+
+FLA {}
+
+BBLK {
+    background-color: #FFFFFF;
+}
+
+BBLU {
+    background-color: #000080;
+}
+
+BCYN {
+    background-color: #008080;
+}
+
+BRED {
+    background-color: #800000;
+}
+
+BMAG {
+    background-color: #800080;
+}
+
+BYEL {
+    background-color: #808000;
+}
+
+BWHT {
+    background-color: #C0C0C0;
+}
+
+BHIK {
+    background-color: #808080;
+}
+
+HBBLU {
+    background-color: #0000FF;
+}
+
+HBGRN {
+    background-color: #00FF00;
+}
+
+HBCYN {
+    background-color: #00FFFF;
+}
+
+HBRED {
+    background-color: #FF0000;
+}
+
+HBMAG {
+    background-color: #FF00FF
+}
+
+HBYEL {
+    background-color: #FFFF00;
+}
+
+HBWHT {
+    background-color: #FFFFFF;
+}
+
+CMD {
+    cursor: pointer;
+    text-decoration: underline;
+    background-color: transparent;
+}
+
+DEL {
+    text-decoration: line-through;
+    color: gray;
+}
+
+line {
+    color: #008080;
+    height: 30px;
+    line-height: 30px;
+    width: 100%;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+}
+
+line::before {
+    content: '';
+    border-top: 1px solid #008080;
+    width: 45%;
+    height: 2px;
+    position: absolute;
+    top: 50%;
+    left: 0px;
+}
+
+line::after {
+    content: '';
+    border-top: 1px solid #008080;
+    width: 45%;
+    height: 2px;
+    position: absolute;
+    top: 50%;
+    right: 0px;
+}
+
+.blink {
+    animation-name: flash;
+    animation-duration: 1s;
+    animation-iteration-count: infinite
+}
+
+@keyframes flash {
+    50% {
+        color: inherit;
+    }
+
+    50% {
+        color: black;
+    }
+}
+
+/* ========================================
+   login.css - 登录界面样式
+   ======================================== */
+
+.server-list {
+    list-style-type: none;
+    font-weight: bold;
+    min-height: 5rem;
+    max-height: 20rem;
+
+}
+
+.server-list .select {
+
+    list-style-type: disc;
+    color: unset;
+}
+
+.server-list li {
+    cursor: pointer;
+    padding-top: 0.4px;
+    padding-bottom: 0.4px;
+    color: #999;
+    line-height: 2em;
+}
+
+.login-content {
+    height: 100%;
+    overflow: auto;
+}
+
+.mypanel {
+    width: 100%;
+    display: none;
+    margin: 0px auto;
+}
+
+.mypanel>ul {
+    padding-left: 0;
+    display: block;
+    margin: 0px;
+    list-style-type: disc;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 0px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 0px;
+}
+
+.mypanel>ul>.active {
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+}
+
+.mypanel .content {
+    background-color: white;
+    border-bottom: none;
+    list-style-type: none;
+    padding: 0.6rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    overflow: auto !important;
+}
+
+.mypanel .bottom {
+    background-color: black;
+    border-bottom: none;
+    list-style-type: none;
+    padding: 0.6rem 1rem;
+}
+
+.new-list {
+    padding-left: 0.6rem;
+}
+
+.new-list>li {
+    list-style-type: disc;
+    font-size: 1rem;
+    line-height: 1.2em;
+    padding-top: 0.6rem;
+    color: #808000;
+    cursor: pointer;
+}
+
+.new-list>li:hover {
+    text-decoration: underline;
+}
+
+.panel_item {
+    cursor: pointer;
+    background-color: black;
+    border-bottom: 1px solid #666666;
+    color: #999999;
+    list-style-type: none;
+    padding: 0.6rem 1rem;
+}
+
+.panel_item:hover {
+    background-color: #999999;
+    color: black;
+
+}
+
+.role-list {}
+
+.role-list>.role-item {
+    font-size: 1rem;
+    cursor: pointer;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    list-style-type: none;
+}
+
+.role-list>.select {
+
+    list-style-type: disc;
+}
+
+.hide_txt {
+    border: none;
+    clear: both;
+    border-bottom: 1px solid #888888;
+    width: 2.5rem;
+    color: #337ab7;
+    padding-left: 0.5rem;
+}
+
+.hide_txt:focus {
+    outline: none;
+}
+
+.regist-info-text {
+    margin: 0.5rem 0px;
+    color: #999999;
+    margin-bottom: 0px;
+}
+
+.regist-title-text {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.regist-title-ref {
+    color: gray;
+    cursor: pointer;
+    clear: both;
+}
+
+.validnum-box {
+    width: 100%;
+    white-space: nowrap;
+    position: relative;
+}
+
+.validnum-box>.validnum-btn {
+    margin: 0px;
+    position: absolute;
+    right: 20%;
+    padding: 0px;
+    outline: none;
+    border: none;
+    height: 100%;
+    cursor: pointer;
+
+    background-color: transparent;
+}
+
+.validnum-box>.validnum-img {
+    margin: 0px;
+    position: absolute;
+    right: 20%;
+    bottom: 1px;
+    padding: 0px;
+    outline: none;
+    border: none;
+    height: 100%;
+    cursor: pointer;
+    width: 130px;
+    height: 40px;
+}
+
+/* ========================================
+   Glyphicons 字体图标
+   ======================================== */
+@font-face {
+    font-family: 'Glyphicons Halflings';
+    src: url('../fonts/glyphicons-halflings-regular.eot');
+    src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+.glyphicon {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.glyphicon-saved:before {
+    content: "\e168";
+}
+
+.glyphicon-ok:before {
+    content: "\e013";
+}
+
+.glyphicon-plus:before {
+    content: "\2b";
+}
+
+.glyphicon-minus:before {
+    content: "\2212";
+}
+
+.glyphicon-user:before {
+    content: "\e008";
+}
+
+.glyphicon-th-list:before {
+    content: "\e012";
+}
+
+.glyphicon-remove:before {
+    content: "\e014";
+}
+
+.glyphicon-zoom-in:before {
+    content: "\e015";
+}
+
+.glyphicon-zoom-out:before {
+    content: "\e016";
+}
+
+.glyphicon-off:before {
+    content: "\e017";
+}
+
+.glyphicon-cog:before {
+    content: "\e019";
+}
+
+.glyphicon-trash:before {
+    content: "\e020";
+}
+
+.glyphicon-home:before {
+    content: "\e021";
+}
+
+.glyphicon-file:before {
+    content: "\e022";
+}
+
+.glyphicon-time:before {
+    content: "\e023";
+}
+
+.glyphicon-refresh:before {
+    content: "\e031";
+}
+
+.glyphicon-lock:before {
+    content: "\e033";
+}
+
+.glyphicon-dashboard:before {
+    content: "\e141";
+}
+
+.glyphicon-flag:before {
+    content: "\e034";
+}
+
+.glyphicon-book:before {
+    content: "\e043";
+}
+
+.glyphicon-comment:before {
+    content: "\e111";
+}
+
+.glyphicon-bookmark:before {
+    content: "\e044";
+}
+
+.glyphicon-chevron-left:before {
+    content: "\e079";
+}
+
+.glyphicon-chevron-right:before {
+    content: "\e080";
+}
+
+.glyphicon-plus-sign:before {
+    content: "\e081";
+}
+
+.glyphicon-minus-sign:before {
+    content: "\e082";
+}
+
+.glyphicon-remove-sign:before {
+    content: "\e083";
+}
+
+.glyphicon-ok-sign:before {
+    content: "\e084";
+}
+
+.glyphicon-question-sign:before {
+    content: "\e085";
+}
+
+.glyphicon-info-sign:before {
+    content: "\e086";
+}
+
+.glyphicon-remove-circle:before {
+    content: "\e088";
+}
+
+.glyphicon-ok-circle:before {
+    content: "\e089";
+}
+
+.glyphicon-ban-circle:before {
+    content: "\e090";
+}
+
+.glyphicon-log-in:before {
+    content: "\e161";
+}
+
+.glyphicon-flash:before {
+    content: "\e162";
+}
+
+.glyphicon-edit:before {
+    content: "\e065";
+}
+
+.glyphicon-send:before {
+    content: "\e171";
+}
+
+.glyphicon-triangle-bottom:before {
+    content: "\e252";
+}
+
+.glyphicon-tasks:before {
+    content: "\e137";
+}
+
+.glyphicon-briefcase:before {
+    content: "\e139";
+}
+
+.glyphicon-triangle-top:before {
+    content: "\e253";
+}
+
+.glyphicon-map-marker:before {
+    content: "\e062";
+}
+
+.glyphicon-search:before {
+    content: "\e003";
+}
+
+.glyphicon-exclamation-sign:before {
+    content: "\e101";
+}
+
+.glyphicon-volume-down:before {
+    content: "\e037";
+}
+
+.glyphicon-chevron-down:before {
+    content: "\e114";
+}
+
+.glyphicon-option-horizontal:before {
+    content: "\e234";
+}
+
+.glyphicon-arrow-left:before {
+    content: "\e091";
+}
+
+.glyphicon-stats:before {
+    content: "\e185";
+}
+
+.glyphicon-shopping-cart:before {
+    content: "\e116";
+}
+
+.glyphicon-envelope:before {
+    content: "\2709";
+}
+
+.glyphicon-qrcode:before {
+    content: "\e039";
+}
+
+.glyphicon-resize-horizontal:before {
+    content: "\e120";
+}
+
+.glyphicon-heart:before {
+    content: "\e005";
+}
+
+.glyphicon-list:before {
+    content: "\e056";
+}
+
+.glyphicon-volume-up:before {
+    content: "\e038";
+}

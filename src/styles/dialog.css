@@ -1,0 +1,254 @@
+.signinfo {
+    position: absolute;
+    bottom: 1em;
+    color: #333;
+    font-size: 0.5rem;
+    left: 0px;
+    right: 0px;
+    text-align: center;
+}
+
+.signinfo>a {
+    color: #333;
+}
+
+.dialog {
+    width: 100%;
+    z-index: 10;
+}
+
+.dialog>.dialog-header {
+    height: 2.5em;
+    line-height: 2.5em;
+    background-color: #222;
+    padding-left: 0.5em;
+    display: flex;
+    flex-direction: row;
+}
+
+.dialog>.dialog-content {
+    overflow: auto;
+    width: 100%;
+}
+
+.dialog>.dialog-content .item-commands {
+    text-align: center;
+}
+
+
+.dialog>.dialog-header>.dialog-title {
+    color: #808000;
+    font-weight: bold;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.dialog>.dialog-header>.dialog-icon {
+    color: #808000;
+    margin-top: 0.65em;
+    margin-right: 0.25em;
+}
+
+.dialog>.dialog-header>.dialog-close {
+    line-height: 2em;
+    color: gray;
+    cursor: pointer;
+    font-size: 1.25em;
+    margin-right: 4px;
+}
+
+.dialog>.dialog-footer>.trade_btn {
+    float: right;
+    border-left: solid 1px gray;
+    display: inline-block;
+    text-align: center;
+    width: 120px;
+    height: 1.875em;
+    line-height: 1.875em;
+}
+
+.dialog>.dialog-footer>.ok {
+    color: #00FFFF;
+}
+
+
+.dialog>.dialog-footer {
+    background-color: #222;
+    white-space: nowrap;
+    height: 2.5em;
+    user-select: none;
+    line-height: 2.5em;
+}
+
+.dialog>.dialog-footer>.item-commands {
+    float: right;
+    margin-right: 2px;
+    padding-bottom: 0px;
+}
+
+.dialog>.dialog-footer>.item-commands>span {
+    height: 2em;
+    line-height: 2em;
+    padding: 0 0.5em 0 0.5em;
+    margin: 0;
+    margin-left: 1em;
+}
+
+.dialog>.dialog-footer>.footer-item {
+    color: #bdc3c7;
+    display: inline-block;
+    width: 5em;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+.dialog>.dialog-footer>.eq-group {
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
+    background-color: #111;
+    line-height: 2em;
+    margin-left: 1em;
+    margin-top: 0.25em;
+}
+
+.dialog>.dialog-footer>.channel-item {
+
+    width: 4em;
+}
+
+
+
+.dialog>.dialog-footer>.select {
+    background-color: #555;
+    color: #bdc3c7;
+}
+
+
+.dialog>.dialog-footer>.sk-group {
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
+    background-color: #111;
+    line-height: 2em;
+    margin-top: .25em;
+    margin-right: 0.5em;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+    float: right
+}
+
+.dialog-score {
+    min-width: 360px;
+    height: 29em;
+    padding-top: 0.5em;
+}
+
+.dialog-score>.score-section {
+    line-height: 1em;
+    padding-left: 0.5em;
+    border-radius: 4px;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: gray;
+    white-space: nowrap;
+    overflow-x: auto;
+    margin-bottom: 0.5em;
+    background-color: #111;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    position: relative;
+}
+
+
+.dialog-score .title {
+    width: 4.375em;
+    display: inline-block;
+    line-height: 1.25em;
+}
+
+.dialog-score .value {
+    width: 6em;
+    display: inline-block;
+    line-height: 1.25em;
+}
+
+.dialog-score h3 {
+    color: #C0C0C0;
+    margin: 0.625em;
+    border-top: 1px solid #343434;
+    border-bottom: 1px solid #343434;
+    font-size: 1em;
+    line-height: 2em;
+}
+
+.dialog-score2 {
+    min-width: 360px;
+    height: 29em;
+    padding-top: 0.5em;
+}
+
+.dialog-score2 .title {
+    width: 8em;
+    display: inline-block;
+    line-height: 1.6em;
+}
+
+.dialog-score2 .value {
+    display: inline-block;
+    line-height: 1.6em;
+    color: #00ff00;
+}
+
+.dialog-score2 h3 {
+    color: #C0C0C0;
+    margin: 0.625em;
+    border-top: 1px solid #343434;
+    border-bottom: 1px solid #343434;
+    font-size: 1em;
+}
+
+.dialog-titles {
+    min-width: 360px;
+    height: 29em;
+    padding-top: 0.5em;
+}
+
+.dialog-titles>.title-item {
+    line-height: 2em;
+    padding-left: 1.5em;
+    border-radius: 4px;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: gray;
+    white-space: nowrap;
+    overflow-x: auto;
+    margin-bottom: 0.5em;
+    background-color: #111;
+}
+
+.dialog-titles>.selected {
+    border-left-color: #00FF00;
+}
+
+.dialog-titles>.title-item>.btn-noused {
+    float: right;
+    display: inline-block;
+    color: #00ff00;
+    padding-left: 2em;
+    background-color: #343434;
+    padding-right: 2em;
+    border-left: 1px solid #121212;
+    cursor: pointer;
+}
+
+.dialog-titles>.empty {
+    color: gray;
+    padding-left: 1.4em;
+    line-height: 2em;
+}

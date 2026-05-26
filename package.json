@@ -1,0 +1,38 @@
+{
+  "name": "msmud",
+  "version": "0.0.1",
+  "description": "",
+  "main": "web.js",
+  "bin": "web.js",
+  "scripts": {
+    "web": "node web.js",
+    "web-debug": "node --inspect-brk web.js",
+    "mix": "node pack.js",
+    "os": "node main.js",
+    "os-debug": "node  --inspect-brk main.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "concurrently \"npm run web\" \"npm run os\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "jquery": "^4.0.0",
+    "json5": "^2.2.3",
+    "pino": "^9.7.0",
+    "pino-http": "^10.5.0",
+    "pino-roll": "^3.1.0",
+    "svg-captcha": "^1.4.0",
+    "vite": "^8.0.14"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
