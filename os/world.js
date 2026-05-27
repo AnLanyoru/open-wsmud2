@@ -110,14 +110,14 @@ WORLD = {
     /** @type {number} -1关闭 0正常 >1 用户等级>连接 */
     status: -1,
     /** 新socket接入计数 */
-    SocketIn: function () {
+    SocketIn() {
         this.SocketCount++;
     },
     /**
      * 处理客户端连接
      * @param {*} socket
      */
-    connect: function (socket) {
+    connect(socket) {
         if (WORLD.status < 0)
             return socket.end();
         if (!WORLD.check_connect(socket))
@@ -135,7 +135,7 @@ WORLD = {
      * @param {*} socket
      * @returns {boolean}
      */
-    check_connect: function (socket) {
+    check_connect(socket) {
         return true;
     },
     /**
@@ -143,7 +143,7 @@ WORLD = {
      * @param {USER} user
      * @returns {boolean}
      */
-    before_login: function (user) {
+    before_login(user) {
         if (this.status < 0) return false;
         if (this.status === 0) return true;
         return this.status <= user.user_level;
@@ -152,7 +152,7 @@ WORLD = {
      * 断开连接
      * @param {*} socket
      */
-    disconnect: function (socket) {
+    disconnect(socket) {
         if (socket.user) {
             socket.user.socket = null;
             socket.user.disconnect();
@@ -168,9 +168,9 @@ WORLD = {
      * @param {string} request - 命令字符串
      * @param {*} socket
      */
-    request: function (request, socket) {
+    request(request, socket) {
         if (!request) return;
-        var user = socket.user;
+        const user = socket.user;
         if (!user) {
             return;
         }
@@ -178,7 +178,7 @@ WORLD = {
             return user.send("不要急，慢慢来。");
         }
         user.request_count = user.request_count + 1;
-        var time = Date.now();
+        const time = Date.now();
         try {
             user.command(request);
         } catch (e) {
@@ -195,7 +195,7 @@ WORLD = {
         }
     },
     /** 保存请求日志 */
-    saveRequest: function () {
+    saveRequest() {
         db.saveRequest(WORLD.RECEIVED);
         WORLD.RECEIVED.length = 0;
     },
@@ -204,7 +204,7 @@ WORLD = {
      * @param {number} [sid] - 服务器ID
      * @returns {Promise<void>}
      */
-    startup: async function (sid) {
+    async startup(sid) {
         if (sid) {
             sid = parseInt(sid);
             this.SERVERS = await db.getServers();
@@ -235,8 +235,8 @@ WORLD = {
      * 向所有在线用户发送消息
      * @param {string} msg
      */
-    sendAll: function (msg) {
-        for (var i = 0; i < WORLD.USERS.length; i++) {
+    sendAll(msg) {
+        for (let i = 0; i < WORLD.USERS.length; i++) {
             WORLD.USERS[i].send(msg);
         }
     },
@@ -245,9 +245,9 @@ WORLD = {
      * @param {string|number} id
      * @returns {USER|undefined}
      */
-    getUser: function (id) {
+    getUser(id) {
         if (!id) return;
-        for (var i = 0; i < WORLD.USERS.length; i++) {
+        for (let i = 0; i < WORLD.USERS.length; i++) {
             if (WORLD.USERS[i].id == id) return WORLD.USERS[i];
         }
 
@@ -257,9 +257,9 @@ WORLD = {
      * @param {string} name
      * @returns {USER|undefined}
      */
-    find_user: function (name) {
+    find_user(name) {
         if (!name) return;
-        for (var i = 0; i < WORLD.USERS.length; i++) {
+        for (let i = 0; i < WORLD.USERS.length; i++) {
             if (WORLD.USERS[i].name == name) return WORLD.USERS[i];
         }
     },
@@ -267,44 +267,44 @@ WORLD = {
      * 用户登录事件回调
      * @param {USER} user
      */
-    on_user_login: function (user) {
+    on_user_login(user) {
 
     },
     /**
      * 跨服登录事件回调
      * @param {USER} user
      */
-    on_user_cross_login: function (user) {
+    on_user_cross_login(user) {
 
     },
     /** 服务器启动回调 */
-    on_startup: function () {
+    on_startup() {
 
     },
     /**
      * 用户退出事件回调
      * @param {USER} user
      */
-    on_user_quit: function (user) {
+    on_user_quit(user) {
 
     },
     /**
      * 用户重连事件回调
      * @param {USER} user
      */
-    on_user_relogin: function (user) {
+    on_user_relogin(user) {
 
     },
     /**
      * 心跳回调
      * @param {number} dt - 当前时间戳
      */
-    on_heart_beat: function (user) {
+    on_heart_beat(user) {
 
     },
     /** 服务器主心跳 */
-    heart_beat: function () {
-        var avtived_obj = null;
+    heart_beat() {
+        let avtived_obj = null;
         try {
             const dt = Date.now();
             WORLD.CONNECT_COUNT = 0;
@@ -334,7 +334,7 @@ WORLD = {
      * 用户登出处理
      * @param {USER} user
      */
-    login_out: function (user) {
+    login_out(user) {
         this.on_user_quit(user);
         if (user.serverid === WORLD.SERVERID) {
             user.save();
@@ -354,8 +354,8 @@ WORLD = {
      * 向所有用户广播消息
      * @param {string} text
      */
-    send: function (text) {
-        for (var i = 0; i < this.USERS.length; i++) {
+    send(text) {
+        for (let i = 0; i < this.USERS.length; i++) {
             this.USERS[i].send(text);
         }
     },
@@ -365,7 +365,7 @@ WORLD = {
      * @param {string} cmd
      * @param {string} msg
      */
-    log: function (user, cmd, msg) {
+    log(user, cmd, msg) {
         WORLD.LOGS.push({
             time: Date.now(),
             cmd: cmd,
@@ -378,7 +378,7 @@ WORLD = {
         }
     },
     /** 保存日志到文件 */
-    saveLog: function () {
+    saveLog() {
         db.saveLogs(WORLD.LOGS);
         WORLD.LOGS.length = 0;
     },
@@ -387,17 +387,17 @@ WORLD = {
      * @param {USER} user
      * @returns {boolean}
      */
-    is_server: function (user) {
+    is_server(user) {
         return user.serverid == WORLD.SERVERID;
     },
     /**
      * 保存所有数据
      * @returns {Promise<boolean>}
      */
-    save: async function () {
+    async save() {
 
-        var roles = [];
-        for (var i = 0; i < WORLD.USERS.length; i++) {
+        const roles = [];
+        for (let i = 0; i < WORLD.USERS.length; i++) {
             if (WORLD.USERS[i].serverid != WORLD.SERVERID) continue;
             roles.push(WORLD.USERS[i].getData());
         }
@@ -418,21 +418,21 @@ WORLD = {
         }
     },
     /** 生成堆内存快照 */
-    writeHeapSnapshot: function () {
-        let v8 = UTIL.require('v8');
-        let dt = new Date();
-        let fname = __PATH.DATA + "/" + dt.getFullYear() + "_" + dt.getMonth() + "_"
+    writeHeapSnapshot() {
+        const v8 = UTIL.require('v8');
+        const dt = new Date();
+        const fname = __PATH.DATA + "/" + dt.getFullYear() + "_" + dt.getMonth() + "_"
             + dt.getDate() + "_" + dt.getHours() + "_" + dt.getMinutes() + ".heapsnapshot";
         v8.writeHeapSnapshot(fname);
         console.log('快照保存到', fname);
     },
     /** 加载本地未保存的用户数据 */
-    loadLocalData: function () {
-        let data = db.getLocalRoles();
+    loadLocalData() {
+        const data = db.getLocalRoles();
         if (!data || !data.length) return;
         console.log("加载上次未保存的本地用户%d", data.length);
         for (let i = 0; i < data.length; i++) {
-            let user = new USER();
+            const user = new USER();
             user.loadData(data[i]);
             this.USERS.push(user);
         }
@@ -443,7 +443,7 @@ WORLD = {
      * @param {string} id - 用户ID
      * @param {string} sid - 服务器ID
      */
-    on_cross_response: function (id, sid) {
+    on_cross_response(id, sid) {
         //允许跨服
     },
     /**
@@ -451,7 +451,7 @@ WORLD = {
      * @param {string} id
      * @returns {boolean}
      */
-    can_cross: function (id) {
+    can_cross(id) {
         //允许跨服
     },
     /**
@@ -460,11 +460,11 @@ WORLD = {
      * @param {CHARACTER} killer
      * @param {CORPSE} corpse
      */
-    on_user_die: function (me, killer, corpse) {
+    on_user_die(me, killer, corpse) {
 
     },
     /** 资源加载完成回调 */
-    on_resource_loaded: function () {
+    on_resource_loaded() {
 
     }
 };
@@ -476,18 +476,18 @@ WORLD = {
  * @returns {number} 加载的文件数
  */
 function loadResource() {
-    let fs = require("fs");
+    const fs = require("fs");
     function readdir(basePath, path) {
         path = path || basePath;
-        let files = fs.readdirSync(path);
+        const files = fs.readdirSync(path);
         let count = 0;
         for (let i = 0; i < files.length; i++) {
-            let sub_path = path + files[i];
-            let stat = fs.statSync(sub_path);
+            const sub_path = path + files[i];
+            const stat = fs.statSync(sub_path);
             if (stat.isDirectory()) {
                 count += readdir(basePath, sub_path + "/");
             } else {
-                let fname = sub_path.replace(basePath, "").replace(".js", "");
+                const fname = sub_path.replace(basePath, "").replace(".js", "");
                 BASE.CREATE(basePath, fname);
                 count++;
             }

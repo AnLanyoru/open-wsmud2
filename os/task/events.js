@@ -2,61 +2,57 @@
  * EVENTS 活动事件管理
  */
 
-/** @type {function} */
-EVENTS = function () {
+EVENTS = class EVENTS extends BASE {
+    /**
+     * 添加/更新活动
+     * @param {{id: string, check: function(USER): boolean}} item - 活动对象
+     */
+    static add(item) {
+        if (!item || !item.id) return;
+        Object.setPrototypeOf(item, EVENT_BASE);
+        const items = WORLD.USER_EVENTS;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].id == item.id) {
+                items[i] = item;
+                return this.notify(item, 1);
+            }
+        }
+        items.push(item);
+        this.notify(item, 0);
+    }
 
-}
-EVENTS.inherits(BASE);
+    /** @type {string[]} 活动操作类型 */
+    static ACTIONS = ['add', 'update', 'finish'];
 
-/**
- * 添加/更新活动
- * @param {{id: string, check: function(USER): boolean}} item - 活动对象
- */
-EVENTS.add = function (item) {
-    if (!item || !item.id) return;
-    Object.setPrototypeOf(item, EVENT_BASE);
-    const items = WORLD.USER_EVENTS;
-    for (var i = 0; i < items.length; i++) {
-        if (items[i].id == item.id) {
-            items[i] = item;
-            return this.notify(item, 1);
+    /**
+     * 通知所有符合条件的玩家
+     * @param {{id: string, check: function(USER): boolean}} item - 活动
+     * @param {number} act - 操作索引(0添加 1更新 2完成)
+     */
+    static notify(item, act) {
+        const users = WORLD.USERS;
+        const msg = `{type: "dialog", dialog: "events",${EVENTS.ACTIONS[act]}:1}`;
+        for (let user of users) {
+            if (!user.socket) continue;
+            if (item.check && !item.check(user))
+                continue;
+            user.send(msg);
         }
     }
-    items.push(item);
-    this.notify(item, 0);
-}
 
-/** @type {string[]} 活动操作类型 */
-EVENTS.ACTIONS = ['add', 'update', 'finish'];
-
-/**
- * 通知所有符合条件的玩家
- * @param {{id: string, check: function(USER): boolean}} item - 活动
- * @param {number} act - 操作索引(0添加 1更新 2完成)
- */
-EVENTS.notify = function (item, act) {
-    let users = WORLD.USERS;
-    let msg = `{type: "dialog", dialog: "events",${EVENTS.ACTIONS[act]}:1}`;
-    for (let user of users) {
-        if (!user.socket) continue;
-        if (item.check && !item.check(user))
-            continue;
-        user.send(msg);
-    }
-}
-
-/**
- * 移除活动
- * @param {string} id - 活动ID
- * @returns {Array|undefined}
- */
-EVENTS.remove = function (id) {
-    if (!id) return;
-    const items = WORLD.USER_EVENTS;
-    for (var i = 0; i < items.length; i++) {
-        if (items[i].id == id) {
-            EVENTS.notify(items[i], 2);
-            return items.splice(i, 1);
+    /**
+     * 移除活动
+     * @param {string} id - 活动ID
+     * @returns {Array|undefined}
+     */
+    static remove(id) {
+        if (!id) return;
+        const items = WORLD.USER_EVENTS;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].id == id) {
+                EVENTS.notify(items[i], 2);
+                return items.splice(i, 1);
+            }
         }
     }
 }
@@ -70,11 +66,11 @@ EVENTS.remove = function (id) {
  */
 const EVENT_BASE = {
     /** @returns {string} */
-    query_desc: function () {
+    query_desc() {
         return this.desc;
     },
     /** @returns {number} */
-    query_grade: function () {
+    query_grade() {
         return this.grade;
     }
 };

@@ -30,7 +30,7 @@ const DB = __CONFIG.DB;
  */
 module.exports = {
     /** 关闭数据库连接 */
-    close: function () {
+    close() {
         return DB.close();
     },
     /**
@@ -39,7 +39,7 @@ module.exports = {
      * @param {number} server
      * @returns {Promise<Array<*>>}
      */
-    getRoles: function (userid, server) {
+    getRoles(userid, server) {
         return DB.getRoles(userid, server);
     },
     /**
@@ -47,7 +47,7 @@ module.exports = {
      * @param {*} role
      * @returns {Promise<*>}
      */
-    addRole: async function (role) {
+    async addRole(role) {
         return await DB.addRole(role);
     },
     /**
@@ -56,7 +56,7 @@ module.exports = {
      * @param {string} roleid
      * @returns {Promise<*>}
      */
-    deleteRole: function (userid, roleid) {
+    deleteRole(userid, roleid) {
         return DB.deleteRole(userid, roleid);
     },
     /**
@@ -64,7 +64,7 @@ module.exports = {
      * @param {*} role
      * @returns {Promise<*>}
      */
-    saveRole: function (role) {
+    saveRole(role) {
         return DB.saveRole(role);
     },
     /**
@@ -72,7 +72,7 @@ module.exports = {
      * @param {Array<{id: string, name: string, userid: number, title: string, level: number, data: string}>} roles
      * @returns {Promise<void>}
      */
-    saveRoles: async function (roles) {
+    async saveRoles(roles) {
         const dt = new Date();
         const path = __PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
         const stream = fs_sync.createWriteStream(path, { flags: 'a' });
@@ -96,7 +96,7 @@ module.exports = {
      * @param {*} stream - 写入流
      * @param {{id: string, name: string, userid: number, title: string, level: number, data: string}} role
      */
-    localBak: function (stream, role) {
+    localBak(stream, role) {
         stream.write('{id:"');
         stream.write(role.id);
         stream.write('",name:"');
@@ -116,13 +116,13 @@ module.exports = {
      * @param {Array<{time: number, user: string, cmd: string}>} recs
      * @returns {Promise<void>}
      */
-    saveRequest: function (recs) {
-        var dt = new Date();
-        var f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-        var path = __PATH.DATA + "req/request" + f + ".txt";
-        var ary = [];
-        for (var i = 0; i < recs.length; i++) {
-            var r = recs[i];
+    saveRequest(recs) {
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const path = __PATH.DATA + "req/request" + f + ".txt";
+        const ary = [];
+        for (let i = 0; i < recs.length; i++) {
+            const r = recs[i];
             ary.push(r.time);
             ary.push(" ");
             ary.push(r.user);
@@ -137,13 +137,13 @@ module.exports = {
      * @param {Array<{time: number, user: string, cmd: string, msg: string}>} logs
      * @returns {Promise<void>}
      */
-    saveLogs: function (logs) {
-        var dt = new Date();
-        var f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-        var path = __PATH.DATA + "log/log" + f + ".txt";
-        var ary = [];
-        for (var i = 0; i < logs.length; i++) {
-            var r = logs[i];
+    saveLogs(logs) {
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const path = __PATH.DATA + "log/log" + f + ".txt";
+        const ary = [];
+        for (let i = 0; i < logs.length; i++) {
+            const r = logs[i];
             ary.push(r.time);
             ary.push(" ");
             ary.push(r.user);
@@ -160,11 +160,11 @@ module.exports = {
      * @param {string} content
      * @returns {Promise<void>}
      */
-    saveData: async function (content) {
-        let path = __PATH.DATA + "data.js";
-        let dt = new Date();
-        var f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-        let _dst = __PATH.DATA + "/temp/temp" + f + ".js";
+    async saveData(content) {
+        const path = __PATH.DATA + "data.js";
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const _dst = __PATH.DATA + "/temp/temp" + f + ".js";
         await fs.copyFile(path, _dst);
         return fs.writeFile(path, content);
     },
@@ -172,8 +172,8 @@ module.exports = {
      * 读取全局数据
      * @returns {Promise<*>}
      */
-    readData: async function () {
-        let path = __PATH.DATA + "data.js";
+    async readData() {
+        const path = __PATH.DATA + "data.js";
         try {
             const data = await fs.readFile(path);
             return JSON.toObject(data);
@@ -187,7 +187,7 @@ module.exports = {
      * @param {string} id
      * @returns {*}
      */
-    getRoleData: function (userid, id) {
+    getRoleData(userid, id) {
 
         return DB.getData(userid, id);
     },
@@ -197,7 +197,7 @@ module.exports = {
      * @param {string} name
      * @returns {*}
      */
-    change_name: function (id, name) {
+    change_name(id, name) {
         return DB.updateRoleName(id, name);
     },
     /**
@@ -207,7 +207,7 @@ module.exports = {
      * @param {number} touserid
      * @returns {*}
      */
-    change_userid: function (id, fromuserid, touserid) {
+    change_userid(id, fromuserid, touserid) {
         return DB.updateUserid(id, fromuserid, touserid);
     },
     /**
@@ -215,7 +215,7 @@ module.exports = {
      * @param {string} path
      * @returns {Promise<boolean>}
      */
-    check_file: async function (path) {
+    async check_file(path) {
         try {
             await fs.access(path)
             return true;
@@ -227,7 +227,7 @@ module.exports = {
      * 初始化数据目录(创建备份目录、复制默认数据)
      * @returns {Promise<void>}
      */
-    initDataDir: async function () {
+    async initDataDir() {
         __PATH.BASE_DATA = __PATH.DATA;
         __PATH.DATA = __PATH.DATA + WORLD.SERVERID + "/";
 
@@ -235,12 +235,12 @@ module.exports = {
             console.log('创建备份文件夹....');
             await fs.mkdir(__PATH.DATA);
         }
-        var paths = await fs.readdir(__PATH.DEF_DATA);
-        for (var i = 0; i < paths.length; i++) {
-            var _src = __PATH.DEF_DATA + paths[i];
-            var _dst = __PATH.DATA + paths[i];
+        const paths = await fs.readdir(__PATH.DEF_DATA);
+        for (let i = 0; i < paths.length; i++) {
+            const _src = __PATH.DEF_DATA + paths[i];
+            const _dst = __PATH.DATA + paths[i];
             if (!await this.check_file(_dst)) {
-                var stat = await fs.stat(_src);
+                const stat = await fs.stat(_src);
                 if (stat.isFile()) {
                     await fs.copyFile(_src, _dst);
                     console.log('创建备份文件 ', _dst, "....");
@@ -256,8 +256,7 @@ module.exports = {
      * 获取服务器列表
      * @returns {*}
      */
-    getServers: function () {
+    getServers() {
         return DB.getServers();
     }
 };
-

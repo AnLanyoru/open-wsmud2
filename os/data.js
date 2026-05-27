@@ -27,9 +27,9 @@ module.exports = {
      * 保存全局数据
      * @returns {Promise<*>}
      */
-    save: function () {
+    save() {
 
-        let str = ["{"];
+        const str = ["{"];
         this.save_temp(str);
         this.on_save(str);
         str.push('}');
@@ -41,7 +41,7 @@ module.exports = {
      * @param {*} value
      * @returns {*}
      */
-    temp_replacer: function (key, value) {
+    temp_replacer(key, value) {
         if (value.e) {
 
         }
@@ -52,14 +52,14 @@ module.exports = {
      * 保存临时数据
      * @param {string[]} str - 输出数组
      */
-    save_temp: function (str) {
+    save_temp(str) {
         str.push('temp:', JSON.stringify(this.temp));
     },
     /**
      * 加载全局数据
      * @returns {Promise<void>}
      */
-    load: async function () {
+    async load() {
         const data = await WORLD.DB.readData(__PATH.DATA + "data.js");
         this.temp = data.temp ?? {};
         this.on_load(data);
@@ -70,9 +70,9 @@ module.exports = {
      * @param {*} [def] - 默认值
      * @returns {*}
      */
-    query_temp: function (name, def) {
+    query_temp(name, def) {
         if (!this.temp) return;
-        let item = this.temp[name];
+        const item = this.temp[name];
         if (item && item.e) {
             if (Date.now() <= item.e) {
                 return item.v;
@@ -88,7 +88,7 @@ module.exports = {
      * @param {*} value - 值
      * @param {number} [time] - 有效期(毫秒)
      */
-    set_temp: function (name, value, time) {
+    set_temp(name, value, time) {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -103,7 +103,7 @@ module.exports = {
      * 移除临时数据
      * @param {string} name
      */
-    remove_temp: function (name) {
+    remove_temp(name) {
         if (!this.temp) return;
         this.temp[name] = null;
     },
@@ -115,9 +115,9 @@ module.exports = {
      * @param {number} [time] - 有效期(毫秒)
      * @returns {number} 累加后的值
      */
-    add_temp: function (name, value, time) {
+    add_temp(name, value, time) {
         if (!this.temp) this.temp = {};
-        let old = this.temp[name];
+        const old = this.temp[name];
         if (time) {
             if (old && old.e) {
                 time = Date.now() + time;
@@ -130,7 +130,7 @@ module.exports = {
                 }
                 return old.v;
             } else {
-                let v = value + (old || 0);
+                const v = value + (old || 0);
                 this.temp[name] = {
                     v: v,
                     e: Date.now() + time
@@ -138,7 +138,7 @@ module.exports = {
                 return v;
             }
         } else {
-            let v = value + (old || 0);
+            const v = value + (old || 0);
             this.temp[name] = v;
             return v;
         }
@@ -151,7 +151,7 @@ module.exports = {
     /**
      * 清除统计数据
      */
-    clear_data: function () {
+    clear_data() {
         this.temp_data = {};
     },
     /**
@@ -160,7 +160,7 @@ module.exports = {
      * @param {USER} user - 用户对象
      * @param {number} val - 累加值
      */
-    add_data: function (key, user, val) {
+    add_data(key, user, val) {
         if (!val) return;
         let data = this.temp_data[key];
         if (!data) data = this.temp_data[key] = {};
@@ -173,12 +173,12 @@ module.exports = {
      * @param {string} key
      * @returns {{name: string, value: number}|undefined}
      */
-    query_max_data: function (key) {
-        let data = this.temp_data[key];
+    query_max_data(key) {
+        const data = this.temp_data[key];
         if (!data) return;
         let userData = null;
         for (let key in data) {
-            let item = data[key];
+            const item = data[key];
             if (!userData) userData = item;
             else if (item.value > userData.value) {
                 userData = item;
@@ -191,12 +191,12 @@ module.exports = {
      * @param {string} key
      * @returns {{name: string, value: number}|undefined}
      */
-    query_min_data: function (key) {
-        let data = this.temp_data[key];
+    query_min_data(key) {
+        const data = this.temp_data[key];
         if (!data) return;
         let userData = null;
         for (let key in data) {
-            let item = data[key];
+            const item = data[key];
             if (!userData) userData = item;
             else if (item.value < userData.value) {
                 userData = item;
@@ -205,4 +205,3 @@ module.exports = {
         return userData;
     }
 };
-

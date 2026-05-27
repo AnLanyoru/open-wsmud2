@@ -2,7 +2,7 @@
  * 登录/会话解密模块
  */
 
-var crypto = require('crypto');
+const crypto = require('crypto');
 /**
  * @type {{
  *   max_idcount: number,
@@ -21,7 +21,7 @@ module.exports = {
      * @param {boolean} [close=true] - 是否关闭连接
      * @returns {boolean} false
      */
-    login_error: function (user, msg, close = true) {
+    login_error(user, msg, close = true) {
         user.send(`{type:'loginerror',msg:'${msg}'}`);
         if (close)
             user.socket?.end();
@@ -33,17 +33,17 @@ module.exports = {
      * @param {string} session - Base64编码的加密会话数据
      * @returns {{id: number, name: string, pwd: string, loginTime: number, level: number}|null} 解密失败返回null
      */
-    encryptUser: function (key, session) {
+    encryptUser(key, session) {
         if (!key || !session) return null;
         if (key.length >= 16) key = key.substr(0, 16);
         try {
             key = Buffer.from(key, 'utf8');
-            var decipher = crypto.createDecipheriv('aes-128-cbc', key, __CONFIG.DESIV);
-            var txt = decipher.update(session, 'base64', 'utf8');
+            const decipher = crypto.createDecipheriv('aes-128-cbc', key, __CONFIG.DESIV);
+            let txt = decipher.update(session, 'base64', 'utf8');
             txt += decipher.final('utf8');
-            var str = txt.split("%");
+            const str = txt.split("%");
             if (str.length !== 5) return null;
-            var id = parseInt(str[0]);
+            const id = parseInt(str[0]);
             if (id > 0)
                 return {
                     id: id,

@@ -20,7 +20,7 @@ Function.prototype.inherits = function (superCtor) {
  * @returns {boolean} 是否成功移除
  */
 Array.prototype.remove = function (item) {
-    for (var i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
         if (this[i] == item) {
             this.splice(i, 1);
             return true;
@@ -34,7 +34,7 @@ Array.prototype.remove = function (item) {
  * @returns {boolean}
  */
 Array.prototype.contain = function (item) {
-    for (var i = 0; i < this.length; i++) {
+    for (let i = 0; i < this.length; i++) {
         if (this[i] === item) {
             return true;
         }
@@ -93,18 +93,18 @@ JSON.toObject = function (str) {
  */
 UTIL = {
     /** 空函数占位 */
-    empty: function () {
+    empty() {
     },
     /**
      * require模块
      * @param {string} str
      * @returns {*}
      */
-    require: function (str) {
+    require(str) {
         return require(str);
     },
     /** @returns {boolean} */
-    is_gift: function () {
+    is_gift() {
         return false;
     },
     /**
@@ -114,7 +114,7 @@ UTIL = {
      * @param {number} [rate=86400000] - 周期(毫秒)
      * @returns {number}
      */
-    wrandom: function (me, max, rate = 86400000) {
+    wrandom(me, max, rate = 86400000) {
         let key = parseInt(me.id[0], 36);
         if (!(key >= 0)) key = 1;
         let time = Math.floor(Date.now() / rate) + key;
@@ -125,9 +125,9 @@ UTIL = {
      * @param {number} value - 以铜板为单位的数值
      * @returns {string}
      */
-    moneyToStr: function (value) {
+    moneyToStr(value) {
         if (!value) return "";
-        var str = [];
+        const str = [];
         if (value >= 10000) {
             str.push(parseInt(value / 10000) + "两<hiy>黄金</hiy>");
             value = value % 10000;
@@ -146,8 +146,8 @@ UTIL = {
      * @param {number} time - 毫秒数
      * @returns {string}
      */
-    timeSpan: function (time) {
-        let str = [];
+    timeSpan(time) {
+        const str = [];
         if (time > 86400000) {
             str.push(Math.floor(time / 86400000), '天');
             time = time % 86400000;
@@ -174,13 +174,13 @@ UTIL = {
      * @param {number} num
      * @returns {string}
      */
-    to_c: function (num) {
+    to_c(num) {
         if (!num) return "";
-        var str = "";
-        var count = 0;
-        var add = 0;//0=0,1=数 2=百十千 3=万亿
+        let str = "";
+        let count = 0;
+        let add = 0;//0=0,1=数 2=百十千 3=万亿
         while (num) {
-            var d = num % 10;
+            let d = num % 10;
             if (count) {
                 if (count % 4 == 0 && add != 3) {
                     str = UTIL.C_STR3[count / 4] + str;
@@ -208,7 +208,7 @@ UTIL = {
      * @param {string} str
      * @returns {string}
      */
-    htmlEncode: function (str) {
+    htmlEncode(str) {
         if (!str) return str;
         return str.replace(/>/g, "&gt;")
             .replace(/</g, "&lt;")
@@ -220,11 +220,11 @@ UTIL = {
      * @param {number} [count=1] - 系数
      * @returns {string}
      */
-    prop_toString: function (prop, sp, count) {
+    prop_toString(prop, sp, count) {
         if (!prop) return "";
-        var str = [];
+        const str = [];
         count = count || 1;
-        for (var item in prop) {
+        for (let item in prop) {
             switch (item) {
                 case "desc":
                 case "desc1":
@@ -287,9 +287,9 @@ UTIL = {
                         str.push(PROPERTIES[item] + "：" + (prop[item] * count) + "%");
                     break;
                 case "skill":
-                    var skills = prop[item];
-                    for (var sk in skills) {
-                        var sk_base = SKILL.get(sk);
+                    let skills = prop[item];
+                    for (let sk in skills) {
+                        let sk_base = SKILL.get(sk);
                         if (sk_base)
                             str.push(sk_base.name + "：+" + skills[sk] + "级");
                     }
@@ -331,11 +331,11 @@ UTIL = {
      * @param {number} [next_hour=5] - 重置小时
      * @returns {number} 毫秒数
      */
-    diff_time: function (next_hour) {
+    diff_time(next_hour) {
         next_hour = next_hour || 5;
-        var dt = new Date();
-        var hour = dt.getHours();
-        var day = dt.getDate();
+        let dt = new Date();
+        let hour = dt.getHours();
+        let day = dt.getDate();
         if (hour >= next_hour) day = day + 1;
         dt = new Date(dt.getFullYear(), dt.getMonth(), day, next_hour);
         return dt - Date.now();
@@ -345,15 +345,15 @@ UTIL = {
      * @param {number} [next_hour=5]
      * @returns {number} 毫秒数
      */
-    diff_week_time: function (next_hour) {
+    diff_week_time(next_hour) {
         next_hour = next_hour || 5;
-        var date = new Date();
-        var week = date.getDay();
+        const date = new Date();
+        let week = date.getDay();
         week = week == 0 ? 1 : 8 - week;
         if (week == 7 && date.getHours() < next_hour) {
             week = 0;
         }
-        var next_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + week, next_hour);
+        const next_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + week, next_hour);
 
 
         return next_date - Date.now();
@@ -363,15 +363,15 @@ UTIL = {
      * @param {number} [next_hour=5]
      * @returns {number} 毫秒数
      */
-    diff_month_time: function (next_hour) {
+    diff_month_time(next_hour) {
         next_hour = next_hour || 5;
-        var date = new Date();
+        let date = new Date();
 
         if (date.getDate() > 1 || date.getHours() >= next_hour) {
             date = new Date(date.setMonth(date.getMonth() + 1, 1));
         }
 
-        var next_date = new Date(date.getFullYear(), date.getMonth(), 1, next_hour);
+        const next_date = new Date(date.getFullYear(), date.getMonth(), 1, next_hour);
 
         return next_date - Date.now();
     },
@@ -381,7 +381,7 @@ UTIL = {
      * 记录日志
      * @param {string} msg
      */
-    log: function (msg) {
+    log(msg) {
 
         this.logs.push({
             dt: Date.now,
@@ -389,16 +389,16 @@ UTIL = {
         });
     },
     /** 保存日志到文件 */
-    saveLog: function () {
+    saveLog() {
         if (!this.logs) return;
 
-        var fs = require("fs");
-        var dt = new Date();
-        var path = __PATH.DATA + "log/";
+        const fs = require("fs");
+        const dt = new Date();
+        const path = __PATH.DATA + "log/";
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
         }
-        var file = path + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".log";
+        const file = path + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".log";
         fs.writeFileSync(path, JSON.stringify(this.logs));
     },
     /** @type {string} ID字符集 */
@@ -409,9 +409,9 @@ UTIL = {
      * 创建对象ID
      * @returns {string}
      */
-    create_id: function () {
-        var str = [];
-        for (var i = 0; i < 4; i++) {
+    create_id() {
+        const str = [];
+        for (let i = 0; i < 4; i++) {
             str.push(this.idstr[parseInt(Math.random() * this.idstr.length)]);
         }
         str.push(parseInt((Date.now() - this.begin) / 1000).toString(16));
@@ -423,11 +423,11 @@ UTIL = {
      * @param {number} [t] - 名字字数(1或2)
      * @returns {string}
      */
-    random_name: function (s, t) {
+    random_name(s, t) {
         t = t || (parseInt(Math.random() * 2) + 1);
-        var str = [];
+        const str = [];
         if (t == 2) {
-            var key = parseInt(Math.random() * this.name0.length);
+            let key = parseInt(Math.random() * this.name0.length);
             if (key % 2 == 1) key -= 1;
             str.push(this.name0[key++]);
             str.push(this.name0[key]);
@@ -462,13 +462,13 @@ UTIL = {
      * @param {Date} [date] - 公历日期，默认今天
      * @returns {{year: number, month: number, day: number, isLeap: boolean}}
      */
-    getLunar: function (date) {
+    getLunar(date) {
         date = date || new Date();
-        var lunarInfo = new Array(0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, 0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0, 0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6, 0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0, //1990
+        const lunarInfo = new Array(0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, 0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, 0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, 0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, 0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, 0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0, 0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, 0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6, 0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, 0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0, //1990
             0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, 0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, 0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, 0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, 0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0, 0x14b63);
         /** @param {number} y @returns {number} */
         function lYearDays(y) {
-            var i, sum = 348;
+            let i, sum = 348;
             for (i = 0x8000; i > 0x8; i >>= 1) sum += (lunarInfo[y - 1900] & i) ? 1 : 0;
             return (sum + leapDays(y));
         }
@@ -487,9 +487,9 @@ UTIL = {
         }
         /** @param {number} y @param {number} m @param {number} d @constructor */
         function Lunar(y, m, d) {
-            var i, leap = 0,
+            let i, leap = 0,
                 temp = 0;
-            var offset = (Date.UTC(y, m, d) - Date.UTC(1900, 0, 31)) / 86400000;
+            let offset = (Date.UTC(y, m, d) - Date.UTC(1900, 0, 31)) / 86400000;
             for (i = 1900; i < 2050 && offset > 0; i++) {
                 temp = lYearDays(i);
                 offset -= temp;
@@ -531,12 +531,12 @@ UTIL = {
      * @param {Date} [dt]
      * @returns {boolean}
      */
-    isLunar15: function (dt) {
+    isLunar15(dt) {
         let issuc = WORLD.DATA.query_temp('lunar15', 0);
         if (issuc === 0) {
             let now = dt || new Date();
             let hour = now.getHours();
-            var lunar = UTIL.getLunar(now);
+            let lunar = UTIL.getLunar(now);
             if ((lunar.day === 14 && hour >= 5) || lunar.day === 15
                 || (lunar.day === 16 && hour < 5)) {
 

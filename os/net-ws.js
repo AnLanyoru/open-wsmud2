@@ -3,64 +3,67 @@
  * 支持多种WebSocket协议版本及原始TCP
  */
 "use strict";
-var crypto = require('crypto');
-var fs = require("fs");
+const crypto = require('crypto');
+const fs = require("fs");
 
 /**
- * WebSocket/TCP 服务器构造函数
- * @param {{SSL: boolean, KEY: string, CERT: string, PASSWORD: string}} options - SSL配置
- * @constructor
+ * WebSocket/TCP 服务器
  */
-function wsServer(options) {
-    var evt = ["Close", "Error", "SocketIn", "Connect", "Receive",
-        "ClientError", "ClientClose", "ClientTimeout"];
-    for (var i = 0; i < evt.length; i++) {
-        this["on" + evt[i]] = function () {
+class wsServer {
+    /**
+     * @param {{SSL: boolean, KEY: string, CERT: string, PASSWORD: string}} options - SSL配置
+     */
+    constructor(options) {
+        const evt = ["Close", "Error", "SocketIn", "Connect", "Receive",
+            "ClientError", "ClientClose", "ClientTimeout"];
+        for (let i = 0; i < evt.length; i++) {
+            this["on" + evt[i]] = function () {
+            }
         }
+        this.options = options.SSL ? {
+            key: fs.readFileSync(options.KEY),
+            cert: fs.readFileSync(options.CERT),
+            requestCert: true,
+            rejectUnauthorized: true,
+            passphrase: options.PASSWORD,
+            ca: [fs.readFileSync(options.CERT)]
+        } : null;
+        this.ssl = options.SSL;
     }
-    this.options = options.SSL ? {
-        key: fs.readFileSync(options.KEY),
-        cert: fs.readFileSync(options.CERT),
-        requestCert: true,
-        rejectUnauthorized: true,
-        passphrase: options.PASSWORD,
-        ca: [fs.readFileSync(options.CERT)]
-    } : null;
-    this.ssl = options.SSL;
-}
 
-/**
- * 启动监听
- * @param {number} port - 端口号
- * @param {function} func - 启动成功回调
- */
-wsServer.prototype.listen = function (port, func) {
+    /**
+     * 启动监听
+     * @param {number} port - 端口号
+     * @param {function} func - 启动成功回调
+     */
+    listen(port, func) {
 
-    var net = require(this.ssl ? 'tls' : 'net');
-    var tcpserver = net.createServer(this.options, onClientConnect.bind(this));
-    tcpserver.listen(port, func);
-    tcpserver.on('close', this.onClose.bind(this));
-    tcpserver.on('error', this.onError.bind(this));
-    this.tcpServer = tcpserver;
-}
+        const net = require(this.ssl ? 'tls' : 'net');
+        const tcpserver = net.createServer(this.options, onClientConnect.bind(this));
+        tcpserver.listen(port, func);
+        tcpserver.on('close', this.onClose.bind(this));
+        tcpserver.on('error', this.onError.bind(this));
+        this.tcpServer = tcpserver;
+    }
 
-/**
- * 发送消息到socket
- * @param {string} msg
- * @param {*} socket
- */
-wsServer.prototype.send = function (msg, socket) {
-    socket.send(msg);
-}
+    /**
+     * 发送消息到socket
+     * @param {string} msg
+     * @param {*} socket
+     */
+    send(msg, socket) {
+        socket.send(msg);
+    }
 
-/**
- * 关闭服务器
- * @returns {Promise<void>}
- */
-wsServer.prototype.close = function () {
-    return new Promise((resolve) => {
-        this.tcpServer.close(resolve);
-    });
+    /**
+     * 关闭服务器
+     * @returns {Promise<void>}
+     */
+    close() {
+        return new Promise((resolve) => {
+            this.tcpServer.close(resolve);
+        });
+    }
 }
 
 module.exports = wsServer;
@@ -77,7 +80,7 @@ function onClientConnect(socket) {
     }
     socket.on('close', this.onClientClose.bind(this, socket));
     socket.on('error', this.onClientError.bind(this, socket));
-    var $this = this;
+    const $this = this;
     socket.setTimeout(3000);
     socket.on('timeout', this.onClientTimeout.bind(this, socket));
     $this.onSocketIn(socket);
@@ -85,7 +88,7 @@ function onClientConnect(socket) {
         if (socket.protocol) {
             socket.protocol.readData(data, socket, $this);
         } else {
-            var header = readHeader(data);
+            const header = readHeader(data);
             socket.requestHeader = header;
             if (header["Sec-WebSocket-Key"]) {
                 socket.protocol = protocols.var1;
@@ -110,7 +113,7 @@ function onClientConnect(socket) {
  *   tcp: {readData: function, sendData: function}
  * }}
  */
-var protocols = {
+const protocols = {
     /** WebSocket 协议版本13 (RFC 6455) */
     var1: {
         /**
@@ -118,15 +121,15 @@ var protocols = {
          * @param {Object<string, string>} header - HTTP头部
          * @param {*} socket
          */
-        handShake: function (header, socket) {
-            var hasher = crypto.createHash("sha1");
+        handShake(header, socket) {
+            const hasher = crypto.createHash("sha1");
             hasher.update(header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-            var hashmsg = hasher.digest().toString('base64');
-            var origin = header.Origin;
-            var protocol = header['sec-websocket-protocol'];
+            const hashmsg = hasher.digest().toString('base64');
+            const origin = header.Origin;
+            let protocol = header['sec-websocket-protocol'];
             if (protocol)
                 protocol.split(/, */);
-            var respon = ["HTTP/1.1 101 Switching Protocols",
+            const respon = ["HTTP/1.1 101 Switching Protocols",
                 "Connection: Upgrade",
                 "Upgrade: WebSocket",
                 `Sec-WebSocket-Accept:${hashmsg}`,
@@ -141,13 +144,13 @@ var protocols = {
          * @param {*} socket
          * @param {wsServer} server
          */
-        readData: function (data, socket, server) {
-            var start = 0;
+        readData(data, socket, server) {
+            let start = 0;
             while (start < data.length) {
-                var iseof = (data[start] >> 7) > 0;
-                var frameType = data[start++] & 0xF;
-                var hasMask = (data[start] >> 7) > 0;
-                var length = (data[start++] & 0x7F);
+                const iseof = (data[start] >> 7) > 0;
+                const frameType = data[start++] & 0xF;
+                const hasMask = (data[start] >> 7) > 0;
+                let length = (data[start++] & 0x7F);
                 if (length == 126) {
                     length = data.readUInt16BE(start);
                     start = start + 2;
@@ -157,7 +160,7 @@ var protocols = {
                     start = start + 4;
                     return;
                 }
-                var markIndex = start;
+                const markIndex = start;
                 start = start + 4;
                 for (let i = 0; i < length; i++) {
                     data[start] = data[start] ^ data[markIndex + (i % 4)];
@@ -174,7 +177,7 @@ var protocols = {
                     case FrameTypes.Pong:
                         break;
                     case FrameTypes.Text:
-                        var msg = data.toString("utf8", markIndex + 4, markIndex + 4 + length);
+                        const msg = data.toString("utf8", markIndex + 4, markIndex + 4 + length);
                         server.onReceive(msg, socket);
                         break;
                     default:
@@ -187,10 +190,10 @@ var protocols = {
          * @param {string} text
          * @param {*} socket
          */
-        sendData: function (text, socket) {
-            var textBuffer = Buffer.from(text);
-            var length = textBuffer.length;
-            var data;
+        sendData(text, socket) {
+            const textBuffer = Buffer.from(text);
+            const length = textBuffer.length;
+            let data;
             if (length < 126) {
                 data = Buffer.alloc(length + 2);
                 data[0] = 129;
@@ -221,21 +224,21 @@ var protocols = {
          * @param {*} socket
          * @param {Buffer} buffer
          */
-        handShake: function (header, socket, buffer) {
-            var key1 = header["Sec-WebSocket-Key1"];
-            var key2 = header["Sec-WebSocket-Key2"];
+        handShake(header, socket, buffer) {
+            const key1 = header["Sec-WebSocket-Key1"];
+            const key2 = header["Sec-WebSocket-Key2"];
 
-            var origin = header["Origin"];
+            const origin = header["Origin"];
 
-            var n1 = getNumber(key1);
+            let n1 = getNumber(key1);
             n1 = parseInt(n1);
             n1 = n1 / getSpace(key1);
 
-            var n2 = getNumber(key2);
+            let n2 = getNumber(key2);
             n2 = parseInt(n2);
             n2 = n2 / getSpace(key2);
 
-            var buf = Buffer.alloc(16);
+            const buf = Buffer.alloc(16);
 
             buf.writeIntBE(n1, 0, 4, true);
 
@@ -243,12 +246,12 @@ var protocols = {
 
             buffer.copy(buf, 8, buffer.length - 8, buffer.length);
 
-            var hasherbs = crypto.createHash("md5");
+            let hasherbs = crypto.createHash("md5");
             hasherbs = hasherbs.update(buf);
             hasherbs = hasherbs.digest();
 
-            var host = "ws://" + header["Host"] + "/";
-            var headers = [
+            const host = "ws://" + header["Host"] + "/";
+            const headers = [
                 "HTTP/1.1 101 WebSocket Protocol Handshake",
                 "Upgrade: WebSocket",
                 "Connection: Upgrade",
@@ -266,17 +269,17 @@ var protocols = {
          * @param {*} socket
          * @param {wsServer} server
          */
-        readData: function (data, socket, server) {
-            var start = 0;
+        readData(data, socket, server) {
+            let start = 0;
             while (start < data.length) {
                 if (data[start] != 0) {
                     break;//error
                 }
-                var end = start + 1;
+                let end = start + 1;
                 while (data[end] != 255 && end < data.length) {
                     end++;
                 }
-                var msg = data.toString("utf8", start + 1, end);
+                const msg = data.toString("utf8", start + 1, end);
                 server.onReceive(msg, socket);
                 start = end + 1;
             }
@@ -285,11 +288,11 @@ var protocols = {
          * @param {string} text
          * @param {*} socket
          */
-        sendData: function (text, socket) {
-            var textBuffer = Buffer.from(text, "utf-8");
-            var length = textBuffer.length;
+        sendData(text, socket) {
+            const textBuffer = Buffer.from(text, "utf-8");
+            const length = textBuffer.length;
 
-            var wrappedBytes = Buffer.alloc(length + 2);
+            const wrappedBytes = Buffer.alloc(length + 2);
             wrappedBytes[0] = 0;
             textBuffer.copy(wrappedBytes, 1);
             wrappedBytes[wrappedBytes.length - 1] = 255;
@@ -303,9 +306,9 @@ var protocols = {
          * @param {*} socket
          * @param {wsServer} server
          */
-        readData: function (data, socket, server) {
+        readData(data, socket, server) {
 
-            var start = 0;
+            let start = 0;
             if (socket.unread_data) {
                 data = Buffer.concat([socket.unread_data, data], socket.unread_data.length + data.length);
                 socket.unread_data = null;
@@ -325,7 +328,7 @@ var protocols = {
                     socket.unread_data = isread ? data.slice(start) : data;
                     return;
                 }
-                let msg = data.toString("utf8", index, index + length);
+                const msg = data.toString("utf8", index, index + length);
 
                 isread = true;
 
@@ -339,10 +342,10 @@ var protocols = {
          * @param {string} text
          * @param {*} socket
          */
-        sendData: function (text, socket) {
-            var textBuffer = Buffer.from(text);
-            var length = textBuffer.length;
-            var data;
+        sendData(text, socket) {
+            const textBuffer = Buffer.from(text);
+            const length = textBuffer.length;
+            let data;
             if (length < 254) {
                 data = Buffer.alloc(length + 1);
                 data.writeUInt8(length);
@@ -389,8 +392,9 @@ function getSpace(str) {
  * @returns {Object<string, string>}
  */
 function readHeader(data) {
-    var header = {}, key, flag = 0;
-    for (var i = 0; i < data.length; i++) {
+    const header = {};
+    let key, flag = 0;
+    for (let i = 0; i < data.length; i++) {
         switch (data[i]) {
             case 0x0D://\r
                 key && (header[key] = data.toString("utf8", flag, i));
@@ -419,7 +423,7 @@ function readHeader(data) {
  * @readonly
  * @enum {number}
  */
-var FrameTypes =
+const FrameTypes =
 {
     Continuation: 0,
     Text: 1,
