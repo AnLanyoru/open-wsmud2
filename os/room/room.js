@@ -9,6 +9,7 @@ ROOM = class ROOM extends ITEM {
         obj.desc = "";
         obj.items = [];
         obj.parent = null;
+        obj.max_item_count = 50;
     }
 
     constructor() {

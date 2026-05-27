@@ -13,6 +13,7 @@ MONSTER = class MONSTER extends CHARACTER {
         obj.auto_pfm = true;
         obj.family = FAMILIES.MONSTER;
         obj.str = obj.con = obj.dex = obj.int = 20;
+        obj.can_speek = false;
     }
 
     constructor() {

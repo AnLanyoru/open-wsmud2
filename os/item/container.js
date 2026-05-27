@@ -8,6 +8,7 @@ CONTAINER = class CONTAINER extends OBJ {
     static __initInstance(obj) {
         obj.count = 1;
         obj.combined = false;
+        obj.is_container = true;
     }
 
     constructor() {

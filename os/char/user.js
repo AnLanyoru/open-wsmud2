@@ -20,6 +20,7 @@ USER = class USER extends CHARACTER {
         obj.id_address = null;
         obj.user_level = 0;
         obj.eq_group = 0;
+        obj.is_player = true;
     }
 
     constructor() {

@@ -18,6 +18,11 @@ EQUIPMENT = class EQUIPMENT extends OBJ {
         obj.is_equipment = true;
         obj.transable = true;
         obj.VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
+        obj.parts = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
+        obj.qualities = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
+        obj.levelData = [
+            0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
+        ];
     }
 
     constructor() {

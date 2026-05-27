@@ -448,8 +448,8 @@ CHARACTER = class CHARACTER extends ITEM {
 function splitmessage(me, text, type, target) {
     if (text.length < 3) return text;
     const str = [];
-    let start = 0;
-    for (let i = 0; i < text.length; i++) {
+    let start = 0, i;
+    for (i = 0; i < text.length; i++) {
         if (text[i] === "$") {
             start < i && str.push(text.substring(start, i));
             const ch = text[++i];
