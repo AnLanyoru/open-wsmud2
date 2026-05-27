@@ -9,6 +9,8 @@ MONEY = class MONEY extends OBJ {
         obj.is_cash = false;
         obj.combined = true;
         obj.count = 1;
+        obj.is_money = true;
+        obj.transable = true;
     }
 
     constructor() {

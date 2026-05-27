@@ -1991,29 +1991,6 @@ declare var UTIL: {
 // ============================================================
 
 // ============================================================
-// world/ 内容脚本的 this 上下文
-// ============================================================
-//
-// world/ 中的 .js 文件通过 BASE.CREATE → BASE.NEW → func.apply(obj) 执行，
-// this 指向新创建的对象，但 TypeScript 在脚本模式下将 this 视为 globalThis。
-// 为让 IDE 能正确推断 this.xxx 的类型并显示中文注解，此处将 inherits 声明为
-// 带 asserts this 返回的全局函数。当内容脚本调用 this.inherits(ROOM) 后，
-// this 的类型会被自动收窄为 globalThis & ROOM，从而获得完整的属性提示。
-//
-
-/**
- * 动态继承 — 世界内容脚本入口方法。
- * 调用后 this 的类型会收窄为包含目标类实例类型的交叉类型，
- * 后续通过 this.xxx 访问属性时将获得对应类定义中的中文注解提示。
- *
- * @example
- *   this.inherits(ROOM);
- *   this.name = "大厅";        // IDE 可提示 ROOM.name 的中文注解
- *   this.no_fight = true;      // IDE 可提示 ROOM.no_fight 的中文注解
- */
-declare function inherits<T extends Constructor>(this: typeof globalThis, ctor: T): asserts this is typeof globalThis & T['prototype'];
-
-// ============================================================
 // 框架魔改 — 内置原型扩展
 // ============================================================
 
@@ -2068,3 +2045,28 @@ interface JSON {
 declare var __CONFIG: any;
 /** 全局路径配置 */
 declare var __PATH: any;
+
+// ============================================================
+// world/ 内容脚本 — this 类型获取中文注解的方法
+// ============================================================
+//
+// TypeScript 限制：脚本模式下顶层 this 为 typeof globalThis，
+// 无法通过 asserts this 收窄类型（TS2777）。以下两种方式可获取中文注解：
+//
+// 方式一（推荐）：点击文件首行的 ROOM/NPC 等类名，按 F12 跳转到类定义查看所有注解。
+//
+// 方式二：在 this.inherits(X) 之上添加一行 JSDoc 类型断言：
+//
+//   // @ts-ignore
+//   const $ = /** @type {ROOM} */ (this);
+//
+//   后续使用 $.no_fight、$.name 可获得中文注解。
+//   注意：需将 this.xxx 改为 $.xxx。原有 this 依然可用，只是无注解。
+
+/**
+ * 动态继承（供 world/ 内容脚本在 this 上调用，消除类型报错）。
+ * 此声明无类型收窄效果，仅使 this.inherits(X) 不产生 TS 错误。
+ */
+interface Object {
+    inherits<T extends Constructor>(ctor: T): void;
+}

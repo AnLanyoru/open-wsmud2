@@ -1,1 +1,5 @@
 node_modules/
+log/access.log.1
+data/database.db
+.env
+data/100/data.js

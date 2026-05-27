@@ -15,6 +15,9 @@ EQUIPMENT = class EQUIPMENT extends OBJ {
         obj.showAction = true;
         obj.allow_fight = true;
         obj.otype = 4;
+        obj.is_equipment = true;
+        obj.transable = true;
+        obj.VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
     }
 
     constructor() {

@@ -11,6 +11,7 @@ OBJ = class OBJ extends ITEM {
         obj.combined = true;
         obj.grade = 0;
         obj.otype = 0;
+        obj.transable = false;
     }
 
     constructor() {
