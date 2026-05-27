@@ -1,14 +1,30 @@
-﻿require("./obj.js");
+/**
+ * CONTAINER 容器类 - 可装入物品的物件
+ */
+require("./obj.js");
+
+/** @type {function} */
 CONTAINER = function () {
     this.count = 1;
     this.combined = false;
-    
+
 }
 CONTAINER.inherits(OBJ);
+/** @type {boolean} */
 CONTAINER.prototype.is_container = true;
+
+/**
+ * 禁止直接拾取容器
+ * @returns {boolean} false
+ */
 CONTAINER.prototype.on_get = function () {
     return false;
 }
+
+/**
+ * 设置初始内容物
+ * @param {...(string|[string, number])} arguments - 物品路径或[物品路径, 数量]
+ */
 CONTAINER.prototype.set_items = function () {
     for (var i = 0; i < arguments.length; i++) {
         var item = arguments[i];
@@ -16,21 +32,31 @@ CONTAINER.prototype.set_items = function () {
             if (typeof item == "string") {
                 OBJ.clone_to(item, this);
             } else if (item.length) {
-                OBJ.clone_to(item[0], this,item[1]);
+                OBJ.clone_to(item[0], this, item[1]);
             }
         }
     }
 }
+
+/**
+ * 查询内容物
+ * @returns {OBJ[]}
+ */
 CONTAINER.prototype.query_items = function () {
     return this.items;
 }
-//这个单纯的字符串描述
+
+/**
+ * 获取描述文本
+ * @param {USER} me
+ * @returns {string}
+ */
 CONTAINER.prototype.get_desc = function (me) {
     var str = [this.color_name, this.desc];
     var items = this.query_items(me);
     if (items && items.length) {
         str.push("它里面有：");
-        for (var i = 0; i <items.length; i++) {
+        for (var i = 0; i < items.length; i++) {
             var item = items[i];
             str.push("\t" + UTIL.to_c(item.count) + item.unit + item.color_name);
         }
@@ -39,10 +65,20 @@ CONTAINER.prototype.get_desc = function (me) {
     }
     return str.join("\n");
 }
+
+/**
+ * 清空内容物
+ * @param {USER} me
+ */
 CONTAINER.prototype.clear_items = function (me) {
     this.items.length = 0;
 }
-//这个提供给LOOK SELECT命令的
+
+/**
+ * 查询描述JSON(含全部拾取命令)
+ * @param {USER} me
+ * @returns {string} JSON
+ */
 CONTAINER.prototype.query_desc = function (me) {
     if (this.json) return this.json;
     var obj = {};
@@ -58,7 +94,16 @@ CONTAINER.prototype.query_desc = function (me) {
     this.json = JSON.stringify(obj)
     return this.json;
 }
-CONTAINER.CREATE = function (name,desc,lv,odds) {
+
+/**
+ * 创建容器(含随机物品)
+ * @param {string} name - 容器名
+ * @param {string} desc - 描述
+ * @param {number} lv - 品级
+ * @param {Array<*>} odds - 掉落定义
+ * @returns {CONTAINER}
+ */
+CONTAINER.CREATE = function (name, desc, lv, odds) {
     var obj = OBJ.CREATE("sp/box#lv");
     obj.items = OBJ.create_by_odds(odds);
     obj.name = name;

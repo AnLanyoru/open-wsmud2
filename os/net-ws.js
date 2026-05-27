@@ -1,6 +1,16 @@
-﻿"use strict";
+/**
+ * WebSocket/TCP 网络层实现
+ * 支持多种WebSocket协议版本及原始TCP
+ */
+"use strict";
 var crypto = require('crypto');
 var fs = require("fs");
+
+/**
+ * WebSocket/TCP 服务器构造函数
+ * @param {{SSL: boolean, KEY: string, CERT: string, PASSWORD: string}} options - SSL配置
+ * @constructor
+ */
 function wsServer(options) {
     var evt = ["Close", "Error", "SocketIn", "Connect", "Receive",
         "ClientError", "ClientClose", "ClientTimeout"];
@@ -18,6 +28,12 @@ function wsServer(options) {
     } : null;
     this.ssl = options.SSL;
 }
+
+/**
+ * 启动监听
+ * @param {number} port - 端口号
+ * @param {function} func - 启动成功回调
+ */
 wsServer.prototype.listen = function (port, func) {
 
     var net = require(this.ssl ? 'tls' : 'net');
@@ -27,9 +43,20 @@ wsServer.prototype.listen = function (port, func) {
     tcpserver.on('error', this.onError.bind(this));
     this.tcpServer = tcpserver;
 }
+
+/**
+ * 发送消息到socket
+ * @param {string} msg
+ * @param {*} socket
+ */
 wsServer.prototype.send = function (msg, socket) {
     socket.send(msg);
 }
+
+/**
+ * 关闭服务器
+ * @returns {Promise<void>}
+ */
 wsServer.prototype.close = function () {
     return new Promise((resolve) => {
         this.tcpServer.close(resolve);
@@ -37,6 +64,11 @@ wsServer.prototype.close = function () {
 }
 
 module.exports = wsServer;
+
+/**
+ * 客户端连接处理
+ * @param {*} socket
+ */
 function onClientConnect(socket) {
 
     socket.send = function (msg) {
@@ -69,8 +101,23 @@ function onClientConnect(socket) {
         }
     });
 }
+
+/**
+ * WebSocket 协议实现集合
+ * @type {{
+ *   var1: {handShake: function, readData: function, sendData: function},
+ *   var2: {handShake: function, readData: function, sendData: function, buffer: Buffer|null},
+ *   tcp: {readData: function, sendData: function}
+ * }}
+ */
 var protocols = {
+    /** WebSocket 协议版本13 (RFC 6455) */
     var1: {
+        /**
+         * WebSocket握手
+         * @param {Object<string, string>} header - HTTP头部
+         * @param {*} socket
+         */
         handShake: function (header, socket) {
             var hasher = crypto.createHash("sha1");
             hasher.update(header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
@@ -85,13 +132,15 @@ var protocols = {
                 `Sec-WebSocket-Accept:${hashmsg}`,
                 `Sec-WebSocket-Origin:${origin}`];
             if (protocol) respon.push(`Sec-WebSocket-Protocol: ${protocol}`);
-            //var extens = header["Sec-Websocket-Extensions"];
-            //if (extens) {
-            //    respon.push(`Sec-WebSocket-Extensions:permessage-deflate; client_max_window_bits`);
-            //}
             respon.push("\r\n");
             socket.write(respon.join("\r\n"));
         },
+        /**
+         * 读取WebSocket帧数据
+         * @param {Buffer} data
+         * @param {*} socket
+         * @param {wsServer} server
+         */
         readData: function (data, socket, server) {
             var start = 0;
             while (start < data.length) {
@@ -117,7 +166,6 @@ var protocols = {
                 switch (frameType) {
                     case FrameTypes.Close:
                         socket.end();
-                        // server.onClientClose(socket);
                         break;
                     case FrameTypes.Binary:
                         break;
@@ -134,6 +182,11 @@ var protocols = {
                 }
             }
         },
+        /**
+         * 发送WebSocket帧
+         * @param {string} text
+         * @param {*} socket
+         */
         sendData: function (text, socket) {
             var textBuffer = Buffer.from(text);
             var length = textBuffer.length;
@@ -161,7 +214,13 @@ var protocols = {
             socket.write(data);
         }
     },
+    /** WebSocket 协议版本00(Hixie) - 已废弃的旧版本 */
     var2: {
+        /**
+         * @param {Object<string, string>} header
+         * @param {*} socket
+         * @param {Buffer} buffer
+         */
         handShake: function (header, socket, buffer) {
             var key1 = header["Sec-WebSocket-Key1"];
             var key2 = header["Sec-WebSocket-Key2"];
@@ -200,8 +259,13 @@ var protocols = {
             socket.write(headers.join("\r\n"));
             socket.write(hasherbs);
         },
-        buffer: null
-        ,
+        /** @type {Buffer|null} */
+        buffer: null,
+        /**
+         * @param {Buffer} data
+         * @param {*} socket
+         * @param {wsServer} server
+         */
         readData: function (data, socket, server) {
             var start = 0;
             while (start < data.length) {
@@ -217,6 +281,10 @@ var protocols = {
                 start = end + 1;
             }
         },
+        /**
+         * @param {string} text
+         * @param {*} socket
+         */
         sendData: function (text, socket) {
             var textBuffer = Buffer.from(text, "utf-8");
             var length = textBuffer.length;
@@ -228,8 +296,13 @@ var protocols = {
             socket.write(wrappedBytes);
         }
     },
+    /** 原始TCP协议(自定义长度前缀) */
     tcp: {
-
+        /**
+         * @param {Buffer} data
+         * @param {*} socket
+         * @param {wsServer} server
+         */
         readData: function (data, socket, server) {
 
             var start = 0;
@@ -242,7 +315,6 @@ var protocols = {
                 let length = data.readUInt8(start);
                 let index = start + 1;
                 if (length === 254) {
-                    //不够读长度咋办
                     length = data.readUInt16BE(index);
                     index += 2;
                 } else if (length === 255) {
@@ -263,6 +335,10 @@ var protocols = {
 
             }
         },
+        /**
+         * @param {string} text
+         * @param {*} socket
+         */
         sendData: function (text, socket) {
             var textBuffer = Buffer.from(text);
             var length = textBuffer.length;
@@ -288,13 +364,30 @@ var protocols = {
     }
 };
 
+/**
+ * 从字符串中提取数字部分
+ * @param {string} str
+ * @returns {string}
+ */
 function getNumber(str) {
     return str.replace(/\D/g, "");
 
 }
+
+/**
+ * 计算字符串中空格数量
+ * @param {string} str
+ * @returns {number}
+ */
 function getSpace(str) {
     return str.replace(/\S/g, "").length;
 }
+
+/**
+ * 解析HTTP头部
+ * @param {Buffer} data
+ * @returns {Object<string, string>}
+ */
 function readHeader(data) {
     var header = {}, key, flag = 0;
     for (var i = 0; i < data.length; i++) {
@@ -320,6 +413,12 @@ function readHeader(data) {
     }
     return header;
 }
+
+/**
+ * WebSocket 帧类型枚举
+ * @readonly
+ * @enum {number}
+ */
 var FrameTypes =
 {
     Continuation: 0,
@@ -329,12 +428,3 @@ var FrameTypes =
     Ping: 9,
     Pong: 10,
 };
-
-//%x0 代表一个继续帧
-//%x1 代表一个文本帧
-//%x2 代表一个二进制帧
-//%x3-7 保留用于未来的非控制帧
-//%x8 代表连接关闭
-//%x9 代表ping
-//%xA 代表pong
-//%xB-F 保留用于未来的控制帧 

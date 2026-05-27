@@ -1,11 +1,24 @@
-﻿
+/**
+ * CHARACTER 技能系统扩展
+ */
 require("./character.js");
+
+/**
+ * 查询技能等级(含属性加成)
+ * @param {string} name - 技能ID
+ * @param {number} [def] - 默认值
+ * @returns {number}
+ */
 CHARACTER.prototype.query_skill = function (name, def) {
     if (!this.skills || !this.skills[name]) return def || 0;
     return this.skills[name].level + this.query_prop(name);
 }
+
+/**
+ * 批量设置技能(NPC初始化用)
+ * @param {...[string, number, (string|string[])]} arguments - [技能ID, 等级, 启用基本技能]
+ */
 CHARACTER.prototype.skill_map = function () {
-    //给NPC初始化技能用的，不做任何判断
     this.skills = this.skills || {};
     for (var i = 0; i < arguments.length; i++) {
         var item = arguments[i];
@@ -31,6 +44,12 @@ CHARACTER.prototype.skill_map = function () {
         }
     }
 }
+
+/**
+ * 移除技能
+ * @param {string} skillid - 技能ID
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.remove_skill = function (skillid) {
     var skill = this.skills[skillid];
     if (!skill) return;
@@ -62,7 +81,12 @@ CHARACTER.prototype.remove_skill = function (skillid) {
     baseskill.on_remove && baseskill.on_remove(this);
     return true;
 }
-//增加技能
+
+/**
+ * 设置技能等级
+ * @param {string} skid - 技能ID
+ * @param {number} level - 等级
+ */
 CHARACTER.prototype.set_skill = function (skid, level) {
     if (!this.skills) this.skills = {};
     var item = this.skills[skid];
@@ -70,7 +94,6 @@ CHARACTER.prototype.set_skill = function (skid, level) {
     if (!skill_base) return;
     if (!item) {
         item = {
-            //id: skid,
             level: level,
             exp: 0
         };
@@ -84,6 +107,11 @@ CHARACTER.prototype.set_skill = function (skid, level) {
     this.init_skill();
     this.recount();
 }
+
+/**
+ * 查询当前技能等级上限
+ * @returns {number}
+ */
 CHARACTER.prototype.skill_limit = function () {
     if (this.exp < 100) return 10;
     switch (this.level) {
@@ -98,6 +126,11 @@ CHARACTER.prototype.skill_limit = function () {
     }
 }
 
+/**
+ * 查询技能引用绝招
+ * @param {*} skill - 技能对象
+ * @returns {PERFORM|undefined}
+ */
 CHARACTER.prototype.query_ref_skill = function (skill) {
     if (!skill || !skill.ref) return;
     var refs = skill.ref.split("/");
@@ -106,14 +139,26 @@ CHARACTER.prototype.query_ref_skill = function (skill) {
         return sp_skill.get_pfm(refs[1]);
     }
 }
-//判断某个技能是否装备到某个基本技能上
+
+/**
+ * 判断某技能是否装备到指定基本技能
+ * @param {string} skid - 技能ID
+ * @param {string} type - 基本技能类型
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.is_enable_skill = function (skid, type) {
     if (!this.skills) return;
     var item = this.skills[skid];
     if (!item) return;
     return item[type];
 }
-//装备技能到基本技能
+
+/**
+ * 装备技能到基本技能
+ * @param {string} base - 基本技能ID
+ * @param {string|null} skill - 特殊技能ID, null为取消装备
+ * @returns {boolean}
+ */
 CHARACTER.prototype.enable_skill = function (base, skill) {
     if (!this.skills) return;
     var baseskill = this.skills[base];
@@ -146,7 +191,8 @@ CHARACTER.prototype.enable_skill = function (base, skill) {
 
     return true;
 }
-//初始化人物使用的技能
+
+/** 初始化当前使用的战斗技能 */
 CHARACTER.prototype.init_skill = function () {
     this.attack_skill = this.query_used_skill(this.query_weapon_type());
     this.noweapon_skill = this.query_used_skill(WEAPON_TYPE.NONE);
@@ -157,6 +203,11 @@ CHARACTER.prototype.init_skill = function () {
     this.auto_skills = null;
 }
 
+/**
+ * 查询当前使用的技能(含装备选择)
+ * @param {string} skname - 基本技能名
+ * @returns {SKILL}
+ */
 CHARACTER.prototype.query_used_skill = function (skname) {
     if (!this.skills) {
         return WORLD.DEFAULT_SKILLS[skname];
@@ -170,6 +221,12 @@ CHARACTER.prototype.query_used_skill = function (skname) {
     }
     return WORLD.DEFAULT_SKILLS[skname];
 }
+
+/**
+ * 查询状态叠加层数
+ * @param {string} sid - 状态ID
+ * @returns {number}
+ */
 CHARACTER.prototype.query_status = function (sid) {
     if (!this.status) return 0;
     for (var i = 0; i < this.status.length; i++) {
@@ -179,6 +236,13 @@ CHARACTER.prototype.query_status = function (sid) {
     }
     return 0;
 }
+
+/**
+ * 添加状态/效果
+ * @param {{id: string, duration: number, override: number, count: number, max_count: number}} buff - 状态定义
+ * @param {CHARACTER} [from] - 来源角色
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.add_status = function (buff, from) {
     if (this.hp <= 0) return false;
     if (!this.status) this.status = [];
@@ -197,7 +261,6 @@ CHARACTER.prototype.add_status = function (buff, from) {
         }
     }
     if (buff.downside && buff.duration && !buff.no_diff) {
-        //buff.duration = buff.duration - this.query_prop("diff_downside");
         buff.duration = Math.round(buff.duration * (100 - this.query_prop("diff_downside_per")) / 100);
         if (buff.duration <= 0) {
             return false;
@@ -220,8 +283,6 @@ CHARACTER.prototype.add_status = function (buff, from) {
             var item = this.status[i];
             if (item.override != buff.override) return false;
             if (item.override == 0) {
-                //0不覆盖 1叠加 2覆盖替换
-
                 return false;
             }
             if (item.override == 1) {
@@ -238,7 +299,7 @@ CHARACTER.prototype.add_status = function (buff, from) {
             } else {
 
                 item.handler && clearTimeout(item.handler);
-                this.change_buff(item, false, item.count);//覆盖先移除 后添加 重新计时
+                this.change_buff(item, false, item.count);
                 this.status_changed(item, "remove");
                 if (buff.duration)
                     item.handler = this.call_out(this.remove_status, buff.duration, sid);
@@ -258,6 +319,11 @@ CHARACTER.prototype.add_status = function (buff, from) {
     this.status_changed(buff, "add");
 }
 
+/**
+ * 清除指定类型的负面状态
+ * @param {*} type - 负面状态类型
+ * @returns {number|undefined} 清除的状态数量
+ */
 CHARACTER.prototype.clear_downside = function (type) {
     if (!this.status) return;
     var removed = "0";
@@ -288,6 +354,7 @@ CHARACTER.prototype.clear_downside = function (type) {
 }
 
 
+/** 清除战斗状态(战斗结束后) */
 CHARACTER.prototype.clear_combat_status = function () {
     if (!this.status || !this.status.length) return;
     var removed = "0";
@@ -310,6 +377,11 @@ CHARACTER.prototype.clear_combat_status = function () {
         }
     }
 }
+
+/**
+ * 按条件批量移除状态
+ * @param {function(*): boolean} func - 判断函数
+ */
 CHARACTER.prototype.remvoe_statuses = function (func) {
     if (!this.status || !this.status.length) return;
     var removed = "0";
@@ -332,6 +404,8 @@ CHARACTER.prototype.remvoe_statuses = function (func) {
         }
     }
 }
+
+/** 清除所有状态 */
 CHARACTER.prototype.clear_status = function () {
     if (!this.status || !this.status.length) return;
     for (var i = 0; i < this.status.length; i++) {
@@ -350,6 +424,13 @@ CHARACTER.prototype.clear_status = function () {
         }
     }
 }
+
+/**
+ * 变更状态效果
+ * @param {*} buff - 状态对象
+ * @param {boolean} isadd - true添加 false移除
+ * @param {number} buff_count - 层数
+ */
 CHARACTER.prototype.change_buff = function (buff, isadd, buff_count) {
     if (isadd) {
         if (buff.prop) {
@@ -394,6 +475,11 @@ CHARACTER.prototype.change_buff = function (buff, isadd, buff_count) {
     }
 
 }
+
+/**
+ * 拼接状态数据到JSON
+ * @param {string[]} str - 输出数组
+ */
 CHARACTER.prototype.appdend_status = function (str) {
     if (!this.status) return;
     var now = Date.now();
@@ -425,6 +511,8 @@ CHARACTER.prototype.appdend_status = function (str) {
     }
     str.push("]");
 }
+
+/** 通知客户端当前状态 */
 CHARACTER.prototype.notify_status = function () {
     if (!this.status) return;
     var str = ['{type:"status",id:\"'];
@@ -460,6 +548,12 @@ CHARACTER.prototype.notify_status = function () {
     str.push("]}");
     this.send(str.join(""));
 }
+
+/**
+ * 状态变更通知
+ * @param {*} item - 状态对象
+ * @param {string} type - 变更类型(add/remove/refresh)
+ */
 CHARACTER.prototype.status_changed = function (item, type) {
     var str = [];
     str.push('{type:"status","action":"');
@@ -502,6 +596,12 @@ CHARACTER.prototype.status_changed = function (item, type) {
         }
     }
 }
+
+/**
+ * 移除状态
+ * @param {string} sid - 状态ID
+ * @param {boolean} [isall] - 是否移除全部层数
+ */
 CHARACTER.prototype.remove_status = function (sid, isall) {
     if (!this.status) return;
     for (var i = this.status.length - 1; i >= 0; i--) {
@@ -522,7 +622,6 @@ CHARACTER.prototype.remove_status = function (sid, isall) {
                 if (item.duration_count === 0 || (item.duration_count > 1 && item.duration_count > item.over_count)) {
                     if (item.duration)
                         item.handler = this.call_out(this.remove_status, item.duration, sid);
-                    // item.start_time = Date.now();
                     return;
                 }
             }
@@ -544,7 +643,6 @@ CHARACTER.prototype.remove_status = function (sid, isall) {
                     this.status_changed(item, "refresh");
                 }
             } else {
-                //覆盖和不覆盖的都直接移除
                 this.status_changed(item, "remove");
                 this._splice_status(i, item);
             }
@@ -553,6 +651,13 @@ CHARACTER.prototype.remove_status = function (sid, isall) {
         }
     }
 }
+
+/**
+ * 从状态数组中安全移除
+ * @param {number} index - 索引
+ * @param {*} item - 状态对象
+ * @returns {*[]|undefined}
+ */
 CHARACTER.prototype._splice_status = function (index, item) {
     if (this.status[index] === item) {
         return this.status.splice(index, 1);

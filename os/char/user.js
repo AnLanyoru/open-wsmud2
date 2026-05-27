@@ -1,40 +1,79 @@
-﻿require("./character.js");
+/**
+ * USER 玩家类
+ */
+require("./character.js");
+
+/** @type {function} */
 USER = function () {
+    /** @type {*} */
     this.socket = null;
+    /** @type {FAMILY} */
     this.family = FAMILIES.NONE;
+    /** @type {number} 最大携带物品数 */
     this.max_item_count = 20;
+    /** @type {number} 最大存储物品数 */
     this.max_store_count = 20;
+    /** @type {number} */
     this.money = 0;
+    /** @type {number} */
     this.request_count = 0;
+    /** @type {number} */
     this.cash_money = 0;
+    /** @type {number} */
     this.score = 0;
+    /** @type {Array|null} */
     this.follower = null;
+    /** @type {string} */
     this.password = "";
+    /** @type {number} */
     this.loginTime = 0;
+    /** @type {*} */
     this.id_address = null;
+    /** @type {number} */
     this.user_level = 0;
+    /** @type {number} */
     this.eq_group = 0;
 };
 USER.inherits(CHARACTER);
+/** @type {boolean} */
 USER.prototype.is_player = true;
 
+/**
+ * 通知消息(玩家状态)
+ * @param {string} text
+ */
 USER.prototype.notify = function (text) {
-    //玩家不能接收消息的状态 不发送
     if (this.socket && !this.is_faint && text && text.length < 30240)
         this.socket.send(text);
 }
+
+/**
+ * 直接发送消息(无视状态)
+ * @param {string} text
+ */
 USER.prototype.send = function (text) {
-    //直接发送消息 不管玩家状态
     if (this.socket && text && text.length < 30240) {
         this.socket.send(text);
     }
 }
+
+/**
+ * 发送失败通知
+ * @param {string} text
+ * @returns {boolean} false
+ */
 USER.prototype.notify_fail = function (text) {
     if (this.socket && !this.is_faint)
         this.socket.send(text);
     return false;
 }
 
+/**
+ * 发送警告消息
+ * @param {string} content - 警告内容
+ * @param {string[]} cmds - 命令/名称交替数组
+ * @param {number} [time] - 超时时间
+ */
 USER.prototype.send_warn = function (content, cmds, time) {
     var str = ["{type:\"warn\",content:\""];
     str.push(content);
@@ -56,6 +95,9 @@ USER.prototype.send_warn = function (content, cmds, time) {
     this.send(str.join(""));
 }
 
+/**
+ * 发送命令按钮列表
+ */
 USER.prototype.send_commands = function () {
     var str = ["{type:\"cmds\",items:["];
     for (var i = 0; i < arguments.length; i += 2) {
@@ -69,9 +111,16 @@ USER.prototype.send_commands = function () {
     str.push("]}");
     this.send(str.join(""));
 }
+
+/**
+ * 是否有Socket连接
+ * @returns {boolean}
+ */
 USER.prototype.is_connect = function () {
     return this.socket !== null;
 }
+
+/** 发送登录初始化消息 */
 USER.prototype.send_loginmessage = function () {
     if (!this.login_message) {
         var str = ['{type:"login"'];
@@ -88,6 +137,11 @@ USER.prototype.send_loginmessage = function () {
 
     this.send(this.login_message)
 }
+
+/**
+ * 重新连线(账号被顶替后重连)
+ * @param {USER} newUser - 新连接的用户对象
+ */
 USER.prototype.relogin = function (newUser) {
     if (!newUser.socket) return;
     newUser.socket.user = null;
@@ -106,22 +160,32 @@ USER.prototype.relogin = function (newUser) {
     this.send(this.environment.to_json());
     this.environment.send_exits(this);
     this.send(this.environment.items_to_json());
-    // if (!WORLD.is_end_cross(this)) {
     this.send_room(this.name + "重新连线。");
     if (this.environment.on_relogin) {
         this.environment.on_relogin(this);
     }
-    // }
     this.disconnect_time = 0;
     this.check_state();
     this.on_skillchanged();
 }
+
+/**
+ * 获取IP地址
+ * @returns {string}
+ */
 USER.prototype.ip = function () {
     return this.socket.remoteAddress;
 }
+
+/**
+ * 获取端口
+ * @returns {number}
+ */
 USER.prototype.port = function () {
     return this.socket.remotePort;
 }
+
+/** 退出游戏 */
 USER.prototype.quit = function () {
     var rm = this.environment;
     if (this.environment) {
@@ -145,13 +209,21 @@ USER.prototype.quit = function () {
         this.socket = null;
     }
 }
+
+/**
+ * 判断是否已进入游戏世界
+ * @returns {boolean}
+ */
 USER.prototype.in_world = function () {
-    //判断是否连线进入过游戏,
     return !!this.environment && !!this.socket;
 }
+
+/**
+ * 断线处理
+ * @param {boolean} [isreplace] - 是否被顶替
+ */
 USER.prototype.disconnect = function (isreplace) {
     if (this.environment && this.socket) {
-        // this.send_message(this.name + "断线了。");
         if (isreplace)
             this.send("<RED>有人使用你的角色从别的地址登陆游戏，请重新登陆</RED>");
     }
@@ -161,16 +233,17 @@ USER.prototype.disconnect = function (isreplace) {
         this.socket = null;
         socket.user = null;
         socket.end();
-        //if (!socket.destroyed)
-        //    socket.destroy();
     }
 }
+
+/**
+ * 从数据库记录加载用户数据
+ * @param {{id: string, name: string, level: number, data: string, user_level: number}} role
+ */
 USER.prototype.loadData = function (role) {
     this.id = role.id;
     this.name = role.name;
     this.level = role.level;
-    //this.title = role.title;de
-    //role.data = role.data.toString();
     var data = JSON.toObject(role.data);
     for (var i = 0; i < SAVE_NUMPROP.length; i++) {
         this[SAVE_NUMPROP[i]] = data.prop[i] || 0;
@@ -203,6 +276,11 @@ USER.prototype.loadData = function (role) {
     }
     this.user_level = role.user_level;
 }
+
+/**
+ * 读取称号数据
+ * @param {Array<[string, string, number]>} titles - 称号数组
+ */
 USER.prototype.read_titles = function (titles) {
     this.titles = [];
     if (!titles) return;
@@ -216,6 +294,12 @@ USER.prototype.read_titles = function (titles) {
         }
     }
 }
+
+/**
+ * 从数据库数组读取物品列表
+ * @param {Array<Array<*>>} items - 物品数据数组
+ * @returns {OBJ[]}
+ */
 USER.prototype.read_items = function (items) {
     var objs = [];
     if (!items) return objs;
@@ -235,6 +319,8 @@ USER.prototype.read_items = function (items) {
     }
     return objs;
 }
+
+/** 执行登录初始化 */
 USER.prototype.do_login = function () {
     this.init();
     this.recount();
@@ -250,28 +336,31 @@ USER.prototype.do_login = function () {
             this.moveto(copy_room, null, this.name + "连线进入这个世界。");
         } else {
             if (this.query_temp("new")) {
-                //还没完成新手教程的，从头开始
                 this.set_temp("new", 1);
-                this.items = [];//清理掉之前的物品
+                this.items = [];
                 this.exp = this.pot = this.money = 0;
             }
             copy_room = rm.create_copy2(this);
             this.moveto(copy_room);
         }
-        //如果在副本副本下线,不可能
-
     } else {
         this.moveto(rm, null, this.name + "连线进入这个世界。");
     }
     this.check_state();
 }
+
+/** @type {string} 默认出生房间 */
 var DEFAULT_ROOM = "yz/wumiao";
 
-
+/** @type {string[]} 需要保存的数值属性列表 */
 var SAVE_NUMPROP = ["str", "con", "dex", "int", "gender", "max_mp", "limit_mp", "exp", "pot", "kar", "per"
     , "hp", "mp", "max_item_count", "money", "reg_time",
     "max_store_count", "cash_money", 'eq_group'];
 
+/**
+ * 获取玩家存档数据
+ * @returns {{id: string, userid: *, name: string, level: number, title: string, data: string}}
+ */
 USER.prototype.getData = function () {
     var str = ["{prop:["];
     for (var i = 0; i < SAVE_NUMPROP.length; i++) {
@@ -372,10 +461,17 @@ USER.prototype.getData = function () {
 }
 
 
+/** 保存玩家数据到数据库 */
 USER.prototype.save = function () {
 
     WORLD.DB.saveRole(this.getData());
 }
+
+/**
+ * 玩家死亡处理
+ * @param {CHARACTER} killer - 击杀者
+ * @returns {boolean|undefined}
+ */
 USER.prototype.die = function (killer) {
     if (this.on_die && this.on_die(killer) === false) {
         this.hp = 1;
@@ -399,9 +495,16 @@ USER.prototype.die = function (killer) {
     WORLD.on_user_die(this, killer);
     this.on_died(killer);
 }
+
+/**
+ * 死亡后回调
+ * @param {CHARACTER} [killer]
+ */
 USER.prototype.on_died = function () {
 
 }
+
+/** 检查并同步玩家状态到客户端 */
 USER.prototype.check_state = function () {
     if (this.hp <= 0) {
         if (this.state) this.set_state(null);
@@ -412,6 +515,12 @@ USER.prototype.check_state = function () {
 
 
 }
+
+/**
+ * 查询玩家操作命令列表(JSON)
+ * @param {USER} player - 观察者
+ * @returns {string} JSON字符串
+ */
 USER.prototype.query_commands = function (player) {
     if (this.commands_json) return this.commands_json;
     var json = {};
@@ -448,6 +557,12 @@ USER.prototype.query_commands = function (player) {
     this.commands_json = JSON.stringify(json)
     return this.commands_json;
 }
+
+/**
+ * 查询指定类型的称号
+ * @param {string} type - 称号类型
+ * @returns {string|null}
+ */
 USER.prototype.query_title = function (type) {
     if (!this.titles) return null;
     for (var i = 0; i < this.titles.length; i++) {
@@ -456,6 +571,12 @@ USER.prototype.query_title = function (type) {
         }
     }
 }
+
+/**
+ * 添加称号
+ * @param {string} title - 称号名称
+ * @param {string} type - 称号类型
+ */
 USER.prototype.add_title = function (title, type) {
     if (!this.titles) this.titles = [];
     var obj = { title: title, type: type };
@@ -484,10 +605,22 @@ USER.prototype.add_title = function (title, type) {
     }
 
 }
+
+/**
+ * 查询用户设置项
+ * @param {string} name - 设置项名称
+ * @returns {number} 设置值
+ */
 USER.prototype.query_setting = function (name) {
     if (!this.settings) return 0;
     return this.settings[name] || 0;
 }
+
+/**
+ * 设置用户配置项
+ * @param {string} name - 设置项名称
+ * @param {string|number} value - 设置值
+ */
 USER.prototype.set_setting = function (name, value) {
     if (!this.settings) this.settings = {};
 
@@ -500,6 +633,11 @@ USER.prototype.set_setting = function (name, value) {
 
     this.login_message = null;
 }
+
+/**
+ * 玩家心跳处理
+ * @param {number} dt - 当前时间戳
+ */
 USER.prototype.heart_beat = function (dt) {
     this.request_count = 0;
     if (this.state && (!this.fight_type || this.state.allow_fight)) {
@@ -513,12 +651,17 @@ USER.prototype.heart_beat = function (dt) {
     }
     this.on_heart_beat && this.on_heart_beat(dt);
     if (this.disconnect_time) {
-        //如果断线 在挂机就一天，没有就5分钟下线
         if (dt - this.disconnect_time > (this.state ? 86400000 : 3600000)) {
             return this.quit();
         }
     }
 }
+
+/**
+ * 设置玩家状态(打坐/练功/闭关等)
+ * @param {{title: string, rate: number} | null} state - 状态对象或null
+ * @param {boolean} [isauto] - 是否自动触发
+ */
 USER.prototype.set_state = function (state, isauto) {
     if (this.state && !state) {
         if (this.state.on_stop) {
@@ -550,13 +693,24 @@ USER.prototype.set_state = function (state, isauto) {
         this.environment.item_changed(this, true);
 }
 
+/**
+ * 获取状态文本描述
+ * @returns {string}
+ */
 USER.prototype.get_state = function () {
     var str = "";
     if (!this.socket) str += "<red>&lt;断线中&gt;</red>";
     if (this.state) str += ("<hig>&lt;" + this.state.title + "&gt;</hig>");
     return str;
 }
+
+/** @type {string[]} 等级称号 */
 const LEVELS_TITLES = ["普通百姓", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
+
+/**
+ * 获取完整显示名称(含颜色)
+ * @returns {string}
+ */
 USER.prototype.long_name = function () {
     if (!this.color_name) {
         var cc = this.get_level_color();
@@ -587,22 +741,41 @@ USER.prototype.long_name = function () {
 }
 
 
+/** 初始化用户任务 */
 USER.prototype.init_tasks = function () {
     for (var i = 0; i < WORLD.TASKS.length; i++) {
         var task = WORLD.TASKS[i];
         task.on_start && task.on_start(this);
     }
 }
+
+/**
+ * 查询精力值
+ * @returns {number}
+ */
 USER.prototype.query_jingli = function () {
     var expend = this.query_temp("ex_jl") || 0;
     return 200 - expend + (this.query_temp("add_jl") || 0);
 }
+
+/** @type {number[]} 各等级精力上限 */
 const jclimits = [1000, 2000, 3000, 5000, 7000, 10000, 15000];
+
+/**
+ * 查询当前等级的精力上限
+ * @returns {number}
+ */
 USER.prototype.query_jclimit = function () {
     return jclimits[this.level] || 1000;
 }
 
 
+/**
+ * 添加物品到背包
+ * @param {OBJ|string} obj - 物品对象或物品路径
+ * @param {number} [count] - 数量
+ * @returns {OBJ|undefined}
+ */
 USER.prototype.add_obj = function (obj, count) {
     if (!obj) return;
     if (typeof obj == "string") {
@@ -617,6 +790,13 @@ USER.prototype.add_obj = function (obj, count) {
     obj.notify_action(this, true);
     return obj;
 }
+
+/**
+ * 从背包移除物品
+ * @param {OBJ|string} obj - 物品对象或ID
+ * @param {number} [count] - 数量
+ * @returns {OBJ|undefined}
+ */
 USER.prototype.remove_obj = function (obj, count) {
     if (typeof obj == "string") {
         obj = this.find_obj(obj);
@@ -631,6 +811,12 @@ USER.prototype.remove_obj = function (obj, count) {
     this.items_changed(obj, count);
     return newobj;
 }
+
+/**
+ * 物品变更通知客户端
+ * @param {OBJ} item - 物品
+ * @param {number} [drop_count] - 减少数量
+ */
 USER.prototype.items_changed = function (item, drop_count) {
 
     if (drop_count) {
@@ -677,7 +863,7 @@ USER.prototype.items_changed = function (item, drop_count) {
     }
 }
 
-//初始化人物使用的技能
+/** 通知客户端技能变更 */
 USER.prototype.on_skillchanged = function () {
     var str = ["{type:\"perform\",skills:["];
     if (this.skills) {
@@ -731,10 +917,18 @@ USER.prototype.on_skillchanged = function () {
     str.push("}");
     this.send(str.join(""));
 }
+
+/** 回到自己的家 */
 USER.prototype.go_home = function () {
     let my_room = this.query_home();
     this.moveto(my_room, this.name + "向里面走去。");
 }
+
+/**
+ * 查询家园房间
+ * @param {string} [rm_name] - 房间名
+ * @returns {ROOM|null}
+ */
 USER.prototype.query_home = function (rm_name) {
     let home = this.query_temp("home");
     if (!home) return null;
@@ -747,18 +941,33 @@ USER.prototype.query_home = function (rm_name) {
     return my_room;
 }
 
+/**
+ * 增加积分
+ * @param {number} val
+ */
 USER.prototype.add_score = function (val) {
     if (!val) return;
     this.score += val;
     WORLD.STATS.updateScore(this);
 }
+
+/**
+ * 增加金钱
+ * @param {number} val
+ * @returns {boolean} 是否成功
+ */
 USER.prototype.add_money = function (val) {
     let money = parseInt(this.money + val);
     if (!(money >= 0)) return false;
     this.money = money;
-    //this.send(`{"type":"dialog","dialog":"pack","money":${money}}`);
     return true;
 }
+
+/**
+ * 增加元宝
+ * @param {number} count
+ * @param {string} desc - 描述
+ */
 USER.prototype.add_cash = function (count, desc) {
     if (!(count > 0 || count < 0)) return;
     this.cash_money += count;
@@ -770,9 +979,20 @@ USER.prototype.add_cash = function (count, desc) {
 
 }
 
+/**
+ * 查询元宝数量
+ * @param {boolean} [is_cash]
+ * @returns {number}
+ */
 USER.prototype.query_cash = function (is_cash) {
     return this.cash_money;
 }
+
+/**
+ * 是否可以跟随此NPC
+ * @param {NPC} npc
+ * @returns {boolean}
+ */
 USER.prototype.can_follow = function (npc) {
     if (!this.follower) this.follower = [];
     var max = this.query_temp("max_follower") || 3;
@@ -784,6 +1004,12 @@ USER.prototype.can_follow = function (npc) {
     }
     return true;
 }
+
+/**
+ * 添加随从
+ * @param {NPC} npc
+ * @returns {boolean} 是否成功
+ */
 USER.prototype.add_follower = function (npc) {
     if (!this.can_follow(npc)) return false;
     var item = {
@@ -794,6 +1020,11 @@ USER.prototype.add_follower = function (npc) {
     FOLLOWER.INIT(this, item);
     return true;
 }
+
+/**
+ * 清除家园和随从
+ * @param {boolean} [clear_follower=true]
+ */
 USER.prototype.clear_home = function (clear_follower = true) {
     var home = ROOM.Get("home/yuanzi");
     if (home) {
@@ -807,6 +1038,10 @@ USER.prototype.clear_home = function (clear_follower = true) {
         FOLLOWER.RESET(this);
 }
 
+/**
+ * 清除技能冷却时间
+ * @param {string} [pfmid] - 指定绝招ID，不传则清除全部
+ */
 USER.prototype.clear_distime = function (pfmid) {
     if (!this.temp) return;
     if (pfmid) {
@@ -821,10 +1056,17 @@ USER.prototype.clear_distime = function (pfmid) {
         this.send('{type:"clearDistime"}');
     }
 }
+
+/** @type {string[]} 死亡消息模板 */
 var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
 
+/**
+ * 添加战斗属性(临时)
+ * @param {string} name - 属性名
+ * @param {number} val - 属性值
+ */
 USER.prototype.add_combat_prop = function (name, val) {
     this.add_prop(name, val);
     if (!this.combat_props) this.combat_props = [];
@@ -833,6 +1075,7 @@ USER.prototype.add_combat_prop = function (name, val) {
 }
 
 
+/** 清除所有战斗临时属性 */
 USER.prototype.clear_combat_prop = function (name, val) {
     if (this.combat_props) {
         for (let i = 0; i < this.combat_props.length; i++) {

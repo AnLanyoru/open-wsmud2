@@ -1,8 +1,19 @@
-﻿SKILL_TYPES = {
+/**
+ * 技能类型枚举
+ * @readonly
+ * @enum {number}
+ */
+SKILL_TYPES = {
     BASE: 0,
     SKILL: 1,
     KNOWLEDGE: 2
 };
+
+/**
+ * 基本技能ID常量
+ * @readonly
+ * @enum {string}
+ */
 BASE_SKILLS = {
     FORCE: "force",
     DODGE: "dodge",
@@ -10,6 +21,11 @@ BASE_SKILLS = {
     BITE: "bite"
 };
 
+/**
+ * 装备类型枚举
+ * @readonly
+ * @enum {number}
+ */
 EQUIP_TYPE = {
     WEAPON: 0,
     CLOTH: 1,
@@ -23,6 +39,12 @@ EQUIP_TYPE = {
     WAIST: 9,//腰带
     THROWING: 10//
 }
+
+/**
+ * 武器类型常量
+ * @readonly
+ * @enum {string}
+ */
 WEAPON_TYPE = {
     NONE: "unarmed",
     SWORD: "sword",
@@ -32,6 +54,12 @@ WEAPON_TYPE = {
     WHIP: "whip",
     THROWING: "throwing"
 }
+
+/**
+ * 属性名称映射表
+ * @readonly
+ * @type {Object<string, string>}
+ */
 PROPERTIES = {
     "con1": "先天根骨",
     "dex1": "先天身法",

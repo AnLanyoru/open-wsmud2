@@ -1,13 +1,20 @@
-﻿require("../util/util.js");
+/**
+ * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
+ */
+require("../util/util.js");
 require("./user.js");
+
+/** @type {function} */
 FOLLOWER = function () {
     this.hp = this.max_hp = 100;
     this.mp = this.max_mp = 100;
     this.str = this.con = this.dex = this.int = this.per = this.age = 20;
     this.family = FAMILIES.NONE;
     this.auto_pfm = true;
+    /** @type {string|null} 主人ID */
     this.master = null;
     this.level = 3;
+    /** @type {string|null} 主人名称 */
     this.master_name = null;
     this.max_item_count = 10;
     this.settings = {
@@ -16,10 +23,22 @@ FOLLOWER = function () {
     };
 }
 FOLLOWER.inherits(CHARACTER);
+
+/**
+ * 查询随从设置
+ * @param {string} name
+ * @returns {number}
+ */
 FOLLOWER.prototype.query_setting = function (name) {
     if (!this.settings) return 0;
     return this.settings[name] || 0;
 }
+
+/**
+ * 设置随从配置
+ * @param {string} name
+ * @param {string|number} value
+ */
 FOLLOWER.prototype.set_setting = function (name, value) {
     if (!this.settings) this.settings = {};
     if (!value || value == "0") {
@@ -31,24 +50,52 @@ FOLLOWER.prototype.set_setting = function (name, value) {
 
     this.login_message = null;
 }
+
+/**
+ * 发送消息(代为翻译人称)
+ * @param {string} text
+ */
 FOLLOWER.prototype.send = function (text) {
     if (this.listener) {
         text = text.replace('你', this.name);
         this.listener.send(text);
     }
 }
+
+/**
+ * 通知失败
+ * @param {string} text
+ * @returns {boolean} false
+ */
 FOLLOWER.prototype.notify_fail = function (text) {
     this.send(text);
     return false;
 }
+
+/**
+ * 通知消息
+ * @param {string} text
+ */
 FOLLOWER.prototype.notify = function (text) {
     this.send(text);
 }
 
+/**
+ * 设置消息监听者
+ * @param {CHARACTER} me - 消息触发者(主人)
+ * @param {USER} target - 监听目标
+ */
 FOLLOWER.prototype.set_listener = function (me, target) {
     if (me.id == this.master) this.listener = target;
 }
+
+/** @type {Map<string, FOLLOWER>} 随从存储 */
 FOLLOWER.STORES = new Map();
+
+/**
+ * 清除所有随从
+ * @param {USER} me
+ */
 FOLLOWER.CLEAR = function (me) {
     if (!me.follower) return;
     for (var i = 0; i < me.follower.length; i++) {
@@ -62,6 +109,10 @@ FOLLOWER.CLEAR = function (me) {
     }
 }
 
+/**
+ * 重置随从(不出现在当前场景)
+ * @param {USER} me
+ */
 FOLLOWER.RESET = function (me) {
     if (!me.follower) return;
     for (var i = 0; i < me.follower.length; i++) {
@@ -72,6 +123,12 @@ FOLLOWER.RESET = function (me) {
         }
     }
 }
+
+/**
+ * 从用户数据初始化随从
+ * @param {USER} me
+ * @param {Array<{id: string, path: string}>} datas
+ */
 FOLLOWER.INIT_FROM_USER = function (me, datas) {
 
     for (var j = 0; j < datas.length; j++) {
@@ -105,6 +162,13 @@ FOLLOWER.INIT_FROM_USER = function (me, datas) {
         my_npc.master_name = me.name;
     }
 }
+
+/**
+ * 初始化单个随从
+ * @param {USER} me
+ * @param {{path: string, id: string}} par
+ * @returns {FOLLOWER|undefined}
+ */
 FOLLOWER.INIT = function (me, par) {
     if (!par || !par.path) return;
     var npc;
@@ -137,6 +201,13 @@ FOLLOWER.INIT = function (me, par) {
     npc.master_name = me.name;
     return npc;
 }
+
+/**
+ * 替换随从(版本更新)
+ * @param {USER} me
+ * @param {FOLLOWER} old - 旧随从
+ * @param {NPC} npc - 新NPC模板
+ */
 FOLLOWER.REPLACE = function (me, old, npc) {
     if (!old || !npc) return;
     var copys = ["str", "con", "dex", "int", "gender", "kar", "per", "name", "title", "desc", "on_master_learn", "on_master_enter"];
@@ -164,7 +235,7 @@ FOLLOWER.REPLACE = function (me, old, npc) {
     for (var sk in npc.skills) {
         var oldSkill = old.skills[sk];
         if (oldSkill && oldSkill.addin && oldSkill.addin.length)
-            continue;//已经进阶的不覆盖
+            continue;
         if (!oldSkill || oldSkill.level < npc.skills[sk].level) {
             old.skills[sk] = npc.skills[sk];
         }
@@ -199,10 +270,24 @@ FOLLOWER.REPLACE = function (me, old, npc) {
         }
     }
 }
+
+/**
+ * 获取随从
+ * @param {USER} me
+ * @param {{id: string}} par
+ * @returns {FOLLOWER|undefined}
+ */
 FOLLOWER.GET = function (me, par) {
     var id = me.id + "_" + par.id;
     return FOLLOWER.STORES.get(id);
 }
+
+/**
+ * 创建随从
+ * @param {USER} me
+ * @param {{path: string, id: string}} par
+ * @param {function(FOLLOWER)} callback
+ */
 FOLLOWER.CREATE = function (me, par, callback) {
     if (!par || !par.path) return;
     var id = me.id + "_" + par.id;
@@ -210,9 +295,18 @@ FOLLOWER.CREATE = function (me, par, callback) {
     if (npc) return callback(npc);
 
 }
+
+/** @type {string[]} 需保存的数值属性 */
 var SAVE_NUMPROP = ["str", "con", "dex", "int", "gender", "max_mp", "limit_mp", "exp", "pot", "kar", "per"
     , "hp", "mp", "max_item_count", "money", 'level'];
+/** @type {string[]} 需保存的字符串属性 */
 var SAVE_STRPROP = ["id", "name", "title", "desc"];
+
+/**
+ * 序列化随从数据
+ * @param {USER} me
+ * @returns {string}
+ */
 FOLLOWER.prototype.save = function (me) {
     var str = ["prop:["];
     for (var i = 0; i < SAVE_NUMPROP.length; i++) {
@@ -251,6 +345,12 @@ FOLLOWER.prototype.save = function (me) {
     }
     return str.join("");
 }
+
+/**
+ * 保存所有随从数据
+ * @param {USER} me
+ * @returns {string} JSON字符串
+ */
 FOLLOWER.SAVE = function (me) {
     if (!me.follower) return "[]";
     var str = ["["];
@@ -273,9 +373,17 @@ FOLLOWER.SAVE = function (me) {
     str.push("]");
     return str.join("");
 }
+
+/** @type {string[]} 死亡消息 */
 var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+/**
+ * 随从死亡
+ * @param {CHARACTER} killer
+ * @returns {boolean|undefined}
+ */
 FOLLOWER.prototype.die = function (killer) {
     if (!this.environment) return;
     if (this.on_die && this.on_die(killer) == false) {
@@ -291,9 +399,12 @@ FOLLOWER.prototype.die = function (killer) {
     this.environment = null;
 }
 
+/**
+ * 随从心跳
+ * @param {number} dt
+ */
 FOLLOWER.prototype.heart_beat = function (dt) {
     if (!this.hp) return;
-    // this.add_exp(this.grow_level, this.grow_level);
     if (!this.fight_type) {
         if (this.hp < this.max_hp) {
             this.add_hp(parseInt(this.max_hp / 3));
@@ -317,6 +428,12 @@ FOLLOWER.prototype.heart_beat = function (dt) {
         }
     }
 }
+
+/**
+ * 设置随从状态
+ * @param {*} state
+ * @param {boolean} [isauto]
+ */
 FOLLOWER.prototype.set_state = function (state, isauto) {
     if (this.state && !state) {
         if (this.state.on_stop) {
@@ -336,6 +453,10 @@ FOLLOWER.prototype.set_state = function (state, isauto) {
     this.master_json = null;
 }
 
+/**
+ * 查询主人专用命令列表
+ * @returns {string} JSON
+ */
 FOLLOWER.prototype.query_mastercommands = function () {
     if (this.master_json) return this.master_json;
     var json = {};
@@ -389,6 +510,12 @@ FOLLOWER.prototype.query_mastercommands = function () {
     this.master_json = JSON.stringify(json)
     return this.master_json;
 }
+
+/**
+ * 查询命令列表(区分主人/他人)
+ * @param {USER} player
+ * @returns {string}
+ */
 FOLLOWER.prototype.query_commands = function (player) {
     if (player.id == this.master) {
         return this.query_mastercommands(player);
@@ -420,6 +547,12 @@ FOLLOWER.prototype.query_commands = function (player) {
     this.json = JSON.stringify(json)
     return this.json;
 }
+
+/**
+ * 回应询问
+ * @param {USER} me
+ * @param {string} par - 询问内容
+ */
 FOLLOWER.prototype.on_ask = function (me, par) {
     switch (par) {
         case "主人":
@@ -427,6 +560,11 @@ FOLLOWER.prototype.on_ask = function (me, par) {
             break;
     }
 }
+
+/**
+ * 加入队伍回调
+ * @param {USER} me
+ */
 FOLLOWER.prototype.on_teamin = function (me) {
     if (!this.team) return;
     for (var i = 0; i < this.team.length; i++) {
@@ -436,6 +574,11 @@ FOLLOWER.prototype.on_teamin = function (me) {
         }
     }
 }
+
+/**
+ * 离开队伍回调
+ * @param {USER} me
+ */
 FOLLOWER.prototype.on_teamout = function (me) {
     if (!this.team) return;
     for (var i = 0; i < this.team.length; i++) {
@@ -448,6 +591,11 @@ FOLLOWER.prototype.on_teamout = function (me) {
         }
     }
 }
+
+/**
+ * 完整显示名称
+ * @returns {string}
+ */
 FOLLOWER.prototype.long_name = function () {
     if (this.color_name) return this.color_name;
     var str = [];
@@ -462,24 +610,31 @@ FOLLOWER.prototype.long_name = function () {
     return this.color_name = str.join("");
 
 }
+
+/**
+ * 主人进入房间回调
+ * @param {USER} me
+ */
 FOLLOWER.prototype.on_enter = function (me) {
     if (me.id == this.master) {
         this.on_master_enter && this.on_master_enter(me);
     }
 }
+
+/**
+ * 主人离开房间回调
+ * @param {USER} me
+ * @param {ROOM} nextrm
+ * @returns {boolean}
+ */
 FOLLOWER.prototype.on_master_leave = function (me, nextrm) {
     if (this.state || !this.team || this.team != me.team) return false;
     if (this.hp <= 0) return false;
     if (me.environment === this.environment) return false;
 
-    //如果去副本或者家里就跟
     if (nextrm.is_fb() || nextrm.parent.id == "home") {
         return true;
     }
 
-
-    //如果当前是副本就自己回去
-    //if (this.environment.is_fb())
-    //    this.environment.item_changed(this, false, this.name + "离开了。");
     return false;
 }

@@ -1,25 +1,52 @@
-﻿/*global SKILL_TYPES SKILL BASE PROPERTIES WORLD FAMILIES*/
+/**
+ * SKILL 技能基类 & PERFORM 绝招类
+ */
+/*global SKILL_TYPES SKILL BASE PROPERTIES WORLD FAMILIES*/
 
 require("../util/util.js");
+
+/** @type {function} */
 SKILL = function () {
     this.id = "";
     this.name = "";
+    /** @type {number} 技能类型 */
     this.type = SKILL_TYPES.SKILL;
+    /** @type {number} 品级 */
     this.grade = 1;
     this.score = 0;
 }
 SKILL.inherits(BASE);
+
+/**
+ * 获取攻击动作描述
+ * @param {CHARACTER} me - 攻击者
+ * @param {CHARACTER} target - 目标
+ * @returns {string}
+ */
 SKILL.prototype.query_attack_action = function (me, target) {
     if (this.attack_actions)
         return this.attack_actions.random();
     return "";
 }
+
+/**
+ * 获取闪避动作描述
+ * @returns {string}
+ */
 SKILL.prototype.query_dodge_action = function () {
     if (!this.dodge_actions) {
         return "";
     }
     return this.dodge_actions.random();
 }
+
+/**
+ * 获取招架动作描述
+ * @param {CHARACTER} me - 防御者
+ * @param {CHARACTER} target - 攻击者
+ * @param {EQUIPMENT} [w2] - 攻击者武器
+ * @returns {string}
+ */
 SKILL.prototype.query_parry_action = function (me, target, w2) {
     var w1 = me.query_weapon();
     w2 = w2 || target.query_weapon();
@@ -43,10 +70,23 @@ SKILL.prototype.query_parry_action = function (me, target, w2) {
     }
 }
 
+/**
+ * 查升级所需经验
+ * @param {number} lv - 当前等级
+ * @param {CHARACTER} me
+ * @returns {number}
+ */
 SKILL.prototype.level_exp = function (lv, me) {
     var grd = this.query_grade(me);
     return (lv + 1) * (grd + 1) * 5;
 }
+
+/**
+ * 查询从100级到指定等级总需经验
+ * @param {number} level
+ * @param {CHARACTER} me
+ * @returns {number}
+ */
 SKILL.prototype.query_needexp = function (level, me) {
     if (level > 100) {
         var grd = this.query_grade(me);
@@ -58,10 +98,19 @@ SKILL.prototype.query_needexp = function (level, me) {
 }
 
 
+/**
+ * 设置为默认技能
+ * @param {string} type - 基本技能类型
+ */
 SKILL.prototype.set_default = function (type) {
     WORLD.DEFAULT_SKILLS[type] = this;
 }
 
+/**
+ * 移除技能附加属性
+ * @param {CHARACTER} me
+ * @param {number} lv - 技能等级
+ */
 SKILL.prototype.release_prop = function (me, lv) {
     if (!lv) return;
     var prop = this.query_prop(lv, me);
@@ -84,6 +133,11 @@ SKILL.prototype.release_prop = function (me, lv) {
     }
 }
 
+/**
+ * 附加技能属性
+ * @param {CHARACTER} me
+ * @param {number} lv
+ */
 SKILL.prototype.attach_prop = function (me, lv) {
     if (!lv) return;
     var prop = this.query_prop(lv, me);
@@ -105,13 +159,30 @@ SKILL.prototype.attach_prop = function (me, lv) {
         }
     }
 }
+
+/**
+ * 查询装备属性(子类重写)
+ * @param {number} lv
+ * @returns {Object<string, Object>|undefined}
+ */
 SKILL.prototype.query_enable_prop = function (lv) {
 
 }
+
+/**
+ * 查询基础属性(子类重写)
+ * @param {number} lv
+ * @returns {Object<string, number>|undefined}
+ */
 SKILL.prototype.query_prop = function (lv) {
 
 }
 
+/**
+ * 查询技能品级(含进阶)
+ * @param {CHARACTER} me
+ * @returns {number}
+ */
 SKILL.prototype.query_grade = function (me) {
     var sk = me.skills[this.id];
     var lv = this.grade;
@@ -124,12 +195,24 @@ SKILL.prototype.query_grade = function (me) {
 
     return lv;
 }
+
+/**
+ * 获取技能颜色名称
+ * @param {CHARACTER} me
+ * @returns {string}
+ */
 SKILL.prototype.query_color_name = function (me) {
 
     var desc = level_color[this.query_grade(me)];
     return "<" + desc + ">" + this.name + "</" + desc + ">";
 }
 
+/**
+ * 查询进阶属性
+ * @param {CHARACTER} me
+ * @param {number} lv
+ * @returns {Object<string, number>|null}
+ */
 SKILL.prototype.query_addin_prop = function (me, lv) {
     var sk = me.skills[this.id];
     if (sk.addin && sk.addin.length) {
@@ -147,6 +230,12 @@ SKILL.prototype.query_addin_prop = function (me, lv) {
     }
     return null;
 }
+
+/**
+ * 检查技能是否已装备到某个基本技能
+ * @param {CHARACTER} me
+ * @returns {boolean}
+ */
 SKILL.prototype.is_enable = function (me) {
     if (this.type !== SKILL_TYPES.SKILL) return true;
     var skill = me.skills[this.id];
@@ -155,12 +244,25 @@ SKILL.prototype.is_enable = function (me) {
     }
     return false;
 }
+
+/**
+ * 检查技能是否装备到指定基本技能
+ * @param {CHARACTER} me
+ * @param {string} baseskill
+ * @returns {boolean}
+ */
 SKILL.prototype.is_enable2 = function (me, baseskill) {
     var skill = me.skills[this.id];
 
     return skill ? skill[baseskill] : false;
 }
-//激活技能,附加装备的部分属性
+
+/**
+ * 激活技能
+ * @param {CHARACTER} me
+ * @param {string} type - 基本技能类型
+ * @returns {boolean}
+ */
 SKILL.prototype.enable = function (me, type) {
     if (!this.can_enables || !this.can_enables.contain(type)) return false;
     if (this.on_enable && this.on_enable(me, type) === false) return false;
@@ -172,7 +274,6 @@ SKILL.prototype.enable = function (me, type) {
             me.change_prop(enable_prop, true);
         }
     }
-    //附加进阶属性
     prop = this.query_addin_prop(me, lv);
     if (prop) {
         if (!this.is_enable(me)) {
@@ -181,7 +282,12 @@ SKILL.prototype.enable = function (me, type) {
     }
     return true;
 }
-//取消激活技能,解除装备的部分属性
+
+/**
+ * 取消激活技能
+ * @param {CHARACTER} me
+ * @param {string} type
+ */
 SKILL.prototype.disenable = function (me, type) {
     this.on_disenable && this.on_disenable(me, type);
     var lv = me.query_skill(this.id);
@@ -193,8 +299,6 @@ SKILL.prototype.disenable = function (me, type) {
         }
     }
 
-
-    //附加进阶属性
     prop = this.query_addin_prop(me, lv);
     if (prop) {
         if (!this.is_enable(me)) {
@@ -204,6 +308,12 @@ SKILL.prototype.disenable = function (me, type) {
     }
     return true;
 }
+
+/**
+ * 检查并执行学习条件
+ * @param {CHARACTER} me
+ * @returns {boolean|undefined}
+ */
 SKILL.prototype.do_learn = function (me) {
     if (this.on_learn && this.on_learn(me) === false) return false;
     if (this.learn_condition) {
@@ -263,6 +373,11 @@ SKILL.prototype.do_learn = function (me) {
     return true;
 }
 
+/**
+ * 学习条件转字符串
+ * @param {CHARACTER} me
+ * @returns {string}
+ */
 SKILL.prototype.condition_tostring = function (me) {
     if (this.learn_condition_string) return this.learn_condition_string;
     var str = [];
@@ -291,6 +406,13 @@ SKILL.prototype.condition_tostring = function (me) {
     this.learn_condition_string = str.join("\n");
     return this.learn_condition_string;
 }
+
+/**
+ * 技能JSON序列化
+ * @param {string[]} str - 输出数组
+ * @param {*} skill_item - 技能数据
+ * @param {CHARACTER} me
+ */
 SKILL.prototype.item_to_json = function (str, skill_item, me) {
     str.push('{"id":"');
     str.push(this.id);
@@ -321,11 +443,17 @@ SKILL.prototype.item_to_json = function (str, skill_item, me) {
     }
     str.push('}');
 }
+
+/**
+ * 增加技能经验
+ * @param {CHARACTER} me
+ * @param {number} exp
+ * @returns {boolean|undefined} true表示升级了
+ */
 SKILL.prototype.add_exp = function (me, exp) {
     var skill = me.skills[this.id];
     if (!skill) {
         skill = {
-            // id: this.id,
             level: 0,
             exp: 0
         };
@@ -363,11 +491,23 @@ SKILL.prototype.add_exp = function (me, exp) {
         me.notify('{type:"dialog",dialog:"skills",id:"' + this.id + '",exp:' + parseInt(skill.exp * 100 / need_exp) + '}');
     }
 }
+
+/**
+ * 查询技能总积分
+ * @param {number} lv
+ * @param {CHARACTER} me
+ * @returns {number}
+ */
 SKILL.prototype.query_score = function (lv, me) {
     if (lv <= 100) return 0;
     return (lv - 100) * this.query_one_score(me);
 }
 
+/**
+ * 查询每级积分
+ * @param {CHARACTER} me
+ * @returns {number}
+ */
 SKILL.prototype.query_one_score = function (me) {
     var sc = 0;
     if (this.type === SKILL_TYPES.SKILL) {
@@ -377,6 +517,13 @@ SKILL.prototype.query_one_score = function (me) {
     }
     return sc;
 }
+
+/**
+ * 技能进阶
+ * @param {CHARACTER} me
+ * @param {SKILL} target_skill - 目标技能
+ * @returns {boolean}
+ */
 SKILL.prototype.grade_up = function (me, target_skill) {
     var skill = me.skills[this.id];
     if (!skill || !(skill.level >= 1000)) return false;
@@ -399,26 +546,47 @@ SKILL.prototype.grade_up = function (me, target_skill) {
     me.recount();
     return true;
 }
+
+/**
+ * 获取绝招定义
+ * @param {string} name - 绝招名
+ * @returns {PERFORM|undefined}
+ */
 SKILL.prototype.get_pfm = function (name) {
     if (this.pfm) {
         return this.pfm[name];
     }
 }
+
+/**
+ * 设置绝招
+ * @param {string} name
+ * @param {PERFORM} obj
+ */
 SKILL.prototype.set_pfm = function (name, obj) {
     if (!this.pfm) {
         this.pfm = {};
     }
     this.pfm[name] = obj;
 }
+
+/** @type {string[]} 品级颜色 */
 var level_color = ["wht", "hig", "hic", "hiy", "hiz", "hio", "ord"];
+/** @type {string[]} 品级描述 */
 var level_desc = ["基本技能", "普通技能", "高级技能", "稀有武技", "绝世武功", "绝世神功", "无上神武"];
 
+/**
+ * 技能创建回调
+ * @param {string} fname
+ */
 SKILL.prototype.create = function (fname) {
     if (WORLD.SKILLS[this.id]) {
         console.log("%s [%s] is repeated ", this.id, fname);
     }
     this.update(fname);
 }
+
+/** 按品级和基本技能类型存储 */
 SKILL.prototype.store = function () {
     if (this.type === SKILL_TYPES.KNOWLEDGE
         || this.type === SKILL_TYPES.BASE
@@ -430,6 +598,10 @@ SKILL.prototype.store = function () {
     }
 }
 
+/**
+ * 技能注册/更新
+ * @param {string} fname
+ */
 SKILL.prototype.update = function (fname) {
     WORLD.SKILLS[this.id] = this;
     var fam = this.family || FAMILIES.NONE;
@@ -477,9 +649,22 @@ SKILL.prototype.update = function (fname) {
         }
     }
 }
+
+/**
+ * 根据ID获取技能
+ * @param {string} id
+ * @returns {SKILL|undefined}
+ */
 SKILL.get = function (id) {
     return WORLD.SKILLS[id];
 }
+
+/**
+ * 查询技能完整描述
+ * @param {CHARACTER} me
+ * @param {number} lv
+ * @returns {string}
+ */
 SKILL.prototype.query_desc = function (me, lv) {
     var str = [];
     var grd = this.query_grade(me);
@@ -571,6 +756,12 @@ SKILL.prototype.query_desc = function (me, lv) {
     }
     return str.join("");
 }
+
+/**
+ * 查询进阶属性槽位
+ * @param {number} index - 槽位索引
+ * @returns {*}
+ */
 SKILL.prototype.query_slot = function (index) {
     if (index < 500) {
         return SKILL.PROPERTIES[index];
@@ -578,8 +769,20 @@ SKILL.prototype.query_slot = function (index) {
         return this.slots ? this.slots[index - 500] : null;
     }
 }
+
+/** @type {number} 引用技能冷却系数 */
 SKILL.REF_CD = 2;
+/** @type {Object<string, *>} 特殊槽位定义 */
 SKILL.SLOTS = {};
+
+/**
+ * 查询绝招描述
+ * @param {CHARACTER} me
+ * @param {PERFORM} p_item
+ * @param {string[]} str
+ * @param {number} lv
+ * @param {string} [pname] - 父技能名(引用技能时)
+ */
 SKILL.prototype.query_pfm_desc = function (me, p_item, str, lv, pname) {
     var canuse = !p_item.check || p_item.check(me, lv) === true;
     var color = canuse ? "hic" : "red";
@@ -612,15 +815,27 @@ SKILL.prototype.query_pfm_desc = function (me, p_item, str, lv, pname) {
 }
 
 
+/** @type {function} 绝招基类 */
 PERFORM = function () {
     this.name = "";
 }
 PERFORM.inherits(BASE);
 
+/**
+ * 查询绝招名称
+ * @param {CHARACTER} me
+ * @returns {string}
+ */
 PERFORM.prototype.query_name = function (me) {
     return this.name;
 }
 
+/**
+ * 改变绝招冷却时间
+ * @param {CHARACTER} me
+ * @param {string} id - 绝招ID
+ * @param {number} [add_time] - 增加冷却时间(毫秒), 不传则清除
+ */
 PERFORM.prototype.change_distime = function (me, id, add_time) {
     if (me.is_player) {
         var dis_time = me.temp["pfm/" + id];
