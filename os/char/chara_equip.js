@@ -1,5 +1,12 @@
-﻿
+/**
+ * CHARACTER 装备系统扩展
+ */
 require("./character.js");
+
+/**
+ * 设置初始佩戴物品
+ * @param {...[string, number, boolean]} arguments - [物品路径, 数量, 是否装备]
+ */
 CHARACTER.prototype.set_objects = function () {
     if (!arguments.length) return;
     if (!this.items) this.items = [];
@@ -17,6 +24,13 @@ CHARACTER.prototype.set_objects = function () {
 
 }
 
+/**
+ * 卸下装备
+ * @param {EQUIPMENT} obj - 装备对象
+ * @param {boolean} [notsend] - 是否不发送消息
+ * @param {number} [recover_time=0] - 冷却时间
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.unequip = function (obj, notsend, recover_time = 0) {
     if (!obj || !obj.is_equipment || !this.equipment) return;
     if (obj.uneq(this, notsend) == false) {
@@ -43,6 +57,12 @@ CHARACTER.prototype.unequip = function (obj, notsend, recover_time = 0) {
 
 
 
+
+/**
+ * 装备物品
+ * @param {EQUIPMENT} obj - 装备对象
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.equip = function (obj) {
     if (!obj || !obj.is_equipment) return;
     if (!this.equipment) this.equipment = []
@@ -90,6 +110,8 @@ CHARACTER.prototype.equip = function (obj) {
         }
     }
 }
+
+/** @type {Object<string, boolean>} 需要武器的技能类型 */
 const WEAPON_TYPES = {
     "sword": true,
     "blade": true,
@@ -97,6 +119,11 @@ const WEAPON_TYPES = {
     "club": true,
     "whip": true
 }
+
+/**
+ * 武器变更处理
+ * @param {boolean} iseq - 是否装备武器
+ */
 CHARACTER.prototype.weapon_changed = function (iseq) {
     this.attack_skill = this.query_used_skill(this.query_weapon_type());
     this.on_skillchanged && this.on_skillchanged();
@@ -108,6 +135,13 @@ CHARACTER.prototype.weapon_changed = function (iseq) {
         }
     }
 }
+
+/**
+ * 添加物品
+ * @param {OBJ|string} obj
+ * @param {number} [count]
+ * @returns {OBJ|undefined}
+ */
 CHARACTER.prototype.add_obj = function (obj, count) {
     if (!obj) return;
     if (typeof obj == "string") {
@@ -118,6 +152,13 @@ CHARACTER.prototype.add_obj = function (obj, count) {
     }
     return obj;
 }
+
+/**
+ * 移除物品
+ * @param {OBJ|string} obj
+ * @param {number} [count]
+ * @returns {OBJ|undefined}
+ */
 CHARACTER.prototype.remove_obj = function (obj, count) {
     if (typeof obj == "string") {
         obj = this.find_obj(obj);
@@ -127,11 +168,21 @@ CHARACTER.prototype.remove_obj = function (obj, count) {
     this.remove_item(obj, count);
     return obj;
 }
+
+/**
+ * 获取当前武器
+ * @returns {EQUIPMENT|undefined}
+ */
 CHARACTER.prototype.query_weapon = function () {
     if (this.equipment) {
         return this.equipment[EQUIP_TYPE.WEAPON];
     }
 }
+
+/**
+ * 获取当前武器类型
+ * @returns {string}
+ */
 CHARACTER.prototype.query_weapon_type = function () {
     if (this.equipment) {
         var eq = this.equipment[EQUIP_TYPE.WEAPON];
@@ -139,18 +190,33 @@ CHARACTER.prototype.query_weapon_type = function () {
     }
     return WEAPON_TYPE.NONE;
 }
+
+/**
+ * 获取武器名称
+ * @returns {string}
+ */
 CHARACTER.prototype.weapon_name = function () {
     if (this.equipment && this.equipment[EQUIP_TYPE.WEAPON]) {
         return this.equipment[EQUIP_TYPE.WEAPON].color_name;
     }
     return "";
 }
+
+/**
+ * 获取暗器名称
+ * @returns {string}
+ */
 CHARACTER.prototype.throwing_name = function () {
     if (this.equipment && this.equipment[EQUIP_TYPE.THROWING]) {
         return this.equipment[EQUIP_TYPE.THROWING].color_name;
     }
     return "";
 }
+
+/**
+ * 是否有暗器可用
+ * @returns {boolean}
+ */
 CHARACTER.prototype.can_throwing = function () {
     if (this.equipment) {
         var th = this.equipment[EQUIP_TYPE.THROWING];
@@ -159,15 +225,31 @@ CHARACTER.prototype.can_throwing = function () {
     }
     return false;
 }
+
+/**
+ * 获取指定类型装备
+ * @param {number} type - 装备类型 (EQUIP_TYPE)
+ * @returns {EQUIPMENT|undefined}
+ */
 CHARACTER.prototype.get_equipment = function (type) {
     return this.equipment && this.equipment[type];
 }
+
+/**
+ * 设置掉落列表
+ * @param {...*} arguments - 掉落定义
+ */
 CHARACTER.prototype.set_drop = function () {
     this.drop_list = this.drop_list || [];
     for (var i = 0; i < arguments.length; i++) {
         this.drop_list.push(arguments[i]);
     }
 }
+
+/**
+ * 查询掉落物品
+ * @returns {OBJ[]|undefined}
+ */
 CHARACTER.prototype.query_drop = function () {
     if (!this.drop_list) return;
     return OBJ.create_by_odds(this.drop_list);

@@ -1,35 +1,81 @@
-﻿
+/**
+ * CHARACTER 通用/显示 方法扩展
+ */
 require("./character");
 
+/** @type {string[]} 等级称号 */
 var level_descs = ["普通百姓", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
+/** @type {string[]} 等级颜色 */
 var level_color = ["", "wht", "hig", "hiy", "hiz", "hio", "ord"];
+
+/**
+ * 获取等级描述(含颜色)
+ * @returns {string}
+ */
 CHARACTER.prototype.get_level_desc = function () {
     if (!this.level) return level_descs[this.level];
     var cc = level_color[this.level];
     return "<" + cc + ">" + level_descs[this.level] + "</" + cc + ">";
 }
+
+/**
+ * 获取等级颜色
+ * @returns {string}
+ */
 CHARACTER.prototype.get_level_color = function () {
     return level_color[this.level];
 }
-//发送给当前对象的消息
+
+/**
+ * 完整显示名称
+ * @returns {string}
+ */
 CHARACTER.prototype.long_name = function () {
 
     if (this.title) return this.title + " " + this.name;
     return this.name;
 
 }
+
+/**
+ * 查询称号
+ * @returns {string|undefined}
+ */
 CHARACTER.prototype.query_title = function () {
     return this.title;
 }
+
+/**
+ * 查询年龄
+ * @returns {number}
+ */
 CHARACTER.prototype.query_age = function () {
     return this.age;
 }
+
+/**
+ * 门派称谓
+ * @param {boolean} [isbad]
+ * @returns {string}
+ */
 CHARACTER.prototype.call = function (isbad) {
     return this.family.call(this, isbad);
 }
+
+/**
+ * 自称
+ * @param {boolean} [isbad]
+ * @returns {string}
+ */
 CHARACTER.prototype.callme = function (isbad) {
     return this.family.call_me(this);
 }
+
+/**
+ * 同门师兄弟姐妹称谓
+ * @param {CHARACTER} target
+ * @returns {string}
+ */
 CHARACTER.prototype.fam_call = function (target) {
     let age1 = target.query_age();
     let age2 = this.query_age();
@@ -38,18 +84,40 @@ CHARACTER.prototype.fam_call = function (target) {
     }
     return this.gender === 1 ? "师弟" : "师妹";
 }
+
+/**
+ * 第三人称代称
+ * @returns {string}
+ */
 CHARACTER.prototype.call3 = function () {
     return this.gender == 1 ? "他" : "她";
 }
+
+/**
+ * 是否隐藏
+ * @returns {boolean}
+ */
 CHARACTER.prototype.is_hidden = function () {
     return this.hp <= 0 || this.query_temp('hidden');
 }
+
+/**
+ * 是否是队友
+ * @param {CHARACTER} p
+ * @returns {boolean}
+ */
 CHARACTER.prototype.is_team = function (p) {
     if (!p) return false;
     if (p.team)
         return this.team == p.team;
     return this.family == p.family;
 }
+
+/**
+ * 向队伍发送消息
+ * @param {string} msg
+ * @param {boolean} [nome] - 是否排除自己
+ */
 CHARACTER.prototype.send_team = function (msg, nome) {
     if (!this.team) return this.send(msg);
     for (var i = 0; i < this.team.length; i++) {
@@ -57,10 +125,20 @@ CHARACTER.prototype.send_team = function (msg, nome) {
         this.team[i].send(msg);
     }
 }
+
+/**
+ * 查询队伍ID
+ * @returns {string|null}
+ */
 CHARACTER.prototype.query_teamid = function () {
     if (this.follow_target) return this.follow_target.query_teamid();
     return null;
 }
+
+/**
+ * 查询状态JSON
+ * @returns {string}
+ */
 CHARACTER.prototype.query_status = function () {
     var ary = ["{type:\"status\",hp:"];
     ary.push(this.hp);
@@ -81,6 +159,13 @@ CHARACTER.prototype.query_status = function () {
 CHARACTER.prototype.query_commands = function () {
 
 }
+
+/**
+ * 查询外观描述
+ * @param {CHARACTER} me - 观察者
+ * @param {string} [eqcmd] - 查看装备命令
+ * @returns {string}
+ */
 CHARACTER.prototype.query_desc = function (me, eqcmd) {
     var str = [];
     str.push(this.long_name());
@@ -94,6 +179,12 @@ CHARACTER.prototype.query_desc = function (me, eqcmd) {
     return str.join("");
 }
 
+/**
+ * 格式化装备显示
+ * @param {string} call3 - 第三人称代词
+ * @param {string[]} str - 输出数组
+ * @param {string} [eqcmd]
+ */
 CHARACTER.prototype.format_equipments = function (call3, str, eqcmd) {
     if (this.query_setting("hide_equip")) {
         return str.push("看样子", call3, "不想让别人看自己的装备。");
@@ -112,6 +203,11 @@ CHARACTER.prototype.format_equipments = function (call3, str, eqcmd) {
     str.push(call3, "光着身子，什么都没穿。\n");
 }
 
+/**
+ * 获取容貌描述
+ * @param {CHARACTER} obj
+ * @returns {string}
+ */
 function get_perdesc(obj) {
     var ary = obj.gender === 1 ? boy_pers : girl_pers;
     var per = obj.per + obj.query_prop("per");
@@ -120,11 +216,23 @@ function get_perdesc(obj) {
     if (index >= ary.length) index = ary.length - 1;
     return ary[index];
 }
+
+/**
+ * 获取年龄段描述
+ * @param {number} age
+ * @returns {string}
+ */
 function get_agestr(age) {
     var index = parseInt((age || 10) / 10);
     if (index >= age_strs.length) index = age_strs.length - 1;
     return age_strs[index];
 }
+
+/**
+ * 获取武功等级描述
+ * @param {number} level
+ * @returns {string}
+ */
 function get_skill_desc(level) {
     if (!level) return "看上去似乎不会任何武功。";
 
@@ -134,6 +242,12 @@ function get_skill_desc(level) {
     if (v > 6) v = 6;
     return "的武功看上去似乎" + skill_levels[v + 20];
 }
+
+/**
+ * 获取气血状态描述
+ * @param {CHARACTER} obj
+ * @returns {string}
+ */
 function get_status(obj) {
     var p = parseInt(obj.hp * 10 / obj.max_hp);
     if (p < 0) p = 0;
@@ -141,6 +255,7 @@ function get_status(obj) {
     return Look_status[p];
 }
 
+/** @type {string[]} 男性容貌描述 */
 var boy_pers = [
     "<BLU>眉歪眼斜，瘌头癣脚，不象人样</BLU>",
     "<BLU>呲牙咧嘴，黑如锅底，奇丑无比</BLU>",
@@ -164,6 +279,8 @@ var boy_pers = [
     "<HIM>神清气爽，骨格清奇，宛若仙人</HIM>",
     "<HIM>一派神人气度，仙风道骨，举止出尘</HIM>"
 ];
+
+/** @type {string[]} 女性容貌描述 */
 var girl_pers = [
     "<BLU>丑如无盐，状如夜叉</BLU>",
     "<BLU>歪鼻斜眼，脸色灰败，直如鬼怪一般</BLU>",
@@ -188,6 +305,7 @@ var girl_pers = [
     "<HIM>宛如<HIW>玉雕冰塑</HIW>，似梦似幻，已不再是凡间人物</HIM>"
 ];
 
+/** @type {string[]} 气血状态描述 */
 var Look_status = [
     "<HIR>受伤过重，已经有如风中残烛，随时都可能断气。</HIR>",
     "<HIR>受伤过重，已经奄奄一息，命在旦夕了。</HIR>",
@@ -202,8 +320,11 @@ var Look_status = [
     "<HIG>看起来气血充盈，并没有受伤。</HIG>"
 ];
 
+/** @type {string[]} 年龄段描述 */
 var age_strs = ["几", "十多", "二十多", "三十多", "四十多", "五十多", "六十多", "七十多", "八十多", "九十多"
     , "一百多"];
+
+/** @type {string[]} 武功等级描述 */
 var skill_levels = [
     "<BLU>初学乍练</BLU>",
     "<BLU>不知所以</BLU>",

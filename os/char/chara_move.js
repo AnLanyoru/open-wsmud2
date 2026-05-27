@@ -1,5 +1,15 @@
-﻿
+/**
+ * CHARACTER 移动/跟随系统扩展
+ */
 
+/**
+ * 移动到新房间
+ * @param {ROOM|string} rm - 目标房间或房间路径
+ * @param {string} [leave_msg] - 离开消息
+ * @param {string} [in_msg] - 进入消息
+ * @param {string} [dir] - 方向
+ * @returns {boolean|undefined}
+ */
 CHARACTER.prototype.moveto = function (rm, leave_msg, in_msg, dir) {
     var cur_room = this.environment;
     var next_room = rm;
@@ -20,10 +30,8 @@ CHARACTER.prototype.moveto = function (rm, leave_msg, in_msg, dir) {
     if (!next_room) return false;
 
     if (next_room.is_full()) {
-        //如果房间人数过多，创建投影
         next_room = next_room.create_shadow();
         if (!next_room) {
-            //如果创建失败就返回，房间设置不允许投影，或别的原因
             return this.notify("那里人太多了，你过不去。");
         }
     }
@@ -39,6 +47,11 @@ CHARACTER.prototype.moveto = function (rm, leave_msg, in_msg, dir) {
         cur_room.parent.on_leaved(this);
     }
 }
+
+/**
+ * 跟随目标
+ * @param {CHARACTER|null} target - 目标或null停止跟随
+ */
 CHARACTER.prototype.do_follow = function (target) {
     if (target) {
         if (target.query_setting("no_follow")) {
@@ -61,6 +74,8 @@ CHARACTER.prototype.do_follow = function (target) {
         this.follow_target = null;
     }
 }
+
+/** 清除所有跟随关系 */
 CHARACTER.prototype.clear_follow = function () {
     if (this.follow_target) {
         this.follow_target.follow_targets.remove(this);
@@ -74,6 +89,10 @@ CHARACTER.prototype.clear_follow = function () {
     }
 }
 
+/**
+ * 通知跟随者移动
+ * @param {string} dir - 方向
+ */
 CHARACTER.prototype.notify_follower = function (dir) {
     if (this.follow_targets) {
         for (var i = 0; i < this.follow_targets.length; i++) {
@@ -89,9 +108,6 @@ CHARACTER.prototype.notify_follower = function (dir) {
                         continue;
                     }
                 }
-                //if (item.state && item.set_state) {
-                //    item.set_state(null);
-                //}
                 item.moveto(this.environment,
                     sendOutMessage(item, dir), sendInMessage(item));
             } else {
@@ -102,6 +118,10 @@ CHARACTER.prototype.notify_follower = function (dir) {
     }
 }
 
+/**
+ * 尝试逃跑
+ * @returns {boolean}
+ */
 CHARACTER.prototype.do_escape = function () {
     var eny = this.query_enemy();
     if (!eny) return true;
@@ -121,6 +141,10 @@ CHARACTER.prototype.do_escape = function () {
 }
 
 
+/**
+ * 退出队伍
+ * @param {string} msg - 退出原因
+ */
 CHARACTER.prototype.team_out = function (msg) {
     var tm = this.team;
     if (!tm) return;

@@ -1,6 +1,11 @@
-﻿
+/**
+ * EQUIPMENT 装备类 - 继承自OBJ
+ */
 require("../util/util.js");
+
+/** @type {function} */
 EQUIPMENT = function () {
+    /** @type {number} 装备部位类型 */
     this.eq_type = EQUIP_TYPE.WEAPON;
     this.level = 0;
     this.exp = 0;
@@ -12,10 +17,16 @@ EQUIPMENT = function () {
     this.otype = 4;
 }
 EQUIPMENT.inherits(OBJ);
+/** @type {boolean} */
 EQUIPMENT.prototype.is_equipment = true;
+/** @type {boolean} */
 EQUIPMENT.prototype.transable = true;
-//EQUIPMENT.prototype.eq_msg = "$N装备上$n。";
-//EQUIPMENT.prototype.uneq_msg = "$N脱下$n。";
+
+/**
+ * 变更装备附加属性
+ * @param {CHARACTER} me
+ * @param {boolean} is_attach - true附加 false移除
+ */
 EQUIPMENT.prototype.change_prop = function (me, is_attach) {
     me.change_prop(this.prop, is_attach);
     if (this.st_prop) {
@@ -24,6 +35,12 @@ EQUIPMENT.prototype.change_prop = function (me, is_attach) {
         }
     }
 }
+
+/**
+ * 通知客户端装备动作按钮变更
+ * @param {CHARACTER} me
+ * @param {boolean} isadd
+ */
 EQUIPMENT.prototype.notify_action = function (me, isadd) {
     if (!this.on_use) return;
     isadd = me.equipment[this.eq_type] == this;
@@ -32,6 +49,12 @@ EQUIPMENT.prototype.notify_action = function (me, isadd) {
     else
         me.send("{type:'removeAction',id:'" + this.id + "'}");
 }
+
+/**
+ * 检查装备条件
+ * @param {CHARACTER} me
+ * @returns {boolean}
+ */
 EQUIPMENT.prototype.check = function (me) {
     if (!this.condition) return true;
     for (var key in this.condition) {
@@ -79,6 +102,13 @@ EQUIPMENT.prototype.check = function (me) {
     }
     return true;
 }
+
+/**
+ * 装备到角色
+ * @param {CHARACTER} me
+ * @param {boolean} [notsend]
+ * @returns {boolean|undefined}
+ */
 EQUIPMENT.prototype.eq = function (me, notsend) {
     if (this.check(me) == false) {
         return false;
@@ -88,7 +118,6 @@ EQUIPMENT.prototype.eq = function (me, notsend) {
     }
     this.change_prop(me, true);
     this.check_group(me, true);
-    //me.add_score(this.query_score());
     if (!notsend) {
         if (this.eq_msg)
             me.send_room(this.eq_msg, this);
@@ -120,11 +149,16 @@ EQUIPMENT.prototype.eq = function (me, notsend) {
     }
     me.send('{type:"dialog",dialog:"pack",id:"' + this.id + '",eq:' + this.eq_type + '}');
 }
+
+/**
+ * 卸下装备
+ * @param {CHARACTER} me
+ * @param {boolean} [notsend]
+ */
 EQUIPMENT.prototype.uneq = function (me, notsend) {
     this.on_uneq && this.on_uneq(me);
     this.change_prop(me, false);
     this.check_group(me, false);
-    //me.add_score(-this.query_score());
 
     if (!notsend) {
         if (this.uneq_msg)
@@ -158,6 +192,10 @@ EQUIPMENT.prototype.uneq = function (me, notsend) {
     me.send('{type:"dialog",dialog:"pack",id:"' + this.id + '",uneq:' + this.eq_type + '}');
 }
 
+/**
+ * 装备条件文本描述
+ * @param {string[]} str - 输出数组
+ */
 EQUIPMENT.prototype.condition_tostring = function (str) {
     if (!this.condition) return;
     for (var key in this.condition) {
@@ -182,15 +220,21 @@ EQUIPMENT.prototype.condition_tostring = function (str) {
         str.push("\n");
     }
 }
+
+/** @type {string[]} 装备部位名称 */
 EQUIPMENT.prototype.parts = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
+/** @type {string[]} 品质名称 */
 EQUIPMENT.prototype.qualities = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
 
+/**
+ * 获取装备完整描述
+ * @param {CHARACTER} me
+ * @returns {string}
+ */
 EQUIPMENT.prototype.get_desc = function (me) {
     var str = [this.color_name];
     str.push("\n");
     str.push(this.parts[this.eq_type]);
-    //str.push("\n");
-    //str.push(this.query_quality());
     str.push("\n");
     this.condition_tostring(str);
 
@@ -222,11 +266,22 @@ EQUIPMENT.prototype.get_desc = function (me) {
 }
 
 
+/**
+ * 查询品质名称
+ * @returns {string}
+ */
 EQUIPMENT.prototype.query_quality = function () {
     return this.qualities[this.grade];
 }
+
+/** @type {string[]} 强化等级图标 */
 const level_desc = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
     "★★★☆", "★★★★", "★★★★☆", "★★★★★", "★★★★★☆", "★★★★★★"];
+
+/**
+ * 装备强化升级
+ * @param {number} lev - 强化目标等级
+ */
 EQUIPMENT.prototype.level_up = function (lev) {
     var cc = this.query_grade_color();
 
@@ -238,9 +293,12 @@ EQUIPMENT.prototype.level_up = function (lev) {
 }
 
 
+/** @type {number[]} 强化等级参数 */
 EQUIPMENT.prototype.levelData = [
     0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
 ];
+
+/** 根据强化等级重新计算属性 */
 EQUIPMENT.prototype.levelchange_prop = function () {
     if (!(this.level >= 0 && this.level < 13)) return;
     const base_props = this.original_prop ?? Object.getPrototypeOf(this).prop;
@@ -305,12 +363,20 @@ EQUIPMENT.prototype.levelchange_prop = function () {
         }
     }
 }
+
+/** 清除所有镶嵌宝石 */
 EQUIPMENT.prototype.clear_stone = function () {
     if (!this.st_prop) return;
 
     this.hole_count += (this.st_prop.length);
     this.st_prop.length = 0;
 }
+
+/**
+ * 镶嵌宝石
+ * @param {OBJ} stone - 宝石物品
+ * @returns {boolean|undefined}
+ */
 EQUIPMENT.prototype.push_stone = function (stone) {
     if (!stone || !stone.prop) return false;
     if (!this.hole_count) return false;
@@ -333,6 +399,12 @@ EQUIPMENT.prototype.push_stone = function (stone) {
         grade: stone.grade
     });
 }
+
+/**
+ * 克隆装备(保留强化和宝石)
+ * @param {CHARACTER} me
+ * @returns {EQUIPMENT}
+ */
 EQUIPMENT.prototype.clone = function (me) {
     var obj = OBJ.CREATE(this.path);
     if (this.temp) {
@@ -349,6 +421,11 @@ EQUIPMENT.prototype.clone = function (me) {
 
 
 
+
+/**
+ * 装备存档序列化
+ * @param {string[]} str
+ */
 EQUIPMENT.prototype.save_db = function (str) {
     str.push('["', this.path, '","', this.id, '",', this.level);
     if (this.st_prop && this.st_prop.length) {
@@ -359,17 +436,18 @@ EQUIPMENT.prototype.save_db = function (str) {
         }
         str.push("]");
     }
-    // else {
-    //     str.push(',[]');
-    // }
     if (this.is_locked)
         str.push(',1');
     if (this.temp)
         str.push(",", this.format_temp(this.temp));
     str.push("]");
 }
+
+/**
+ * 从数据库加载装备
+ * @param {Array<*>} data
+ */
 EQUIPMENT.prototype.load_db = function (data) {
-    //const [path, id, level, sts, locked,temp] = data;
     this.id = data[1];
     if (data[2] > 0) {
         this.level = data[2];
@@ -390,6 +468,11 @@ EQUIPMENT.prototype.load_db = function (data) {
     }
 
 }
+
+/**
+ * 装备加载后回调
+ * @param {CHARACTER} me
+ */
 EQUIPMENT.prototype.on_load = function (me) {
     this.on_reload && this.on_reload(me);
     if (this.level > 0) {
@@ -397,12 +480,24 @@ EQUIPMENT.prototype.on_load = function (me) {
     }
 }
 
+/** @type {number[]} 各品级装备价值 */
 EQUIPMENT.prototype.VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
+
+/**
+ * 装备创建回调
+ * @param {string} path
+ * @param {string} [par]
+ */
 EQUIPMENT.prototype.on_create = function (path, par) {
     this.value = this.VALUES[this.grade];
 
 }
 
+/**
+ * 查询套装描述
+ * @param {CHARACTER} me
+ * @param {string[]} str
+ */
 EQUIPMENT.prototype.query_group_desc = function (me, str) {
     if (!this.group_prop || !this.group_name) return;
     var count = 0;
@@ -434,6 +529,11 @@ EQUIPMENT.prototype.query_group_desc = function (me, str) {
 
 }
 
+/**
+ * 检查并更新套装效果
+ * @param {CHARACTER} me
+ * @param {boolean} isadd - true装备 false卸下
+ */
 EQUIPMENT.prototype.check_group = function (me, isadd) {
     if (!this.group_prop || !this.group_name) return;
     var count = isadd ? 1 : 0;

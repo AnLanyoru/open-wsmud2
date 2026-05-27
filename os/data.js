@@ -1,8 +1,32 @@
-﻿
+/**
+ * 全局数据管理模块
+ * @type {{
+ *   parties: Map<*, *>,
+ *   PAIMAI: Map<*, *>,
+ *   temp: Object<string, *>,
+ *   save: function(): Promise<*>,
+ *   temp_replacer: function(string, *): *,
+ *   save_temp: function(string[]): void,
+ *   load: function(): Promise<void>,
+ *   query_temp: function(string, *): *,
+ *   set_temp: function(string, *, number=): void,
+ *   remove_temp: function(string): void,
+ *   add_temp: function(string, *, number=): *,
+ *   temp_data: Object<string, Object<string, {name: string, value: number}>>,
+ *   clear_data: function(): void,
+ *   add_data: function(string, USER, number): void,
+ *   query_max_data: function(string): {name: string, value: number}|undefined,
+ *   query_min_data: function(string): {name: string, value: number}|undefined
+ * }}
+ */
 module.exports = {
     parties: new Map(),
     PAIMAI: new Map(),
     temp: {},
+    /**
+     * 保存全局数据
+     * @returns {Promise<*>}
+     */
     save: function () {
 
         let str = ["{"];
@@ -11,6 +35,12 @@ module.exports = {
         str.push('}');
         return WORLD.DB.saveData(str.join(""));
     },
+    /**
+     * JSON序列化替换函数
+     * @param {string} key
+     * @param {*} value
+     * @returns {*}
+     */
     temp_replacer: function (key, value) {
         if (value.e) {
 
@@ -18,14 +48,28 @@ module.exports = {
 
         return value;
     },
+    /**
+     * 保存临时数据
+     * @param {string[]} str - 输出数组
+     */
     save_temp: function (str) {
         str.push('temp:', JSON.stringify(this.temp));
     },
+    /**
+     * 加载全局数据
+     * @returns {Promise<void>}
+     */
     load: async function () {
         const data = await WORLD.DB.readData(__PATH.DATA + "data.js");
         this.temp = data.temp ?? {};
         this.on_load(data);
     },
+    /**
+     * 查询临时数据
+     * @param {string} name - 键名
+     * @param {*} [def] - 默认值
+     * @returns {*}
+     */
     query_temp: function (name, def) {
         if (!this.temp) return;
         let item = this.temp[name];
@@ -38,6 +82,12 @@ module.exports = {
         }
         return item || def;
     },
+    /**
+     * 设置临时数据
+     * @param {string} name - 键名
+     * @param {*} value - 值
+     * @param {number} [time] - 有效期(毫秒)
+     */
     set_temp: function (name, value, time) {
         if (!this.temp) this.temp = {};
         if (time) {
@@ -49,11 +99,22 @@ module.exports = {
             this.temp[name] = value;
         }
     },
+    /**
+     * 移除临时数据
+     * @param {string} name
+     */
     remove_temp: function (name) {
         if (!this.temp) return;
         this.temp[name] = null;
     },
 
+    /**
+     * 累加临时数据
+     * @param {string} name - 键名
+     * @param {number} value - 累加值
+     * @param {number} [time] - 有效期(毫秒)
+     * @returns {number} 累加后的值
+     */
     add_temp: function (name, value, time) {
         if (!this.temp) this.temp = {};
         let old = this.temp[name];
@@ -82,11 +143,23 @@ module.exports = {
             return v;
         }
     },
+    /**
+     * 统计用临时数据存储
+     * @type {Object<string, Object<string, {name: string, value: number}>>}
+     */
     temp_data: {},
+    /**
+     * 清除统计数据
+     */
     clear_data: function () {
         this.temp_data = {};
-    }
-    ,
+    },
+    /**
+     * 添加统计数据
+     * @param {string} key - 类别
+     * @param {USER} user - 用户对象
+     * @param {number} val - 累加值
+     */
     add_data: function (key, user, val) {
         if (!val) return;
         let data = this.temp_data[key];
@@ -94,7 +167,13 @@ module.exports = {
         let user_data = data[user.id];
         if (!user_data) user_data = data[user.id] = { name: user.name, value: 0 };
         user_data.value += val;
-    }, query_max_data: function (key) {
+    },
+    /**
+     * 查询最大值
+     * @param {string} key
+     * @returns {{name: string, value: number}|undefined}
+     */
+    query_max_data: function (key) {
         let data = this.temp_data[key];
         if (!data) return;
         let userData = null;
@@ -106,7 +185,13 @@ module.exports = {
             }
         }
         return userData;
-    }, query_min_data: function (key) {
+    },
+    /**
+     * 查询最小值
+     * @param {string} key
+     * @returns {{name: string, value: number}|undefined}
+     */
+    query_min_data: function (key) {
         let data = this.temp_data[key];
         if (!data) return;
         let userData = null;

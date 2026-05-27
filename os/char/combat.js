@@ -1,5 +1,13 @@
-﻿
+/**
+ * 战斗系统 - 扩展CHARACTER
+ */
 require("./character.js");
+
+/**
+ * 开始攻击目标
+ * @param {CHARACTER} target - 攻击目标
+ * @param {number} type - 战斗类型(1=比试, 2=生死)
+ */
 CHARACTER.prototype.begin_attack = function (target, type) {
 
     if (!target || target === this) return;
@@ -22,13 +30,23 @@ CHARACTER.prototype.begin_attack = function (target, type) {
             this.send('{type:"combat",start:1}');
 
         }
-        this.fight_type = type; //1fight hp<30% 2 kill 0
+        this.fight_type = type;
     }
 
 }
+
+/**
+ * 开始比试(fight)
+ * @param {CHARACTER} target
+ */
 CHARACTER.prototype.do_fight = function (target) {
     this.begin_attack(target, 1);
 }
+
+/**
+ * 开始击杀(kill)
+ * @param {CHARACTER} target
+ */
 CHARACTER.prototype.do_kill = function (target) {
     if (this.fight_type == 2 && this.query_enemy() == target) return;
     this.begin_attack(target, 2);
@@ -36,12 +54,23 @@ CHARACTER.prototype.do_kill = function (target) {
     target.notify("<hir>看起来" + this.name + "想杀死你！</hir>\n");
     this.notify("<hir>看起来" + target.name + "想杀死你！</hir>\n");
 }
+
+/**
+ * 添加敌人
+ * @param {CHARACTER} target
+ */
 CHARACTER.prototype.add_enemy = function (target) {
     if (!this.enemy) {
         this.enemy = [];
     }
     this.enemy.push(target);
 }
+
+/**
+ * 通知房间内玩家HP/MP变化
+ * @param {string} [type] - 'hp'或'mp'
+ * @param {number} [val] - 新值
+ */
 CHARACTER.prototype.notify_hp = function (type, val) {
     if (!this.environment) return;
 
@@ -74,6 +103,12 @@ CHARACTER.prototype.notify_hp = function (type, val) {
         }
     }
 }
+
+/**
+ * 增加/减少气血
+ * @param {number} v - 变化量
+ * @returns {number} 实际变化量
+ */
 CHARACTER.prototype.add_hp = function (v) {
 
     if (v > this.max_hp - this.hp) v = this.max_hp - this.hp;
@@ -84,6 +119,12 @@ CHARACTER.prototype.add_hp = function (v) {
     this.notify_hp("hp", this.hp);
     return v;
 }
+
+/**
+ * 增加/减少内力
+ * @param {number} v - 变化量
+ * @returns {number|undefined} 实际变化量
+ */
 CHARACTER.prototype.add_mp = function (v) {
     var mp = this.mp + v;
     if (mp > this.max_mp) mp = this.max_mp;
@@ -93,6 +134,12 @@ CHARACTER.prototype.add_mp = function (v) {
     this.notify_hp("mp", this.mp);
     return v;
 }
+
+/**
+ * 是否在战斗中
+ * @param {CHARACTER} [p] - 检查是否与此角色战斗
+ * @returns {boolean}
+ */
 CHARACTER.prototype.is_fighting = function (p) {
     if (!this.fight_type) return false;
     if (!this.enemy || !this.enemy.length) {
@@ -106,6 +153,8 @@ CHARACTER.prototype.is_fighting = function (p) {
     }
     return true;
 }
+
+/** 结束战斗 */
 CHARACTER.prototype.end_fight = function () {
     if (this.enemy) this.enemy.length = 0;
     this.release_time = 0;
@@ -120,6 +169,11 @@ CHARACTER.prototype.end_fight = function () {
     this.clear_combat_prop();
     return false;
 }
+
+/**
+ * 查询当前有效敌人
+ * @returns {CHARACTER|undefined}
+ */
 CHARACTER.prototype.query_enemy = function () {
     if (!this.enemy) return;
     for (var i = 0; i < this.enemy.length; i++) {
@@ -131,10 +185,20 @@ CHARACTER.prototype.query_enemy = function () {
     }
     return this.enemy[0];
 }
+
+/**
+ * 是否可以攻击
+ * @returns {boolean}
+ */
 CHARACTER.prototype.can_attack = function () {
     return this.hp > 0 && this.fight_type > 0 && !this.is_faint && !this.is_busy;
 }
 
+/**
+ * 结束对某目标的一轮攻击
+ * @param {CHARACTER} target
+ * @returns {boolean|undefined} true继续攻击 false停止
+ */
 CHARACTER.prototype.end_attack = function (target) {
     if (!target) return;
     if (!this.fight_type) return;
@@ -165,13 +229,19 @@ CHARACTER.prototype.end_attack = function (target) {
             return this.end_fight();
         }
     }
-    return true;//是否继续攻击 
+    return true;
 }
+
+/**
+ * 查询攻击部位
+ * @returns {{name: string, hert: number, crit: number}}
+ */
 CHARACTER.prototype.query_part = function () {
     return CHARACTER_PARTS.random();
 }
 
 
+/** 恢复满血满蓝 */
 CHARACTER.prototype.full = function () {
 
     this.hp = this.max_hp;
@@ -181,6 +251,10 @@ CHARACTER.prototype.full = function () {
     this.notify_hp();
 }
 
+/**
+ * 清除技能冷却
+ * @param {string} [pfmid] - 指定绝招ID
+ */
 CHARACTER.prototype.clear_distime = function (pfmid) {
     if (this.auto_skills) {
         if (!pfmid) {
@@ -201,6 +275,11 @@ CHARACTER.prototype.clear_distime = function (pfmid) {
 
     }
 }
+
+/**
+ * 执行攻击动作
+ * @param {*} par - 攻击参数
+ */
 CHARACTER.prototype.do_attacks = function (par) {
 
     var targets = par.targets;
@@ -221,6 +300,11 @@ CHARACTER.prototype.do_attacks = function (par) {
         this.end_attack(targets[i]);
     }
 }
+
+/**
+ * 人物攻击部位定义
+ * @type {Array<{name: string, hert: number, crit: number}>}
+ */
 var CHARACTER_PARTS = [
     { name: "左脚", hert: 0.8, crit: 0 },
     { name: "右脚", hert: 0.8, crit: 0 },
@@ -239,6 +323,7 @@ var CHARACTER_PARTS = [
     { name: "腰间", hert: 0.99, crit: 5 }
 ];
 
+/** @type {string[]} 胜利消息 */
 var WINNER_MSG = [
     "<CYN>$N哈哈大笑，愉快地说道：承让了！</CYN>",
     "<CYN>$N双手一拱，笑著说道：知道我的厉害了吧！</CYN>",

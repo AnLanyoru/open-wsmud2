@@ -1,23 +1,42 @@
-﻿
+/**
+ * NPC 非玩家角色类
+ */
+
+/** @type {function} */
 NPC = function () {
     this.hp = this.max_hp = 100;
     this.mp = this.max_mp = 100;
     this.str = this.con = this.dex = this.int = this.per = this.age = 20;
     this.family = FAMILIES.NONE;
+    /** @type {boolean} 是否自动释放绝招 */
     this.auto_pfm = true;
 }
 NPC.inherits(CHARACTER);
+
+/**
+ * 设置闲聊消息
+ * @param {string[]} items - 消息列表
+ * @param {number} [chance] - 触发概率
+ */
 NPC.prototype.set_chat_msg = function (items, chance) {
     if (items) {
         this.chat_msg = items;
-        //this.chat_chance = chance || 10;
     }
 }
+
+/** 随机发送闲聊消息 */
 NPC.prototype.do_chat_msg = function () {
     if (!this.is_fighting() && this.is_living && this.chat_msg) {
         this.do_say(this.chat_msg.random());
     }
 }
+
+/**
+ * 格式化装备显示
+ * @param {string} call3 - 第三人称代词
+ * @param {string[]} str - 输出数组
+ * @param {string} [eqcmd] - 查看命令前缀
+ */
 NPC.prototype.format_equipments = function (call3, str, eqcmd) {
     if (this.equipment && this.equipment.length) {
         var eqstr = [];
@@ -34,6 +53,10 @@ NPC.prototype.format_equipments = function (call3, str, eqcmd) {
     str.push(call3, "穿着一件<wht>布衣</wht>。\n");
 }
 
+/**
+ * 设置出售物品列表
+ * @param {...string} arguments - 物品路径列表
+ */
 NPC.prototype.set_goods = function () {
     if (!arguments.length) return;
     this.sell_list = [];
@@ -45,6 +68,12 @@ NPC.prototype.set_goods = function () {
         this.sell_list.push(obj);
     }
 }
+
+/**
+ * 查询操作命令JSON(缓存)
+ * @param {USER} player - 观察者
+ * @returns {string}
+ */
 NPC.prototype.query_commands = function (player) {
 
     if (this.json) return this.json;
@@ -53,6 +82,12 @@ NPC.prototype.query_commands = function (player) {
     return this.json;
 }
 
+/**
+ * 构建操作命令JSON
+ * @param {USER} player - 观察者
+ * @param {boolean} isyb - 是否元宝商人
+ * @returns {string} JSON字符串
+ */
 NPC.prototype.query_commands_json = function (player, isyb) {
     var json = {};
     json.type = "item";
@@ -112,14 +147,26 @@ NPC.prototype.query_commands_json = function (player, isyb) {
     }
     return JSON.stringify(json);
 }
+
+/**
+ * 更新房间内交互命令
+ * @param {Object<string, {name: string, action: function}>} acts
+ */
 NPC.prototype.update_action = function (acts) {
     this.json = null;
     this.actions = acts;
 }
 
+/** @type {string[]} NPC死亡消息 */
 var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+/**
+ * NPC死亡处理
+ * @param {CHARACTER} killer - 击杀者
+ * @returns {boolean|undefined}
+ */
 NPC.prototype.die = function (killer) {
     if (!this.environment) return;
     if (this.on_die && this.on_die(killer) == false) {
@@ -138,7 +185,6 @@ NPC.prototype.die = function (killer) {
     this.environment.item_changed(corpse, true);
     this.environment.item_changed(this, false);
     if (isinfb && this.score && killer && killer.add_fbscore) {
-        //副本分数
         killer.add_fbscore(this.score);
     }
     if (!isinfb && !this.no_refresh && !this.master && !this.die_room.is_shadow) {
@@ -151,6 +197,7 @@ NPC.prototype.die = function (killer) {
     }
 }
 
+/** NPC复活刷新 */
 NPC.prototype.relive = function () {
     if (!this.die_room) return;
     var room = ROOM.Get(this.die_room.path);
@@ -163,6 +210,11 @@ NPC.prototype.relive = function () {
     this.items = null;
     this.skills = null;
 }
+
+/**
+ * 销毁NPC
+ * @param {string} [msg] - 离开消息
+ */
 NPC.prototype.destroy = function (msg) {
     if (this.environment) {
         this.environment.item_changed(this, false, msg);
@@ -170,6 +222,11 @@ NPC.prototype.destroy = function (msg) {
     this.clear_follow();
 
 }
+
+/**
+ * NPC心跳处理
+ * @param {number} dt - 当前时间戳
+ */
 NPC.prototype.heart_beat = function (dt) {
 
     if (!this.fight_type) {
@@ -196,6 +253,14 @@ NPC.prototype.heart_beat = function (dt) {
 
 
 
+/**
+ * 创建NPC实例到指定环境
+ * @param {string} path - NPC模板路径
+ * @param {ROOM|CHARACTER} env - 目标环境
+ * @param {function(NPC)} [oncreate] - 创建后回调
+ * @param {number} [count=1] - 创建数量
+ * @returns {NPC}
+ */
 NPC.CREATE = function (path, env, oncreate, count) {
     if (!path || !env) return;
 
@@ -210,18 +275,29 @@ NPC.CREATE = function (path, env, oncreate, count) {
     }
     return obj;
 }
+
+/**
+ * 克隆NPC实例
+ * @param {string} path - NPC模板路径
+ * @returns {NPC}
+ */
 NPC.CLONE = function (path) {
     let base = NPC.GET(path);
     let item = Object.create(base);
     item.clone();
     return item;
 }
+
+/**
+ * 获取NPC模板(带缓存)
+ * @param {string} path - NPC模板路径
+ * @returns {NPC}
+ */
 NPC.GET = function (path) {
     let base = WORLD.NPC_STROE.get(path);
     if (!base) {
         base = BASE.CREATE(__PATH.NPC, path);
         if (!base) throw new Error('没有人物' + path + "的定义。");
-        //这里会自己调用create方法存储到NPC_STROE，记住了吗
     }
     return base;
 }
