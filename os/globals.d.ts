@@ -1986,6 +1986,57 @@ declare var UTIL: {
     isLunar15(dt?: Date): boolean;
 };
 
+// ============================================================
+// 框架魔改 — 内置原型扩展
+// ============================================================
+
+/** 服务器端 os/util/util.js 原型扩展 */
+interface Array<T> {
+    /** 移除数组中第一个匹配元素（== 宽松相等），成功返回 true */
+    remove(item: any): boolean | undefined;
+    /** 判断数组是否包含指定元素（=== 严格相等） */
+    contain(item: any): boolean;
+    /** 随机返回数组中的一个元素 */
+    random(index?: number): T;
+}
+
+/** 客户端 src/utils/util.js 原型扩展（PascalCase 命名） */
+interface Array<T> {
+    /** 移除第一个匹配元素（==），返回自身以支持链式调用 */
+    Remove(o: any): T[];
+    /** 通过谓词函数移除所有匹配项 */
+    RemoveAt(func: (item: T) => boolean): void;
+    /** 判断数组是否包含指定元素（== 宽松相等） */
+    Has(o: any): boolean;
+    /** 映射数组，过滤掉结果为假值的项（不同于原生 map） */
+    Map<R>(fn: (item: T) => R): R[];
+    /** 通过谓词查找第一个匹配元素，未找到返回 null */
+    First(fn: (item: T) => boolean): T | null;
+    /** 通过谓词过滤数组（同原生 filter） */
+    Where(fn: (item: T) => boolean): T[];
+}
+
+interface Date {
+    /** 增加/减少天数，返回自身以支持链式调用 */
+    AddDays(d: number): Date;
+    /** 增加/减少月数，返回自身以支持链式调用 */
+    AddMonths(m: number): Date;
+    /** 增加/减少年数，返回自身以支持链式调用 */
+    AddYears(y: number): Date;
+    /** 格式化为 YYYY-MM-DD 字符串 */
+    ToDateString(): string;
+}
+
+interface Function {
+    /** 基于 Node.js util.inherits 的原型继承语法糖 */
+    inherits(superCtor: Function): void;
+}
+
+interface JSON {
+    /** 使用 JSON5 将字符串解析为对象（支持宽松语法） */
+    toObject(str: string): any;
+}
+
 /** 全局配置对象 */
 declare var __CONFIG: any;
 /** 全局路径配置 */
