@@ -1990,6 +1990,33 @@ declare var UTIL: {
 // 框架魔改 — 内置原型扩展
 // ============================================================
 
+// ============================================================
+// world/ 内容脚本的 this 上下文
+// ============================================================
+//
+// world/ 中的 .js 文件通过 BASE.CREATE → BASE.NEW → func.apply(obj) 执行，
+// this 指向新创建的对象，但 TypeScript 在脚本模式下将 this 视为 globalThis。
+// 为让 IDE 能正确推断 this.xxx 的类型并显示中文注解，此处将 inherits 声明为
+// 带 asserts this 返回的全局函数。当内容脚本调用 this.inherits(ROOM) 后，
+// this 的类型会被自动收窄为 globalThis & ROOM，从而获得完整的属性提示。
+//
+
+/**
+ * 动态继承 — 世界内容脚本入口方法。
+ * 调用后 this 的类型会收窄为包含目标类实例类型的交叉类型，
+ * 后续通过 this.xxx 访问属性时将获得对应类定义中的中文注解提示。
+ *
+ * @example
+ *   this.inherits(ROOM);
+ *   this.name = "大厅";        // IDE 可提示 ROOM.name 的中文注解
+ *   this.no_fight = true;      // IDE 可提示 ROOM.no_fight 的中文注解
+ */
+declare function inherits<T extends Constructor>(this: typeof globalThis, ctor: T): asserts this is typeof globalThis & T['prototype'];
+
+// ============================================================
+// 框架魔改 — 内置原型扩展
+// ============================================================
+
 /** 服务器端 os/util/util.js 原型扩展 */
 interface Array<T> {
     /** 移除数组中第一个匹配元素（== 宽松相等），成功返回 true */
