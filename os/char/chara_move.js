@@ -2,6 +2,64 @@
  * CHARACTER 移动/跟随系统扩展
  */
 
+var dirs = {
+    "north": "北方",
+    "south": "南方",
+    "east": "东方",
+    "west": "西方",
+    "northup": "北边",
+    "southup": "南边",
+    "eastup": "东边",
+    "westup": "西边",
+    "northdown": "北边",
+    "southdown": "南边",
+    "eastdown": "东边",
+    "westdown": "西边",
+    "northeast": "东北",
+    "northwest": "西北",
+    "southeast": "东南",
+    "southwest": "西南",
+    "up": "上",
+    "down": "下",
+    "enter": "里",
+    "out": "外"
+};
+
+function sendOutMessage(player, dir) {
+    dir = dirs[dir] || "";
+    if (player.is_fighting()) {
+        return player.name + "往" + dir + "落荒而逃了。";
+    }
+    var eq = player.hp * 100 / player.max_hp;
+    if (eq < 5) {
+        return player.name + "撑起满是<HIR>鲜血</HIR>的躯体，一瘸一拐地朝" + dir + "挪去。";
+    } else if (eq < 10) {
+        return player.name + "一边擦着嘴角的<HIR>鲜血</HIR>，一边朝" + dir + "走去。";
+    } else if (eq < 30) {
+        return player.name + "灰头土脸、狼狈不堪地向" + dir + "离去。";
+    } else if (eq < 50) {
+        return player.name + "一声不吭的转身朝" + dir + "走去，脸色好像有些难看。";
+    }
+    return player.name + "往" + dir + "离开。";
+}
+
+function sendInMessage(player, dir) {
+    if (player.fight_type) {
+        return player.name + "跌跌撞撞地跑了过来，模样有些狼狈。";
+    }
+    var eq = player.hp * 100 / player.max_hp;
+    if (eq < 5) {
+        return player.name + "撑着满是<HIR>鲜血</HIR>的躯体，一瘸一拐地挪了过来。";
+    } else if (eq < 10) {
+        return player.name + "一边擦着嘴角的<HIR>鲜血</HIR>，一边走了过来，龇牙咧嘴的。";
+    } else if (eq < 30) {
+        return player.name + "灰头土脸、狼狈不堪地走了过来。";
+    } else if (eq < 50) {
+        return player.name + "像斗败了的公鸡，垂头丧气地走了过来。";
+    }
+    return player.name + "走了过来。";
+}
+
 Object.assign(CHARACTER.prototype, {
     /**
      * 移动到新房间

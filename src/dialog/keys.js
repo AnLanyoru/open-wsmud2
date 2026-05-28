@@ -38,6 +38,7 @@ const Keys = {
     show: function (elem) {
         this.element = elem;
         this.init();
+        this.create_html();
         elem.on('click', '.skey-item', this.item_clicked);
         document.body.addEventListener('keydown', this.record_press);
     }, hide: function () {

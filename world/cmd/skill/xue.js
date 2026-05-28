@@ -254,7 +254,7 @@ function do_learn(me) {
     }
 
     if (exp > me.pot)
-        return me.notify_fail("你的潜能不够，无法继续学习下去了。");
+        exp = me.pot;
 
     if (this.skill_base.type === SKILL_TYPES.KNOWLEDGE) {
         let diff = me.query_prop('haoranqi');
