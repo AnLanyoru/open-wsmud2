@@ -88,6 +88,7 @@ class GameMainPage extends Page {
                 <span channel="es">全区</span>
                 <span channel="pty">帮派</span>
                 <span channel="emote">表情</span>
+                <span channel="cmd">指令</span>
             </div>
             <div class="chat-input">
                 <input class="sender-box" />
@@ -182,7 +183,11 @@ function SendChatMessage() {
     if (value.length > 100) return ReceiveMessage("<hir>你输入的内容太多了。</hir>");
     var channel = $(".channel-box").attr("channel");
     $(".sender-box").val("").focus();
-    SendCommand(channel + " " + value + "");
+    if (channel == "cmd") {
+        SendCommand(value);
+    } else {
+        SendCommand(channel + " " + value + "");
+    }
 
 }
 
