@@ -1,6 +1,7 @@
 
 import Util from '../utils/util.js';
 import { ReceiveMessage } from '../client.js';
+import Combat from '../combat.js';
 
 export default {
     types: [
@@ -29,11 +30,6 @@ export default {
         // }
     ],
     init: function (elem) {
-        elem.on('click', '[ecmd]', this.onButtonClick);
-        elem.on('click', '.setting-item', this.onClickRow);
-        elem.on("click", ".switch", this.switchClick);
-        elem.on("change", "select", this.selectChanged);
-        if (this.element) return;
         this.element = elem;
         let html = [];
         html.push('<div class="extend-list">');
@@ -41,6 +37,10 @@ export default {
         html.push("</div>");
         this.append_edit(html);
         elem.html(html.join(""));
+        elem.on('click', '[ecmd]', this.onButtonClick);
+        elem.on('click', '.setting-item', this.onClickRow);
+        elem.on("click", ".switch", this.switchClick);
+        elem.on("change", "select", this.selectChanged);
         this.edit_elem = this.element.find('.extend-add');
         this.list_elem = this.element.find('.extend-list');
     },
@@ -190,7 +190,7 @@ export default {
         this.edit_elem.find('.switch').removeClass('on');
         if (this.record_cmds.length > 0) {
             Dialog.show('setting');
-            Dialog.setting.footerChanged(3);
+            Dialog.setting.footerChanged("extend");
             this.edit_elem.show();
             this.list_elem.hide();
             this.edit_elem.find('textarea').val(this.record_cmds.join(";"));
@@ -199,7 +199,7 @@ export default {
     },
     helper: "<li ecmd='show_actions'>可用命令参考</li><li ecmd='show_vars'>可用变量参考</li><li ecmd='show_paras'>参数用法参考</li>",
     append_edit: function (html) {
-        html.push('<div class="extend-add hide">');
+        html.push('<div class="extend-add" style="display:none">');
         html.push('<div class="extend-row">');
         html.push('<input  prop="name" class="extend-input"/>');
         html.push("<div class='extend-row-header'>提示/描述/说明</div>");
@@ -334,10 +334,10 @@ export default {
         }
         if (this.list_elem.is('.hide')) {
             this.list_elem.removeClass('hide');
-            this.edit_elem.addClass('hide');
+            this.edit_elem.hide();
             return false;
         }
-        this.footer_buttons.remove(); 59
+        this.footer_buttons.remove();
     }, close: function () {
 
     },
@@ -525,7 +525,7 @@ export default {
         let func = Dialog.extend['cmd_' + cmd];
         func && func.apply(Dialog.extend, paras);
     }, cmd_add: function () {
-        this.edit_elem.removeClass('hide');
+        this.edit_elem.show();
         this.list_elem.addClass('hide');
         this.edit_elem.attr("sid", '-1');
         let elems = this.edit_elem.find('input, textarea');

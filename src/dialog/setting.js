@@ -17,7 +17,7 @@ export default {
         this.keysElement = $(keys_template);
         this.customElement = $(custom_template);
         Dialog.injectStyle(setting_css);
-        var elems = $(".setting>.setting-item");
+        var elems = this.settingElement.find(".setting-item");
         for (var i = 0; i < elems.length; i++) {
             var item = $(elems[i]);
             var prop = item.attr("for");
@@ -46,14 +46,14 @@ export default {
                     if (value) {
                         item.find(".switch ").addClass("on");
                         item.find(".switch-text").html("开");
-                        $("#" + prop).show().val(value);
+                        this.customElement.find("#" + prop).show().val(value);
                     }
                     break;
                 case "auto_work":
                     if (value) {
                         item.find(".switch ").addClass("on");
                         item.find(".switch-text").html("开");
-                        $("#" + prop).show().val(value != 1 ? value : "");
+                        this.customElement.find("#" + prop).show().val(value != 1 ? value : "");
                     }
                     break;
                 default:
@@ -62,6 +62,22 @@ export default {
                         item.find(".switch-text").html("开");
                     }
                     break;
+            }
+        }
+        var customItems = this.customElement.find(".setting-item");
+        for (var i = 0; i < customItems.length; i++) {
+            var item = $(customItems[i]);
+            var prop = item.attr("for");
+            if (!prop) continue;
+            var value = Setting[prop];
+            if (value) {
+                item.find(".switch").addClass("on");
+                item.find(".switch-text").html("开");
+                if (prop === "auto_pfm" || prop === "auto_pfm2") {
+                    this.customElement.find("#" + prop).show().val(value);
+                } else if (prop === "auto_work") {
+                    this.customElement.find("#" + prop).show().val(value != 1 ? value : "");
+                }
             }
         }
     },
@@ -100,7 +116,7 @@ export default {
         if (!elem || elem === this.selectitem) return this.child?.command(item);
         this.selectitem && this.selectitem.remove();
         this.selectitem = elem;
-        if (this.child) this.child.hide();
+        if (this.child && this.child.hide() === false) return;
         this.child = null;
 
         if (item == "setting") {

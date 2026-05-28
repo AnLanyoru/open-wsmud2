@@ -14,6 +14,10 @@ FAMILY = class FAMILY extends BASE {
         obj.battle_score = 0;
         obj.battle_gift = 0;
         obj.can_battle = false;
+        obj.query_temp = CHARACTER.prototype.query_temp;
+        obj.set_temp = CHARACTER.prototype.set_temp;
+        obj.remove_temp = CHARACTER.prototype.remove_temp;
+        obj.add_temp = CHARACTER.prototype.add_temp;
     }
 
     constructor() {
