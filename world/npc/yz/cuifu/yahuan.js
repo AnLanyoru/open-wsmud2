@@ -11,7 +11,8 @@ this.set({
     max_hp: 100,
     score: -10,
     exp: 0,
-    pot:0
+    pot:0,
+    max_item_count: 20
 
 });
 this.add_action("ok", "救出丫鬟", function (me) {

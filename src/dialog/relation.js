@@ -1,5 +1,19 @@
 
 
+function format_time_span(time) {
+    let diff = Math.floor(time / 1000);
+    if (diff < 0) diff = 0;
+    if (diff > 3600) {
+        let str = Math.floor(diff / 3600) + "小时";
+        diff = diff % 3600;
+        str += Math.floor(diff / 60) + "分";
+        return str;
+    }
+    let str = Math.floor(diff / 60) + "分";
+    diff = diff % 60;
+    return str + diff + "秒";
+}
+
 export default {
     init: function () { },
     createElement: function () {
