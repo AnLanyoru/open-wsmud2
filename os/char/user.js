@@ -736,7 +736,7 @@ USER = class USER extends CHARACTER {
      */
     query_jingli() {
         const expend = this.query_temp("ex_jl") || 0;
-        return 200 - expend + (this.query_temp("add_jl") || 0);
+        return 200 - expend + (this.query_temp("ad_jl") || 0);
     }
 
 
