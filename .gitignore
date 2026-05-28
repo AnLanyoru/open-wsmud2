@@ -2,4 +2,5 @@ node_modules/
 log/access.log.1
 data/database.db
 .env
+www/
 data/100/data.js
