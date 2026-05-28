@@ -61,8 +61,8 @@ module.exports = {
      */
     async load() {
         const data = await WORLD.DB.readData(__PATH.DATA + "data.js");
-        this.temp = data.temp ?? {};
-        this.on_load(data);
+        this.temp = data?.temp ?? {};
+        this.on_load(data ?? {});
     },
     /**
      * 查询临时数据

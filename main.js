@@ -56,3 +56,19 @@ process.on('uncaughtException', (error) => {
 process.on('unhandledRejection', (reason, promise) => {
     console.error('未处理的Promise拒绝:', reason);
 });
+
+let isShuttingDown = false;
+process.on('SIGINT', async () => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log('收到SIGINT信号，正在保存数据...');
+    await WORLD.close();
+    process.exit(0);
+});
+process.on('SIGTERM', async () => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log('收到SIGTERM信号，正在保存数据...');
+    await WORLD.close();
+    process.exit(0);
+});
