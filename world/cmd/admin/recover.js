@@ -5,7 +5,7 @@ this.allow_state = true;
 this.allow_die = true;
 this.admin = true;
 this.regex = /^(.+?)(?:\s(\w+))?$/;
-this.allow_level = 2;
+this.allow_level = 6;
 this.enter = function (me, userid, objid) {
 
 }
