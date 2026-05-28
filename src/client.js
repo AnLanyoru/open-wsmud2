@@ -1,5 +1,6 @@
 
 import * as Util from './utils/util.js';
+import Setting from './setting.js';
 
 let IsConnecting = false;
 let ChangeServer = false;
@@ -67,6 +68,11 @@ export function isConnected() {
 
 export function SendCommand(cmd) {
     if (IsConnecting) return;
+    if (Setting.show_send) {
+        var d = new Date();
+        var time = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+        ReceiveMessage("<hio>" + time + "</hio> " + "<HIW>" + cmd+ "</HIW>");
+    }
     if (!GameClient || !GameClient.Connected()) {
         LastCommand = cmd;
         ReceiveMessage("<red>连接中断，正在重新连线...</red>");

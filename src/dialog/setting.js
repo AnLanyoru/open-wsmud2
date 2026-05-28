@@ -530,6 +530,18 @@ const setting_template = `
                 </span>
             </div>
             <h3>基本设置</h3>
+            <div class="setting-item" for="show_send">
+                <span class="title">
+                    显示指令
+                </span>
+                <span class="switch">
+                    <span class="switch-button">
+                    </span>
+                    <span class="switch-text">
+                        关
+                    </span>
+                </span>
+            </div>
             <div class="setting-item" for="fullscreen">
                 <span class="title">
                     全屏显示

@@ -111,7 +111,7 @@ const setting_keys = {
 
     },
     'keep_msg': {
-        type: "Boolean",
+        type: "Boolean", 
         desc: "切换房间时不清空上房间信息"
 
     }, 'off_move': {
@@ -226,6 +226,10 @@ const setting_keys = {
     }, 'hide_equip': {
         type: "Boolean",
         desc: "隐藏自己的装备"
+    }, 
+    'show_send': {
+        type: "Boolean",
+        desc: "显示发送的指令"
     },
     'off_fight': {
         type: "Boolean",

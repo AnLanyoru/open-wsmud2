@@ -10,6 +10,7 @@ const Setting = {
     exits_dir: 0,
     show_sa: 0,
     show_command: 0,
+    show_send: 0,
     fontsize: "0.875rem",
     font: "",
     no_spmsg: 0,

@@ -45,6 +45,8 @@ function on_check(me) {
 
 function do_cai(me) {
     let lv = me.random(18);
+    let grade = me.query_prop('caiyao1');
+    lv = lv > grade ? grade : lv;
     let obj = me.add_obj('res/cao#' + lv);
     if (obj) {
         me.send_room("<hig>$N采到一株" + obj.color_name + "。</hig>");
