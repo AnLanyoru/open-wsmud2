@@ -187,7 +187,7 @@ export default {
         Dialog.icon("stats");
         Dialog.title(this.selectedItem.name);
 
-        Dialog.contentElement.html(this.element);
+        Dialog.contentElement.empty().append(this.element);
         this.element.on("click", ".top-item", this.itemClick);
         this.left_silder.on("click", ".stats-silder ", this.silderClick);
         this.isShow = true;

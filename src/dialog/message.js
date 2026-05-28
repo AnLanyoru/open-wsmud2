@@ -134,7 +134,7 @@ export default {
         //if (this.selectedChild == child) return;
         if (this.selectedChild) this.selectedChild.inner_close();
         if (!child.element) child.element = child.createElement();
-        Dialog.contentElement.html(child.element);
+        Dialog.contentElement.empty().append(child.element);
         child.inner_show();
 
         this.selectedChild = child;
