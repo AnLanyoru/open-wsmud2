@@ -164,7 +164,11 @@ module.exports = {
         const path = __PATH.DATA + "data.js";
         const dt = new Date();
         const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-        const _dst = __PATH.DATA + "/temp/temp" + f + ".js";
+        const tempDir = __PATH.DATA + "/temp/";
+        if (!await this.check_file(tempDir)) {
+            await fs.mkdir(tempDir);
+        }
+        const _dst = tempDir + "temp" + f + ".js";
         await fs.copyFile(path, _dst);
         return fs.writeFile(path, content);
     },
@@ -234,6 +238,13 @@ module.exports = {
         if (!await this.check_file(__PATH.DATA)) {
             console.log('创建备份文件夹....');
             await fs.mkdir(__PATH.DATA);
+        }
+        // 确保子目录存在
+        for (const sub of ['bak', 'log', 'req', 'temp']) {
+            const dir = __PATH.DATA + sub;
+            if (!await this.check_file(dir)) {
+                await fs.mkdir(dir);
+            }
         }
         const paths = await fs.readdir(__PATH.DEF_DATA);
         for (let i = 0; i < paths.length; i++) {
