@@ -61,6 +61,7 @@ function calculate_lv(grade) {
 
     // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
     let total = 0;
+    let ranges_cumulative = [];
     const cumulative = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[i];
@@ -68,10 +69,11 @@ function calculate_lv(grade) {
             w = Math.floor(w * (1 + grade * i / 1200));
         }
         total += w;
+        ranges_cumulative.push(ranges[i]);
         cumulative.push(total);
     }
 
-    const [lo, hi] = ranges[UTIL.weightedChoice(cumulative, ranges)];
+    const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, cumulative);
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
