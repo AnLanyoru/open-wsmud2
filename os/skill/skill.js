@@ -202,21 +202,19 @@ export class SKILL extends BASE {
 
     /**
      * 查询装备属性(子类重写)
-     * @param {number} lv
+     * @param {number} lv - 技能等级
+     * @param {import("../char/character").CHARACTER} [me] - 角色
      * @returns {Object<string, Object>|undefined}
      */
-    query_enable_prop(lv) {
-
-    }
+    query_enable_prop(lv, me) { return undefined; }
 
     /**
      * 查询基础属性(子类重写)
-     * @param {number} lv
+     * @param {number} lv - 技能等级
+     * @param {import("../char/character").CHARACTER} [me] - 角色
      * @returns {Object<string, number>|undefined}
      */
-    query_prop(lv) {
-
-    }
+    query_prop(lv, me) { return undefined; }
 
     /**
      * 查询技能品级(含进阶)
@@ -307,7 +305,7 @@ export class SKILL extends BASE {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop(lv);
+        let prop = this.query_enable_prop(lv, me);
         if (prop) {
             const enable_prop = prop[type];
             if (enable_prop) {
@@ -332,7 +330,7 @@ export class SKILL extends BASE {
     disenable(me, type) {
         this.on_disenable && this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop(lv);
+        let prop = this.query_enable_prop(lv, me);
         if (prop) {
             const enable_prop = prop[type];
             if (enable_prop) {
@@ -731,7 +729,7 @@ export class SKILL extends BASE {
             str.push(cc);
             str.push(">\n");
         }
-        prop = this.query_enable_prop(lv, me);
+        prop = this.query_enable_prop(lv);
         let isEnable = this.type === SKILL_TYPES.KNOWLEDGE;
         if (prop) {
             for (let item in prop) {

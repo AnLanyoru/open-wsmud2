@@ -152,7 +152,7 @@ export default class extends SKILL {
     }
 };
 
-    query_prop(lv) {
+    query_prop(lv, me) {
     return {
         int: 10 + parseInt(lv / 10),
         zj_per: parseInt(lv / 300) + 5

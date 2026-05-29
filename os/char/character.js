@@ -200,18 +200,15 @@ export class CHARACTER extends ITEM {
     /**
      * 发送消息给自身(不考虑状态)
      * @param {string} msg — 所有调用点均传入字符串, USER覆写用socket.send
+     * @returns {void}
      */
-    send(msg) {
-
-    }
+    send(msg) { return undefined; }
 
     /**
      * 发送命令列表(客户端交互菜单) — USER覆写用arguments处理变长(命令名, 显示名, ...)偶数对
      * @returns {void}
      */
-    send_commands() {
-
-    }
+    send_commands() { return undefined; }
 
     /**
      * 操作失败通知 — 发送错误消息并返回false用于return链
@@ -235,9 +232,7 @@ export class CHARACTER extends ITEM {
      * @param {CHARACTER} [killer] - 击杀者
      * @returns {boolean|void} 返回false阻止死亡(如on_die回调拒绝)
      */
-    die(killer) {
-
-    }
+    die(killer) { return undefined; }
 
     /**
      * 是否在指定路径的房间
@@ -736,10 +731,9 @@ export class CHARACTER extends ITEM {
     /**
      * 增加积分 — 仅USER覆写, NPC的score通过add_fbscore独立管理
      * @param {number} val
+     * @returns {void}
      */
-    add_score(val) {
-
-    }
+    add_score(val) { return undefined; }
 
     /**
      * 添加战斗临时属性

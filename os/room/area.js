@@ -118,10 +118,10 @@ export class AREA extends BASE {
 
     /**
      * 玩家离开区域回调
-     * @param {USER} me
+     * @param {import("../char/user").USER} me
+     * @returns {void}
      */
-    on_leaved(me) {
-    }
+    on_leaved(me) { return undefined; }
 
     /**
      * 玩家离开前回调
@@ -134,10 +134,10 @@ export class AREA extends BASE {
 
     /**
      * 玩家进入后回调
-     * @param {USER} me
+     * @param {import("../char/user").USER} me
+     * @returns {void}
      */
-    on_enterd(me) {
-    }
+    on_enterd(me) { return undefined; }
 
     /**
      * 玩家进入前回调
@@ -153,8 +153,7 @@ export class AREA extends BASE {
      * @param {string} path
      * @returns {void}
      */
-    find_area(path) {
-    }
+    find_area(path) { return undefined; }
 
     /**
      * 查询指定难度的通关记录

@@ -45,32 +45,25 @@ export class USERTASK extends BASE {
      * 查询任务标题
      * @returns {string|undefined}
      */
-    query_title() {
-
-    }
+    query_title() { return undefined; }
 
     /**
      * 开始任务
      * @returns {*}
      */
-    start() {
-
-    }
+    start() { return undefined; }
 
     /**
      * 查询任务描述
      * @returns {string|undefined}
      */
-    query_desc() {
-
-    }
+    query_desc() { return undefined; }
 
     /**
      * 查询任务状态
      * @returns {number} 0不显示 1进行中 2可领取 3已完成
      */
-    query_state() {
-    }
+    query_state() { return undefined; }
 
     /**
      * 运行指定ID的任务

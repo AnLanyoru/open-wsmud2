@@ -306,9 +306,7 @@ export class OBJ extends ITEM {
      * 克隆后回调
      * @returns {void}
      */
-    on_clone() {
-
-    }
+    on_clone() { return undefined; }
 
     /**
      * 创建物品实例

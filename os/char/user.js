@@ -587,11 +587,10 @@ export class USER extends CHARACTER {
 
     /**
      * 死亡后回调
-     * @param {CHARACTER} [killer]
+     * @param {import("./character").CHARACTER} [killer]
+     * @returns {void}
      */
-    on_died() {
-
-    }
+    on_died() { return undefined; }
 
     /** 检查并同步玩家状态到客户端 */
     check_state() {

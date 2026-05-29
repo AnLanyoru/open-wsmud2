@@ -73,9 +73,9 @@ export class ITEM extends BASE {
     /**
      * 合并物品 — 相同物品合并count和temp, OBJ覆写
      * @param {ITEM} obj - 要合并的物品
+     * @returns {void}
      */
-    combine(obj) {
-    }
+    combine(obj) { return undefined; }
 
     /**
      * 拆分堆叠 — 分出count个返回新物品, OBJ覆写
@@ -154,24 +154,21 @@ export class ITEM extends BASE {
     /**
      * 通知消息 — CHARACTER覆写, ROOM::notify遍历items调用
      * @param {string} msg
+     * @returns {void}
      */
-    notify(msg) {
-
-    }
+    notify(msg) { return undefined; }
 
     /**
      * 心跳处理
      * @param {number} dt - 当前时间戳
+     * @returns {void}
      */
-    heart_beat(dt) {
-
-    }
+    heart_beat(dt) { return undefined; }
     /**
      * 初始化
+     * @returns {void}
      */
-    init() {
-
-    }
+    init() { return undefined; }
 
     /**
      * 添加物件可以接收的命令(目标是当前对象的)
@@ -477,9 +474,7 @@ export class ITEM extends BASE {
      * 销毁对象
      * @returns {void}
      */
-    destroy() {
-
-    }
+    destroy() { return undefined; }
 
     /**
      * 格式化临时数据为JSON字符串

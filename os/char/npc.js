@@ -346,9 +346,9 @@ export class NPC extends CHARACTER {
     /**
      * 发言 — NPC闲聊时调用, 默认空实现由资源文件覆写
      * @param {string} [msg] - 闲聊消息
+     * @returns {void}
      */
-    do_say(msg) {
-    }
+    do_say(msg) { return undefined; }
 }
 
 /** @type {string[]} NPC死亡消息 */
