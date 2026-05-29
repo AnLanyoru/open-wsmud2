@@ -62,14 +62,14 @@ export class FOLLOWER extends CHARACTER {
     /** @type {OBJ[]|null} 背包物品 */
     items = null;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((me: USER) => void)|null} 亲热回调 — 调用已被注释, 由资源文件设置 */
-    on_makelove = null;
+    get on_makelove() { return undefined; }
     /** @type {((me: USER) => void)|null} 主人进入回调 */
-    on_master_enter = null;
+    get on_master_enter() { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 */
-    on_heart_beat = null;
+    get on_heart_beat() { return undefined; }
 
     constructor() {
         super();

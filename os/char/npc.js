@@ -47,14 +47,14 @@ export class NPC extends CHARACTER {
     /** @type {boolean} 禁止战斗标识 */
     no_fight = false;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((me: USER) => CHARACTER|false|void)|null} 查找师傅回调 — bai.js:38 检查 ==false 拒绝拜师 */
-    on_master = null;
+    get on_master() { return undefined; }
     /** @type {((me: CHARACTER) => boolean|void)|null} 检查技能回调 — checkskill.js:35只传1参, skill参数实际未使用 */
-    on_checkskill = null;
+    get on_checkskill() { return undefined; }
     /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 — 暂未被调用, 由资源文件设置 */
-    on_pfm = null;
+    get on_pfm() { return undefined; }
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 

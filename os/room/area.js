@@ -77,10 +77,10 @@ export class AREA extends BASE {
     /** @type {number} 副本难度系数 */
     fb_index = 1;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((user: USER) => void)|null} 登录回调 */
-    on_login = null;
+    get on_login() { return undefined; }
 
     // ============ 交互属性 ============
 

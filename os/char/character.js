@@ -172,24 +172,24 @@ export class CHARACTER extends ITEM {
     /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
     chat_msg = null;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 — character.js:432 传(path,par), NPC定义可无参 */
-    on_create = null;
+    get on_create() { return undefined; }
     /** @type {(() => void)|null} 对象克隆回调 — character.js:475 无参调用 */
-    on_clone = null;
+    get on_clone() { return undefined; }
     /** @type {((killer: CHARACTER) => boolean|void)|null} 死亡回调 — 返回false阻止默认死亡处理, npc.js:217 传(killer) */
-    on_die = null;
+    get on_die() { return undefined; }
     /** @type {(() => void)|null} 复活回调 — 由 force_skill.on_relive/room.on_relive 间接触发 */
-    on_relive = null;
+    get on_relive() { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
-    on_heart_beat = null;
+    get on_heart_beat() { return undefined; }
     /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
-    on_died = null;
+    get on_died() { return undefined; }
     /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
-    on_fight_over = null;
+    get on_fight_over() { return undefined; }
     /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
-    on_skillchanged = null;
+    get on_skillchanged() { return undefined; }
 
     constructor() {
         super();
