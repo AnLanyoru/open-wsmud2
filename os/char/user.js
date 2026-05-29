@@ -47,7 +47,7 @@ export class USER extends CHARACTER {
     serverid = 0;
     /** @type {number} 请求计数(频率限制) */
     request_count = 0;
-    /** @type {Function|null} 等待用户输入的回调 */
+    /** @type {((me: CHARACTER, req: string) => void)|null} 等待用户输入的回调 */
     wait_input = null;
 
     // ============ 权限与状态 ============

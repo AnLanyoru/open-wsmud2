@@ -73,7 +73,7 @@ export class CHARACTER extends ITEM {
     environment = null;
     /** @type {Object<string, *>|null} 当前活动状态 */
     state = null;
-    /** @type {Function|null} 等待用户输入的回调 */
+    /** @type {((me: CHARACTER, req: string) => void)|null} 等待用户输入的回调 — character.js:319 传(this, req) */
     wait_input = null;
     /** @type {boolean} 是否静默消息 */
     no_message = false;

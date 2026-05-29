@@ -65,7 +65,7 @@ export class FOLLOWER extends CHARACTER {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {((me: USER) => void)|null} 亲热回调 */
+    /** @type {((me: USER) => void)|null} 亲热回调 — 调用已被注释, 由资源文件设置 */
     on_makelove = null;
     /** @type {((me: USER) => void)|null} 主人进入回调 */
     on_master_enter = null;

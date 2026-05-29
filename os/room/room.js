@@ -69,11 +69,11 @@ export class ROOM extends ITEM {
     on_enter = null;
     /** @type {((dt: number) => void)|null} 心跳回调 */
     on_heart_beat = null;
-    /** @type {((user: USER) => void)|null} 登录回调 */
+    /** @type {((user: USER) => void)|null} 登录回调 — ROOM暂未被调用, 仅AREA.on_login被login.js调用 */
     on_login = null;
-    /** @type {((path: string, par?: string) => void)|null} 房间创建回调 */
+    /** @type {(() => void)|null} 房间创建回调 — room.js:596/633 无参调用 */
     on_create = null;
-    /** @type {((isdiff: boolean) => void)|null} 设置难度回调 */
+    /** @type {((type: number) => void)|null} 设置难度回调 — room.js:975传入number而非boolean */
     on_set_difficulty = null;
 
     // ============ 玩法相关 ============

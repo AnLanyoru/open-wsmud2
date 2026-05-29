@@ -60,11 +60,11 @@ export class OBJ extends ITEM {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {((me: CHARACTER) => void)|null} 使用回调 */
+    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 — use.js:64传(me,par), 返回值决定是否广播动作 */
     on_use = null;
-    /** @type {((me: CHARACTER) => void)|null} 修炼回调 */
+    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 — 调用已被注释, 资源文件定义为(me,skill,lv) */
     on_study = null;
-    /** @type {((me: CHARACTER) => void)|null} 打开回调 */
+    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 — open.js:14取返回值为OBJ[]或false阻止打开 */
     on_open = null;
     /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
     on_init = null;
