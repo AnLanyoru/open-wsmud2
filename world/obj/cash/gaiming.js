@@ -42,7 +42,7 @@ function readname(me, cmd) {
 
 async function update_name(me, name, obj) {
     try {
-        let result = await WORLD.DB.change_name(me.id, name);
+        let result = await WORLD.DB.change_name(me.id, me.userid, name);
         if (!result) return me.send('名称更改失败，请联系管理员');
         me.wait_input = null;
         me.name = name;

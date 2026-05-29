@@ -184,8 +184,8 @@ export default {
      * @param {string} name
      * @returns {*}
      */
-    change_name(id, name) {
-        return DB.updateRoleName(id, name);
+    change_name(id, userid, name) {
+        return DB.updateRoleName(id, userid, name);
     },
     /**
      * 修改角色所属用户

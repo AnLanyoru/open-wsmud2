@@ -3,7 +3,7 @@ USERLOGIN.check_user = function (loginuser, id) {
 
     return true;
 }
-USERLOGIN.check_session = function (user, str) {
+USERLOGIN.check_session = async function (user, str) {
 
     if (user.userid) {
         return this.login_error(user, '参数错误');
@@ -17,6 +17,17 @@ USERLOGIN.check_session = function (user, str) {
     if (!cookieUser || cookieUser.id === 0) {
         return this.login_error(user, "登录参数错误，请使用账号密码<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>");
     }
+
+    // 验证token中的密码是否与数据库一致（防止密码修改后旧token仍可用）
+    try {
+        var dbUser = await WORLD.DB.getUserByID(cookieUser.id);
+        if (!dbUser || dbUser.pwd !== cookieUser.pwd) {
+            return this.login_error(user, "密码已修改，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>", true);
+        }
+    } catch (e) {
+        return this.login_error(user, '登录验证失败，请稍后再试。');
+    }
+
     user.user_level = cookieUser.level ?? 0;
 
     user.wait_input = null;

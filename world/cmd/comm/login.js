@@ -26,11 +26,20 @@ this.check_user = function (loginuser, id) {
     }
     return {};
 }
-this.relogin = function (oldUser, user) {
+this.relogin = async function (oldUser, user) {
     if (oldUser.userid === user.userid) {
         if (!this.on_user_relogin(oldUser, user) !== false) return;
-        if (oldUser.password !== user.password && oldUser.loginTime > user.loginTime) {
-            return user.send("{type:'loginerror',msg:'密码失效，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+        // 验证新连接token中的密码与数据库一致
+        try {
+            var dbUser = await WORLD.DB.getUserByID(user.userid);
+            if (!dbUser || dbUser.pwd !== user.password) {
+                return user.send("{type:'loginerror',msg:'密码已修改，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+            }
+        } catch (e) {
+            return user.send("{type:'loginerror',msg:'登录验证失败'}");
+        }
+        if (oldUser.loginTime > user.loginTime) {
+            return user.send("{type:'loginerror',msg:'已有更新的登录，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
         }
         oldUser.password = user.password;
         oldUser.loginTime = user.loginTime;
