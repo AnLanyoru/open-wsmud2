@@ -7,7 +7,7 @@ this.allow_level = 6;
 
 this.regex = /^(\w+)\s(.+)$/;
 this.enter = function (me, user, arg) {
-    if (me && me.allow_level < 5) return false;
+    if (me && me.user_level < 5) return false;
     if (!arg) return me && me.send("没有消息内容。");
     var msg;
     var is_str = typeof arg == "string";

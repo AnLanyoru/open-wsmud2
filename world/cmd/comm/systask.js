@@ -2,6 +2,7 @@
 this.inherits(COMMAND);
 this.command = "systask";
 this.regex = /(\w+)\s+(\w+)?/;
+this.allow_level = 6;
 this.enter = function (me, arg, par) {
     if (!arg) return false;
     var task = TASK.GET(arg);
