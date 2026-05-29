@@ -78,13 +78,13 @@ export class AREA extends BASE {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 登录回调 */
+    /** @type {((user: USER) => void)|null} 登录回调 */
     on_login = null;
-    /** @type {Function|null} 离开回调 */
+    /** @type {((me: USER) => boolean)|null} 离开回调 */
     on_leave = null;
-    /** @type {Function|null} 进入区域回调 */
+    /** @type {((me: USER) => void)|null} 进入区域回调 */
     on_enter = null;
-    /** @type {Function|null} 进入区域后回调 */
+    /** @type {((me: USER) => void)|null} 进入区域后回调 */
     on_enterd = null;
 
     // ============ 交互属性 ============

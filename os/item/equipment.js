@@ -64,9 +64,9 @@ export class EQUIPMENT extends OBJ {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 装备时回调 */
+    /** @type {((me: CHARACTER) => void)|null} 装备时回调 */
     on_eq = null;
-    /** @type {Function|null} 卸下时回调 */
+    /** @type {((me: CHARACTER) => void)|null} 卸下时回调 */
     on_uneq = null;
     /** @type {string|null} 自定义装备消息 */
     eq_msg = null;

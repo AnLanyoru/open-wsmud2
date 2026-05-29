@@ -61,19 +61,19 @@ export class ROOM extends ITEM {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 离开房间回调 */
+    /** @type {((obj: CHARACTER, dir: string) => boolean|void)|null} 离开房间回调 */
     on_leave = null;
-    /** @type {Function|null} 进入房间前回调 */
+    /** @type {((obj: CHARACTER) => void)|null} 进入房间前回调 */
     on_before_enter = null;
-    /** @type {Function|null} 进入房间后回调 */
+    /** @type {((obj: CHARACTER) => void)|null} 进入房间后回调 */
     on_enter = null;
-    /** @type {Function|null} 心跳回调 */
+    /** @type {((dt: number) => void)|null} 心跳回调 */
     on_heart_beat = null;
-    /** @type {Function|null} 登录回调 */
+    /** @type {((user: USER) => void)|null} 登录回调 */
     on_login = null;
-    /** @type {Function|null} 房间创建回调 */
+    /** @type {((path: string, par?: string) => void)|null} 房间创建回调 */
     on_create = null;
-    /** @type {Function|null} 设置难度回调 */
+    /** @type {((isdiff: boolean) => void)|null} 设置难度回调 */
     on_set_difficulty = null;
 
     // ============ 玩法相关 ============

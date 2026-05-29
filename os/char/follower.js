@@ -65,11 +65,11 @@ export class FOLLOWER extends CHARACTER {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 亲热回调 */
+    /** @type {((me: USER) => void)|null} 亲热回调 */
     on_makelove = null;
-    /** @type {Function|null} 主人进入回调 */
+    /** @type {((me: USER) => void)|null} 主人进入回调 */
     on_master_enter = null;
-    /** @type {Function|null} 心跳回调 */
+    /** @type {((dt: number) => void)|null} 心跳回调 */
     on_heart_beat = null;
 
     constructor() {

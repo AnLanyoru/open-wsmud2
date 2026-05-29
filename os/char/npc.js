@@ -50,11 +50,11 @@ export class NPC extends CHARACTER {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 查找师傅回调 */
+    /** @type {((me: USER) => CHARACTER|void)|null} 查找师傅回调 */
     on_master = null;
-    /** @type {Function|null} 检查技能回调 */
+    /** @type {((me: USER, skill: string) => boolean|void)|null} 检查技能回调 */
     on_checkskill = null;
-    /** @type {Function|null} 绝招回调 */
+    /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 */
     on_pfm = null;
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============

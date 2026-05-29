@@ -142,17 +142,17 @@ export class CHARACTER extends ITEM {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 对象创建回调 */
+    /** @type {((path: string, par?: string) => void)|null} 对象创建回调 */
     on_create = null;
-    /** @type {Function|null} 对象克隆回调 */
+    /** @type {(() => void)|null} 对象克隆回调 */
     on_clone = null;
-    /** @type {Function|null} 死亡回调 */
+    /** @type {(() => void)|null} 死亡回调 */
     on_die = null;
-    /** @type {Function|null} 复活回调 */
+    /** @type {(() => void)|null} 复活回调 */
     on_relive = null;
-    /** @type {Function|null} 心跳回调 */
+    /** @type {((dt: number) => void)|null} 心跳回调 */
     on_heart_beat = null;
-    /** @type {Function|null} 死亡后回调(仅NPC) */
+    /** @type {(() => void)|null} 死亡后回调(仅NPC) */
     on_died = null;
 
     // ============ 由mixin/extends提供的多态方法(见文件末尾writable定义) ============

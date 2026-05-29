@@ -60,16 +60,18 @@ export class OBJ extends ITEM {
 
     // ============ 回调函数(由资源文件设置) ============
 
-    /** @type {Function|null} 使用回调 */
+    /** @type {((me: CHARACTER) => void)|null} 使用回调 */
     on_use = null;
-    /** @type {Function|null} 修炼回调 */
+    /** @type {((me: CHARACTER) => void)|null} 修炼回调 */
     on_study = null;
-    /** @type {Function|null} 打开回调 */
+    /** @type {((me: CHARACTER) => void)|null} 打开回调 */
     on_open = null;
-    /** @type {Function|null} 初始化回调 */
+    /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
     on_init = null;
-    /** @type {Function|null} 创建后回调 */
+    /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
     on_create = null;
+    /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
+    on_reload = null;
 
     /**
      * 初始化回调
