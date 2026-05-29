@@ -2,8 +2,10 @@
  * 所有命令的基类，
  * 自动加载所有定义在__COMMAND文件夹下的命令文件
  */
+import { BASE } from "./base.js";
+import { WORLD } from "./world.js";
 
-COMMAND = class extends BASE {
+export class COMMAND extends BASE {
 
     static __initInstance(obj) {
         obj.allow_fight = true;
@@ -71,3 +73,4 @@ COMMAND = class extends BASE {
         }
     }
 }
+globalThis.COMMAND = COMMAND;

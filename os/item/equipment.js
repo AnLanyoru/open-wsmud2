@@ -1,9 +1,12 @@
 /**
  * EQUIPMENT 装备类 - 继承自OBJ
  */
-require("../util/util.js");
+import { OBJ } from "./obj.js";
+import { UTIL } from "../util/util.js";
+import { EQUIP_TYPE, PROPERTIES } from "../const.js";
+import { SKILL } from "../skill/skill.js";
 
-EQUIPMENT = class EQUIPMENT extends OBJ {
+export class EQUIPMENT extends OBJ {
 
     static __initInstance(obj) {
         /** @type {number} 装备类型(WEAPON/CLOTH等) */
@@ -584,3 +587,4 @@ EQUIPMENT = class EQUIPMENT extends OBJ {
 /** @type {string[]} 强化等级图标 */
 const level_desc = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
     "★★★☆", "★★★★", "★★★★☆", "★★★★★", "★★★★★☆", "★★★★★★"];
+globalThis.EQUIPMENT = EQUIPMENT;

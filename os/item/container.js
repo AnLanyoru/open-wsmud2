@@ -1,9 +1,10 @@
 /**
  * CONTAINER 容器类 - 可装入物品的物件
  */
-require("./obj.js");
+import { OBJ } from "./obj.js";
+import { UTIL } from "../util/util.js";
 
-CONTAINER = class CONTAINER extends OBJ {
+export class CONTAINER extends OBJ {
 
     static __initInstance(obj) {
         /** @type {number} 物品数量 */
@@ -123,3 +124,4 @@ CONTAINER = class CONTAINER extends OBJ {
         return obj;
     }
 }
+globalThis.CONTAINER = CONTAINER;

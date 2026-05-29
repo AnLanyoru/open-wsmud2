@@ -1,7 +1,9 @@
 /**
  * CHARACTER 属性/临时数据系统扩展
  */
-require("./character.js");
+import { CHARACTER } from "./character.js";
+import { SKILL } from "../skill/skill.js";
+import { UTIL } from "../util/util.js";
 
 Object.assign(CHARACTER.prototype, {
     /**

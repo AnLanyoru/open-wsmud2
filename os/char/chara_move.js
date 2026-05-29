@@ -1,6 +1,8 @@
 /**
  * CHARACTER 移动/跟随系统扩展
  */
+import { CHARACTER } from "./character.js";
+import { ROOM } from "../room/room.js";
 
 var dirs = {
     "north": "北方",

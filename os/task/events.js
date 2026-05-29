@@ -1,8 +1,10 @@
 /**
  * EVENTS 活动事件管理
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
 
-EVENTS = class EVENTS extends BASE {
+export class EVENTS extends BASE {
     /**
      * 添加/更新活动
      * @param {{id: string, check: function(USER): boolean}} item - 活动对象
@@ -66,6 +68,8 @@ EVENTS = class EVENTS extends BASE {
  *   query_grade: function(): number
  * }}
  */
+globalThis.EVENTS = EVENTS;
+
 const EVENT_BASE = {
     /** @returns {string} */
     query_desc() {

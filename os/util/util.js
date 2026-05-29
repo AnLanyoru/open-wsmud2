@@ -2,8 +2,11 @@
  * UTIL 工具集 - 通用工具方法
  */
 
-const util = require('util');
-const JSON5 = require('json5');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import util from 'util';
+import JSON5 from 'json5';
 
 /**
  * nodejs自带原型继承扩展
@@ -62,36 +65,7 @@ JSON.toObject = function (str) {
 
 }
 
-/**
- * UTIL 全局工具对象
- * @type {{
- *   empty: function,
- *   require: function(string): *,
- *   is_gift: function(): boolean,
- *   wrandom: function(CHARACTER, number, number=): number,
- *   moneyToStr: function(number): string,
- *   timeSpan: function(number): string,
- *   to_c: function(number): string,
- *   htmlEncode: function(string): string,
- *   prop_toString: function(Object, string=, number=): string,
- *   diff_time: function(number=): number,
- *   diff_week_time: function(number=): number,
- *   diff_month_time: function(number=): number,
- *   logs: Array<*>,
- *   log: function(string): void,
- *   saveLog: function(): void,
- *   create_id: function(): string,
- *   random_name: function(number, number=): string,
- *   getLunar: function(Date=): {year: number, month: number, day: number, isLeap: boolean},
- *   isLunar15: function(Date=): boolean,
- *   C_STR: string,
- *   C_STR2: string[],
- *   C_STR3: string[],
- *   idstr: string,
- *   begin: number
- * }}
- */
-UTIL = {
+export const UTIL = {
     /** 空函数占位 */
     empty() {
     },
@@ -338,7 +312,7 @@ UTIL = {
         let day = dt.getDate();
         if (hour >= next_hour) day = day + 1;
         dt = new Date(dt.getFullYear(), dt.getMonth(), day, next_hour);
-        return dt - Date.now();
+        return dt.getTime() - Date.now();
     },
     /**
      * 到下周指定小时的时间差
@@ -356,7 +330,7 @@ UTIL = {
         const next_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + week, next_hour);
 
 
-        return next_date - Date.now();
+        return next_date.getTime() - Date.now();
     },
     /**
      * 到下月1号指定小时的时间差
@@ -373,7 +347,7 @@ UTIL = {
 
         const next_date = new Date(date.getFullYear(), date.getMonth(), 1, next_hour);
 
-        return next_date - Date.now();
+        return next_date.getTime() - Date.now();
     },
     /** @type {Array<{dt: function, content: string}>} */
     logs: [],
@@ -456,7 +430,7 @@ UTIL = {
     /** @type {string} 男名用字 */
     name2: "世舜丞主产仁仇仓仕仞任伋众伸佐佺侃侪促俟信俣修倝倡倧偿储僖僧僳儒俊伟列则刚创前剑助劭势勘参叔吏嗣士壮孺守宽宾宋宗宙宣实宰尊峙峻崇崈川州巡帅庚战才承拯操斋昌晁暠曹曾珺玮珹琒琛琩琮琸瑎玚璟璥瑜生畴矗矢石磊砂碫示社祖祚祥禅稹穆竣竦综缜绪舱舷船蚩襦轼辑轩子杰榜碧葆莱蒲天乐东钢铎铖铠铸铿锋镇键镰馗旭骏骢骥驹驾骄诚诤赐慕端征坚建弓强彦御悍擎攀旷昂晷健冀凯劻啸柴木林森朴骞寒函高魁魏鲛鲲鹰丕乒候冕勰备宪宾密封山峰弼彪彭旁日明昪昴胜汉涵汗浩涛淏清澜浦澉澎澔瀚瀛灏沧虚豪豹辅辈迈邶合部阔雄霆震韩俯颁颇频颔风飒飙飚马亮仑仝代儋利力劼勒卓哲喆展帝弛弢弩彰征律德志忠思振挺掣旲旻昊昮晋晟晸朕朗段殿泰滕炅炜煜煊炎选玄勇君稼黎利贤谊金鑫辉墨欧有友闻问",
     /** @type {string} 女名用字 */
-    name3: "筠柔竹霭凝晓欢霄枫芸菲寒伊亚宜姬舒影荔枝思丽秀娟英华慧巧美娜静淑惠珠翠雅芝玉萍红娥玲芬芳燕彩春菊勤珍贞莉兰凤洁梅琳素云莲真环雪荣妹霞香月莺媛艳瑞凡佳嘉琼桂娣叶璧璐娅琦晶妍茜秋珊莎锦黛青倩婷姣婉娴瑾颖露瑶怡婵雁蓓纨仪荷丹蓉眉君琴蕊薇菁梦岚苑婕馨瑗琰韵融园艺咏卿聪澜纯毓悦昭冰爽琬茗羽希宁欣飘育滢馥",
+    name3: "筠柔竹霭凝晓欢霄枫芸菲寒伊亚宜姬舒影荔技思丽秀娟英华慧巧美娜静淑惠珠翠雅芝玉萍红娥玲芬芳燕彩春菊勤珍贞莉兰凤洁梅琳素云莲真环雪荣妹霞香月莺媛艳瑞凡佳嘉琼桂娣叶璧璐娅琦晶妍茜秋珊莎锦黛青倩婷姣婉娴瑾颖露瑶怡婵雁蓓纨仪荷丹蓉眉君琴蕊薇菁梦岚苑婕馨瑗琰韵融园艺咏卿聪澜纯毓悦昭冰爽琬茗羽希宁欣飘育滢馥",
 
     /**
      * 获取农历日期
@@ -616,3 +590,4 @@ UTIL = {
 
 
 };
+globalThis.UTIL = UTIL;

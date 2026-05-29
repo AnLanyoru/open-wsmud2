@@ -1,9 +1,10 @@
 /**
  * CORPSE 尸体类 - 继承自CONTAINER
  */
-require("../item/obj.js");
+import { OBJ } from "./obj.js";
+import { CONTAINER } from "./container.js";
 
-CORPSE = class CORPSE extends CONTAINER {
+export class CORPSE extends CONTAINER {
 
     static __initInstance(obj) {
         /** @type {string} 单位 */
@@ -124,3 +125,4 @@ CORPSE = class CORPSE extends CONTAINER {
         return this.json;
     }
 }
+globalThis.CORPSE = CORPSE;

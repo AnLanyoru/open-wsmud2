@@ -1,8 +1,14 @@
 /**
  * NPC 非玩家角色类
  */
+import { CHARACTER } from "./character.js";
+import { ROOM } from "../room/room.js";
+import { OBJ } from "../item/obj.js";
+import { WORLD } from "../world.js";
+import { FAMILIES } from "../skill/family.js";
+import { BASE } from "../base.js";
 
-NPC = class NPC extends CHARACTER {
+export class NPC extends CHARACTER {
 
     /**
      * @param {NPC} obj - 要初始化的NPC实例
@@ -314,3 +320,5 @@ NPC = class NPC extends CHARACTER {
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+globalThis.NPC = NPC;

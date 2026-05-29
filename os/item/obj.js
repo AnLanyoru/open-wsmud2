@@ -1,8 +1,12 @@
 /**
  * OBJ 普通物品基类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { ITEM } from "../item.js";
+import { UTIL } from "../util/util.js";
 
-OBJ = class OBJ extends ITEM {
+export class OBJ extends ITEM {
 
     static __initInstance(obj) {
         /** @type {string} 单位 */
@@ -324,13 +328,13 @@ OBJ = class OBJ extends ITEM {
     }
 
     /** @type {function} 临时数据(复用CHARACTER) */
-    query_temp = CHARACTER.prototype.query_temp;
+    query_temp = globalThis.CHARACTER.prototype.query_temp;
     /** @type {function} */
-    set_temp = CHARACTER.prototype.set_temp;
+    set_temp = globalThis.CHARACTER.prototype.set_temp;
     /** @type {function} */
-    remove_temp = CHARACTER.prototype.remove_temp;
+    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
     /** @type {function} */
-    add_temp = CHARACTER.prototype.add_temp;
+    add_temp = globalThis.CHARACTER.prototype.add_temp;
 
     /**
      * 根据概率列表创建物品
@@ -366,3 +370,4 @@ OBJ = class OBJ extends ITEM {
 
 /** @type {string[]} 品级颜色 */
 const grade_color = ["wht", "hig", "hic", "hiy", "HIZ", "hio", "ord"];
+globalThis.OBJ = OBJ;

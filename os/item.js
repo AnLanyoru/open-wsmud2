@@ -5,9 +5,10 @@
  * 2. add_action方式，房间里的指令推荐用这种
  * 3. on(xxx)方式，对房间里的命令的反映
  */
-require("./util/util");
+import { BASE } from "./base.js";
+import { UTIL } from "./util/util.js";
 
-ITEM = class ITEM extends BASE {
+export class ITEM extends BASE {
 
     static __initInstance(obj) {
         // ITEM has no instance properties to initialize
@@ -393,3 +394,4 @@ ITEM = class ITEM extends BASE {
         return tmp.join("");
     }
 }
+globalThis.ITEM = ITEM;

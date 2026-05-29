@@ -1,10 +1,17 @@
 /**
  * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
  */
-require("../util/util.js");
-require("./user.js");
+import "../util/util.js";
+import { CHARACTER } from "./character.js";
+import { USER } from "./user.js";
+import { NPC } from "./npc.js";
+import { FAMILIES } from "../skill/family.js";
+import { CORPSE } from "../item/corpse.js";
+import { ROOM } from "../room/room.js";
+import { UTIL } from "../util/util.js";
+import { OBJ } from "../item/obj.js";
 
-FOLLOWER = class FOLLOWER extends CHARACTER {
+export class FOLLOWER extends CHARACTER {
 
     /**
      * @param {FOLLOWER} obj - 要初始化的随从实例
@@ -655,3 +662,5 @@ const SAVE_STRPROP = ["id", "name", "title", "desc"];
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+globalThis.FOLLOWER = FOLLOWER;

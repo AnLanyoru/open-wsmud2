@@ -1,8 +1,12 @@
 /**
  * AREA 区域类 - 管理一组房间
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { FAMILIES } from "../skill/family.js";
+import { NPC } from "../char/npc.js";
 
-AREA = class AREA extends BASE {
+export class AREA extends BASE {
 
     static __initInstance(obj) {
         /** @type {ROOM[]} */
@@ -226,3 +230,4 @@ AREA = class AREA extends BASE {
         return this.actions;
     }
 }
+globalThis.AREA = AREA;

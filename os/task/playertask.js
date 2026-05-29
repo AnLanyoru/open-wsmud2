@@ -1,9 +1,11 @@
 /**
  * USERTASK 玩家任务基类
  */
-require("../util/util");
+import { UTIL } from "../util/util.js";
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
 
-USERTASK = class USERTASK extends BASE {
+export class USERTASK extends BASE {
 
     static __initInstance(obj) {
         // USERTASK has no instance properties to initialize
@@ -103,3 +105,4 @@ USERTASK = class USERTASK extends BASE {
         }
     }
 }
+globalThis.USERTASK = USERTASK;

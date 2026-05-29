@@ -1,10 +1,15 @@
 /**
  * CHARACTER 生物基类
  */
-require("../item");
+import { ITEM } from "../item.js";
+import { OBJ } from "../item/obj.js";
+import { SKILL } from "../skill/skill.js";
+import { WORLD } from "../world.js";
+import { UTIL } from "../util/util.js";
+import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE } from "../const.js";
 /*global CHARACTER ROOM ITEM*/
 
-CHARACTER = class CHARACTER extends ITEM {
+export class CHARACTER extends ITEM {
 
     /**
      * @param {CHARACTER} obj - 要初始化的角色实例
@@ -495,3 +500,5 @@ function splitmessage(me, text, type, target) {
     start < i && str.push(text.substring(start, i));
     return str.join("");
 }
+
+globalThis.CHARACTER = CHARACTER;

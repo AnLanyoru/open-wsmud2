@@ -1,7 +1,10 @@
 /**
  * CHARACTER 技能系统扩展
  */
-require("./character.js");
+import { CHARACTER } from "./character.js";
+import { SKILL } from "../skill/skill.js";
+import { WORLD } from "../world.js";
+import { WEAPON_TYPE, BASE_SKILLS, SKILL_TYPES } from "../const.js";
 
 Object.assign(CHARACTER.prototype, {
     /**
@@ -633,6 +636,7 @@ Object.assign(CHARACTER.prototype, {
 
                 if (item.override === 1) {
                     item.count--;
+
                     if (item.count === 0 || isall) {
 
                         this.change_buff(item, false, item.count);

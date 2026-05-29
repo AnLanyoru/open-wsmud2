@@ -1,7 +1,7 @@
 /**
  * 战斗系统 - 扩展CHARACTER
  */
-require("./character.js");
+import { CHARACTER } from "./character.js";
 
 Object.assign(CHARACTER.prototype, {
     /**

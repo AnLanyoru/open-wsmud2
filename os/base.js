@@ -5,10 +5,10 @@
  * 可以用this.XXX扩展属性和方法
  */
 
-const vm = require('vm');
-const fs = require("fs");
+import vm from 'vm';
+import fs from 'fs';
 
-BASE = class BASE {
+export class BASE {
     static __initInstance(obj) {
         // BASE has no instance properties to initialize
     }
@@ -262,3 +262,4 @@ BASE = class BASE {
         obj.update && obj.update(fname, ary[2]);
     }
 }
+globalThis.BASE = BASE;

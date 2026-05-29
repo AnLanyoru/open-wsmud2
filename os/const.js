@@ -3,30 +3,32 @@
  * @readonly
  * @enum {number}
  */
-SKILL_TYPES = {
+export const SKILL_TYPES = {
     BASE: 0,
     SKILL: 1,
     KNOWLEDGE: 2
 };
+globalThis.SKILL_TYPES = SKILL_TYPES;
 
 /**
  * 基本技能ID常量
  * @readonly
  * @enum {string}
  */
-BASE_SKILLS = {
+export const BASE_SKILLS = {
     FORCE: "force",
     DODGE: "dodge",
     PARRY: "parry",
     BITE: "bite"
 };
+globalThis.BASE_SKILLS = BASE_SKILLS;
 
 /**
  * 装备类型枚举
  * @readonly
  * @enum {number}
  */
-EQUIP_TYPE = {
+export const EQUIP_TYPE = {
     WEAPON: 0,
     CLOTH: 1,
     SHOES: 2,
@@ -39,13 +41,14 @@ EQUIP_TYPE = {
     WAIST: 9,//腰带
     THROWING: 10//
 }
+globalThis.EQUIP_TYPE = EQUIP_TYPE;
 
 /**
  * 武器类型常量
  * @readonly
  * @enum {string}
  */
-WEAPON_TYPE = {
+export const WEAPON_TYPE = {
     NONE: "unarmed",
     SWORD: "sword",
     BLADE: "blade",
@@ -54,13 +57,14 @@ WEAPON_TYPE = {
     WHIP: "whip",
     THROWING: "throwing"
 }
+globalThis.WEAPON_TYPE = WEAPON_TYPE;
 
 /**
  * 属性名称映射表
  * @readonly
  * @type {Object<string, string>}
  */
-PROPERTIES = {
+export const PROPERTIES = {
     "con1": "先天根骨",
     "dex1": "先天身法",
     "int1": "先天悟性",
@@ -98,6 +102,7 @@ PROPERTIES = {
     zj_per: "招架",
     gj_per: "攻击",
     ds_per: "躲闪",
+    mz_per: "命中",
     hp_per: "气血",
     study_per: "学习效率",
     dazuo_per: "打坐效率",
@@ -141,3 +146,4 @@ PROPERTIES = {
     fenjie: "分解获得的玄晶",
 
 };
+globalThis.PROPERTIES = PROPERTIES;

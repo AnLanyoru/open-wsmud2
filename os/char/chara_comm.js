@@ -1,7 +1,8 @@
 /**
  * CHARACTER 通用/显示 方法扩展
  */
-require("./character");
+import { CHARACTER } from "./character.js";
+import { ROOM } from "../room/room.js";
 
 /** @type {string[]} 等级称号 */
 const level_descs = ["普通百姓", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
@@ -125,6 +126,14 @@ Object.assign(CHARACTER.prototype, {
             if (nome && this.team[i] == this) continue;
             this.team[i].send(msg);
         }
+    },
+
+    /**
+     * 向门派发送消息
+     * @param {string} str
+     */
+    send_fam(str) {
+        this.family.send(str);
     },
 
     /**

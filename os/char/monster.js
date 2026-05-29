@@ -2,10 +2,14 @@
  * MONSTER 怪物类
  */
 
-require("../util/util.js");
-require("./character");
+import "../util/util.js";
+import { CHARACTER } from "./character.js";
+import { FAMILIES } from "../skill/family.js";
+import { BASE_SKILLS } from "../const.js";
+import { CORPSE } from "../item/corpse.js";
+import { WORLD } from "../world.js";
 
-MONSTER = class MONSTER extends CHARACTER {
+export class MONSTER extends CHARACTER {
 
     /**
      * @param {MONSTER} obj - 要初始化的怪物实例
@@ -177,3 +181,5 @@ const MONSTER_PARTS = [
     { name: "前肢", hert: 0.85, crit: 1 },
     { name: "腰间", hert: 0.99, crit: 5 },
 ];
+
+globalThis.MONSTER = MONSTER;

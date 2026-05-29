@@ -1,8 +1,10 @@
 /**
  * TASK 系统任务基类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
 
-TASK = class TASK extends BASE {
+export class TASK extends BASE {
 
     static __initInstance(obj) {
         // TASK has no instance properties to initialize
@@ -71,3 +73,4 @@ TASK = class TASK extends BASE {
 
     }
 }
+globalThis.TASK = TASK;

@@ -3,13 +3,17 @@
  * 支持多种WebSocket协议版本及原始TCP
  */
 "use strict";
-const crypto = require('crypto');
-const fs = require("fs");
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import crypto from 'crypto';
+import fs from 'fs';
 
 /**
  * WebSocket/TCP 服务器
  */
-class wsServer {
+export default class wsServer {
     /**
      * @param {{SSL: boolean, KEY: string, CERT: string, PASSWORD: string}} options - SSL配置
      */
@@ -67,8 +71,7 @@ class wsServer {
         });
     }
 }
-
-module.exports = wsServer;
+globalThis.wsServer = wsServer;
 
 /**
  * 客户端连接处理
@@ -108,14 +111,6 @@ function onClientConnect(socket) {
     });
 }
 
-/**
- * WebSocket 协议实现集合
- * @type {{
- *   var1: {handShake: function, readData: function, sendData: function},
- *   var2: {handShake: function, readData: function, sendData: function, buffer: Buffer|null},
- *   tcp: {readData: function, sendData: function}
- * }}
- */
 const protocols = {
     /** WebSocket 协议版本13 (RFC 6455) */
     var1: {

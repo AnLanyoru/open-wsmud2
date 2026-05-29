@@ -2,33 +2,13 @@
  * 数据持久化模块 - 数据库操作/文件备份
  */
 
-const fs_sync = require("fs");
+import fs_sync from 'fs';
+
 const fs = fs_sync.promises;
 
 const DB = __CONFIG.DB;
 
-/**
- * @type {{
- *   close: function(): *,
- *   getRoles: function(number, number): Promise<Array<*>>,
- *   addRole: function(*): Promise<*>,
- *   deleteRole: function(number, string): Promise<*>,
- *   saveRole: function(*): Promise<*>,
- *   saveRoles: function(Array<*>): Promise<void>,
- *   localBak: function(*, *): void,
- *   saveRequest: function(Array<*>): Promise<void>,
- *   saveLogs: function(Array<*>): Promise<void>,
- *   saveData: function(string): Promise<void>,
- *   readData: function(): Promise<*>,
- *   getRoleData: function(number, string): *,
- *   change_name: function(string, string): *,
- *   change_userid: function(string, number, number): *,
- *   check_file: function(string): Promise<boolean>,
- *   initDataDir: function(): Promise<void>,
- *   getServers: function(): *
- * }}
- */
-module.exports = {
+export default {
     /** 关闭数据库连接 */
     close() {
         return DB.close();

@@ -1,9 +1,17 @@
 /**
  * USER 玩家类
  */
-require("./character.js");
+import { CHARACTER } from "./character.js";
+import { ROOM } from "../room/room.js";
+import { OBJ } from "../item/obj.js";
+import { FOLLOWER } from "./follower.js";
+import { FAMILIES } from "../skill/family.js";
+import { WORLD } from "../world.js";
+import { CORPSE } from "../item/corpse.js";
+import { SKILL } from "../skill/skill.js";
+import { WEAPON_TYPE } from "../const.js";
 
-USER = class USER extends CHARACTER {
+export class USER extends CHARACTER {
 
     /**
      * @param {USER} obj - 要初始化的玩家实例
@@ -39,6 +47,8 @@ USER = class USER extends CHARACTER {
         obj.eq_group = 0;
         /** @type {boolean} */
         obj.is_player = true;
+        /** @type {number} 所在服务器ID */
+        obj.serverid = 0;
     }
 
     constructor() {
@@ -1099,3 +1109,5 @@ const jclimits = [1000, 2000, 3000, 5000, 7000, 10000, 15000];
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+globalThis.USER = USER;

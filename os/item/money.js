@@ -1,9 +1,9 @@
 /**
  * MONEY 货币类 - 继承自OBJ
  */
-require("../item/obj.js");
+import { OBJ } from "./obj.js";
 
-MONEY = class MONEY extends OBJ {
+export class MONEY extends OBJ {
 
     static __initInstance(obj) {
         /** @type {boolean} 是否为现金(元宝) */
@@ -48,3 +48,4 @@ MONEY = class MONEY extends OBJ {
 
     }
 }
+globalThis.MONEY = MONEY;

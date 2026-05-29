@@ -1,8 +1,14 @@
 /**
  * ROOM 房间类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { ITEM } from "../item.js";
+import { OBJ } from "../item/obj.js";
+import { NPC } from "../char/npc.js";
+import { USER } from "../char/user.js";
 
-ROOM = class ROOM extends ITEM {
+export class ROOM extends ITEM {
 
     static __initInstance(obj) {
         obj.name = "房间";
@@ -990,3 +996,4 @@ function getAreaByPath(path) {
         if (items[i].room_path == path) return items[i];
     }
 }
+globalThis.ROOM = ROOM;

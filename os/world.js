@@ -2,76 +2,14 @@
  * WORLD 全局对象 - 游戏世界核心管理
  */
 
-require("./util/util");
-const db = require("./util/data");
+import "./util/util.js";
+import db from "./util/data.js";
+import WORLD_DATA from "./data.js";
+import USERLOGIN_MODULE from "./login.js";
+import LISTENER_MODULE from "./ws.js";
+import fs from "fs";
 
-/**
- * @type {{
- *   USERS: USER[],
- *   COMMANDS: Object<string, COMMAND>,
- *   SKILLS: Object<string, SKILL>,
- *   ROOMS: Object<string, ROOM>,
- *   RUN_ROOMS: ROOM[],
- *   DEFAULT_SKILLS: Object<string, SKILL>,
- *   AREAS: AREA[],
- *   TASKS: USERTASK[],
- *   SYSTEMTASKS: TASK[],
- *   USER_EVENTS: Array<{id: string}>,
- *   OBJ_STROE: Map<string, OBJ>,
- *   NPC_STROE: Map<string, NPC>,
- *   HEARTBEATCOUNT: number,
- *   RECEIVED: Array<{time: number, cmd: string, user: string}>,
- *   LOGS: Array<{time: number, cmd: string, user: string, msg: string}>,
- *   SERVERID: number,
- *   SERVERS: Array<*>,
- *   CONNECT_COUNT: number,
- *   DATA: *,
- *   USERLOGIN: *,
- *   DB: *,
- *   SocketCount: number,
- *   LISTENER: *,
- *   max_connect_count: number,
- *   max_user_count: number,
- *   MESSAGE: {stores: Map<*, *>, NOTICES: Array<*>},
- *   STATS: {TOPS: Array<*>, EXP: Array<*>, SCORE: Array<*>, WEAPON: Array<*>},
- *   status: number,
- *   heart_beat_service: *,
- *   SERVER: *,
- *   DEFAULT_COMMAND: COMMAND,
- *   SocketIn: function(): void,
- *   connect: function(*): void,
- *   check_connect: function(*): boolean,
- *   before_login: function(USER): boolean,
- *   disconnect: function(*): void,
- *   request: function(string, *): void,
- *   saveRequest: function(): void,
- *   startup: function(number=): Promise<void>,
- *   sendAll: function(string): void,
- *   getUser: function(string|number): USER|undefined,
- *   find_user: function(string): USER|undefined,
- *   on_user_login: function(USER): void,
- *   on_user_cross_login: function(USER): void,
- *   on_startup: function(): void,
- *   on_user_quit: function(USER): void,
- *   on_user_relogin: function(USER): void,
- *   on_heart_beat: function(number): void,
- *   heart_beat: function(): void,
- *   login_out: function(USER): void,
- *   send: function(string): void,
- *   log: function(USER|null, string, string): void,
- *   saveLog: function(): void,
- *   is_server: function(USER): boolean,
- *   save: function(): Promise<boolean>,
- *   writeHeapSnapshot: function(): void,
- *   loadLocalData: function(): void,
- *   on_cross_response: function(string, string): void,
- *   can_cross: function(string): boolean,
- *   on_user_die: function(CHARACTER, CHARACTER, CORPSE): void,
- *   on_resource_loaded: function(): void,
- *   auto_get: function
- * }}
- */
-WORLD = {
+const WORLD = {
     USERS: [],
     COMMANDS: {},
     SKILLS: {},
@@ -90,11 +28,11 @@ WORLD = {
     SERVERID: 0,
     SERVERS: [],
     CONNECT_COUNT: 0,
-    DATA: require('./data'),
-    USERLOGIN: require('./login'),
+    DATA: WORLD_DATA,
+    USERLOGIN: USERLOGIN_MODULE,
     DB: db,
     SocketCount: 0,
-    LISTENER: require("./ws"),
+    LISTENER: LISTENER_MODULE,
     max_connect_count: 1100,
     max_user_count: 5100,
     MESSAGE: {
@@ -130,7 +68,7 @@ WORLD = {
         if (!WORLD.check_connect(socket))
             return socket.end();
 
-        socket.user = new USER();
+        socket.user = new globalThis.USER();
 
         socket.user.socket = socket;
         socket.user.wait_input = this.USERLOGIN.check_session.bind(this.USERLOGIN);
@@ -451,7 +389,7 @@ WORLD = {
         if (!data || !data.length) return;
         console.log("加载上次未保存的本地用户%d", data.length);
         for (let i = 0; i < data.length; i++) {
-            const user = new USER();
+            const user = new globalThis.USER();
             user.loadData(data[i]);
             this.USERS.push(user);
         }
@@ -497,7 +435,6 @@ WORLD = {
  * @returns {number} 加载的文件数
  */
 function loadResource() {
-    const fs = require("fs");
     function readdir(basePath, path) {
         path = path || basePath;
         const files = fs.readdirSync(path);
@@ -552,3 +489,6 @@ function loadResource() {
         console.log("error: ", e, e.stack);
     }
 }
+
+globalThis.WORLD = WORLD;
+export { WORLD };

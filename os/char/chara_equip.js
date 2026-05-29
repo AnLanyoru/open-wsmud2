@@ -1,7 +1,9 @@
 /**
  * CHARACTER 装备系统扩展
  */
-require("./character.js");
+import { CHARACTER } from "./character.js";
+import { OBJ } from "../item/obj.js";
+import { EQUIP_TYPE, WEAPON_TYPE } from "../const.js";
 
 Object.assign(CHARACTER.prototype, {
     /**

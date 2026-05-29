@@ -1,11 +1,14 @@
 /**
  * SKILL 技能基类 & PERFORM 绝招类
  */
-/*global SKILL_TYPES SKILL BASE PROPERTIES WORLD FAMILIES*/
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { UTIL } from "../util/util.js";
+import { CHARACTER } from "../char/character.js";
+import { FAMILIES } from "./family.js";
+import { SKILL_TYPES, PROPERTIES } from "../const.js";
 
-require("../util/util.js");
-
-SKILL = class SKILL extends BASE {
+export class SKILL extends BASE {
 
     static __initInstance(obj) {
         obj.id = "";
@@ -824,7 +827,7 @@ SKILL = class SKILL extends BASE {
     }
 }
 
-PERFORM = class PERFORM extends BASE {
+export class PERFORM extends BASE {
 
     static __initInstance(obj) {
         obj.name = "";
@@ -882,3 +885,5 @@ PERFORM = class PERFORM extends BASE {
 const level_color = ["wht", "hig", "hic", "hiy", "hiz", "hio", "ord"];
 /** @type {string[]} 品级描述 */
 const level_desc = ["基本技能", "普通技能", "高级技能", "稀有武技", "绝世武功", "绝世神功", "无上神武"];
+globalThis.SKILL = SKILL;
+globalThis.PERFORM = PERFORM;
