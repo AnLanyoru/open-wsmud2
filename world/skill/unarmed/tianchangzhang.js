@@ -1,3 +1,6 @@
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
 this.inherits(SKILL);
 this.name = "天长掌法";
 this.id = "tianchangzhang";
@@ -76,3 +79,4 @@ this.pfm = {
         }
     }
 };
+}

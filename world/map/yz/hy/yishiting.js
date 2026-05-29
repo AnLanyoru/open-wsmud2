@@ -1,3 +1,6 @@
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
 this.inherits(ROOM);
 this.name = "黑鹰厅"
 this.desc = "高约三丈的穹顶下，黑檀木横梁上悬着一块鎏金 “奉旨缉拿” 匾额，边缘镶着铜质云纹，匾额下方垂着三盏羊角宫灯，灯影在青砖地面投下晃动的光斑。西侧墙根处有一扇半尺厚的<cmd cmd='look men'>铁门</cmd>，门框与石壁严丝合缝。";
@@ -39,4 +42,5 @@ this.close_men = function () {
         this.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
         ROOM.Get('yz/hy/dilao').send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
     }
+}
 }

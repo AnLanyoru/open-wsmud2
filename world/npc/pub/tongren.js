@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "<yel>铜人</yel>",
     desc: "这是一个铜做的假人，防御很高，用来测试伤害的",
@@ -26,4 +29,5 @@ this.die = function () {
     this.add_hp(this.max_hp);
     this.send_room('$N身上破损的铜皮剥落，再次神采奕奕，精气十足。\n');
     return false;
+}
 }

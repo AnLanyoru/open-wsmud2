@@ -1,4 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
 
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const AREA = globalThis.AREA;
 this.inherits(COMMAND);
 this.command = "cr2";
 this.allow_fight = true;
@@ -72,3 +75,4 @@ const FB_MAX = {
     SHAOLIN: 13,
     NONE: 12
 };
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const FOLLOWER = globalThis.FOLLOWER;
+this.inherits(ROOM);
 this.name = "院子"
 this.desc = "这是你家的大院，迎面是一个假山水池，池上摆着一块奇形怪状的石头，据说是之前人家留下来的，水池两旁种满了花草，东边是一颗槐树，郁郁葱葱，遮盖了大半个院子，背面是你的卧室，西面是练功房";
 this.exits = { "out": "yz/home", "west": "home/liangong", north: "home/woshi", "east": "home/lianyao", "northeast": "home/huayuan" };
@@ -29,4 +33,5 @@ this.on_leave = function (me) {
         me.actions = null;
         me.master_json = null;
     }
+}
 }

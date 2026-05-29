@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "diaoyu";
 
 this.enter = function (me) {
@@ -111,4 +115,5 @@ function query_er(me) {
             return me.items[i];
         }
     }
+}
 }

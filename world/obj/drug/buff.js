@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "药丸",
@@ -59,4 +62,5 @@ this.create_type1 = function (lv) {
     this.prop = {
         dex: val
     };
+}
 }

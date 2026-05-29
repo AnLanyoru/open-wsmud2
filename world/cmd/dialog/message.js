@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "message";
 this.allow_busy = true;
 this.allow_state = true;
@@ -71,4 +75,5 @@ this.check_store = function (store) {
             return false;
     }
     return true;
+}
 }

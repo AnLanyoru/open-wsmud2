@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "fight";
 this.enter = function (me, argid) {
     if (argid == "none") {
@@ -72,4 +75,5 @@ this.enter = function (me, argid) {
         target.begin_attack(me, 1);
 
     }
+}
 }

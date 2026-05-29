@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "独臂神尼",
     desc: "这是一位白衣女尼，手握拂尘，目视前方。一只长袖空空如也，显是断了一臂，尽管如此，仍然掩不住她迷人的风采。",
@@ -52,4 +55,5 @@ this.on_checkskill = function (me) {
 this.on_teach = function (me, sk) {
     if (sk != "shenxingbaibian") return me.notify_fail("独臂神尼说道：贫尼只能教你神行百变。");
     return true;
+}
 }

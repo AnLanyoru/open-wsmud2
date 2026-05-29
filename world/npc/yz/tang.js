@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL; const TASK = globalThis.TASK;
+this.inherits(NPC);
 this.set({
     name: "唐楠",
     desc: "据说唐楠是四川唐家的后代。",
@@ -57,4 +61,5 @@ this.on_accept = function (me, obj, count) {
     } else {
         me.notify("唐楠对你说道：这位" + me.call() + "，这次需要" + (cash / 10000) + "两黄金才能刷新了。");
     }
+}
 }

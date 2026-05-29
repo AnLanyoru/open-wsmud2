@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "舍身崖"
 this.desc = "这是一段极窄极险的山崖，四周云雾飞绕，下面渊深无底。如不小心，一失足掉下去，只怕连骨头都找不到。边上有个小山洞";
 this.exits = { "westdown": "huashan/zhenyue" };
@@ -23,3 +26,4 @@ this.add_action("jumpdown", "跳下去", function (me) {
         me.die();
     }
 })
+}

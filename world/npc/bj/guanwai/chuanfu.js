@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "船夫",
     desc: "这是一个松花江上的船夫。饱经风霜的脸上透出东北人的豪爽。",
@@ -35,4 +38,5 @@ this.on_accept = function (me, obj, count) {
             return true;
         }
     }
+}
 }

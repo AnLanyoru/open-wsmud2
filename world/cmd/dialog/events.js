@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "events";
 this.allow_busy = true;
@@ -61,4 +65,5 @@ this.check_command = function (event, me) {
         return me.notify_fail("你现在正忙。");
     }
     return true;
+}
 }

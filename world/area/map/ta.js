@@ -1,4 +1,7 @@
-﻿
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
 this.inherits(AREA);
 this.set({
     id: "wudao",
@@ -50,4 +53,5 @@ this.query_actions = function (me) {
     }
 
     return actions;
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "status";
 this.allow_busy = true;
 this.allow_state = true;
@@ -41,4 +45,5 @@ this.enter = function (me, type, tid) {
         str.push(status.downside ? "</red>\n" : "</hig>\n");
         me.send(str.join(""));
     }
+}
 }

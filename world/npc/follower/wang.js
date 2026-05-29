@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "王语嫣",
     desc: "她似有烟霞轻笼，恍入仙境，当真非尘世中人。",
@@ -30,4 +33,5 @@ this.on_master_enter = function (me) {
         else
             me.notify("王语嫣对你微微颔首，柔声道：" + name + "姑娘。");
     }
+}
 }

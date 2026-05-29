@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "张淡月",
     desc: "这是一个黑衣大汉,脸色大变,身子发颤,似乎恐惧已极",
@@ -55,4 +58,5 @@ this.on_kill = function (me) {
             item.do_kill(me);
         }
     }, this.environment);
+}
 }

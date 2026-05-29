@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
+this.inherits(COMMAND);
 this.command = "checkskill";
 this.allow_busy = true;
 this.allow_state = true;
@@ -40,4 +44,5 @@ this.enter = function (player, skid, from) {
     if (!target.skills) target.skills = {};
     obj.desc = skill_base.query_desc(target, target.query_skill(skid, 1000));
     return player.send(JSON.stringify(obj));
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "本",
     name: "武道",
@@ -17,3 +20,4 @@ this.lingwu = function (me, p) {
 // this.add_action("wu2", "融合", function (me) {
 //     me.do_command('lingwu2');
 // });
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "颗";
 this.name = "解毒丹";
 this.value = 1000;
@@ -14,4 +17,5 @@ this.on_use = function (me) {
         return;
     }
     return me.notify_fail('你没中蛇毒，用不着吃解药。');
+}
 }

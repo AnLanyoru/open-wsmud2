@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES; const USERTASK = globalThis.USERTASK;
+this.inherits(NPC);
 this.set({
     name: "门派后勤管理员",
     desc: "他是你们门派里面负责发放弟子福利的人",
@@ -81,4 +85,4 @@ this.add_action("job_up_ok", null, function (me) {
         me.send(`${this.name}说：你的师门功绩还不够晋升，再努力一点吧。`);
     }
 });
-
+}

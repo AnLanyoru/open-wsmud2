@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "emote";
 this.allow_busy = true;
@@ -218,3 +222,4 @@ var emote = {
     惊讶: ["$N惊讶地张着嘴巴，半天也说不出一句话来。", "$N对着$n惊讶地「啊！」了一声。"],
     叹气: ["$N深深地叹了口气。", "$N看着$n，深深地叹了口气。"]
 };
+}

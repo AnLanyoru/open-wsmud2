@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(COMMAND);
 this.command = "study";
 this.allow_fight = false;
 this.enter = function (me, bookid) {
@@ -138,4 +142,5 @@ function do_learn(me) {
         me.add_score(one_score * (this.target.max_level - lv));
         me.send('{type:"dialog",dialog:"skills",id:"' + this.skill_base.id + '",level:' + this.target.max_level + ',exp:0}');
     }
+}
 }

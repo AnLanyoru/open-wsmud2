@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "木头人",
     desc: "这是一个木头做的假人，用来测试伤害的",
@@ -20,4 +23,5 @@ this.die = function () {
     this.add_hp(this.max_hp);
     this.send_room('$N身上破损的木头剥落，再次神采奕奕，精气十足。\n');
     return false;
+}
 }

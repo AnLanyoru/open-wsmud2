@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
 this.inherits(COMMAND);
 this.command = "sys";
 this.allow_busy = true;
@@ -13,4 +17,5 @@ this.enter = function (me, msg) {
     WORLD.sendAll(msg);
 
 
+}
 }

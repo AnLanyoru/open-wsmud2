@@ -164,7 +164,7 @@ const WORLD = {
         this.SERVERID = this.SERVER.id;
 
         await db.initDataDir();
-        loadResource();
+        await loadResource();
         await this.DATA.load();
         await this.LISTENER.start(this.SERVER.port);
         console.log("服务", this.SERVER.name, "(" + this.SERVERID + ")启动");
@@ -434,7 +434,25 @@ const WORLD = {
  * @param {string} [path] - 当前路径
  * @returns {number} 加载的文件数
  */
-function loadResource() {
+async function loadResource() {
+    async function preloadDir(basePath, dirPath) {
+        dirPath = dirPath || basePath;
+        const files = fs.readdirSync(dirPath);
+        let count = 0;
+        for (let i = 0; i < files.length; i++) {
+            const sub_path = dirPath + files[i];
+            const stat = fs.statSync(sub_path);
+            if (stat.isDirectory()) {
+                count += await preloadDir(basePath, sub_path + "/");
+            } else if (files[i].endsWith('.js')) {
+                const fname = sub_path.replace(basePath, "").replace(".js", "");
+                const fkey = basePath + fname;
+                await BASE.PRELOAD(fkey, sub_path);
+                count++;
+            }
+        }
+        return count;
+    }
     function readdir(basePath, path) {
         path = path || basePath;
         const files = fs.readdirSync(path);
@@ -452,37 +470,28 @@ function loadResource() {
         }
         return count;
     }
+    const dirs = [
+        __PATH.EXTENDS, __PATH.COMMAND, __PATH.FAMILY,
+        __PATH.OBJ, __PATH.AREA, __PATH.SKILL,
+        __PATH.MAP, __PATH.TASK, __PATH.NPC,
+    ];
     try {
+        // Phase 1: preload all modules
+        let preloadSum = 0;
+        for (const dir of dirs) {
+            const count = await preloadDir(dir);
+            console.log("preload %s %d", dir, count);
+            preloadSum += count;
+        }
+        console.log('模块预加载%d', preloadSum);
+
+        // Phase 2: create instances (sync from cache)
         let sum = 0;
-        let count = readdir(__PATH.EXTENDS);
-        console.log("%s %d ", __PATH.EXTENDS, count);
-        sum += count;
-        count = readdir(__PATH.COMMAND);
-        console.log("%s%d ", __PATH.COMMAND, count);
-        sum += count;
-        count = readdir(__PATH.FAMILY);
-        console.log("%s %d ", __PATH.FAMILY, count);
-        sum += count;
-
-
-        count = readdir(__PATH.OBJ);
-        console.log("%s %d ", __PATH.OBJ, count);
-        sum += count;
-
-        count = readdir(__PATH.AREA);
-        console.log("%s %d ", __PATH.AREA, count);
-        sum += count;
-
-        count = readdir(__PATH.SKILL);
-        console.log("%s %d ", __PATH.SKILL, count);
-        sum += count;
-
-        count = readdir(__PATH.MAP);
-        console.log("%s %d ", __PATH.MAP, count);
-        sum += count;
-        count = readdir(__PATH.TASK);
-        console.log("%s %d ", __PATH.TASK, count);
-        sum += count;
+        for (const dir of dirs) {
+            const count = readdir(dir);
+            console.log("%s %d", dir, count);
+            sum += count;
+        }
         console.log('资源脚本加载%d', sum);
         WORLD.on_resource_loaded();
     } catch (e) {

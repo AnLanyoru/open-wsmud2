@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const USERTASK = globalThis.USERTASK;
 this.inherits(COMMAND);
 this.command = "task";
 this.regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
@@ -61,4 +64,5 @@ this.tasks_fin = function (me) {
             this.task_fin(me, task);
         }
     }
+}
 }

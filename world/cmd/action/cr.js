@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const AREA = globalThis.AREA; const ROOM = globalThis.ROOM;
 this.inherits(COMMAND);
 this.command = "cr";
 this.allow_fight = true;
@@ -486,4 +489,5 @@ function fb_confirm_over(me) {
     }
     me.notify(str.join(""));
     me.send_commands("cr over", "领取奖励并离开副本");
+}
 }

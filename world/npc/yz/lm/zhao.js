@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "赵三拳",
     desc: "流氓巷里的流氓头领，神神秘秘的整天在巷子最里面不知道在干嘛",
@@ -39,3 +42,4 @@ this.set_drop({
     obj: ["eq/lv1/lm_head", "eq/lv1/lm_cloth", "eq/lv1/lm_shoes", "eq/lv1/lm_shou", "eq/lv1/lm_jian", "book/bc#taizuchangquan"],
     odds: 9000
 });
+}

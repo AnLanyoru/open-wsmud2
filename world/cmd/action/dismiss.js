@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const FOLLOWER = globalThis.FOLLOWER;
+this.inherits(COMMAND);
 this.command = "dismiss";
 this.regex = /^(\w+)(\s+ok)?$/;
 this.enter = function (me, objid, isok) {
@@ -25,4 +29,5 @@ this.enter = function (me, objid, isok) {
 
         me.send_commands("dismiss " + objid + " ok", "确定遣散");
     }
+}
 }

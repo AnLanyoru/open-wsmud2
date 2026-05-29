@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(SKILL);
 this.name = "如意刀";
 this.id = "ruyidao";
 this.grade = 1;
@@ -64,3 +68,4 @@ this.pfm = {
         }
     }
 };
+}

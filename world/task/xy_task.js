@@ -1,4 +1,7 @@
-﻿
+import { TASK } from "../../os/task/task.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC; const AREA = globalThis.AREA; const ROOM = globalThis.ROOM; const EVENTS = globalThis.EVENTS; const COMMAND = globalThis.COMMAND;
 this.inherits(TASK);
 this.id = "xiangyang";
 this.is_start = false;
@@ -672,5 +675,4 @@ function clear_items(corpse, me) {
         }
     }
 }
-
-
+}

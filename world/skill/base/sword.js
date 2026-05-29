@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(SKILL);
 this.id = "sword";
 this.name = "基本剑法";
 this.grade = 0;
@@ -33,4 +37,5 @@ this.set_pfm("lian", {
 });
 this.query_prop = function (lv) {
     return { mz: lv };
+}
 }

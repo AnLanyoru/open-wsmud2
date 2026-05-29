@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const COMMAND = globalThis.COMMAND;
+this.inherits(NPC);
 this.set({
     name: "赵铁笔",
     desc: "他是负责户口登记的，需要离婚，解除师徒关系可以来找他。",
@@ -239,4 +243,5 @@ this.on_accept = function (me, obj, count) {
             return true;
         }
     }
+}
 }

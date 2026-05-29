@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "青蝠身法";
 this.id = "qingfushenfa";
 this.grade =2;
@@ -29,3 +32,4 @@ this.learn_condition = {
         dodge: 200
     }
 };
+}

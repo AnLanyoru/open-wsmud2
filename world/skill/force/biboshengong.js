@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "碧波神功";
 this.id = "biboshengong";
 this.grade = 2;
@@ -24,3 +27,4 @@ this.learn_condition = {
         force: 200
     }
 };
+}

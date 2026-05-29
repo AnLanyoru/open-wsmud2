@@ -1,3 +1,6 @@
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
 this.inherits(SKILL);
 this.name = "黑龙心法";
 this.id = "heilongxinfa";
@@ -96,3 +99,4 @@ this.pfm = {
         }
     }
 };
+}

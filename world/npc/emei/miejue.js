@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "灭绝",
     desc: "她是一位白发苍苍的老尼，是峨眉派第三代掌门，她脸上冷冰冰，毫无表情。",
@@ -39,4 +43,5 @@ this.on_master = function (me) {
     if (me.query_skill("linjizhuang", 0) < 500 && me.query_skill("linjizhuang2", 0) < 500) return me.notify_fail("灭绝说道：你的临济十二庄掌握程度还不够，需要多加练习。");
     if (me.query_skill("huifengjian", 0) < 300) return me.notify_fail("灭绝说道：你的回风拂柳剑掌握程度还不够，需要多加练习。");
     return true;
+}
 }

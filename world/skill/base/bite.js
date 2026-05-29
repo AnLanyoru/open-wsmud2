@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.type = SKILL_TYPES.BASE;
 this.id = "bite";
 this.name = "野兽扑咬";
@@ -11,3 +15,4 @@ this.attack_actions = [
 ];
 this.query_prop = lv => ({ gj: parseInt(lv / 5), mz: parseInt(lv / 5) });
 this.set_default(this.id);
+}

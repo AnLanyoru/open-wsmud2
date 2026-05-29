@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "小龙女",
     title: "<wht>玉女素心</wht>",
@@ -26,3 +29,4 @@ this.skill_map(
     ["force", 300],
     ["unarmed", 300],
     ["whip", 300]);
+}

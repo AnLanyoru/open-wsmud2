@@ -1,4 +1,6 @@
-﻿
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
 this.inherits(AREA);
 this.set({
     name: "住房",
@@ -18,4 +20,4 @@ this.map = [{ n: "卧室", id: "home/danjian", p: [0, 0] },
 this.query_owner = function (me) {
     return me.id;
 }
-
+}

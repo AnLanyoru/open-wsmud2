@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "女管家",
     desc: "她是鳌拜府上的管家，精明干练",
@@ -31,4 +34,5 @@ this.on_kill = function (me) {
 this.on_leave = function (me, dir) {
     if (dir == "south" || dir == "north")
         return me.notify_fail("女官家挡住了你。");
+}
 }

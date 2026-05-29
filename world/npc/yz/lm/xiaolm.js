@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "小流氓",
     desc: "他是流氓巷里的小流氓，整天无所事事，吊儿郎当",
@@ -66,3 +69,4 @@ this.on_kill = function (me) {
 //    me.notify("你大怒道：一个小流氓也想跟着我。手起刀落，小流氓就躺在地上了！");
 //    this.die(me);
 //});
+}

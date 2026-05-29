@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(ROOM);
 this.name = "训练室"
 this.desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识，就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。";
 this.exits = { "west": "new/new1", "south": "new/new3" };
@@ -119,4 +123,5 @@ function ask6(me) {
             me.add_exp(10000, 10000, 10000);
         }
     }, 1000);
+}
 }

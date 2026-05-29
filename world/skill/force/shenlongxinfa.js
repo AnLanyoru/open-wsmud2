@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "神龙心法";
 this.id = "shenlongxinfa";
 this.grade = 2;
@@ -76,3 +79,4 @@ this.pfm = {
         }
     }
 };
+}

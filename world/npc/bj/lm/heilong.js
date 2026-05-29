@@ -1,3 +1,7 @@
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const EVENTS = globalThis.EVENTS; const COMMAND = globalThis.COMMAND;
 this.inherits(MONSTER);
 
 
@@ -131,4 +135,5 @@ this.to_next2 = function (me) {
             grade: 1
         });
     }
+}
 }

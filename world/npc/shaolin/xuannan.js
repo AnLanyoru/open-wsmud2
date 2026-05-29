@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "玄难",
     desc: "他是一位须发花白的老僧，身穿一袭金边黑布袈裟。",
@@ -48,4 +52,5 @@ this.on_master = function (me) {
     }
     if (me.query_skill("yijinjing", 0) < 500 &&  me.query_skill("yijinjing2", 0) < 500) return me.notify_fail("玄难说道：你的易筋经掌握程度还不够，需要多加练习。");
     return false;
+}
 }

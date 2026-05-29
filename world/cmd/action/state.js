@@ -1,3 +1,6 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "state";
 this.allow_busy = true;
@@ -17,4 +20,5 @@ this.enter = function (me, type) {
 
     }
 
+}
 }

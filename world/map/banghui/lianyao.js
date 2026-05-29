@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "炼药房"
 this.desc = "这是你帮会的炼药房，还没进入就先闻到一股浓烈的药草香味，房间里面没有多余的设施，一个大大的炼药炉摆在房子中间，可以同时供多名帮派成员使用。";
 this.exits = { "north": "banghui/yuanzi" };
@@ -26,4 +29,5 @@ this.on_enter = function (me) {
         }
 
     }
+}
 }

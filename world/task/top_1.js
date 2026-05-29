@@ -1,4 +1,7 @@
-﻿
+import { TASK } from "../../os/task/task.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const FAMILIES = globalThis.FAMILIES; const COMMAND = globalThis.COMMAND;
 this.inherits(TASK);
 this.id = "top";
 this.prev_time = 0;
@@ -175,4 +178,5 @@ this.sort_family = function (fam) {
     if (user) {
         user.set_temp('last_sm', Date.now());
     }
+}
 }

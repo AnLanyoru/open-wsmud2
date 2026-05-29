@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "大冬瓜",
     desc: "这是一种暗器，丢出去可以砸人。",
@@ -13,3 +17,4 @@ this.set({
         add_sh_per:5
     }
 });
+}

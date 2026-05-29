@@ -1,3 +1,6 @@
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     name: "帮派积分",
@@ -6,4 +9,4 @@ this.set({
     grade: 2,
     value: 1
 });
-
+}

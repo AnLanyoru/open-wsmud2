@@ -1,5 +1,7 @@
-﻿
+import { ROOM } from "../../../../os/room/room.js";
 
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(ROOM);
 this.name = "客店后院";
 this.desc = "这里客店后院。一阵阵打斗之声从东面的厢房中传来，其中夹杂着一个女子的声音。房门的板壁不住的震动，似乎客房四周的板壁都要被刀风掌力震坍一般。西首也是厢房，不时有人探头出来观望。北面是客店大门。";
@@ -37,3 +39,4 @@ this.add_action('lkfb', null, function (me, par) {
     }
 
 });
+}

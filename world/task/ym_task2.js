@@ -1,4 +1,7 @@
-﻿
+import { USERTASK } from "../../os/task/playertask.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC; const ROOM = globalThis.ROOM;
 this.inherits(USERTASK);
 this.id = "yamen2";
 this.requests = new Map();
@@ -194,4 +197,5 @@ this.clear = function (player, npc) {
 this.giveup = function (player) {
     player.remove_temp("ym_task");
     this.remove_request(player, true);
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(SKILL);
 this.name = "八卦拳";
 this.id = "baguaquan";
 this.grade = 2;
@@ -81,3 +85,4 @@ this.pfm = {
         }
     }
 };
+}

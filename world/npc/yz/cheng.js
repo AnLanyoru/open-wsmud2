@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const USERTASK = globalThis.USERTASK;
+this.inherits(NPC);
 this.set({
     name: "程药发",
     desc: "他就是程药发，扬州现任知府。",
@@ -30,3 +34,4 @@ this.add_action("ask1", "追捕", function (me) {
    
 //     USERTASK.GET("yamen").quickly_start(me);
 // });
+}

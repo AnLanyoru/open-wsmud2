@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "程玉环",
     desc: "她就是程知府的独生女儿，长得如花似玉，貌赛天仙的程玉环。\n据说她曾经在武当门下学过剑法。",
@@ -21,4 +24,4 @@ this.skill_map(
         ["literate", 100],
         ["taijijian", 100],
         ["taijiquan", 100]);
-
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "军服",
     desc: "官兵穿的衣服，虽然简陋但是实用",
@@ -11,3 +15,4 @@ this.set({
         max_hp: 10
     }
 });
+}

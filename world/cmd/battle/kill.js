@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC;
+this.inherits(COMMAND);
 this.command = "kill";
 this.enter = function (me, argid) {
     if (me.state) {
@@ -85,4 +89,4 @@ this.enter = function (me, argid) {
     WORLD.auto_pfm(me, target);
 
 }
-
+}

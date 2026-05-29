@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "createrole";
 var name_reg = /^[\u4E00-\u9FA5]{2,5}$/;
 var id_reg = /^[a-z][a-z0-9]{2,9}$/;
@@ -95,4 +99,4 @@ this.save2db = async function (me) {
         }
     }
 }
-
+}

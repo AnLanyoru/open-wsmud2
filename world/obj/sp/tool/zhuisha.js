@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC;
+this.inherits(OBJ);
 this.set({
     unit: "个",
     name: "门派追杀令",
@@ -51,4 +55,5 @@ this.on_create = function (path, par) {
     var lv = parseInt(par);
     if (!(lv > 0 && lv <= 5)) return;
     this.grade = lv;
+}
 }

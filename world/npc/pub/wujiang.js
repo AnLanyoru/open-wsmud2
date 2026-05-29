@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "武将",
     desc: "他站在那里，的确有说不出的威风。",
@@ -30,3 +33,4 @@ this.skill_map(
     ["dodge", 190],
     ["parry", 190],
     ["blade", 190]);
+}

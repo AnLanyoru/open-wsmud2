@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "药铺"
 this.desc = "这是一家药铺，一股浓浓的药味让你几欲窒息，那是从药柜上的几百个小抽屉里散发出来的。神医平一指坐在茶几旁，独自喝着茶，看也不看你一眼。一名小伙计站在柜台后招呼着顾客。柜台上贴着一张发黄的<cmd cmd='look guanggao'>广告(guanggao)</cmd>。";
 this.exits = { "south": "yz/dongdajie2", "north": "yz/neishi" };
@@ -29,4 +33,5 @@ function do_work(me) {
 
     var exp = WORLD.DATA.get_exp(me);
     me.add_exp(exp, exp, 100 + me.random(20));
+}
 }

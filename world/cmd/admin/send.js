@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
 this.inherits(COMMAND);
 this.command = "send";
 this.allow_busy = true;
@@ -70,3 +74,4 @@ const RECORD = {
     score: true,
     weapon: true
 };
+}

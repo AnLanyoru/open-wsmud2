@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "drop";
 this.regex = /^(?:(\d+\s))?(.+?)$/;
 this.enter = function (player, count, objid) {
@@ -37,4 +41,5 @@ this.exec = function (player, obj, count) {
     } else {
         player.notify("你什么都没丢掉。");
     }
+}
 }

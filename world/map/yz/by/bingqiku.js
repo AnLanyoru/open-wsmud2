@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
+this.inherits(ROOM);
 this.name = "兵器库"
 this.desc = "这里是兵器库，到处银光闪闪，让人眼花缭乱。宝刀、宝剑、金箍棒，大刀、长剑、哨棒，短刀、短剑、短棍，各色各样的兵器应有尽有，你一时不知道挑什么好。";
 this.exits = { "north": "yz/by/bingying" };
@@ -73,3 +77,4 @@ this.add_action('lkfb', null, function (me, par) {
     me.send('你从兵器库钻入一个狭长的甬道。');
     me.enable_area();
 });
+}

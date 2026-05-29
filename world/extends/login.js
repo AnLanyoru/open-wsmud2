@@ -1,3 +1,5 @@
+const WORLD = globalThis.WORLD;
+
 const USERLOGIN = WORLD.USERLOGIN;
 USERLOGIN.check_user = function (loginuser, id) {
 
@@ -110,3 +112,4 @@ USERLOGIN.load_roles = async function (user) {
         return USERLOGIN.login_error(user, '数据读取失败');
     }
 }
+export default function() {}

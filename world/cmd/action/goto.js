@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const ROOM = globalThis.ROOM; const USERTASK = globalThis.USERTASK;
+this.inherits(COMMAND);
 this.command = "goto";
 this.allow_fight = false;
 this.regex = /^(\w+)(?:\s+(\w+))$/;
@@ -156,3 +160,4 @@ function find_room(area, path) {
 const NPC_ROOMS = {
 
 };
+}

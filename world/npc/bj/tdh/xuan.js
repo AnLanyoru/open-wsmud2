@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "玄真道长",
     desc: "这位沉默寡言的道人，便是天地会青木堂护法。他是青木堂数一数二的好手，一柄长剑使得出神入化。",
@@ -42,3 +45,4 @@ this.set_drop({
         obj: ["book/bc#yunlongjian"],
         odds: 1000
     });
+}

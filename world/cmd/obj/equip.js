@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "eq";
 this.enter = function (me, oid) {
@@ -26,4 +28,5 @@ this.enter = function (me, oid) {
         }
     }
 
+}
 }

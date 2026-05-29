@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(OBJ);
 this.set({
     name: "碎裂的贪狼",
     desc: "一颗神秘的宝石",
@@ -60,4 +64,5 @@ this.on_create = function (path, par) {
         this.combine_to = "st/st_s2#" + stype;
         this.desc = this.desc + "\n十块可以合成高级宝石。";
     }
+}
 }

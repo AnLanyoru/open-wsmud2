@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "苏梦清",
     desc: "她是峨眉派俗家弟子，一位面容清瘦，身材娇小的女子",
@@ -33,4 +37,5 @@ this.skill_map(
 this.on_master = function (me) {
     if (me.gender != 2) return me.notify_fail("苏梦清对你说道：这位"+me.call()+"，我们峨眉派不收男弟子的。");
     return true;
+}
 }

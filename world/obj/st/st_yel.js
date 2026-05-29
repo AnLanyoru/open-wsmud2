@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(OBJ);
 this.set({
     name: "碎裂的黄宝石",
     desc: "一块黄色的宝石，里面有些神秘的力量",
@@ -57,4 +61,5 @@ this.on_create = function (path, par) {
         this.combine_to = "st/st_fy";
     }
     this.desc += "\n气血：+" + this.prop.max_hp;
+}
 }

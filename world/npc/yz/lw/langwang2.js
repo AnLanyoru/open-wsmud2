@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "<wht>月夜狼王<wht>",
     desc: "一只巨大的银色巨狼，是森林中的狼王吃了月饼或者见到什么不该见到的东西变成的",
@@ -12,4 +15,4 @@ this.set({
     str: 36
 });
 //drop path,min,max,per
-
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "checkobj";
 this.allow_busy = true;
 this.allow_state = true;
@@ -62,4 +65,5 @@ function query_obj_desc(player,obj, type) {
         }
     }
     return JSON.stringify(json);
+}
 }

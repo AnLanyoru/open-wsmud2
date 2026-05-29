@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "颗";
 this.name = "蛇血丹";
 this.value = 30000;
@@ -58,4 +61,5 @@ this.on_create = function (path, par) {
     this.drug_type = lv;
     this.name = ["再生", "暴虐", "龟灵", "培元"][lv] + this.name;
 
+}
 }

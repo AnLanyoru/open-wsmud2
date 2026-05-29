@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "丫鬟",
     desc: "她是一个长得很好看的小姑娘。",
@@ -46,4 +49,5 @@ this.on_enter = function (me) {
         me.notify("丫鬟看到你进来，吓了一跳，待看清来人，扑到你前面泣声喊道：大人，救救我！", this);
         me.send_commands("ok " + this.id, "答应她");
     }
+}
 }

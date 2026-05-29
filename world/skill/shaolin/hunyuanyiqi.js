@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "混元一气";
 this.id = "hunyuanyiqi";
 this.grade = 1;
@@ -23,4 +27,5 @@ this.query_enable_prop = function (lv) {
             desc: "唯一：将你内力的55%转化为气血"
         }
     };
+}
 }

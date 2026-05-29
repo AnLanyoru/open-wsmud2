@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "厨师",
     desc: "他原是归安县的知县，因贪赃枉法，百姓恨之切齿，终被告发革职。他长得尖嘴猴腮，一看就知不是好人 。",
@@ -18,3 +21,4 @@ this.skill_map(
     ["parry", 100],
     ["force", 100],
     ["unarmed", 100]);
+}

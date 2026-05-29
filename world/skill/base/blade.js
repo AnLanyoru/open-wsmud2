@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.id = "blade";
 this.name = "基本刀法";
 this.type = SKILL_TYPES.BASE;
@@ -31,4 +35,5 @@ this.set_pfm("zhan", {
 });
 this.query_prop = function (lv) {
     return { mz: lv };
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "洪七公",
     desc: "他就是丐帮第十七任帮主，号称“北丐”的洪七公老爷子",
@@ -41,4 +45,5 @@ this.on_master = function (me) {
     if (me.query_skill("huntianqigong", 0) < 500 && me.query_skill("huntianqigong2", 0) < 500) return me.notify_fail("洪七公说道：你的混天气功掌握程度还不够，需要多加练习。");
     if (me.query_skill("dagoubang", 0) < 500 && me.query_skill("dagoubang2", 0) < 500) return me.notify_fail("洪七公说道：你的打狗棒掌握程度还不够，还需多加努力。");
     return true;
+}
 }

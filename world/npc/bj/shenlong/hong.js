@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "洪安通",
     desc: "他就是武功盖世、令江湖人等谈之色变的神龙教教主洪安通。",
@@ -55,4 +58,5 @@ this.on_kill = function (me) {
             item.do_kill(me);
         }
     }, this.environment);
+}
 }

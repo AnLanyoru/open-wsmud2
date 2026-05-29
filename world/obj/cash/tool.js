@@ -1,3 +1,6 @@
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     unit: "个",
@@ -42,4 +45,5 @@ this.on_use = function (me, par) {
     let obj = me.add_obj(path + this.grade, 1);
     me.send('你获得了' + obj.unit_name(1) + "。");
     return true;
+}
 }

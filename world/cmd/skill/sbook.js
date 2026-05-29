@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
 this.inherits(COMMAND);
 this.command = "sbook";
 this.allow_busy = true;
@@ -98,4 +102,5 @@ this.split_book = function (me, book) {
     if (!me.remove_obj(book, 1)) return me.notify('拆分失败。');
     let obj = me.add_obj('book/bc#' + skill.id, count);
     me.send('你将' + book.color_name + "拆分为" + obj.unit_name(count) + "。");
+}
 }

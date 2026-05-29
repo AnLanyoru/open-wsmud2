@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "颗";
 this.name = "毁容丸";
 this.value = 1280000;
@@ -9,4 +12,5 @@ this.on_use = function (me) {
     if (me.per < 2) return me.notify_fail("你已经没有办法继续折腾你的容貌了。");
     me.per -= 1;
     me.notify("<hib>你吞下一颗毁容丸，感觉自己的容貌发生了一些变化。</hib>");
+}
 }

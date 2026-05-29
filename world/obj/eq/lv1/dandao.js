@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "黑虎单刀",
     desc: "一把短柄的砍刀，看上去锋利异常",
@@ -12,3 +16,4 @@ this.set({
         str: 3
     }
 });
+}

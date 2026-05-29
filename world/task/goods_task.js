@@ -1,4 +1,7 @@
-﻿
+import { TASK } from "../../os/task/task.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES;
 this.inherits(TASK);
 this.id = "goods";
 this.handler = null;
@@ -92,4 +95,5 @@ this.set_goods = function (me, list) {
 
 this.stop = function () {
     if (this.handler) clearTimeout(this.handler);
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "unxiangqian";
 this.regex = /^(\w+)(?:\s+(\w+))?$/;
 const MONEYS = [10, 100, 1000, 5000, 10000, 100000, 1000000];
@@ -98,4 +102,5 @@ this.enter = function (player, objid, par) {
 
 
 
+}
 }

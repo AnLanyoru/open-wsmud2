@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(COMMAND);
 this.command = "use";
 this.allow_busy = true;
 this.allow_die = true;
@@ -65,4 +69,5 @@ this.enter = function (player, objid, par) {
         player.set_temp(key, 1, obj.distime);
     }
 
+}
 }

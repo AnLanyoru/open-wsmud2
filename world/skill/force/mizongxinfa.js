@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "密宗心法";
 this.id = "mizongxinfa";
 this.grade = 1;
@@ -21,4 +24,5 @@ this.query_enable_prop = function (lv) {
             desc: "唯一：将你内力的60%转化为气血"
         }
     };
+}
 }

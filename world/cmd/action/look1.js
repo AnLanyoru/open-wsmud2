@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "look1";
 this.allow_busy = true;
 this.allow_state = true;
@@ -29,4 +33,5 @@ this.enter = function (player, index, from) {
             player.notify(obj.query_desc(player, "look1"));
         }
     }
+}
 }

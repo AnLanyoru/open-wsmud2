@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "liaoshang";
 this.enter = function (me) {
     if (me.is_fighting()) return me.notify("战斗中疗伤，你找死吗？");
@@ -53,4 +56,5 @@ function do_dazuo(me) {
         me.send_message(me.name + "疗伤完毕，脸色看起来好了很多。");
         return false;
     }
+}
 }

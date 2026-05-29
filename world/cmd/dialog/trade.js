@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "trade";
 this.allow_fight = false;
@@ -10,4 +12,5 @@ this.enter = function (me, arg) {
     }
     if (target.is_player) return me.notify("你不能和玩家交易。");
     me.send('{"type":"dialog","dialog":"trade",target:"' + target.id + '",name:"' + target.name + '"}');
+}
 }

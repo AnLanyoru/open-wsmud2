@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "左全",
     desc: "这是位豪爽大方的丐帮七袋弟子，看来是个北地豪杰。",
@@ -26,4 +30,5 @@ this.skill_map(
 
 this.on_master = function (me) {
     return true;
+}
 }

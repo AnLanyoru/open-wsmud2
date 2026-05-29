@@ -1,5 +1,7 @@
-﻿
+import { ROOM } from "../../../../os/room/room.js";
 
+export default function() {
+    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC;
 this.inherits(ROOM);
 this.name = "海滩";
 this.desc = "这里就是神龙岛了。南边是一望无际的大海；往北则是一片灌木林。岛上的空气似乎又热又闷, 咸湿的海风中带着一股腥臭, 又夹杂了一缕奇特的花香, 闻起来十分怪异，海边泊着一艘大船。";
@@ -48,3 +50,4 @@ this.add_action('lkfb', null, function (me, par) {
         }
     }
 });
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "阎基",
     desc: "他是一个没落江湖医生。自从得了胡家刀谱几页残篇后，武功大进。",
@@ -45,3 +48,4 @@ this.set_drop({
         obj: ["book/bc#hujiadaofa", "sp/bj/yanji"],
         odds: 3000
 });
+}

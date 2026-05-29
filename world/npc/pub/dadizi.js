@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "大师兄",
     desc: "他就是你们门派的首席大弟子",
@@ -68,4 +72,4 @@ this.manage = function (me) {
 
 this.add_action("ask2", "请安", this.greeting);
 this.add_action('manage', '设置', this.manage);
-
+}

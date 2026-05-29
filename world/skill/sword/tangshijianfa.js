@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "唐诗剑法";
 this.id = "tangshijianfa";
 this.grade = 1;
@@ -90,4 +93,5 @@ this.pfm = {
             return "躺下装死，敌人将放弃对你的进攻";
         }
     }
+}
 }

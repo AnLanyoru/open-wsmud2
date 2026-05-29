@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "金丝宝甲",
     desc: "这是一件金丝做成的甲衣，据说可以刀枪不入",
@@ -13,3 +17,4 @@ this.set({
         diff_sh:50
     }
 });
+}

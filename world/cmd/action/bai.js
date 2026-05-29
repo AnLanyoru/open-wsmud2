@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const FAMILIES = globalThis.FAMILIES;
+this.inherits(COMMAND);
 this.command = "bai";
 this.enter = function (me, target) {
     if (!WORLD.is_server(me)) return me.notify("你不能拜师。");
@@ -52,4 +56,5 @@ this.enter = function (me, target) {
 
     }
     return me.send_room("$n说道：在下才疏学浅，不敢误人子弟。", target);
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const USER = globalThis.USER; const TASK = globalThis.TASK; const COMMAND = globalThis.COMMAND;
+this.inherits(ROOM);
 this.name = "擂台"
 this.desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
 this.exits = { "down": "yz/leitai/ltx" };
@@ -51,4 +55,5 @@ this.on_leave = function (me, dir) {
     }
     me.notify("你正在比武，打完才能下擂台。");
     return false;
+}
 }

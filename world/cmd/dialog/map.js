@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "map";
 this.allow_busy = true;
 this.allow_state = true;
@@ -68,4 +72,5 @@ function getAreaByPath(areas, path) {
     for (var i = 0; i < areas.length; i++) {
         if (areas[i].path == path) return areas[i];
     }
+}
 }

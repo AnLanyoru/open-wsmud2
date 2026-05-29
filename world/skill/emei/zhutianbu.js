@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "诸天化身步";
 this.id = "zhutianbu";
 this.grade = 1;
@@ -28,4 +32,5 @@ this.query_enable_prop = function (lv) {
             ds: lv +10
         }
     };
+}
 }

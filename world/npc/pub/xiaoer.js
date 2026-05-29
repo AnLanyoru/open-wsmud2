@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(NPC);
 this.set({
     name: "店小二",
     desc: "这位店小二正笑咪咪地忙著，还不时拿起挂在脖子上的抹布擦脸。",
@@ -97,3 +101,4 @@ this.add_action("xufei", null, function (me) {
 //     }
 //     return me.send('店小二说道：这位客官，小的这两天也没听到什么消息。');
 // });
+}

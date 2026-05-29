@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "玲珑火芝",
@@ -14,4 +17,5 @@ this.on_use = function (me) {
     me.limit_mp += sx;
     me.notify("<red>你感觉一股热流顺着喉咙涌到全身，你的经脉仿佛都被拓宽了。</red>");
     me.notify("<hiw>你的内力上限增加了" + sx + "。</hiw>");
+}
 }

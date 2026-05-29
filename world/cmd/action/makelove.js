@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "makelove";
 this.allow_fight = false;
 
@@ -117,4 +121,5 @@ function do_dazuo(me) {
             return me.notify_fail("<hic>你觉得你的经脉充盈，已经没有办法再增加内力了。</hic>");
 
     }
+}
 }

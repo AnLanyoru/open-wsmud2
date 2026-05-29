@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "流氓巾",
     desc: "这是一条黑色的带子，随意束住头发，看上去有几分潇洒",
@@ -11,3 +15,4 @@ this.set({
         max_hp:10
     }
 });
+}

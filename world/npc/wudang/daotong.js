@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "道童",
     desc: "他是武当派的入门弟子，看上去十几岁。",
@@ -25,3 +29,4 @@ this.skill_map(
     ["literate", 50],
     ["wudangxinfa", 50, "force"],
     ["wudangchangquan", 50, "unarmed"]);
+}

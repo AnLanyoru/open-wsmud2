@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "份",
     name: "龙脉地图",
@@ -8,3 +11,4 @@ this.set({
     value: 10000,
     grade: 2
 });
+}

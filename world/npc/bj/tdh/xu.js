@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "徐天川",
     desc: "他是青木堂数一数二的好手，手上功夫十分了得，尤其擅使一套猴拳。",
@@ -36,3 +39,4 @@ this.set_drop({
         obj: ["book/bc#houquan"],
         odds: 5000
     });
+}

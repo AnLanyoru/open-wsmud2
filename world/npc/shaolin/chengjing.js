@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "澄净",
     desc: "他是一位须发花白的老僧，身穿一袭金边黑布袈裟。他身材瘦高，太阳穴高高鼓起，似乎身怀绝世武功。",
@@ -48,4 +52,5 @@ this.on_master = function (me) {
     if (me.query_skill("ranmudao", 0) < 500 && me.query_skill("ranmudao2", 0) < 500) return me.notify_fail("澄净说道：你的燃木刀掌握程度还不够，需要多加练习。");
     if (me.query_skill("yizhichan", 0) < 500 && me.query_skill("yizhichan2", 0) < 500) return me.notify_fail("澄净说道：你的一指禅掌握程度还不够，需要多加练习。");
     return false;
+}
 }

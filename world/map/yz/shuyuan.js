@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "书院"
 this.desc = "这里是书院的讲堂，窗明几净，一尘不染。一位庄重严肃的老者坐在太师椅上讲学，那就是当今大儒朱先生了。在他的两侧坐满了求学的学生。一张古意盎然的书案放在朱先生的前面，案上摆着几本翻开了的线装书籍。朱先生的身后是一个书架(shujia)讲堂内多历代楹联石刻，足见书院历史的悠久。值得一提的是嵌在讲堂前左壁的学规(xuegui)。书院老夫子刚奉了圣旨颁发学位，就在门口树着书院新立的学位公告板(board)。";
 this.exits = { "south": "yz/dongdajie1" };
@@ -12,4 +15,5 @@ this.set_npc("yz/zhu");
 this.on_leave = function (me, dir) {
     if (dir == "north" )
         return me.notify_fail("那是朱熹的私人寝室！！");
+}
 }

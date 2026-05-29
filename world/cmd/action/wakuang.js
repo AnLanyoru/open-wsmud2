@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "wakuang";
 this.enter = function (me, arg) {
     if (!me.equipment || !me.equipment[0]
@@ -26,4 +29,5 @@ this.enter = function (me, arg) {
     me.do_command("go", "west");
     me.do_command("go", "west");
     me.do_command("wa");
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const EVENTS = globalThis.EVENTS; const COMMAND = globalThis.COMMAND;
+this.inherits(OBJ);
 this.set({
     unit: "本",
     name: "挖矿指南",
@@ -33,4 +37,5 @@ this.on_create = function (path, par) {
     var lv = parseInt(par);
     if (!(lv > 0 && lv < 6)) return;
     this.grade = lv;
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     unit: "本",
     name: "药王神篇",
@@ -24,4 +28,5 @@ this.on_create = function (path, par) {
         this.desc = "药神神农氏的著作，里面记载了很多药草知识";
     }
     EQUIPMENT.prototype.on_create.apply(this);
+}
 }

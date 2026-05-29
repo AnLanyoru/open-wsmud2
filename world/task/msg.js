@@ -1,4 +1,7 @@
-﻿
+import { TASK } from "../../os/task/task.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const COMMAND = globalThis.COMMAND; const __PATH = globalThis.__PATH;
 this.inherits(TASK);
 this.id = "msg";
 this.handler = null;
@@ -94,4 +97,5 @@ this.check_temp_files = async function (path, func) {
             fs.unlink(dir + paths[i]);
         }
     }
+}
 }

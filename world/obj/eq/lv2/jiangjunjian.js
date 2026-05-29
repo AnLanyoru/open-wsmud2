@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "将军剑",
     desc: "扬州城守备自己定做的一把长剑，剑鞘粗犷，剑身却很精致，看来是花了不少功夫。",
@@ -13,3 +17,4 @@ this.set({
         str: 3
     }
 });
+}

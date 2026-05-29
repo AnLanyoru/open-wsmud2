@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "流氓护腕",
     desc: "这是一条黑色的不知道什么动物的皮制成的护腕，已经被磨的铮亮",
@@ -11,3 +15,4 @@ this.set({
         gjsd: 100
     }
 });
+}

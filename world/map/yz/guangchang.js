@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "广场";
 this.desc = "这里是城市的正中心，一个很宽阔的广场，铺着青石地面。一些游手好闲的人在这里溜溜达达，经常有艺人在这里表演。中央有一棵<cmd cmd='look tree'>大榕树(tree)</cmd>，盘根错节，据传已有千年的树龄，是这座城市的历史见证。";
 this.exits = {
@@ -26,4 +29,5 @@ function climb_tree(me, par) {
         in_msg = me.per > 40 ? "一阵清香飞来，你定眼一看，" + me.name + "已经婷婷玉立在你眼前。" : me.name + "气喘嘘嘘地爬了上来。";
     }
     me.moveto("yz/tree1", leave_msg, in_msg);
+}
 }

@@ -1,3 +1,7 @@
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+    const ROOM = globalThis.ROOM;
 this.inherits(NPC);
 this.set({
     name: "黑鹰教习",
@@ -76,3 +80,4 @@ this.set_drop({
         'eq/lv1/xk_shoes'],
     odds: 3000
 });
+}

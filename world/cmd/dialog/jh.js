@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const FAMILIES = globalThis.FAMILIES; const AREA = globalThis.AREA; const ROOM = globalThis.ROOM;
 this.inherits(COMMAND);
 this.command = "jh";
 this.allow_busy = true;
@@ -383,3 +386,4 @@ const JDS = {
     // gysd: 7,
     // yzjd: 8
 };
+}

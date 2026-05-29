@@ -1,4 +1,6 @@
-﻿
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
 this.inherits(AREA);
 this.set({
     id: "letai",
@@ -12,4 +14,5 @@ this.on_leave = function (me) {
     if (me.is_in('yz/leitai/leitai'))
         return me.notify_fail('结束比武后才可离开擂台。');
     return true;
+}
 }

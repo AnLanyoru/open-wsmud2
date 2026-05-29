@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "简长老",
     desc: "简长老是丐邦的执法长老，代帮主执掌法刀以及青竹令等",
@@ -35,4 +39,5 @@ this.on_master = function (me) {
     if (me.query_skill("gaibangxinfa", 0) < 100) return me.notify_fail("简长老说道：你的丐帮心法掌握程度还不够，需要多加练习。");
     if (me.query_skill("jiaohuabangfa", 0) < 100) return me.notify_fail("简长老说道：你的叫花棒法掌握程度还不够，还需多加努力。");
     return true;
+}
 }

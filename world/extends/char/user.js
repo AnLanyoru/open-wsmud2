@@ -1,3 +1,6 @@
+const UTIL = globalThis.UTIL;
+const USER = globalThis.USER;
+
 
 USER.prototype.recount = function () {
     this.max_hp = parseInt(this.con * 5 + (this.max_mp * this.query_force_rad()
@@ -193,5 +196,4 @@ FOLLOWER.prototype.remove_obj = USER.prototype.remove_obj;
 FOLLOWER.prototype.recount = USER.prototype.recount;
 FOLLOWER.prototype.items_changed = USER.prototype.items_changed;
 FOLLOWER.prototype.send_commands = USER.prototype.send_commands;
-
-
+export default function() {}

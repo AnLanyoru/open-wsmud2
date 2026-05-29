@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "仓库"
 this.desc = "这里是你帮派的仓库，一扇厚厚的铁门紧锁着，里面堆满了你们帮会的战利品，仓库管理员可以在这里选择怎么处理这些战利品。";
 this.exits = { "south": "banghui/juyitang" };
@@ -25,4 +29,4 @@ this.add_action("alloc", "分配战利品", function (me, par) {
     WORLD.COMMANDS["party"].enter(me, 'alloc');
 
 });
-
+}

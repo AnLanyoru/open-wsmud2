@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "本",
     name: "内功快速入门",
@@ -17,4 +20,5 @@ this.on_study = function (me, skill_base) {
 this.do_study = function (me, skill_base) {
 
     skill_base.add_exp(me, 10);
+}
 }

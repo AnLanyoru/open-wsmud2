@@ -1,3 +1,7 @@
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC; const USER = globalThis.USER; const COMMAND = globalThis.COMMAND;
 this.inherits(ROOM);
 this.name = "武道塔"
 this.desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
@@ -91,4 +95,4 @@ this.on_leave = function (me, dir) {
         me.die = USER.prototype.die;
     }
 }
-
+}

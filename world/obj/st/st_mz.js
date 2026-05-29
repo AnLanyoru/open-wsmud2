@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "白虎之魂",
     desc: "传说为白虎残魂所化，非金非石非木，隐隐有白虎虚影，主杀伐，镇四方",
@@ -44,4 +47,5 @@ this.on_create = function (path, par) {
             this.desc += "\n命中：+300\n攻击：+300";
             break;
     }
+}
 }

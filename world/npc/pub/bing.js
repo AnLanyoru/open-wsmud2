@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "官兵",
     desc: "虽然官兵的武艺不能和武林人士相比，可是他们讲究的是人多力量大。",
@@ -40,4 +43,5 @@ this.on_kill = function (me) {
             item.do_kill(me);
         }
     }, this.environment);
+}
 }

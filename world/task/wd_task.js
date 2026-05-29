@@ -1,4 +1,7 @@
-﻿
+import { USERTASK } from "../../os/task/playertask.js";
+
+export default function() {
+    const OBJ = globalThis.OBJ;
 this.inherits(USERTASK);
 this.id = "wudao";
 
@@ -136,5 +139,4 @@ this.reward = function (me, lv) {
 
 
 }
-
-
+}

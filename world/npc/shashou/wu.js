@@ -1,4 +1,7 @@
-﻿
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
 this.inherits(NPC);
 this.set({
     name: "雾中楼",
@@ -40,4 +43,5 @@ this.on_master = function (me) {
     if (me.query_skill("shashengjue", 0) < 500 && me.query_skill("shashengjue2", 0) < 500) return me.notify_fail("雾中楼说道：你的杀生决掌握程度还不够，需要多加练习。");
     if (me.query_skill("taxuexunmei", 0) < 500 && me.query_skill("taxuexunmei2", 0) < 500) return me.notify_fail("雾中楼说道：你的踏雪寻梅掌握程度还不够，还需多加努力。");
     return true;
+}
 }

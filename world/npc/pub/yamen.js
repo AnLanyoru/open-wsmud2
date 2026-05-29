@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(NPC);
 this.set({
     name: "逃犯",
     desc: "他是衙门正在追捕的逃犯",
@@ -30,4 +34,5 @@ this.init_from = function (player, grade = 0, level = 0) {
     this.init();
     this.recount();
 
+}
 }

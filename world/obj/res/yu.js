@@ -1,4 +1,6 @@
-﻿
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     unit: "条",
@@ -24,3 +26,4 @@ this.on_create = function (path, par) {
 }
 //100, 1000, 5000, 10000, 50000, 100000, 680000][this.grade];
 //100 200 300 500 1000
+}

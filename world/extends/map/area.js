@@ -1,3 +1,7 @@
+const WORLD = globalThis.WORLD;
+const AREA = globalThis.AREA;
+const ROOM = globalThis.ROOM;
+
 AREA.prototype.notify_update = function () {
     this.json = null;
     if (this.is_area)
@@ -18,5 +22,4 @@ AREA.prototype.is_unlock = function (me) {
         return me.isenable_area(this);
     return (this.unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
 }
-
-
+export default function() {}

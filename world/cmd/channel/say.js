@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
 this.inherits(COMMAND);
 this.command = "say";
 this.allow_busy = true;
@@ -16,4 +20,5 @@ this.enter = function (me, msg) {
     msg = UTIL.htmlEncode(UTIL.replace_word(msg));
     me.add_temp('chat2', 1, UTIL.diff_time());
     return me.send_room("$N说：" + UTIL.htmlEncode(msg));
+}
 }

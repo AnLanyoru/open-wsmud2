@@ -1,3 +1,11 @@
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;
+const NPC = globalThis.NPC;
+const ROOM = globalThis.ROOM;
+const FAMILY = globalThis.FAMILY;
+const EVENTS = globalThis.EVENTS;
+const COMMAND = globalThis.COMMAND;
+
 FAMILY.prototype.init = function () {
     if (!this.def_npcs) return;
     for (let item of this.def_npcs) {
@@ -412,4 +420,4 @@ FAMILY.prototype.query_task_title = function (me) {
 FAMILY.prototype.query_job_title = function (level) {
     return TITLES[level];
 }
-
+export default function() {}

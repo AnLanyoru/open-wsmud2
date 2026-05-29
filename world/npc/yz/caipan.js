@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "裁判",
     desc: "福威镖局的镖头",
@@ -14,3 +17,4 @@ this.set_chat_msg([
     "裁判说道：要报名打擂台的找我啊，免费帮你找对手！",
     "裁判说道：想看哪个擂台的比赛问我就好了。 "
 ]);
+}

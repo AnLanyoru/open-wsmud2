@@ -1,4 +1,6 @@
-﻿
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     name: "新手宝箱",
@@ -16,4 +18,5 @@ this.on_open = function (me) {
 
     ];
     return OBJ.create_by_odds(result);
+}
 }

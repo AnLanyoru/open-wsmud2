@@ -1,3 +1,6 @@
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
 this.inherits(FAMILY);
 
 this.id = "NONE";
@@ -39,4 +42,5 @@ this.query_task_title = function (me) {
 
 this.query_job_title = function (level) {
     return TITLES[level];
+}
 }

@@ -1,4 +1,7 @@
-﻿
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
 this.inherits(NPC);
 this.set({
     name: "张三丰",
@@ -47,4 +50,5 @@ this.on_master = function (me) {
     if (me.query_skill("taijiquan", 0) < 500 &&  me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极拳掌握程度还不够，需要多加练习。");
     if (me.query_skill("taijishengong", 0) < 500 &&  me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极神功掌握程度还不够，还需多加努力。");
     return false;
+}
 }

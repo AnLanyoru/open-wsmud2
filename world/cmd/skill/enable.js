@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(COMMAND);
 this.command = "enable";
 this.regex = /^(\w+?)\s+(.+?)$/;
 this.allow_fight = false;
@@ -71,3 +75,4 @@ const WEAPON_SKILLS = {
     "blade": 5,
     "staff": 7, "club": 8, "whip": 9
 };
+}

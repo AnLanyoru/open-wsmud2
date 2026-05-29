@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "许雪亭",
     desc: "这是个五十来岁的高瘦汉子，着一袭青衣，昂然挺立。",
@@ -53,3 +56,4 @@ this.set_chat_msg([
     "许雪亭怒道：唉，偌大一个神龙教，都毁在一个娘么手里了！",
     "许雪亭叹口气，说道：唉，不杀了洪安通，谁也活不了。"
 ]);
+}

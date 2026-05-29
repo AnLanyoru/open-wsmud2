@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "黑龙鞭",
     desc: "这是一柄墨黑长鞭，坚韧无比。是史松的成名武器",
@@ -16,3 +20,4 @@ this.set({
         busy:500
     }
 });
+}

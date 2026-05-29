@@ -1,3 +1,8 @@
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+const NPC = globalThis.NPC;
+
 
 
 const STATS = WORLD.STATS;
@@ -230,3 +235,4 @@ STATS.updateScore = function (me) {
     this.updateScoreItem(me, fam);
 
 }
+export default function() {}

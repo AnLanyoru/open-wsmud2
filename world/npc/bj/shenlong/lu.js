@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "陆高轩",
     desc: "他天庭饱满,地阔方圆,容貌颇为英俊.然而满面愁容,恰似顷刻间便有杀身之祸一般.",
@@ -48,3 +51,4 @@ this.set_drop({
     obj: ["book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shedaoqigong", "book/bc#shenlongjian", "book/bc#huagumianzhang"],
     odds: 5000
 });
+}

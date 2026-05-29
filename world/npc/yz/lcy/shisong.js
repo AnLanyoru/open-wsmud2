@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "史松",
     desc: "这是一个精壮汉子，军官模样，腰间围一条长鞭。",
@@ -67,4 +70,5 @@ function getAllFromMe(mao, items) {
             break;
         }
     }
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "pty";
 this.allow_busy = true;
 this.allow_state = true;
@@ -36,4 +40,5 @@ this.enter = function (me, str) {
     }
     me.set_temp('chat', 1, 5000);
     me.add_temp('chat2', 1, UTIL.diff_time());
+}
 }

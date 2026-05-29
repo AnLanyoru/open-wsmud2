@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "土匪",
     desc: "这家伙满脸横肉一付凶神恶煞的模样，令人望而生畏。",
@@ -38,4 +41,5 @@ this.set_drop({
 this.on_enter = function (me) {
     me.notify("土匪一声大喊: 此山是我开，此树是我栽，若要从此过，留下买路财 !");
     this.do_kill(me);
+}
 }

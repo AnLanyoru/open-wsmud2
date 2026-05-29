@@ -1,4 +1,7 @@
-﻿
+import { USERTASK } from "../../os/task/playertask.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(USERTASK);
 this.id = "yamen";
 
@@ -134,4 +137,5 @@ this.set_curtm = function (me, count) {
 
     me.set_temp("ym_tm", tm);
 
+}
 }

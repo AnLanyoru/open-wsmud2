@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "谷虚道长",
     desc: "他就是俞莲舟的弟子谷虚道长。\n他今年四十岁，主管武当派的俗事。",
@@ -29,4 +33,5 @@ this.skill_map(
 
 this.on_master = function (me) {
     return true;
+}
 }

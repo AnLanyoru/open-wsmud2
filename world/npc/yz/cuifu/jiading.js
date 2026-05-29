@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "家丁",
     desc: "崔府的家丁",
@@ -31,3 +34,4 @@ this.set_drop({
         obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes"],
         odds: 3000
     });
+}

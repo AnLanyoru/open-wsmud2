@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const USER = globalThis.USER;
+this.inherits(COMMAND);
 this.command = "answer";
 this.regex = /^(\w+)(?:\s+(\w+))$/;
 this.allow_busy = true;
@@ -21,4 +25,5 @@ USER.prototype.send_question = function (npc, list, callbacks) {
     str.push('</div>');
     this.send(str.join(''));
     npc.on_answers = callbacks;
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "株",
     name: "当归",
@@ -21,4 +24,5 @@ this.on_create = function (path, par) {
     if (this.grade === 6) this.desc = "这是一株神奇的药草，可以炼制出传说中的神丹";
     this.value = [100, 1000, 5000, 10000, 50000, 100000, 680000][this.grade];
 
+}
 }

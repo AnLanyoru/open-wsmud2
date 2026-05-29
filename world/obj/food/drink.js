@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "壶";
 this.name = "米酒";
 this.value = 200;
@@ -70,3 +73,4 @@ const OBJS = [{
     unit: "壶",
     grade: 2
 }];
+}

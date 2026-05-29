@@ -1,4 +1,7 @@
-﻿
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
 this.inherits(SKILL);
 this.id = "literate";
 this.name = "读书写字";
@@ -125,3 +128,4 @@ this.slots = [
         }
     }
 ];
+}

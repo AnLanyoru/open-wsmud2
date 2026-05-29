@@ -1,4 +1,6 @@
+import { COMMAND } from "../../../os/command.js";
 
+export default function() {
 this.inherits(COMMAND);
 this.command = "eqgroup";
 this.allow_fight = false;
@@ -39,4 +41,5 @@ this.save_eqgroup = function (me) {
         let eq = me.equipment[i];
         eqs[i] = eq ? eq.id : null;
     }
+}
 }

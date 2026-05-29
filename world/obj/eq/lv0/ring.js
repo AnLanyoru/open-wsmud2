@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     unit: "枚",
     name: "铁戒指",
@@ -9,3 +13,4 @@ this.set({
 this.prop = {
     gj: 1
 };
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "平四",
     desc: "他是胡家忠心耿耿的仆役。",
@@ -42,4 +45,5 @@ this.on_leave = function (me, dir) {
         me.notify("平四拦住你恭敬的说道：" + me.call() + "，有什么事情吗？");
         return false;
     }
+}
 }

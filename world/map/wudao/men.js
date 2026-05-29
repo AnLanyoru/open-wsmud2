@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "入口"
 this.desc = "这里是武道塔的入口，旁边就是天下学武之人无限向往的武道之塔了，站在这里你可以完完整整感受到它庄严雄伟的气势，犹如一根擎天巨柱直入云霄。";
 this.exits = { "enter": "wudao/ta" };
@@ -23,4 +26,5 @@ this.on_leave = function (me, dir) {
             return false;
         }
     }
+}
 }

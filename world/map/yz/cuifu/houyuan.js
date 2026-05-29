@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "后院"
 this.desc = "这里是财主后院，各种古玩琳琅满目，商周青铜、汉瓦当、唐三彩……，应有尽有，只要拥有一件，就够你吃一辈子了。崔员外正坐在琉璃榻上，慢幽幽地喝着参汤。东侧有一扇<cmd cmd='look men'>门(men)</cmd>。";
 this.exits = { "south": "yz/cuifu/dayuan", "west": "yz/cuifu/xixiang" };
@@ -24,4 +27,5 @@ this.on_leave = function (me, dir) {
             return false;
         }
     }
+}
 }

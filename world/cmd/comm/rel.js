@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const FOLLOWER = globalThis.FOLLOWER;
 this.inherits(COMMAND);
 this.command = "rel";
 this.allow_busy = true;
@@ -78,4 +82,5 @@ function query_er(me) {
             return me.items[i];
         }
     }
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const TASK = globalThis.TASK;
+this.inherits(NPC);
 this.set({
     name: "蒙古密探",
     desc: "鬼鬼祟祟的，一看就有问题",
@@ -50,4 +54,5 @@ this.relive = function () {
     this.equipment = null;
     this.items = null;
     this.skills = null;
+}
 }

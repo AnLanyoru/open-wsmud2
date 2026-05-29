@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "无根道长",
     desc: "这是个五十来岁的黑须道长,相貌威武,眼中略带杀气。",
@@ -55,4 +58,5 @@ this.on_kill = function (me) {
             item.do_kill(me);
         }
     }, this.environment);
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "薛慕华",
     desc: "他就是号称阎王敌的神医——薛慕华，据说他精通医理，可以起死回生。",
@@ -28,4 +32,5 @@ this.skill_map(
 this.on_master = function (me) {
 
     return true;
+}
 }

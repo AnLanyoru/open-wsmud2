@@ -1,3 +1,6 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "spfm";
 this.allow_die = true;
@@ -21,4 +24,5 @@ this.set_qkyz = function (me, arg) {
     me.set_temp('qkyz_m', arg);
 
     me.send('<cyn>你的乾坤一掷每次使用将消耗' + arg + '个铜板。</cyn>');
+}
 }

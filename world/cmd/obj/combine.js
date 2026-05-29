@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "combine";
 this.regex = /^(\w+)(?:\s(\d+))?$/;
 this.enter = function (player, objid, count) {
@@ -37,4 +41,5 @@ this.enter = function (player, objid, count) {
         }
     }
   
+}
 }

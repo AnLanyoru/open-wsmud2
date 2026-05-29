@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const USERTASK = globalThis.USERTASK; const COMMAND = globalThis.COMMAND;
+this.inherits(NPC);
 this.name = "金古易";
 
 this.desc = "当代武林泰斗金古易，有时候猛的一看，你还以为是三个人。";
@@ -234,4 +238,5 @@ this.send_master = function (me) {
 }
 this.on_die = function () {
     this.call_out(this.relive, 10000);
+}
 }

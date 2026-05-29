@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "份",
     name: "武道残页",
@@ -9,3 +12,4 @@ this.set({
 });
 
 this.otype = 1;
+}

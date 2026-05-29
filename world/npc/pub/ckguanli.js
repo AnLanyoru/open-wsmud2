@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "仓库管理员",
     desc: "他是帮会仓库管理员",
@@ -21,3 +24,4 @@ this.add_action("askhyd", "仓库盘点", function (me, par) {
         me.send_commands("party fam", "开启帮派战", "party boss", "发送英雄帖");
     }
 });
+}

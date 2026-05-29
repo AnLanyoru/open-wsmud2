@@ -1,4 +1,7 @@
-﻿
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
 this.inherits(SKILL);
 this.id = "dodge";
 this.name = "基本轻功";
@@ -13,3 +16,4 @@ this.dodge_actions = ["但是和$p$l偏了几寸。",
 
 this.set_default(this.id);
 this.query_prop = lv => ({ dex: parseInt(lv / 10) });
+}

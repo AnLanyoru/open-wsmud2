@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "封不平",
     desc: "封不平是华山剑宗第一高手，满脸戾气一张黄焦焦的面皮。",
@@ -33,4 +37,5 @@ this.on_master = function (me) {
     if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("封不平说道：你的华山心法掌握程度还不够，需要多加练习。");
     if (me.query_skill("huashanjianfa", 0) < 200) return me.notify_fail("封不平说道：你的华山剑法掌握程度还不够，需要多加练习。");
     return true;
+}
 }

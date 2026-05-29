@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const NPC = globalThis.NPC; const FOLLOWER = globalThis.FOLLOWER;
+this.inherits(OBJ);
 this.set({
     unit: "张",
     name: "契约",
@@ -108,3 +112,4 @@ this.npcs = {
     dini: "follower/dini",
     shimei: "follower/shimei"
 };
+}

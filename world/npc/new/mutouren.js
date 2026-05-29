@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "<hiw>木头人</hiw>",
     desc: "这是一个木头做的假人，用来训练新手用的",
@@ -15,3 +18,4 @@ this.set({
 this.set_drop({
     obj: "sp/new/mutou"
 });
+}

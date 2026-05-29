@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL;
 this.inherits(COMMAND);
 this.command = "shop";
 this.allow_busy = true;
@@ -278,4 +281,4 @@ this.groups = [
     ]
 
 ];
-
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "李力世",
     desc: "这是一个身材矮小，满连胡须的中年人，身上的衣服又脏又破，脸上满是皱纹，看上去饱经风霜。",
@@ -38,3 +41,4 @@ this.set_drop({
         obj: ["book/bc#wuhuduanmendao"],
         odds: 5000
     });
+}

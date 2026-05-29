@@ -1,4 +1,7 @@
-﻿
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+    const ROOM = globalThis.ROOM;
 this.inherits(AREA);
 this.set({
     name: "黑鹰校场",
@@ -48,3 +51,4 @@ this.drops = [
     'eq/lv1/xk_head',
     'eq/lv1/xk_shoes',
     'eq/lv1/qingmu'];
+}

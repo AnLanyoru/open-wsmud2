@@ -1,4 +1,8 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const ROOM = globalThis.ROOM;
+this.inherits(MONSTER);
 this.set({
     name: "狼王",
     desc: "一只强壮的野狼，应该是这里的头领，对你龇了龇锋利的尖牙，吐出那长长的血红色的舌头",
@@ -107,4 +111,5 @@ this.on_shedied = function (npc, corpse) {
         npc.end_fight();
         me.environment.create_lw(me, npc, 8, '$N撕扯着毒蛇整个吞了下去...\n<wht>一阵烟雾过后，狼王已经消失不见，一只巨大的银色巨狼站在你面前向你咆哮...</wht>');
     }
+}
 }

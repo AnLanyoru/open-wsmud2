@@ -1,3 +1,6 @@
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
 this.inherits(NPC);
 this.name = "披甲俑卫";
 this.desc = "身着残破铁甲，头盔遮住大半面容，仅露一双空洞眼窝。手持锈迹斑斑的长刀。";
@@ -39,3 +42,4 @@ this.set_drop({
         'eq/lv2/lm_pei'],
     odds: 500
 });
+}

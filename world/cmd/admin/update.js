@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC; const BASE = globalThis.BASE; const TASK = globalThis.TASK; const __PATH = globalThis.__PATH;
 this.inherits(COMMAND);
 this.command = "update";
 this.allow_busy = true;
@@ -117,4 +121,5 @@ this.wait = function (me) {
     let time = updtime.getTime() - Date.now();
     task.handler = task.call_out(task.run2, time);
     this.format_time(me, updtime);
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "黄蓉",
     desc: "这便是桃花岛岛主的独生女儿。她生性跳脱飞扬，喜欢四处乱跑。",
@@ -23,4 +26,4 @@ this.skill_map(
     ["unarmed", 500],
     ["sword", 500],
     ["literate", 1500]);
-
+}

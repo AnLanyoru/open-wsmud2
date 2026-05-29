@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "小巷子"
 this.desc = "这里是扬州城北的一个破烂小巷子，因为在城外所以官兵一直都不大爱管，久而久之这里就成了一些大小流氓的聚集地，到处都是乌烟瘴气。墙角有几个小流氓吊儿郎当的站着看着你。";
 this.exits = {  "east": "yz/lmw/xiangzi2", };
@@ -11,4 +14,5 @@ this.on_leave = function (me,dir) {
             return false;
         }
     }
+}
 }

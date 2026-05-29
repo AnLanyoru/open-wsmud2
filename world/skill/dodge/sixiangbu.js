@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "四象步法";
 this.id = "sixiangbu";
 this.grade = 2;
@@ -78,3 +81,4 @@ this.pfm = {
         }
     }
 };
+}

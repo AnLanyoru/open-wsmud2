@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "卧室"
 this.desc = "这是你的卧室，房间不算大却陈设豪华，地上铺着猩红的羊毛手织地毯，摆着一张楠木花雕大床，一具红松大衣柜，柜顶搁着几只牛皮藤箱子，靠窗处是一张花梨木书桌，旁边一个书架，里面放了一些四书五经之类的儒家书籍。";
 this.exits = { "south": "home/yuanzi" };
@@ -28,4 +31,4 @@ this.add_action("sleep", "睡觉", function (me) {
 this.allow_store = true;
 
 this.add_action('drop', null, function (me) { return me.notify('自己家里就不要乱丢东西了。'); });
-
+}

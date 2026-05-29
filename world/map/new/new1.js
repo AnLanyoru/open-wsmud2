@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "训练室"
 this.desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识， 就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。房子中间有个桌子，几张<cmd cmd='look yizi'><hig>椅子</hig></cmd>。";
 this.exits = { "east": "new/new2" };
@@ -126,4 +129,5 @@ this.on_leave = function (me, dir) {
     if (!lv) return true;
     if (lv < 4) return me.notify_fail("你先听完课再乱跑。");
     if (dir != "east") return me.notify_fail("你要去东面的训练室找指引者。");
+}
 }

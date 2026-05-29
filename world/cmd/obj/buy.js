@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "buy";
 this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
 this.enter = function (me, count, objid, from) {
@@ -77,4 +81,5 @@ this.enter = function (me, count, objid, from) {
         //玩家售卖
     }
     // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
+}
 }

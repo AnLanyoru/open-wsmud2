@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES; const SKILL_TYPES = globalThis.SKILL_TYPES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(SKILL);
 this.type = SKILL_TYPES.SKILL;
 this.id = "bite2";
 this.name = "野兽扑咬";
@@ -43,3 +47,4 @@ this.pfm = {
         }
     }
 };
+}

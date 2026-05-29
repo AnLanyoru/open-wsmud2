@@ -1,3 +1,7 @@
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+    const ROOM = globalThis.ROOM;
 this.inherits(NPC);
 this.set({
     name: "铁虎",
@@ -79,3 +83,4 @@ this.set_drop({
     obj: ["book/bc#wuhuduanmendao", "eq/lv1/dandao"],
     odds: 3000
 });
+}

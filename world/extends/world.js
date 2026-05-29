@@ -1,3 +1,6 @@
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;
+
 
 WORLD.on_startup = function () {
     init_fams();
@@ -61,3 +64,4 @@ WORLD.close = async function () {
     }
     return false;
 }
+export default function() {}

@@ -1,3 +1,7 @@
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;
+const FAMILY_AREA = globalThis.FAMILY_AREA;
+
 const stand_actions = [
     ['goto fam1', '练功', '回到你所在门派师父所在位置学习武功'],
 
@@ -35,3 +39,4 @@ FAMILY_AREA.prototype.notify_update = function () {
     this.json = null;
     WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
 }
+export default function() {}

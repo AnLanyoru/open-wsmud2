@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "李四",
     desc: "他是杀手楼的银牌杀手，看上去是一个走在大街上你绝对不会看上一眼的普通人",
@@ -39,3 +43,4 @@ this.set_chat_msg([
     "",
     ""
 ]);
+}

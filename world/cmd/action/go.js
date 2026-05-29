@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const ROOM = globalThis.ROOM;
+this.inherits(COMMAND);
 this.command = "go";
 //this.regex = /^(\w+)(?:\s+(n|s|m))?$/;
 
@@ -132,4 +136,5 @@ function getFace(player) {
         if (v > face2.length - 1) v = face2.length - 1;
         return face2[v];
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "密室"
 this.desc = "这是一间密室，房间很小，设备也很简陋，一张小床，一张单桌，一个大汉站在哪里小心的戒备这你。";
 this.exits = { "out": "yz/lcy/fang2" };
@@ -17,4 +20,4 @@ this.on_enter = function (me) {
     }
   
 }
-
+}

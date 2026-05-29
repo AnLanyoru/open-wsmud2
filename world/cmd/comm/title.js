@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "title";
 this.allow_busy = true;
 this.allow_state = true;
@@ -32,4 +35,5 @@ this.enter = function(me, index) {
     me.color_name = null;
     me.environment.item_changed(me, true);
     
+}
 }

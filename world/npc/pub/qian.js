@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "钱眼开",
     desc: "他就是钱庄的老板钱眼开，人称铁公鸡",
@@ -19,3 +22,4 @@ this.set_chat_msg([
 	"钱眼开笑着说道：当年雾中楼在本银号存的钱可以说是最多的了。",
 	"钱眼开笑着说道：在本店存钱无利息，存物不收手续费，客官你看着办吧。"
 ]);
+}

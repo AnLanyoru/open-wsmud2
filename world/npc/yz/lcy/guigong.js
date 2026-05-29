@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "龟公",
     desc: "一个满脸横肉的汉子，在丽春院日子久了，养的白白肥肥。",
@@ -38,3 +41,4 @@ this.set_drop({
     obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes"],
     odds: 6000
 });
+}

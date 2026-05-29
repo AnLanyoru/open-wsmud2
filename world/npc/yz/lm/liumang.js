@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "流氓",
     desc: "流氓巷里的大流氓。",
@@ -35,4 +38,5 @@ this.on_kill = function (me) {
             item.do_kill(me);
         }
     }, me.environment);
+}
 }

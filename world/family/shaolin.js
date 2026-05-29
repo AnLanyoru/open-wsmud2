@@ -1,4 +1,8 @@
-﻿this.inherits(FAMILY);
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(FAMILY);
 
 this.id = "SHAOLIN";
 this.name = "少林派";
@@ -96,3 +100,4 @@ this.boss_skills2 = [
     ["ranmudao3", 5000, ["blade", "parry"]],
     ["shaolinshenfa2", 5000, "dodge"],
     ["yizhichan2", 5000, "unarmed"]];
+}

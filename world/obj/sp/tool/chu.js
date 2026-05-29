@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     unit: "把",
     name: "铁镐",
@@ -28,4 +32,5 @@ this.on_create = function (path, par) {
         this.desc = "你可以在自家后院挖矿，更容易挖到高级的宝石";
     }
     EQUIPMENT.prototype.on_create.apply(this);
+}
 }

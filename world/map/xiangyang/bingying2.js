@@ -1,3 +1,6 @@
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
 /**
  *
  * @authors kwer (kwer8080@foxmail.com)
@@ -11,3 +14,4 @@ this.exits = {
     "out" : "xiangyang/guangchang",
 };
 this.set_npc('xiangyang/bing');
+}

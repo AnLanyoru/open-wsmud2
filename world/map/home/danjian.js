@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const FOLLOWER = globalThis.FOLLOWER;
+this.inherits(ROOM);
 this.name = "卧室"
 this.desc = "这是你的卧室，房间不大陈设也不多，但是收拾的干净整洁，房间里面除了一张楠木大床，一张书桌，一个箱子就没别的东西了。";
 this.exits = { "out": "yz/home" };
@@ -52,3 +56,4 @@ this.add_action("sleep", "睡觉", function (me) {
 
     me.notify("你躺到床上被子一盖，不一会就呼呼的睡着了。");
 });
+}

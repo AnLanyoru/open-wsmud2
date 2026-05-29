@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "qu";
 this.regex = /^(?:(\d+\s+))?(\w+)$/;
 this.enter = function (me, count, arg) {
@@ -21,4 +25,5 @@ this.enter = function (me, count, arg) {
 
     me.notify('{type:"dialog",dialog:"list",id:"' + moved_obj.id + '",storeid:"' + arg + '",store:' + (-move_count) + '}');
 
+}
 }

@@ -1,3 +1,7 @@
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
+    const MONSTER = globalThis.MONSTER;
 this.inherits(FAMILY);
 
 this.id = "MONSTER";
@@ -8,4 +12,5 @@ this.call = function (player, isbad) {
 }
 this.call_me = function (player, isbad) {
 
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "衙役",
     desc: "",
@@ -13,4 +16,4 @@ this.set({
     max_hp: 40000000,
 
 });
-
+}

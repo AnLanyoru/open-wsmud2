@@ -1,4 +1,7 @@
-﻿this.inherits(AREA);
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+this.inherits(AREA);
 this.set({
     id: "by",
     name: "兵营",
@@ -48,3 +51,4 @@ this.quick_drops = [
         odds: 1000
     }
 ];
+}

@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
 this.inherits(COMMAND);
 this.command = "fangqi";
 this.allow_fight = false;
@@ -112,4 +115,5 @@ this.reset_skill = function (me, skill, skill_base, level) {
     str.push("}");
     me.notify(str.join(""));
     return true;
+}
 }

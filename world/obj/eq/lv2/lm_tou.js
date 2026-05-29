@@ -1,3 +1,7 @@
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
 this.inherits(EQUIPMENT);
 this.set({
     name: "龙纹冠",
@@ -24,4 +28,5 @@ this.group_prop = function (count) {
             dazuo_per: 15
         };
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "狼",
     desc: "一只野狼，后腿微屈，前腿向前伸出，摆出一副向下俯冲的架势，两只眼睛里发出幽幽的凶光",
@@ -25,4 +28,5 @@ this.on_enter = function (me) {
     } else {
         me.notify(this.name + "凑到你身边蹭了蹭。");
     }
+}
 }

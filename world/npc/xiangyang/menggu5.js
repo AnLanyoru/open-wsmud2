@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "蒙古兵",
     desc: "进攻襄阳城的蒙古兵，狡勇善战",
@@ -28,3 +31,4 @@ this.skill_map(
     ["mengguxinfa", 300, "force"],
     ["dashouyin", 300, "unarmed"],
     ["feiyanzoubi", 300, "dodge"]);
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(NPC);
 this.set({
     name: "管家",
     desc: "他就是负责扬州私人住宅租售的管家，也负责替人看家",
@@ -84,4 +88,5 @@ this.on_leave = function (me, dir) {
         }
 
     }
+}
 }

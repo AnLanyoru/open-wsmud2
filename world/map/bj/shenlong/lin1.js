@@ -1,5 +1,6 @@
-﻿
+import { ROOM } from "../../../../os/room/room.js";
 
+export default function() {
 this.inherits(ROOM);
 this.name = "灌木林";
 this.desc = "这是一片灌木林。你对这样一个孤岛上竟有这样大一片<cmd cmd='look bush'>灌木林</cmd>感到非常吃惊.前面根本没有路, 四周的密林中长满了杂草。";
@@ -18,3 +19,4 @@ this.set_item("bush", "灌木林","这是一片很大的灌木林，把路都给
         }
     }
 ]);
+}

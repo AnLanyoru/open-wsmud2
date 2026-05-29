@@ -1,4 +1,7 @@
-﻿this.inherits(FAMILY);
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
+this.inherits(FAMILY);
 
 this.id = "LIUSHAN";
 this.name = "六扇门";
@@ -25,4 +28,5 @@ this.call_me = function (player, isbad) {
         if (age < 50) return isbad ? "大爷我" : "在下";
         else return isbad ? "老子" : "老头子";
     }
+}
 }

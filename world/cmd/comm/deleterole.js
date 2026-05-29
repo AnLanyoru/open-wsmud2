@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "deleterole";
 this.allow_login = true;
 this.enter = function (me, pars) {
@@ -21,4 +25,5 @@ this.enter = function (me, pars) {
     }).catch(err => {
         me.notify("{type:\"deleterole\",result:0}");
     });
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "花",
     desc: "",
@@ -9,4 +12,4 @@ this.set({
     hp: 1500,
     max_hp: 1500
 });
-
+}

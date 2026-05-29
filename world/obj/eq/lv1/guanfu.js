@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "官服",
     desc: "一件朝廷命官穿着的官服，上面用金丝线绣着一些花纹。",
@@ -11,3 +15,4 @@ this.set({
         max_hp: 20
     }
 });
+}

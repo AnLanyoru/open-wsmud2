@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "张无忌",
     desc: "江湖中不世出的少年英雄",
@@ -30,4 +33,5 @@ this.on_master_enter = function (me) {
     if (this.random(3) == 1) {
         me.notify("张无忌对你嘿嘿一笑。");
     }
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(NPC);
 this.name = "铁匠";
 this.title = "铁匠铺老板";
 this.desc = "铁匠正用铁钳夹住一块红热的铁块放进炉中。";
@@ -110,4 +114,5 @@ this.dzwq = function (arg, me, str) {
         me.notify("铁匠说道：不错，这是你要的。");
         me.notify("铁匠给你" + obj.unit_name() + "。");
     }
+}
 }

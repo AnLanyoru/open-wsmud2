@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "shutdown";
 this.allow_busy = true;
 this.allow_state = true;
@@ -24,4 +28,5 @@ this.enter = function (me, arg) {
         WORLD.close();
         // WORLD.LISTENER.tcpServer._events.connection = null;
     });
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "xiangqian";
 this.regex = /^(\w+)(?:\s(\w+))?$/;
 this.enter = function (player, objid, st) {
@@ -48,4 +52,5 @@ this.enter = function (player, objid, st) {
     str.push(']}');
     player.notify(str.join(""));
 
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "块",
     name: "熊胆",
@@ -13,4 +16,5 @@ this.on_use = function (me) {
     }
     me.send_room("<hiw>$N拿出一块熊胆，三下五除二得就吞了下去。</hiw>");
     me.add_maxmp(40);
+}
 }

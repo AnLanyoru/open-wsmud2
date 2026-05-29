@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "粒",
     name: "培元丹",
@@ -49,4 +52,5 @@ this.on_create = function (path, par) {
             break;
     }
     this.grade = lv + 1;
+}
 }

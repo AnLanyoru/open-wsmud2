@@ -1,3 +1,7 @@
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
 this.inherits(EQUIPMENT);
 this.set({
     name: "龙纹剑",
@@ -25,4 +29,5 @@ this.group_prop = function (count) {
             dazuo_per: 15
         };
     }
+}
 }

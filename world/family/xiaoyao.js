@@ -1,3 +1,6 @@
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
 this.inherits(FAMILY);
 
 this.id = "XIAOYAO";
@@ -87,4 +90,5 @@ this.on_battle = function (fam) {
     if (this.boss) {
         this.boss.do_command("chat", "...");
     }
+}
 }

@@ -1,3 +1,6 @@
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     unit: "份",
@@ -22,4 +25,5 @@ this.on_use = function (me, par) {
     me.send('<hic>感谢购买，恭喜你拥有了自己的住宅。</hic>');
     me.send_commands('goto home', '现在就过去');
     return true;
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "小箱子",
     desc: "这是在崔员外家找到的一个小箱子，不知道里面放了些了什么。",
@@ -23,4 +26,5 @@ this.on_open = function (me) {
         obj: ["eq/lv1/pifeng"],
         odds: 2000
     }]);
+}
 }

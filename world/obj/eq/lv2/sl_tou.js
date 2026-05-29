@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "神龙冠",
     desc: "神龙教管理层的制服帽子",
@@ -13,3 +17,4 @@ this.set({
         con:5
     }
 });
+}

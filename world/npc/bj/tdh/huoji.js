@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "药铺伙计",
     desc: "他十分强壮，看上去会几分武功，对药铺生意似乎并不在乎。",
@@ -29,3 +32,4 @@ this.set_drop({
         obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
         odds: 8000
 });
+}

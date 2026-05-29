@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "谷物加工厂";
 this.no_fight = true;
 this.desc = "这是一间谷物加工厂，这里是谷子脱壳成米的地方。米厂老板是一个一看就知道是十分精明的干瘦的中年人，老是带着一脸奸笑。你可以看到许多人正在忙忙碌碌的工作着，门口挂著一块<CMD cmd='look sign'>牌子(sign)</cmd>。";
@@ -32,4 +36,5 @@ function do_work(me) {
 
     var exp = WORLD.DATA.get_exp(me);
     me.add_exp(exp, exp, 100 + me.random(20));
+}
 }

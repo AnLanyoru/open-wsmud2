@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "韦春芳",
     desc: "韦春芳是当朝鹿鼎公兼天地会总舵主韦小宝他娘，虽是徐娘半老，但风韵尤存。",
@@ -51,4 +54,5 @@ this.on_accept = function (me, obj, count) {
         }
     }
     return false;
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "道觉禅师",
     desc: "他是一位身材高大的中年僧人，两臂粗壮，膀阔腰圆。他手持兵刃，身穿一袭灰布镶边袈裟，似乎有一身武艺。",
@@ -42,4 +46,5 @@ this.on_master = function (me) {
     if (me.gender == 2) return me.notify_fail("道觉禅师说道：阿弥陀佛，少林寺不收女弟子。");
     if (me.query_skill("hunyuanyiqi", 0) < 100) return me.notify_fail("道觉禅师说道：你的混元一气掌握程度还不够，需要多加练习。");
     return true;
+}
 }

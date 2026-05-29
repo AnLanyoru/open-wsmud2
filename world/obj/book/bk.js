@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(OBJ);
 this.set({
     unit: "本",
     name: "武功秘籍",
@@ -53,4 +57,5 @@ this.on_use = function (me) {
         + ',exp:0}');
     me.notify('你学会了' + skill_base.color_name + '。');
     me.recount();
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "周芷若",
     desc: "她是一位容貌美丽，端庄可爱的姑娘。虽然年纪很轻，但在峨眉派中是出类拔萃的人物。",
@@ -40,4 +44,5 @@ this.on_master = function (me) {
     if (me.query_skill("linjizhuang", 0) < 300 && me.query_skill("linjizhuang2", 0) < 300) return me.notify_fail("周芷若说道：你的临济十二庄掌握程度还不够，需要多加练习。");
     if (me.query_skill("huifengjian", 0) < 300) return me.notify_fail("周芷若说道：你的回风拂柳剑掌握程度还不够，需要多加练习。");
     return true;
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC); 
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC); 
 this.set({
     name: "林平之",
     desc: "他就是「福威镖局」的少当家－－林平之。",
@@ -18,3 +21,4 @@ this.skill_map(
         ["literate", 150]);
 
 this.set_objects(["eq/lv0/cloth", 1, 1], ["eq/lv0/jian", 1, 1]);
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "大门"
 this.desc = "这里就是文士庄允城的旧居。自从他被朝廷抓走后,这里好象就没有人住了。一扇<cmd cmd='look men'>大门</cmd>紧锁着,周围是高高的<cmd cmd='look wall'>围墙</cmd>。一切都很干净,并没有积多少灰尘。";
 this.exits={"south":"bj/zhuang/xiaolu2"};
@@ -25,3 +28,4 @@ this.set_item("wall","院墙","墙很高，可能翻不过去。",[
     }
 }]
 ]);
+}

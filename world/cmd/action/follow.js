@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "follow";
 this.enter = function (me, objid) {
     if (me.is_player && !me.query_temp("admin")) return false;
@@ -16,4 +19,5 @@ this.enter = function (me, objid) {
         me.do_follow(obj);
     }
 
+}
 }

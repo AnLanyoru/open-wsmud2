@@ -1,3 +1,7 @@
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL;
 this.inherits(OBJ);
 this.set({
     unit: "份",
@@ -17,4 +21,5 @@ this.on_create = function (path, par) {
     this.name = "技能：" + skill.name;
     this.desc = skill.color_name + "秘籍。";
 
+}
 }

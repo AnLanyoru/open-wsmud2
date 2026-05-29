@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "易直非",
     desc: "一个神秘的商人，可以帮你兑换你一直想要却得不到的道具",
@@ -15,5 +18,4 @@ this.set({
 this.add_action("ask3", "兑换", function (me) {
 
 });
-
-
+}

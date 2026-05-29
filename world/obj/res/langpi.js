@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "狼皮",
     desc: "一块完整的狼皮",
@@ -18,3 +21,4 @@ this.on_use = function (me) {
     me.notify("<hic>你把一块完整的狼皮当作衣服披在身上。</hic>");
 }
 this.transable = true;
+}

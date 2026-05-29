@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "open";
 this.enter = function (player, objid) {
     var obj = player.find_obj(objid);
@@ -23,4 +27,5 @@ this.enter = function (player, objid) {
         }
     }
     player.remove_obj(obj,1);
+}
 }

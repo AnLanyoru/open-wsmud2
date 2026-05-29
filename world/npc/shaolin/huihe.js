@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "慧合尊者",
     desc: "他是一位两鬓斑白的老僧，身穿一袭青布镶边袈裟。他身材略高，太阳穴微凸，双目炯炯有神。",
@@ -46,4 +50,5 @@ this.on_master = function (me) {
     if (me.query_skill("hunyuanyiqi", 0) < 300) return me.notify_fail("慧合尊者说道：你的混元一气掌握程度还不够，需要多加练习。");
     if (me.query_skill("shaolinshenfa", 0) < 300) return me.notify_fail("慧合尊者说道：你的少林身法掌握程度还不够，需要多加练习。");
     return true;
+}
 }

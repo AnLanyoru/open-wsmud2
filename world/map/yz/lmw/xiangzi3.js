@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL;
+this.inherits(ROOM);
 this.name = "巷子深处"
 this.desc = "这里是流氓巷的最里面，这里的小流氓反而变少了，四周看上去也有些整洁，有块空地上放着一个<cmd cmd='look shinian'>石撵</cmd>，四周地面磨得的光亮，看上去像是经常被拖动的样子。北面好像有个仓库，有个大铁门锁着。";
 this.exits = { "west": "yz/lmw/xiangzi2",  "east": "yz/lmw/fang", };
@@ -47,4 +51,5 @@ function do_work(me) {
     me.add_mp(-10);
     this.skill_base.add_exp(me, 30);
     me.notify_fail("<hic>你推了一圈，感觉自己对拳脚方面功夫多了些理解。</hic>");
+}
 }

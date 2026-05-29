@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "阿紫",
     desc: "她容颜俏丽，可眼神中总是透出一股邪气。",
@@ -21,3 +24,4 @@ this.skill_map(
     ["force", 500],
     ["unarmed", 500],
     ["throwing", 500]);
+}

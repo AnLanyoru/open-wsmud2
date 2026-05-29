@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const BASE = globalThis.BASE; const __PATH = globalThis.__PATH;
+this.inherits(ROOM);
 this.name = "落雁峰"
 this.desc = "南峰又名落雁峰，是华山最高峰。峰头题刻极多，如“太华峰头”、“竣极于天”、“袖拂天星”等，极言华岳之高。环顾四周，皆在足下。寇准诗赞曰：只有天在上，更无山与齐；举头红日近，回首白云低。传说五代时候的隐士陈抟就隐居在这里。宋太祖曾经下诏征他出山作官，他便在这里写下谢诏表说：“一片野心都被白云锁住，九重宠诏休教丹凤衔来”，表示不愿出山做官。";
 this.exits = { "eastdown": "huashan/zhandao" };
@@ -76,4 +80,5 @@ this.create_jueding = function (rm) {
         rm.shadow_rooms.push(shadow);
     }
     return shadow;
+}
 }

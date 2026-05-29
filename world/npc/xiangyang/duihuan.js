@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "<hic>守城低保CD重置</hic>",
     desc: "减掉你今天手残领取低保的军功，重置你的守城CD，24小时有效",
@@ -30,3 +33,4 @@ this.add_action("xycz", "确定重置CD", function (me) {
     var obj=me.add_obj("sp/mihan");
     me.notify("已扣除掉你领取的低保军功200，重置守城CD，你获得了一个" + obj .color_name+ "。");
 });
+}

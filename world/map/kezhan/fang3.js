@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "天字号客房";
 this.desc = "这是客栈里面最好的客房，房间里面空间很大，门口竖有张屏风，看上去很贵重的样子，据说这里面的布置，物件都是客栈老板花大价钱买来的天材地宝，在这里练功对你大有益处。";
 this.exits = { "down": "yz/kedian" };
@@ -36,4 +39,5 @@ this.on_heart_beat = function () {
             return check_moveout(item);
         }
     }
+}
 }

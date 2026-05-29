@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC;
+this.inherits(COMMAND);
 this.command = "score";
 this.allow_busy = true;
 this.allow_state = true;
@@ -142,4 +146,5 @@ this.get_level_desc = function (me) {
     }
     return "<" + cc + ">" + level_descs[me.level] + "</" + cc + ">";
 
+}
 }

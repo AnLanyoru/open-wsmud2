@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "score2";
 this.allow_busy = true;
 this.allow_state = true;
@@ -74,4 +78,5 @@ this.enter = function (me, arg) {
     str.push(target.query_prop("diff_downside_per"));
     str.push('%"}');
     me.send(str.join(""));
+}
 }

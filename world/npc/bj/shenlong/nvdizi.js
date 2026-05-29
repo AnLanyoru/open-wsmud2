@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "神龙教女弟子",
     desc: "这是一个神龙教女弟子，一袭红衣,长得颇为可爱。",
@@ -45,3 +48,4 @@ this.set_chat_msg([
     "年轻弟子忽然齐声叫道:乘风破浪逞英豪,教主如同日月光!",
     "年轻弟子齐声叫道:教主永享仙福,寿与天齐!"
 ]);
+}

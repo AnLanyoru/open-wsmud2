@@ -1,3 +1,6 @@
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
 this.inherits(FAMILY);
 
 this.id = "WUDANG";
@@ -80,3 +83,4 @@ this.boss_skills2 = [
     ["tiyunzong2", 5000, "dodge"],
     ["taijijian3", 5000, "sword"],
     ["taijiquan3", 5000, ["unarmed", "parry"]]];
+}

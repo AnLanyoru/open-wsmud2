@@ -1,3 +1,7 @@
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
 this.inherits(EQUIPMENT);
 this.set({
     name: "青木令",
@@ -9,3 +13,4 @@ this.set({
         limit_mp: 100
     }
 });
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "程灵素",
     desc: "她相貌似乎已有十六七岁，身形却如是个十四五岁的幼女，一双眼睛黑如点漆，朗似秋水",
@@ -26,4 +29,5 @@ this.on_master_enter = function (me) {
     if (this.random(3) == 1) {
         me.notify("程灵素看你进来，对你羞赧一笑，苍白的小脸上笑容如春花初绽，竟似越看越美。");
     }
+}
 }

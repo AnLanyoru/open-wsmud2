@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "select,command";
 this.allow_busy = true;
@@ -78,4 +80,5 @@ this.exec = function (me, target) {
             me.action_target.add_listen(me);
     }
     return this.notify(str.join(""));
+}
 }

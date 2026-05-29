@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "赌场"
 this.desc = "赌桌围着黑压压的赌徒，吆喝声、惊叹声、欢呼声、咒骂声、哄笑声和噼哩啪啦的声响使你的耳朵几乎无法忍受，赌桌旁的墙上贴有一张<cmd cmd='look paper'>纸</cmd>。";
 this.exits = { "east": "yz/nandajie1", };
@@ -139,3 +143,4 @@ this.add_action("rbok", "", function (me, par) {
     return true;
 
 });
+}

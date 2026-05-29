@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "鳌拜",
     desc: "他就是满洲第一勇士，身穿一袭金边锦缎。他身材魁梧，相貌狰狞，太阳穴高高鼓起，似乎身怀绝世武功。",
@@ -57,3 +60,4 @@ this.set_drop({
     obj: "sp/fb/tiao",
     odds: 1000
 });
+}

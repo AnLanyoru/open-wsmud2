@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "毒蛇",
     desc: "一只昂首挺胸，吐着信子的毒蛇正盯着你。",
@@ -28,4 +31,5 @@ this.on_enter = function (me) {
     } else {
         me.notify(this.name + "朝你吐了吐信子。");
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(AREA);
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+this.inherits(AREA);
 this.set({
     id: "tdh",
     name: "天地会",
@@ -29,3 +32,4 @@ this.drops = [
     "book/bc#mizongxinfa", "book/bc#dashouyin", "book/bc#houquan", "book/bc#yunlongjian", "book/bc#yunlongshenfa", "book/bc#yunlongxinfa",
     "book/bc#shenxingbaibian", "book/bc#qiufengfuchen", "eq/lv2/yunlongjian"
 ];
+}

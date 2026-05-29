@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "贪狼",
     desc: "一颗神秘的宝石",
@@ -45,4 +48,5 @@ this.on_create = function (path, par) {
         default:
             return;
     }
+}
 }

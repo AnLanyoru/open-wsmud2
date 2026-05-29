@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "风清扬",
     desc: "他就是华山剑宗的长老风清扬。他身材瘦长，眉宇间一直笼罩着一股淡淡的忧伤神色，显然对当年的剑宗气宗之争一直难以忘怀。",
@@ -45,4 +49,5 @@ this.on_master = function (me) {
     if (me.query_skill("kuangfengkuaijian", 0) == 0 && me.query_skill("kuangfengkuaijian2", 0) < 500) return me.notify_fail("风清扬说道：你的狂风快剑掌握程度还不够，还需多加努力。");
     me.notify("风清扬叹了口气说到：剑气之争又如何？");
     return true;
+}
 }

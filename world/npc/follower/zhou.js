@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "周芷若",
     desc: "她秀若芝兰，淡雅脱俗，年纪虽小却十足是个绝色的美人胚子",
@@ -35,4 +38,5 @@ this.on_master_enter = function (me) {
     if (this.random(3) == 1) {
         me.notify("周芷若对你微微一笑。");
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "dice";
 this.allow_busy = true;
 this.allow_state = true;
@@ -68,4 +71,5 @@ this.enter = function (me, type, objid) {
     if (item.dice.users.length===0) {
         me.team.alloc(item);
     }
+}
 }

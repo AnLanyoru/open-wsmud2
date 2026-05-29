@@ -1,4 +1,7 @@
-﻿this.inherits(FAMILY_AREA);
+import { FAMILY_AREA } from "../../../os/room/fam_area.js";
+
+export default function() {
+this.inherits(FAMILY_AREA);
 this.set({
     id: "gaibang",
     name: "丐帮",
@@ -21,3 +24,4 @@ this.map = [
     { n: "暗道", id: "gaibang/andao4", p: [5, 1], exits: ["w", "n"] },
     { n: "林中小屋", id: "gaibang/xiaowu", p: [5, 0] }
 ];
+}

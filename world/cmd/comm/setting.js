@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC;
+this.inherits(COMMAND);
 this.command = "setting";
 this.allow_busy = true;
 this.allow_state = true;
@@ -317,3 +321,4 @@ const setting_keys = {
 
     }
 };
+}

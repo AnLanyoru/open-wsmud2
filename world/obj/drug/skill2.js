@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(OBJ);
 this.set({
     unit: "粒",
     name: "突破丹",
@@ -51,4 +55,5 @@ this.on_create = function (path, par) {
     }
     this.grade = lv ? lv : 1;
     this.value = VALUES[this.grade];
+}
 }

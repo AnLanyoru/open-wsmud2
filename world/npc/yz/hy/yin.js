@@ -1,3 +1,6 @@
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
 this.inherits(NPC);
 this.set({
     name: "尹小龙",
@@ -79,4 +82,5 @@ this.clear_items = function (eny) {
         eny.add_temp('hy_ct', -1);
         this.owner = null;
     }
+}
 }

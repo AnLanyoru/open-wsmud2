@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const SKILL = globalThis.SKILL;
+this.inherits(NPC);
 this.set({
     name: "朱熹",
     desc: "他是当朝有名的大儒。",
@@ -96,4 +100,5 @@ this.do_teach = function (me, skill, lv) {
         }
     }
     return true;
+}
 }

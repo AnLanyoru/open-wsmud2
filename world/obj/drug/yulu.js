@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "颗";
 this.name = "九花玉露丸";
 this.value = 200000;
@@ -13,4 +16,5 @@ this.on_use = function (me) {
     }
     me.add_hp(me.max_hp);
     me.send_room("$N吃下一颗" + this.color_name + "，气色恢复如初。");
+}
 }

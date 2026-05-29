@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "苏星河",
     desc: "此人就是号称聪辩老人的苏星河，据说他能言善辩，是一个武林中的智者，而他的武功也是无人能知。",
@@ -39,4 +43,5 @@ this.on_master = function (me) {
 
     if (me.query_skill("xiaoyaoxinfa", 0) < 100) return me.notify_fail("苏星河说道：你的逍遥心法掌握程度还不够，需要多加练习。");
     return true;
+}
 }

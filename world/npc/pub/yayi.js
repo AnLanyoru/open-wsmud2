@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "衙役",
     desc: "一个高大威猛的汉子，因为久在官府做事，脸上已经磨炼得毫无表情。",
@@ -18,4 +21,4 @@ this.skill_map(["dodge", 5500],
     ["unarmed", 5500],
     ["sword", 5500],
     ["changshengjue", 5500, "force"]);
-
+}

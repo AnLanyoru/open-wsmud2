@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "大门"
 this.desc = "一座富丽堂皇的大宅院出现在你的眼前，两头高大的石狮子镇住了大门两侧。门额上悬挂一方横匾，写着‘满洲第一勇士鳌拜府’几个大字，门外有官兵把守，戒备森严。门上挂着两个灯笼，赫然写着“鳌”字。";
 this.exits = { "west": "bj/ao/dayuan" };
@@ -8,3 +11,4 @@ this.on_leave = function (me, dir) {
     }
 }
 this.set_npc(["pub/bing",2]);
+}

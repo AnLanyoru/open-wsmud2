@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
+this.inherits(COMMAND);
 this.command = "fenjie";
 this.regex = /^(\w+)(?:\s(\w+))?$/;
 this.enter = function (player, objid, isok) {
@@ -106,4 +110,4 @@ this.fenjie2 = function (player, obj, isok) {
 
     return WORLD.add_recover_obj(player, obj, 2, rec_items);
 }
-
+}

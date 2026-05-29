@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "内室";
 this.desc = "这里是一个空荡荡的房间，除了<cmd cmd='look floor'>地板(floor)</cmd>，什么也没有。";
 this.exits = { "east": "bj/tdh/hct" };
@@ -29,3 +32,4 @@ this.add_action("knock", "敲地板", function (me) {
        this.add_exit("down","bj/tdh/andao1");
    }
 });
+}

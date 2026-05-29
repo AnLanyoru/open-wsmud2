@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "胡斐",
     desc: "他就是胡一刀之子胡斐，因其武功高强神出鬼没。在江湖上人送外号「雪山飞狐」。他身穿一件白色长衫，腰间别着一把看起来很旧的刀。 ",
@@ -79,3 +82,4 @@ this.set_ask("胡家刀谱", function (me) {
         me.notify("胡斐说道：胡家刀法是我祖上飞天狐狸所创，可惜刀谱丢了几页。");
     }
 });
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "岳不群",
     desc: "他就是华山派的现任掌门人，江湖上人称“君子剑”的岳不群。他看上去是个和善的中年人，对人总是彬彬有礼，很有一代宗师的风范。",
@@ -44,4 +48,5 @@ this.on_master = function (me) {
     if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山心法掌握程度还不够，需要多加练习。");
     if (me.query_skill("huashanjianfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山剑法掌握程度还不够，还需多加努力。");
     return true;
+}
 }

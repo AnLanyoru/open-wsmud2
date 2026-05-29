@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "武当长剑",
     desc: "武当正式弟子的配剑，剑身长而窄，灵动飘逸",
@@ -12,3 +16,4 @@ this.set({
         int: 3
     }
 });
+}

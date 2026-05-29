@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(NPC);
 this.set({
     name: "擂台比武报名",
     desc: "他是负责比武大赛报名的",
@@ -42,4 +46,4 @@ this.add_action("askbiwu1", "观战", function (me) {
 
     WORLD.COMMANDS['biwu'].enter(me, 'watch');
 });
-
+}

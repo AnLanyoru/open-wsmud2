@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "login";
 this.allow_login = true;
@@ -108,4 +111,5 @@ this.on_user_login = function (user) {
         user.force_skill.on_relive(user);
     }
 
+}
 }

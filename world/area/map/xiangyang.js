@@ -1,3 +1,7 @@
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
 this.inherits(AREA);
 this.set({
     id: "xiangyang",
@@ -163,4 +167,5 @@ this.query_actions = function (me) {
         actions.push(["systask xiangyang reward", "领取军功", "<hig>武神历" + UTIL.to_c(index) + "年蒙古大军久攻不下从襄阳城撤退，襄阳危机解除！郭大侠犒赏全军!</hig>"]);
     }
     return actions;
+}
 }

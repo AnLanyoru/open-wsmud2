@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "蒙面大盗",
     desc: "他是来劫镖的江洋大盗",
@@ -20,4 +23,5 @@ this.set({
 this.on_kill = function (me) {
 
 
+}
 }

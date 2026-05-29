@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     unit: "个",
     name: "鸟窝",
@@ -10,3 +14,4 @@ this.prop = {
     fy: 550,
     desc:"这件衣服的材料非常轻盈，却韧性十足，坚逾精钢"
 };
+}

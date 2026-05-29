@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "盘";
 this.name = "米饭";
 this.value = 200;
@@ -72,4 +75,5 @@ this.on_create = function (path, par) {
         this.distype = null;
     }
     this.value = this.grade * 1000;
+}
 }

@@ -1,3 +1,6 @@
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
 /**
  *
  * @authors kwer (kwer8080@foxmail.com)
@@ -14,3 +17,4 @@ this.exits = {
     // south : "xiangyang/jiedao",
     // north : "xiangyang/eastroad1",
 };
+}

@@ -1,3 +1,6 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "lockobj";
 this.allow_busy = true;
@@ -18,4 +21,5 @@ this.enter = function (me, objid) {
     obj.is_locked = true;
     me.send('<hic>设置' + obj.color_name + "为锁定状态，将禁止丢弃，贩卖，分解操作。</hic>\n");
     me.send(`{type:"dialog",dialog:"pack",id:"${obj.id}",locked:1}`);
+}
 }

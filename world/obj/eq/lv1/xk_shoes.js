@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "侠客靴",
     desc: "江湖中很流行的侠客侠女套装，这是其中一双靴子，可以看出做工很讲究，好看又实用。",
@@ -11,3 +15,4 @@ this.set({
         dex: 2
     }
 });
+}

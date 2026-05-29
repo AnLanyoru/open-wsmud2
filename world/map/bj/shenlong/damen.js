@@ -1,5 +1,6 @@
-﻿
+import { ROOM } from "../../../../os/room/room.js";
 
+export default function() {
 this.inherits(ROOM);
 this.name = "大门";
 this.desc = "这是间很大的竹屋。门外站着几个年轻弟子.再住北就是神龙教大厅, 隔得虽远, 却也可以听得到厅上众人齐声念颂之声。";
@@ -14,4 +15,5 @@ this.on_leave = function (me, dir) {
             return false;
         }
     }
+}
 }

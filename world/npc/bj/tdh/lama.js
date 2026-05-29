@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "喇嘛",
     desc: "这是一个高大喇嘛，两臂粗壮，膀阔腰圆，似乎不是中土人士。",
@@ -66,3 +69,4 @@ this.set_drop({
         obj: ["book/bc#mizongxinfa", "book/bc#dashouyin"],
         odds: 3000
     });
+}

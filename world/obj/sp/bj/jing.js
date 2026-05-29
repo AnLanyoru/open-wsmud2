@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "本",
     name: "四十二章经",
@@ -99,3 +102,4 @@ this.add_action("he", "兑换", function (me, par) {
         }
     }
 });
+}

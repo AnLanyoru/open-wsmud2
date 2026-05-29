@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "经验",
     desc: "你获得的经验，潜能",
@@ -9,4 +12,5 @@ this.set({
 this.on_receive = function (me) {
     if (!this.count) return false;
     me.add_exp(this.count, this.count);
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(AREA);
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+this.inherits(AREA);
 this.set({
     id: "yz",
     name: "扬州城",
@@ -54,3 +57,4 @@ this.actions = [
     ['goto kuang', '矿山', '扬州城的西面有座矿山，可以挖到珍惜的宝石'],
     ['goto bp', '帮派', '回到自己的帮派驻地'],
     ['pm list', '拍卖', '打开正在拍卖的道具列表']];
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "洗髓丹",
@@ -76,4 +79,5 @@ function checkResult(me, str) {
         me.notify("请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20");
         me.send_commands("quxiao", "取消使用");
     }
+}
 }

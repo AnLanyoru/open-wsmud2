@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "jinglian";
 this.regex = /^(\w+)(?:\s(\w+))?$/;
 this.enter = function (player, objid, isok) {
@@ -103,4 +107,5 @@ function query_level_color(lv) {
     var jlcolor = ["", "hig", "hig", "hic", "hic", "hiy", "hiy", "HIZ", "HIZ", "hio", "hio", "ord", "ord"];
     var cc = jlcolor[lv];
     return "<" + cc + ">＋" + lv + " </" + cc + ">";
+}
 }

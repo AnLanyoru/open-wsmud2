@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "tm";
 this.allow_busy = true;
 this.allow_state = true;
@@ -19,4 +23,5 @@ this.enter = function (me, str) {
     msg = UTIL.htmlEncode(UTIL.replace_word(str));
     me.send_team(JSON.stringify({ type: "msg", ch: "tm", content: msg, uid: me.id, name: me.name }));
     me.add_temp('chat2', 1, UTIL.diff_time());
+}
 }

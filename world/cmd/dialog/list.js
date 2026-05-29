@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "list";
 this.enter = function (me, arg) {
@@ -50,4 +52,5 @@ this.enter = function (me, arg) {
     str.push("\"}");
 
     me.send(str.join(""));
+}
 }

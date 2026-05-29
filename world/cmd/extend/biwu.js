@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const CHARACTER = globalThis.CHARACTER; const NPC = globalThis.NPC; const USER = globalThis.USER;
+this.inherits(COMMAND);
 this.command = "biwu";
 this.allow_busy = true;
 this.allow_state = true;
@@ -443,4 +447,5 @@ this.updatePlayerStats = function (player, sc, fam) {
 
 this.biwu_watch = function (me) {
 
+}
 }

@@ -1,3 +1,7 @@
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
 this.inherits(OBJ);
 this.set({
     name: "潜能",
@@ -14,3 +18,4 @@ this.on_use = function (me) {
 //     count = count ?? this.count;
 //     return UTIL.to_c(count) + "万点<hig>潜能</hig>";
 // }
+}

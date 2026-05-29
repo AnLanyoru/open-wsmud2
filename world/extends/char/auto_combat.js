@@ -1,3 +1,7 @@
+const SKILL = globalThis.SKILL;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+const CHARACTER = globalThis.CHARACTER;
+
 CHARACTER.prototype.reauto_attack = function () {
     if (!this.auto_pfm && this.fight_type) {
         if (this.attack_handler) clearTimeout(this.attack_handler);
@@ -193,3 +197,4 @@ CHARACTER.prototype.set_releasetime = function (rtime) {
         }
     }
 }
+export default function() {}

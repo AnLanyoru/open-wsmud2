@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "包",
     name: "鱼饵",
@@ -24,4 +27,5 @@ this.on_open = function (me) {
     ];
 
     return OBJ.create_by_odds(result);
+}
 }

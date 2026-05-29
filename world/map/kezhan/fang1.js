@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "人字号客房";
 this.desc = "这是客栈里的一间客房，房间不大，还算干净整洁，这里面很安静，你都听不到房间外面的声音。没有你的允许是没有人进来的，你在里面可以做任何事情，只要不打扰到别人。";
 this.exits = { "down": "yz/kedian" };
@@ -36,4 +39,5 @@ this.on_heart_beat = function () {
             return check_moveout(item);
         }
     }
+}
 }

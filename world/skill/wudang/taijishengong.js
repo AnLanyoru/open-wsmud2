@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "太极神功";
 this.id = "taijishengong";
 this.family = "武当派";
@@ -65,3 +69,4 @@ this.pfm = {
         }
     }
 };
+}

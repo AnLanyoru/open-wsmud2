@@ -1,3 +1,6 @@
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
 this.inherits(FAMILY);
 
 this.id = "HUASHAN";
@@ -88,3 +91,4 @@ this.boss_skills2 = [
 this.eqs = [
 
 ];
+}

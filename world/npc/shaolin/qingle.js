@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "清乐比丘",
     desc: "他是一位体格强健的壮年僧人，他身得虎背熊腰，全身似乎蕴含着无穷劲力。他身穿一袭白布黑边袈裟，似乎身怀武艺。",
@@ -35,4 +39,5 @@ this.skill_map(
 this.on_master = function (me) {
     if (me.gender == 2) return me.notify_fail("清乐比丘说道：阿弥陀佛，少林寺不收女弟子。");
     return true;
+}
 }

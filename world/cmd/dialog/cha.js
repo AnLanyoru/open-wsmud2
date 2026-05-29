@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
+this.inherits(COMMAND);
 this.command = "cha,skills";
 this.allow_busy = true;
 this.allow_state = true;
@@ -73,4 +77,5 @@ this.render_skill = function (me, target, isfollower) {
 
     str.push("}");
     me.send(str.join(""));
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(NPC);
 this.set({
     name: "",
     desc: "他是武道塔的神秘守护者",
@@ -89,3 +93,4 @@ this.skills_def = [
         ["xuantiejianfa", 5000, "sword"], ["qiankundanuoyi", 5000, "parry"], ["lingboweibu2", 5000, "dodge"],
     ]
 ];
+}

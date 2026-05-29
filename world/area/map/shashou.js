@@ -1,4 +1,7 @@
-﻿this.inherits(FAMILY_AREA);
+import { FAMILY_AREA } from "../../../os/room/fam_area.js";
+
+export default function() {
+this.inherits(FAMILY_AREA);
 this.set({
     id: "shashou",
     name: "杀手楼",
@@ -25,3 +28,4 @@ this.map = [
     { n: "休息室", id: "shaolin/banruo", p: [1, -3] },
     { n: "练功房", id: "shaolin/luohan", p: [1, -5] }
 ];
+}

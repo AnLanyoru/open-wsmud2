@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "碗";
 this.name = "米饭";
 this.value = 200;
@@ -64,4 +67,5 @@ this.on_create = function (path, par) {
         unit: "碗"
     }
     ][lv]);
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "千斤拳",
     desc: "据说有千斤重，拎上去确实有几分重量，形状奇特，边缘高低不平的裂齿",
@@ -12,3 +16,4 @@ this.set({
         str: 3
     }
 });
+}

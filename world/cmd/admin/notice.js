@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "notice";
 this.allow_busy = true;
 this.allow_state = true;
@@ -29,4 +33,5 @@ this.updatelast = function (me) {
    降低营地1刷新速度10秒，其他营地暂时关闭
     `;
     me.send(MESSAGE.NOTICES[MESSAGE.NOTICES.length - 1].content);
-} 
+}
+}

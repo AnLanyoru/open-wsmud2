@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "武林高手",
     desc: "他是一个武林高手，但是没人知道他的名字",
@@ -19,3 +22,4 @@ this.skill_map(
     ["sword", 100],
     ["blade", 100],
     ["unarmed", 100]);
+}

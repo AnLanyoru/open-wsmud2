@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const USERTASK = globalThis.USERTASK;
+this.inherits(NPC);
 this.set({
     name: "林震南",
     desc: "他就是「福威镖局」的总镖头－－林震南。",
@@ -25,4 +29,4 @@ this.add_action("ksyb", "雇佣镖师", function (me) {
 
     USERTASK.GET("yunbiao").quick_start(me);
 });
-
+}

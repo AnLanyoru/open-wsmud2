@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "caiyao";
 
 this.enter = function (me) {
@@ -101,4 +105,5 @@ function do_cai(me) {
         + WORLD.DATA.query_temp("caiyao_exp", 0);
     let pot = exp + me.query_prop('ly_qn');
     me.add_exp(exp, pot, 0);
+}
 }

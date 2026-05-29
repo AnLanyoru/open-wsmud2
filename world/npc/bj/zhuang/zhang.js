@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "章老三",
     desc: "这是一个神龙教弟子，一袭黑衣,混身透着一股邪气。",
@@ -38,3 +41,4 @@ this.set_drop({
     obj: ["book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"],
     odds: 3000
 });
+}

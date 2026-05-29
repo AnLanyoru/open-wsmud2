@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "actions";
 this.allow_busy = true;
 this.allow_state = true;
@@ -41,4 +44,5 @@ this.enter = function (me, type) {
     }
     str.push("]}");
     me.send(str.join(""));
+}
 }

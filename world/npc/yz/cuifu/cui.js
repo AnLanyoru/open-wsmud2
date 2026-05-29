@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "崔员外",
     desc: "崔府的主人，满脸肥肉，据说他鱼肉乡里，坏事做尽",
@@ -42,4 +45,5 @@ this.on_enter = function (target) {
         target.notify("崔员外扯着嗓子喊道：管家，管家，有人闯进来了。");
     }
 
+}
 }

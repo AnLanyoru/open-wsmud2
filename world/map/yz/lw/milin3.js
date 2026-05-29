@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const COMMAND = globalThis.COMMAND;
+this.inherits(ROOM);
 this.name = "密林深处"
 this.desc = "这里是密林的深处，楠木参天，浓阴蔽日，再往里就没有路走了，一只大狼懒洋洋的趴着，四周散落着不少乱七八糟的物件。";
 this.exits = { "east": "yz/lw/milin2" };
@@ -176,4 +180,5 @@ this.on_lwdie = function (me, t) {
     me.add_title('月夜之狼', 'zq');
     me.notify('<hig>恭喜你获得称号【月夜之狼】</hig>');
     WORLD.DATA.set_temp(type, 1, UTIL.diff_time());
+}
 }

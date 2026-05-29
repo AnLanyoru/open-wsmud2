@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "packitem";
 this.regex=/^(\w+)\s+(\w+)(?:\s+(\w+))?$/;
 this.enter = function (player,cmd, objid,par) {
@@ -10,4 +13,5 @@ this.enter = function (player,cmd, objid,par) {
     var act = obj.actions[cmd];
     if (!act || !act.action) return player.notify("你要对" + obj.color_name + "做什么？");
     act.action.call(obj, player, par);
+}
 }

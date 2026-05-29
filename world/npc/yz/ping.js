@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL; const SKILL = globalThis.SKILL;
+this.inherits(NPC);
 this.set({
     name: "平一指",
     desc: "他就是医术高超的「杀人神医」平一指。可是他性格古怪，不是什么人都医的。",
@@ -82,4 +86,5 @@ this.do_teach = function (me, skill, lv) {
         }
     }
     return true;
+}
 }

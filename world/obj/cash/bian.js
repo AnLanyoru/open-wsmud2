@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL;
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "变性丹",
@@ -68,4 +72,5 @@ this.on_use = function (me) {
         return false;
     }
 
+}
 }

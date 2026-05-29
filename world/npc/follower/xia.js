@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "夏雪宜",
     desc: "他就是人称“金蛇郎君”的一代怪杰——夏雪宜。",
@@ -26,4 +29,4 @@ this.skill_map(
     ["force", 600],
     ["sword", 600],
     ["unarmed", 600]);
-
+}

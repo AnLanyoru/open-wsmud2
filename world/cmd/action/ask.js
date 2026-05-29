@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL; const NPC = globalThis.NPC;
+this.inherits(COMMAND);
 this.command = "ask";
 this.regex = /^(\w+)\s+about\s+(.+)$/;
 this.enter = function (me, objid,par) {
@@ -68,3 +72,4 @@ NPC.prototype.on_ask = function (me, par) {
 //    default:
 //        return 0;
 //}
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     unit: "件",
     name: "粉红绸衫",
@@ -6,3 +10,4 @@ this.set({
     value: 0,
     eq_type: EQUIP_TYPE.CLOTH,
 });
+}

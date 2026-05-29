@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "小昭",
     desc: "她因年纪幼小，身材尚未长成，但更显得娇小玲珑、甜美可爱。",
@@ -32,4 +35,5 @@ this.on_master_enter = function (me) {
         else
             me.notify("小昭嘻嘻一笑，对你说道：" + me.name + "姐姐，你来啦。");
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "史青山",
     desc: "他就是扬州城的守备，曾经是武当山的俗家弟子，不知为何吃上了朝廷饭。",
@@ -73,4 +76,5 @@ function check_bing(me) {
             item.do_kill(me);
         }
     }, this.environment);
+}
 }

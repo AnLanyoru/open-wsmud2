@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const ROOM = globalThis.ROOM; const USER = globalThis.USER;
+this.inherits(COMMAND);
 this.command = "relive";
 this.allow_die = true;
 this.enter = function (me, arg) {
@@ -106,4 +110,5 @@ this.enter = function (me, arg) {
             me.remove_temp('fbbs');
         }
     }
+}
 }

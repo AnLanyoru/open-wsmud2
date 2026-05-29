@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.id = "throwing";
 this.name = "基本暗器";
 this.grade = 0;
@@ -10,4 +14,5 @@ this.attack_actions = [
 ];
 this.query_prop = function (lv) {
     return { mz: lv };
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "茅十八",
     desc: "他虬髯如乱草，满脸血污，好象曾受过很重的伤，可以看得见他左腿上血迹未干。但他双目炯炯，却又有着说不出的威风。",
@@ -86,4 +89,5 @@ function getAllFromMe(shi, items) {
             break;
         }
     }
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(COMMAND);
 this.command = "perform";
 this.allow_busy = true;
 this.allow_faint = true;
@@ -167,3 +171,4 @@ const WEAPON = {
 //     WHIP: "whip",
 //     THROWING: "throwing"
 // }
+}

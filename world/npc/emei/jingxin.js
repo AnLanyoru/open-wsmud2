@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "静心",
     desc: "她一位中年出家道姑，道冠高拢，慈眉善目",
@@ -36,4 +40,5 @@ this.on_master = function (me) {
     if (me.query_skill("emeixinfa", 0) < 100) return me.notify_fail("静心说道：你的峨眉心法掌握程度还不够，需要多加练习。");
     if (me.query_skill("jindingzhang", 0) < 100) return me.notify_fail("静心说道：你的金顶绵掌掌握程度还不够，需要多加练习。");
     return true;
+}
 }

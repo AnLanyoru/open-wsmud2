@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "仓库扩充石",
@@ -13,4 +16,5 @@ this.on_use = function (me) {
     me.max_store_count += size;
     me.notify('你的仓库容量扩充为' + me.max_store_count + "。");
     return true;
+}
 }

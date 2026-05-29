@@ -1,4 +1,7 @@
-﻿this.inherits(AREA);
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
+this.inherits(AREA);
 this.set({
     id: "lw",
     name: "树林",
@@ -30,4 +33,4 @@ this.drops = ["res/pimao1",
     "eq/lv0/shoes",
     "eq/lv0/duanyi",
     "book/book#dodge"];
-
+}

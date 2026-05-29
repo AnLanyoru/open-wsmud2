@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "温仪的香囊",
     desc: "金蛇郎君夏雪宜送给温仪的定情信物",
@@ -11,3 +15,4 @@ this.set({
         releasetime:1000,
     }
 });
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "朱雀之魂",
     desc: "传说为朱雀残魂所化，非金非石非木，隐隐有朱雀虚影，主毁灭，镇邪祟",
@@ -43,4 +46,5 @@ this.on_create = function (path, par) {
             this.desc += "\n暴击伤害：+3%\n命中：+300";
             break;
     }
+}
 }

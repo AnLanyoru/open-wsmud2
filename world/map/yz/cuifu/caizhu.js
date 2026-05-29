@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "大门"
 this.desc = "一座富丽堂皇的大宅院出现在你的眼前，两头高大的石狮子镇住了大门两侧，朱漆大门足足有三寸厚。门上挂着两个灯笼，写着“崔”字。崔家是当地首富，而且以蛮横著称。几条狼狗嚎叫着向你冲了过来。";
 this.exits = { "north": "yz/cuifu/dayuan" };
@@ -25,4 +28,5 @@ this.on_enter = function (me) {
         player.add_fbscore(20);
 
     }
+}
 }

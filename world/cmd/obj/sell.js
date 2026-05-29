@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "sell";
 this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
 this.enter = function (me, count, objid, to) {
@@ -101,4 +105,5 @@ this.enter = function (me, count, objid, to) {
     if (target && target.on_user_sell) {
         target.on_user_sell(me, obj, sell_count);
     }
+}
 }

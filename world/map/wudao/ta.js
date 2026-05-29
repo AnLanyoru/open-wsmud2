@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const NPC = globalThis.NPC; const USER = globalThis.USER; const USERTASK = globalThis.USERTASK; const COMMAND = globalThis.COMMAND;
+this.inherits(ROOM);
 this.name = "第一层"
 this.desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
 this.exits = { "up": "wudao/up", "out": "wudao/men" };
@@ -201,4 +205,5 @@ this.on_leave = function (me, dir) {
         if (npc) this.items.remove(npc);
         me.die = USER.prototype.die;
     }
+}
 }

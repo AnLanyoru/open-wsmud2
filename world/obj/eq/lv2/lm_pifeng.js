@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "龙纹披风",
     desc: "以黑龙皮膜制成，边缘缀着七枚龙鳞甲片，展开时如黑龙展翅。",
@@ -24,4 +28,5 @@ this.group_prop = function (count) {
             dazuo_per: 15
         };
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "店小二",
     desc: "这位店小二正笑咪咪地忙著，还不时拿起挂在脖子上的抹布擦脸。",
@@ -29,4 +32,5 @@ this.set_goods("food/food#0", "food/food#1", "food/food#2", "food/food#3", "food
 
 this.on_leave = function (me, dir) {
 
+}
 }

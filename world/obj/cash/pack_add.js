@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "颗",
     name: "背包扩充石",
@@ -13,4 +16,5 @@ this.on_use = function (me) {
     me.send('{"type":"dialog","dialog":"pack",max_item_count:' + me.max_item_count + '}');
     // me.notify('你的背包容量扩充为' + me.max_item_count + "。");
     return true;
+}
 }

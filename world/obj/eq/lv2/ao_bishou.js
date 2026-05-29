@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "鳌拜匕首",
     desc: "这是鳌拜收藏的一把匕首，剑身如墨，无半点光泽。",
@@ -14,3 +18,4 @@ this.set({
         add_sh_per:2
     }
 });
+}

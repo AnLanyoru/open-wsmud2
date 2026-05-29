@@ -1,3 +1,6 @@
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
 this.inherits(OBJ);
 this.set({
     name: "夜明珠",
@@ -7,3 +10,4 @@ this.set({
     grade: 3
 });
 this.transable = true;
+}

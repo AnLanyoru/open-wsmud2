@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "give";
 this.regex = /^(\w+)(?:\s+(\w+))?\s+(\w+)$/;
 this.enter = function (player, target, count, objid) {
@@ -60,4 +64,5 @@ this.enter = function (player, target, count, objid) {
             player.send_room("$N给了$n" + UTIL.to_c(count) + obj.unit + obj.color_name + "。", target);
         }
     }
+}
 }

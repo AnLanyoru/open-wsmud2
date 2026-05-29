@@ -1,4 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
 
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "info";
 this.allow_busy = true;
@@ -66,4 +69,5 @@ this.query_ymcount = function (me) {
     if (!sm) return 0;
     sm = Math.floor((Date.now() - sm * 100000) / 3600000);
     return Math.min(sm, 60);
+}
 }

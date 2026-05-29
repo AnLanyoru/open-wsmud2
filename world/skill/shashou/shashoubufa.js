@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "杀手步法";
 this.id = "shashoubufa";
 this.grade = 1;
@@ -28,4 +32,5 @@ this.query_enable_prop = function (lv) {
             ds: parseInt(lv ) + 100
         }
     };
+}
 }

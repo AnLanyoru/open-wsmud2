@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "金蛇披风",
     desc: "一件暗金色的披风，",
@@ -12,3 +16,4 @@ this.set({
         max_hp: 300
     }
 });
+}

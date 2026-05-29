@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.id = "unarmed";
 this.name = "基本拳脚";
 this.type = SKILL_TYPES.BASE;
@@ -33,3 +37,4 @@ this.set_pfm("zhong", {
     }
 });
 this.query_prop = lv => ({ str: parseInt(lv / 10) });
+}

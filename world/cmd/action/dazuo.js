@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(COMMAND);
 this.command = "dazuo";
 this.enter = function (me) {
     if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
@@ -90,4 +94,5 @@ function count_speed(me) {
         exp += Math.min(time, prop);
     }
     return exp;
+}
 }

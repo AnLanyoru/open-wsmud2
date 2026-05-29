@@ -1,3 +1,6 @@
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+const CHARACTER = globalThis.CHARACTER;
+
 
 CHARACTER.prototype.recount = function () {
 
@@ -380,3 +383,4 @@ function damage_msg(damage, type, ob, iscrit, msg) {
             return "<wht>结果造成" + sh + "。</wht>";
     }
 }
+export default function() {}

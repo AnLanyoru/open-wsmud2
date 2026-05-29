@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const SKILL = globalThis.SKILL;
+this.inherits(OBJ);
 this.set({
     unit: "张",
     name: "叛师符",
@@ -91,4 +95,5 @@ this.on_use = function (me) {
         return false;
     }
 
+}
 }

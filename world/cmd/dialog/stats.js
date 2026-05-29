@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const EQUIP_TYPE = globalThis.EQUIP_TYPE;
 this.inherits(COMMAND);
 this.command = "stats";
 this.allow_busy = true;
@@ -416,3 +419,4 @@ UserStats.prototype.queue = function (me) {
 //        result.length = this.maxCount;
 //    }
 //}
+}

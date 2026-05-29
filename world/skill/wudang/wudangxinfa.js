@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "武当心法";
 this.id = "wudangxinfa";
 this.grade = 1;
@@ -23,3 +27,4 @@ this.learn_condition = {
         force: 50
     }
 };
+}

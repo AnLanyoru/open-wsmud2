@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "擂台"
 this.desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
 this.exits = {};
@@ -67,4 +71,5 @@ this.on_leave = function (me, dir) {
     //     return me.notify_fail("你比试完才可以下擂台。");
     // }
     return me.notify_fail("你比试完才可以下擂台。");
+}
 }

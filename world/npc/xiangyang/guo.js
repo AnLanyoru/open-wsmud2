@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "郭靖",
     desc: "被尊为“天下第一侠士”,率领群雄守护着南宋襄阳城的前线边境",
@@ -49,4 +52,5 @@ this.query_commands = function (player) {
 
     this.json = JSON.stringify(json)
     return this.json;
+}
 }

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "高根明",
     desc: "高根明是岳不群的第五位弟子",
@@ -34,4 +38,5 @@ this.skill_map(
 
 this.on_master = function (me) {
     return true;
+}
 }

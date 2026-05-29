@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "东厢"
 this.desc = "这是一个昏暗的房间，窗户都被钉死。地上放着皮鞭、木棍等刑具，显然这是财主私立公堂，折磨仆人、丫鬟的所在。一个丫鬟被绳子绑着，浑身赤裸跪在地上哭哭啼啼，身上是一道道的伤口。墙角有个<cmd cmd='look gui'>柜子</cmd>，好像放了不少东西。";
 this.exits = {  "west": "yz/cuifu/houyuan" };
@@ -22,3 +25,4 @@ this.set_item("gui", "柜子", "一个黑乎乎的柜子，里面不知道放了
         return true;
     }
 ]]);
+}

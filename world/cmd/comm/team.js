@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "team";
 this.allow_busy = true;
 this.allow_state = true;
@@ -230,5 +234,4 @@ function checkTeamfb(me) {
         me.notify("<hic>你退出了队伍，自动离开副本。</hic>");
     }
 }
-
-
+}

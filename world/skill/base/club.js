@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.id = "club";
 this.name = "基本棍法";
 this.grade = 0;
@@ -10,4 +14,5 @@ this.set_default(this.id);
 this.desc = "棍法类技能的基础功法，坚持锻炼会增加你的招架能力";
 this.query_prop = function (lv) {
     return { zj: lv  };
+}
 }

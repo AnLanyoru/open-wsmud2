@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "何小二",
     desc: "他是杀手楼的弟子，负责新入门的杀手训练",
@@ -35,3 +39,4 @@ this.set_chat_msg([
     "",
     ""
 ]);
+}

@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(NPC);
 this.set({
     name: "拍卖师",
     desc: "他是藏宝阁里负责拍卖的拍卖师",
@@ -20,3 +24,4 @@ this.set_chat_msg([
 this.add_action("spm", "拍卖物品", function (me, par) {
     WORLD.COMMANDS['pm'].enter(me, 'list');
 });
+}

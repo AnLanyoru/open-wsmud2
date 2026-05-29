@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(COMMAND);
 this.command = "xue";
 this.allow_state = true;
 this.allow_fight = false;
@@ -276,4 +280,5 @@ function count_speed(me) {
             + WORLD.DATA.query_temp("study_per", 0) + me.int) / 100) * 3;
 
     return pot;
+}
 }

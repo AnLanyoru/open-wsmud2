@@ -1,4 +1,7 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+this.inherits(SKILL);
 this.name = "云龙身法";
 this.id = "yunlongshenfa";
 this.grade = 1;
@@ -31,4 +34,5 @@ this.query_enable_prop = function (lv) {
             ds: lv + 20
         }
     };
+}
 }

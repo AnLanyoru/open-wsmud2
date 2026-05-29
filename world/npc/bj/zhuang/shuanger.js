@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "双儿",
     desc: "她是一个十分清秀的少女,大约十四五岁年纪，一张雪白的脸庞,眉弯嘴小,笑靥如花,正笑嘻嘻地看着你。",
@@ -51,3 +54,4 @@ this.set_ask("跟我走吧", function (me) {
         me.notify("双儿睁大眼睛看着你说道：不行的,夫人没有同意。");
     }
 });
+}

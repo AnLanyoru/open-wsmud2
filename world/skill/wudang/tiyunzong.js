@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "梯云纵";
 this.id = "tiyunzong";
 this.family = FAMILIES.WUDANG;
@@ -46,4 +50,5 @@ this.on_dodge_over = function (me, target, par) {
         });
         me.set_temp("tiyunzong", 1, me.random(8000) + lv);
     }
+}
 }

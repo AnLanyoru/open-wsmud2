@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "小师妹",
     desc: "她是宗门里最小的师妹，长得是娇柔可爱",
@@ -32,4 +35,5 @@ this.on_master_enter = function (me) {
     if (this.random(3) == 1) {
         me.notify("小师妹朝你微微一笑。");
     }
+}
 }

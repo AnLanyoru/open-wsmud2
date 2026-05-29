@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const EVENTS = globalThis.EVENTS;
 this.inherits(COMMAND);
 this.command = "sx";
 this.allow_busy = true;
@@ -218,4 +222,5 @@ this.manage_battle2 = function (me, par2) {
             me.do_command('goto', 'fam3');
         }
     });
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "金雕",
     desc: "一只大金雕，正立在树枝上仰视长天。",
@@ -22,4 +25,5 @@ this.set_drop({
 this.on_enter = function (me) {
     me.notify("一只迅猛的金雕朝你俯冲过来。");
     this.do_kill(me);
+}
 }

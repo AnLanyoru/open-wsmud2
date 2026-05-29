@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
+this.inherits(OBJ);
 this.set({
     unit: "份",
     name: "秘籍碎片",
@@ -25,3 +29,4 @@ this.on_create = function (path, par) {
 
 }
 const COMBINED = [10, 10, 30, 50, 100, 200, 500];
+}

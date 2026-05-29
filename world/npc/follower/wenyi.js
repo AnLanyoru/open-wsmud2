@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "温仪",
     desc: "这是一个美如天仙的女子，眉宇间却是仿佛隐藏着深忧。",
@@ -29,4 +32,5 @@ this.on_master_enter = function (me) {
     if (this.random(3) == 1) {
        
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "镖头",
     desc: "福威镖局的镖头",
@@ -15,3 +18,4 @@ this.skill_map(
         ["dodge", 150],
         ["force", 150]);
         this.set_objects(["eq/lv0/cloth", 1, 1], ["eq/lv0/jian", 1, 1]);
+}

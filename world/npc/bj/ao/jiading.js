@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "家将",
     desc: "鳌拜府上的家将，看上去有两下子",
@@ -35,3 +38,4 @@ this.set_drop({
     obj: ["book/bc#juemengun"],
     odds: 3000
 });
+}

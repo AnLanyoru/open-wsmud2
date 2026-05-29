@@ -1,4 +1,7 @@
-﻿
+import { USERTASK } from "../../os/task/playertask.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(USERTASK);
 this.id = "growup";
 this.sort = 1;
@@ -166,3 +169,4 @@ const temps = [
     }
 
 ];
+}

@@ -1,4 +1,7 @@
-﻿
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
 this.inherits(SKILL);
 this.id = "parry";
 this.name = "基本招架";
@@ -22,3 +25,4 @@ this.unarmed_vs_weapon_actions =[
 this.desc = "招架类技能的基础功法，坚持锻炼会提高你的招架能力";
 this.query_prop = lv => ({ zj: lv });
 this.set_default(this.id);
+}

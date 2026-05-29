@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "fenpei";
 this.allow_fight = false;
 this.enter = function (me) {
@@ -48,4 +51,5 @@ function checkResult(me, str) {
         me.wait_input = readnumber;
         me.notify("请说出你要增加的先天属性(臂力 根骨 身法 悟性)，总计" + fen +"，比如:10 0 0 10");
     }
+}
 }

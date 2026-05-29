@@ -1,4 +1,6 @@
-﻿
+import { AREA } from "../../../os/room/area.js";
+
+export default function() {
 this.inherits(AREA);
 this.set({
     name: "新手",
@@ -11,3 +13,4 @@ this.map = [{ n: "训练室", id: "new/new1", p: [0, 0], exits: ["e"] },
             { n: "训练室", id: "new/new2", p: [1, 0] },
             { n: "训练室", id: "new/new3", p: [1, 1], exits: ["n"] },
 ];
+}

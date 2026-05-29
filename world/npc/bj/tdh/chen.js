@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "陈近南",
     desc: "这是一个文士打扮的中年书生，神色和蔼。他就是天下闻名的天地会总舵主陈近南，据说十八般武艺，样样精通。偶尔向这边看过来，顿觉他目光如电，英气逼人。",
@@ -40,3 +43,4 @@ this.set_drop({
     obj: ["eq/lv2/yunlongjian"],
     odds: 1000
 });
+}

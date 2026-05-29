@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "守卫",
     desc: "襄阳城的守卫者，常年驻守襄阳，勇猛异常",
@@ -40,4 +43,5 @@ this.on_die = function (me) {
         me.add_temp('jg', -300);
         me.notify('<red>你击杀了襄阳守军，军功减少300。</red>');
     }
+}
 }

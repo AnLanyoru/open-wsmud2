@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "东北虎",
     desc:"一只矫捷的斑斓猛虎，形体巨大，状极威猛，雄伟极了",
@@ -21,4 +24,5 @@ this.set_drop({
 this.on_enter = function(me) {
     me.notify("一只凶猛的东北虎朝你扑了过来。");
     this.do_kill(me);
+}
 }

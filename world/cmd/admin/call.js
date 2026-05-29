@@ -1,3 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "call";
 this.allow_busy = true;
@@ -15,10 +19,10 @@ this.enter = function (me, target, arg) {
             if (!player) return me.notify("没有这个玩家");
         }
         func.call(player);
-        //me.recount();
         me.notify("ok");
     } catch (e) {
         console.log(e);
         me.notify("error:" + e);
     }
+}
 }

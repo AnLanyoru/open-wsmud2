@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "张",
     name: "技能重置卡",
@@ -12,4 +15,5 @@ this.on_use = function (me) {
 
     me.send('请从技能列表选择遗忘技能，然后选择使用重置卡，将会重置你的某项技能。');
     return false;
+}
 }

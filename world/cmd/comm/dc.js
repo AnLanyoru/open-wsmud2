@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "dc";
 this.regex = /(\w+)\s+(\w+)\s*(.+)?/;
@@ -48,3 +50,4 @@ const ALLOW_DC = {
     lingwu3: true,
     fenjie: true
 };
+}

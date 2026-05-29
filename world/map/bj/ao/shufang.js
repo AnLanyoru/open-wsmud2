@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "书房"
 this.desc = "这里是鳌拜书房，却没有一本书。各种古玩琳琅满目，商周青铜、汉瓦当、唐三彩，珍珠宝石，应有尽有，只要拥有一件，就够你吃一辈子了。北面墙上有一副<cmd cmd='look hua'> 画(hua) </cmd>。书桌上有一本<cmd cmd='look shu'> 书(shu) </cmd>。";
 this.exits = { "south": "bj/ao/houyuan" };
@@ -35,4 +38,5 @@ function open_door(dir, me) {
         me.set_temp("fb/ao/tui", 1);
         me.add_fbscore(10);
     }
+}
 }

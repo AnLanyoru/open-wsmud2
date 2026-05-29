@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+    const OBJ = globalThis.OBJ;
+this.inherits(NPC);
 this.set({
     name: "庄允城",
     desc: "这是个饱读诗书，却手无搏鸡之力的书生。因编辑‘明史辑略’，被吴之荣告发，全家逮入京中。",
@@ -50,3 +54,4 @@ this.set_ask("吴之荣", function (me) {
 
 
 });
+}

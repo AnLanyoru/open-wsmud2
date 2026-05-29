@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "崔莺莺",
     desc: "她长得极美，尤其是那对眼睛，媚得直可以勾人魂魄。",
@@ -31,3 +34,4 @@ this.set_ask("东厢", function (me) {
     }
     return false;
 });
+}

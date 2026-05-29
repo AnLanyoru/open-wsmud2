@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(COMMAND);
 this.command = "shortcut";
 this.allow_busy = true;
 this.allow_state = true;
@@ -27,4 +31,5 @@ this.enter = function (player, arg) {
         player.send("{type:'addAction',id:'" + obj.id + "',name:'" + obj.name + "'}");
        
     }
+}
 }

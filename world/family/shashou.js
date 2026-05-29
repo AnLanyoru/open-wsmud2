@@ -1,4 +1,7 @@
-﻿this.inherits(FAMILY);
+import { FAMILY } from "../../os/skill/family.js";
+
+export default function() {
+this.inherits(FAMILY);
 
 this.id = "SHASHOU";
 this.boss_path = "shashou/wu";
@@ -105,3 +108,4 @@ this.boss_skills = [
     ["taijishengong2", 800, "force"],
     ["tiyunzong2", 800, "dodge"],
     ["taijiquan3", 5000, ["unarmed", "parry"]]];
+}

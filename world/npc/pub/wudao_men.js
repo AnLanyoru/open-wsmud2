@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "守门人",
     desc: "他是武道塔的守门人，一个神神秘秘的老头",
@@ -30,3 +33,4 @@ this.set({
     }
 
 });
+}

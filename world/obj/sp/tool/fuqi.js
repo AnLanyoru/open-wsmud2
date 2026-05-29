@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "休书",
     desc: "这是一封休书",
@@ -32,4 +35,5 @@ this.on_receive = function (me) {
         me.add_title("", "mar");
         me.set_temp("marry_leave", 1, 7 * 24 * 3600000);
     }
+}
 }

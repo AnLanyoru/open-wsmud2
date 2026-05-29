@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "流氓鞋",
     desc: "这是一件褐色的皮靴，看上去叼叼的，虽然有些非主流",
@@ -11,3 +15,4 @@ this.set({
         dex: 1
     }
 });
+}

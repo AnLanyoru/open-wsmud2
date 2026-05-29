@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "look,l";
 this.allow_busy = true;
 this.allow_state = true;
@@ -95,4 +98,4 @@ this.obs = function (me, target) {
 }
 const PROPS1 = ['hp', 'mp', 'gj', 'fy', 'mz', 'ds', 'zj'];
 const PROPS2 = ['气血', '内力', '攻击', '防御', '命中', '躲闪', '招架'];
-
+}

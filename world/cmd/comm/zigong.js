@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+this.inherits(COMMAND);
 this.command = "zigong";
 this.enter = function (me, arg) {
     if (me.gender == 2) return me.notify("你要割什么？");
@@ -47,4 +51,5 @@ this.enter = function (me, arg) {
         me.send_commands("zigong ok","确认不要了");
     }
 
+}
 }

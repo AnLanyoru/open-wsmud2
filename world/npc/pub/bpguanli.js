@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(NPC);
 this.set({
     name: "帮会管理员",
     desc: "他是帮会方面的管理员",
@@ -74,3 +78,4 @@ this.add_action("jrfb", "进入副本区域", function (me, par) {
 
     WORLD.COMMANDS['party'].enter(me, 'enter');
 });
+}

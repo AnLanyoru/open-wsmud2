@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
+this.inherits(ROOM);
 this.name = "小路"
 this.desc = "你走在一条小路上。前面道路崎岖，行人很少。往南有条小路通往城内。";
 this.exits = { "north": "bj/zhuang/xiaolu2"};
@@ -29,3 +33,4 @@ this.add_action('lkfb', null, function (me, par) {
     }
 
 });
+}

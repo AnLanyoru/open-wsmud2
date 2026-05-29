@@ -1,4 +1,7 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+this.inherits(COMMAND);
 this.command = "escape";
 this.enter = function (me) {
 
@@ -6,4 +9,5 @@ this.enter = function (me) {
         return me.notify("你现在没有在战斗，逃跑干嘛？");
     }
     me.do_escape();
+}
 }

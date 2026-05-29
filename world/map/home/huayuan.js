@@ -1,4 +1,7 @@
-﻿
+import { ROOM } from "../../../os/room/room.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(ROOM);
 this.name = "小花园"
 this.no_fight = true;
@@ -34,3 +37,4 @@ this.add_action("xkwk", "挖矿", function (me) {
 this.add_action("cai", "采药", function (me) {
     return WORLD.COMMANDS['caiyao'].enter(me);
 });
+}

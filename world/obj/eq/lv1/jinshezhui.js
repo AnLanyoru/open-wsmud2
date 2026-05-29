@@ -1,4 +1,8 @@
-﻿this.inherits(EQUIPMENT);
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+
+export default function() {
+    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+this.inherits(EQUIPMENT);
 this.set({
     name: "金蛇锥",
     desc: "金蛇郎君的独门暗器，形状奇特",
@@ -11,3 +15,4 @@ this.set({
         mz:5
     }
 });
+}

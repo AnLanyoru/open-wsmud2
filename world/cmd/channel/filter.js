@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const UTIL = globalThis.UTIL;
+this.inherits(COMMAND);
 this.command = "filter";
 this.enter = function (me, str) {
 
@@ -419,3 +423,4 @@ for (var i = 0; i < workds.length; i++) {
     workds[i] = new RegExp(workds[i]);
 }
 UTIL.workds_regex = workds;
+}

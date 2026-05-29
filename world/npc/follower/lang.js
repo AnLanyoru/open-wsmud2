@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "<wht>浪翻云</wht>",
     desc: "他身形雄伟，面貌粗犷豪雄，脸目丑陋，一对黄睛似醒还醉",
@@ -25,3 +28,4 @@ this.skill_map(
     ["sword", 5000],
     ["literate", 5000]
 );
+}

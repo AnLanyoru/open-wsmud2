@@ -1,4 +1,7 @@
-﻿this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
+this.inherits(MONSTER);
 this.set({
     name: "大狼狗",
     desc: "一只昂首挺胸，吐着长舌头的大狼狗。像是财主家里养的宠物。",
@@ -19,4 +22,5 @@ this.set_drop({
 });
 this.on_enter = function (me) {
     this.do_kill(me);
+}
 }

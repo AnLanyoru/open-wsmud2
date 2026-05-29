@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "青青",
     desc: "她是一个梳着高髻，身着羽衣的绝色美人，如同壁画上的仙子。",
@@ -23,3 +26,4 @@ this.skill_map(
     ["unarmed", 300],
     ["sword", 300],
     ["literate", 3000]);
+}

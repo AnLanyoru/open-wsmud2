@@ -1,4 +1,8 @@
-﻿this.inherits(CONTAINER);
+import { CONTAINER } from "../../../os/item/container.js";
+
+export default function() {
+    const OBJ = globalThis.OBJ;
+this.inherits(CONTAINER);
 this.set({
     name: "餐桌",
     desc: "这是醉仙楼的宴席桌子，上面放满了各种好吃的。",
@@ -16,4 +20,5 @@ this.query_items = function (me) {
 }
 this.clear_items = function (me) {
     me.set_temp("get_dest", 1, 3600000 * 48);
+}
 }

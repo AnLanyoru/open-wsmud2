@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "武馆教习",
     desc: "一个高大威猛的汉子，负责教导武馆新人基本功法",
@@ -53,3 +57,4 @@ this.on_accept = function (me, obj, count) {
 //     if (me.family != FAMILIES.NONE) return me.notify("武馆教习对你说道：你还是去找自己的师门看看吧。");
 //     me.do_command("task", "sm " + this.id);
 // });
+}

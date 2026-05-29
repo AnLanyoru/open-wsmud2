@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+this.inherits(ROOM);
 this.name = "后院"
 this.desc = "这里是鳌府后院，中心是一个大花园。西边一条长廊走道直通往鳌拜的卧房，有几个官兵把守。北边是书房。南边是鳌拜私设的牢房, <cmd cmd='look men'>牢门(men)</cmd>是锁着的。";
 this.exits = { "west": "bj/ao/woshi", east:"bj/ao/dayuan","north":"bj/ao/shufang" };
@@ -17,4 +20,4 @@ this.set_item("men", "铁门", "这是一扇很结实的铁门。", [
     }]
 ]);
 this.set_npc("bj/ao/guanjia", ["bj/ao/jiading", 2]);
-
+}

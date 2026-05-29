@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "鲁有脚",
     desc: "丐帮长老，在丐帮中有仁有义，行事光明磊落，深得洪七公的器重。",
@@ -38,4 +42,5 @@ this.on_master = function (me) {
     if (me.query_skill("huntianqigong", 0) < 300 && me.query_skill("huntianqigong2", 0) < 300) return me.notify_fail("鲁有脚说道：你的混天气功掌握程度还不够，需要多加练习。");
 
     return true;
+}
 }

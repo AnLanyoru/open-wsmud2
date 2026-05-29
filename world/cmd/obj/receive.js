@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
+this.inherits(COMMAND);
 this.command = "receive";
 this.allow_busy = true;
 this.allow_state = true;
@@ -79,4 +83,5 @@ this.receive_all = function (me) {
     if (count > 0)
         return me.send('领取完毕，共收取' + count + '条消息的附件。');
     return me.send('没有可领取的消息。');
+}
 }

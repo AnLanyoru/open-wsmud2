@@ -1,4 +1,6 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
 this.inherits(COMMAND);
 this.command = "reward";
 this.allow_busy = true;
@@ -62,4 +64,4 @@ this.score = [
 for (let i = 0; i < 20; i++) {
     this.score[i] = "每天获得潜能：" + (20 - i) * 1000;
 }
-
+}

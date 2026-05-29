@@ -1,4 +1,7 @@
+import { COMMAND } from "../../../os/command.js";
 
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "skgroup";
 this.allow_fight = false;
@@ -56,4 +59,5 @@ this.save_eqgroup = function (me, index) {
         }
     }
     me.sk_groups[index] = eqs;
+}
 }

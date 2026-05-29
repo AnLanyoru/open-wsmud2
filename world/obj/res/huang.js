@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const ROOM = globalThis.ROOM;
+this.inherits(OBJ);
 this.set({
     name: "雄黄",
     desc: "一块雄黄，驱蛇效果俱佳",
@@ -29,4 +33,5 @@ this.on_use = function (me) {
         list[i].moveto(ROOM.Get(exits.random()).query_copy2(me), '毒蛇被熏的四散逃去。');
     }
 
+}
 }

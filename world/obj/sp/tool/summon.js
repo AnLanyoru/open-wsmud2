@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+    const NPC = globalThis.NPC; const TASK = globalThis.TASK;
+this.inherits(OBJ);
 this.set({
     unit: "块",
     name: "召唤令",
@@ -19,4 +23,5 @@ this.on_disappear = function (boss) {
     if (boss.environment) {
         boss.destroy(boss.name+"走了。");
     }
+}
 }

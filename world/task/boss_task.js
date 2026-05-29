@@ -1,4 +1,7 @@
-﻿
+import { TASK } from "../../os/task/task.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const NPC = globalThis.NPC; const ROOM = globalThis.ROOM; const EVENTS = globalThis.EVENTS;
 this.inherits(TASK);
 this.id = "boss";
 const BOSSTASK = this;
@@ -279,3 +282,4 @@ this.boss_min_fb = [
 this.paths = [
     "yz/lm/zhao", "bj/ao/aobai", "bj/tdh/chen", "bj/shenlong/hong"
 ];
+}

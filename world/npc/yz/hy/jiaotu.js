@@ -1,3 +1,7 @@
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+    const ROOM = globalThis.ROOM; const CORPSE = globalThis.CORPSE;
 this.inherits(NPC);
 this.set({
     name: "黑鹰教徒",
@@ -104,3 +108,4 @@ this.set_drop({
     min: 1,
     max: 3
 });
+}

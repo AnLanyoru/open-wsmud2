@@ -1,4 +1,8 @@
-﻿this.inherits(ROOM);
+import { ROOM } from "../../../../os/room/room.js";
+
+export default function() {
+    const OBJ = globalThis.OBJ;
+this.inherits(ROOM);
 this.name = "侧厅";
 
 this.desc = "这里是侧厅，靠墙是一排书架，摆满了各种拳谱、书籍。墙角有一张木床。天地会总舵主陈近南常常在这里读书、休息。";
@@ -14,3 +18,4 @@ this.items = OBJ.create_by_odds([
        odds: 4000
     }
 ]);
+}

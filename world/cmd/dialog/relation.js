@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const FOLLOWER = globalThis.FOLLOWER;
+this.inherits(COMMAND);
 this.command = "relation";
 this.allow_busy = true;
 this.allow_state = true;
@@ -91,4 +95,5 @@ this.enter = function (me, arg) {
 
     str.push("}");
     me.send(str.join(""));
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "粒",
     name: "聚气丹",
@@ -58,4 +61,5 @@ this.on_create = function (path, par) {
             this.desc = "江湖中各大门派用来给入门弟子快速增加内力的丹药，使用后增加最大内力10，不超过内力上限。";
             break;
     }
+}
 }

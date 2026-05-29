@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "庄夫人",
     desc: "只见她约莫二十六七年纪,全身缟素,不施脂粉,脸色苍白",
@@ -60,4 +63,5 @@ this.on_accept = function (me, obj, count) {
         }
         return true;
     }
+}
 }

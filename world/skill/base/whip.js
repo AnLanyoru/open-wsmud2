@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(SKILL);
 this.id = "whip";
 this.name = "基本鞭法";
 this.grade = 0;
@@ -11,4 +15,5 @@ this.desc = "鞭法类技能的基础功法，坚持锻炼会磨练你的技巧�
 
 this.query_prop = function (lv) {
     return { mz: lv };
+}
 }

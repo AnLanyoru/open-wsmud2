@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD;
 this.inherits(COMMAND);
 this.command = "tasks";
 this.allow_busy = true;
@@ -22,4 +25,5 @@ this.enter = function (me, arg) {
         });
     }
     me.notify( JSON.stringify(obj));
+}
 }

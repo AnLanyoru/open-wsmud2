@@ -1,4 +1,8 @@
-﻿this.inherits(SKILL);
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(SKILL);
 this.name = "毒蛇攻击";
 this.id = "dushegongji";
 this.grade = 1;
@@ -42,4 +46,5 @@ this.on_attack_over = function (me, target, par) {
         }
     }
 
+}
 }

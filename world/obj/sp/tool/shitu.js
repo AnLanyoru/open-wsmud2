@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "师徒关系解除通知",
     desc: "",
@@ -29,4 +32,5 @@ this.on_receive = function (me) {
         me.notify("你和" + name + "的师徒关系自动解除了。");
         me.set_temp("st_leave", 1, 3600000 * 24 * 7);
     }  
+}
 }

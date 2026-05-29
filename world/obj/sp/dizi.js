@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(OBJ);
 this.set({
     unit: "个",
     name: "首席弟子称号",
@@ -14,4 +18,5 @@ this.on_receive = function (me) {
     if (!this.family || !this.family.top_name) return;
     me.add_title(this.family.top_name,"family");
     me.notify("<hig>你获得了称号：" + this.family.top_name +"</hig>。");
+}
 }

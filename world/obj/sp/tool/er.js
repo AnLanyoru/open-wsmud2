@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "个",
     name: "鱼饵",
@@ -36,4 +39,5 @@ this.on_create = function (path, par) {
             this.consume = 10000;
             break;
     }
+}
 }

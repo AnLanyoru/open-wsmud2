@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "蒙哥",
     desc: "蒙古国的大汉，拖雷长子，率领蒙古大军南征北战，屡立战功",
@@ -29,5 +32,4 @@ this.skill_map(
     ["mengguqiangfa", 2000, ["club", "parry"]],
     ["longxianggong", 2000, ["unarmed", "force"]],
     ["feiyanzoubi", 2000, "dodge"]);
-
-
+}

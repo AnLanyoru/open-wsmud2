@@ -1,4 +1,8 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const SKILL = globalThis.SKILL;
+this.inherits(OBJ);
 this.set({
     unit: "张",
     name: "改名符",
@@ -94,4 +98,5 @@ async function update_name(me, name, obj) {
         }
     }
 
+}
 }

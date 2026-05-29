@@ -1,3 +1,6 @@
+import { MONSTER } from "../../../../os/char/monster.js";
+
+export default function() {
 this.inherits(MONSTER);
 this.name = "石甲蝎";
 this.desc = "通体青黑如岩石，甲壳上布满尖刺，尾钩泛着幽蓝毒光。";
@@ -37,4 +40,5 @@ this.on_enter = function (me) {
     if (me.is_player && !this.fight_type) {
         this.do_kill(me);
     }
+}
 }

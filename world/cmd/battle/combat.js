@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const SKILL = globalThis.SKILL; const WEAPON_TYPE = globalThis.WEAPON_TYPE; const USER = globalThis.USER;
+this.inherits(COMMAND);
 this.command = "combat";
 this.allow_busy = true;
 this.allow_state = true;
@@ -51,3 +55,4 @@ this.enter = function (me, type) {
 //    this.pfm_json = JSON.stringify(obj)
 //    return this.pfm_json;
 //}
+}

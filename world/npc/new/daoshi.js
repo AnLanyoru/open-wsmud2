@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "<hic>指引者</hic>",
     desc: "她是一位漂亮的女性，脸上笑眯眯的",
@@ -40,4 +43,5 @@ this.query_commands_json = function (player, isyb) {
         }
     }
     return JSON.stringify(json);
+}
 }

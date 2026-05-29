@@ -1,4 +1,8 @@
-﻿this.inherits(COMMAND);
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
+this.inherits(COMMAND);
 this.command = "lianxi";
 this.allow_fight = false;
 this.regex = /^(\w+)(?:\s+(\d+))?$/;
@@ -185,4 +189,5 @@ function count_speed(me) {
 
 
     return pot;
+}
 }

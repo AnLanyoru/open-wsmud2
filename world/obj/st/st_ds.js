@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "青龙之魂",
     desc: "传说为青龙残魂所化，非金非石非木，隐隐有青龙虚影，主统御，镇八荒",
@@ -43,4 +46,5 @@ this.on_create = function (path, par) {
             this.desc += "\n躲闪：+500\n招架：+500";
             break;
     }
+}
 }

@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     name: "天师符",
     desc: "使用后可使你原地复活",
@@ -7,3 +10,4 @@ this.set({
     value: 50000,
     grade: 3
 });
+}

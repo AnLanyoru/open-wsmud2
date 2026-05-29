@@ -1,3 +1,6 @@
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;
+
 
 const STATS = WORLD.STATS;
 const DATA = WORLD.DATA;
@@ -113,3 +116,4 @@ DATA.reset_famtops = function (me, fam) {
     }
 
 }
+export default function() {}

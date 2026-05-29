@@ -1,4 +1,7 @@
-﻿
+import { COMMAND } from "../../../os/command.js";
+
+export default function() {
+    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
 this.inherits(COMMAND);
 this.command = "unjinglian";
 
@@ -49,4 +52,5 @@ this.enter = function (me, oid) {
         me.notify("铁匠说道：取消精炼后装备的等级变为初始等级，退回全部玄晶，不论精炼等级统一收费。");
         me.notify(str.join(""));
     }
+}
 }

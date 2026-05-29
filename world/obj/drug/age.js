@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.unit = "颗";
 this.name = "驻颜丹";
 this.value = 1280000;
@@ -10,3 +13,4 @@ this.on_use = function (me) {
     me.notify("<him>你吞下一颗驻颜丹，感觉自己又年轻了一些。</him>");
 }
 this.transable = true;
+}

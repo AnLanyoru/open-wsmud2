@@ -1,4 +1,7 @@
-﻿this.inherits(OBJ);
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default function() {
+this.inherits(OBJ);
 this.set({
     unit: "个",
     name: "师门令牌",
@@ -17,4 +20,5 @@ this.on_create = function (path, par) {
     if (!(lv > 0 && lv < 6)) return;
     this.grade = lv;
     this.desc = "可以用来完成师门交给你的任务，限制" + (10 + this.grade * 20) + "难度以前";
+}
 }

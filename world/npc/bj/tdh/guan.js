@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "关安基",
     desc: "只见他长长的胡子飘在胸前，模样甚是威严。因此人称关夫子。",
@@ -36,3 +39,4 @@ this.set_chat_msg([
     "关安基忽然说：唉，我的脾气不大好，大家可要小心了。",
     "关安基忽然说：本堂的香主谁来当，还轮不到我说话。"
 ]);
+}

@@ -1,4 +1,7 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+this.inherits(NPC);
 this.set({
     name: "门派弟子",
     desc: "门派弟子",
@@ -15,4 +18,5 @@ this.set({
 });
 this.init_from = function (fam, level) {
 
+}
 }

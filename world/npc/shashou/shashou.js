@@ -1,4 +1,8 @@
-﻿this.inherits(NPC);
+import { NPC } from "../../../os/char/npc.js";
+
+export default function() {
+    const FAMILIES = globalThis.FAMILIES;
+this.inherits(NPC);
 this.set({
     name: "守卫",
     desc: "他是杀手楼的守卫，警惕的观望着四周",
@@ -33,4 +37,5 @@ this.on_leave = function (me, dir) {
        
     }
 
+}
 }
