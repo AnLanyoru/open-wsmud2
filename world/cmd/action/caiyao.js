@@ -65,16 +65,13 @@ function calculate_lv(grade) {
     const tiers = ['white', 'green', 'blue', 'yellow', 'purple', 'orange', 'red'];
     const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17], [18, 22]];
 
-    // grade略微提升高品质概率：最高档和次高档权重随grade递增
-    const bonus = 1 + grade / 200;
-
+    // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
     let total = 0;
     const cumulative = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[tiers[i]];
-        // 对品质上限附近的两档施加grade加成
-        if (i >= maxTier - 1 && i >= 3) {
-            w = Math.floor(w * bonus);
+        if (i >= 1) {
+            w = Math.floor(w * (1 + grade * i / 1200));
         }
         total += w;
         cumulative.push([total, i]);
