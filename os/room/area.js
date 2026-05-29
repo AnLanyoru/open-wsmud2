@@ -5,6 +5,7 @@ import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
+import { ROOM } from "./room.js";
 
 export class AREA extends BASE {
 
@@ -295,5 +296,35 @@ export class AREA extends BASE {
      */
     query_actions() {
         return this.actions;
+    }
+
+    // ============ 区域扩展(由extends合并) ============
+
+    /** 通知区域更新 */
+    notify_update() {
+        this.json = null;
+        if (this.is_area)
+            WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
+        else
+            WORLD.send(`{type:"dialog",dialog:"jh",t:"fb",refresh:${this.fb_index}}`);
+    }
+
+    /** @param {CHARACTER} me @returns {string} */
+    query_owner(me) {
+        return me.query_teamid();
+    }
+
+    /** @param {CHARACTER} me */
+    clear_copy(me) {
+        var room = ROOM.Get(this.first)?.query_copy2(me);
+        if (room)
+            room.clear_copy(me);
+    }
+
+    /** @param {CHARACTER} me @returns {boolean} */
+    is_unlock(me) {
+        if (this.jd_index >= 0)
+            return me.isenable_area(this);
+        return (this.unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
     }
 }

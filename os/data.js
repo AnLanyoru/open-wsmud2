@@ -1,11 +1,119 @@
 import { WORLD } from "./world.js";
+import { FAMILIES } from "./skill/family.js";
 
-export default {
+const STATS = WORLD.STATS;
+const DATA = {
     parties: new Map(),
     PAIMAI: new Map(),
     temp: {},
-    on_load(data) {},
-    on_save(str) {},
+    exps: [15, 20, 30, 40, 50, 100, 200, 80, 90, 100, 110, 120, 130],
+
+    stone_values: [1000, 5000, 30000, 150000, 1000000, 10000000],
+    book_values: [1, 1000, 5000, 10000, 100000, 500000, 2000000],
+
+    /** @param {CHARACTER} me @returns {number} */
+    get_exp(me) {
+        return me.random(5) + this.exps[me.level];
+    },
+
+    on_load(data) {
+        WORLD.MESSAGE.load(data);
+        this.remove_temp('xy_status');
+        this.remove_temp('xy_users');
+        this.remove_temp('xy_party');
+        STATS.TOPS = STATS.load_tops(data.tops);
+        STATS.SCORE = data.score ?? new Array(20).fill({ "name": "无", "score": 0 });
+        STATS.EQ_STATS = new Array(11);
+        data.eq_stats = data.eq_stats ?? [];
+        for (let i = 0; i < 11; i++) {
+            STATS.EQ_STATS[i] = data.eq_stats[i] ?? new Array(10).fill({ "score": 0 });
+        }
+        for (let key of FAMS_TATAS) {
+            let tops = data['tops_' + key];
+            STATS['tops_' + key] =
+                STATS.load_tops(tops, FAMILIES[key].name + "弟子", key);
+        }
+        const sc_stats = data.score_stats ?? {};
+        STATS.SC_STATS = {};
+        for (let key of FAMS_TATAS) {
+            STATS.SC_STATS[key] = sc_stats[key] ??
+                new Array(20).fill({ "name": "无", "score": 0 });
+        }
+
+        console.log("全局数据已加载");
+    },
+
+    on_save(str) {
+        str.push(',tops:', STATS.saveTops(STATS.TOPS));
+
+        str.push(',score:', STATS.saveScore());
+
+        str.push(',messages:', WORLD.MESSAGE.save());
+        str.push(',notices:', WORLD.MESSAGE.saveNotice());
+
+        for (let key of FAMS_TATAS) {
+            let tops = STATS['tops_' + key];
+            if (tops) {
+                str.push(',tops_', key, ':', STATS.saveTops(tops));
+            }
+        }
+        str.push(',eq_stats:', JSON.stringify(STATS.EQ_STATS ?? []));
+
+        str.push(',score_stats:', JSON.stringify(STATS.SC_STATS ?? {}));
+    },
+
+    /** 创建默认排行榜 */
+    create_def_tops() {
+        for (let key of FAMS_TATAS) {
+            STATS['tops_' + key] = STATS.load_tops(null, FAMILIES[key].name + "弟子");
+        }
+    },
+
+    /** 创建默认装备统计 */
+    create_def_eqs() {
+        STATS.EQ_STATS = new Array(11);
+        for (let i = 0; i < 11; i++) {
+            STATS.EQ_STATS[i] = new Array(10).fill({ "score": 0 });
+        }
+        STATS.EQ_STATS[0] = STATS.WEAPON;
+    },
+
+    /** 创建默认分数统计 */
+    create_def_scs() {
+        STATS.SC_STATS = {};
+        for (let key of FAMS_TATAS) {
+            STATS.SC_STATS[key] = new Array(20).fill({ "score": 0 });
+        }
+    },
+
+    PROPS: {},
+
+    /** @param {USER} me @param {FAMILY} fam */
+    reset_famtops(me, fam) {
+        me.remove_temp('top_fam_sc');
+        me.remove_temp('top_fam');
+        let tops = STATS['tops_' + fam.id];
+        if (tops) {
+            for (let i = 0; i < tops.length; i++) {
+                let user = tops[i];
+                if (user.userid === me.id) {
+                    user.userid = null;
+                    user.name = fam.name + "弟子";
+                    user.title = null;
+                    break;
+                }
+            }
+        }
+        tops = STATS.SC_STATS?.[fam.id];
+        if (tops) {
+            for (let i = 0; i < tops.length; i++) {
+                if (tops[i].id === me.id) {
+                    tops.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    },
     /**
      * 保存全局数据
      * @returns {Promise<*>}
@@ -193,3 +301,8 @@ export default {
         return userData;
     }
 };
+
+const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
+    'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];
+
+export default DATA;

@@ -7,6 +7,8 @@ import { UTIL } from "./util/util.js";
 import { BASE } from "./base.js";
 import db from "./util/data.js";
 import { USER } from "./char/user.js";
+import { NPC } from "./char/npc.js";
+import { OBJ } from "./item/obj.js";
 import WORLD_DATA from "./data.js";
 import USERLOGIN_MODULE from "./login.js";
 import LISTENER_MODULE from "./ws.js";
@@ -41,12 +43,417 @@ const WORLD = {
     MESSAGE: {
         stores: new Map(),
         NOTICES: [],
+
+        /** @param {string} toid @param {CHARACTER} from @param {{content: string, time: number, attach?: *, rec?: boolean}} msg */
+        pushUserMessage(toid, from, msg) {
+            let user = this.stores.get(toid);
+            if (!user) {
+                user = new Map();
+                this.stores.set(toid, user);
+            }
+            let store = user.get(from.id);
+            if (!store) {
+                store = { name: from.name, items: [] };
+                user.set(from.id, store);
+            }
+            msg.index = store.items.length;
+            store.items.push(msg);
+        },
+
+        /** @param {CHARACTER} me @returns {Array} */
+        getUserMessages(me) {
+            let store = this.stores.get(me.id);
+            let newMessages = [];
+            if (this.NOTICES.length) {
+                let nt = this.NOTICES[this.NOTICES.length - 1];
+                newMessages.push({
+                    id: "notice",
+                    content: nt.content.length > 50 ? nt.content.substring(0, 50) : nt.content,
+                    time: nt.time,
+                    name: "公告"
+                });
+            }
+            if (store) {
+                let diff_time = 24 * 3600000 * 30;
+                let now = Date.now();
+                store.forEach((x, y) => {
+                    let last = x.items[x.items.length - 1];
+                    if (last) {
+                        if (now - last.time < diff_time)
+                            newMessages.push({
+                                id: y,
+                                name: x.name,
+                                content: last.content,
+                                time: last.time
+                            });
+                    }
+                });
+            }
+            return newMessages;
+        },
+
+        /** @param {CHARACTER} me @param {string} from @param {number} [count] @returns {Array} */
+        getMessageFromID(me, from, count) {
+            let items = [];
+            if (from !== "notice") {
+                let store = this.stores.get(me.id);
+                if (!store) return;
+                let list = store.get(from);
+                if (!list) return items;
+                items = list.items;
+            } else {
+                items = this.NOTICES;
+            }
+            count = count || 0;
+            let ary = [];
+            let diff_time = 24 * 3600000 * 30;
+            let now = Date.now();
+            for (let i = 0; i < 13; i++) {
+                let index = items.length - count - i - 1;
+                if (index < 0) break;
+                if (now - items[index].time < diff_time)
+                    ary.push(items[index]);
+            }
+            return ary;
+        },
+
+        /** @param {CHARACTER} me @param {string} from @param {number} index */
+        getMessageByIndex(me, from, index) {
+            let store = this.stores.get(me.id);
+            if (!store) return;
+            let list = store.get(from);
+            return list && list.items[index];
+        },
+
+        /** @returns {string} */
+        save() {
+            let str = ["["];
+            let now = Date.now();
+            let diff_time = 24 * 3600000 * 30;
+            this.stores.forEach((x, uid) => {
+                if (str.length > 1) str.push(",");
+                str.push("{id:\"");
+                str.push(uid);
+                str.push("\",items:[");
+                let isReceive = false;
+                x.forEach((st, from) => {
+                    if (isReceive) str.push(",");
+                    str.push("{uid:\"");
+                    str.push(from);
+                    str.push("\",name:\"");
+                    str.push(st.name);
+                    str.push("\",items:[");
+                    let ishasmsg = false;
+                    for (let i = 0; i < st.items.length; i++) {
+                        let item = st.items[i];
+                        if (now - item.time < diff_time) {
+                            if (ishasmsg) str.push(",");
+                            str.push("{time:");
+                            str.push(item.time);
+                            str.push(",content:");
+                            str.push(JSON.stringify(item.content));
+                            if (item.attach) {
+                                str.push(",attach:[");
+                                for (let j = 0; j < item.attach.length; j++) {
+                                    str.push("{name:\"");
+                                    str.push(item.attach[j].name);
+                                    str.push("\",obj:\"");
+                                    str.push(item.attach[j].obj);
+                                    str.push("\",count:");
+                                    str.push(item.attach[j].count || 1);
+                                    str.push("}");
+                                    if (j !== item.attach.length - 1) {
+                                        str.push(",");
+                                    }
+                                }
+                                str.push("]");
+                                if (item.rec) {
+                                    str.push(",rec:true");
+                                }
+                            }
+                            str.push("}");
+                            ishasmsg = true;
+                        }
+                    }
+                    str.push("]}");
+                    isReceive = true;
+                });
+                str.push("]}");
+            });
+            str.push("]");
+            return str.join("");
+        },
+
+        /** @returns {string} */
+        saveNotice() {
+            if (this.NOTICES.length > 500) this.NOTICES.splice(0, this.NOTICES.length - 500);
+            return JSON.stringify(this.NOTICES);
+        },
+
+        /** @param {{notices?: Array, messages?: Array}} data */
+        load(data) {
+            this.NOTICES = data.notices ?? [];
+            let sts = data.messages ?? [];
+            if (!sts) return;
+            for (let i = 0; i < sts.length; i++) {
+                let st = sts[i];
+                let user = new Map();
+                for (let j = 0; j < st.items.length; j++) {
+                    let ust = st.items[j];
+                    let obj = {
+                        name: ust.name,
+                        items: []
+                    };
+                    for (let k = 0; k < ust.items.length; k++) {
+                        let msg = ust.items[k];
+                        obj.items.push({
+                            content: msg.content,
+                            time: msg.time,
+                            rec: msg.rec,
+                            attach: msg.attach,
+                            index: obj.items.length
+                        });
+                    }
+                    user.set(ust.uid, obj);
+                }
+                this.stores.set(st.id, user);
+            }
+            console.log("消息数据已加载");
+        },
     },
     STATS: {
         TOPS: [],
         EXP: [],
         SCORE: [],
         WEAPON: [],
+
+        /** @param {Array} tops @param {string} [defname] @param {string} [key] @returns {Array} */
+        load_tops(tops, defname = '武林高手', key = "") {
+            tops = tops ?? new Array(10).fill({ path: "pub/gaoshou1" });
+            const ary = [];
+            for (let i = 0; i < tops.length; i++) {
+                let item = tops[i];
+                let npc;
+                npc = NPC.CLONE("pub/gaoshou1");
+                npc.name = defname;
+                if (item.userid) {
+                    this.loadTopUser(item, npc);
+                } else {
+                    npc.score = 10 - i;
+                }
+                npc.top_index = i + 1;
+                npc.id = "top_" + key + "_" + i;
+                ary.push(npc);
+            }
+            return ary;
+        },
+
+        /** @param {*} data @param {NPC} npc */
+        loadTopUser(data, npc) {
+            npc.title = data.title;
+            npc.name = data.name;
+            for (let i = 0; i < COPY_PROPS.length; i++) {
+                npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
+            }
+            npc.skills = data.skills;
+            if (data.eq) {
+                npc.equipment = [];
+                for (let i = 0; i < data.eq.length; i++) {
+                    let item = data.eq[i];
+                    if (!item) continue;
+                    let obj = OBJ.CREATE(item[0]);
+                    if (!obj) continue;
+                    obj.load_db(item);
+                    npc.equipment[i] = obj;
+                }
+            }
+            npc.userid = data.userid;
+            npc.temp = data.temp;
+            npc.clear_prop();
+            npc.init();
+            npc.recount();
+        },
+
+        /** @param {USER} player */
+        checkStats(player) {
+            this.updateScore(player);
+            WORLD.COMMANDS.biwu.checkStats(player);
+        },
+
+        /** @param {Array} tops @returns {string} */
+        saveTops(tops) {
+            let str = ["["];
+            for (let i = 0; i < tops.length; i++) {
+                let top = tops[i];
+                if (top.userid) {
+                    str.push("{userid:\"");
+                    str.push(top.userid);
+                    str.push("\",name:\"");
+                    str.push(top.name);
+                    str.push("\",title:\"");
+                    str.push(top.title);
+                    str.push("\"");
+                    for (let j = 0; j < COPY_PROPS.length; j++) {
+                        str.push(",");
+                        str.push(COPY_PROPS[j]);
+                        str.push(":");
+                        str.push(top[COPY_PROPS[j]]);
+                    }
+                    if (top.skills) {
+                        str.push(",skills:");
+                        str.push(JSON.stringify(top.skills));
+                    }
+                    if (top.equipment) {
+                        str.push(",eq:[");
+                        for (let j = 0; j < top.equipment.length; j++) {
+                            if (j > 0) str.push(",");
+                            if (top.equipment[j]) top.equipment[j].save_db(str);
+                            else str.push("null");
+                        }
+                        str.push("]");
+                    }
+                    if (top.temp) {
+                        str.push(",temp:", JSON.stringify(top.temp));
+                    }
+                    str.push("}");
+                } else {
+                    str.push('{ path: "pub/gaoshou1"}');
+                }
+                if (i !== this.TOPS.length - 1) str.push(",");
+            }
+            str.push("]");
+            return str.join("");
+        },
+
+        /** @returns {string} */
+        saveWeapon() {
+            return JSON.stringify(this.WEAPON);
+        },
+
+        /** @returns {string} */
+        saveScore() {
+            return JSON.stringify(this.SCORE);
+        },
+
+        /** @param {USER} me @param {EQUIPMENT} wea @param {Array} ary */
+        updateEqitem(me, wea, ary) {
+            let score = wea.query_score();
+            if (!score) return;
+            let cur_index = -1;
+            let new_index = -1;
+            for (let i = ary.length - 1; i >= 0; i--) {
+                let item = ary[i];
+                if (item.user === me.id) {
+                    if (wea.id === item.id || score > item.score) {
+                        cur_index = i;
+                    } else {
+                        return;
+                    }
+                }
+                if (score > item.score) {
+                    new_index = i;
+                }
+            }
+            if (cur_index === -1 && new_index === -1) return;
+
+            if (cur_index === -1) {
+                let item = {
+                    id: wea.id,
+                    user: me.id,
+                    score: score,
+                    name: me.name,
+                    desc: wea.get_desc(me),
+                    wname: wea.color_name
+                };
+                ary.splice(new_index, 0, item);
+                if (ary.length > 15)
+                    ary.length = 15;
+                return item;
+            }
+
+            let item = ary[cur_index];
+            item.wname = wea.color_name;
+            item.desc = wea.get_desc(me);
+            item.id = wea.id;
+            item.user = me.id;
+            item.name = me.name;
+            item.score = score;
+            if (cur_index === new_index
+                || new_index - cur_index === 1) {
+                return item;
+            }
+            if (new_index === -1) {
+                ary.splice(cur_index, 1);
+                ary.push(item);
+            } else if (cur_index > new_index) {
+                ary.splice(cur_index, 1);
+                ary.splice(new_index, 0, item);
+            } else {
+                ary.splice(new_index, 0, item);
+                ary.splice(cur_index, 1);
+            }
+        },
+
+        /** @param {USER} me @param {EQUIPMENT} wea */
+        updateWeapon(me, wea) {
+            if (!WORLD.is_server(me)) return;
+            let eqs = this.EQ_STATS[wea.eq_type];
+            this.updateEqitem(me, wea, eqs);
+        },
+
+        /** @param {USER} me @param {Array} ary */
+        updateScoreItem(me, ary) {
+            let score = me.score;
+            let cur_index = -1;
+            let new_index = -1;
+            for (let i = ary.length - 1; i >= 0; i--) {
+                let item = ary[i];
+                if (item.id === me.id) {
+                    cur_index = i;
+                }
+                if (score > item.score) {
+                    new_index = i;
+                }
+            }
+            if (cur_index === -1 && new_index === -1) return;
+
+            if (cur_index === -1) {
+                let item = { id: me.id, score: score, name: me.color_name || me.name };
+                ary.splice(new_index, 0, item);
+                if (ary.length > 30)
+                    ary.length = 30;
+                return;
+            }
+
+            let item = ary[cur_index];
+            item.score = score;
+            item.name = me.color_name || me.name;
+            if (cur_index === new_index
+                || new_index - cur_index === 1) {
+                return;
+            }
+
+            if (new_index === -1) {
+                ary.splice(cur_index, 1);
+                ary.push(item);
+            } else if (cur_index > new_index) {
+                ary.splice(cur_index, 1);
+                ary.splice(new_index, 0, item);
+            } else {
+                ary.splice(new_index, 0, item);
+                ary.splice(cur_index, 1);
+            }
+        },
+
+        /** @param {USER} me */
+        updateScore(me) {
+            if (!WORLD.is_server(me)) return;
+            let ary = this.SCORE;
+            this.updateScoreItem(me, ary);
+            let fam = this.SC_STATS[me.family.id];
+            if (!fam) return;
+            this.updateScoreItem(me, fam);
+        },
     },
     /** @type {number} -1关闭 0正常 >1 用户等级>连接 */
     status: -1,
@@ -428,8 +835,69 @@ const WORLD = {
     /** @returns {void} 资源加载完成回调 */
     on_resource_loaded() {
 
-    }
+    },
+
+    // ============ WORLD方法(由extends合并) ============
+
+    /** 服务启动回调 */
+    on_startup() {
+        for (let fam in FAMILIES) {
+            FAMILIES[fam].init();
+        }
+        WORLD.COMMANDS.jh.init();
+    },
+
+    /** @param {USER} user 玩家退出时调用 */
+    on_user_quit(user) {
+        if (WORLD.is_server(user)) {
+            if (user.query_temp('pt')) {
+                WORLD.COMMANDS['party'].on_user_login(user, false);
+            }
+            WORLD.on_user_save(user);
+        } else {
+            if (user.query_temp('cross_type') == 'duizhan') {
+                WORLD.PUB_USERS.push(user);
+                user.disconnect_time = 0;
+            }
+        }
+    },
+
+    /** @param {USER} user 玩家退出或关闭时保存 */
+    on_user_save(user) {
+
+    },
+
+    /** @param {number} now 心跳回调 */
+    on_heart_beat(now) {
+
+    },
+
+    /** @param {*} socket @returns {boolean} */
+    check_connect(socket) {
+        if (WORLD.SERVER.istest) return true;
+        return true;
+    },
+
+    /** @returns {Promise<boolean>} */
+    async close() {
+        WORLD.status = 5;
+        console.log('正在尝试关闭数据连接');
+        for (let user of this.USERS) {
+            if (user.socket)
+                user.socket.end();
+        }
+        console.log('关闭网络连接');
+        clearInterval(this.heart_beat_service);
+        if (await WORLD.save()) {
+            console.log('关闭数据连接');
+            return true;
+        }
+        return false;
+    },
 };
+
+const COPY_PROPS = ["str", "con", "dex", "int", "gender", "max_mp", "exp", "pot", "kar", "per"
+    , "hp", "max_hp", "mp", 'age', 'score'];
 
 /**
  * 递归加载资源文件
