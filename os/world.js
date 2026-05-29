@@ -4,7 +4,9 @@
 
 import "./util/util.js";
 import { UTIL } from "./util/util.js";
+import { BASE } from "./base.js";
 import db from "./util/data.js";
+import { USER } from "./char/user.js";
 import WORLD_DATA from "./data.js";
 import USERLOGIN_MODULE from "./login.js";
 import LISTENER_MODULE from "./ws.js";
@@ -69,7 +71,7 @@ const WORLD = {
         if (!WORLD.check_connect(socket))
             return socket.end();
 
-        socket.user = new globalThis.USER();
+        socket.user = new USER();
 
         socket.user.socket = socket;
         socket.user.wait_input = this.USERLOGIN.check_session.bind(this.USERLOGIN);
@@ -390,7 +392,7 @@ const WORLD = {
         if (!data || !data.length) return;
         console.log("加载上次未保存的本地用户%d", data.length);
         for (let i = 0; i < data.length; i++) {
-            const user = new globalThis.USER();
+            const user = new USER();
             user.loadData(data[i]);
             this.USERS.push(user);
         }

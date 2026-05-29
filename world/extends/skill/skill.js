@@ -1,3 +1,5 @@
+import { PERFORM } from "../../../os/skill/skill.js";
+
 PERFORM.prototype.query_releasetime = function (me, lv) {
     var rtime = this.release_time;
     if (!(rtime >= 0)) rtime = me.gjsd;

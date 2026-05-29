@@ -4,6 +4,8 @@ export default {
     parties: new Map(),
     PAIMAI: new Map(),
     temp: {},
+    on_load(data) {},
+    on_save(str) {},
     /**
      * 保存全局数据
      * @returns {Promise<*>}

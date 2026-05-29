@@ -4,6 +4,7 @@
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { UTIL } from "../util/util.js";
+import { CHARACTER } from "../char/character.js";
 
 /** @type {Object<string, FAMILY>} 所有门派注册表 */
 export const FAMILIES = {};
@@ -66,14 +67,14 @@ export class FAMILY extends BASE {
     }
 
 
-    /** @type {function} 临时数据查询(复用globalThis.CHARACTER) */
-    query_temp = globalThis.CHARACTER.prototype.query_temp;
+    /** @type {function} 临时数据查询(复用CHARACTER) */
+    query_temp = CHARACTER.prototype.query_temp;
     /** @type {function} */
-    set_temp = globalThis.CHARACTER.prototype.set_temp;
+    set_temp = CHARACTER.prototype.set_temp;
     /** @type {function} */
-    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
+    remove_temp = CHARACTER.prototype.remove_temp;
     /** @type {function} */
-    add_temp = globalThis.CHARACTER.prototype.add_temp;
+    add_temp = CHARACTER.prototype.add_temp;
 
     /**
      * 向门派所有在线成员发送消息
@@ -98,7 +99,7 @@ export class FAMILY extends BASE {
 
     /**
      * 增加门派积分
-     * @param {globalThis.CHARACTER} me
+     * @param {CHARACTER} me
      * @param {number} sc
      */
     add_score(me, sc) {
@@ -112,7 +113,7 @@ export class FAMILY extends BASE {
      * @param {string} str
      */
     static addSendFamToCharacter() {
-        globalThis.CHARACTER.prototype.send_fam = function (str) {
+        CHARACTER.prototype.send_fam = function (str) {
             this.family.send(str);
         };
     }
@@ -165,7 +166,7 @@ export class FAMILY extends BASE {
 
     /**
      * 增加门派贡献
-     * @param {globalThis.CHARACTER} me
+     * @param {CHARACTER} me
      * @param {number} count
      */
     add_gongji(me, count) {

@@ -1,5 +1,6 @@
 import { UTIL } from "../../../os/util/util.js";
 import { USER } from "../../../os/char/user.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
 
 USER.prototype.recount = function () {
