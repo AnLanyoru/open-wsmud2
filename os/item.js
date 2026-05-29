@@ -64,8 +64,9 @@ export class ITEM extends BASE {
     no_message = false;
     /** @type {Object<string, number>|null} 属性加成映射 — CHARACTER/EQUIPMENT专属 */
     prop = null;
+
     /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
-    on_create = null;
+    get on_create() { return undefined; }
 
     // ============ 堆叠操作(OBJ覆写, ITEM提供安全默认) ============
 
@@ -463,8 +464,6 @@ export class ITEM extends BASE {
     long_name() {
         return this.name;
     }
-
-
     /**
      * 对象创建回调
      * @param {string} file - 文件名

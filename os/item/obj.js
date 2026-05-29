@@ -69,20 +69,20 @@ export class OBJ extends ITEM {
     /** @type {boolean} 容器是否打开 — CONTAINER/CORPSE专属 */
     is_open = false;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置, getter 返回 undefined 被类方法覆盖) ============
 
-    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 — use.js:64传(me,par), 返回值决定是否广播动作 */
-    on_use = null;
-    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 — 调用已被注释, 资源文件定义为(me,skill,lv) */
-    on_study = null;
-    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 — open.js:14取返回值为OBJ[]或false阻止打开 */
-    on_open = null;
+    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 */
+    get on_use() { return undefined; }
+    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 */
+    get on_study() { return undefined; }
+    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 */
+    get on_open() { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
-    on_init = null;
+    get on_init() { return undefined; }
     /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
-    on_create = null;
+    get on_create() { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
-    on_reload = null;
+    get on_reload() { return undefined; }
 
     /**
      * 初始化回调
