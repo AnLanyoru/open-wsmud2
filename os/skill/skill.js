@@ -33,6 +33,22 @@ export class SKILL extends BASE {
      * @type {{[key: string]: any}}
      */
     learn_condition = {};
+    /**
+     * 以下动作数组支持 $ 占位符，由 splitmessage() 运行时替换。
+     * $N=发起者 $n=目标 $P=发起者敬称 $p=目标敬称 $l=攻击部位 $w/$W=发起者武器 $i=目标武器 $T=暗器
+     */
+    /** @type {string[]} 攻击动作 — $N(发起者) $n(目标) $w(发起者武器) $l(攻击部位) */
+    attack_actions = [];
+    /** @type {string[]} 闪避动作 — $p(闪避者) $l(避开部位) */
+    dodge_actions = [];
+    /** @type {string[]} 招架动作 — $p(防御者) $P(攻击者) $w(攻击者武器) $i(防御者武器) */
+    parry_actions = [];
+    /** @type {string[]} 武器对武器招架 — $p(防御者) $i(防御者武器) */
+    weapon_vs_weapon_actions = [];
+    /** @type {string[]} 武器对空手招架 — $p(防御者) $w(攻击者武器) */
+    weapon_vs_unarmed_actions = [];
+    /** @type {string[]} 空手对武器招架 — $p(防御者) $w(攻击者武器) */
+    unarmed_vs_weapon_actions = [];
 
     constructor() {
         super();
