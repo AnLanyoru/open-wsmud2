@@ -17,46 +17,124 @@ export class USER extends CHARACTER {
      * @param {USER} obj - 要初始化的玩家实例
      */
     static __initInstance(obj) {
-        /** @type {WebSocket|null} */
         obj.socket = null;
-        /** @type {FAMILY} */
         obj.family = FAMILIES.NONE;
-        /** @type {number} */
         obj.max_item_count = 20;
-        /** @type {number} */
         obj.max_store_count = 20;
-        /** @type {number} */
         obj.money = 0;
-        /** @type {number} */
         obj.request_count = 0;
-        /** @type {number} */
         obj.cash_money = 0;
-        /** @type {number} */
         obj.score = 0;
-        /** @type {Array|null} */
         obj.follower = null;
-        /** @type {string} */
         obj.password = "";
-        /** @type {number} */
         obj.loginTime = 0;
-        /** @type {string|null} */
         obj.id_address = null;
-        /** @type {number} */
         obj.user_level = 0;
-        /** @type {number} */
         obj.eq_group = 0;
-        /** @type {boolean} */
         obj.is_player = true;
-        /** @type {number} 所在服务器ID */
         obj.serverid = 0;
     }
 
-    constructor() {
-        super();
-        USER.__initInstance(this);
-    }
+    // ============ 玩家标识 ============
 
+    /** @type {boolean} 是否为玩家 */
     is_player = true;
+    /** @type {string} 玩家数据库ID(角色ID) */
+    id;
+    /** @type {number} 账号ID */
+    userid;
+    /** @type {string} 角色名称(覆盖父类) */
+    name;
+    /** @type {number} 角色等级 */
+    level = 0;
+    /** @type {string} 角色称号 */
+    title;
+    /** @type {FAMILY} 所属门派 */
+    family = FAMILIES.NONE;
+
+    // ============ 网络连接 ============
+
+    /** @type {WebSocket|null} 网络套接字 */
+    socket = null;
+    /** @type {string|null} IP地址 */
+    ip_address = null;
+    /** @type {string} 登录密码 */
+    password = "";
+    /** @type {number} 登录时间戳 */
+    loginTime = 0;
+    /** @type {number} 所在服务器ID */
+    serverid = 0;
+    /** @type {number} 请求计数(频率限制) */
+    request_count = 0;
+    /** @type {Function|null} 等待用户输入的回调 */
+    wait_input = null;
+
+    // ============ 权限与状态 ============
+
+    /** @type {number} 用户权限等级 0=普通 6=管理员 */
+    user_level = 0;
+    /** @type {boolean} 是否静默消息 */
+    no_message = false;
+    /** @type {string|null} 登录提示消息缓存 */
+    login_message = null;
+    /** @type {number} 断线时间戳 */
+    disconnect_time = 0;
+
+    // ============ 物品与装备 ============
+
+    /** @type {number} 最大背包容量 */
+    max_item_count = 20;
+    /** @type {number} 最大仓库容量 */
+    max_store_count = 20;
+    /** @type {number} 金钱 */
+    money = 0;
+    /** @type {number} 元宝(充值货币) */
+    cash_money = 0;
+    /** @type {OBJ[]|null} 背包物品 */
+    items = null;
+    /** @type {OBJ[]|null} 仓库物品 */
+    stores = null;
+    /** @type {EQUIPMENT[]|null} 装备列表 */
+    equipment = null;
+    /** @type {number} 当前装备组 */
+    eq_group = 0;
+    /** @type {Array|null} 装备组定义 */
+    eq_groups = null;
+
+    // ============ 技能 ============
+
+    /** @type {Object<string, {level: number, exp: number, enable_skill: number}>|null} 技能映射 */
+    skills = null;
+    /** @type {Array|null} 技能组定义 */
+    sk_groups = null;
+    /** @type {string[]|null} 秘籍列表 */
+    books = null;
+
+    // ============ 社交与随从 ============
+
+    /** @type {Array|null} 随从描述列表 */
+    follower = null;
+
+    // ============ 设置与数据 ============
+
+    /** @type {Object<string, *>|null} 用户设置 */
+    settings = null;
+    /** @type {Object<string, *>|null} 临时数据 */
+    temp = null;
+    /** @type {Array|null} 称号列表 */
+    titles = null;
+    /** @type {string|null} 离线前所在房间路径 */
+    quit_room = null;
+    /** @type {number} 阅历积分 */
+    score = 0;
+    /** @type {boolean} 禁止战斗标识 */
+    no_fight = false;
+    /** @type {boolean} 记录伤害标识 */
+    record_damage = false;
+    /** @type {boolean} 屏蔽战斗消息标识 */
+    no_combatmsg = false;
+    /** @type {Object<string, string>|null} 命令JSON缓存 */
+    commands_json = null;
 
     /**
      * 通知消息(玩家状态)

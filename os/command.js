@@ -12,10 +12,31 @@ export class COMMAND extends BASE {
         obj.allow_level = 0;
     }
 
-    constructor() {
-        super();
-        COMMAND.__initInstance(this);
-    }
+    // ============ 命令标识 ============
+
+    /** @type {string} 命令名(逗号分隔多个别名) */
+    command;
+    /** @type {RegExp|null} 参数正则表达式 */
+    regex = null;
+    /** @type {Function|null} 命令执行函数(绑定到目标prototype) */
+    exec = null;
+
+    // ============ 权限控制 ============
+
+    /** @type {boolean} 是否允许战斗中执行 */
+    allow_fight = true;
+    /** @type {boolean} 是否允许死亡时执行 */
+    allow_die = false;
+    /** @type {boolean} 是否允许昏迷时执行 */
+    allow_faint = false;
+    /** @type {boolean} 是否允许在状态中执行 */
+    allow_state = false;
+    /** @type {boolean} 是否允许忙乱时执行 */
+    allow_busy = false;
+    /** @type {number} 所需权限等级 0=所有人 6=管理员 */
+    allow_level = 0;
+    /** @type {boolean} 是否允许未登录时执行 */
+    allow_login = false;
 
     /**
      * 将命令绑定到某些对象上，调用方式: obj.do_commandname()

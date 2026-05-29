@@ -9,13 +9,10 @@ import { NPC } from "../char/npc.js";
 export class AREA extends BASE {
 
     static __initInstance(obj) {
-        /** @type {ROOM[]} */
         obj.rooms = [];
-        /** @type {Array} */
         obj.map = [];
         obj.name = "";
         obj.is_area = false;
-        /** @type {string|null} */
         obj.first = null;
         obj.is_show = true;
         obj.is_copy = false;
@@ -25,6 +22,81 @@ export class AREA extends BASE {
         obj.exp = 1000;
         obj.pot = 1000;
     }
+
+    // ============ 核心属性 ============
+
+    /** @type {string} 区域名称 */
+    name = "";
+    /** @type {string} 区域ID */
+    id;
+    /** @type {string} 区域描述 */
+    desc;
+    /** @type {boolean} 是否为区域 */
+    is_area = false;
+    /** @type {boolean} 是否在小地图显示 */
+    is_show = true;
+
+    // ============ 房间管理 ============
+
+    /** @type {ROOM[]} 区域内的房间列表 */
+    rooms = [];
+    /** @type {Array} 小地图数据 */
+    map = [];
+    /** @type {string|null} 默认入口房间路径 */
+    first = null;
+
+    // ============ 副本相关 ============
+
+    /** @type {boolean} 是否为副本区域 */
+    is_copy = false;
+    /** @type {boolean} 是否支持多人副本 */
+    is_multi = false;
+    /** @type {number} 副本消耗(体力/令牌等) */
+    expend = 10;
+    /** @type {number} 副本索引 */
+    index = 0;
+    /** @type {number} 副本基础经验 */
+    exp = 1000;
+    /** @type {number} 副本基础潜能 */
+    pot = 1000;
+    /** @type {boolean} 是否非副本(普通区域标识) */
+    not_fb = false;
+    /** @type {string|null} 重生房间路径 */
+    recover_room = null;
+
+    // ============ 掉落相关 ============
+
+    /** @type {Array|null} 掉落列表缓存 */
+    drop_list = null;
+    /** @type {Array|null} 困难模式掉落列表缓存 */
+    diff_drop_list = null;
+    /** @type {Array|null} 普通模式NPC掉落配置 */
+    drop_npcs0 = null;
+    /** @type {Array|null} 困难模式NPC掉落配置 */
+    drop_npcs1 = null;
+
+    // ============ 门派与社交 ============
+
+    /** @type {string|null} 所属门派标识 */
+    family = null;
+    /** @type {boolean} 是否为公共区域 */
+    is_public = false;
+
+    // ============ 缓存 ============
+
+    /** @type {Object|null} JSON缓存 */
+    json = null;
+    /** @type {string|null} 所属区域路径(用于快速查找) */
+    room_path = null;
+    /** @type {number} 副本难度系数 */
+    fb_index = 1;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {Function|null} 登录回调 */
+    on_login = null;
+    /** @type {Function|null} 离开回调 */
+    on_leave = null;
 
     constructor() {
         super();

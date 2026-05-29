@@ -13,20 +13,76 @@ export class ROOM extends ITEM {
     static __initInstance(obj) {
         obj.name = "房间";
         obj.desc = "";
-        /** @type {ITEM[]} */
         obj.items = [];
-        /** @type {AREA|null} */
         obj.parent = null;
         obj.max_item_count = 50;
     }
 
-    constructor() {
-        super();
-        ROOM.__initInstance(this);
-    }
+    // ============ 核心标识属性 ============
 
-    /** @type {number} */
+    /** @type {number} 最大容纳物品/角色数 */
     max_item_count = 50;
+    /** @type {string} 房间全名(含区域前缀) */
+    long_name;
+    /** @type {string} 房间描述 */
+    desc = "";
+    /** @type {string} 所属区域路径 */
+    area;
+
+    // ============ 容器与出口 ============
+
+    /** @type {ITEM[]} 房间内的物品和角色 */
+    items = [];
+    /** @type {Object<string, string>|null} 出口映射 {方向: 目标路径} */
+    exits = null;
+    /** @type {string|null} 出口JSON缓存 */
+    room_exits_json = null;
+    /** @type {Object<string, string>|null} 隐藏物品映射 */
+    hidden_items = null;
+    /** @type {string|null} 命令JSON缓存 */
+    commands_json = null;
+
+    // ============ 层级关系 ============
+
+    /** @type {AREA|null} 所属区域 */
+    parent = null;
+
+    // ============ 副本与镜像 ============
+
+    /** @type {boolean} 是否为副本房间 */
+    is_copy_room = false;
+    /** @type {boolean} 是否为镜像房间 */
+    is_shadow = false;
+    /** @type {boolean} 是否禁止创建镜像 */
+    no_shadow = false;
+    /** @type {number} 房间创建时间戳 */
+    create_time = 0;
+    /** @type {Object<string, ROOM>|null} 副本房间映射 {ownerId: ROOM} */
+    copy_rooms = null;
+    /** @type {ROOM[]|null} 镜像房间列表 */
+    shadow_rooms = null;
+    /** @type {ROOM[]|null} 公共房间列表 */
+    public_rooms = null;
+    /** @type {string|null} 副本持有者ID */
+    owner = null;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {Function|null} 离开房间回调 */
+    on_leave = null;
+    /** @type {Function|null} 进入房间前回调 */
+    on_before_enter = null;
+    /** @type {Function|null} 心跳回调 */
+    on_heart_beat = null;
+    /** @type {Function|null} 登录回调 */
+    on_login = null;
+
+    // ============ 玩法相关 ============
+
+    /** @type {Object<string, *>|null} 副本临时数据 */
+    temp = null;
+    /** @type {boolean} 是否可钓鱼 */
+    can_diaoyu = false;
 
     /**
      * 玩家/物件离开房间

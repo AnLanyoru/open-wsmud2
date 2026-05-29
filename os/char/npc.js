@@ -14,17 +14,55 @@ export class NPC extends CHARACTER {
      * @param {NPC} obj - 要初始化的NPC实例
      */
     static __initInstance(obj) {
-        /** @type {number} */
         obj.hp = obj.max_hp = 100;
-        /** @type {number} */
         obj.mp = obj.max_mp = 100;
-        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
-        /** @type {FAMILY} */
         obj.family = FAMILIES.NONE;
-        /** @type {boolean} */
         obj.auto_pfm = true;
     }
+
+    // ============ 核心属性 ============
+
+    /** @type {boolean} 是否自动释放绝招 */
+    auto_pfm = true;
+    /** @type {string} NPC名称 */
+    name;
+    /** @type {number} NPC等级 */
+    level = 0;
+    /** @type {string} NPC描述 */
+    desc;
+
+    // ============ 功能属性 ============
+
+    /** @type {string[]|null} 闲聊消息列表 */
+    chat_msg = null;
+    /** @type {number} 闲聊触发概率(百分比) */
+    chat_chance = 0;
+    /** @type {OBJ[]|null} 出售物品列表 */
+    sell_list = null;
+    /** @type {Array|null} 命令JSON缓存 */
+    json = null;
+    /** @type {string|null} 死亡后重生房间路径 */
+    die_room = null;
+    /** @type {boolean} 是否禁止刷新(不重生) */
+    no_refresh = false;
+    /** @type {number} 击杀奖励积分 */
+    score = 0;
+    /** @type {string|null} 任务主人ID */
+    master = null;
+    /** @type {string|null} 对话问题 */
+    question = null;
+    /** @type {boolean} 禁止战斗标识 */
+    no_fight = false;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {Function|null} 查找师傅回调 */
+    on_master = null;
+    /** @type {Function|null} 检查技能回调 */
+    on_checkskill = null;
+    /** @type {Function|null} 绝招回调 */
+    on_pfm = null;
 
     constructor() {
         super();

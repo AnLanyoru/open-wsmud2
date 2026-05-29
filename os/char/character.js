@@ -15,17 +15,148 @@ export class CHARACTER extends ITEM {
      * @param {CHARACTER} obj - 要初始化的角色实例
      */
     static __initInstance(obj) {
-        /** @type {string} */
         obj.name = "生物";
-        /** @type {number} */
         obj.hp = obj.max_hp = 100;
-        /** @type {number} */
         obj.mp = obj.max_mp = 100;
-        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = 20;
-        /** @type {number} */
         obj.money = 0;
     }
+
+    // ============ 核心标识属性 ============
+
+    /** @type {string} 角色名称 */
+    name = "生物";
+    /** @type {string} 角色称呼(第三人称) */
+    title;
+    /** @type {string} 带颜色的名称缓存 */
+    color_name;
+    /** @type {number} 性别 0=女 1=男 */
+    gender = 1;
+    /** @type {number} 年龄 */
+    age = 20;
+    /** @type {number} 等级 */
+    level = 0;
+    /** @type {string} 角色描述 */
+    desc;
+
+    // ============ 战斗属性 ============
+
+    /** @type {number} 当前气血 */
+    hp = 100;
+    /** @type {number} 最大气血 */
+    max_hp = 100;
+    /** @type {number} 当前内力 */
+    mp = 100;
+    /** @type {number} 最大内力 */
+    max_mp = 100;
+    /** @type {number} 臂力 */
+    str = 20;
+    /** @type {number} 根骨 */
+    con = 20;
+    /** @type {number} 身法 */
+    dex = 20;
+    /** @type {number} 悟性 */
+    int = 20;
+    /** @type {number} 容貌 */
+    per = 20;
+    /** @type {number} 经验值 */
+    exp = 0;
+    /** @type {number} 潜能值 */
+    pot = 0;
+    /** @type {number} 阅历积分 */
+    score = 0;
+
+    // ============ 身份标识 ============
+
+    /** @type {boolean} 是否为玩家 */
+    is_player = false;
+    /** @type {number} 用户权限等级 0=普通 6=管理员 */
+    user_level = 0;
+
+    // ============ 环境与交互 ============
+
+    /** @type {ROOM|null} 当前所在房间 */
+    environment = null;
+    /** @type {Object<string, *>|null} 当前活动状态 */
+    state = null;
+    /** @type {Function|null} 等待用户输入的回调 */
+    wait_input = null;
+    /** @type {boolean} 是否静默消息 */
+    no_message = false;
+
+    // ============ 技能与装备(由mixin动态填充) ============
+
+    /** @type {Object<string, {level: number, exp: number, enable_skill: number}>|null} 技能映射 */
+    skills = null;
+    /** @type {Array<*>|null} buff/debuff状态列表 */
+    status = null;
+    /** @type {EQUIPMENT[]|null} 装备列表(按EQUIP_TYPE索引) */
+    equipment = null;
+    /** @type {Object<string, number>|null} 属性加成映射 */
+    prop = null;
+    /** @type {Object<string, *>|null} 临时数据 */
+    temp = null;
+    /** @type {Object<string, [string, number]>|null} 战斗属性修饰 */
+    combat_props = null;
+
+    // ============ 战斗系统属性 ============
+
+    /** @type {number} 战斗类型 0=无 1=切磋 2=生死 */
+    fight_type = 0;
+    /** @type {CHARACTER[]|null} 敌人列表 */
+    enemy = null;
+    /** @type {SKILL|null} 当前攻击技能 */
+    attack_skill = null;
+    /** @type {SKILL|null} 空手技能 */
+    noweapon_skill = null;
+    /** @type {SKILL|null} 闪避技能 */
+    dodge_skill = null;
+    /** @type {SKILL|null} 招架技能 */
+    parry_skill = null;
+    /** @type {SKILL|null} 内功技能 */
+    force_skill = null;
+    /** @type {Array|null} 自动技能缓存 */
+    auto_skills = null;
+    /** @type {ITEM|null} 当前攻击部位 */
+    attack_part = null;
+    /** @type {number} 忙乱状态倒计时 */
+    is_busy = 0;
+    /** @type {number} 昏迷状态倒计时 */
+    is_faint = 0;
+    /** @type {number} 免疫控制倒计时 */
+    ig_control = 0;
+    /** @type {number} 闪避状态倒计时 */
+    is_miss = 0;
+    /** @type {number} 鲁莽状态倒计时 */
+    is_rash = 0;
+    /** @type {number} 分身状态倒计时 */
+    is_shadow = 0;
+    /** @type {Function|null} 攻击处理器(定时器句柄) */
+    attack_handler = null;
+
+    // ============ 社交与移动属性 ============
+
+    /** @type {CHARACTER|null} 跟随目标 */
+    follow_target = null;
+    /** @type {CHARACTER[]|null} 跟随者列表 */
+    follow_targets = null;
+    /** @type {Array|null} 队伍引用 */
+    team = null;
+    /** @type {number} 武器切换冷却时间戳 */
+    release_time = 0;
+    /** @type {Array|null} 掉落列表 */
+    drop_list = null;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {Function|null} 对象创建回调 */
+    on_create = null;
+    /** @type {Function|null} 对象克隆回调 */
+    on_clone = null;
+    /** @type {Function|null} 死亡回调 */
+    on_die = null;
+    /** @type {Function|null} 复活回调 */
+    on_relive = null;
 
     constructor() {
         super();

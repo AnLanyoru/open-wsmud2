@@ -20,8 +20,32 @@ export class ITEM extends BASE {
         ITEM.__initInstance(this);
     }
 
+    // ============ 核心标识属性 ============
+
+    /** @type {string} 物件路径标识 */
+    path;
+    /** @type {string} 物件唯一ID */
+    id;
+    /** @type {string} 物件唯一UID */
+    uid;
+    /** @type {string} 物件名称 */
+    name;
+
+    // ============ 容器相关属性 ============
+
     /** @type {number} 最大携带物品数 */
     max_item_count = 10;
+    /** @type {number} 金钱数量 */
+    money = 0;
+    /** @type {ITEM[]|null} 子物品列表 */
+    items = null;
+
+    // ============ 交互相关属性 ============
+
+    /** @type {Object<string, {name: string, action: Function}>|null} 可执行命令映射 */
+    actions = null;
+    /** @type {string|null} JSON缓存 */
+    json = null;
 
     /**
      * 心跳处理

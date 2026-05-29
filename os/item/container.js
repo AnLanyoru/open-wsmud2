@@ -7,11 +7,8 @@ import { UTIL } from "../util/util.js";
 export class CONTAINER extends OBJ {
 
     static __initInstance(obj) {
-        /** @type {number} 物品数量 */
         obj.count = 1;
-        /** @type {boolean} 是否可堆叠合并 */
         obj.combined = false;
-        /** @type {boolean} 是否为容器 */
         obj.is_container = true;
     }
 
@@ -21,8 +18,18 @@ export class CONTAINER extends OBJ {
         CONTAINER.__initInstance(this);
     }
 
+    // ============ 核心属性 ============
+
     /** @type {boolean} 是否为容器 */
     is_container = true;
+    /** @type {number} 物品数量 */
+    count = 1;
+    /** @type {boolean} 是否可堆叠合并 */
+    combined = false;
+    /** @type {number} 最大容纳物品数 */
+    max_item_count = 50;
+    /** @type {boolean} 是否已打开 */
+    is_open = false;
 
     /**
      * 禁止直接拾取容器

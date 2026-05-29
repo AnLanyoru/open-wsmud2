@@ -7,11 +7,8 @@ import { CONTAINER } from "./container.js";
 export class CORPSE extends CONTAINER {
 
     static __initInstance(obj) {
-        /** @type {string} 单位 */
         obj.unit = "具";
-        /** @type {number} 物品数量 */
         obj.count = 1;
-        /** @type {boolean} 是否不分配(副本内) */
         obj.no_alloc = false;
     }
 
@@ -20,6 +17,17 @@ export class CORPSE extends CONTAINER {
         super();
         CORPSE.__initInstance(this);
     }
+
+    // ============ 核心属性 ============
+
+    /** @type {string} 单位 */
+    unit = "具";
+    /** @type {number} 物品数量 */
+    count = 1;
+    /** @type {boolean} 是否不分配(副本内) */
+    no_alloc = false;
+    /** @type {string|null} 死者名称 */
+    owner_name = null;
 
     /**
      * 禁止直接拾取尸体本身
