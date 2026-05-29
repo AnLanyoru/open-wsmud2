@@ -13,7 +13,8 @@ this.set({
     exp: 5000000,
     pot: 5000000,
     max_mp: 2000,
-    max_hp: 2000
+    max_hp: 2000,
+    max_item_count: 20
 });
 this.skill_map(
     ["dodge", 300],

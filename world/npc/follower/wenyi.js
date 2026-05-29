@@ -14,7 +14,8 @@ this.set({
     pot: 800000,
     max_mp: 2000,
     max_hp: 2000,
-    level: 3
+    level: 3,
+    max_item_count: 20
 });
 this.set_objects(["eq/lv0/cloth", 1, 1]);
 this.skill_map(
