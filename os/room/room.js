@@ -5,8 +5,12 @@ import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { ITEM } from "../item.js";
 import { OBJ } from "../item/obj.js";
-import { NPC } from "../char/npc.js";
-import { USER } from "../char/user.js";
+
+// 懒加载 USER/NPC 避免循环依赖: room.js → user.js/npc.js → character.js (TDZ)
+let _USER = null;
+let _NPC = null;
+import("../char/user.js").then(m => { _USER = m.USER; });
+import("../char/npc.js").then(m => { _NPC = m.NPC; });
 
 export class ROOM extends ITEM {
 
@@ -269,7 +273,7 @@ export class ROOM extends ITEM {
             const obj_path = name[0];
             if (!obj_path) continue;
             for (let j = 0; j < name[1]; j++) {
-                const obj = NPC.CLONE(obj_path);
+                const obj = _NPC.CLONE(obj_path);
                 if (obj) {
                     this.items.push(obj);
                     obj.environment = this;

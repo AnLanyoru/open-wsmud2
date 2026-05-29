@@ -6,9 +6,7 @@ import "./util/util.js";
 import { UTIL } from "./util/util.js";
 import { BASE } from "./base.js";
 import db from "./util/data.js";
-import { USER } from "./char/user.js";
-import { NPC } from "./char/npc.js";
-import { OBJ } from "./item/obj.js";
+import { FAMILIES } from "./skill/family.js";
 import WORLD_DATA from "./data.js";
 import USERLOGIN_MODULE from "./login.js";
 import LISTENER_MODULE from "./ws.js";
@@ -227,52 +225,10 @@ const WORLD = {
         SCORE: [],
         WEAPON: [],
 
-        /** @param {Array} tops @param {string} [defname] @param {string} [key] @returns {Array} */
-        load_tops(tops, defname = '武林高手', key = "") {
-            tops = tops ?? new Array(10).fill({ path: "pub/gaoshou1" });
-            const ary = [];
-            for (let i = 0; i < tops.length; i++) {
-                let item = tops[i];
-                let npc;
-                npc = NPC.CLONE("pub/gaoshou1");
-                npc.name = defname;
-                if (item.userid) {
-                    this.loadTopUser(item, npc);
-                } else {
-                    npc.score = 10 - i;
-                }
-                npc.top_index = i + 1;
-                npc.id = "top_" + key + "_" + i;
-                ary.push(npc);
-            }
-            return ary;
-        },
-
-        /** @param {*} data @param {NPC} npc */
-        loadTopUser(data, npc) {
-            npc.title = data.title;
-            npc.name = data.name;
-            for (let i = 0; i < COPY_PROPS.length; i++) {
-                npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
-            }
-            npc.skills = data.skills;
-            if (data.eq) {
-                npc.equipment = [];
-                for (let i = 0; i < data.eq.length; i++) {
-                    let item = data.eq[i];
-                    if (!item) continue;
-                    let obj = OBJ.CREATE(item[0]);
-                    if (!obj) continue;
-                    obj.load_db(item);
-                    npc.equipment[i] = obj;
-                }
-            }
-            npc.userid = data.userid;
-            npc.temp = data.temp;
-            npc.clear_prop();
-            npc.init();
-            npc.recount();
-        },
+        // load_tops/loadTopUser 实现在 world/extends/stats.js 中覆盖
+        // (需要 NPC/OBJ 导入, 避免 world.js ↔ obj.js/npc.js 循环依赖)
+        load_tops(tops, defname, key) { return []; },
+        loadTopUser(data, npc) {},
 
         /** @param {USER} player */
         checkStats(player) {
@@ -473,17 +429,8 @@ const WORLD = {
      * @returns {void}
      */
     connect(socket) {
-        if (WORLD.status < 0)
-            return socket.end();
-        if (!WORLD.check_connect(socket))
-            return socket.end();
-
-        socket.user = new USER();
-
-        socket.user.socket = socket;
-        socket.user.wait_input = this.USERLOGIN.check_session.bind(this.USERLOGIN);
-
-        socket.setTimeout(60000);
+        // 实现在 world/extends/world.js 中覆盖(避免 world.js ↔ user.js 循环依赖)
+        socket.end();
     },
     /**
      * 检查连接是否允许
@@ -638,32 +585,12 @@ const WORLD = {
     on_user_cross_login(user) {
 
     },
-    /** @returns {void} 服务器启动回调 */
-    on_startup() {
-
-    },
-    /**
-     * 用户退出事件回调
-     * @param {USER} user
-     * @returns {void}
-     */
-    on_user_quit(user) {
-
-    },
     /**
      * 用户重连事件回调
      * @param {USER} user
      * @returns {void}
      */
     on_user_relogin(user) {
-
-    },
-    /**
-     * 心跳回调
-     * @param {number} dt - 当前时间戳
-     * @returns {void}
-     */
-    on_heart_beat(user) {
 
     },
     /** @returns {void} 服务器主心跳 */
@@ -795,15 +722,7 @@ const WORLD = {
     },
     /** @returns {void} 加载本地未保存的用户数据 */
     loadLocalData() {
-        const data = db.getLocalRoles();
-        if (!data || !data.length) return;
-        console.log("加载上次未保存的本地用户%d", data.length);
-        for (let i = 0; i < data.length; i++) {
-            const user = new USER();
-            user.loadData(data[i]);
-            this.USERS.push(user);
-        }
-        db.deleteLocalRoles();
+        // 实现在 world/extends/world.js 中覆盖(避免 world.js ↔ user.js 循环依赖)
     },
     /**
      * 跨服响应回调

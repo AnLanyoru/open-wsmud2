@@ -81,12 +81,6 @@ export class AREA extends BASE {
 
     /** @type {((user: USER) => void)|null} 登录回调 */
     on_login = null;
-    /** @type {((me: USER) => boolean)|null} 离开回调 */
-    on_leave = null;
-    /** @type {((me: USER) => boolean|void)|null} 进入区域回调 — jh.js/cr.js检查==false阻止进入 */
-    on_enter = null;
-    /** @type {((me: USER) => void)|null} 进入区域后回调 — 暂未被调用, 由资源文件设置 */
-    on_enterd = null;
 
     // ============ 交互属性 ============
 

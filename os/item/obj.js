@@ -2,9 +2,12 @@
  * OBJ 普通物品基类
  */
 import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
 import { ITEM } from "../item.js";
 import { UTIL } from "../util/util.js";
+
+// 懒加载 WORLD 避免循环依赖: obj.js → world.js → family.js → room.js → obj.js
+let _WORLD = null;
+import("../world.js").then(m => { _WORLD = m.WORLD; });
 
 export class OBJ extends ITEM {
 
@@ -314,7 +317,7 @@ export class OBJ extends ITEM {
      * @returns {OBJ}
      */
     static CREATE(otype, count) {
-        let base = WORLD.OBJ_STROE.get(otype);
+        let base = _WORLD.OBJ_STROE.get(otype);
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype);
             if (!base) throw new Error('没有物品' + otype + "的定义。");
@@ -339,7 +342,7 @@ export class OBJ extends ITEM {
         this.on_create && this.on_create(path, par);
         const cc = grade_color[this.grade];
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
-        WORLD.OBJ_STROE.set(this.path, this);
+        _WORLD.OBJ_STROE.set(this.path, this);
     }
 
     /**

@@ -7,7 +7,6 @@ const require = createRequire(import.meta.url);
 
 import util from 'util';
 import JSON5 from 'json5';
-import { WORLD } from "../world.js";
 
 /**
  * nodejs原型继承 — 将superCtor的方法复制到this.prototype
@@ -512,7 +511,8 @@ export const UTIL = {
      * @param {Date} [dt]
      * @returns {boolean}
      */
-    isLunar15(dt) {
+    async isLunar15(dt) {
+        const { WORLD } = await import("../world.js");
         let issuc = WORLD.DATA.query_temp('lunar15', 0);
         if (issuc === 0) {
             let now = dt || new Date();

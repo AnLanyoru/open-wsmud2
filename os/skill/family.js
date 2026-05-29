@@ -3,12 +3,19 @@
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
+import { ITEM } from "../item.js";
 import { UTIL } from "../util/util.js";
-import { CHARACTER } from "../char/character.js";
-import { NPC } from "../char/npc.js";
 import { ROOM } from "../room/room.js";
 import { EVENTS } from "../task/events.js";
 import { COMMAND } from "../command.js";
+
+// CHARACTER 仅运行时使用(避免 family.js → character.js 循环导致 CHARACTER TDZ)
+let _CHARACTER = null;
+import("../char/character.js").then(m => { _CHARACTER = m.CHARACTER; });
+
+// 懒加载 NPC 避免循环依赖: family.js → npc.js → character.js (TDZ)
+let _NPC = null;
+import("../char/npc.js").then(m => { _NPC = m.NPC; });
 
 /** @type {Object<string, FAMILY>} 所有门派注册表 */
 export const FAMILIES = {};
@@ -72,13 +79,13 @@ export class FAMILY extends BASE {
 
 
     /** @type {function} 临时数据查询(复用CHARACTER) */
-    query_temp = CHARACTER.prototype.query_temp;
+    query_temp = ITEM.prototype.query_temp;
     /** @type {function} */
-    set_temp = CHARACTER.prototype.set_temp;
+    set_temp = ITEM.prototype.set_temp;
     /** @type {function} */
-    remove_temp = CHARACTER.prototype.remove_temp;
+    remove_temp = ITEM.prototype.remove_temp;
     /** @type {function} */
-    add_temp = CHARACTER.prototype.add_temp;
+    add_temp = ITEM.prototype.add_temp;
 
     /**
      * 向门派所有在线成员发送消息
@@ -117,7 +124,7 @@ export class FAMILY extends BASE {
      * @param {string} str
      */
     static addSendFamToCharacter() {
-        CHARACTER.prototype.send_fam = function (str) {
+        _CHARACTER.prototype.send_fam = function (str) {
             this.family.send(str);
         };
     }
@@ -193,7 +200,7 @@ export class FAMILY extends BASE {
         for (let item of this.def_npcs) {
             let rm = ROOM.Get(item[1]);
             if (!rm) throw new Error('房间' + item[1] + "不存在");
-            let npc = NPC.CLONE(item[0]);
+            let npc = _NPC.CLONE(item[0]);
             if (!npc) throw new Error('npc ' + item[0] + "不存在");
             rm.items.push(npc);
             rm.max_item_count = 100;
@@ -215,7 +222,7 @@ export class FAMILY extends BASE {
                 if (!rm) continue;
                 let npc = rm.find_obj_bypath(spath);
                 npc.destroy();
-                npc = NPC.CREATE(spath, rm);
+                npc = _NPC.CREATE(spath, rm);
                 if (npc.is(this.boss_path)) {
                     this.boss = npc;
                 }
@@ -328,7 +335,7 @@ export class FAMILY extends BASE {
         if (!this.boss_guard) return;
 
         var boss_room = this.get_room(ROOM.Get(this.boss_guard[0]));
-        var npc = NPC.CLONE("pub/menpai");
+        var npc = _NPC.CLONE("pub/menpai");
         npc.init_from(this, 5);
         npc.name = this.boss.name;
         npc.desc = this.boss.desc;
@@ -342,7 +349,7 @@ export class FAMILY extends BASE {
         this.battle_boss = npc;
         for (var i = 0; i < this.boss_guard.length; i++) {
             for (var j = 0; j < 2; j++) {
-                npc = NPC.CLONE("pub/menpai");
+                npc = _NPC.CLONE("pub/menpai");
                 npc.init_from(this, i == 0 ? 4 : 3);
                 var rm = this.get_room(ROOM.Get(this.boss_guard[i]));
 
@@ -362,7 +369,7 @@ export class FAMILY extends BASE {
 
     /** @param {number} level @returns {NPC} */
     create_npc(level) {
-        var npc = NPC.CLONE("pub/menpai");
+        var npc = _NPC.CLONE("pub/menpai");
         npc.init_from(this, level);
         return npc;
     }
