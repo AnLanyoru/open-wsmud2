@@ -549,6 +549,68 @@ UTIL = {
         }
         return issuc > 0;
 
+    },
+    /**
+     * 普通等概率随机选择（对标 Python random.choice）
+     * @param {Array} arr 候选数组
+     * @returns {*} 随机选中的元素
+     */
+    choice(arr) {
+        if (!Array.isArray(arr) || arr.length === 0) {
+            throw new Error('候选数组不能为空');
+        }
+        const idx = Math.floor(Math.random() * arr.length);
+        return arr[idx];
+    },
+
+    /**
+     * 带权重随机选择（二分查找实现，对标 Python random.choices 单选场景）
+     * @param {Array} items 候选元素数组
+     * @param {number[]} weights 对应权重数组，需与 items 长度一致
+     * @returns {*} 按权重随机选中的元素
+     */
+    weightedChoice(items, weights) {
+        // 参数校验
+        if (!Array.isArray(items) || !Array.isArray(weights)) {
+            throw new Error('items 和 weights 必须为数组');
+        }
+        if (items.length !== weights.length) {
+            throw new Error('元素数组与权重数组长度必须一致');
+        }
+        if (items.length === 0) {
+            throw new Error('候选数组不能为空');
+        }
+
+        // 1. 构建前缀和数组
+        const prefixSum = [];
+        let total = 0;
+        for (const w of weights) {
+            if (typeof w !== 'number' || w < 0) {
+                throw new Error('权重必须为非负数字');
+            }
+            total += w;
+            prefixSum.push(total);
+        }
+
+        // 所有权重为 0 时，直接返回第一个元素
+        if (total === 0) return items[0];
+
+        // 2. 生成随机值 [0, total)
+        const roll = Math.random() * total;
+
+        // 3. 二分查找：找到第一个大于 roll 的前缀和下标
+        let left = 0;
+        let right = prefixSum.length - 1;
+        while (left < right) {
+            const mid = (left + right) >> 1;
+            if (prefixSum[mid] > roll) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+
+        return items[left];
     }
 
 

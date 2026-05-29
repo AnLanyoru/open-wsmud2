@@ -45,12 +45,37 @@ function on_check(me) {
     var pot = exp + me.query_prop('gsj_qn');
     me.send(`你正在挖矿，每10秒获得${exp}经验，${pot}潜能，有概率挖到<hig>玄晶</hig>和其他宝石。`);
 }
+function calculate_lv(grade) {
+    const items = ["st/xuanjing", "st/st_red#0", "st/st_blu#0", "st/st_gre#0", "st/st_yel#0",
+        "st/st_red#1", "st/st_blu#1", "st/st_gre#1", "st/st_yel#1"];
+
+    // 玄晶(0):500, 绿宝石(1-4):90, 蓝宝石(5-8):1
+    const base = [500, 90, 90, 90, 90, 1, 1, 1, 1];
+
+    // grade小幅将绿宝石概率分配给蓝宝石和玄晶，玄晶分配更多(95%)
+    let weights = base.slice();
+    if (grade > 0) {
+        const shift = grade / 200;
+        for (let i = 1; i <= 4; i++) {
+            let loss = base[i] * shift;
+            weights[i] -= loss;
+            weights[0] += loss * 0.98;
+            let blueGain = loss * 0.02 / 4;
+            for (let j = 5; j <= 8; j++) {
+                weights[j] += blueGain;
+            }
+        }
+    }
+    return UTIL.weightedChoice(items, weights);
+}
+
 function do_diaoyu(me) {
-    let obj = me.add_obj(["st/xuanjing", "st/st_red#0", "st/st_blu#0", "st/st_gre#0", "st/st_yel#0"
-        , "st/st_red#1", "st/st_blu#1", "st/st_gre#1", "st/st_yel#1"][me.random(9)]);
+    let r_i = me.random(100);
+    if (r_i > 89) {
+    let obj = me.add_obj(calculate_lv(0));
     if (obj) {
         me.notify("<hig>恭喜你得到一颗" + obj.color_name + "。</hig>");
-    }
+    }}
 
 
     var exp = WORLD.DATA.get_exp(me)
