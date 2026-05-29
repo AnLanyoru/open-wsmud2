@@ -298,9 +298,9 @@ export class NPC extends CHARACTER {
 
 
     /**
-     * 创建NPC实例到指定环境
+     * 创建NPC实例到指定环境 — 6处调用均为ROOM, 无CHARACTER调用者
      * @param {string} path - NPC模板路径
-     * @param {ROOM|CHARACTER} env - 目标环境
+     * @param {ROOM} env - 目标房间
      * @param {function(NPC)} [oncreate] - 创建后回调
      * @param {number} [count=1] - 创建数量
      * @returns {NPC}
@@ -308,8 +308,6 @@ export class NPC extends CHARACTER {
     static CREATE(path, env, oncreate, count) {
         if (!path || !env) return;
 
-
-        if (env.environment) env = env.environment;
         count = count || 1;
         let obj = null;
         for (let i = 0; i < count; i++) {
@@ -345,20 +343,16 @@ export class NPC extends CHARACTER {
         }
         return base;
     }
+    /**
+     * 发言 — NPC闲聊时调用, 默认空实现由资源文件覆写
+     * @param {string} [msg] - 闲聊消息
+     */
+    do_say(msg) {
+    }
 }
 
 /** @type {string[]} NPC死亡消息 */
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
-
-// is_fighting/clear_status/clear_follow/add_hp/add_mp/query_enemy 从 CHARACTER 继承
-// do_say 提为正式方法(资源文件可覆写)
-
-/**
- * 发言 — NPC闲聊时调用, 默认空实现由资源文件覆写
- * @param {string} [msg] - 闲聊消息
- */
-do_say(msg) {
-}
 
