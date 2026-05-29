@@ -1,37 +1,24 @@
-﻿this.inherits(SKILL);
-this.name = "中平枪法";
-this.id = "zhongpingqiang";
-this.grade = 3;
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends SKILL {
+    name = "中平枪法";
+    id = "zhongpingqiang";
+    grade = 3;
+    attack_actions = [
     "$N双手一别，尽力前伸，使出一招「中平无敌」，手中$w平平直出，刺向$n的$l",
     "$N手中$w盘旋回转，风响阵阵，屈身下蹲，反手一招「夜叉探海」自下向$n的$l刺去",
     "$N举起$w，抖出一朵枪花，一招「灵蛇出洞」向$n分心扎去",
     "$N一招「反身拿枪」，手中$w划个小圈消去$n的后招，而后$w微抬，指向$n的$l"
 ];
-this.desc = "";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["club", "parry"];
-this.learn_condition = {
+    desc = "";
+    can_enables = ["club", "parry"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         club: 500
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        club: {
-            gj: parseInt(lv * 1.8) + 5,
-            mz: parseInt(lv * 1.7) + 5
-        },
-        parry: {
-            zj: parseInt(lv * 1.5) + 5,
-            fy: parseInt(lv * 1.5) + 5
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: "zpqf_cc",
         value: lv => 10 + lv / 500,
@@ -47,7 +34,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     lian:
     {
         name: "突击",
@@ -105,3 +92,17 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        club: {
+            gj: parseInt(lv * 1.8) + 5,
+            mz: parseInt(lv * 1.7) + 5
+        },
+        parry: {
+            zj: parseInt(lv * 1.5) + 5,
+            fy: parseInt(lv * 1.5) + 5
+        }
+    };
+}
+}

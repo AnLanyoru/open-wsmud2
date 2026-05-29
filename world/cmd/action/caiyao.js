@@ -1,7 +1,14 @@
-﻿this.inherits(COMMAND);
-this.command = "caiyao";
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "caiyao";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me) {
     if (!me.environment) return false;
     if (!me.environment.can_caiyao)
         return me.notify('这里不能采药、');
@@ -23,6 +30,7 @@ this.enter = function (me) {
         desc: '["你仔细盯着树底下，石缝下面，一颗小草也不放过。","你找到一株奇怪的药草，努力辨别它的品种。","你爬到树上仔细寻找有没有需要的药材。"]',
     });
 }
+}
 
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level]
@@ -42,7 +50,6 @@ function on_check(me) {
     }
     me.send(`你正在采药，当前效率${grade}，每10秒获得${exp}经验，${exp}潜能，${str}。`);
 }
-
 function calculate_lv(grade) {
     // 权重基准(×10取整，保证红色0.1权重变为1)
     const weights = {
@@ -87,7 +94,6 @@ function calculate_lv(grade) {
 
     return 0;
 }
-
 function do_cai(me) {
     let r_i = me.random(100);
     if (r_i > 89) {

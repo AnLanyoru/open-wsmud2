@@ -1,9 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "梯云纵";
-this.id = "tiyunzong";
-this.family = FAMILIES.WUDANG;
-this.grade = 2;
-this.dodge_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "梯云纵";
+    id = "tiyunzong";
+    family = FAMILIES.WUDANG;
+    grade = 2;
+    dodge_actions = [
     "只见$n一招「<WHT>白鹤冲天</wht>」，身体向上笔直地纵起丈余，躲过了$N这一招。",
     "$n一个「<RED>鹞子翻身</RED>」，向后纵出数丈之远，避开了$N的凌厉攻势。",
     "$n使出「<MAG>大鹏展翅</MAG>」，向一旁飘然纵出，轻轻着地。",
@@ -13,15 +16,15 @@ this.dodge_actions = [
     "却见$n足不点地一招「<MAG>大鹏展翅</MAG>」，往旁窜开数尺，躲了开去。",
     "$n身形微晃，一招「<RED>鹞子翻身</RED>」有惊无险地避开了$N这一招。",
 ];
-//"\s?\+\s?(\w+)\s?\+\s?"(.+?)"\s?\+\s?NOR\s?\+\s?"
-this.learn_condition = {
+    learn_condition = {
     max_mp: 1000,
     skill: {
         dodge: 200
     }
 };
-this.can_enables = ["dodge"];
-this.query_enable_prop = function (lv) {
+    can_enables = ["dodge"];
+
+    query_enable_prop(lv) {
     return {
         dodge: {
             ds: parseInt(lv * 1.5 + 5),
@@ -30,7 +33,7 @@ this.query_enable_prop = function (lv) {
         }
     };
 }
-this.on_dodge_over = function (me, target, par) {
+    on_dodge_over(me, target, par) {
     if (par.is_dodge && !me.query_temp("tiyunzong")) {
         var lv = me.query_skill("tiyunzong", 0);
         me.add_status({
@@ -47,3 +50,5 @@ this.on_dodge_over = function (me, target, par) {
         me.set_temp("tiyunzong", 1, me.random(8000) + lv);
     }
 }
+}
+

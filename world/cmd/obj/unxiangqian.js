@@ -1,11 +1,16 @@
-﻿this.inherits(COMMAND);
-this.command = "unxiangqian";
-this.regex = /^(\w+)(?:\s+(\w+))?$/;
-const MONEYS = [10, 100, 1000, 5000, 10000, 100000, 1000000];
-const MONEYS_DESC = [null,
-    "1两<wht>白银</wht>", "10两<wht>白银</wht>", "50两<wht>白银</wht>",
-    "1两<hiy>黄金</hiy>", "10两<hiy>黄金</hiy>", "100两<hiy>黄金</hiy>"];
-this.enter = function (player, objid, par) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "unxiangqian";
+    regex = /^(\w+)(?:\s+(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, par) {
     if (!objid) {
         var str = ["{type:\"cmds\",items:["];
         for (var i = 0; i < player.items.length; i++) {
@@ -99,3 +104,9 @@ this.enter = function (player, objid, par) {
 
 
 }
+}
+
+const MONEYS = [10, 100, 1000, 5000, 10000, 100000, 1000000];
+const MONEYS_DESC = [null,
+    "1两<wht>白银</wht>", "10两<wht>白银</wht>", "50两<wht>白银</wht>",
+    "1两<hiy>黄金</hiy>", "10两<hiy>黄金</hiy>", "100两<hiy>黄金</hiy>"];

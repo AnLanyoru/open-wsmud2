@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "xiangqian";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, st) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "xiangqian";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, st) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要镶嵌什么装备？");
@@ -49,3 +57,5 @@ this.enter = function (player, objid, st) {
     player.notify(str.join(""));
 
 }
+}
+

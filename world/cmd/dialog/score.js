@@ -1,9 +1,21 @@
-﻿this.inherits(COMMAND);
-this.command = "score";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { NPC } from "../../../os/char/npc.js";
+
+export default class extends COMMAND {
+    command = "score";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    props = ["hp", "mp", "max_hp", "max_mp", "str", "con",
+    "dex", "int", "kar", "gj", "fy", "mz", "zj", "exp", "pot"];
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     var target = me;
     if (arg) {
         if (arg === "title") {
@@ -118,6 +130,17 @@ this.enter = function (me, arg) {
     str.push('}');
     me.send(str.join(""));
 }
+    get_level_desc(me) {
+    if (!me.level) return level_descs[me.level];
+    var cc = level_color[me.level];
+    if (me.level === 6) {
+        return "<" + cc + ">" + level6_descs[me.query_temp('lv6', 0)] + "</" + cc + ">";
+    }
+    return "<" + cc + ">" + level_descs[me.level] + "</" + cc + ">";
+
+}
+}
+
 const MASTER_NAMES = {};
 const MASTER_NAME = function (me) {
     let path = me.query_temp('master');
@@ -128,18 +151,6 @@ const MASTER_NAME = function (me) {
     MASTER_NAMES[path] = obj.name;
     return obj.name
 }
-this.props = ["hp", "mp", "max_hp", "max_mp", "str", "con",
-    "dex", "int", "kar", "gj", "fy", "mz", "zj", "exp", "pot"];
-
 const level_descs = ["普通百姓", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
 const level_color = ["", "wht", "hig", "hiy", "hiz", "hio", "ord"];
 const level6_descs = ["武神", '剑神', '刀皇', '兵主', '战神'];
-this.get_level_desc = function (me) {
-    if (!me.level) return level_descs[me.level];
-    var cc = level_color[me.level];
-    if (me.level === 6) {
-        return "<" + cc + ">" + level6_descs[me.query_temp('lv6', 0)] + "</" + cc + ">";
-    }
-    return "<" + cc + ">" + level_descs[me.level] + "</" + cc + ">";
-
-}

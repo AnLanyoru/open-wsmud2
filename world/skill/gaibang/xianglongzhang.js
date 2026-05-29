@@ -1,10 +1,13 @@
-﻿this.inherits(SKILL);
-this.name = "降龙十八掌";
-this.id = "xianglongzhang";
-this.grade = 4;
-this.family = FAMILIES.GAIBANG;
-this.first_title = "丐帮副帮主";
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "降龙十八掌";
+    id = "xianglongzhang";
+    grade = 4;
+    family = FAMILIES.GAIBANG;
+    first_title = "丐帮副帮主";
+    attack_actions = [
     "$N双掌平平提到胸前，神色沉重的缓缓施出「亢龙有悔」推向$n",
     "$N突然身形飞起，双掌居高临下一招「飞龙在天」拍向$n的$l",
     "$N右掌一招「见龙在田」，迅捷无比地劈向$n的$l",
@@ -24,35 +27,15 @@ this.attack_actions = [
     "$N嗔目大喝，使出「羝羊触蕃」，双掌由下往上击向$n的$l",
     "$N左掌护胸，右掌使一招「神龙摆尾」上下晃动着击向$n的$l"
 ];
-this.desc = "丐帮的降龙十八掌，至刚至猛，威震天下";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "丐帮的降龙十八掌，至刚至猛，威震天下";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 20000,
     skill: {
         unarmed: 500
     }
 };
-this.query_prop = function (lv) {
-    return {
-        gj_per: 5 + parseInt(lv / 300)
-    };
-}
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 2 + 5,
-            str: parseInt(lv / 6) + 20,
-            mz: parseInt(lv * 1.2) + 20
-        },
-        parry: {
-            zj: lv * 2 + 5,
-            fy: lv * 2 + 100
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     qi:
     {
         name: "降龙",
@@ -171,3 +154,24 @@ this.pfm = {
         }
     }
 };
+
+    query_prop(lv) {
+    return {
+        gj_per: 5 + parseInt(lv / 300)
+    };
+}
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 2 + 5,
+            str: parseInt(lv / 6) + 20,
+            mz: parseInt(lv * 1.2) + 20
+        },
+        parry: {
+            zj: lv * 2 + 5,
+            fy: lv * 2 + 100
+        }
+    };
+}
+}
+

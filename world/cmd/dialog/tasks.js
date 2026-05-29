@@ -1,11 +1,18 @@
-﻿
-this.inherits(COMMAND);
-this.command = "tasks";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "tasks";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     var obj = {};
     obj.type = "dialog";
     obj.dialog = "tasks";
@@ -23,3 +30,5 @@ this.enter = function (me, arg) {
     }
     me.notify( JSON.stringify(obj));
 }
+}
+

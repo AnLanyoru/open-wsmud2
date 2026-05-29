@@ -1,11 +1,20 @@
-﻿
-this.inherits(COMMAND);
-this.command = "pk";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "pk";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me) {
     var zc = WORLD.AREAS[6];
 
 }
+}
+

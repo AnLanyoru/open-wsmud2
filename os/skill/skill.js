@@ -1,24 +1,30 @@
 /**
  * SKILL 技能基类 & PERFORM 绝招类
  */
-/*global SKILL_TYPES SKILL BASE PROPERTIES WORLD FAMILIES*/
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { UTIL } from "../util/util.js";
+import { CHARACTER } from "../char/character.js";
+import { FAMILIES } from "./family.js";
+import { SKILL_TYPES, PROPERTIES } from "../const.js";
 
-require("../util/util.js");
+export class SKILL extends BASE {
 
-SKILL = class SKILL extends BASE {
+    // ============ 核心属性 ============
 
-    static __initInstance(obj) {
-        obj.id = "";
-        obj.name = "";
-        /** @type {number} SKILL_TYPES枚举值 */
-        obj.type = SKILL_TYPES.SKILL;
-        obj.grade = 1;
-        obj.score = 0;
-    }
+    /** @type {string} 技能ID */
+    id = "";
+    /** @type {string} 技能名称 */
+    name = "";
+    /** @type {number} SKILL_TYPES枚举值 */
+    type = SKILL_TYPES.SKILL;
+    /** @type {number} 技能品级 */
+    grade = 1;
+    /** @type {number} 技能评分 */
+    score = 0;
 
     constructor() {
         super();
-        SKILL.__initInstance(this);
     }
 
     /**
@@ -824,15 +830,13 @@ SKILL = class SKILL extends BASE {
     }
 }
 
-PERFORM = class PERFORM extends BASE {
+export class PERFORM extends BASE {
 
-    static __initInstance(obj) {
-        obj.name = "";
-    }
+    /** @type {string} 绝招名称 */
+    name = "";
 
     constructor() {
         super();
-        PERFORM.__initInstance(this);
     }
 
     /**

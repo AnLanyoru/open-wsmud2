@@ -1,19 +1,16 @@
-﻿
-this.inherits(USERTASK);
-this.id = "sm";
-this.on_create = function () {
+import { USERTASK } from "../../os/task/playertask.js";
+import { OBJ } from "../../os/item/obj.js";
+
+export default class extends USERTASK {
+    id = "sm";
+
+    on_create() {
 }
-
-
-const TAGS = ['hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
-
-const TITLES = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
-this.query_title = function (me) {
+    query_title(me) {
     let tag = TAGS[me.query_temp('sm_level', 0)];
     return `<${tag}>师门物资</${tag}>`;
 }
-
-this.query_desc = function (me) {
+    query_desc(me) {
     let tm = me.query_temp("sm_tm", 0);
     if (!tm) return;
 
@@ -42,19 +39,18 @@ this.query_desc = function (me) {
 
     return `你是${me.family.query_task_title(me)}，在此期间将持续获得师门的资助，当前累计${sm}/60。<br><mem>每小时获得一份师门资源，可通过后勤管理提升师门职位${mem}</mem>`;
 }
-this.query_smcount = function (me) {
+    query_smcount(me) {
     let sm = me.query_temp("sm_tm", 0);
     if (!sm) return -1;
     sm = Math.floor((Date.now() - sm * 100000) / 3600000);
     return Math.min(sm, 60);
 }
-//0 不显示 1，进行中，2.可领取 3.已完成
-this.query_state = function (me) {
+    query_state(me) {
     let sm = this.query_smcount(me);
     if (sm < 0) return 0;
     return sm > 0 ? 2 : 1;
 }
-this.format_time_span = function (time) {
+    format_time_span(time) {
     if (time > 3600000)
         return Math.floor(time / 3600000) + "小时后";
     if (time > 60000)
@@ -62,12 +58,7 @@ this.format_time_span = function (time) {
     return Math.floor(time / 1000) + "秒后";
 
 }
-const EXPS = [5000, 10000, 12500, 15000, 17500, 20000];
-
-const GONGJI = [10, 20, 40, 60, 80, 100];
-const MONEYS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];
-
-this.on_finish = function (me) {
+    on_finish(me) {
     let sm = this.query_smcount(me);
     if (!(sm > 0)) return false;
     let sm_level = me.query_temp('sm_level', 0);
@@ -136,8 +127,7 @@ this.on_finish = function (me) {
 
     return true;
 }
-
-this.set_curtm = function (me, count) {
+    set_curtm(me, count) {
 
 
     let tm = me.query_temp("sm_tm", 0);
@@ -151,3 +141,10 @@ this.set_curtm = function (me, count) {
     me.set_temp("sm_tm", tm);
 
 }
+}
+
+const TAGS = ['hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
+const TITLES = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
+const EXPS = [5000, 10000, 12500, 15000, 17500, 20000];
+const GONGJI = [10, 20, 40, 60, 80, 100];
+const MONEYS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000];

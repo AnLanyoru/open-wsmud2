@@ -1,4 +1,7 @@
-﻿this.inherits(ROOM);
-this.name = "偏厅"
-this.desc = "偏厅里供奉着华山历代祖师的神位。正中神案的墙上是华山派开山祖师风祖师的画象。画象神情清隽，非常传神。神案上香炉里插着三柱清香，香烟袅袅上升，散发着一股檀香味。西面有扇门通往外面的正厅。";
-this.exits = { "west": "huashan/keting" };
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends ROOM {
+    name = "偏厅";
+    desc = "偏厅里供奉着华山历代祖师的神位。正中神案的墙上是华山派开山祖师风祖师的画象。画象神情清隽，非常传神。神案上香炉里插着三柱清香，香烟袅袅上升，散发着一股檀香味。西面有扇门通往外面的正厅。";
+    exits = { "west": "huashan/keting" };
+}

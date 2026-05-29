@@ -1,18 +1,18 @@
-﻿this.inherits(OBJ);
-this.set({
-    name: "师徒关系解除通知",
-    desc: "",
-    unit: "封",
-    value: 0,
-    grade: 3
-});
-this.on_create = function (path, par) {
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default class extends OBJ {
+    name = "师徒关系解除通知";
+    desc = "";
+    unit = "封";
+    value = 0;
+    grade = 3;
+
+    on_create(path, par) {
     if (par) {
         this.target = par.substr(1);
     }
 }
-
-this.on_receive = function (me) {
+    on_receive(me) {
     if (!this.target) return;
     if (me.query_temp("tudi") == this.target) {
         var name = me.query_temp("tudi_n");
@@ -29,4 +29,5 @@ this.on_receive = function (me) {
         me.notify("你和" + name + "的师徒关系自动解除了。");
         me.set_temp("st_leave", 1, 3600000 * 24 * 7);
     }  
+}
 }

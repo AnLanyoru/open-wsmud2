@@ -1,22 +1,27 @@
-﻿this.inherits(NPC);
-this.name = "金古易";
+import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { USERTASK } from "../../../os/task/playertask.js";
+import { COMMAND } from "../../../os/command.js";
 
-this.desc = "当代武林泰斗金古易，有时候猛的一看，你还以为是三个人。";
-this.title = "<hic>武林泰斗</hic>";
-this.max_hp = 8000000;
-this.hp = 8000000;
-this.max_mp = 1000000;
-this.str = 22;
-this.con = 22;
-this.age = 71;
-this.dex = 22;
-this.int = 22;
-this.per = 55;
-this.gender = 1;
-this.level = 4;
-this.pfm_rate = 1;
-this.no_refresh = true;
-this.prop = {
+export default class extends NPC {
+    name = "金古易";
+    desc = "当代武林泰斗金古易，有时候猛的一看，你还以为是三个人。";
+    title = "<hic>武林泰斗</hic>";
+    max_hp = 8000000;
+    hp = 8000000;
+    max_mp = 1000000;
+    str = 22;
+    con = 22;
+    age = 71;
+    dex = 22;
+    int = 22;
+    per = 55;
+    gender = 1;
+    level = 4;
+    pfm_rate = 1;
+    no_refresh = true;
+    prop = {
     gjsd: 1500,
     add_sh_per: 90,
     diff_sh_per: 135,
@@ -24,40 +29,28 @@ this.prop = {
     mz: 20000,
     ds: 20000
 };
-this.skill_map(
-    ["dodge", 3000],
-    ["parry", 3000],
-    ["force", 3000],
-    ["unarmed", 3000],
-    ["sword", 3000],
-    ["literate", 3000],
-    ["yijinjing", 3000, "force"],
-    ["yitianjianfa", 3000, "sword"],
-    ["lingboweibu", 3000, "dodge"],
-    ["taijiquan", 3000, "parry"],
-    ["jiuyinbaiguzhao", 3000, "unarmed"]);
 
-this.on_kill = function (me) {
+    constructor() {
+        super();
+        this.skill_map(
+            ["dodge", 3000],
+            ["parry", 3000],
+            ["force", 3000],
+            ["unarmed", 3000],
+            ["sword", 3000],
+            ["literate", 3000],
+            ["yijinjing", 3000, "force"],
+            ["yitianjianfa", 3000, "sword"],
+            ["lingboweibu", 3000, "dodge"],
+            ["taijiquan", 3000, "parry"],
+            ["jiuyinbaiguzhao", 3000, "unarmed"]);
+        this.add_action("levelup", "提升境界", testLevel);
+    }
+
+    on_kill(me) {
     return me.notify_fail('金古易拍了拍你的脑袋。');
 }
-this.add_action("levelup", "提升境界", testLevel);
-function testLevel(me) {
-
-    me.send_room("$N向$n恭敬的问道：敢问老先生，" + me.callme() + "武功境界如何？\n", this);
-
-
-
-    if (me.level == 4) {
-        return checkWS(me);
-
-    } else if (me.level == 5) {
-        return me.notify("金古易对你恭敬一揖：老朽金古易，拜见" + me.name + "帝君！");
-    }
-    this.tellResult(me);
-}
-
-
-this.tellResult = function (me) {
+    tellResult(me) {
     if (me.query_status("force")) {
         return me.notify("金古易摇了摇头对你说道：你目前有内功附加的状态，老头子我实在看不出来" + me.call() + "的境界几何。");
     }
@@ -166,33 +159,7 @@ this.tellResult = function (me) {
     }
 
 }
-function checkWS(me) {
-    if (me.query_temp("wd")) {
-
-        return me.notify("金古易对你说道：武道塔的守门人，连我都看不出他的境界，他肯定知道些什么。");
-    }
-
-    var check = {};
-    for (var sk in me.skills) {
-        var item = me.skills[sk];
-        if (item.enable_skill && item.level >= 2200 &&
-            me.skills[item.enable_skill].level >= 2200) {
-            check[sk] = true;
-        }
-    }
-
-    if (check["force"] && check["unarmed"] && (check["sword"] || check["blade"] || check["club"] || check["whip"] || check["staff"]) && check["parry"] && check["dodge"]
-        && me.max_mp >= 1200000) {
-        me.set_temp("wd", 1);
-
-
-        me.notify("金古易对你哈哈一笑道：这位" + me.call() + "，你我同为圣君，指点可不敢当！\n顿了顿，金古易又对你说道：你可以去试着寻找武道塔的守门人，或许他可以指点你。");
-    } else {
-        me.notify("金古易对你哈哈一笑道：这位" + me.call() + "，你我同为圣君，指点可不敢当！\n顿了顿，金古易又对你说道：传说中武圣之上还有帝君，只是中原武林传承断裂，日渐式微，如何成就帝君就恕老朽孤陋寡闻了。");
-    }
-
-}
-this.send_master = function (me) {
+    send_master(me) {
     if (me.level <= 1) return;
     var shifu = me.query_temp("shifu");
     if (!shifu) return;
@@ -232,6 +199,48 @@ this.send_master = function (me) {
 
 
 }
-this.on_die = function () {
+    on_die() {
     this.call_out(this.relive, 10000);
+}
+}
+
+function testLevel(me) {
+
+    me.send_room("$N向$n恭敬的问道：敢问老先生，" + me.callme() + "武功境界如何？\n", this);
+
+
+
+    if (me.level == 4) {
+        return checkWS(me);
+
+    } else if (me.level == 5) {
+        return me.notify("金古易对你恭敬一揖：老朽金古易，拜见" + me.name + "帝君！");
+    }
+    this.tellResult(me);
+}
+function checkWS(me) {
+    if (me.query_temp("wd")) {
+
+        return me.notify("金古易对你说道：武道塔的守门人，连我都看不出他的境界，他肯定知道些什么。");
+    }
+
+    var check = {};
+    for (var sk in me.skills) {
+        var item = me.skills[sk];
+        if (item.enable_skill && item.level >= 2200 &&
+            me.skills[item.enable_skill].level >= 2200) {
+            check[sk] = true;
+        }
+    }
+
+    if (check["force"] && check["unarmed"] && (check["sword"] || check["blade"] || check["club"] || check["whip"] || check["staff"]) && check["parry"] && check["dodge"]
+        && me.max_mp >= 1200000) {
+        me.set_temp("wd", 1);
+
+
+        me.notify("金古易对你哈哈一笑道：这位" + me.call() + "，你我同为圣君，指点可不敢当！\n顿了顿，金古易又对你说道：你可以去试着寻找武道塔的守门人，或许他可以指点你。");
+    } else {
+        me.notify("金古易对你哈哈一笑道：这位" + me.call() + "，你我同为圣君，指点可不敢当！\n顿了顿，金古易又对你说道：传说中武圣之上还有帝君，只是中原武林传承断裂，日渐式微，如何成就帝君就恕老朽孤陋寡闻了。");
+    }
+
 }

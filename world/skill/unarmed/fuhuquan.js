@@ -1,11 +1,13 @@
-﻿this.inherits(SKILL);
-this.name = "伏虎拳";
-this.id = "fuhuquan";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.is_public=true;
-this.family = FAMILIES.SHAOLIN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "伏虎拳";
+    id = "fuhuquan";
+    grade = 1;
+    is_public = true;
+    family = FAMILIES.SHAOLIN;
+    attack_actions = [
     "$N并举双拳，使出一招「灌顶」，当头砸向$n的$l",
     "$N使出一招「解苦」，身形一低，左手护顶，右手一拳击向$n的裆部",
     "$N使出一招「颦眉」，左拳虚击$n的前胸，一错身，右拳横扫$n的太阳穴 ",
@@ -15,25 +17,15 @@ this.attack_actions = [
     "$N使出一招「明心」，全身疾转，双拳横扫$n的$l",
     "$N飞身一跃，使出一招「制胜」，一拳猛击$n咽喉"
 ];
-this.desc = "少林七十二绝技之一，拳法威猛，非臂力高强不可练习";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "少林七十二绝技之一，拳法威猛，非臂力高强不可练习";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 500,
     skill: {
         unarmed: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 10,
-            max_hp: lv + 100
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "罗汉伏虎",
@@ -58,3 +50,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 10,
+            max_hp: lv + 100
+        }
+    };
+}
+}
+

@@ -1,13 +1,21 @@
-this.inherits(COMMAND);
-this.command = "send";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_level = 6;
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
 
-this.regex = /^(\w+)\s(.+)$/;
-this.enter = function (me, user, arg) {
-    if (me && me.allow_level < 5) return false;
+export default class extends COMMAND {
+    command = "send";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_level = 6;
+    regex = /^(\w+)\s(.+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, user, arg) {
+    if (me && me.user_level < 5) return false;
     if (!arg) return me && me.send("没有消息内容。");
     var msg;
     var is_str = typeof arg == "string";
@@ -63,7 +71,7 @@ this.enter = function (me, user, arg) {
     me && me.notify("发送完成，共发送" + users.length);
 
 }
-
+}
 
 const RECORD = {
     top: true,

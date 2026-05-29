@@ -1,14 +1,14 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "个",
-    name: "鱼饵",
-    desc: "一些钓鱼用到的鱼饵",
-    value: 100,
-    consume: 5000
-});
-this.transable = true;
-//this.value = [500, 1000, 5000, 10000, 50000, 100000, 680000][this.grade];
-this.on_create = function (path, par) {
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default class extends OBJ {
+    unit = "个";
+    name = "鱼饵";
+    desc = "一些钓鱼用到的鱼饵";
+    value = 100;
+    consume = 5000;
+    transable = true;
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var lv = parseInt(par);
@@ -36,4 +36,5 @@ this.on_create = function (path, par) {
             this.consume = 10000;
             break;
     }
+}
 }

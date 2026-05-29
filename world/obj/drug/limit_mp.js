@@ -1,19 +1,20 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "粒",
-    name: "培元丹",
-    grade: 1,
-    desc: "江湖中各大门派用来给弟子们拓展经脉的丹药，使用后会增加你10点内力上限",
-    value: 10000,
-    add_mp: 10,
-});
-this.transable = true;
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    unit = "粒";
+    name = "培元丹";
+    grade = 1;
+    desc = "江湖中各大门派用来给弟子们拓展经脉的丹药，使用后会增加你10点内力上限";
+    value = 10000;
+    add_mp = 10;
+    transable = true;
+
+    on_use(me) {
     me.send_room("<hir>$N吞下了一颗培元丹。</hir>");
     me.limit_mp += this.add_mp;
     me.notify("<hiw>你的内力上限增加了" + this.add_mp + "。</hiw>");
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = path + "#0";
         return;
@@ -49,4 +50,5 @@ this.on_create = function (path, par) {
             break;
     }
     this.grade = lv + 1;
+}
 }

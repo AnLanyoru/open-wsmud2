@@ -1,10 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "use";
-this.allow_busy = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, par) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { EQUIP_TYPE } from "../../../os/const.js";
+
+export default class extends COMMAND {
+    command = "use";
+    allow_busy = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, par) {
     var obj = player.find_obj(objid);
 
     var iseq = false;
@@ -66,3 +74,5 @@ this.enter = function (player, objid, par) {
     }
 
 }
+}
+

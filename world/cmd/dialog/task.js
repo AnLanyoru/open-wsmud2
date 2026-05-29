@@ -1,9 +1,17 @@
-﻿
-this.inherits(COMMAND);
-this.command = "task";
-this.regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
-this.allow_state = true;
-this.enter = function (me, tid, cmd, oid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { USERTASK } from "../../../os/task/playertask.js";
+
+export default class extends COMMAND {
+    command = "task";
+    regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
+    allow_state = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, tid, cmd, oid) {
     if (!tid || !cmd) return;
     if (!me.is_player || !WORLD.is_server(me)) return;
     if (tid === 'all') return this.tasks_fin(me);
@@ -34,13 +42,7 @@ this.enter = function (me, tid, cmd, oid) {
 
     }
 }
-const ALLOW_COMMANDS = {
-    start: true,
-    giveup: true,
-    fin: true,
-    fin2: true
-};
-this.task_fin = function (me, task, par) {
+    task_fin(me, task, par) {
     if (task.on_finish(me, par)) {
         const obj = {};
         obj.type = "dialog";
@@ -54,7 +56,7 @@ this.task_fin = function (me, task, par) {
         return me.notify(JSON.stringify(obj));
     }
 }
-this.tasks_fin = function (me) {
+    tasks_fin(me) {
     for (let i = 0; i < WORLD.TASKS.length; i++) {
         const task = WORLD.TASKS[i];
         if (task.query_state(me) === 2) {
@@ -62,3 +64,11 @@ this.tasks_fin = function (me) {
         }
     }
 }
+}
+
+const ALLOW_COMMANDS = {
+    start: true,
+    giveup: true,
+    fin: true,
+    fin2: true
+};

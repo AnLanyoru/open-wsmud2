@@ -1,55 +1,77 @@
 /**
  * EQUIPMENT 装备类 - 继承自OBJ
  */
-require("../util/util.js");
+import { OBJ } from "./obj.js";
+import { UTIL } from "../util/util.js";
+import { EQUIP_TYPE, PROPERTIES } from "../const.js";
+import { SKILL } from "../skill/skill.js";
 
-EQUIPMENT = class EQUIPMENT extends OBJ {
-
-    static __initInstance(obj) {
-        /** @type {number} 装备类型(WEAPON/CLOTH等) */
-        obj.eq_type = EQUIP_TYPE.WEAPON;
-        /** @type {number} 强化等级 */
-        obj.level = 0;
-        /** @type {number} 经验值 */
-        obj.exp = 0;
-        /** @type {number} 品级(0-6) */
-        obj.grade = 0;
-        /** @type {number} 物品数量 */
-        obj.count = 1;
-        /** @type {boolean} 是否可堆叠合并 */
-        obj.combined = false;
-        /** @type {boolean} 显示动作按钮 */
-        obj.showAction = true;
-        /** @type {boolean} 允许战斗中使用 */
-        obj.allow_fight = true;
-        /** @type {number} 物件类型标识 */
-        obj.otype = 4;
-        /** @type {boolean} 是否为装备 */
-        obj.is_equipment = true;
-        /** @type {boolean} 是否可交易 */
-        obj.transable = true;
-        /** @type {number[]} 各品级装备价值 */
-        obj.VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
-        /** @type {string[]} 装备部位名称 */
-        obj.parts = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
-        /** @type {string[]} 品质名称 */
-        obj.qualities = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
-        /** @type {number[]} 强化等级参数 */
-        obj.levelData = [
-            0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
-        ];
-    }
+export class EQUIPMENT extends OBJ {
 
     /** 构造EQUIPMENT实例 */
     constructor() {
         super();
-        EQUIPMENT.__initInstance(this);
     }
+
+    // ============ 装备标识 ============
 
     /** @type {boolean} 是否为装备 */
     is_equipment = true;
     /** @type {boolean} 是否可交易 */
     transable = true;
+    /** @type {number} 装备类型(WEAPON/CLOTH等) */
+    eq_type = EQUIP_TYPE.WEAPON;
+
+    // ============ 装备属性 ============
+
+    /** @type {number} 强化等级 */
+    level = 0;
+    /** @type {number} 装备经验值 */
+    exp = 0;
+    /** @type {number} 品级(0-6) */
+    grade = 0;
+    /** @type {number} 物品数量 */
+    count = 1;
+    /** @type {boolean} 是否可堆叠合并 */
+    combined = false;
+    /** @type {boolean} 显示动作按钮 */
+    showAction = true;
+    /** @type {boolean} 允许战斗中使用 */
+    allow_fight = true;
+    /** @type {number} 物件类型标识 */
+    otype = 4;
+
+    // ============ 附加属性 ============
+
+    /** @type {Object<string, number>|null} 装备附加属性(强化) */
+    prop = null;
+    /** @type {Array<{prop: Object<string, number>}>|null} 宝石镶嵌属性列表 */
+    st_prop = null;
+    /** @type {number} 宝石孔数量 */
+    hole_count = 0;
+    /** @type {Object} 装备条件({skill, str, gender等}) */
+    condition = null;
+    /** @type {Function|null} 套装属性计算函数 */
+    group_prop = null;
+    /** @type {string|null} 套装名称 */
+    group_name = null;
+    /** @type {string} 武器类型(sword/blade/staff等) */
+    weapon_type;
+    /** @type {Object|null} 原始属性(用于强化计算) */
+    original_prop = null;
+    /** @type {string} 带颜色的显示名称 */
+    color_name;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {((me: CHARACTER) => boolean|void)|null} 装备时回调 — equipment.js:167检查==false阻止装备 */
+    on_eq = null;
+    /** @type {((me: CHARACTER) => void)|null} 卸下时回调 — equipment.js:210不检查返回值 */
+    on_uneq = null;
+    /** @type {string|null} 自定义装备消息 */
+    eq_msg = null;
+    /** @type {string|null} 自定义卸下消息 */
+    uneq_msg = null;
 
     /**
      * 变更装备附加属性

@@ -1,12 +1,15 @@
-﻿this.inherits(EQUIPMENT);
-this.set({
-    unit: "根",
-    name: "铁杖",
-    desc: "这是一根浑铁杖，似乎威力不大。",
-    value: 2500,
-    eq_type: EQUIP_TYPE.WEAPON,
-    weapon_type: WEAPON_TYPE.STAFF
-});
-this.prop = {
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+import { EQUIP_TYPE, WEAPON_TYPE } from "../../../../os/const.js";
+
+export default class extends EQUIPMENT {
+    unit = "根";
+    name = "铁杖";
+    desc = "这是一根浑铁杖，似乎威力不大。";
+    value = 2500;
+    eq_type = EQUIP_TYPE.WEAPON;
+    weapon_type = WEAPON_TYPE.STAFF;
+    prop = {
     gj: 2
 };
+}
+

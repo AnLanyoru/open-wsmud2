@@ -1,15 +1,17 @@
-﻿this.inherits(OBJ);
-this.set({
-    name: "雄黄",
-    desc: "一块雄黄，驱蛇效果俱佳",
-    unit: "块",
-    value: 10,
-    grade: 1,
-    combined: true,
-    allow_fight: true
-});
-this.transable = true;
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends OBJ {
+    name = "雄黄";
+    desc = "一块雄黄，驱蛇效果俱佳";
+    unit = "块";
+    value = 10;
+    grade = 1;
+    combined = true;
+    allow_fight = true;
+    transable = true;
+
+    on_use(me) {
     me.notify("<hic>你把雄黄捏碎，朝四周撒去。</hic>");
     var list = [];
     for (var i = 0; i < me.environment.items.length; i++) {
@@ -30,3 +32,5 @@ this.on_use = function (me) {
     }
 
 }
+}
+

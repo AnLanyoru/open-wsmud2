@@ -1,3 +1,7 @@
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
 CHARACTER.prototype.reauto_attack = function () {
     if (!this.auto_pfm && this.fight_type) {
         if (this.attack_handler) clearTimeout(this.attack_handler);
@@ -193,3 +197,4 @@ CHARACTER.prototype.set_releasetime = function (rtime) {
         }
     }
 }
+export default function() {}

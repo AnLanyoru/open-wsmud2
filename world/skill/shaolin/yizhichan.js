@@ -1,35 +1,27 @@
-﻿this.inherits(SKILL);
-this.name = "一指禅";
-this.id = "yizhichan";
-this.grade = 3;
-this.family = FAMILIES.SHAOLIN;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
-this.attack_actions = [
+export default class extends SKILL {
+    name = "一指禅";
+    id = "yizhichan";
+    grade = 3;
+    family = FAMILIES.SHAOLIN;
+    attack_actions = [
     "$N双指并拢，一式<HIY>「佛恩济世」</HIY>，和身而上，左右手一前一后戳向$n的胸腹间",
     "$N左掌护胸，一式<HIY>「佛光普照」</HIY>，右手中指前后划了个半弧，猛地一甩，疾点$n的$l",
     "$N身形闪动，一式<HIY>「佛门广渡」</HIY>，双手食指端部各射出一道青气，射向$n的全身要穴",
     "$N盘膝跌坐，一式<HIY>「佛法无边」</HIY>，左手握拳托肘，右手拇指直立，遥遥对着$n一捺"
 ];
-this.desc = "少林寺七十二绝技之一指禅";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "少林寺七十二绝技之一指禅";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 8000,
     skill: {
         unarmed: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.5) + 20,
-            str: parseInt(lv / 5) + 1,
-            mz: parseInt(lv * 0.8 + 3)
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "惊魔一指",
@@ -68,3 +60,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.5) + 20,
+            str: parseInt(lv / 5) + 1,
+            mz: parseInt(lv * 0.8 + 3)
+        }
+    };
+}
+}
+

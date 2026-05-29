@@ -1,12 +1,40 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "张",
-    name: "契约",
-    desc: "一张契约",
-    value: 100000,
-    grade: 5
-});
-this.on_use = function (me, par) {
+import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { NPC } from "../../../os/char/npc.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
+
+export default class extends OBJ {
+    unit = "张";
+    name = "契约";
+    desc = "一张契约";
+    value = 100000;
+    grade = 5;
+    npcs = {
+    wang: "follower/wang",
+    shuang: "follower/shuang",
+    zhou: "follower/zhou",
+    cheng: "follower/cheng",
+    xiaozhao: "follower/xiaozhao",
+    zhang: "follower/zhang",
+    xia: "follower/xia",
+    wen: "follower/wenyi",
+    liumang: "yz/lm/xiaolm",
+    wei: "yz/lcy/weichunfang",
+    aobai: "bj/ao/aobai",
+    qufeiyan: "wuyue/henshan/qufeiyan",
+    huang: "follower/huang",
+    azi: "follower/azi",
+    azhu: "murong/azhu",
+    abi: "murong/abi",
+    long: "follower/xiaolongnv",
+    qing: "follower/qing",
+    qin: "follower/qin",
+    lang: "follower/lang",
+    dini: "follower/dini",
+    shimei: "follower/shimei"
+};
+
+    on_use(me, par) {
     if (!me.is_player) return me.notify_fail("你不能使用契约书。");
     if (me.environment.parent.id != "home") return me.notify_fail("你只能在自己家使用契约。");
     if (!this.npc_path) return me.notify("你使用了契约书，可是没有任何反应。");
@@ -72,7 +100,7 @@ this.on_use = function (me, par) {
 
 
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         return;
     }
@@ -84,27 +112,5 @@ this.on_create = function (path, par) {
     this.desc = "这是一张契约书，在你的家里使用就可以拥有" + npc.name + "，你最多可以拥有三个追随者，新增的会继承原先NPC的技能，装备，物品。";
     this.npc_path = path;
 }
-this.npcs = {
-    wang: "follower/wang",
-    shuang: "follower/shuang",
-    zhou: "follower/zhou",
-    cheng: "follower/cheng",
-    xiaozhao: "follower/xiaozhao",
-    zhang: "follower/zhang",
-    xia: "follower/xia",
-    wen: "follower/wenyi",
-    liumang: "yz/lm/xiaolm",
-    wei: "yz/lcy/weichunfang",
-    aobai: "bj/ao/aobai",
-    qufeiyan: "wuyue/henshan/qufeiyan",
-    huang: "follower/huang",
-    azi: "follower/azi",
-    azhu: "murong/azhu",
-    abi: "murong/abi",
-    long: "follower/xiaolongnv",
-    qing: "follower/qing",
-    qin: "follower/qin",
-    lang: "follower/lang",
-    dini: "follower/dini",
-    shimei: "follower/shimei"
-};
+}
+

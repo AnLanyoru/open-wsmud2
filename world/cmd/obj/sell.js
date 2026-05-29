@@ -1,7 +1,16 @@
-﻿this.inherits(COMMAND);
-this.command = "sell";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
-this.enter = function (me, count, objid, to) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "sell";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, count, objid, to) {
     var target;
     if (to) {
         target = me.find_obj(to, me.environment);
@@ -102,3 +111,5 @@ this.enter = function (me, count, objid, to) {
         target.on_user_sell(me, obj, sell_count);
     }
 }
+}
+

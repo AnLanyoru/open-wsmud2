@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "deleterole";
-this.allow_login = true;
-this.enter = function (me, pars) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "deleterole";
+    allow_login = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, pars) {
     if (!pars) return;
     var olduser = WORLD.getUser(pars);
     if (olduser) {
@@ -22,3 +30,5 @@ this.enter = function (me, pars) {
         me.notify("{type:\"deleterole\",result:0}");
     });
 }
+}
+

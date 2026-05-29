@@ -1,27 +1,21 @@
-﻿this.inherits(SKILL);
-this.name = "太极神功";
-this.id = "taijishengong";
-this.family = "武当派";
-this.can_enables = ["force"];
-this.family = FAMILIES.WUDANG;
-this.grade = 3;
-this.force_rad = 0.8;
-this.learn_condition = {
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "太极神功";
+    id = "taijishengong";
+    family = "武当派";
+    can_enables = ["force"];
+    family = FAMILIES.WUDANG;
+    grade = 3;
+    force_rad = 0.8;
+    learn_condition = {
     max_mp: 500,
     skill: {
         force: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            max_hp: lv * 10,
-            limit_mp:  lv *104,
-            desc: "唯一：将你内力的80%转化为气血"
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     tu:
     {
         name: "真武除邪",
@@ -65,3 +59,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            max_hp: lv * 10,
+            limit_mp:  lv *104,
+            desc: "唯一：将你内力的80%转化为气血"
+        }
+    };
+}
+}
+

@@ -1,10 +1,19 @@
-﻿this.inherits(COMMAND);
-this.command = "cha,skills";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends COMMAND {
+    command = "cha,skills";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     var target = me;
     var isfollower = false;
     if (arg) {
@@ -30,8 +39,7 @@ this.enter = function (me, arg) {
     }
     this.render_skill(me, target, isfollower);
 }
-
-this.render_skill = function (me, target, isfollower) {
+    render_skill(me, target, isfollower) {
     var skills = target.skills;
     var str = ['{"type":"dialog","dialog":"'];
     str.push(me === target ? 'skills' : 'master');
@@ -74,3 +82,5 @@ this.render_skill = function (me, target, isfollower) {
     str.push("}");
     me.send(str.join(""));
 }
+}
+

@@ -49,3 +49,4 @@ PERFORM.prototype.query_mp = function (me, lv) {
     if (mp < 0) mp = 0;
     return parseInt(mp);
 }
+export default function() {}

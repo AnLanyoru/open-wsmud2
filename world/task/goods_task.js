@@ -1,16 +1,22 @@
-﻿
-this.inherits(TASK);
-this.id = "goods";
-this.handler = null;
-this.customer = {};
-this.startup = function (oldtask) {
+import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { UTIL } from "../../os/util/util.js";
+import { FAMILIES } from "../../os/skill/family.js";
+
+export default class extends TASK {
+    id = "goods";
+    handler = null;
+    customer = {};
+
+    startup(oldtask) {
 
     if (oldtask) {
         this.customer = oldtask.customer;
     }
     this.handler = this.call_out(this.refresh_goods, UTIL.diff_time(12));//12点刷新一次
 }
-this.refresh_goods = function () {
+    refresh_goods() {
     this.handler = null;
     for (var i = 0; i < WORLD.USERS.length; i++) {
         WORLD.USERS[i].send('{type:"msg",ch:"chat",content:"近日新到一批宝石，秘籍，丹药，不知哪位江湖朋友需要。",lv:0,name:"唐楠"}');
@@ -26,7 +32,7 @@ this.refresh_goods = function () {
 
     this.startup();
 }
-this.query_goods = function (me) {
+    query_goods(me) {
     if (this.customer[me.id]) return this.customer[me.id];
     var ref_count = me.query_temp("ref_count", 0);
     var list = [];
@@ -85,11 +91,11 @@ this.query_goods = function (me) {
     this.customer[me.id] = list;
     return list;
 }
-this.set_goods = function (me, list) {
+    set_goods(me, list) {
     this.customer[me.id] = list;
 }
-
-
-this.stop = function () {
+    stop() {
     if (this.handler) clearTimeout(this.handler);
 }
+}
+

@@ -1,8 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "makelove";
-this.allow_fight = false;
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
-this.enter = function (me, oid) {
+export default class extends COMMAND {
+    command = "makelove";
+    allow_fight = false;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, oid) {
 
     if (me.environment.parent.id != 'home') return me.notify("这里双修可不太好，找个安全点的地方吧！");
 
@@ -36,7 +43,7 @@ this.enter = function (me, oid) {
 
 
 }
-this.accept = function (me, target) {
+    accept(me, target) {
 
     let name = target.name;
     me.send("<yel>你和" + name + "面对面盘膝坐下，掌心相对，双掌相抵。</yel>");
@@ -62,6 +69,8 @@ this.accept = function (me, target) {
         }
     });
 }
+}
+
 function on_check(me) {
     let speed = parseInt((me.query_skill("force") / 100
         + me.query_prop("shuangxiu")

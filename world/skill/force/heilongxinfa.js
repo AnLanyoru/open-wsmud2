@@ -1,30 +1,18 @@
-this.inherits(SKILL);
-this.name = "黑龙心法";
-this.id = "heilongxinfa";
-this.grade = 1;
-this.force_rad = 0.65;
-this.desc = "黑龙会的内功心法，入会便能修炼";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
+import { SKILL } from "../../../os/skill/skill.js";
 
-
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            fy: lv,
-            limit_mp: lv * 10,
-            desc: "唯一：将你内力的65%转化为气血"
-        }
-    };
-}
-
-this.learn_condition = {
+export default class extends SKILL {
+    name = "黑龙心法";
+    id = "heilongxinfa";
+    grade = 1;
+    force_rad = 0.65;
+    desc = "黑龙会的内功心法，入会便能修炼";
+    can_enables = ["force"];
+    learn_condition = {
     skill: {
         force: 30
     }
 };
-this.slots = [
+    slots = [
     {
         prop: 'hl_fy',
         value: (lv) => lv,
@@ -40,20 +28,7 @@ this.slots = [
         },
     },
 ];
-
-this.on_force_parry = function (me, target) {
-    let sh = me.query_temp('sk_heilong');
-    if (sh > 0) {
-        me.send_combat(
-            '<blk>$n被$N的黑龙护体反弹了' + sh + '点伤害！！</blk>\n',
-            target
-        );
-        target.damage2(sh, me);
-        me.end_attack(target);
-    }
-    return 0;
-}
-this.pfm = {
+    pfm = {
     power:
     {
         name: "黑龙护体",
@@ -96,3 +71,26 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            fy: lv,
+            limit_mp: lv * 10,
+            desc: "唯一：将你内力的65%转化为气血"
+        }
+    };
+}
+    on_force_parry(me, target) {
+    let sh = me.query_temp('sk_heilong');
+    if (sh > 0) {
+        me.send_combat(
+            '<blk>$n被$N的黑龙护体反弹了' + sh + '点伤害！！</blk>\n',
+            target
+        );
+        target.damage2(sh, me);
+        me.end_attack(target);
+    }
+    return 0;
+}
+}

@@ -1,8 +1,15 @@
-﻿
-this.inherits(COMMAND);
-this.command = "login";
-this.allow_login = true;
-this.enter = function (user, id) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "login";
+    allow_login = true;
+
+    /**
+     * @param {CHARACTER} user - 执行命令的角色
+     */
+    enter(user, id) {
     if (user.id) return;
 
     if (user.serverid !== WORLD.SERVERID) return;
@@ -16,7 +23,7 @@ this.enter = function (user, id) {
         this.loginIn(user, id);
     }
 }
-this.check_user = function (loginuser, id) {
+    check_user(loginuser, id) {
     for (var i = 0; i < WORLD.USERS.length; i++) {
         let user = WORLD.USERS[i];
         if (user.id === id) {
@@ -26,11 +33,20 @@ this.check_user = function (loginuser, id) {
     }
     return {};
 }
-this.relogin = function (oldUser, user) {
+    async relogin(oldUser, user) {
     if (oldUser.userid === user.userid) {
         if (!this.on_user_relogin(oldUser, user) !== false) return;
-        if (oldUser.password !== user.password && oldUser.loginTime > user.loginTime) {
-            return user.send("{type:'loginerror',msg:'密码失效，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+        // 验证新连接token中的密码与数据库一致
+        try {
+            var dbUser = await WORLD.DB.getUserByID(user.userid);
+            if (!dbUser || dbUser.pwd !== user.password) {
+                return user.send("{type:'loginerror',msg:'密码已修改，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+            }
+        } catch (e) {
+            return user.send("{type:'loginerror',msg:'登录验证失败'}");
+        }
+        if (oldUser.loginTime > user.loginTime) {
+            return user.send("{type:'loginerror',msg:'已有更新的登录，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
         }
         oldUser.password = user.password;
         oldUser.loginTime = user.loginTime;
@@ -45,7 +61,7 @@ this.relogin = function (oldUser, user) {
         return user.send("{type:'loginerror',msg:'当前使用的登陆凭证和角色不一致'}");
     }
 }
-this.on_user_relogin = function (user, me) {
+    on_user_relogin(user, me) {
 
     if (user.state && user.state.id == "cross") {
         if (user.state.is_over || Date.now() - user.state.stime > 1800000) {
@@ -59,13 +75,12 @@ this.on_user_relogin = function (user, me) {
 
     return true;
 }
-
-this.loginIn = async function (user, id) {
+    async loginIn(user, id) {
     try {
         const data = await WORLD.DB.getRoleData(user.userid, id);
         if (!data) return user.send("{type:'loginerror',msg:'角色读取失败，请重新登陆 '}");
 
-        oldUser = WORLD.getUser(id);
+        const oldUser = WORLD.getUser(id);
         if (oldUser) return user.send("{type:'loginerror',msg:'重复登录'}");
         if (data.pwd !== user.password)
             return user.send("{type:'loginerror',msg:'密码失效，请<CMD onclick=\\'Process.relogin()\\'>重新登录</CMD>'}");
@@ -84,11 +99,7 @@ this.loginIn = async function (user, id) {
         user.send("{type:'loginerror',msg:'数据加载失败'}");
     }
 }
-
-
-
-
-this.on_user_login = function (user) {
+    on_user_login(user) {
     user.send("欢迎登陆<HIW>MUD游戏</HIW>");
 
 
@@ -100,3 +111,5 @@ this.on_user_login = function (user) {
     }
 
 }
+}
+

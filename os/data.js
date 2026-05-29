@@ -1,25 +1,4 @@
-/**
- * 全局数据管理模块
- * @type {{
- *   parties: Map<*, *>,
- *   PAIMAI: Map<*, *>,
- *   temp: Object<string, *>,
- *   save: function(): Promise<*>,
- *   temp_replacer: function(string, *): *,
- *   save_temp: function(string[]): void,
- *   load: function(): Promise<void>,
- *   query_temp: function(string, *): *,
- *   set_temp: function(string, *, number=): void,
- *   remove_temp: function(string): void,
- *   add_temp: function(string, *, number=): *,
- *   temp_data: Object<string, Object<string, {name: string, value: number}>>,
- *   clear_data: function(): void,
- *   add_data: function(string, USER, number): void,
- *   query_max_data: function(string): {name: string, value: number}|undefined,
- *   query_min_data: function(string): {name: string, value: number}|undefined
- * }}
- */
-module.exports = {
+export default {
     parties: new Map(),
     PAIMAI: new Map(),
     temp: {},

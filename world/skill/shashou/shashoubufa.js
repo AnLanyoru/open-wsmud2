@@ -1,10 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "杀手步法";
-this.id = "shashoubufa";
-this.grade = 1;
-this.family = FAMILIES.SHASHOU;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "杀手步法";
+    id = "shashoubufa";
+    grade = 1;
+    family = FAMILIES.SHASHOU;
+    dodge_actions = [
   "只见$n一招「蟾飞九天」，身体向上笔直地纵起丈余，躲过了$N这一招",
 	"但是$n一个使出「蛙鸣震天」，身形飘忽，轻轻一纵，早已避开",
 	 "$n一招「蛙入稻田」，身行随意转，倏地往一旁挪开了三尺，避过了这一招",
@@ -12,20 +14,21 @@ this.dodge_actions = [
 	"却见$n「蟾翻白肚」，足不点地，往旁窜开数尺，躲了开去",
 	"$n身形一招「金蟾归月」，身形微晃，有惊无险地避开了$N这一招"
 ];
-this.desc = "杀手楼的入门轻功身法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["dodge"];
-this.learn_condition = {
+    desc = "杀手楼的入门轻功身法";
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         dodge: 50
     }
 };
-this.query_enable_prop = function (lv) {
+
+    query_enable_prop(lv) {
     return {
         dodge: {
             ds: parseInt(lv ) + 100
         }
     };
 }
+}
+

@@ -1,9 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "score2";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "score2";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     var target = me;
     if (arg) {
         target = me.find_obj(arg, me.environment);
@@ -75,3 +83,5 @@ this.enter = function (me, arg) {
     str.push('%"}');
     me.send(str.join(""));
 }
+}
+

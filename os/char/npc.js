@@ -1,28 +1,66 @@
 /**
  * NPC 非玩家角色类
  */
+import { CHARACTER } from "./character.js";
+import { ROOM } from "../room/room.js";
+import { OBJ } from "../item/obj.js";
+import { WORLD } from "../world.js";
+import { FAMILIES } from "../skill/family.js";
+import { BASE } from "../base.js";
 
-NPC = class NPC extends CHARACTER {
+export class NPC extends CHARACTER {
 
     /**
      * @param {NPC} obj - 要初始化的NPC实例
      */
-    static __initInstance(obj) {
-        /** @type {number} */
-        obj.hp = obj.max_hp = 100;
-        /** @type {number} */
-        obj.mp = obj.max_mp = 100;
-        /** @type {number} */
-        obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
-        /** @type {FAMILY} */
-        obj.family = FAMILIES.NONE;
-        /** @type {boolean} */
-        obj.auto_pfm = true;
-    }
+
+    // ============ 核心属性 ============
+
+    /** @type {boolean} 是否自动释放绝招 */
+    auto_pfm = true;
+    /** @type {string} NPC名称 */
+    name;
+    /** @type {number} NPC等级 */
+    level = 0;
+    /** @type {string} NPC描述 */
+    desc;
+
+    // ============ 功能属性 ============
+
+    /** @type {string[]|null} 闲聊消息列表 */
+    chat_msg = null;
+    /** @type {number} 闲聊触发概率(百分比) */
+    chat_chance = 0;
+    /** @type {OBJ[]|null} 出售物品列表 */
+    sell_list = null;
+    /** @type {Array|null} 命令JSON缓存 */
+    json = null;
+    /** @type {string|null} 死亡后重生房间路径 */
+    die_room = null;
+    /** @type {boolean} 是否禁止刷新(不重生) */
+    no_refresh = false;
+    /** @type {number} 击杀奖励积分 */
+    score = 0;
+    /** @type {string|null} 任务主人ID */
+    master = null;
+    /** @type {string|null} 对话问题 */
+    question = null;
+    /** @type {boolean} 禁止战斗标识 */
+    no_fight = false;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {((me: USER) => CHARACTER|false|void)|null} 查找师傅回调 — bai.js:38 检查 ==false 拒绝拜师 */
+    on_master = null;
+    /** @type {((me: CHARACTER) => boolean|void)|null} 检查技能回调 — checkskill.js:35只传1参, skill参数实际未使用 */
+    on_checkskill = null;
+    /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 — 暂未被调用, 由资源文件设置 */
+    on_pfm = null;
+
+    // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 
     constructor() {
         super();
-        NPC.__initInstance(this);
     }
 
     /**
@@ -314,3 +352,22 @@ NPC = class NPC extends CHARACTER {
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+// ============ Mixin多态方法桩(writable, 供Object.assign覆写) ============
+Object.defineProperties(NPC.prototype, {
+    /** @type {() => boolean} 是否正在战斗 */
+    is_fighting: { value: function () { return false; }, writable: true, configurable: true },
+    /** @type {() => void} 清除所有状态 */
+    clear_status: { value: function () { }, writable: true, configurable: true },
+    /** @type {() => void} 清除跟随关系 */
+    clear_follow: { value: function () { }, writable: true, configurable: true },
+    /** @type {(val: number, notify?: boolean) => void} 增加气血 */
+    add_hp: { value: function (val, notify) { }, writable: true, configurable: true },
+    /** @type {(val: number, notify?: boolean) => void} 增加内力 */
+    add_mp: { value: function (val, notify) { }, writable: true, configurable: true },
+    /** @type {() => CHARACTER|null} 查询当前敌人(combat mixin) */
+    query_enemy: { value: function () { return null; }, writable: true, configurable: true },
+    /** @type {(msg?: string) => void} 发言(由资源文件定义, 完全动态) */
+    do_say: { value: function (msg) { }, writable: true, configurable: true },
+});
+

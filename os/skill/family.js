@@ -1,31 +1,32 @@
 /**
  * FAMILY 门派基类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { UTIL } from "../util/util.js";
 
 /** @type {Object<string, FAMILY>} 所有门派注册表 */
-FAMILIES = {};
+export const FAMILIES = {};
 
-FAMILY = class FAMILY extends BASE {
+export class FAMILY extends BASE {
 
-    static __initInstance(obj) {
-        /** @type {string[]} */
-        obj.titles = [];
-        /** @type {NPC[]} */
-        obj.npcs = [];
-        /** @type {string|null} */
-        obj.battle_family = null;
-        obj.battle_score = 0;
-        obj.battle_gift = 0;
-        obj.can_battle = false;
-        obj.query_temp = CHARACTER.prototype.query_temp;
-        obj.set_temp = CHARACTER.prototype.set_temp;
-        obj.remove_temp = CHARACTER.prototype.remove_temp;
-        obj.add_temp = CHARACTER.prototype.add_temp;
-    }
+    // ============ 核心属性 ============
+
+    /** @type {string[]} 门派称谓列表 */
+    titles = [];
+    /** @type {NPC[]} 门派NPC列表 */
+    npcs = [];
+    /** @type {string|null} 敌对门派 */
+    battle_family = null;
+    /** @type {number} 门派战积分 */
+    battle_score = 0;
+    /** @type {number} 门派战奖励 */
+    battle_gift = 0;
+    /** @type {boolean} 是否可门派战 */
+    can_battle = false;
 
     constructor() {
         super();
-        FAMILY.__initInstance(this);
     }
 
     /**
@@ -65,14 +66,14 @@ FAMILY = class FAMILY extends BASE {
     }
 
 
-    /** @type {function} 临时数据查询(复用CHARACTER) */
-    query_temp = CHARACTER.prototype.query_temp;
+    /** @type {function} 临时数据查询(复用globalThis.CHARACTER) */
+    query_temp = globalThis.CHARACTER.prototype.query_temp;
     /** @type {function} */
-    set_temp = CHARACTER.prototype.set_temp;
+    set_temp = globalThis.CHARACTER.prototype.set_temp;
     /** @type {function} */
-    remove_temp = CHARACTER.prototype.remove_temp;
+    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
     /** @type {function} */
-    add_temp = CHARACTER.prototype.add_temp;
+    add_temp = globalThis.CHARACTER.prototype.add_temp;
 
     /**
      * 向门派所有在线成员发送消息
@@ -97,7 +98,7 @@ FAMILY = class FAMILY extends BASE {
 
     /**
      * 增加门派积分
-     * @param {CHARACTER} me
+     * @param {globalThis.CHARACTER} me
      * @param {number} sc
      */
     add_score(me, sc) {
@@ -111,7 +112,7 @@ FAMILY = class FAMILY extends BASE {
      * @param {string} str
      */
     static addSendFamToCharacter() {
-        CHARACTER.prototype.send_fam = function (str) {
+        globalThis.CHARACTER.prototype.send_fam = function (str) {
             this.family.send(str);
         };
     }
@@ -164,7 +165,7 @@ FAMILY = class FAMILY extends BASE {
 
     /**
      * 增加门派贡献
-     * @param {CHARACTER} me
+     * @param {globalThis.CHARACTER} me
      * @param {number} count
      */
     add_gongji(me, count) {
@@ -180,7 +181,3 @@ FAMILY = class FAMILY extends BASE {
     }
 }
 
-// Apply CHARACTER.prototype.send_fam after class definition
-CHARACTER.prototype.send_fam = function (str) {
-    this.family.send(str);
-};

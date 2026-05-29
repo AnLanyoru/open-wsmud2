@@ -1,9 +1,10 @@
-﻿this.inherits(SKILL);
-this.name = "四象步法";
-this.id = "sixiangbu";
-this.grade = 2;
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "四象步法";
+    id = "sixiangbu";
+    grade = 2;
+    dodge_actions = [
     "只见$n一招「少阴步」，身体向上笔直地纵起丈余，躲过了$N这一招。",
     "$n一个「乾兑步」，向后纵出数丈之远，避开了$N的凌厉攻势。",
     "$n使出「离震步」，向一旁飘然纵出，轻轻着地。",
@@ -11,25 +12,16 @@ this.dodge_actions = [
     "$n身随意转「太阴步」，倏地往一旁挪开了三尺，避过了这一招。",
     "可是$n侧身一让，一个「巽坎步」，$N这一招扑了个空。",
 ];
-this.desc = "关外胡家的轻功身法，胡斐就是凭借这个步法闯出个雪山飞狐的名号";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["dodge"];
-this.learn_condition = {
+    desc = "关外胡家的轻功身法，胡斐就是凭借这个步法闯出个雪山飞狐的名号";
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 1000,
     dex1: 20,
     skill: {
         dodge: 200
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            ds: lv + 10
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'sxbf_gjsd',
         value: (lv) => 10,
@@ -46,7 +38,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "飞天狐狸",
@@ -78,3 +70,12 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            ds: lv + 10
+        }
+    };
+}
+}

@@ -1,19 +1,21 @@
-﻿this.inherits(OBJ);
-this.set({
-    name: "碎裂的贪狼",
-    desc: "一颗神秘的宝石",
-    unit: "块",
-    value: 10000,
-    combined: true,
-    is_stone: true,
-    transable: true,
-    grade: 3,
-    prop: {
+import { OBJ } from "../../../os/item/obj.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends OBJ {
+    name = "碎裂的贪狼";
+    desc = "一颗神秘的宝石";
+    unit = "块";
+    value = 10000;
+    combined = true;
+    is_stone = true;
+    transable = true;
+    grade = 3;
+    prop = {
         str: 1
-    }
-});
-this.otype = 2;
-this.on_create = function (path, par) {
+    };
+    otype = 2;
+
+    on_create(path, par) {
     var lv = 0;
     if (par != undefined) {
         par = par.substr(1);
@@ -61,3 +63,5 @@ this.on_create = function (path, par) {
         this.desc = this.desc + "\n十块可以合成高级宝石。";
     }
 }
+}
+

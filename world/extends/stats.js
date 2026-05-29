@@ -1,3 +1,8 @@
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { EQUIP_TYPE } from "../../os/const.js";
+import { NPC } from "../../os/char/npc.js";
+
 
 
 const STATS = WORLD.STATS;
@@ -230,3 +235,4 @@ STATS.updateScore = function (me) {
     this.updateScoreItem(me, fam);
 
 }
+export default function() {}

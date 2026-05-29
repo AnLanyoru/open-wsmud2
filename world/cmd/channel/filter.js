@@ -1,8 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "filter";
-this.enter = function (me, str) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "filter";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, str) {
 
 }
+}
+
 UTIL.check_word = function (str) {
     for (var i = 0; i < UTIL.workds_regex.length; i++) {
         if (UTIL.workds_regex[i].test(str)) {
@@ -20,7 +30,6 @@ UTIL.replace_word = function (str) {
 UTIL.add_world = function (str) {
     UTIL.workds_regex.push(new RegExp(str));
 }
-
 var workds = [
     '爱液',
     '按摩棒',
@@ -413,7 +422,6 @@ var workds = [
     '乳交',
     '幼齿',
     '习近平', '毛泽东'];
-
 UTIL.workds_regex = [];
 for (var i = 0; i < workds.length; i++) {
     workds[i] = new RegExp(workds[i]);

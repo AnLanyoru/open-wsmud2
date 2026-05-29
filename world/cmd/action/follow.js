@@ -1,6 +1,13 @@
-﻿this.inherits(COMMAND);
-this.command = "follow";
-this.enter = function (me, objid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "follow";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, objid) {
     if (me.is_player && !me.query_temp("admin")) return false;
     if (!objid) {
         return me.notify("你要跟随谁？");
@@ -16,4 +23,5 @@ this.enter = function (me, objid) {
         me.do_follow(obj);
     }
 
+}
 }

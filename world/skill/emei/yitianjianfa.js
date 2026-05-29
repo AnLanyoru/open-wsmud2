@@ -1,10 +1,14 @@
-﻿this.inherits(SKILL);
-this.name = "倚天剑法";
-this.id = "yitianjianfa";
-this.grade = 4;
-this.first_title = "倚天传人";
-this.family = FAMILIES.EMEI;
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends SKILL {
+    name = "倚天剑法";
+    id = "yitianjianfa";
+    grade = 4;
+    first_title = "倚天传人";
+    family = FAMILIES.EMEI;
+    attack_actions = [
     "$N剑尖剑芒暴长，一招「倚天寒芒」，手中$w大开大阖，剑芒直刺$n的$l",
     "$N剑芒吞吐，单手$w一招「翻江倒海」，剑势曼妙，剑光直逼向$n的$l",
     "$N一式「神剑佛威」，屈腕云剑，剑光如彩碟纷飞，幻出点点星光飘向$n",
@@ -14,49 +18,15 @@ this.attack_actions = [
     "$N反身跃起，双手握剑举至头顶使出倚天剑法奥义“谁与争锋”，这看似简简单单的一剑，而厚重的剑气直奔$n的$l而去"
 
 ];
-this.desc = "峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。";
-//"\+(\w+)\+"(.+?)"\+NOR\+"
-//<$1>$2</$1>
-
-this.can_enables = ["sword"];
-this.query_prop = function (lv) {
-    return {
-        diff_fy_per: 5 + parseInt(lv / 300)
-    };
-}
-this.learn_condition = {
+    desc = "峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         sword: 500
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: 30 + parseInt(lv * 1.8),
-            mz: parseInt(lv * 1.8) + 20,
-            desc: "命中敌人后会使敌方防御减少1%，可叠加最高20层"
-        }
-    };
-}
-this.on_attack_over = function (me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
-        target.add_status({
-            id: "fumo",
-            name: "伏魔",
-            desc: "你的防御减少了",
-            max_count: 20,
-            prop: {
-                fy_per: -1
-            },
-            duration: 5000,
-            count: 1,
-            downside: true,
-            override: 1
-        });
-    }
-}
-this.pfm = {
+    pfm = {
     yi:
     {
         name: "倚天剑决",
@@ -118,3 +88,37 @@ this.pfm = {
         }
     }
 };
+
+    query_prop(lv) {
+    return {
+        diff_fy_per: 5 + parseInt(lv / 300)
+    };
+}
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: 30 + parseInt(lv * 1.8),
+            mz: parseInt(lv * 1.8) + 20,
+            desc: "命中敌人后会使敌方防御减少1%，可叠加最高20层"
+        }
+    };
+}
+    on_attack_over(me, target, par) {
+    if (!par.is_dodge && !par.is_parry) {
+        target.add_status({
+            id: "fumo",
+            name: "伏魔",
+            desc: "你的防御减少了",
+            max_count: 20,
+            prop: {
+                fy_per: -1
+            },
+            duration: 5000,
+            count: 1,
+            downside: true,
+            override: 1
+        });
+    }
+}
+}
+

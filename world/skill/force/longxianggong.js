@@ -1,48 +1,25 @@
-﻿this.inherits(SKILL);
-this.name = "龙象般若功";
-this.id = "longxianggong";
-this.grade = 5;
-this.force_rad = 0.9;
-this.desc = "密宗至高无上的护法神功，外功掌力强悍凶猛，抗击打能力强，内力亦刚亦柔";
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends SKILL {
+    name = "龙象般若功";
+    id = "longxianggong";
+    grade = 5;
+    force_rad = 0.9;
+    desc = "密宗至高无上的护法神功，外功掌力强悍凶猛，抗击打能力强，内力亦刚亦柔";
+    attack_actions = [
     "$N单掌一抖，运聚龙象般若功功力，呼啸着向$n的$l处拍去",
     "$N右拳横移，左掌运起龙象般若功的劲力，猛地拍向$n的$l",
     "$N吐气扬声，双拳同时运满龙象般若功功力，朝$n$l处贯去",
     "$N运足龙象般若功，双拳平推，顿时一股凌厉的罡劲直袭$n"
 ];
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+    can_enables = ["force"];
+    learn_condition = {
     max_mp: 50000,
     skill: {
         force: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: parseInt(lv * 1.9) + 10,
-            fy: parseInt(lv * 1.9) + 10,
-            hp_per: 10 + parseInt(lv / 300),
-            limit_mp: lv * 198,
-            desc: "唯一：将你内力的90%转化为气血"
-        },
-    };
-}
-this.on_force_parry = function (me, target, sh) {
-    var lv = me.query_temp("xqs");
-    if (lv) {
-        var hp = me.do_recover(lv * sh / 100);
-        if (hp) {
-            me.send_room("<hiy>$N全身罡气流转，似乎更加精神奕奕。</hiy>");
-            return hp;
-        }
-    }
-    return 0;
-}
-
-this.slots = [
+    slots = [
 
     {
         prop: "lxg_lt",
@@ -58,7 +35,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     power:
     {
         name: "龙吞势",
@@ -136,3 +113,27 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: parseInt(lv * 1.9) + 10,
+            fy: parseInt(lv * 1.9) + 10,
+            hp_per: 10 + parseInt(lv / 300),
+            limit_mp: lv * 198,
+            desc: "唯一：将你内力的90%转化为气血"
+        },
+    };
+}
+    on_force_parry(me, target, sh) {
+    var lv = me.query_temp("xqs");
+    if (lv) {
+        var hp = me.do_recover(lv * sh / 100);
+        if (hp) {
+            me.send_room("<hiy>$N全身罡气流转，似乎更加精神奕奕。</hiy>");
+            return hp;
+        }
+    }
+    return 0;
+}
+}

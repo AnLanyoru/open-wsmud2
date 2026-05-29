@@ -1,7 +1,13 @@
-﻿
-this.inherits(COMMAND);
-this.command = "list";
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "list";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     var target = me;
     if (arg) {
         target = me.find_obj(arg, me.environment);
@@ -50,4 +56,5 @@ this.enter = function (me, arg) {
     str.push("\"}");
 
     me.send(str.join(""));
+}
 }

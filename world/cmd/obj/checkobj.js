@@ -1,10 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "checkobj";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(\w+?)\s+from\s+(\w+)$/;
-this.enter = function (player, objid,  type) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "checkobj";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(\w+?)\s+from\s+(\w+)$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, type) {
     var obj = null;
     if (type == "item") {
         obj = player.find_obj(objid);
@@ -47,6 +54,8 @@ this.enter = function (player, objid,  type) {
     }
     player.notify(query_obj_desc(player,obj, type));
 }
+}
+
 function query_obj_desc(player,obj, type) {
     var json = {};
     json.type = "dialog";

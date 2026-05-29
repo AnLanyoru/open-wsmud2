@@ -1,9 +1,10 @@
-﻿this.inherits(SKILL);
-this.name = "云龙剑";
-this.id = "yunlongjian";
-this.grade = 2;
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.attack_actions = [
+export default class extends SKILL {
+    name = "云龙剑";
+    id = "yunlongjian";
+    grade = 2;
+    attack_actions = [
     "$N使一式<GRN>「悠悠顺自然」</GRN>，手中$w嗡嗡微振，幻成一条白光刺向$n的$l",
     "$N错步上前，使出<HIC>「来去若梦行」</HIC>，剑意若有若无，$w淡淡地向$n的$l挥去",
     "$N一式<HIB>「志当存高远」</HIB>，纵身飘开数尺，运发剑气，手中$w遥摇指向$n的$l",
@@ -17,34 +18,15 @@ this.attack_actions = [
     "$N随风轻轻飘落，一式<GRN>「清风知我意」</GRN>，手中$w平指，缓缓拍向$n脸颊"
 
 ];
-this.desc = "天地会看家本领，其特殊攻击法威力奇大，堪称武林一绝。学习需要云龙心法支持。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["sword"];
-//this.on_learn = function (me) {
-//    if (me.max_mp < 100)
-//        return me.notify_fail("你的内力不够。");
-//    if (me.query_skill("sword", 1) < 60)
-//        return me.notify_fail("你的基础不够，无法领会更高深的技巧。");
-//    if (me.query_skill("yunlongxinfa", 1) < 60)
-//        return me.notify_fail("你的云龙心法等级不够，无法学习云龙剑。");
-//    return true;
-//}
-this.learn_condition = {
+    desc = "天地会看家本领，其特殊攻击法威力奇大，堪称武林一绝。学习需要云龙心法支持。";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         sword: 200
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: parseInt(lv * 1.1 + 10),
-            mz: lv
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: "ylj_sh",
         value: lv => 30 + lv / 100,
@@ -61,7 +43,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     wu:
     {
         name: "云龙三现",
@@ -102,3 +84,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: parseInt(lv * 1.1 + 10),
+            mz: lv
+        }
+    };
+}
+}

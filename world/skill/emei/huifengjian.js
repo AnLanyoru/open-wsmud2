@@ -1,9 +1,13 @@
-﻿this.inherits(SKILL);
-this.name = "回风拂柳剑";
-this.id = "huifengjian";
-this.grade = 2;
-this.family = FAMILIES.EMEI;
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends SKILL {
+    name = "回风拂柳剑";
+    id = "huifengjian";
+    grade = 2;
+    family = FAMILIES.EMEI;
+    attack_actions = [
 "$N剑尖剑芒暴长，一招「清风袭月」，手中$w自左下大开大阖，一剑向右上向$n的$l",
   "$N长剑圈转，施一招「飘雪穿云」，手中$w平展下刺，一剑轻轻划过$n的$l",
   "只见$N长剑轻灵跳动，剑随身长，右手$w猛地使出一式「千峰竞秀」刺向$n的$l",
@@ -13,25 +17,15 @@ this.attack_actions = [
   "$N挥剑分击，剑势自胸前跃出，右手$w一式「进退龙游」，毫无留恋之势，刺向$n的$l",
  "$N退步，左手剑指划转，腰部一扭，右手$w一记「天地鹤翔」自下而上刺向$n的$l"
 ];
-this.desc = "峨眉派的入门剑法，剑法轻灵，如回风拂柳";
-//"\+(\w+)\+"(.+?)"\+NOR\+"
-//<$1>$2</$1>
-this.learn_condition = {
+    desc = "峨眉派的入门剑法，剑法轻灵，如回风拂柳";
+    learn_condition = {
     max_mp: 2000,
     skill: {
         sword: 200
     }
 };
-this.can_enables = ["sword"];
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: 20 + parseInt(lv * 1.3),
-            mz: parseInt(lv * 1.3) + 20
-        }
-    };
-}
-this.pfm = {
+    can_enables = ["sword"];
+    pfm = {
     mie:
     {
         name: "灭剑",
@@ -97,3 +91,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: 20 + parseInt(lv * 1.3),
+            mz: parseInt(lv * 1.3) + 20
+        }
+    };
+}
+}
+

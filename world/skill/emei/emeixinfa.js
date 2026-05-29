@@ -1,14 +1,21 @@
-﻿this.inherits(SKILL);
-this.name = "峨眉心法";
-this.id = "emeixinfa";
-this.grade = 1;
-this.force_rad = 0.6;
-this.desc = "峨眉派的入门心法";
-this.family = FAMILIES.EMEI;
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.query_enable_prop = function (lv) {
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "峨眉心法";
+    id = "emeixinfa";
+    grade = 1;
+    force_rad = 0.6;
+    desc = "峨眉派的入门心法";
+    family = FAMILIES.EMEI;
+    can_enables = ["force"];
+    learn_condition = {
+    skill: {
+        force: 50
+    }
+};
+
+    query_enable_prop(lv) {
     return {
         force: {
             max_hp: lv * 2 + 10,
@@ -17,8 +24,5 @@ this.query_enable_prop = function (lv) {
         }
     };
 }
-this.learn_condition = {
-    skill: {
-        force: 50
-    }
-};
+}
+

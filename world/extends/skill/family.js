@@ -1,3 +1,10 @@
+import { WORLD } from "../../../os/world.js";
+import { FAMILIES, FAMILY } from "../../../os/skill/family.js";
+import { NPC } from "../../../os/char/npc.js";
+import { ROOM } from "../../../os/room/room.js";
+import { EVENTS } from "../../../os/task/events.js";
+import { COMMAND } from "../../../os/command.js";
+
 FAMILY.prototype.init = function () {
     if (!this.def_npcs) return;
     for (let item of this.def_npcs) {
@@ -412,4 +419,4 @@ FAMILY.prototype.query_task_title = function (me) {
 FAMILY.prototype.query_job_title = function (level) {
     return TITLES[level];
 }
-
+export default function() {}

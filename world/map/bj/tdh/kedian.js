@@ -1,15 +1,34 @@
-﻿
+import { ROOM } from "../../../../os/room/room.js";
+import { WORLD } from "../../../../os/world.js";
 
-this.inherits(ROOM);
-this.name = "客店后院";
-this.desc = "这里客店后院。一阵阵打斗之声从东面的厢房中传来，其中夹杂着一个女子的声音。房门的板壁不住的震动，似乎客房四周的板壁都要被刀风掌力震坍一般。西首也是厢房，不时有人探头出来观望。北面是客店大门。";
+export default class extends ROOM {
+    name = "客店后院";
+    desc = "这里客店后院。一阵阵打斗之声从东面的厢房中传来，其中夹杂着一个女子的声音。房门的板壁不住的震动，似乎客房四周的板壁都要被刀风掌力震坍一般。西首也是厢房，不时有人探头出来观望。北面是客店大门。";
+    exits = { "east": "bj/tdh/kedian3", "south": "bj/tdh/andao", "west": "bj/tdh/hutong"};
 
-this.exits = { "east": "bj/tdh/kedian3", "south": "bj/tdh/andao", "west": "bj/tdh/hutong"};
-this.on_enter = function (me) {
+    constructor() {
+        super();
+        this.add_action('lkfb', null, function (me, par) {
+
+            if (par) {
+
+                WORLD.COMMANDS['cr'].enter(me, 'over');
+
+                me.moveto(ROOM.Get('bj/hg/xiaolu'));
+
+                me.send('你从客栈后院出来，来到一个胡同里面。');
+            } else {
+                me.send('你即将离开这个副本进入公共区域，是否确认？');
+                me.send_commands('lkfb ok', '确认进入');
+            }
+
+        });
+    }
+
+    on_enter(me) {
     me.notify("你走出天地会暗道，发现来到一处客店的后院。");
 }
-
-this.on_leave = function (me,dir) {
+    on_leave(me, dir) {
     if (dir === "east") {
         var lv = me.query_skill("dodge", 0);
         if (lv < 200) {
@@ -21,19 +40,5 @@ this.on_leave = function (me,dir) {
         return false;
     }
 }
+}
 
-this.add_action('lkfb', null, function (me, par) {
-
-    if (par) {
-
-        WORLD.COMMANDS['cr'].enter(me, 'over');
-
-        me.moveto(ROOM.Get('bj/hg/xiaolu'));
-
-        me.send('你从客栈后院出来，来到一个胡同里面。');
-    } else {
-        me.send('你即将离开这个副本进入公共区域，是否确认？');
-        me.send_commands('lkfb ok', '确认进入');
-    }
-
-});

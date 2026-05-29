@@ -1,9 +1,17 @@
-this.inherits(ROOM);
-this.name = "武道塔"
-this.desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
-this.exits = { "up": "wudao/up", "out": "wudao/ding" };
-this.max_item_count = 1;
-this.on_before_enter = function (me) {
+import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { NPC } from "../../../os/char/npc.js";
+import { USER } from "../../../os/char/user.js";
+import { COMMAND } from "../../../os/command.js";
+
+export default class extends ROOM {
+    name = "武道塔";
+    desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
+    exits = { "up": "wudao/up", "out": "wudao/ding" };
+    max_item_count = 1;
+
+    on_before_enter(me) {
     var level = (me.query_temp("wd_level", 0)) + 1 - 100;
     this.name = "上" + UTIL.to_c(level) + "层";
     if (level > 5) return
@@ -17,7 +25,7 @@ this.on_before_enter = function (me) {
     this.items.push(npc);
     this.refresh();
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     me.die = this.on_die1;
     let npc = this.items[0];
     if (npc && !npc.is_player) {
@@ -26,8 +34,7 @@ this.on_enter = function (me) {
         npc.on_kill(me);
     }
 }
-
-this.on_die1 = function (me) {
+    on_die1(me) {
     if (this.on_die && this.on_die(me) == false) {
         this.hp = 1;
         return false;
@@ -39,8 +46,7 @@ this.on_die1 = function (me) {
     this.moveto('wudao/ding');
     this.notify("<hir>你的挑战失败了。</hir>");
 }
-
-this.on_die_boss = function (me) {
+    on_die_boss(me) {
     me.notify("<hig>恭喜你战胜了" + this.name + "。</hig>");
     let count = me.query_temp('wd_level', 0);
     if (count > 105) {
@@ -59,10 +65,10 @@ this.on_die_boss = function (me) {
     }
     me.environment.item_changed(this, false, this.name + "离开了。");
 }
-this.on_reward = function (me, lv) {
+    on_reward(me, lv) {
 
 }
-this.on_leave = function (me, dir) {
+    on_leave(me, dir) {
 
     var npc = this.find_by_path("pub/wudao_boss");
     if (dir == "up") {
@@ -90,5 +96,6 @@ this.on_leave = function (me, dir) {
         if (npc) this.items.remove(npc);
         me.die = USER.prototype.die;
     }
+}
 }
 

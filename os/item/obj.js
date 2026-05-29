@@ -1,34 +1,77 @@
 /**
  * OBJ 普通物品基类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { ITEM } from "../item.js";
+import { UTIL } from "../util/util.js";
 
-OBJ = class OBJ extends ITEM {
-
-    static __initInstance(obj) {
-        /** @type {string} 单位 */
-        obj.unit = "个";
-        /** @type {string} 物品路径 */
-        obj.path = null;
-        /** @type {number} 物品数量 */
-        obj.count = 1;
-        /** @type {boolean} 是否可堆叠合并 */
-        obj.combined = true;
-        /** @type {number} 品级(0-6) */
-        obj.grade = 0;
-        /** @type {number} 物件类型标识 */
-        obj.otype = 0;
-        /** @type {boolean} 是否可交易 */
-        obj.transable = false;
-    }
+export class OBJ extends ITEM {
 
     /** 构造OBJ实例 */
     constructor() {
         super();
-        OBJ.__initInstance(this);
     }
 
+    // ============ 核心属性 ============
+
+    /** @type {string} 单位(个/把/件等) */
+    unit = "个";
+    /** @type {string|null} 物品路径标识 */
+    path = null;
+    /** @type {number} 物品数量 */
+    count = 1;
+    /** @type {boolean} 是否可堆叠合并 */
+    combined = true;
+    /** @type {number} 品级(0-6) */
+    grade = 0;
+    /** @type {number} 物件类型标识 */
+    otype = 0;
     /** @type {boolean} 是否可交易 */
     transable = false;
+
+    // ============ 显示属性 ============
+
+    /** @type {string} 带颜色的显示名称 */
+    color_name;
+    /** @type {string} 物品描述 */
+    desc;
+    /** @type {number} 物品价值 */
+    value = 0;
+    /** @type {boolean} 是否为金钱 */
+    is_money = false;
+    /** @type {boolean} 是否为装备 */
+    is_equipment = false;
+    /** @type {boolean} 显示动作按钮 */
+    showAction = true;
+    /** @type {number} 连续使用间隔(毫秒) */
+    distime = 0;
+
+    // ============ 功能属性 ============
+
+    /** @type {string|null} JSON描述缓存 */
+    json = null;
+    /** @type {Object<string, *>|null} 临时数据 */
+    temp = null;
+    /** @type {number} 最大叠加数量 */
+    combine_count = 999;
+    /** @type {boolean} 是否已锁定 */
+    is_locked = false;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 — use.js:64传(me,par), 返回值决定是否广播动作 */
+    on_use = null;
+    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 — 调用已被注释, 资源文件定义为(me,skill,lv) */
+    on_study = null;
+    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 — open.js:14取返回值为OBJ[]或false阻止打开 */
+    on_open = null;
+    /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
+    on_init = null;
+    /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
+    on_create = null;
+    /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
+    on_reload = null;
 
     /**
      * 初始化回调
@@ -324,13 +367,13 @@ OBJ = class OBJ extends ITEM {
     }
 
     /** @type {function} 临时数据(复用CHARACTER) */
-    query_temp = CHARACTER.prototype.query_temp;
+    query_temp = globalThis.CHARACTER.prototype.query_temp;
     /** @type {function} */
-    set_temp = CHARACTER.prototype.set_temp;
+    set_temp = globalThis.CHARACTER.prototype.set_temp;
     /** @type {function} */
-    remove_temp = CHARACTER.prototype.remove_temp;
+    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
     /** @type {function} */
-    add_temp = CHARACTER.prototype.add_temp;
+    add_temp = globalThis.CHARACTER.prototype.add_temp;
 
     /**
      * 根据概率列表创建物品

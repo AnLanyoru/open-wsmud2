@@ -1,6 +1,12 @@
-﻿this.inherits(ROOM);
-this.name = "长廊"
-this.desc = "这是条长长的走廊。四处黑沉沉的。";
-this.exits={"north":"bj/zhuang/xiaowu","south":"bj/zhuang/dating"};
+import { ROOM } from "../../../../os/room/room.js";
 
-this.set_npc("bj/shenlong/dizi");
+export default class extends ROOM {
+    name = "长廊";
+    desc = "这是条长长的走廊。四处黑沉沉的。";
+    exits = {"north":"bj/zhuang/xiaowu","south":"bj/zhuang/dating"};
+
+    constructor() {
+        super();
+        this.set_npc("bj/shenlong/dizi");
+    }
+}

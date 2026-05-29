@@ -1,13 +1,12 @@
-﻿
-this.inherits(AREA);
-this.set({
-    name: "帮会",
-    room_path: "banghui/",
-    id: "banghui",
-    is_copy: true,
-    not_fb: true
-});
-this.map = [{ n: "大门", id: "home/danjian", p: [0, 0] },
+import { AREA } from "../../../os/room/area.js";
+
+export default class extends AREA {
+    name = "帮会";
+    room_path = "banghui/";
+    id = "banghui";
+    is_copy = true;
+    not_fb = true;
+    map = [{ n: "大门", id: "home/danjian", p: [0, 0] },
     { n: "聚义堂", id: "home/woshi", p: [2, 0] },
     { n: "院子", id: "home/yuanzi", p: [1, 0], exits: ["w", "e", "s", "n"] },
     { n: "练功房", id: "home/liangong", p: [1, -1] },
@@ -16,6 +15,8 @@ this.map = [{ n: "大门", id: "home/danjian", p: [0, 0] },
 
 
 ];
-this.query_owner = function (me) {
+
+    query_owner(me) {
     return me.query_temp("pt");
+}
 }

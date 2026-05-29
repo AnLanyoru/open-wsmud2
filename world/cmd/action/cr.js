@@ -1,9 +1,20 @@
-﻿
-this.inherits(COMMAND);
-this.command = "cr";
-this.allow_fight = true;
-//this.allow_busy = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { AREA } from "../../../os/room/area.js";
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends COMMAND {
+    command = "cr";
+    allow_fight = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     if (!me.environment) return;
 
     if (!arg) {
@@ -15,6 +26,8 @@ this.enter = function (me, arg) {
         fb_start(me, arg);
     }
 }
+}
+
 function fb_ok(me) {
     var r = me.query_temp("teamcr");
     if (r == 1) {
@@ -77,7 +90,6 @@ function fb_saodang(me, path, isdiff, count) {
         me.notify(area.name + "扫荡完成。");
     });
 }
-
 function fb_quick(me, area, isdiff) {
 
     var drops = area.query_drops(isdiff, me);
@@ -379,8 +391,6 @@ function fb_over(me) {
         me.notify("你现在还不能离开副本。");
     }
 }
-
-
 function fb_first_check(me, fb, area, diff) {
     if (me.family === FAMILIES.NONE && !me.query_temp('sr')) {
         return;//无门无派的非长期散人不参与
@@ -437,7 +447,6 @@ function fb_first_check(me, fb, area, diff) {
     WORLD.DATA.set_temp(fb_key2, ss_userids);
     fb.parent.notify_update();
 }
-
 function team_name(tms) {
     var str = [];
     for (var i = 0; i < tms.length; i++) {

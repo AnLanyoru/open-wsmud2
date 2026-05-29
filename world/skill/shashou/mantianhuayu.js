@@ -1,10 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "漫天花雨";
-this.id = "mantianhuayu";
-this.grade = 4;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.family = FAMILIES.SHASHOU;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "漫天花雨";
+    id = "mantianhuayu";
+    grade = 4;
+    family = FAMILIES.SHASHOU;
+    attack_actions = [
     "$N双手一晃，一招「千变万化」，手中的$w幻出万道金光，如一条金龙般飞向$n的$l",
     "$N右手一抖，一道金光冒出，正是一招「奇诡莫测」，抢先飞向$n的$l",
     "$N突然旋身，$w在旋转中化作「银轮割风」，边缘泛着锐光，既封退路又取$l",
@@ -12,37 +14,15 @@ this.attack_actions = [
     "$N手腕轻抖，$w骤然化作「飞星追影」，一道冷光划破虚空，直取$n$l要害",
     "$N指尖一弹，$w化作「流光穿云」，破风之声忽强忽弱，轨迹飘忽难测地缠向$n$l"
 ];
-this.desc = "杀手楼的暗器武功，使用的时候如漫天星光而得名";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["throwing", "sword"];
-this.learn_condition = {
+    desc = "杀手楼的暗器武功，使用的时候如漫天星光而得名";
+    can_enables = ["throwing", "sword"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         throwing: 300
     }
 };
-
-this.query_prop = function (lv) {
-    return {
-        bj_per: 5 + parseInt(lv / 300)
-    };
-}
-this.query_enable_prop = function (lv) {
-    return {
-        throwing: {
-            gj: parseInt(lv * 1.4) + 4,
-            mz: parseInt(lv * 1.4) + 4,
-            mz_per: parseInt(lv / 500) + 1
-        },
-        sword: {
-            gj: parseInt(lv * 1.4) + 4,
-            mz: parseInt(lv * 1.4) + 4,
-            bj_per: 8,
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     luo:
     {
         name: "落花",
@@ -109,3 +89,25 @@ this.pfm = {
         }
     }
 };
+
+    query_prop(lv) {
+    return {
+        bj_per: 5 + parseInt(lv / 300)
+    };
+}
+    query_enable_prop(lv) {
+    return {
+        throwing: {
+            gj: parseInt(lv * 1.4) + 4,
+            mz: parseInt(lv * 1.4) + 4,
+            mz_per: parseInt(lv / 500) + 1
+        },
+        sword: {
+            gj: parseInt(lv * 1.4) + 4,
+            mz: parseInt(lv * 1.4) + 4,
+            bj_per: 8,
+        }
+    };
+}
+}
+

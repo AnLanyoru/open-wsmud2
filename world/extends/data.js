@@ -1,3 +1,6 @@
+import { WORLD } from "../../os/world.js";
+import { FAMILIES } from "../../os/skill/family.js";
+
 
 const STATS = WORLD.STATS;
 const DATA = WORLD.DATA;
@@ -113,3 +116,4 @@ DATA.reset_famtops = function (me, fam) {
     }
 
 }
+export default function() {}

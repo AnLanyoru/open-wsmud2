@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "wk";
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "wk";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me) {
 
     var wea = me.query_weapon();
     if (me.master) {
@@ -38,6 +46,7 @@ this.enter = function (me) {
         on_check: on_check
     });
 }
+}
 
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level]
@@ -68,14 +77,16 @@ function calculate_lv(grade) {
     }
     return UTIL.weightedChoice(items, weights);
 }
-
 function do_diaoyu(me) {
     let r_i = me.random(100);
     if (r_i > 89) {
     let obj = me.add_obj(calculate_lv(0));
     if (obj) {
         me.notify("<hig>恭喜你得到一颗" + obj.color_name + "。</hig>");
-    }}
+    } else {
+        me.notify("<hig>你挖了一会儿，发现一些碎石，没有挖到宝贝。</hig>");
+    }
+}
 
 
     var exp = WORLD.DATA.get_exp(me)
@@ -85,4 +96,3 @@ function do_diaoyu(me) {
     me.add_exp(exp, pot, 0);
 
 }
-

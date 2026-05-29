@@ -1,9 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "perform";
-this.allow_busy = true;
-this.allow_faint = true;
-this.regex = /^(\w+)\.(.+?)$/;
-this.enter = function (me, sk, pfmid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends COMMAND {
+    command = "perform";
+    allow_busy = true;
+    allow_faint = true;
+    regex = /^(\w+)\.(.+?)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, sk, pfmid) {
     if (!sk || !pfmid) return me.notify("你要使用什么绝招。");
     if (!me.skills) return me.notify("你目前没有学会任何技能。");
     var baseSkill = me.skills[sk];
@@ -143,13 +152,13 @@ this.enter = function (me, sk, pfmid) {
     }
 
 }
+}
 
 const NOWEAPON = {
     "force": true,
     "unarmed": true, "dodge": true,
     "parry": true, throwing: true
 };
-
 const WEAPON = {
     sword: "sword",
     blade: "blade",
@@ -157,13 +166,3 @@ const WEAPON = {
     club: "club",
     whip: "whip"
 };
-
-// WEAPON_TYPE = {
-//     NONE: "unarmed",
-//     SWORD: "sword",
-//     BLADE: "blade",
-//     STAFF: "staff",
-//     CLUB: "club",
-//     WHIP: "whip",
-//     THROWING: "throwing"
-// }

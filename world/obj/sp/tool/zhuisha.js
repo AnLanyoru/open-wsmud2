@@ -1,18 +1,33 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "个",
-    name: "门派追杀令",
-    desc: "门派追杀令，使用后可以召唤门派NPC追杀10分钟内击杀过自己门派NPC的玩家",
-    grade: 1,
-    value: 10000
-});
-this.on_use = function (me) {
+import { OBJ } from "../../../../os/item/obj.js";
+import { WORLD } from "../../../../os/world.js";
+import { NPC } from "../../../../os/char/npc.js";
+
+export default class extends OBJ {
+    unit = "个";
+    name = "门派追杀令";
+    desc = "门派追杀令，使用后可以召唤门派NPC追杀10分钟内击杀过自己门派NPC的玩家";
+    grade = 1;
+    value = 10000;
+
+    on_use(me) {
     if (!me.is_player) return me.notify("你不能用追杀令。");
     me.notify("请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：");
 
     me.wait_input = readname.bind(this);
     return false;
 }
+    on_create(path, par) {
+    if (!par) {
+        this.path = path + "#1";
+        return;
+    }
+    par = par.substr(1);
+    var lv = parseInt(par);
+    if (!(lv > 0 && lv <= 5)) return;
+    this.grade = lv;
+}
+}
+
 function readname(me, cmd) {
     if (!cmd) return me.send('请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：');
     var ss = cmd.split(' ');
@@ -40,15 +55,4 @@ function readname(me, cmd) {
         fam.boss.do_command("chat", npc.name + "听令，即刻起追杀" + name + "，不得有误。");
     }
     npc.follow_kill(user);
-}
-
-this.on_create = function (path, par) {
-    if (!par) {
-        this.path = path + "#1";
-        return;
-    }
-    par = par.substr(1);
-    var lv = parseInt(par);
-    if (!(lv > 0 && lv <= 5)) return;
-    this.grade = lv;
 }

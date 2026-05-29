@@ -1,8 +1,10 @@
-﻿this.inherits(SKILL);
-this.name = "五毒烟萝步";
-this.id = "wuduyanluobu";
-this.grade = 3;
-this.dodge_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends SKILL {
+    name = "五毒烟萝步";
+    id = "wuduyanluobu";
+    grade = 3;
+    dodge_actions = [
     "$n不慌不忙，一式「江水横流」，身行倏的向一旁平移数尺,堪堪躲过了$N的功势。",
     "$n身行如鬼魅般一晃，刹那间已远去数丈之外，$N顿时扑了个空。",
     "$n身行忽的加快，如一缕青烟般绕着$N飞快旋转，看得$N一阵头晕眼花，急忙收招跳开。",
@@ -10,22 +12,14 @@ this.dodge_actions = [
     "$n怪异的一笑，身行忽的变得朦胧不清，$N的凌厉招式竟然透体而过，原来竟是一具幻影。",
     "$n的身行顿时变得如蛇一般柔软，随着$N的招式左右摆动，竟使得$N招招落空。"
 ];
-this.can_enables = ["dodge"];
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            ds: parseInt(lv * 1.5) + 130,
-            dex: parseInt(lv / 7)
-        }
-    };
-}
-this.learn_condition = {
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         dodge: 500
     }
 };
-this.slots = [
+    slots = [
     {
         prop: "wdylb_ds",
         value: lv => 100,
@@ -40,7 +34,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     snake:
     {
         name: "金蛇游身",
@@ -74,3 +68,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            ds: parseInt(lv * 1.5) + 130,
+            dex: parseInt(lv / 7)
+        }
+    };
+}
+}

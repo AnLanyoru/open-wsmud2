@@ -1,8 +1,14 @@
-﻿
-this.inherits(COMMAND);
-this.command = "dc";
-this.regex = /(\w+)\s+(\w+)\s*(.+)?/;
-this.enter = function (player, arg, cmd, par) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "dc";
+    regex = /(\w+)\s+(\w+)\s*(.+)?/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, arg, cmd, par) {
     if (!arg || !cmd) return;
     var target = player.find_obj(arg, player.environment);
     if (!target) return player.send("没有这个人。");
@@ -16,6 +22,8 @@ this.enter = function (player, arg, cmd, par) {
     }
     target.set_listener(player, null);
 }
+}
+
 const ALLOW_DC = {
     study: true,
     store: true,

@@ -1,13 +1,19 @@
-﻿this.inherits(COMMAND);
-this.command = "message";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
-const MESSAGE = WORLD.MESSAGE;
-this.regex = /^(\w+)\s(\w+)$/;
-this.enter = function (me, arg, arg2) {
+export default class extends COMMAND {
+    command = "message";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)\s(\w+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg, arg2) {
     if (arg === 'delete') {
         if (!arg2) return this.delete_all(me);
         return this.delete_from(me, arg2);
@@ -41,7 +47,7 @@ this.enter = function (me, arg, arg2) {
     // }
     me.send(JSON.stringify(obj));
 }
-this.delete_from = function (me, from) {
+    delete_from(me, from) {
     let stores = MESSAGE.stores.get(me.id);
     if (!stores) return me.send('你没有消息。');
     let store = stores.get(from);
@@ -52,8 +58,7 @@ this.delete_from = function (me, from) {
     stores.delete(from);
     me.send('{type:"dialog",dialog:"message",clear:"' + from + '"}');
 }
-
-this.delete_all = function (me) {
+    delete_all(me) {
     let stores = MESSAGE.stores.get(me.id);
     if (!stores) return;
     stores.forEach((x, y) => {
@@ -64,7 +69,7 @@ this.delete_all = function (me) {
     MESSAGE.stores.delete(me.id);
     me.send('{type:"dialog",dialog:"message",clear:true}');
 }
-this.check_store = function (store) {
+    check_store(store) {
     let items = store.items;
     for (let item of items) {
         if (item.attach && !item.rec)
@@ -72,3 +77,6 @@ this.check_store = function (store) {
     }
     return true;
 }
+}
+
+const MESSAGE = WORLD.MESSAGE;

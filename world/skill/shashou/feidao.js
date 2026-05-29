@@ -1,29 +1,20 @@
-﻿this.inherits(SKILL);
-this.name = "飞刀";
-this.id = "feidao";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.family = FAMILIES.SHASHOU;
-
-this.desc = "杀手楼的入门暗器武功";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["throwing"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "飞刀";
+    id = "feidao";
+    grade = 1;
+    family = FAMILIES.SHASHOU;
+    desc = "杀手楼的入门暗器武功";
+    can_enables = ["throwing"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         throwing: 100
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        throwing: {
-            gj: parseInt(lv * 1.1) + 4
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     jiang:
     {
         name: "又见飞刀",
@@ -51,3 +42,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        throwing: {
+            gj: parseInt(lv * 1.1) + 4
+        }
+    };
+}
+}
+

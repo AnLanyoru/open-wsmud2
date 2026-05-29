@@ -1,18 +1,18 @@
-﻿this.inherits(OBJ);
-this.set({
-    name: "休书",
-    desc: "这是一封休书",
-    unit: "封",
-    value: 0,
-    grade: 3
-});
-this.on_create = function (path, par) {
+import { OBJ } from "../../../../os/item/obj.js";
+
+export default class extends OBJ {
+    name = "休书";
+    desc = "这是一封休书";
+    unit = "封";
+    value = 0;
+    grade = 3;
+
+    on_create(path, par) {
     if (par) {
         this.target = par.substr(1);
     }
 }
-
-this.on_receive = function (me) {
+    on_receive(me) {
     if (!this.target) return;
     if (me.query_temp("wife") == this.target) {
         var name = me.query_temp("wife_n");
@@ -32,4 +32,5 @@ this.on_receive = function (me) {
         me.add_title("", "mar");
         me.set_temp("marry_leave", 1, 7 * 24 * 3600000);
     }
+}
 }

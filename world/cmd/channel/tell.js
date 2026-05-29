@@ -1,9 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "tell";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(\w+)\s(.+)$/;
-this.enter = function (me, target, cont) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
+export default class extends COMMAND {
+    command = "tell";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(\w+)\s(.+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, target, cont) {
+
+}
 }

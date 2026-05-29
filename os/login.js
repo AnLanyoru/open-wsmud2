@@ -2,16 +2,8 @@
  * 登录/会话解密模块
  */
 
-const crypto = require('crypto');
-/**
- * @type {{
- *   max_idcount: number,
- *   max_ipcount: number,
- *   login_error: function(USER, string, boolean=): boolean,
- *   encryptUser: function(string, string): {id: number, name: string, pwd: string, loginTime: number, level: number}|null
- * }}
- */
-module.exports = {
+import crypto from 'crypto';
+export default {
     max_idcount: 10,
     max_ipcount: 12,
     /**

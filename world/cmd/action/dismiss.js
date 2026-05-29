@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "dismiss";
-this.regex = /^(\w+)(\s+ok)?$/;
-this.enter = function (me, objid, isok) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
+
+export default class extends COMMAND {
+    command = "dismiss";
+    regex = /^(\w+)(\s+ok)?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, objid, isok) {
     var npc = me.find_obj(objid, me.environment);
     if (!npc) return me.notify("你要遣散谁？");
     if (!npc.master || npc.master != me.id) return me.notify("你不能遣散" + npc.call3() + "。");
@@ -26,3 +34,5 @@ this.enter = function (me, objid, isok) {
         me.send_commands("dismiss " + objid + " ok", "确定遣散");
     }
 }
+}
+

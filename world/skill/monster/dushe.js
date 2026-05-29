@@ -1,18 +1,19 @@
-﻿this.inherits(SKILL);
-this.name = "毒蛇攻击";
-this.id = "dushegongji";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.family = FAMILIES.MONSTER;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "毒蛇攻击";
+    id = "dushegongji";
+    grade = 1;
+    family = FAMILIES.MONSTER;
+    attack_actions = [
     "$N张嘴朝$n的$l咬去", "$N往$n的$l狠狠的扑了过去",
     "$N猛的扑向$n的$l", "$N扑上来张嘴往$n的$l咬去"
 ];
-this.desc = "毒蛇攻击方式，会中毒";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["bite"];
-this.query_enable_prop = function (lv) {
+    desc = "毒蛇攻击方式，会中毒";
+    can_enables = ["bite"];
+
+    query_enable_prop(lv) {
     return {
         bite: {
             gj: lv,
@@ -22,7 +23,7 @@ this.query_enable_prop = function (lv) {
         }
     };
 }
-this.on_attack_over = function (me, target, par) {
+    on_attack_over(me, target, par) {
     if (!par.is_dodge && !par.is_parry) {
         var lv = me.query_skill("dushegongji", 0);
         var sh = parseInt((lv / 10) + 10);
@@ -43,3 +44,5 @@ this.on_attack_over = function (me, target, par) {
     }
 
 }
+}
+

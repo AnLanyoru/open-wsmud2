@@ -1,10 +1,13 @@
-﻿this.inherits(SKILL);
-this.name = "金顶绵掌";
-this.id = "jindingzhang";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
-this.family = FAMILIES.EMEI;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "金顶绵掌";
+    id = "jindingzhang";
+    grade = 1;
+    family = FAMILIES.EMEI;
+    attack_actions = [
     "$N身形微晃，一招「三阳开泰」，掌起风生，$n只觉得一股暖气袭向$l",
     "$N双手变幻，五指轻弹，一招「五气呈祥」，力分五路，招罩十方，抓向$n的$l",
     "$N左手前引，右手倏出，抢在头里，一招「罡风推云」，疾抓向$n的$l",
@@ -14,30 +17,15 @@ this.attack_actions = [
     "$N一幅宝像庄严，使出「梵心降魔」，掌势如虹，绕着$n漂移不定",
     "$N双臂疾舞，化为点点掌影，一招「法尊八荒」铺天盖地袭向$n全身各处大穴"
 ];
-this.desc = "峨眉派拳脚功夫，掌风阴柔，犹如长江大河，汹涌不绝";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "峨眉派拳脚功夫，掌风阴柔，犹如长江大河，汹涌不绝";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 500,
     skill: {
         unarmed: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv + 20,
-            mz:lv
-
-        }, parry: {
-            zj: parseInt(lv * 1.2) + 10,
-            max_hp: lv*3
-
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     po:
     {
         name: "佛光普照",
@@ -62,3 +50,19 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv + 20,
+            mz:lv
+
+        }, parry: {
+            zj: parseInt(lv * 1.2) + 10,
+            max_hp: lv*3
+
+        }
+    };
+}
+}
+

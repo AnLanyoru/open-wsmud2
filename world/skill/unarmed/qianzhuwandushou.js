@@ -1,9 +1,11 @@
-﻿this.inherits(SKILL);
-this.name = "千蛛万毒手";
-this.id = "qianzhuwandushou";
-this.grade = 3;
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
-this.attack_actions = [
+export default class extends SKILL {
+    name = "千蛛万毒手";
+    id = "qianzhuwandushou";
+    grade = 3;
+    attack_actions = [
     "$N身形一晃而至，一招「小鬼勾魂」，双掌带着一缕腥风拍向$n的前心",
     "$N身形化做一缕轻烟绕着$n急转，一招「天网恢恢」，双掌幻出无数掌影罩向$n",
     "$N大喝一声，一招「恶鬼推门」，单掌如巨斧开山带着一股腥风猛劈向$n的面门",
@@ -13,36 +15,16 @@ this.attack_actions = [
     "$N一个急旋，飞身纵起，半空中一式「毒龙摆尾」，反手击向$n的$l",
     "$N大喝一声，运起五毒神功，一招「毒火焚身」，刹那间全身毛发尽绿，一对碧绿的双爪闪电般的朝$n的$l抓去"
 ];
-this.desc = "五毒教的千蛛万毒手";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "五毒教的千蛛万毒手";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 8000,
     skill: {
         unarmed: 300,
         wudushengong: 300,
     }
 };
-this.query_prop = function (lv) {
-    return {
-        per: (-parseInt(lv / 300) - 1)
-    };
-}
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.5 + 20),
-            mz: lv,
-            str: parseInt(lv / 8),
-        }, parry: {
-            zj: parseInt(lv * 1.5 + 20),
-            fy: lv,
-        }
-    };
-}
-
-this.slots = [
+    slots = [
     {
         prop: 'qzwds_cc',
         value: (lv, grade) => grade,
@@ -58,27 +40,7 @@ this.slots = [
         }
     },
 ];
-this.on_parry_over = function (me, target, par) {
-    if (me.query_temp("wangu")) {
-        var lv = me.query_skill("wudushengong", 0) + me.query_skill("qianzhuwandushou", 0);
-        var gj = 200 + parseInt(lv * (lv / 1000 + 1));
-        if (par.is_parry) {
-            let val = me.query_prop('qzwds_sh');
-            if (val > 0) {
-                gj = gj * val / 100;
-            }
-        }
-        target.send_combat("<red>毒气顺着$W侵入$N体内，$P感到全身一阵发麻。</red>\n");
-        target.damage2(gj, me);
-        me.end_attack(target);
-    }
-}
-this.on_disenable = function (me, type) {
-    if (type === "parry") {
-        me.remove_status("wangu", true);
-    }
-}
-this.pfm = {
+    pfm = {
     qian:
     {
         name: "千蛛万毒",
@@ -148,3 +110,43 @@ this.pfm = {
 
     }
 };
+
+    query_prop(lv) {
+    return {
+        per: (-parseInt(lv / 300) - 1)
+    };
+}
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.5 + 20),
+            mz: lv,
+            str: parseInt(lv / 8),
+        }, parry: {
+            zj: parseInt(lv * 1.5 + 20),
+            fy: lv,
+        }
+    };
+}
+    on_parry_over(me, target, par) {
+    if (me.query_temp("wangu")) {
+        var lv = me.query_skill("wudushengong", 0) + me.query_skill("qianzhuwandushou", 0);
+        var gj = 200 + parseInt(lv * (lv / 1000 + 1));
+        if (par.is_parry) {
+            let val = me.query_prop('qzwds_sh');
+            if (val > 0) {
+                gj = gj * val / 100;
+            }
+        }
+        target.send_combat("<red>毒气顺着$W侵入$N体内，$P感到全身一阵发麻。</red>\n");
+        target.damage2(gj, me);
+        me.end_attack(target);
+    }
+}
+    on_disenable(me, type) {
+    if (type === "parry") {
+        me.remove_status("wangu", true);
+    }
+}
+}
+

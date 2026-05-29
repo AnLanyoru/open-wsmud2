@@ -1,9 +1,15 @@
-﻿
-this.inherits(COMMAND);
-this.command = "select,command";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "select,command";
+    allow_busy = true;
+    allow_state = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     if (!me.environment) return;
     if (arg) {
         var target = me.environment.find_obj(arg);
@@ -40,7 +46,7 @@ this.enter = function (me, arg) {
         me.notify(me.environment.query_commands(me, true));
     }
 }
-this.exec = function (me, target) {
+    exec(me, target) {
     var str = ['{type:"'];
     str.push(me == target ? 'login"' : 'select"');
     if (target) {
@@ -78,4 +84,5 @@ this.exec = function (me, target) {
             me.action_target.add_listen(me);
     }
     return this.notify(str.join(""));
+}
 }

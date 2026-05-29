@@ -1,24 +1,25 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "<hic>指引者</hic>",
-    desc: "她是一位漂亮的女性，脸上笑眯眯的",
-    title: "<hig>新手导师</hig>",
-    gender: 2,
-    age: 20,
-    per: 41,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 1500,
-    max_hp: 1500,
-});
-this.set_objects([
-    "sp/new/qicai", 1, 1
-]);
+import { NPC } from "../../../os/char/npc.js";
 
+export default class extends NPC {
+    name = "<hic>指引者</hic>";
+    desc = "她是一位漂亮的女性，脸上笑眯眯的";
+    title = "<hig>新手导师</hig>";
+    gender = 2;
+    age = 20;
+    per = 41;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 1500;
+    max_hp = 1500;
 
+    constructor() {
+        super();
+        this.set_objects([
+            "sp/new/qicai", 1, 1
+        ]);
+    }
 
-
-this.query_commands_json = function (player, isyb) {
+    query_commands_json(player, isyb) {
 
     var json = {};
     json.type = "item";
@@ -40,4 +41,5 @@ this.query_commands_json = function (player, isyb) {
         }
     }
     return JSON.stringify(json);
+}
 }

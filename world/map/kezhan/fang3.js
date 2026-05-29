@@ -1,10 +1,13 @@
-﻿this.inherits(ROOM);
-this.name = "天字号客房";
-this.desc = "这是客栈里面最好的客房，房间里面空间很大，门口竖有张屏风，看上去很贵重的样子，据说这里面的布置，物件都是客栈老板花大价钱买来的天材地宝，在这里练功对你大有益处。";
-this.exits = { "down": "yz/kedian" };
-this.is_shadow = true;
-this.max_item_count = 1;
-this.on_enter = function (me) {
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends ROOM {
+    name = "天字号客房";
+    desc = "这是客栈里面最好的客房，房间里面空间很大，门口竖有张屏风，看上去很贵重的样子，据说这里面的布置，物件都是客栈老板花大价钱买来的天材地宝，在这里练功对你大有益处。";
+    exits = { "down": "yz/kedian" };
+    is_shadow = true;
+    max_item_count = 1;
+
+    on_enter(me) {
     if (check_moveout(me)) {
         me.add_status({
             id: "room",
@@ -19,9 +22,18 @@ this.on_enter = function (me) {
         });
     }
 }
-this.on_leave = function (me) {
+    on_leave(me) {
     me.remove_status("room");
 }
+    on_heart_beat() {
+    for (let item of this.items) {
+        if (item.hp > 0) {
+            return check_moveout(item);
+        }
+    }
+}
+}
+
 function check_moveout(me) {
     if (!me.query_temp("kezhan")) {
         me.moveto("yz/kedian", null, me.name + "走了下来。");
@@ -29,11 +41,4 @@ function check_moveout(me) {
         return false;
     }
     return true;
-}
-this.on_heart_beat = function () {
-    for (let item of this.items) {
-        if (item.hp > 0) {
-            return check_moveout(item);
-        }
-    }
 }

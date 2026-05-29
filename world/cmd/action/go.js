@@ -1,8 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "go";
-//this.regex = /^(\w+)(?:\s+(n|s|m))?$/;
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { EQUIP_TYPE } from "../../../os/const.js";
+import { ROOM } from "../../../os/room/room.js";
 
-this.enter = function (me, dir) {
+export default class extends COMMAND {
+    command = "go";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, dir) {
     if (me.hp <= 0) return;
     if (!dir) return me.notify("你要往哪里走？");
     dir = OUTER_DOORS[dir];
@@ -43,6 +50,7 @@ this.enter = function (me, dir) {
             return me.notify("你现在正在被追杀，不能进入安全区和副本区域。");
     }
     me.moveto(next_room, sendOutMessage(me, dir), sendInMessage(me), dir);
+}
 }
 
 var OUTER_DOORS = {
@@ -96,7 +104,6 @@ function sendInMessage(player, dir) {
     }
     return face + "走了过来。";
 }
-
 var dirs = {
     "north": "北方",
     "south": "南方",

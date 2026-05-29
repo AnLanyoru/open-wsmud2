@@ -1,3 +1,5 @@
+import { EQUIPMENT } from "../../../os/item/equipment.js";
+
 EQUIPMENT.prototype.query_score = function () {
     if (this.grade) {
         var sc = this.score;
@@ -12,4 +14,4 @@ EQUIPMENT.prototype.query_score = function () {
     }
     return 0;
 }
-
+export default function() {}

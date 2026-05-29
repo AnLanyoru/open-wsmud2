@@ -1,10 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "武当剑法";
-this.id = "wudangjianfa";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.family = FAMILIES.WUDANG;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "武当剑法";
+    id = "wudangjianfa";
+    grade = 1;
+    family = FAMILIES.WUDANG;
+    attack_actions = [
     "$N身体左转，左手剑指，两腿屈膝，右前臂内旋，剑尖前端一寸处短促抖腕发力，一招<HIB>「飞燕入林」</HIB>，手中$w轻轻颤动，一剑自上而下扎向$n的$l",
     "$N身形不动，右前臂外旋，剑刃上崩，立马左腿左弓步，一招<HIG>「青龙吐水」</HIG>，手中$w向前下反刺，一剑指向$n的$l",
     "$N左脚向前一步，蹬地跳起，身体腾空疾速左转，右手$w先向前刺，随转体变向，使出一式<MAG>「凤凰挚窝」</MAG>，剑光如匹练般泄向$n的$l",
@@ -15,24 +17,15 @@ this.attack_actions = [
     "$N侧身退步，左手剑指划转，腰部一扭，上体后仰，右手$w一记<HIM>「反身朝阳」</HIM>自下上撩指向$n的$l"
 
 ];
-this.desc = "武当派的入门剑法";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["sword"];
-this.learn_condition = {
+    desc = "武当派的入门剑法";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 900,
     skill: {
         sword: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: parseInt(lv + 10)
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     san:
     {
         name: "三环套月",
@@ -60,3 +53,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: parseInt(lv + 10)
+        }
+    };
+}
+}
+

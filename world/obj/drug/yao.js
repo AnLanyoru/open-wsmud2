@@ -1,15 +1,18 @@
-﻿this.inherits(OBJ);
-this.unit = "颗";
-this.name = "蛇血丹";
-this.value = 30000;
-this.grade = 3;
-this.combined = true;
-this.distime = 60000;
-this.allow_fight = true;
-this.desc = "这是一份白驼山出产的蛇血丹，不知道什么功效";
-this.action_msg = "吃";
-this.transable = true;
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    unit = "颗";
+    name = "蛇血丹";
+    value = 30000;
+    grade = 3;
+    combined = true;
+    distime = 60000;
+    allow_fight = true;
+    desc = "这是一份白驼山出产的蛇血丹，不知道什么功效";
+    action_msg = "吃";
+    transable = true;
+
+    on_use(me) {
     me.notify("<hic>你吃掉一颗蛇血丹。</hic>");
     switch (this.drug_type) {
         case 1:
@@ -50,7 +53,7 @@ this.on_use = function (me) {
             break;
     }
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     var lv = 0;
     if (par) {
         lv = parseInt(par.substr(1));
@@ -58,4 +61,5 @@ this.on_create = function (path, par) {
     this.drug_type = lv;
     this.name = ["再生", "暴虐", "龟灵", "培元"][lv] + this.name;
 
+}
 }

@@ -1,9 +1,16 @@
-﻿this.inherits(COMMAND);
-this.command = "createrole";
-var name_reg = /^[\u4E00-\u9FA5]{2,5}$/;
-var id_reg = /^[a-z][a-z0-9]{2,9}$/;
-this.allow_login = true;
-this.enter = function (me, pars) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "createrole";
+    allow_login = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, pars) {
     if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
     pars = pars.split(' ');
     var name = pars[0], gender = parseInt(pars[1]),
@@ -72,8 +79,7 @@ this.enter = function (me, pars) {
     me.skills = {};
     this.save2db(me);
 }
-
-this.save2db = async function (me) {
+    async save2db(me) {
     try {
         let roleData = me.getData();
         roleData.server = WORLD.SERVERID;
@@ -95,4 +101,7 @@ this.save2db = async function (me) {
         }
     }
 }
+}
 
+var name_reg = /^[\u4E00-\u9FA5]{2,5}$/;
+var id_reg = /^[a-z][a-z0-9]{2,9}$/;

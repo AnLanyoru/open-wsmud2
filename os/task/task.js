@@ -1,19 +1,16 @@
 /**
  * TASK 系统任务基类
  */
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
 
-TASK = class TASK extends BASE {
-
-    static __initInstance(obj) {
-        // TASK has no instance properties to initialize
-    }
+export class TASK extends BASE {
 
     /**
      * @returns {TASK}
      */
     constructor() {
         super();
-        TASK.__initInstance(this);
     }
 
     /**

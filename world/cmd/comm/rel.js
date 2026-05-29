@@ -1,10 +1,19 @@
-this.inherits(COMMAND);
-this.command = "rel";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(\w+)?(?:\s+(\w+))?$/;
-this.enter = function (me, type, cmd) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
+
+export default class extends COMMAND {
+    command = "rel";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(\w+)?(?:\s+(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, type, cmd) {
     if (type === 'marry') {
         return me.send('解除夫妻关系，需要到扬州城的衙门找户部主簿办理。');
     }
@@ -70,7 +79,7 @@ this.enter = function (me, type, cmd) {
         }
     }
 }
-
+}
 
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {

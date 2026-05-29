@@ -1,9 +1,15 @@
-﻿
-this.inherits(COMMAND);
-this.command = "unjinglian";
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
-const MONEYS = [10, 100, 1000, 5000, 10000, 20000, 100000];
-this.enter = function (me, oid) {
+export default class extends COMMAND {
+    command = "unjinglian";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, oid) {
     if (oid) {
         var obj = me.find_obj(oid);
         if (!obj) {
@@ -50,3 +56,6 @@ this.enter = function (me, oid) {
         me.notify(str.join(""));
     }
 }
+}
+
+const MONEYS = [10, 100, 1000, 5000, 10000, 20000, 100000];

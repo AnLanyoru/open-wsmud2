@@ -1,30 +1,20 @@
-﻿this.inherits(SKILL);
-this.name = "混天气功";
-this.id = "huntianqigong";
-this.grade = 3;
-this.force_rad = 0.7;
-this.desc = "丐帮的高级心法";
-this.family = FAMILIES.GAIBANG;
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: parseInt(lv * 1.2) + 10,
-            con: parseInt(lv / 6) + 4,
-            limit_mp: lv * 102,
-            desc: "唯一：将你内力的70%转化为气血"
-        }
-    };
-}
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.learn_condition = {
+export default class extends SKILL {
+    name = "混天气功";
+    id = "huntianqigong";
+    grade = 3;
+    force_rad = 0.7;
+    desc = "丐帮的高级心法";
+    family = FAMILIES.GAIBANG;
+    can_enables = ["force"];
+    learn_condition = {
     skill: {
         force: 250
     }
 };
-this.pfm = {
+    pfm = {
     power:
     {
         name: "混元天罡",
@@ -58,3 +48,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: parseInt(lv * 1.2) + 10,
+            con: parseInt(lv / 6) + 4,
+            limit_mp: lv * 102,
+            desc: "唯一：将你内力的70%转化为气血"
+        }
+    };
+}
+}
+

@@ -1,8 +1,15 @@
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
-this.inherits(COMMAND);
-this.command = "skgroup";
-this.allow_fight = false;
-this.enter = function (me, par) {
+export default class extends COMMAND {
+    command = "skgroup";
+    allow_fight = false;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, par) {
     let index = parseInt(par);
     if (!(index >= 0 && index < 3)) return;
     let cur_index = this.cur_eqs(me);
@@ -28,24 +35,17 @@ this.enter = function (me, par) {
     me.notify_hp();
 
 }
-
-this.enable_one = function (me, base, skill) {
+    enable_one(me, base, skill) {
 
 }
-
-
-const SK_TYPES = [
-    "force", "unarmed", "dodge", "parry", "sword",
-    "blade", "throwing", "staff", "club", "whip"
-];
-this.cur_eqs = function (me) {
+    cur_eqs(me) {
     for (let i = 0; i < me.sk_groups.length; i++) {
         if (!me.sk_groups[i])
             return i;
     }
     return -1;
 }
-this.save_eqgroup = function (me, index) {
+    save_eqgroup(me, index) {
     let eqs = [];
     for (let sk of SK_TYPES) {
         let skill = me.skills[sk];
@@ -57,3 +57,9 @@ this.save_eqgroup = function (me, index) {
     }
     me.sk_groups[index] = eqs;
 }
+}
+
+const SK_TYPES = [
+    "force", "unarmed", "dodge", "parry", "sword",
+    "blade", "throwing", "staff", "club", "whip"
+];

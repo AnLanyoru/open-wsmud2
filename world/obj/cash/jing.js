@@ -1,14 +1,16 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "枚",
-    name: "养精丹",
-    desc: "一枚丹药，吃了后会增加10点精力，但是吃多了会伤肝。",
-    ad_jl: 10,
-    grade: 1,
-    value: 10000,
-    max_count: 10
-});
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends OBJ {
+    unit = "枚";
+    name = "养精丹";
+    desc = "一枚丹药，吃了后会增加10点精力，但是吃多了会伤肝。";
+    ad_jl = 10;
+    grade = 1;
+    value = 10000;
+    max_count = 10;
+
+    on_use(me) {
     //if (this.grade==1&& me.query_temp("jing" + this.grade) >= 10) {
     //    me.notify("<yel>你已经吃太多养精丹了，要注意身体。</yel>");
     //    return false;
@@ -21,7 +23,7 @@ this.on_use = function (me) {
 
     return true;
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var lv = parseInt(par);
@@ -55,3 +57,5 @@ this.on_create = function (path, par) {
     }
     this.grade = lv + 1;
 }
+}
+

@@ -58,7 +58,7 @@ class UserAPI extends APIBASE {
             return { code: 0, result: "注册失败" };
         }
         this.deleteSession("valno");
-        this.signIn(user.id, user.name, user.pwd);
+        this.signIn(user.id, user.name, user.pwd, 0);
         return { code: 1 };
     }
     async validimage() {

@@ -1,7 +1,16 @@
-﻿this.inherits(COMMAND);
-this.command = "get";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
-this.enter = function (player, count, objid, from) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "get";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, count, objid, from) {
     if (!objid) return player.notify("你要捡什么东西？");
     var parent = player.environment;
     if (from) {
@@ -68,6 +77,8 @@ this.enter = function (player, count, objid, from) {
         parent.refresh();
     }
 }
+}
+
 function getObj(me, item, parent) {
 
     if (!(item.count > 0)) return true;

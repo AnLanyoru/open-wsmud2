@@ -108,23 +108,21 @@ module.exports = {
         return db.query("update players set name=?,title=?,level=?,data=? where userid=? and id=?",
             [role.name, role.title, role.level, role.data, role.userid, role.id]);
     },
-    exitsRoleName: function (name) {
-        let sql = "select name from players where name=?";// or phone=?
+    existsRoleName: function (name) {
+        let sql = "select name from players where name=?";
         return db.get(sql, [name]);
     },
 
-    getData: function (id) {
-        return db.get("select a.id,a.name,a.title,a.level,a.data,b.pwd,b.level user_level from players a left join users b on a.userid=b.id  where  a.userid=?",
-            [id]);
+    getData: function (userid, id) {
+        return db.get("select a.id,a.name,a.title,a.level,a.data,b.pwd,b.level user_level from players a left join users b on a.userid=b.id where a.userid=? and a.id=?",
+            [userid, id]);
     },
-    updateRoleName: function (id, name) {
-
-        WORLD_DATA.query_db("update players set name=? where id=? ",
-            [name, id]);
-
+    updateRoleName: function (id, userid, name) {
+        return db.query("update players set name=? where id=? and userid=?",
+            [name, id, userid]);
     },
     updateUserid: function (id, fromuserid, touserid) {
-        WORLD_DATA.query_db("update player set userid=? where id=? and userid=?",
+        return db.query("update players set userid=? where id=? and userid=?",
             [touserid, id, fromuserid]);
     }
 

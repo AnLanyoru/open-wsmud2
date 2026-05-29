@@ -1,10 +1,19 @@
-﻿this.inherits(COMMAND);
-this.command = "lianxi";
-this.allow_fight = false;
-this.regex = /^(\w+)(?:\s+(\d+))?$/;
-this.allow_state = true;
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
-this.enter = function (me, skid, par) {
+export default class extends COMMAND {
+    command = "lianxi";
+    allow_fight = false;
+    regex = /^(\w+)(?:\s+(\d+))?$/;
+    allow_state = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, skid, par) {
     if (!me.skills) return;
     if (!(me.pot > 0)) return me.send('你的潜能不足。');
     if (me.state && me.state.id !== 'lianxi')
@@ -70,6 +79,8 @@ this.enter = function (me, skid, par) {
         on_check: on_check
     });
 }
+}
+
 function on_check(me) {
     let max_level = this.max_level;
     let speed = count_speed(me);
@@ -101,8 +112,6 @@ function on_check(me) {
     str.push('</hic>\n点击练习其他武功可添加到队列。');
     me.send(str.join(""));
 }
-
-
 function format_timespan(time, str) {
     if (time < 60) return str.push('少于1分钟');
     if (time > 86400) {
@@ -115,9 +124,6 @@ function format_timespan(time, str) {
     }
     str.push(Math.floor(time / 60), '分钟');
 }
-
-
-
 function to_next(me) {
     let state = me.state;
     if (state.queues.length > 0) {
@@ -136,7 +142,6 @@ function to_next(me) {
         return WORLD.check_user_next(me);
     }
 }
-
 function check_skill(me, skill, limit = true) {
 
     var lv = me.query_skill(skill.id, 0);
@@ -177,7 +182,6 @@ function do_learn(me) {
     return me.notify_fail("你的潜能不够，无法继续练习下去了。");
 
 }
-
 function count_speed(me) {
     let pot = parseInt((me.int + me.query_prop("int")) * (100 + me.query_prop("lianxi_per")
         + me.family.query_temp('lianxi_per', 0)

@@ -1,12 +1,21 @@
-﻿this.inherits(ROOM);
-this.name = "谷物加工厂";
-this.no_fight = true;
-this.desc = "这是一间谷物加工厂，这里是谷子脱壳成米的地方。米厂老板是一个一看就知道是十分精明的干瘦的中年人，老是带着一脸奸笑。你可以看到许多人正在忙忙碌碌的工作着，门口挂著一块<CMD cmd='look sign'>牌子(sign)</cmd>。";
-this.exits = { "east": "yz/nanmen" };
-this.set_item("sign", "牌子", "现在正紧缺人手，急需雇佣一批短工来干活。", [[
-    "work", "开始工作", start_work
-]]);
-this.add_action("work", "开始工作", start_work);
+import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends ROOM {
+    name = "谷物加工厂";
+    no_fight = true;
+    desc = "这是一间谷物加工厂，这里是谷子脱壳成米的地方。米厂老板是一个一看就知道是十分精明的干瘦的中年人，老是带着一脸奸笑。你可以看到许多人正在忙忙碌碌的工作着，门口挂著一块<CMD cmd='look sign'>牌子(sign)</cmd>。";
+    exits = { "east": "yz/nanmen" };
+
+    constructor() {
+        super();
+        this.set_item("sign", "牌子", "现在正紧缺人手，急需雇佣一批短工来干活。", [[
+            "work", "开始工作", start_work
+        ]]);
+        this.add_action("work", "开始工作", start_work);
+    }
+}
+
 function start_work(me) {
     if (me.level > 1) return me.notify("老板嘿嘿一笑：我这里人手已经够了，做义工可没工钱的哟！");
     if (me.gender == 2) return me.notify("老板嘿嘿一笑：我这里可不招女人，你去成衣店和药店看看有没招工的！");

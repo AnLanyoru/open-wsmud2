@@ -1,21 +1,32 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "擂台比武报名",
-    desc: "他是负责比武大赛报名的",
-    gender: 1,
-    age: 35,
-    per: this.random(20) + 10,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 1500,
-    max_hp: 1500
-});
-this.set_objects([
-    "eq/lv1/junfu", 1, 1
-]);
+import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
 
+export default class extends NPC {
+    name = "擂台比武报名";
+    desc = "他是负责比武大赛报名的";
+    gender = 1;
+    age = 35;
+    per = this.random(20) + 10;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 1500;
+    max_hp = 1500;
 
-this.query_commands = function (player) {
+    constructor() {
+        super();
+        this.set_objects([
+            "eq/lv1/junfu", 1, 1
+        ]);
+        this.add_action("askbiwu", "挑战", function (me) {
+            me.send('从高手榜单选择你要挑战的高手。');
+        });
+        this.add_action("askbiwu1", "观战", function (me) {
+
+            WORLD.COMMANDS['biwu'].enter(me, 'watch');
+        });
+    }
+
+    query_commands(player) {
     if (this.json) return this.json;
     var json = {};
     json.type = "item";
@@ -34,12 +45,5 @@ this.query_commands = function (player) {
     this.json = JSON.stringify(json);
     return this.json;
 }
-this.add_action("askbiwu", "挑战", function (me) {
-    me.send('从高手榜单选择你要挑战的高手。');
-});
-
-this.add_action("askbiwu1", "观战", function (me) {
-
-    WORLD.COMMANDS['biwu'].enter(me, 'watch');
-});
+}
 

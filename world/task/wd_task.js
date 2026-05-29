@@ -1,11 +1,10 @@
-﻿
-this.inherits(USERTASK);
-this.id = "wudao";
+import { USERTASK } from "../../os/task/playertask.js";
+import { OBJ } from "../../os/item/obj.js";
 
-const TAGS = ['wht', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
+export default class extends USERTASK {
+    id = "wudao";
 
-
-this.query_title = function (me) {
+    query_title(me) {
     let wd_lv = me.query_temp("wd_level", 0);
 
     let lv = Math.floor(wd_lv / 20);
@@ -13,9 +12,7 @@ this.query_title = function (me) {
     let tag = TAGS[lv];
     return `<${tag}>武道塔挑战：${wd_lv}层</${tag}>`;
 }
-
-
-this.query_desc = function (me) {
+    query_desc(me) {
     let lv = me.query_temp("wd_level", 0);
     if (!(lv > 0)) return;
     let tm = me.query_temp("wd_tm", 0);
@@ -43,7 +40,7 @@ this.query_desc = function (me) {
 
     return `你的武道塔挑战记录是${lv}层，守门人将按照你的最高挑战记录发放奖励，当前可领取${wd}/7。<br><mem>每天获得一份奖励，挑战更高层获得更多奖励${mem}</mem>`;
 }
-this.format_time_span = function (time) {
+    format_time_span(time) {
 
     if (time > 3600000)
         return Math.floor(time / 3600000) + "小时后";
@@ -52,22 +49,19 @@ this.format_time_span = function (time) {
     return Math.floor(time / 1000) + "秒后";
 
 }
-
-this.query_count = function (me) {
+    query_count(me) {
     let tm = me.query_temp("wd_tm", 0);
     if (!tm) return 0;
     tm = Math.floor((Date.now() - tm * 100000) / 3600000 / 24);
     return Math.min(tm, 7);
 }
-//0 不显示 1，进行中，2.可领取 3.已完成
-this.query_state = function (me) {
+    query_state(me) {
     let lv = me.query_temp("wd_level", 0);
     if (!(lv > 0)) return 0;
     let sm = this.query_count(me);
     return sm > 0 ? 2 : 1;
 }
-const EXPS = [1000, 2000, 3000, 4000, 5000, 6000, 7000];
-this.on_finish = function (me) {
+    on_finish(me) {
     let wd_count = this.query_count(me);
     if (!(wd_count > 0)) return false;
     let wd_lv = me.query_temp("wd_level", 0);
@@ -85,7 +79,7 @@ this.on_finish = function (me) {
 
     return true;
 }
-this.set_curtm = function (me, count) {
+    set_curtm(me, count) {
     let tm = me.query_temp("wd_tm", 0);
 
     tm = Math.max((Date.now() - 3600000 * 24 * 7) / 100000, tm);
@@ -97,15 +91,7 @@ this.set_curtm = function (me, count) {
     me.set_temp("wd_tm", tm);
 
 }
-
-const REWARDS = [
-    ["drug/max_mp#0", "drug/skill2#1"],
-    ["drug/max_mp#1", "drug/skill2#2"],
-    ["drug/max_mp#2", "drug/skill2#3"],
-    ["drug/max_mp#3", "drug/skill2#4"],
-    ["drug/max_mp#4", "drug/skill2#5"],
-];
-this.reward = function (me, lv) {
+    reward(me, lv) {
     let items = [];
     let exp = 10000;
     if (lv <= 29) {
@@ -136,5 +122,14 @@ this.reward = function (me, lv) {
 
 
 }
+}
 
-
+const TAGS = ['wht', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
+const EXPS = [1000, 2000, 3000, 4000, 5000, 6000, 7000];
+const REWARDS = [
+    ["drug/max_mp#0", "drug/skill2#1"],
+    ["drug/max_mp#1", "drug/skill2#2"],
+    ["drug/max_mp#2", "drug/skill2#3"],
+    ["drug/max_mp#3", "drug/skill2#4"],
+    ["drug/max_mp#4", "drug/skill2#5"],
+];

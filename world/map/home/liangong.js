@@ -1,10 +1,17 @@
-﻿this.inherits(ROOM);
-this.name = "练功房"
-this.desc = "这是一间布置的很别致的练功房，房间的北面各种武器玲琅满目，刀枪剑棍，十八般兵器在这里都能找到，四周石壁看上去很坚固，南半部散放着几个蒲团，供诸你打坐吐纳，调气养息，修练内功之用。";
-this.exits = { "east": "home/yuanzi" };
-this.add_action("xiulian", "修炼", null);
-this.add_action("fenpei", "分配属性", null);
-this.on_leave = function (me) {
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends ROOM {
+    name = "练功房";
+    desc = "这是一间布置的很别致的练功房，房间的北面各种武器玲琅满目，刀枪剑棍，十八般兵器在这里都能找到，四周石壁看上去很坚固，南半部散放着几个蒲团，供诸你打坐吐纳，调气养息，修练内功之用。";
+    exits = { "east": "home/yuanzi" };
+
+    constructor() {
+        super();
+        this.add_action("xiulian", "修炼", null);
+        this.add_action("fenpei", "分配属性", null);
+    }
+
+    on_leave(me) {
     if (me.master) {
         me.actions = null;
         me.master_json = null;
@@ -12,7 +19,7 @@ this.on_leave = function (me) {
     me.remove_status("room");
  
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     if (me.master) {
         me.actions = [
             { cmd: "dc " + me.id + " dazuo", name: "让" + me.name + "打坐" },
@@ -32,4 +39,5 @@ this.on_enter = function (me) {
             dazuo_per: 50
         }
     });
+}
 }

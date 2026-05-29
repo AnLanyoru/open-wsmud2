@@ -1,10 +1,19 @@
-﻿this.inherits(COMMAND);
-this.command = "setting";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(?:(\w+)?\s+(.+))?$/;
-this.enter = function (me, key, value) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { NPC } from "../../../os/char/npc.js";
+
+export default class extends COMMAND {
+    command = "setting";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(?:(\w+)?\s+(.+))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, key, value) {
     if (!me.is_player) return;
     if (!key) {
         var str = ['{type:"setting",items:{'];
@@ -75,7 +84,7 @@ this.enter = function (me, key, value) {
         //}
     }
 }
-this.clear = function (me) {
+    clear(me) {
     let str = [];
     for (let user of WORLD.USERS) {
         if (!user.settings) continue;
@@ -88,6 +97,8 @@ this.clear = function (me) {
     }
     if (me) me.send(str.join(''));
 }
+}
+
 const setting_keys = {
     'hide_roomdesc': {
         type: "Boolean",

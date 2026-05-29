@@ -1,9 +1,10 @@
-﻿this.inherits(SKILL);
-this.name = "云龙身法";
-this.id = "yunlongshenfa";
-this.grade = 1;
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "云龙身法";
+    id = "yunlongshenfa";
+    grade = 1;
+    dodge_actions = [
     "$n一式<HIY>「龙腾虎跃」</HIY>，身行一转，猛的跳向一旁,躲过了$N的功势。",
     "$n一式<HIY>「沙场点兵」</HIY>，双臂置于身后，不急不缓，昂首从$N眼前跨过。",
     "$n一式<HIG>「风雨同舟」</HIG>，不退反进，一下子绕到了$N的身后。",
@@ -15,20 +16,20 @@ this.dodge_actions = [
     "$n一式<HIC>「幻眼云烟」</HIC>，身形陡地变得飘忽不定，令$N无法看清。",
     "$n一式<HIW>「九天揽月」</HIW>，宛若一条矫矢苍龙，倏的拔地而起，令$N不敢仰视。",
 ];
-this.desc = "天地会的轻功身法，身似游龙，无影无随";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["dodge"];
-this.learn_condition = {
+    desc = "天地会的轻功身法，身似游龙，无影无随";
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 600,
     skill: {
         dodge: 50
     }
 };
-this.query_enable_prop = function (lv) {
+
+    query_enable_prop(lv) {
     return {
         dodge: {
             ds: lv + 20
         }
     };
+}
 }

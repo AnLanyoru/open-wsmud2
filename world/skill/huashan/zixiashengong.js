@@ -1,31 +1,21 @@
-﻿this.inherits(SKILL);
-this.name = "紫霞神功";
-this.id = "zixiashengong";
-this.grade = 3;
-this.force_rad = 0.6;
-this.family = FAMILIES.HUASHAN;
-this.desc = "华山派的内功心法，气宗的立派根本，以修炼时身上紫气环绕而得名";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "紫霞神功";
+    id = "zixiashengong";
+    grade = 3;
+    force_rad = 0.6;
+    family = FAMILIES.HUASHAN;
+    desc = "华山派的内功心法，气宗的立派根本，以修炼时身上紫气环绕而得名";
+    can_enables = ["force"];
+    learn_condition = {
     max_mp: 300,
     skill: {
         force: 300
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: parseInt(lv * 1.3) + 10,
-            mz: parseInt(lv * 1.2) + 10,
-            limit_mp: lv * 100,
-            desc: "唯一：将你内力的60%转化为气血"
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     xi:
     {
         name: "紫气东来",
@@ -61,3 +51,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: parseInt(lv * 1.3) + 10,
+            mz: parseInt(lv * 1.2) + 10,
+            limit_mp: lv * 100,
+            desc: "唯一：将你内力的60%转化为气血"
+        }
+    };
+}
+}
+

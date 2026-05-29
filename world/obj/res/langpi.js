@@ -1,13 +1,15 @@
-﻿this.inherits(OBJ);
-this.set({
-    name: "狼皮",
-    desc: "一块完整的狼皮",
-    unit: "块",
-    value: 10,
-    grade: 1,
-    combined: true
-});
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    name = "狼皮";
+    desc = "一块完整的狼皮";
+    unit = "块";
+    value = 10;
+    grade = 1;
+    combined = true;
+    transable = true;
+
+    on_use(me) {
     me.add_status({
         id: "langpi",
         name: "伪装",
@@ -17,4 +19,4 @@ this.on_use = function (me) {
     me.set_temp('langpi', 1, 10000);
     me.notify("<hic>你把一块完整的狼皮当作衣服披在身上。</hic>");
 }
-this.transable = true;
+}

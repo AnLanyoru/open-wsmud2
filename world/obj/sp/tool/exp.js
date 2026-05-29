@@ -1,12 +1,16 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "本",
-    name: "挖矿指南",
-    desc: "一本书，里面记载的挖矿的方法，提高你的挖矿效率",
-    grade: 1,
-    value: 10000
-});
-this.on_use = function (me) {
+import { OBJ } from "../../../../os/item/obj.js";
+import { WORLD } from "../../../../os/world.js";
+import { EVENTS } from "../../../../os/task/events.js";
+import { COMMAND } from "../../../../os/command.js";
+
+export default class extends OBJ {
+    unit = "本";
+    name = "挖矿指南";
+    desc = "一本书，里面记载的挖矿的方法，提高你的挖矿效率";
+    grade = 1;
+    value = 10000;
+
+    on_use(me) {
     me.notify("你打开这本挖矿指南仔细研究起来....");
     COMMAND.DO('sys', me.name + '捡到一本挖矿指南，学会了里面记载的挖矿技巧，所有人的挖矿效率都提高了。');
 
@@ -24,7 +28,7 @@ this.on_use = function (me) {
     });
     return true;
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = path + "#1";
         return;
@@ -34,3 +38,5 @@ this.on_create = function (path, par) {
     if (!(lv > 0 && lv < 6)) return;
     this.grade = lv;
 }
+}
+

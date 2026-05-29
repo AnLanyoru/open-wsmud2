@@ -1,9 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "少林身法";
-this.id = "shaolinshenfa";
-this.family = FAMILIES.SHAOLIN;
-this.grade = 1;
-this.dodge_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "少林身法";
+    id = "shaolinshenfa";
+    family = FAMILIES.SHAOLIN;
+    grade = 1;
+    dodge_actions = [
   "$n一式「<HIG>一苇渡江</HIG>」，前后脚脚尖脚跟相靠，身体如行云流水般滑出丈余。",
 "$n一式「<WHT>雨燕掠波</WHT>」，双臂前伸，全身贴地平飞，顿时闪过了$N的凌厉攻势。",
 "$n一式「<CYN>移步换形</CYN>」，足不动，手不抬，一转眼间便绕到了$N的身后。",
@@ -13,21 +16,14 @@ this.dodge_actions = [
 "$n一式「<RED>苍龙出水</RED>」，双脚点地，全身化为一道白影，急速绕着$N打了几转。",
 "$n一式「<HIR>稚凤归巢</HIR>」，身体如陀螺般急转，气流形成一个个漩涡，令$N陷身其间，动弹不得。",
 ];
-this.can_enables = ["dodge"];
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            ds: lv + 30
-        }
-    };
-}
-this.learn_condition = {
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 800,
     skill: {
         dodge:50
     }
 };
-this.pfm = {
+    pfm = {
     lingbo:
     {
         name: "一苇渡江",
@@ -56,3 +52,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            ds: lv + 30
+        }
+    };
+}
+}
+

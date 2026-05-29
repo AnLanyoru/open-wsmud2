@@ -1,8 +1,17 @@
-this.inherits(COMMAND);
-this.command = "sys";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, msg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "sys";
+    allow_busy = true;
+    allow_state = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, msg) {
     if (me) return;
     //if (!msg) {
     //    return;
@@ -14,3 +23,5 @@ this.enter = function (me, msg) {
 
 
 }
+}
+

@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "buy";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
-this.enter = function (me, count, objid, from) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "buy";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, count, objid, from) {
     var target;
     if (from) {
         target = me.find_obj(from, me.environment);
@@ -78,3 +86,5 @@ this.enter = function (me, count, objid, from) {
     }
     // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
 }
+}
+

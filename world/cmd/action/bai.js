@@ -1,6 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "bai";
-this.enter = function (me, target) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends COMMAND {
+    command = "bai";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, target) {
     if (!WORLD.is_server(me)) return me.notify("你不能拜师。");
     if (!target) return me.notify("你要拜谁为师？");
     target = me.find_obj(target, me.environment);
@@ -53,3 +62,5 @@ this.enter = function (me, target) {
     }
     return me.send_room("$n说道：在下才疏学浅，不敢误人子弟。", target);
 }
+}
+

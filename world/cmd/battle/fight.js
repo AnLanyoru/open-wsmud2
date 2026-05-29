@@ -1,6 +1,13 @@
-﻿this.inherits(COMMAND);
-this.command = "fight";
-this.enter = function (me, argid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "fight";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, argid) {
     if (argid == "none") {
         var items = me.environment.items;
         for (var i = 0; i < items.length; i++) {
@@ -72,4 +79,5 @@ this.enter = function (me, argid) {
         target.begin_attack(me, 1);
 
     }
+}
 }

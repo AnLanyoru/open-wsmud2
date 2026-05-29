@@ -1,11 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "dice";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\d)\s(\w+)$/;
-this.enter = function (me, type, objid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "dice";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\d)\s(\w+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, type, objid) {
     if (!me.team) return me.send("你没有在队伍里。");
     if (!me.team.objs || !me.team.objs.length) return me.send("目前没有等待分配的战利品。");
     var item = null;
@@ -68,4 +75,5 @@ this.enter = function (me, type, objid) {
     if (item.dice.users.length===0) {
         me.team.alloc(item);
     }
+}
 }

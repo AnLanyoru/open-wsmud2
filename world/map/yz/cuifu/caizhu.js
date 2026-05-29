@@ -1,11 +1,18 @@
-﻿this.inherits(ROOM);
-this.name = "大门"
-this.desc = "一座富丽堂皇的大宅院出现在你的眼前，两头高大的石狮子镇住了大门两侧，朱漆大门足足有三寸厚。门上挂着两个灯笼，写着“崔”字。崔家是当地首富，而且以蛮横著称。几条狼狗嚎叫着向你冲了过来。";
-this.exits = { "north": "yz/cuifu/dayuan" };
-this.set_npc([
-    "yz/cuifu/langgou", 2
-]);
-this.on_enter = function (me) {
+import { ROOM } from "../../../../os/room/room.js";
+
+export default class extends ROOM {
+    name = "大门";
+    desc = "一座富丽堂皇的大宅院出现在你的眼前，两头高大的石狮子镇住了大门两侧，朱漆大门足足有三寸厚。门上挂着两个灯笼，写着“崔”字。崔家是当地首富，而且以蛮横著称。几条狼狗嚎叫着向你冲了过来。";
+    exits = { "north": "yz/cuifu/dayuan" };
+
+    constructor() {
+        super();
+        this.set_npc([
+            "yz/cuifu/langgou", 2
+        ]);
+    }
+
+    on_enter(me) {
     if (me.is("yz/cuifu/yahuan")) {
         var player = me.follow_target;
         if (!player || !player.is_here(me)) return;
@@ -25,4 +32,5 @@ this.on_enter = function (me) {
         player.add_fbscore(20);
 
     }
+}
 }

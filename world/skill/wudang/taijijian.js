@@ -1,10 +1,14 @@
-﻿this.inherits(SKILL);
-this.name = "太极剑法";
-this.id = "taijijian";
-this.grade = 4;
-this.first_title = "太极传人";
-this.family = FAMILIES.WUDANG;
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends SKILL {
+    name = "太极剑法";
+    id = "taijijian";
+    grade = 4;
+    first_title = "太极传人";
+    family = FAMILIES.WUDANG;
+    attack_actions = [
     "$N虚步提腰，一招「<HIM>蜻蜓点水</HIM>」，手中$w轻轻颤动，一剑剑点向$n的$l",
     "$N向前跨上一步，左手剑诀，右手$w使出一式「<YEL>指南针</YEL>」直刺$n的$l",
     "$N身形往右一挫，左手剑诀，右手$w使出一式「<WHT>大魁星</WHT>」刺向$n的$l",
@@ -39,52 +43,16 @@ this.attack_actions = [
     "$N回身拧腰，右手虚抱，一招「<HIY>拨云瞻日</HIY>」，$w中宫直进，刺向$n的$l"
 
 ];
-this.desc = "由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一";
-//"\+(\w+)\+"(.+?)"\+NOR\+"
-//<$1>$2</$1>
-this.learn_condition = {
+    desc = "由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一";
+    learn_condition = {
     max_mp: 8900,
     skill: {
         sword: 300,
         taijishengong: 300
     }
 };
-this.can_enables = ["sword"];
-this.query_prop = function (lv) {
-    return {
-        int: 10 + parseInt(lv / 10),
-        zj_per: parseInt(lv / 300) + 5
-    };
-}
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: 20 + parseInt(lv * 1.3),
-            mz: 20 + parseInt(lv * 1.2),
-            zj: 20 + parseInt(lv * 0.8),
-            desc: "攻击命中后会使敌方忙乱2秒，冷却10秒"
-        }
-    };
-}
-//当一次攻击结束后
-this.on_attack_over = function (me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
-        if (!me.query_temp("sk/taijijian/sword")) {
-            me.send_room("<cyn>$n一招失势被$N的剑招所乱！</cyn>", target);
-            target.add_status({
-                id: "busy",
-                is_busy: true,
-                name: "忙乱",
-                desc: "你处于忙乱状态，无法攻击，招架",
-                duration: 2000,
-                downside: true
-
-            });
-            me.set_temp("sk/taijijian/sword", 1, 10000);
-        }
-    }
-}
-this.pfm = {
+    can_enables = ["sword"];
+    pfm = {
     chan:
     {
         name: "缠字诀",
@@ -183,3 +151,39 @@ this.pfm = {
         }
     }
 };
+
+    query_prop(lv) {
+    return {
+        int: 10 + parseInt(lv / 10),
+        zj_per: parseInt(lv / 300) + 5
+    };
+}
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: 20 + parseInt(lv * 1.3),
+            mz: 20 + parseInt(lv * 1.2),
+            zj: 20 + parseInt(lv * 0.8),
+            desc: "攻击命中后会使敌方忙乱2秒，冷却10秒"
+        }
+    };
+}
+    on_attack_over(me, target, par) {
+    if (!par.is_dodge && !par.is_parry) {
+        if (!me.query_temp("sk/taijijian/sword")) {
+            me.send_room("<cyn>$n一招失势被$N的剑招所乱！</cyn>", target);
+            target.add_status({
+                id: "busy",
+                is_busy: true,
+                name: "忙乱",
+                desc: "你处于忙乱状态，无法攻击，招架",
+                duration: 2000,
+                downside: true
+
+            });
+            me.set_temp("sk/taijijian/sword", 1, 10000);
+        }
+    }
+}
+}
+

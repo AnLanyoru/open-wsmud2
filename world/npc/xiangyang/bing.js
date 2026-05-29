@@ -1,28 +1,32 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "蒙古密探",
-    desc: "鬼鬼祟祟的，一看就有问题",
-    gender: 1,
-    age: 25,
-    per: 17,
-    max_mp: 160000,
-    max_hp: 160000,
-    no_refresh: true
-});
-this.skill_map(
-    ["dodge", 300],
-    ["parry", 300],
-    ["force", 300],
-    ["unarmed", 300],
-    ["club", 300],
-    ["mengguqiangfa", 300, ["club", "parry"]],
-    ["mengguxinfa", 300, "force"],
-    ["dashouyin", 300, "unarmed"],
-    ["feiyanzoubi", 300, "dodge"]);
-// this.set_drop({
-//     obj: ["sp/mihan"]
-// });
-this.on_die = function (killer) {
+import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { TASK } from "../../../os/task/task.js";
+
+export default class extends NPC {
+    name = "蒙古密探";
+    desc = "鬼鬼祟祟的，一看就有问题";
+    gender = 1;
+    age = 25;
+    per = 17;
+    max_mp = 160000;
+    max_hp = 160000;
+    no_refresh = true;
+
+    constructor() {
+        super();
+        this.skill_map(
+            ["dodge", 300],
+            ["parry", 300],
+            ["force", 300],
+            ["unarmed", 300],
+            ["club", 300],
+            ["mengguqiangfa", 300, ["club", "parry"]],
+            ["mengguxinfa", 300, "force"],
+            ["dashouyin", 300, "unarmed"],
+            ["feiyanzoubi", 300, "dodge"]);
+    }
+
+    on_die(killer) {
 
 
     if (WORLD.DATA.query_temp("xy_status")) {
@@ -34,7 +38,7 @@ this.on_die = function (killer) {
     task.on_mihan(killer);
     this.call_out(this.relive, 3600000);
 }
-this.relive = function () {
+    relive() {
 
     var task = TASK.GET("xiangyang");
     if (!task || task.is_start) {
@@ -51,3 +55,5 @@ this.relive = function () {
     this.items = null;
     this.skills = null;
 }
+}
+

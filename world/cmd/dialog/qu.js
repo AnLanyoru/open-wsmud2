@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "qu";
-this.regex = /^(?:(\d+\s+))?(\w+)$/;
-this.enter = function (me, count, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "qu";
+    regex = /^(?:(\d+\s+))?(\w+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, count, arg) {
     if (!me.environment.allow_store) return me.notify("这里没有仓库。");
 
     if (!arg) return me.notify("你要取什么东西？");
@@ -22,3 +30,5 @@ this.enter = function (me, count, arg) {
     me.notify('{type:"dialog",dialog:"list",id:"' + moved_obj.id + '",storeid:"' + arg + '",store:' + (-move_count) + '}');
 
 }
+}
+

@@ -1,10 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "达摩剑";
-this.id = "damojian";
-this.grade = 2;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
-this.family = FAMILIES.SHAOLIN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "达摩剑";
+    id = "damojian";
+    grade = 2;
+    family = FAMILIES.SHAOLIN;
+    attack_actions = [
     "$N使一式<MAG>「万事随缘往」</MAG>，手中$w嗡嗡微振，幻成一条疾光刺向$n的$l",
     "$N错步上前，使出<HIC>「来去若梦行」</HIC>，剑意若有若无，$w淡淡地向$n的$l挥去",
     "$N一式<YEL>「浮世沧桑远」</YEL>，纵身飘开数尺，运发剑气，手中$w遥摇指向$n的$l",
@@ -15,27 +17,15 @@ this.attack_actions = [
 "$N合掌跌坐，一式<HIG>「禅心顿自明」</HIG>，$w自怀中跃出，如疾电般射向$n的胸口"
 
 ];
-this.desc = "少林寺七十二绝技之达摩剑";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["sword"];
-this.learn_condition = {
+    desc = "少林寺七十二绝技之达摩剑";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 2000,
     skill: {
         sword: 200
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: lv + 10,
-            str: parseInt(lv / 10) + 2,
-            mz: lv+10,
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     jiang:
     {
         name: "三绝剑",
@@ -60,3 +50,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: lv + 10,
+            str: parseInt(lv / 10) + 2,
+            mz: lv+10,
+        }
+    };
+}
+}
+

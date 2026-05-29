@@ -1,6 +1,14 @@
-﻿this.inherits(COMMAND);
-this.command = "open";
-this.enter = function (player, objid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "open";
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid) {
     var obj = player.find_obj(objid);
     if (!obj) return player.notify("你要打开什么？");
     if (!obj.on_open) return player.notify("这个东西打不开。");
@@ -24,3 +32,5 @@ this.enter = function (player, objid) {
     }
     player.remove_obj(obj,1);
 }
+}
+

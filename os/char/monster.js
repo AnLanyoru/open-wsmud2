@@ -2,32 +2,43 @@
  * MONSTER 怪物类
  */
 
-require("../util/util.js");
-require("./character");
+import "../util/util.js";
+import { CHARACTER } from "./character.js";
+import { FAMILIES } from "../skill/family.js";
+import { BASE_SKILLS } from "../const.js";
+import { CORPSE } from "../item/corpse.js";
+import { WORLD } from "../world.js";
 
-MONSTER = class MONSTER extends CHARACTER {
+export class MONSTER extends CHARACTER {
 
     /**
      * @param {MONSTER} obj - 要初始化的怪物实例
      */
-    static __initInstance(obj) {
-        /** @type {number} */
-        obj.hp = obj.max_hp = 100;
-        /** @type {number} */
-        obj.mp = obj.max_mp = 100;
-        /** @type {boolean} */
-        obj.auto_pfm = true;
-        /** @type {FAMILY} */
-        obj.family = FAMILIES.MONSTER;
-        /** @type {number} */
-        obj.str = obj.con = obj.dex = obj.int = 20;
-        /** @type {boolean} */
-        obj.can_speek = false;
-    }
+
+    // ============ 核心属性 ============
+
+    /** @type {boolean} 是否能说话 */
+    can_speek = false;
+    /** @type {boolean} 是否自动释放绝招 */
+    auto_pfm = true;
+    /** @type {string} 怪物名称 */
+    name;
+    /** @type {number} 怪物等级 */
+    level = 0;
+    /** @type {string} 怪物描述 */
+    desc;
+
+    // ============ 功能属性 ============
+
+    /** @type {string|null} 死亡后重生房间路径 */
+    die_room = null;
+    /** @type {Array|null} 命令JSON缓存 */
+    json = null;
+    /** @type {number} 击杀奖励积分 */
+    score = 0;
 
     constructor() {
         super();
-        MONSTER.__initInstance(this);
     }
 
     can_speek = false;
@@ -177,3 +188,4 @@ const MONSTER_PARTS = [
     { name: "前肢", hert: 0.85, crit: 1 },
     { name: "腰间", hert: 0.99, crit: 5 },
 ];
+

@@ -3,7 +3,7 @@
  * 封装网络层并桥接到WORLD
  */
 
-const ws = require("./net-ws");
+import ws from "./net-ws.js";
 
 /** @type {wsServer} */
 const server = new ws({
@@ -102,4 +102,4 @@ server.onClientError = function (socket, e) {
     }
 }
 
-module.exports = server;
+export default server;

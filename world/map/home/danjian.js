@@ -1,9 +1,24 @@
-﻿this.inherits(ROOM);
-this.name = "卧室"
-this.desc = "这是你的卧室，房间不大陈设也不多，但是收拾的干净整洁，房间里面除了一张楠木大床，一张书桌，一个箱子就没别的东西了。";
-this.exits = { "out": "yz/home" };
+import { ROOM } from "../../../os/room/room.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
-this.on_enter = function (me) {
+export default class extends ROOM {
+    name = "卧室";
+    desc = "这是你的卧室，房间不大陈设也不多，但是收拾的干净整洁，房间里面除了一张楠木大床，一张书桌，一个箱子就没别的东西了。";
+    exits = { "out": "yz/home" };
+    allow_store = true;
+
+    constructor() {
+        super();
+        this.add_action("store", "打开仓库");
+        this.add_action("xiulian", "修炼", null);
+        this.add_action("fenpei", "分配属性", null);
+        this.add_action("sleep", "睡觉", function (me) {
+
+            me.notify("你躺到床上被子一盖，不一会就呼呼的睡着了。");
+        });
+    }
+
+    on_enter(me) {
     if (me.follower) {
         for (var i = 0; i < me.follower.length; i++) {
             FOLLOWER.CREATE(me, me.follower[i], this.on_npc_create.bind(this, me));
@@ -27,18 +42,14 @@ this.on_enter = function (me) {
         }
     });
 }
-this.on_leave = function (me) {
+    on_leave(me) {
     if (me.master) {
         me.actions = null;
         me.master_json = null;
     }
     me.remove_status("room");
 }
-this.add_action("store", "打开仓库");
-this.add_action("xiulian", "修炼", null);
-this.add_action("fenpei", "分配属性", null);
-this.allow_store = true;
-this.on_npc_create = function (me, npc) {
+    on_npc_create(me, npc) {
     if (!npc) return;
     if (npc.environment && npc.environment.parent.id == "home") return;
     if (!npc.hp) npc.hp = 1;
@@ -47,8 +58,5 @@ this.on_npc_create = function (me, npc) {
 
     npc.on_master_enter && npc.on_master_enter(me);
 }
+}
 
-this.add_action("sleep", "睡觉", function (me) {
-
-    me.notify("你躺到床上被子一盖，不一会就呼呼的睡着了。");
-});

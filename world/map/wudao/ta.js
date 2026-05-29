@@ -1,9 +1,20 @@
-﻿this.inherits(ROOM);
-this.name = "第一层"
-this.desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
-this.exits = { "up": "wudao/up", "out": "wudao/men" };
-this.max_item_count = 1;
-this.on_before_enter = function (me) {
+import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { NPC } from "../../../os/char/npc.js";
+import { USER } from "../../../os/char/user.js";
+import { USERTASK } from "../../../os/task/playertask.js";
+import { COMMAND } from "../../../os/command.js";
+
+export default class extends ROOM {
+    name = "第一层";
+    desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
+    exits = { "up": "wudao/up", "out": "wudao/men" };
+    max_item_count = 1;
+
+    on_before_enter(me) {
     var level = (me.query_temp("wd_level") || 0) + 1;
     var name = UTIL.to_c(level);
     this.name = "第" + name + "层";
@@ -32,7 +43,7 @@ this.on_before_enter = function (me) {
     this.refresh();
     //this.item_changed(npc, true);
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     me.die = this.on_die1;
     let npc = this.items[0];
     if (npc && !npc.is_player) {
@@ -41,8 +52,7 @@ this.on_enter = function (me) {
         npc.do_kill(me);
     }
 }
-
-this.on_die1 = function (me) {
+    on_die1(me) {
     if (this.on_die && this.on_die(me) == false) {
         this.hp = 1;
         return false;
@@ -65,8 +75,7 @@ this.on_die1 = function (me) {
         }
     }
 }
-
-this.on_die_boss = function (me) {
+    on_die_boss(me) {
     me.notify("<hig>恭喜你战胜了" + this.name + "。</hig>");
     this.on_reward(me);
     const count = me.query_temp('wd_s', 0) + 99;
@@ -79,7 +88,7 @@ this.on_die_boss = function (me) {
     }
     me.environment.item_changed(this, false, this.name + "离开了。");
 }
-this.on_die2 = function (me) {
+    on_die2(me) {
     me.notify("<hig>恭喜你战胜了武道塔守护者，你现在可以进入下一层。</hig>");
 
     USERTASK.GET('wudao').on_finish(me);
@@ -108,7 +117,7 @@ this.on_die2 = function (me) {
     }
 
 }
-this.reward = function (me, count) {
+    reward(me, count) {
     if (count > 100) count = 100;
     var lv = 1000 + count * 100;
     me.add_exp(lv, lv);
@@ -128,8 +137,7 @@ this.reward = function (me, count) {
         }
     }
 }
-
-this.reward3 = function (me, count) {
+    reward3(me, count) {
 
     var items = [];
     if (count > 100) count = 100;
@@ -154,7 +162,7 @@ this.reward3 = function (me, count) {
         }
     }
 }
-this.on_leave = function (me, dir) {
+    on_leave(me, dir) {
     var level = me.query_temp("wd_level", 0) + 1;
     if (me.query_temp('wudao_o')) level = 100;
     var npc = this.find_by_path(level == 100 ? "pub/wudao_boss" : "pub/wudao");
@@ -202,3 +210,5 @@ this.on_leave = function (me, dir) {
         me.die = USER.prototype.die;
     }
 }
+}
+

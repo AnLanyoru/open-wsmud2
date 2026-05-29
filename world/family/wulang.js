@@ -1,10 +1,11 @@
-﻿this.inherits(FAMILY);
+import { FAMILY } from "../../os/skill/family.js";
 
-this.id = "WULANG";
-this.name = "无浪门";
-this.top_name = "";
+export default class extends FAMILY {
+    id = "WULANG";
+    name = "无浪门";
+    top_name = "";
 
-this.call = function (player, isbad) {
+    call(player, isbad) {
     var age = player.query_age();
     if (player.gender == 2) {
         if (age < 18) return isbad ? "小贱人" : "小姑娘";
@@ -16,7 +17,7 @@ this.call = function (player, isbad) {
         else return isbad ? "老匹夫" : "老爷子";
     }
 }
-this.call_me = function (player, isbad) {
+    call_me(player, isbad) {
     var age = player.query_age();
     if (player.gender == 2) {
         if (age < 30) return isbad ? "本姑娘" : "小女子";
@@ -25,4 +26,5 @@ this.call_me = function (player, isbad) {
         if (age < 50) return isbad ? "大爷我" : "在下";
         else return isbad ? "老子" : "老头子";
     }
+}
 }

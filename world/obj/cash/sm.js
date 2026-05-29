@@ -1,13 +1,13 @@
-﻿
-this.inherits(OBJ);
-this.set({
-    name: "副本补给包",
-    desc: "包含328个扫荡符，18个天师符，100精力",
-    unit: "个",
-    value: 0,
-    grade: 5
-});
-this.on_open = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    name = "副本补给包";
+    desc = "包含328个扫荡符，18个天师符，100精力";
+    unit = "个";
+    value = 0;
+    grade = 5;
+
+    on_open(me) {
     var result = [
         {
             obj: "cash/saodang",
@@ -24,4 +24,4 @@ this.on_open = function (me) {
 
     return OBJ.create_by_odds(result);
 }
-
+}

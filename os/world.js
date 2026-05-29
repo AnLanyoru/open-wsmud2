@@ -2,76 +2,14 @@
  * WORLD 全局对象 - 游戏世界核心管理
  */
 
-require("./util/util");
-const db = require("./util/data");
+import "./util/util.js";
+import db from "./util/data.js";
+import WORLD_DATA from "./data.js";
+import USERLOGIN_MODULE from "./login.js";
+import LISTENER_MODULE from "./ws.js";
+import fs from "fs";
 
-/**
- * @type {{
- *   USERS: USER[],
- *   COMMANDS: Object<string, COMMAND>,
- *   SKILLS: Object<string, SKILL>,
- *   ROOMS: Object<string, ROOM>,
- *   RUN_ROOMS: ROOM[],
- *   DEFAULT_SKILLS: Object<string, SKILL>,
- *   AREAS: AREA[],
- *   TASKS: USERTASK[],
- *   SYSTEMTASKS: TASK[],
- *   USER_EVENTS: Array<{id: string}>,
- *   OBJ_STROE: Map<string, OBJ>,
- *   NPC_STROE: Map<string, NPC>,
- *   HEARTBEATCOUNT: number,
- *   RECEIVED: Array<{time: number, cmd: string, user: string}>,
- *   LOGS: Array<{time: number, cmd: string, user: string, msg: string}>,
- *   SERVERID: number,
- *   SERVERS: Array<*>,
- *   CONNECT_COUNT: number,
- *   DATA: *,
- *   USERLOGIN: *,
- *   DB: *,
- *   SocketCount: number,
- *   LISTENER: *,
- *   max_connect_count: number,
- *   max_user_count: number,
- *   MESSAGE: {stores: Map<*, *>, NOTICES: Array<*>},
- *   STATS: {TOPS: Array<*>, EXP: Array<*>, SCORE: Array<*>, WEAPON: Array<*>},
- *   status: number,
- *   heart_beat_service: *,
- *   SERVER: *,
- *   DEFAULT_COMMAND: COMMAND,
- *   SocketIn: function(): void,
- *   connect: function(*): void,
- *   check_connect: function(*): boolean,
- *   before_login: function(USER): boolean,
- *   disconnect: function(*): void,
- *   request: function(string, *): void,
- *   saveRequest: function(): void,
- *   startup: function(number=): Promise<void>,
- *   sendAll: function(string): void,
- *   getUser: function(string|number): USER|undefined,
- *   find_user: function(string): USER|undefined,
- *   on_user_login: function(USER): void,
- *   on_user_cross_login: function(USER): void,
- *   on_startup: function(): void,
- *   on_user_quit: function(USER): void,
- *   on_user_relogin: function(USER): void,
- *   on_heart_beat: function(number): void,
- *   heart_beat: function(): void,
- *   login_out: function(USER): void,
- *   send: function(string): void,
- *   log: function(USER|null, string, string): void,
- *   saveLog: function(): void,
- *   is_server: function(USER): boolean,
- *   save: function(): Promise<boolean>,
- *   writeHeapSnapshot: function(): void,
- *   loadLocalData: function(): void,
- *   on_cross_response: function(string, string): void,
- *   can_cross: function(string): boolean,
- *   on_user_die: function(CHARACTER, CHARACTER, CORPSE): void,
- *   on_resource_loaded: function(): void,
- *   auto_get: function
- * }}
- */
-WORLD = {
+const WORLD = {
     USERS: [],
     COMMANDS: {},
     SKILLS: {},
@@ -90,11 +28,11 @@ WORLD = {
     SERVERID: 0,
     SERVERS: [],
     CONNECT_COUNT: 0,
-    DATA: require('./data'),
-    USERLOGIN: require('./login'),
+    DATA: WORLD_DATA,
+    USERLOGIN: USERLOGIN_MODULE,
     DB: db,
     SocketCount: 0,
-    LISTENER: require("./ws"),
+    LISTENER: LISTENER_MODULE,
     max_connect_count: 1100,
     max_user_count: 5100,
     MESSAGE: {
@@ -130,7 +68,7 @@ WORLD = {
         if (!WORLD.check_connect(socket))
             return socket.end();
 
-        socket.user = new USER();
+        socket.user = new globalThis.USER();
 
         socket.user.socket = socket;
         socket.user.wait_input = this.USERLOGIN.check_session.bind(this.USERLOGIN);
@@ -226,12 +164,13 @@ WORLD = {
         this.SERVERID = this.SERVER.id;
 
         await db.initDataDir();
-        loadResource();
+        await loadResource();
         await this.DATA.load();
         await this.LISTENER.start(this.SERVER.port);
         console.log("服务", this.SERVER.name, "(" + this.SERVERID + ")启动");
         console.log("ws://" + this.SERVER.ip + ":" + this.SERVER.port);
-        this.heart_beat_service = setInterval(WORLD.heart_beat, __CONFIG.HEARTBEAT);
+        this.heartbeat_interval = __CONFIG.HEARTBEAT;
+        this.heart_beat_service = setInterval(WORLD.heart_beat, this.heartbeat_interval);
 
         this.status = __CONFIG.CONNECT_LEVEL ?? 0;
         this.on_startup();
@@ -334,7 +273,6 @@ WORLD = {
                 avtived_obj.heart_beat(dt);
             }
             WORLD.HEARTBEATCOUNT++;
-            console.log("心跳", WORLD.HEARTBEATCOUNT, "在线", WORLD.CONNECT_COUNT, "用户", WORLD.USERS.length, "房间", WORLD.RUN_ROOMS.length);
             if (WORLD.HEARTBEATCOUNT > 720) {
                 WORLD.HEARTBEATCOUNT = 0;
                 WORLD.save();
@@ -451,7 +389,7 @@ WORLD = {
         if (!data || !data.length) return;
         console.log("加载上次未保存的本地用户%d", data.length);
         for (let i = 0; i < data.length; i++) {
-            const user = new USER();
+            const user = new globalThis.USER();
             user.loadData(data[i]);
             this.USERS.push(user);
         }
@@ -496,8 +434,25 @@ WORLD = {
  * @param {string} [path] - 当前路径
  * @returns {number} 加载的文件数
  */
-function loadResource() {
-    const fs = require("fs");
+async function loadResource() {
+    async function preloadDir(basePath, dirPath) {
+        dirPath = dirPath || basePath;
+        const files = fs.readdirSync(dirPath);
+        let count = 0;
+        for (let i = 0; i < files.length; i++) {
+            const sub_path = dirPath + files[i];
+            const stat = fs.statSync(sub_path);
+            if (stat.isDirectory()) {
+                count += await preloadDir(basePath, sub_path + "/");
+            } else if (files[i].endsWith('.js')) {
+                const fname = sub_path.replace(basePath, "").replace(".js", "");
+                const fkey = basePath + fname;
+                await BASE.PRELOAD(fkey, sub_path);
+                count++;
+            }
+        }
+        return count;
+    }
     function readdir(basePath, path) {
         path = path || basePath;
         const files = fs.readdirSync(path);
@@ -515,40 +470,33 @@ function loadResource() {
         }
         return count;
     }
+    const dirs = [
+        __PATH.EXTENDS, __PATH.COMMAND, __PATH.FAMILY,
+        __PATH.OBJ, __PATH.AREA, __PATH.SKILL,
+        __PATH.MAP, __PATH.TASK, __PATH.NPC,
+    ];
     try {
+        // Phase 1: preload all modules
+        let preloadSum = 0;
+        for (const dir of dirs) {
+            const count = await preloadDir(dir);
+            console.log("preload %s %d", dir, count);
+            preloadSum += count;
+        }
+        console.log('模块预加载%d', preloadSum);
+
+        // Phase 2: create instances (sync from cache)
         let sum = 0;
-        let count = readdir(__PATH.EXTENDS);
-        console.log("%s %d ", __PATH.EXTENDS, count);
-        sum += count;
-        count = readdir(__PATH.COMMAND);
-        console.log("%s%d ", __PATH.COMMAND, count);
-        sum += count;
-        count = readdir(__PATH.FAMILY);
-        console.log("%s %d ", __PATH.FAMILY, count);
-        sum += count;
-
-
-        count = readdir(__PATH.OBJ);
-        console.log("%s %d ", __PATH.OBJ, count);
-        sum += count;
-
-        count = readdir(__PATH.AREA);
-        console.log("%s %d ", __PATH.AREA, count);
-        sum += count;
-
-        count = readdir(__PATH.SKILL);
-        console.log("%s %d ", __PATH.SKILL, count);
-        sum += count;
-
-        count = readdir(__PATH.MAP);
-        console.log("%s %d ", __PATH.MAP, count);
-        sum += count;
-        count = readdir(__PATH.TASK);
-        console.log("%s %d ", __PATH.TASK, count);
-        sum += count;
+        for (const dir of dirs) {
+            const count = readdir(dir);
+            console.log("%s %d", dir, count);
+            sum += count;
+        }
         console.log('资源脚本加载%d', sum);
         WORLD.on_resource_loaded();
     } catch (e) {
         console.log("error: ", e, e.stack);
     }
 }
+
+export { WORLD };

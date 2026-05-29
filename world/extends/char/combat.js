@@ -1,3 +1,6 @@
+import { WEAPON_TYPE } from "../../../os/const.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
 
 CHARACTER.prototype.recount = function () {
 
@@ -380,3 +383,4 @@ function damage_msg(damage, type, ob, iscrit, msg) {
             return "<wht>结果造成" + sh + "。</wht>";
     }
 }
+export default function() {}

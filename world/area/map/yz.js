@@ -1,15 +1,15 @@
-﻿this.inherits(AREA);
-this.set({
-    id: "yz",
-    name: "扬州城",
-    desc: "公共区域，你可以在这里买卖物品，使用仓库，购买房屋，帮派驻地等",
-    is_area: true,
-    first: "yz/guangchang",
-    index: 0,
-    room_path: "yz/",
-    is_public: true
-});
-this.map = [{ n: "中央广场", id: "yz/guangchang", p: [0, 0], exits: ["w2", "e2", "s", "n"] },
+import { AREA } from "../../../os/room/area.js";
+
+export default class extends AREA {
+    id = "yz";
+    name = "扬州城";
+    desc = "公共区域，你可以在这里买卖物品，使用仓库，购买房屋，帮派驻地等";
+    is_area = true;
+    first = "yz/guangchang";
+    index = 0;
+    room_path = "yz/";
+    is_public = true;
+    map = [{ n: "中央广场", id: "yz/guangchang", p: [0, 0], exits: ["w2", "e2", "s", "n"] },
 { n: "北大街", id: "yz/beidajie1", p: [0, -1], exits: ["w", "e", "n"] },
 { n: "北大街", id: "yz/beidajie2", p: [0, -2], exits: ["w", "e", "n"] },
 { n: "北门", id: "yz/beimen", p: [0, -3] },
@@ -48,9 +48,9 @@ this.map = [{ n: "中央广场", id: "yz/guangchang", p: [0, 0], exits: ["w2", "
 { n: "客栈", id: "yz/kedian", p: [1, -1], exits: ["w"] },
 { n: "杂货铺", id: "yz/zahuopu", p: [2, 1], exits: ["w", "s1d"] },
 { n: "成衣铺", id: "yz/garments", p: [2, 2] }];
-
-this.actions = [
+    actions = [
     ['goto home', '回家', '回到你在扬州城购买的房屋，可练功，采药等'],
     ['goto kuang', '矿山', '扬州城的西面有座矿山，可以挖到珍惜的宝石'],
     ['goto bp', '帮派', '回到自己的帮派驻地'],
     ['pm list', '拍卖', '打开正在拍卖的道具列表']];
+}

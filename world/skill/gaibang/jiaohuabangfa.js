@@ -1,9 +1,12 @@
-﻿this.inherits(SKILL);
-this.name = "叫花棒法";
-this.id = "jiaohuabangfa";
-this.grade = 1;
-this.family = FAMILIES.GAIBANG;
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "叫花棒法";
+    id = "jiaohuabangfa";
+    grade = 1;
+    family = FAMILIES.GAIBANG;
+    attack_actions = [
     "$N斜里冲前一步，身法诡异，手中$w急速横扫$n的$l",
     "$N忽然直身飞入半空，又忽的飞身扑下，$w攻向$n的$l",
     "$N原地一个后滚翻，身体向$n平飞过去，手中$w指向$n的$l",
@@ -11,28 +14,15 @@ this.attack_actions = [
     "$N向前顺势一滚，接着翻身跳起，手里$w斜向上击向$n的$l"
 
 ];
-this.desc = "丐帮的入门棒法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["club", "parry"];
-this.learn_condition = {
+    desc = "丐帮的入门棒法";
+    can_enables = ["club", "parry"];
+    learn_condition = {
     max_mp:500,
     skill: {
         club: 50
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        club: {
-            gj: lv + 10
-        },
-        parry: {
-            zj: lv + 10
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     wu:
     {
         name: "绊字决",
@@ -67,3 +57,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        club: {
+            gj: lv + 10
+        },
+        parry: {
+            zj: lv + 10
+        }
+    };
+}
+}
+

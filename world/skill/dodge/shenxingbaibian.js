@@ -1,9 +1,10 @@
-﻿this.inherits(SKILL);
-this.name = "神形百变";
-this.id = "shenxingbaibian";
-this.grade = 2;
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "神形百变";
+    id = "shenxingbaibian";
+    grade = 2;
+    dodge_actions = [
     "$n一式<HIC>「行云流水」</HIC>，身不倾，脚不移，身体如行云流水般直滑出丈余。",
     "$n一式<BLU>「潜音夜行」</BLU>，忽然一弯腰，全身贴地而行，顿时闪过了$N的凌厉攻势。",
     "$n一式<HIW>「移步换形」</HIW>，足不动，手不抬，一转眼间便绕到了$N的身后。",
@@ -15,11 +16,9 @@ this.dodge_actions = [
     "$n一式<GRN>「临行秋波」</GRN>，身行倏的从$N的眼前直绕到身后，$N瞪大了两眼，不明所以。",
     "$n一式<HIY>「浪子回头」</HIY>，身行倏的从$N的眼前飘过，长发一甩，潇洒之极。"
 ];
-this.desc = "神行百变是铁剑门木桑道长所传下来的轻功绝技，是逃命的高招";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["dodge"];
-this.learn_condition = {
+    desc = "神行百变是铁剑门木桑道长所传下来的轻功绝技，是逃命的高招";
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 1000,
     dex1: 20,
     int1: 20,
@@ -27,15 +26,7 @@ this.learn_condition = {
         dodge: 200
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            ds: Math.round(lv * 1.2 + 20),
-            dex: Math.round(lv / 10)
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'sxbb_cd',
         value: (lv) => 5000,
@@ -51,7 +42,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "神行",
@@ -82,3 +73,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            ds: Math.round(lv * 1.2 + 20),
+            dex: Math.round(lv / 10)
+        }
+    };
+}
+}

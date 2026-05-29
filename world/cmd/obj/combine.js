@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "combine";
-this.regex = /^(\w+)(?:\s(\d+))?$/;
-this.enter = function (player, objid, count) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "combine";
+    regex = /^(\w+)(?:\s(\d+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, count) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要用什么合成？");
@@ -38,3 +46,5 @@ this.enter = function (player, objid, count) {
     }
   
 }
+}
+

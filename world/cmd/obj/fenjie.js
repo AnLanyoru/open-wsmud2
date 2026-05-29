@@ -1,7 +1,16 @@
-﻿this.inherits(COMMAND);
-this.command = "fenjie";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, isok) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends COMMAND {
+    command = "fenjie";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, isok) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要分解什么装备？");
@@ -40,10 +49,7 @@ this.enter = function (player, objid, isok) {
     WORLD.add_recover_obj(player, obj, 2, sum_count);
 
 }
-const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
-    'fy', 'fy', 'gj'];
-
-this.fenjie2 = function (player, obj, isok) {
+    fenjie2(player, obj, isok) {
 
     // if (obj.path.startsWith('eq/cp')
     //     || obj.path.startsWith('eq/zb'))
@@ -106,4 +112,7 @@ this.fenjie2 = function (player, obj, isok) {
 
     return WORLD.add_recover_obj(player, obj, 2, rec_items);
 }
+}
 
+const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
+    'fy', 'fy', 'gj'];

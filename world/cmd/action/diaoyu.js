@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "diaoyu";
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "diaoyu";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me) {
     if (!me.environment || !me.environment.can_diaoyu)
         return false;
     var wea = me.query_weapon();
@@ -23,6 +31,7 @@ this.enter = function (me) {
         no_move: "你还在钓鱼，专心点比较好！",
         desc: '["你眼睛一眨也不眨地盯着浮漂，专心致志。","浮漂一上一下的在动，看样子有东西要上钩了！"]',
     });
+}
 }
 
 function on_check(me) {
@@ -60,21 +69,20 @@ function calculate_lv(grade) {
     const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17]];
 
     // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
-    let total = 0;
-    const cumulative = [];
+    const ranges_cumulative = [];
+    const rawWeights = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[i];
         if (i >= 1) {
             w = Math.floor(w * (1 + grade * i / 1200));
         }
-        total += w;
-        cumulative.push(total);
+        ranges_cumulative.push(ranges[i]);
+        rawWeights.push(w);
     }
 
-    const [lo, hi] = ranges[UTIL.weightedChoice(cumulative, ranges)];
+    const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, rawWeights);
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
-
 function do_diaoyu(me) {
     let r_i = me.random(100);
     if (r_i > 89) {
@@ -102,7 +110,6 @@ function do_diaoyu(me) {
     var pot = exp + me.query_prop('lsj_qn');
     me.add_exp(exp, pot, 0);
 }
-
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {

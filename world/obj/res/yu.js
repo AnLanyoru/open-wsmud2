@@ -1,14 +1,14 @@
-﻿
-this.inherits(OBJ);
-this.set({
-    unit: "条",
-    name: "鲢鱼",
-    desc: "一条活蹦乱跳的鲢鱼",
-    value: 100
-});
-this.transable = true;
-this.otype = 3;
-this.on_create = function (path, par) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    unit = "条";
+    name = "鲢鱼";
+    desc = "一条活蹦乱跳的鲢鱼";
+    value = 100;
+    transable = true;
+    otype = 3;
+
+    on_create(path, par) {
     if (!par) {
         par = 0;
     } else
@@ -22,5 +22,4 @@ this.on_create = function (path, par) {
     this.value = [500, 1000, 5000, 10000, 50000, 100000, 680000][this.grade];
     this.desc = "一条活蹦乱跳的" + this.name;
 }
-//100, 1000, 5000, 10000, 50000, 100000, 680000][this.grade];
-//100 200 300 500 1000
+}

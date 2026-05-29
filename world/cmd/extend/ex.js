@@ -1,18 +1,23 @@
-﻿this.inherits(COMMAND);
-this.command = "ex";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.admin = true;
-this.enter = function (me, type) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "ex";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    admin = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, type) {
     return false;
 }
-
-this.append_sklf = function (env) {
-
-}
-
-this.on_enter_fb = function (me, env) {
+    append_sklf(env) {
 
 }
+    on_enter_fb(me, env) {
 
+}
+}

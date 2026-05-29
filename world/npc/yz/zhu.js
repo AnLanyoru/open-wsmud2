@@ -1,32 +1,39 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "朱熹",
-    desc: "他是当朝有名的大儒。",
-    gender: 1,
-    age: 35,
-    per: 22,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 1500,
-    max_hp: 1500,
-});
-this.set_chat_msg([
-    "朱熹说道：万物之生，负阴而抱阳，莫不有太极，莫不有两仪",
-    "朱熹说道：为学之道，莫先于穷理；穷理之要，必先于读书。",
-    "朱熹说道：读书之法，在循序而渐进，熟读而精思。",
-    "朱熹说道：立身以立学为先，立学以读书为本。"
-]);
-this.skill_map(
-    ["literate", 10000]);
-this.add_action('tui', '退款', function (me) {
-    var count = me.query_temp('learn/zhu', 0);
-    if (!count) return me.notify('朱熹说道：我不记得收过你这个学生啊....');
-    me.notify('朱熹说道：这是你的学费。');
-    me.remove_temp('learn/zhu');
-    me.add_exp(0, 0, count);
-});
+import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.on_checkskill = function (me) {
+export default class extends NPC {
+    name = "朱熹";
+    desc = "他是当朝有名的大儒。";
+    gender = 1;
+    age = 35;
+    per = 22;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 1500;
+    max_hp = 1500;
+
+    constructor() {
+        super();
+        this.set_chat_msg([
+            "朱熹说道：万物之生，负阴而抱阳，莫不有太极，莫不有两仪",
+            "朱熹说道：为学之道，莫先于穷理；穷理之要，必先于读书。",
+            "朱熹说道：读书之法，在循序而渐进，熟读而精思。",
+            "朱熹说道：立身以立学为先，立学以读书为本。"
+        ]);
+        this.skill_map(
+            ["literate", 10000]);
+        this.add_action('tui', '退款', function (me) {
+            var count = me.query_temp('learn/zhu', 0);
+            if (!count) return me.notify('朱熹说道：我不记得收过你这个学生啊....');
+            me.notify('朱熹说道：这是你的学费。');
+            me.remove_temp('learn/zhu');
+            me.add_exp(0, 0, count);
+        });
+    }
+
+    on_checkskill(me) {
     if (!me.query_temp("learn/zhu")) {
         me.notify_fail("朱熹说道： 咦？" + me.name + "，我不记得收过你这个学生啊....");
         var lv = me.query_skill("literate", 0);
@@ -48,7 +55,7 @@ this.on_checkskill = function (me) {
     }
     return true;
 }
-this.on_accept = function (me, obj, count) {
+    on_accept(me, obj, count) {
     if (obj != "money") return false;
 
     me.add_temp("learn/zhu", count);
@@ -56,11 +63,11 @@ this.on_accept = function (me, obj, count) {
 
     return true;
 }
-this.on_teach = function (me) {
+    on_teach(me) {
 
     return this.on_checkskill(me);
 }
-this.do_teach = function (me, skill, lv) {
+    do_teach(me, skill, lv) {
     var money = me.query_temp("learn/zhu", 0);
     if (!money) {
         me.remove_temp("learn/zhu");
@@ -97,3 +104,5 @@ this.do_teach = function (me, skill, lv) {
     }
     return true;
 }
+}
+

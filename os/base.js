@@ -5,10 +5,11 @@
  * 可以用this.XXX扩展属性和方法
  */
 
-const vm = require('vm');
-const fs = require("fs");
+import vm from 'vm';
+import fs from 'fs';
+import { pathToFileURL } from 'url';
 
-BASE = class BASE {
+export class BASE {
     static __initInstance(obj) {
         // BASE has no instance properties to initialize
     }
@@ -194,6 +195,29 @@ BASE = class BASE {
      * @param {string} fname - 文件名(可能带 #参数)
      * @returns {BASE|undefined}
      */
+    /**
+     * 预加载一个资源文件（async），存入缓存供后续同步 CREATE 使用
+     * @param {string} fkey - 缓存键
+     * @param {string} filepath - 文件路径
+     */
+    static async PRELOAD(fkey, filepath) {
+        try {
+            const mod = await import(pathToFileURL(filepath).href);
+            const func = mod.default;
+            if (typeof func === 'function') {
+                BASE.ITEMS[fkey] = func;
+            } else {
+                // extends/ files: side-effects ran on import
+                BASE.ITEMS[fkey] = function () {};
+            }
+        } catch (e) {
+            console.error("preload %s error:", filepath, e, e.stack);
+        }
+    }
+
+    /**
+     * 同步创建对象（需先通过 PRELOAD 预加载）
+     */
     static CREATE(path, fname) {
 
         const ary = BASE.PATH_REG.exec(fname);
@@ -207,17 +231,17 @@ BASE = class BASE {
         if (func) {
             return BASE.NEW(fname, func, paras);
         }
-        const filepath = fkey + ".js";
-        try {
-            const script = fs.readFileSync(filepath);
-            func = vm.compileFunction(script.toString(), [],
-                { filename: filepath });
 
-            BASE.ITEMS[fkey] = func;
-            return BASE.NEW(fname, func, paras);
-        } catch (e) {
-            console.error("create %s%s error:", filepath, e, e.stack);
+        // For files with # parameters, try the base path
+        if (fname.includes('/')) {
+            const baseKey = path + fname.substring(0, fname.lastIndexOf('/'));
+            func = BASE.ITEMS[baseKey];
+            if (func) {
+                return BASE.NEW(fname, func, paras);
+            }
         }
+
+        console.error("resource not preloaded: %s", fkey);
     }
 
     /**
@@ -234,10 +258,10 @@ BASE = class BASE {
      * @returns {BASE}
      */
     static NEW(fname, func, par) {
-        const obj = new BASE();
-        func.apply(obj);
+        const isClass = func.toString().trim().startsWith('class');
+        const obj = isClass ? new func(par) : (() => { const o = new BASE(); func.apply(o); return o; })();
         obj.path = fname;
-        obj.create(fname, par);
+        if (obj.create) obj.create(fname, par);
         return obj;
     }
 

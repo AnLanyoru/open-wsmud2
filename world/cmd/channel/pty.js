@@ -1,9 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "pty";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, str) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "pty";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, str) {
     if (!str) return;
     if (str.length > 200) return me.notify("你说的太多了。");
     if (me.query_temp("no_chat")) return me.notify("你目前被禁言中。");
@@ -37,3 +46,5 @@ this.enter = function (me, str) {
     me.set_temp('chat', 1, 5000);
     me.add_temp('chat2', 1, UTIL.diff_time());
 }
+}
+

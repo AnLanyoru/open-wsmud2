@@ -1,13 +1,13 @@
-﻿
-this.inherits(OBJ);
-this.set({
-    name: "师门补给包",
-    desc: "里面有28个橙色师门令牌,6个紫色师门令牌，50精力",
-    unit: "个",
-    value: 0,
-    grade: 5
-});
-this.on_open = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    name = "师门补给包";
+    desc = "里面有28个橙色师门令牌,6个紫色师门令牌，50精力";
+    unit = "个";
+    value = 0;
+    grade = 5;
+
+    on_open(me) {
     var result = [
 
 
@@ -18,4 +18,4 @@ this.on_open = function (me) {
 
     return OBJ.create_by_odds(result);
 }
-
+}

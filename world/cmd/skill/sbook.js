@@ -1,9 +1,18 @@
-this.inherits(COMMAND);
-this.command = "sbook";
-this.allow_busy = true;
-this.allow_state = true;
-this.regex = /^(\w+)(?:\s+(\w+))?$/;
-this.enter = function (me, arg, isok) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
+
+export default class extends COMMAND {
+    command = "sbook";
+    allow_busy = true;
+    allow_state = true;
+    regex = /^(\w+)(?:\s+(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg, isok) {
     if (!arg) return this.render_books(me);
     if (arg === 'clear') return this.clear_base(me);
     if (arg.length < 4) return this.check_books(me, arg);
@@ -33,7 +42,7 @@ this.enter = function (me, arg, isok) {
         me.send(`{"type":"dialog","dialog":"skills","book":["${skill.name}",${skill.grade},${me.books.length - 1}]}`);
     }
 }
-this.check_books = function (me, arg) {
+    check_books(me, arg) {
     let index = parseInt(arg);
     if (!(index >= 0 && index < me.books.length))
         return me.send('你要查看哪本秘籍？ ');
@@ -50,8 +59,7 @@ this.check_books = function (me, arg) {
     }
     me.send(desc);
 }
-
-this.render_books = function (me) {
+    render_books(me) {
     let str = ['{"type":"dialog","dialog":"skills",'];
     let books = me.books ?? [];
     str.push("books:[");
@@ -63,7 +71,7 @@ this.render_books = function (me) {
     str.push(']}');
     me.send(str.join(""));
 }
-this.clear_base = function (me) {
+    clear_base(me) {
     let books = me.books ?? [];
     for (let i = 0; i < books.length; i++) {
         let skill = SKILL.get(books[i]);
@@ -76,7 +84,7 @@ this.clear_base = function (me) {
     }
     this.render_books(me);
 }
-this.has_base = function (me) {
+    has_base(me) {
     let books = me.books ?? [];
     for (let sk of books) {
         let skill = SKILL.get(sk);
@@ -86,8 +94,7 @@ this.has_base = function (me) {
     return false;
 
 }
-const COMBINED = [10, 10, 30, 50, 100, 200, 500];
-this.split_book = function (me, book) {
+    split_book(me, book) {
     let books = me.books ?? [];
     if (books.indexOf(book.skill) < 0) return me.notify('你只能把已经存放到书架的' + book.color_name + "拆分为秘籍残页。");
 
@@ -99,3 +106,6 @@ this.split_book = function (me, book) {
     let obj = me.add_obj('book/bc#' + skill.id, count);
     me.send('你将' + book.color_name + "拆分为" + obj.unit_name(count) + "。");
 }
+}
+
+const COMBINED = [10, 10, 30, 50, 100, 200, 500];

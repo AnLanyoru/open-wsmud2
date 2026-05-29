@@ -1,3 +1,5 @@
+import { WORLD } from "../../os/world.js";
+
 
 
 const MESSAGE = WORLD.MESSAGE;
@@ -100,9 +102,8 @@ MESSAGE.save = function () {
                     if (ishasmsg) str.push(",");
                     str.push("{time:");
                     str.push(item.time);
-                    str.push(",content:`");
-                    str.push(item.content);
-                    str.push("`");
+                    str.push(",content:");
+                    str.push(JSON.stringify(item.content));
                     if (item.attach) {
                         str.push(",attach:[");
                         for (let j = 0; j < item.attach.length; j++) {
@@ -167,3 +168,4 @@ MESSAGE.load = function (data) {
     }
     console.log("消息数据已加载");
 }
+export default function() {}

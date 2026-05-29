@@ -1,34 +1,18 @@
-﻿this.inherits(SKILL);
-this.name = "云龙心法";
-this.id = "yunlongxinfa";
-this.grade = 1;
-this.force_rad = 0.55;
-this.desc = "天地会的内功心法，入会便能修炼";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.on_learn = function (me) {
-    if (me.query_skill("force", 1) < 30)
-        return me.notify_fail("你的基础内功级别不够，无法学习云龙心法。");
-    return true;
-}
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: lv,
-            limit_mp: lv * 10,
-            desc: "唯一：将你内力的55%转化为气血"
-        }
-    };
-}
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.learn_condition = {
+export default class extends SKILL {
+    name = "云龙心法";
+    id = "yunlongxinfa";
+    grade = 1;
+    force_rad = 0.55;
+    desc = "天地会的内功心法，入会便能修炼";
+    can_enables = ["force"];
+    learn_condition = {
     skill: {
         force: 50
     }
 };
-
-this.slots = [
+    slots = [
     {
         prop: 'ylxf_mz',
         value: (lv) => lv > 1500 ? 4510 + lv - 1500 :
@@ -48,7 +32,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     power:
     {
         name: "云龙决",
@@ -90,3 +74,19 @@ this.pfm = {
         }
     }
 };
+
+    on_learn(me) {
+    if (me.query_skill("force", 1) < 30)
+        return me.notify_fail("你的基础内功级别不够，无法学习云龙心法。");
+    return true;
+}
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: lv,
+            limit_mp: lv * 10,
+            desc: "唯一：将你内力的55%转化为气血"
+        }
+    };
+}
+}

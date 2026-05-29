@@ -1,10 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "actions";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, type) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "actions";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, type) {
     //if (!me.actions_changed) return ;
     var str = ["{type:\"actions\",actions:["];
     var items = me.items;
@@ -41,4 +48,5 @@ this.enter = function (me, type) {
     }
     str.push("]}");
     me.send(str.join(""));
+}
 }

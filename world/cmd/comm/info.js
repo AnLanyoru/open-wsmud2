@@ -1,10 +1,17 @@
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
-this.inherits(COMMAND);
-this.command = "info";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, tid) {
+export default class extends COMMAND {
+    command = "info";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, tid) {
     let str = [];
     let notifier = me;
     if (tid) {
@@ -45,25 +52,26 @@ this.enter = function (me, tid) {
     str.push('已领取', me.query_temp('xy_hd', 0) * REWARDS_LIMIT[me.level], '/', REWARDS_LIMIT[me.level] * 5, '奖励军功\n');
     notifier.send(str.join(""));
 }
-
-const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];//奖励等级对应的每份上限
-const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];//每周功绩上限
-const YMTITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];
-this.query_wdcount = function (me) {
+    query_wdcount(me) {
     let tm = me.query_temp("wd_tm", 0);
     if (!tm) return 0;
     tm = Math.floor((Date.now() - tm * 100000) / 3600000 / 24);
     return Math.min(tm, 7);
 }
-this.query_smcount = function (me) {
+    query_smcount(me) {
     let sm = me.query_temp("sm_tm", 0);
     if (!sm) return -1;
     sm = Math.floor((Date.now() - sm * 100000) / 3600000);
     return Math.min(sm, 60);
 }
-this.query_ymcount = function (me) {
+    query_ymcount(me) {
     let sm = me.query_temp("ym_tm", 0);
     if (!sm) return 0;
     sm = Math.floor((Date.now() - sm * 100000) / 3600000);
     return Math.min(sm, 60);
 }
+}
+
+const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];
+const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];
+const YMTITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];

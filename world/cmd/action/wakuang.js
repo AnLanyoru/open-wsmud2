@@ -1,6 +1,13 @@
-﻿this.inherits(COMMAND);
-this.command = "wakuang";
-this.enter = function (me, arg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "wakuang";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, arg) {
     if (!me.equipment || !me.equipment[0]
         || !me.equipment[0].path.startsWith("sp/tool/chu")) {
         var chu = null;
@@ -26,4 +33,5 @@ this.enter = function (me, arg) {
     me.do_command("go", "west");
     me.do_command("go", "west");
     me.do_command("wa");
+}
 }

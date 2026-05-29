@@ -1,15 +1,18 @@
-﻿this.inherits(OBJ);
-this.unit = "颗";
-this.name = "丹药";
-this.value = 1920000;
-this.combined = true;
-this.action_msg = "吃";
-this.distime = 60000;
-this.allow_fight = true;
-this.distype = "marry";
-this.allow_die = true;
-this.transable = true;
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+
+export default class extends OBJ {
+    unit = "颗";
+    name = "丹药";
+    value = 1920000;
+    combined = true;
+    action_msg = "吃";
+    distime = 60000;
+    allow_fight = true;
+    distype = "marry";
+    allow_die = true;
+    transable = true;
+
+    on_use(me) {
     if (this.level === 2) {
         if (me.hp > 0)
             return me.notify_fail('这颗丹药在你死亡的时候才会起作用。');
@@ -65,10 +68,7 @@ this.on_use = function (me) {
         });
     }
 }
-const names = ['回天丹', '灵悟丹', '还魂丹', '驱魔丹', '龙魂丹'];
-const descs = ['服用后后刷新你的所有技能冷却', '服用后一小时内增加1000悟性，可叠加', '死亡后使用可以原地复活',
-    "服用后驱散你的负面状态", "服用后6秒内你将免疫绝大部分伤害"];
-this.on_create = function (path, par) {
+    on_create(path, par) {
     var lv = 0;
     if (par) {
         lv = parseInt(par.substr(1));
@@ -82,3 +82,8 @@ this.on_create = function (path, par) {
         this.distime = 0;
     }
 }
+}
+
+const names = ['回天丹', '灵悟丹', '还魂丹', '驱魔丹', '龙魂丹'];
+const descs = ['服用后后刷新你的所有技能冷却', '服用后一小时内增加1000悟性，可叠加', '死亡后使用可以原地复活',
+    "服用后驱散你的负面状态", "服用后6秒内你将免疫绝大部分伤害"];

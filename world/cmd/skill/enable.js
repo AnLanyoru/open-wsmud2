@@ -1,8 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "enable";
-this.regex = /^(\w+?)\s+(.+?)$/;
-this.allow_fight = false;
-this.enter = function (me, base, skill, no_sent) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
+
+export default class extends COMMAND {
+    command = "enable";
+    regex = /^(\w+?)\s+(.+?)$/;
+    allow_fight = false;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, base, skill, no_sent) {
     if (!me.skills) return me.notify("你还不会任何技能。");
     var baseskill = me.skills[base];
     if (!baseskill) return me.notify("你还不会这个基本技能。");
@@ -64,6 +73,7 @@ this.enter = function (me, base, skill, no_sent) {
         me.notify_hp();
     }
 
+}
 }
 
 const WEAPON_SKILLS = {

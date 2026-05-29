@@ -1,44 +1,40 @@
-﻿this.inherits(NPC);
-this.name = "铁匠";
-this.title = "铁匠铺老板";
-this.desc = "铁匠正用铁钳夹住一块红热的铁块放进炉中。";
-this.age = 33;
-this.max_hp = 100;
-this.max_mp = 100;
-this.per = 10;
-this.gender = 1;
-this.set_goods("eq/lv0/jian", "eq/lv0/dao", "eq/lv0/tiegun", "eq/lv0/tiezhang", "eq/lv0/fei", "sp/tool/chu#0");
-this.add_action("unxx", "取消镶嵌", function (me, arg) {
+import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { EQUIP_TYPE, WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends NPC {
+    name = "铁匠";
+    title = "铁匠铺老板";
+    desc = "铁匠正用铁钳夹住一块红热的铁块放进炉中。";
+    age = 33;
+    max_hp = 100;
+    max_mp = 100;
+    per = 10;
+    gender = 1;
+
+    constructor() {
+        super();
+        this.set_goods("eq/lv0/jian", "eq/lv0/dao", "eq/lv0/tiegun", "eq/lv0/tiezhang", "eq/lv0/fei", "sp/tool/chu#0");
+        this.add_action("unxx", "取消镶嵌", function (me, arg) {
 
 
-    WORLD.COMMANDS['unxiangqian'].enter(me);
-});
-this.add_action("unjl", "取消精炼", function (me, arg) {
-    WORLD.COMMANDS['unjinglian'].enter(me);
-});
-this.add_action("dz", "锻造武器", function (me, arg) {
-    // me.send_commands('dz1 ' + this.id, "锻造武器",
-    //     'dz2 ' + this.id, "重铸武器",
-    //     'dz3 ' + this.id, "武器改名",
-    //     'dz4 ' + this.id, "更改武器类型");
-    WORLD.COMMANDS['duanzao'].enter(me);
-});
-// this.add_action("dz1", "", function (me, arg) {
-//     WORLD.COMMANDS['duanzao'].enter(me);
-// });
-// this.add_action("dz2", "", function (me, arg) {
-//     WORLD.COMMANDS['reduanzao'].enter(me);
-// });
+            WORLD.COMMANDS['unxiangqian'].enter(me);
+        });
+        this.add_action("unjl", "取消精炼", function (me, arg) {
+            WORLD.COMMANDS['unjinglian'].enter(me);
+        });
+        this.add_action("dz", "锻造武器", function (me, arg) {
+            // me.send_commands('dz1 ' + this.id, "锻造武器",
+            //     'dz2 ' + this.id, "重铸武器",
+            //     'dz3 ' + this.id, "武器改名",
+            //     'dz4 ' + this.id, "更改武器类型");
+            WORLD.COMMANDS['duanzao'].enter(me);
+        });
+    }
 
-// this.add_action("dz3", "", function (me, arg) {
-//     WORLD.COMMANDS['reduanzao2'].enter(me);
-// });
-
-// this.add_action("dz4", "", function (me, arg) {
-//     WORLD.COMMANDS['reduanzao3'].enter(me);
-// });
-
-this.on_duanzao = function (me, arg) {
+    on_duanzao(me, arg) {
     if (arg == "ok") {
         var item = me.find_obj_bypath("st/yuanjing");
         if (!item || item.count < 10) return me.notify("铁匠说道：材料不够就别来烦我。");
@@ -61,10 +57,7 @@ this.on_duanzao = function (me, arg) {
         me.send_commands("cancle", '我不锻造了');
     }
 }
-
-// this.wp_names = ["君子剑", '真武剑', '屠龙刀', '倚天剑', '碧血剑', '碧血照丹青',
-//     '轩辕剑', '鹰刀', '盘古斧'];
-this.dzwq = function (arg, me, str) {
+    dzwq(arg, me, str) {
 
     if (str == "cancle") {
         me.notify("铁匠说道：好吧，可惜了。");
@@ -111,3 +104,5 @@ this.dzwq = function (arg, me, str) {
         me.notify("铁匠给你" + obj.unit_name() + "。");
     }
 }
+}
+

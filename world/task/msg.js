@@ -1,20 +1,24 @@
-﻿
-this.inherits(TASK);
-this.id = "msg";
-this.handler = null;
-this.startup = function () {
-    this.handler = this.call_out(this.run, 20 * 60000);
-}
-this.stop = function () {
-    if (this.handler) clearTimeout(this.handler);
-}
-this.msgs = [
+import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { COMMAND } from "../../os/command.js";
+
+export default class extends TASK {
+    id = "msg";
+    handler = null;
+    msgs = [
     "欢迎登录，感谢你的支持，如有任何问题或建议",
     "如有BUG请提交管理员，谢谢配合"
 
 ];
-this.is_check_file = false;
-this.run = function () {
+    is_check_file = false;
+
+    startup() {
+    this.handler = this.call_out(this.run, 20 * 60000);
+}
+    stop() {
+    if (this.handler) clearTimeout(this.handler);
+}
+    run() {
     COMMAND.DO("sys", this.msgs.random());
     this.startup();
     var dt = new Date();
@@ -27,13 +31,11 @@ this.run = function () {
         this.clearyz();
     }
 }
-this.clearyz = function () {
+    clearyz() {
     WORLD.COMMANDS['checkorg'].cmd_clearmail();
     WORLD.COMMANDS['checkorg'].cmd_clearstore();
 }
-
-
-this.check_file = function () {
+    check_file() {
 
     const min1 = new Date(Date.now() - 3600000 * 24 * 7);//七天内每个一小时
     const min2 = new Date(Date.now() - 3600000 * 24 * 30);//30天内每天一个
@@ -84,9 +86,7 @@ this.check_file = function () {
         return true;
     });
 }
-
-
-this.check_temp_files = async function (path, func) {
+    async check_temp_files(path, func) {
     const dir = __PATH.DATA + path + "/";
     const paths = await fs.readdir(dir);
     for (var i = 0; i < paths.length; i++) {
@@ -95,3 +95,6 @@ this.check_temp_files = async function (path, func) {
         }
     }
 }
+}
+
+const __PATH = globalThis.__PATH;

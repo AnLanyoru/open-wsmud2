@@ -1,8 +1,16 @@
-this.inherits(COMMAND);
-this.command = "say";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, msg) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+
+export default class extends COMMAND {
+    command = "say";
+    allow_busy = true;
+    allow_state = true;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, msg) {
 
     if (!msg) {
         return me.send_room("$N在自言自语的说些什么。");
@@ -17,3 +25,5 @@ this.enter = function (me, msg) {
     me.add_temp('chat2', 1, UTIL.diff_time());
     return me.send_room("$N说：" + UTIL.htmlEncode(msg));
 }
+}
+

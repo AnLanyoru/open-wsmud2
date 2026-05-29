@@ -1,10 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "look3";
-this.allow_busy = true;
-this.allow_state = true;
-this.regex = /^(?:(\w+)\sof\s)?(\w+)$/;
-//查看不在同一房间的
-this.enter = function (me, index, userid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends COMMAND {
+    command = "look3";
+    allow_busy = true;
+    allow_state = true;
+    regex = /^(?:(\w+)\sof\s)?(\w+)$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, index, userid) {
     if (userid.startsWith("fb_")) {
         var area_index = parseInt(userid.substr(3));
         var area = WORLD.AREAS[area_index];
@@ -62,3 +70,5 @@ this.enter = function (me, index, userid) {
         }
     }
 }
+}
+

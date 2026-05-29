@@ -1,12 +1,14 @@
-﻿this.inherits(OBJ);
-this.set({
-    unit: "颗",
-    name: "变性丹",
-    desc: "使用后可以使男性变为女性，女性变为男性，无性变为男性，不满足条件的武功将被移除",
-    grade: 5,
-    value: 0
-});
-this.on_use = function (me) {
+import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
+
+export default class extends OBJ {
+    unit = "颗";
+    name = "变性丹";
+    desc = "使用后可以使男性变为女性，女性变为男性，无性变为男性，不满足条件的武功将被移除";
+    grade = 5;
+    value = 0;
+
+    on_use(me) {
 
     if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
     var gender = me.gender == 1 ? 2 : 1;
@@ -69,3 +71,5 @@ this.on_use = function (me) {
     }
 
 }
+}
+

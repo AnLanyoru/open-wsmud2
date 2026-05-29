@@ -1,20 +1,25 @@
-﻿this.inherits(COMMAND);
-this.command = "recover";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.admin = true;
-this.regex = /^(.+?)(?:\s(\w+))?$/;
-this.allow_level = 6;
-this.enter = function (me, userid, objid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "recover";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    admin = true;
+    regex = /^(.+?)(?:\s(\w+))?$/;
+    allow_level = 6;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, userid, objid) {
 
 }
-
-this.clear = function (user) {
+    clear(user) {
 
 }
+    add_obj(me, obj, type, key) {
 
-
-this.add_obj = function (me, obj, type, key) {
-
+}
 }

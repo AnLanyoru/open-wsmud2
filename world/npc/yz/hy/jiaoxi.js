@@ -1,34 +1,45 @@
-this.inherits(NPC);
-this.set({
-    name: "黑鹰教习",
-    desc: "他身穿黑袍，手持长刀",
-    gender: 1,
-    age: 32,
-    per: 22,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 2500,
-    max_hp: 2500
-});
+import { NPC } from "../../../../os/char/npc.js";
+import { ROOM } from "../../../../os/room/room.js";
 
+export default class extends NPC {
+    name = "黑鹰教习";
+    desc = "他身穿黑袍，手持长刀";
+    gender = 1;
+    age = 32;
+    per = 22;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 2500;
+    max_hp = 2500;
+    no_refresh = true;
 
-this.no_refresh = true;
-this.skill_map(
-    ["unarmed", 180],
-    ["dodge", 180],
-    ["force", 180],
-    ["parry", 180],
-    ["blade", 180],
-    ["heilongxinfa", 180, "force"],
-    ["wuhuduanmendao", 180, "blade"]);
-this.set_objects(
-    ["eq/lv0/cloth", 1, 1],
-    ["eq/lv1/dandao", 1, 1]
-);
+    constructor() {
+        super();
+        this.skill_map(
+            ["unarmed", 180],
+            ["dodge", 180],
+            ["force", 180],
+            ["parry", 180],
+            ["blade", 180],
+            ["heilongxinfa", 180, "force"],
+            ["wuhuduanmendao", 180, "blade"]);
+        this.set_objects(
+            ["eq/lv0/cloth", 1, 1],
+            ["eq/lv1/dandao", 1, 1]
+        );
+        this.set_drop({
+            obj: "st/xuanjing",
+            min: 1,
+            max: 3
+        }, {
+            obj: ['eq/lv1/xk_cloth',
+                'eq/lv1/xk_head',
+                'eq/lv1/xk_shoes'],
+            odds: 3000
+        });
+    }
 
-
-
-this.on_kill = function (me) {
+    on_kill(me) {
     if (!this.fight_type) {
         let rooms = ['yz/hy/jiaochang1', 'yz/hy/jiaochang3',
             'yz/hy/jiaochang4', 'yz/hy/jiaochang5'];
@@ -49,7 +60,7 @@ this.on_kill = function (me) {
     }
 
 }
-this.on_died = function (me, corpse) {
+    on_died(me, corpse) {
     let eny = this.enemy[0];
     if (eny && eny.hp > 0 && eny.environment === this.die_room) {
 
@@ -66,13 +77,5 @@ this.on_died = function (me, corpse) {
     }
     corpse.items = null;
 }
-this.set_drop({
-    obj: "st/xuanjing",
-    min: 1,
-    max: 3
-}, {
-    obj: ['eq/lv1/xk_cloth',
-        'eq/lv1/xk_head',
-        'eq/lv1/xk_shoes'],
-    odds: 3000
-});
+}
+

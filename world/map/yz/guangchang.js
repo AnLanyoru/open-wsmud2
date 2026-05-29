@@ -1,14 +1,21 @@
-﻿this.inherits(ROOM);
-this.name = "广场";
-this.desc = "这里是城市的正中心，一个很宽阔的广场，铺着青石地面。一些游手好闲的人在这里溜溜达达，经常有艺人在这里表演。中央有一棵<cmd cmd='look tree'>大榕树(tree)</cmd>，盘根错节，据传已有千年的树龄，是这座城市的历史见证。";
-this.exits = {
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends ROOM {
+    name = "广场";
+    desc = "这里是城市的正中心，一个很宽阔的广场，铺着青石地面。一些游手好闲的人在这里溜溜达达，经常有艺人在这里表演。中央有一棵<cmd cmd='look tree'>大榕树(tree)</cmd>，盘根错节，据传已有千年的树龄，是这座城市的历史见证。";
+    exits = {
     east: "yz/dongdajie1", west: "yz/xidajie1", south: "yz/nandajie1", north: "yz/beidajie1"
 };
-this.set_npc("yz/zhubanxian");
-this.set_item("tree", "大榕树", "一棵枝叶茂盛的大榕树，看来似乎可以爬上去", [[
-    "climb", "爬",  climb_tree
-]]);
-this.add_action("climb tree", "爬树");
+
+    constructor() {
+        super();
+        this.set_npc("yz/zhubanxian");
+        this.set_item("tree", "大榕树", "一棵枝叶茂盛的大榕树，看来似乎可以爬上去", [[
+            "climb", "爬",  climb_tree
+        ]]);
+        this.add_action("climb tree", "爬树");
+    }
+}
 
 function climb_tree(me, par) {
     if (par != "tree") return me.notify("你要爬什么？");

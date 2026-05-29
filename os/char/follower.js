@@ -1,43 +1,79 @@
 /**
  * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
  */
-require("../util/util.js");
-require("./user.js");
+import "../util/util.js";
+import { CHARACTER } from "./character.js";
+import { USER } from "./user.js";
+import { NPC } from "./npc.js";
+import { FAMILIES } from "../skill/family.js";
+import { CORPSE } from "../item/corpse.js";
+import { ROOM } from "../room/room.js";
+import { UTIL } from "../util/util.js";
+import { OBJ } from "../item/obj.js";
 
-FOLLOWER = class FOLLOWER extends CHARACTER {
+export class FOLLOWER extends CHARACTER {
 
     /**
      * @param {FOLLOWER} obj - 要初始化的随从实例
      */
-    static __initInstance(obj) {
-        /** @type {number} */
-        obj.hp = obj.max_hp = 100;
-        /** @type {number} */
-        obj.mp = obj.max_mp = 100;
-        /** @type {number} */
-        obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
-        /** @type {FAMILY} */
-        obj.family = FAMILIES.NONE;
-        /** @type {boolean} */
-        obj.auto_pfm = true;
-        /** @type {string|null} */
-        obj.master = null;
-        /** @type {number} */
-        obj.level = 3;
-        /** @type {string|null} */
-        obj.master_name = null;
-        /** @type {number} */
-        obj.max_item_count = 10;
-        /** @type {Object} */
-        obj.settings = {
-            auto_kill: 1,
-            auto_dice: 1
-        };
-    }
+
+    // ============ 核心属性 ============
+
+    /** @type {boolean} 是否自动释放绝招 */
+    auto_pfm = true;
+    /** @type {FAMILY} 所属门派 */
+    family = FAMILIES.NONE;
+    /** @type {string} 随从名称 */
+    name;
+    /** @type {number} 随从等级 */
+    level = 3;
+    /** @type {string} 随从描述 */
+    desc;
+    /** @type {string} 随从称号 */
+    title;
+
+    // ============ 主人相关 ============
+
+    /** @type {string|null} 主人ID */
+    master = null;
+    /** @type {string|null} 主人名称 */
+    master_name = null;
+    /** @type {USER|null} 消息监听者(主人) */
+    listener = null;
+    /** @type {Object|null} 主人可见命令JSON缓存 */
+    master_json = null;
+    /** @type {Array|null} 公开命令JSON缓存 */
+    json = null;
+
+    // ============ 战斗与装备 ============
+
+    /** @type {EQUIPMENT[]|null} 装备列表 */
+    equipment = null;
+    /** @type {Object<string, {level: number, exp: number}>|null} 技能映射 */
+    skills = null;
+
+    // ============ 物品与设置 ============
+
+    /** @type {number} 最大背包容量 */
+    max_item_count = 10;
+    /** @type {Object<string, number>} 随从设置 */
+    settings = { auto_kill: 1, auto_dice: 1 };
+    /** @type {number} 背包金钱 */
+    money = 0;
+    /** @type {OBJ[]|null} 背包物品 */
+    items = null;
+
+    // ============ 回调函数(由资源文件设置) ============
+
+    /** @type {((me: USER) => void)|null} 亲热回调 — 调用已被注释, 由资源文件设置 */
+    on_makelove = null;
+    /** @type {((me: USER) => void)|null} 主人进入回调 */
+    on_master_enter = null;
+    /** @type {((dt: number) => void)|null} 心跳回调 */
+    on_heart_beat = null;
 
     constructor() {
         super();
-        FOLLOWER.__initInstance(this);
     }
 
     /**
@@ -655,3 +691,4 @@ const SAVE_STRPROP = ["id", "name", "title", "desc"];
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+

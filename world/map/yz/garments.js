@@ -1,12 +1,19 @@
-﻿this.inherits(ROOM);
-this.name = "成衣店"
-this.desc = "这里是扬州名媛贵妇常到之处，现在也挤得凄凄惨惨，脂粉横飞。因为这里卖的时尚，一直是她们最热衷的装扮。店主是个很可人的小女孩，你认真一看，顿时发现满个店堂里的女人加在一起，还不如她靓丽。店门口横横歪歪地写着几个大字。想来出自小宝手笔。";
-this.exits = { "down": "yz/zahuopu" };
+import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
 
-this.no_fight = true;
-this.set_npc("yz/zeng");
+export default class extends ROOM {
+    name = "成衣店";
+    desc = "这里是扬州名媛贵妇常到之处，现在也挤得凄凄惨惨，脂粉横飞。因为这里卖的时尚，一直是她们最热衷的装扮。店主是个很可人的小女孩，你认真一看，顿时发现满个店堂里的女人加在一起，还不如她靓丽。店门口横横歪歪地写着几个大字。想来出自小宝手笔。";
+    exits = { "down": "yz/zahuopu" };
+    no_fight = true;
 
-this.add_action("work", "开始工作", start_work);
+    constructor() {
+        super();
+        this.set_npc("yz/zeng");
+        this.add_action("work", "开始工作", start_work);
+    }
+}
+
 function start_work(me) {
     if (me.level > 1) return me.notify("曾柔：我这里人手已经够了，做义工可没工钱的哟！");
     if (me.gender == 1) return me.notify("曾柔不好意思道：小宝可不许我雇佣男工，你去药店试试。");

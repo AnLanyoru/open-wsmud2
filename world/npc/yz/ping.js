@@ -1,27 +1,33 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "平一指",
-    desc: "他就是医术高超的「杀人神医」平一指。可是他性格古怪，不是什么人都医的。",
-    title: "药铺老板",
-    gender: 1,
-    age: 65,
-    per: 22,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 1500,
-    max_hp: 1500,
-});
+import { NPC } from "../../../os/char/npc.js";
+import { UTIL } from "../../../os/util/util.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
-this.skill_map(
-    ["lianyao", 3000]);
-this.add_action('tui', '退款', function (me) {
-    var count = me.query_temp('learn/ping', 0);
-    if (!count) return me.notify('平一指说道：你从没给老夫交过学费。');
-    me.notify('平一指哼了一声。');
-    me.remove_temp('learn/ping');
-    me.add_exp(0, 0, count);
-});
-this.on_checkskill = function (me) {
+export default class extends NPC {
+    name = "平一指";
+    desc = "他就是医术高超的「杀人神医」平一指。可是他性格古怪，不是什么人都医的。";
+    title = "药铺老板";
+    gender = 1;
+    age = 65;
+    per = 22;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 1500;
+    max_hp = 1500;
+
+    constructor() {
+        super();
+        this.skill_map(
+            ["lianyao", 3000]);
+        this.add_action('tui', '退款', function (me) {
+            var count = me.query_temp('learn/ping', 0);
+            if (!count) return me.notify('平一指说道：你从没给老夫交过学费。');
+            me.notify('平一指哼了一声。');
+            me.remove_temp('learn/ping');
+            me.add_exp(0, 0, count);
+        });
+    }
+
+    on_checkskill(me) {
     if (!me.query_temp("learn/ping")) {
         me.notify_fail("平一指说道：老夫医一人，杀一人。杀一人，医一人，你要不要试试。");
         var lv = me.query_skill("lianyao", 0);
@@ -46,17 +52,17 @@ this.on_checkskill = function (me) {
     }
     return true;
 }
-this.on_accept = function (me, obj, count) {
+    on_accept(me, obj, count) {
     if (obj != "money") return false;
     me.add_temp("learn/ping", count);
     me.notify("平一指点了点头，说道：不错，你就跟我学学炼药吧。");
     return true;
 }
-this.on_teach = function (me) {
+    on_teach(me) {
 
     return this.on_checkskill(me);
 }
-this.do_teach = function (me, skill, lv) {
+    do_teach(me, skill, lv) {
     var money = me.query_temp("learn/ping");
     var exp = parseInt((me.int + me.query_prop("int")) * (100 + me.query_prop("study_per") + me.int) / 100) * 30;
 
@@ -83,3 +89,5 @@ this.do_teach = function (me, skill, lv) {
     }
     return true;
 }
+}
+

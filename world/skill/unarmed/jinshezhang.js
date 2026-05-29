@@ -1,9 +1,11 @@
-﻿this.inherits(SKILL);
-this.name = "金蛇游身掌";
-this.id = "jinshezhang";
-this.grade = 3;
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
-this.attack_actions = [
+export default class extends SKILL {
+    name = "金蛇游身掌";
+    id = "jinshezhang";
+    grade = 3;
+    attack_actions = [
     "$N双掌一错，一招「千蛇出洞」幻出漫天掌影拢向$n的$l",
     "$N暴喝一声，双掌连环推出，一招「大沼龙蛇」强劲的掌风直扑$n的$l",
     "$N双掌纷飞，一招「双蛇抢珠」直取$n的$l",
@@ -16,26 +18,15 @@ this.attack_actions = [
     "$N使出「灵蛇游八方」，身形散作八处同时向$n的$l出掌攻击",
     "$N使出金蛇游身掌法「金蛇探头」，如鬼魅般欺至$n身前，一掌拍向$n的$l"
 ];
-this.desc = "金蛇郎君所创的一门掌法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "金蛇郎君所创的一门掌法";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         unarmed: 400
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.3) + 20,
-            mz: parseInt(lv * 1.3) + 20,
-            dex: parseInt(lv / 6)
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'jsys_ds',
         value: (lv) => 1,
@@ -52,7 +43,7 @@ this.slots = [
         }
     },
 ];
-this.pfm = {
+    pfm = {
     qian:
     {
         name: "金龙升天",
@@ -92,3 +83,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.3) + 20,
+            mz: parseInt(lv * 1.3) + 20,
+            dex: parseInt(lv / 6)
+        }
+    };
+}
+}
+

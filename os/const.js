@@ -3,7 +3,7 @@
  * @readonly
  * @enum {number}
  */
-SKILL_TYPES = {
+export const SKILL_TYPES = {
     BASE: 0,
     SKILL: 1,
     KNOWLEDGE: 2
@@ -14,7 +14,7 @@ SKILL_TYPES = {
  * @readonly
  * @enum {string}
  */
-BASE_SKILLS = {
+export const BASE_SKILLS = {
     FORCE: "force",
     DODGE: "dodge",
     PARRY: "parry",
@@ -26,7 +26,7 @@ BASE_SKILLS = {
  * @readonly
  * @enum {number}
  */
-EQUIP_TYPE = {
+export const EQUIP_TYPE = {
     WEAPON: 0,
     CLOTH: 1,
     SHOES: 2,
@@ -45,7 +45,7 @@ EQUIP_TYPE = {
  * @readonly
  * @enum {string}
  */
-WEAPON_TYPE = {
+export const WEAPON_TYPE = {
     NONE: "unarmed",
     SWORD: "sword",
     BLADE: "blade",
@@ -60,7 +60,7 @@ WEAPON_TYPE = {
  * @readonly
  * @type {Object<string, string>}
  */
-PROPERTIES = {
+export const PROPERTIES = {
     "con1": "先天根骨",
     "dex1": "先天身法",
     "int1": "先天悟性",
@@ -98,6 +98,7 @@ PROPERTIES = {
     zj_per: "招架",
     gj_per: "攻击",
     ds_per: "躲闪",
+    mz_per: "命中",
     hp_per: "气血",
     study_per: "学习效率",
     dazuo_per: "打坐效率",

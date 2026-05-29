@@ -1,14 +1,21 @@
-﻿this.inherits(SKILL);
-this.name = "杀手心法";
-this.id = "shashouxinfa";
-this.grade = 1;
-this.force_rad = 0.55;
-this.desc = "杀手楼的入门心法";
-this.family = FAMILIES.SHASHOU;
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.query_enable_prop = function (lv) {
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends SKILL {
+    name = "杀手心法";
+    id = "shashouxinfa";
+    grade = 1;
+    force_rad = 0.55;
+    desc = "杀手楼的入门心法";
+    family = FAMILIES.SHASHOU;
+    can_enables = ["force"];
+    learn_condition = {
+    skill: {
+        force: 50
+    }
+};
+
+    query_enable_prop(lv) {
     return {
         force: {
             gj: 1 + lv,
@@ -17,8 +24,5 @@ this.query_enable_prop = function (lv) {
         }
     };
 }
-this.learn_condition = {
-    skill: {
-        force: 50
-    }
-};
+}
+

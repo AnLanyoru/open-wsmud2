@@ -1,14 +1,25 @@
-﻿
-this.inherits(COMMAND);
-this.command = "jh";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.fbs_json = null;
-this.fbs = [];
-this.regex = /^(\w+)?\s?(lock|\d+)?(?:\s(start[1|2|3]?))?$/;
-this.enter = function (me, type, arg, isstart) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { AREA } from "../../../os/room/area.js";
+import { ROOM } from "../../../os/room/room.js";
+
+export default class extends COMMAND {
+    command = "jh";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    fbs_json = null;
+    fbs = [];
+    regex = /^(\w+)?\s?(lock|\d+)?(?:\s(start[1|2|3]?))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, type, arg, isstart) {
     if (!me.is_player) return;
     var unlock = me.query_temp("fb", 0);
     var unlock2 = me.query_temp("fb2", 0);
@@ -146,8 +157,7 @@ this.enter = function (me, type, arg, isstart) {
     }
 
 }
-
-this.enter_ar_fb = function (me, fb, diff = 0) {
+    enter_ar_fb(me, fb, diff = 0) {
     var count =
         me.query_temp(fb.count_key ?? ("fbc_0_" + fb.fb_index), 0);
 
@@ -174,8 +184,7 @@ this.enter_ar_fb = function (me, fb, diff = 0) {
             "进入副本");
     }
 }
-
-this.return_famdesc = function (me, index) {
+    return_famdesc(me, index) {
 
     if (!(index >= 0 && index < this.families.length)) return me.notify("没有这个门派。");
     var fb = this.families[index];
@@ -215,8 +224,7 @@ this.return_famdesc = function (me, index) {
     fb.json = JSON.stringify(obj);
     me.send(fb.json);
 }
-
-this.return_areadesc = function (me, index) {
+    return_areadesc(me, index) {
     if (!(index >= 0 && index < this.areas.length)) return me.notify("没有这个副本。");
     var fb = this.areas[index];
     if (!fb) return me.notify("没有这个区域。");
@@ -236,8 +244,7 @@ this.return_areadesc = function (me, index) {
     fb.json = JSON.stringify(obj);
     me.send(fb.json);
 }
-
-this.return_fbdesc = function (me, index) {
+    return_fbdesc(me, index) {
     if (!(index >= 0 && index < this.fbs.length)) return me.notify("没有这个副本。");
     var fb = this.fbs[index];
     if (!fb) return me.notify("没有这个副本。");
@@ -264,7 +271,7 @@ this.return_fbdesc = function (me, index) {
     fb.json = JSON.stringify(obj);
     me.send(fb.json);
 }
-this.fb_drops = function (fb) {
+    fb_drops(fb) {
     var json = [];
     var drops = fb.drops || [];
     fb.drop_items = [];
@@ -279,8 +286,7 @@ this.fb_drops = function (fb) {
     }
     return json.join("\n");
 }
-
-this.fb_status = function (fb) {
+    fb_status(fb) {
     let status = [];
     let fblock = fb.fb_index + 1;
     let fb_key = "fb_first_" + fblock + "_0";
@@ -312,13 +318,11 @@ this.fb_status = function (fb) {
     }
     return status;
 }
-
-this.init = function () {
+    init() {
 
     this.map_json = this.getAllMaps();
 }
-
-this.getAllMaps = function (me) {
+    getAllMaps(me) {
     var map = {};
     map.type = "dialog";
     map.dialog = "jh";
@@ -353,11 +357,7 @@ this.getAllMaps = function (me) {
     AREA.FBS = this.fbs;
     return JSON.stringify(map);
 }
-
-AREA.Get_FB = function (id) {
-    return FBS[id];
-}
-this.get_area = function (id) {
+    get_area(id) {
     if (!this.areas) this.getAllMaps();
     let index = AREAS[id];
     if (index >= 0) {
@@ -365,7 +365,11 @@ this.get_area = function (id) {
     }
     return null;
 }
+}
 
+AREA.Get_FB = function (id) {
+    return FBS[id];
+}
 const AREAS = {
     yz: 0, wudang: 1, shaolin: 2, huashan: 3, emei: 4,
     xiaoyao: 5, gaibang: 6, shashou: 7, xiangyang: 8, wudao: 9

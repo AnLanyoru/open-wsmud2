@@ -1,28 +1,34 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "武馆教习",
-    desc: "一个高大威猛的汉子，负责教导武馆新人基本功法",
-    gender: 1,
-    age: 25,
-    per: this.random(20) + 10,
-    mp: 400,
-    max_mp: 400,
-    hp: 400,
-    max_hp: 400,
-    family: FAMILIES.NONE
-});
-this.skill_map(
-    ["force", 300],
-    ["dodge", 300],
-    ["parry", 300],
-    ["sword", 300],
-    ["blade", 300],
-    ["club", 300],
-    ["staff", 300],
-    ["whip", 300],
-    ["unarmed", 300],
-    ["throwing", 300]);
-this.on_checkskill = function (me) {
+import { NPC } from "../../../os/char/npc.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+
+export default class extends NPC {
+    name = "武馆教习";
+    desc = "一个高大威猛的汉子，负责教导武馆新人基本功法";
+    gender = 1;
+    age = 25;
+    per = this.random(20) + 10;
+    mp = 400;
+    max_mp = 400;
+    hp = 400;
+    max_hp = 400;
+    family = FAMILIES.NONE;
+
+    constructor() {
+        super();
+        this.skill_map(
+            ["force", 300],
+            ["dodge", 300],
+            ["parry", 300],
+            ["sword", 300],
+            ["blade", 300],
+            ["club", 300],
+            ["staff", 300],
+            ["whip", 300],
+            ["unarmed", 300],
+            ["throwing", 300]);
+    }
+
+    on_checkskill(me) {
     if (!me.query_temp("wg_sr")) {
         me.send_room("武馆教习瞄了$N一眼：100两白银，先交钱再学功夫，包教包会。");
 
@@ -30,10 +36,10 @@ this.on_checkskill = function (me) {
     }
     return true;
 }
-this.on_teach = function (me) {
+    on_teach(me) {
     return me.query_temp("wg_sr") == 1;
 }
-this.on_accept = function (me, obj, count) {
+    on_accept(me, obj, count) {
     if (obj != "money") return false;
     if (me.query_temp("wg_sr")) {
         me.notify("武馆教习愉快笑了笑，收下你的钱。");
@@ -48,8 +54,5 @@ this.on_accept = function (me, obj, count) {
     }
     return true;
 }
+}
 
-// this.add_action("ask1", "武馆任务", function (me) {
-//     if (me.family != FAMILIES.NONE) return me.notify("武馆教习对你说道：你还是去找自己的师门看看吧。");
-//     me.do_command("task", "sm " + this.id);
-// });

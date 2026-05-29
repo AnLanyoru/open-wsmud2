@@ -1,10 +1,13 @@
-﻿this.inherits(SKILL);
-this.name = "天山折梅手";
-this.id = "zhemeishou";
-this.family = FAMILIES.XIAOYAO;
-this.grade = 2;
+import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
-this.attack_actions = [
+export default class extends SKILL {
+    name = "天山折梅手";
+    id = "zhemeishou";
+    family = FAMILIES.XIAOYAO;
+    grade = 2;
+    attack_actions = [
     "$N一招「<RED>黄昏独自愁</RED>」，身子跃然而起，抓向$n的头部",
     "$N一招「<YEL>梅花雪落覆白苹</YEL>」，双手合击，$n只觉无处可避",
     "$N一招「<HIC>砌下落梅如雪乱</HIC>」，双手飘然抓向$n",
@@ -12,37 +15,23 @@ this.attack_actions = [
     "$N左手虚晃，右手一记「<MAG>红颜未老恩先绝</MAG>」击向$n的头部",
     "$N施出「<RED>虚妄笑红</RED>」，右手横扫$n的$l，左手攻向$n的胸口"
 ];
-this.parry_actions = [
+    parry_actions = [
     "$n一招「<GRN>寒山一带伤心碧</GRN>」，双手纷飞，$N只觉眼花缭乱，无处下手",
     "$n一招「<BLK>吹梅笛怨</BLK>」，双手横挥，扫开$N",
     "$n施出「<YEL>玉石俱焚</YEL>」，不顾一切扑向$N，$P急忙收招防护",
     "$n一招「<WHT>花开堪折直须折</WHT>」，拿向$N的$W，$P一见急忙收招",
 
 ];
-this.desc = "逍遥派手法，三路掌法，三路擒拿，号称可化解天下招数武功";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "逍遥派手法，三路掌法，三路擒拿，号称可化解天下招数武功";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         unarmed: 100,
         parry: 100
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 10,
-            mz: lv + 20
-        },
-        parry: {
-            zj: parseInt(lv * 1.3 + 20),
-            dex: parseInt(lv / 8) + 1
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     duo:
     {
         name: "空手入白刃",
@@ -68,3 +57,18 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 10,
+            mz: lv + 20
+        },
+        parry: {
+            zj: parseInt(lv * 1.3 + 20),
+            dex: parseInt(lv / 8) + 1
+        }
+    };
+}
+}
+

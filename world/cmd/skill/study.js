@@ -1,7 +1,17 @@
-﻿this.inherits(COMMAND);
-this.command = "study";
-this.allow_fight = false;
-this.enter = function (me, bookid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
+
+export default class extends COMMAND {
+    command = "study";
+    allow_fight = false;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, bookid) {
     if (!bookid) return me.notify("你要学习什么技能？");
 
     if (bookid.length < 4) return this.study_from_books(me, bookid);
@@ -22,8 +32,7 @@ this.enter = function (me, bookid) {
     this.study_skill(me, skill, target);
 
 }
-
-this.study_from_books = function (me, bindex) {
+    study_from_books(me, bindex) {
     let books = me.books;
     if (me.master) {
         let user = WORLD.getUser(me.master);
@@ -39,8 +48,7 @@ this.study_from_books = function (me, bindex) {
     var target = { color_name: skill.color_name, max_level: 100, };
     this.study_skill(me, skill, target);
 }
-
-this.study_skill = function (me, skill, target) {
+    study_skill(me, skill, target) {
     if (skill.is_custom && !me.create_for(skill.id)) return me.notify('这是别人自创的武功，目前无法学习。');
 
     if (!checkSkillCount(me, skill.id)) return;
@@ -76,7 +84,7 @@ this.study_skill = function (me, skill, target) {
         },
     });
 }
-
+}
 
 function checkSkillCount(me, sk) {
     var count = 0;

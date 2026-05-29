@@ -1,43 +1,56 @@
-this.inherits(MONSTER);
+import { MONSTER } from "../../../../os/char/monster.js";
+import { WORLD } from "../../../../os/world.js";
+import { UTIL } from "../../../../os/util/util.js";
+import { EVENTS } from "../../../../os/task/events.js";
+import { COMMAND } from "../../../../os/command.js";
 
-
-this.name = "黑龙";
-this.desc = "它被玄铁锁链捆在盘龙柱上，鳞甲黯淡，挣扎时锁链摩擦作响，发出低哑悲鸣";
-this.gender = 0;
-
-this.age = 200;
-this.per = 20;
-
-this.mp = 500000;
-this.max_mp = 500000;
-this.hp = 55000;
-this.max_hp = 5000000;
-this.score = 29;
-this.prop = {
+export default class extends MONSTER {
+    name = "黑龙";
+    desc = "它被玄铁锁链捆在盘龙柱上，鳞甲黯淡，挣扎时锁链摩擦作响，发出低哑悲鸣";
+    gender = 0;
+    age = 200;
+    per = 20;
+    mp = 500000;
+    max_mp = 500000;
+    hp = 55000;
+    max_hp = 5000000;
+    score = 29;
+    prop = {
     gj: 4900,
     mz: 4900,
     ds: 1900,
     fy: 4900,
     zj: 1900
 };
-this.on_create = function () {
+    is_free = false;
+    fight_time = 0;
+
+    constructor() {
+        super();
+        this.set_drop({
+            obj: "st/xuanjing",
+            min: 1,
+            max: 10
+        }, {
+            obj: ['eq/lv2/lm_jian', 'sp/bj/zhu', 'book/bc#qinlong'],
+            odds: 300
+        });
+        this.skill_map(
+            ["dodge", 380],
+            ["parry", 380],
+            ["force", 380],
+            ["bite", 380],
+            ["heilong", 380, ["bite", "dodge", "parry"]]);
+        this.add_action('free', '放了它', function (me) {
+            me.send(this.name + '挣扎双翼连接的锁链哗啦作响：狡猾的人类，又想骗我什么？这根柱子灵纹封印，单靠蛮力无法破坏。');
+
+        });
+    }
+
+    on_create() {
     this.hp = 55000;
 }
-this.set_drop({
-    obj: "st/xuanjing",
-    min: 1,
-    max: 10
-}, {
-    obj: ['eq/lv2/lm_jian', 'sp/bj/zhu', 'book/bc#qinlong'],
-    odds: 300
-});
-this.skill_map(
-    ["dodge", 380],
-    ["parry", 380],
-    ["force", 380],
-    ["bite", 380],
-    ["heilong", 380, ["bite", "dodge", "parry"]]);
-this.on_kill = function (me) {
+    on_kill(me) {
     if (this.is_free) return false;
     if (!this.fight_type) {
         this.environment.set_temp(me, 'kill_hl', 1);
@@ -45,10 +58,7 @@ this.on_kill = function (me) {
         this.do_kill(me);
     }
 }
-
-this.is_free = false;
-this.fight_time = 0;
-this.heart_beat = function (dt) {
+    heart_beat(dt) {
     if (this.fight_type > 0) {
         this.fight_time++;
         if (this.fight_time > 60) {
@@ -59,8 +69,7 @@ this.heart_beat = function (dt) {
         this.hp = this.is_free ? 5000000 : 55000;
     }
 }
-
-this.on_enter = function (me) {
+    on_enter(me) {
     let room = this.environment;
     if (room.query_temp(me, 'kill_hl')) {
         this.do_kill(me);
@@ -69,12 +78,7 @@ this.on_enter = function (me) {
         me.send_commands('kill ' + this.id, '击杀它', 'free ' + this.id, '放了它');
     }
 }
-this.add_action('free', '放了它', function (me) {
-    me.send(this.name + '挣扎双翼连接的锁链哗啦作响：狡猾的人类，又想骗我什么？这根柱子灵纹封印，单靠蛮力无法破坏。');
-
-});
-
-this.on_free = function (me) {
+    on_free(me) {
     this.is_free = true;
     this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
 
@@ -82,13 +86,13 @@ this.on_free = function (me) {
     this.call_out(this.to_next, 3000, me);
 
 }
-this.to_next = function (me) {
+    to_next(me) {
     this.full();
     this.send_room('$N身躯如墨色闪电般绷直，借反冲之力腾空而起，修长的身躯在空中蜿蜒盘旋，低沉的龙吟响彻锁龙井。');
 
     this.call_out(this.to_next2, 3000, me);
 }
-this.to_next2 = function (me) {
+    to_next2(me) {
     if (!this.is_here(me))
         return this.destroy(this.name + '飞走了。');
     this.send_room('$N悬在半空低头审视着$n，最终什么也没说，庞大身躯骤然腾空，转瞬间便消失在锁龙井深处。', me);
@@ -132,3 +136,5 @@ this.to_next2 = function (me) {
         });
     }
 }
+}
+

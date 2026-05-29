@@ -1,21 +1,21 @@
-﻿this.inherits(NPC);
-this.set({
-    name: "逃犯",
-    desc: "他是衙门正在追捕的逃犯",
-    title: "<red>衙门逃犯</red>",
-    gender: 1,
-    age: 25,
-    per: 18,
-    mp: 400,
-    max_mp: 400,
-    hp: 400,
-    max_hp: 400,
-    no_refresh: true,
-    no_fight: true
+import { NPC } from "../../../os/char/npc.js";
+import { UTIL } from "../../../os/util/util.js";
 
-});
+export default class extends NPC {
+    name = "逃犯";
+    desc = "他是衙门正在追捕的逃犯";
+    title = "<red>衙门逃犯</red>";
+    gender = 1;
+    age = 25;
+    per = 18;
+    mp = 400;
+    max_mp = 400;
+    hp = 400;
+    max_hp = 400;
+    no_refresh = true;
+    no_fight = true;
 
-this.init_from = function (player, grade = 0, level = 0) {
+    init_from(player, grade = 0, level = 0) {
 
     this.con = this.dex = this.int = this.str = 30;
     this.gender = this.random(2) + 1;
@@ -31,3 +31,5 @@ this.init_from = function (player, grade = 0, level = 0) {
     this.recount();
 
 }
+}
+

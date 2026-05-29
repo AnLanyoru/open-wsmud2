@@ -1,7 +1,13 @@
-﻿
-this.inherits(COMMAND);
-this.command = "eq";
-this.enter = function (me, oid) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+
+export default class extends COMMAND {
+    command = "eq";
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, oid) {
     var obj = me.find_obj(oid);
     if (!obj) {
         return me.notify("你要装备什么？");
@@ -26,4 +32,5 @@ this.enter = function (me, oid) {
         }
     }
 
+}
 }

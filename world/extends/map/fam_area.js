@@ -1,3 +1,7 @@
+import { WORLD } from "../../../os/world.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { FAMILY_AREA } from "../../../os/room/fam_area.js";
+
 const stand_actions = [
     ['goto fam1', '练功', '回到你所在门派师父所在位置学习武功'],
 
@@ -35,3 +39,4 @@ FAMILY_AREA.prototype.notify_update = function () {
     this.json = null;
     WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
 }
+export default function() {}

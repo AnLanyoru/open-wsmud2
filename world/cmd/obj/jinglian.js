@@ -1,7 +1,15 @@
-﻿this.inherits(COMMAND);
-this.command = "jinglian";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, isok) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+
+export default class extends COMMAND {
+    command = "jinglian";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
+    enter(player, objid, isok) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要精炼什么装备？");
@@ -96,6 +104,7 @@ this.enter = function (player, objid, isok) {
     str.push('"}');
     player.notify(str.join(""));
 
+}
 }
 
 function query_level_color(lv) {

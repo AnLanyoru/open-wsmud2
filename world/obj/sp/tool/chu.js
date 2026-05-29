@@ -1,15 +1,15 @@
-﻿this.inherits(EQUIPMENT);
-this.set({
-    unit: "把",
-    name: "铁镐",
-    desc: "一根精铁制成的铁镐",
-    value: 1000,
-    eq_type: EQUIP_TYPE.WEAPON,
-    weapon_type: WEAPON_TYPE.STAFF,
+import { EQUIPMENT } from "../../../../os/item/equipment.js";
+import { EQUIP_TYPE, WEAPON_TYPE } from "../../../../os/const.js";
 
-});
+export default class extends EQUIPMENT {
+    unit = "把";
+    name = "铁镐";
+    desc = "一根精铁制成的铁镐";
+    value = 1000;
+    eq_type = EQUIP_TYPE.WEAPON;
+    weapon_type = WEAPON_TYPE.STAFF;
 
-this.on_create = function (path, par) {
+    on_create(path, par) {
     let lv = 1;
     if (par) {
         par = par.substr(1);
@@ -29,3 +29,5 @@ this.on_create = function (path, par) {
     }
     EQUIPMENT.prototype.on_create.apply(this);
 }
+}
+

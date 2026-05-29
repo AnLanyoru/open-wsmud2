@@ -1,10 +1,18 @@
-﻿this.inherits(COMMAND);
-this.command = "party";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.admin = true;
-this.regex = /^(\w+)(?:\s+(.+?))?(?:\s+(\w+))?$/;
-this.enter = function (me, cmd, par, par2) {
+import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
+export default class extends COMMAND {
+    command = "party";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    admin = true;
+    regex = /^(\w+)(?:\s+(.+?))?(?:\s+(\w+))?$/;
+
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me, cmd, par, par2) {
+
+}
 }

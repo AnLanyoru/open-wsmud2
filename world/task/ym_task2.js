@@ -1,28 +1,24 @@
-﻿
-this.inherits(USERTASK);
-this.id = "yamen2";
-this.requests = new Map();
+import { USERTASK } from "../../os/task/playertask.js";
+import { WORLD } from "../../os/world.js";
+import { NPC } from "../../os/char/npc.js";
+import { ROOM } from "../../os/room/room.js";
 
-this.on_create = function () {
+export default class extends USERTASK {
+    id = "yamen2";
+    requests = new Map();
+
+    on_create() {
     var task = USERTASK.GET('yamen2');
     if (task) {
         this.requests = task.requests;
     }
 }
-
-const TAGS = ['wht', 'hic', 'hiy', 'hiz', 'hio', 'ora'];
-this.query_title = function (me) {
+    query_title(me) {
     let tag = TAGS[me.query_temp('ym_level', 0)];
 
     return `<${tag}>衙门追捕</${tag}>`;
 }
-
-
-
-const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];
-const UPGRADE_COUNT = [1, 10, 10, 10, 10, 10];
-
-this.query_desc = function (me) {
+    query_desc(me) {
     let request = this.query_request(me);
     if (!request) return me.remove_temp('ym_task');
     var str = ["扬州知府委托你追杀逃犯："];
@@ -53,18 +49,13 @@ this.query_desc = function (me) {
 
     return str.join("");
 }
-
-this.query_state = function (me) {
+    query_state(me) {
     let request = this.query_request(me);
     if (me.query_temp("ym_task") && request)
         return 1;
     return 0;
 }
-
-const LEVEL_LIMIT = [0, 1000000, 5000000, 17000000, 80000000, 300000000, 1000000000];
-const LEVEL_LIMIT2 = [0, 0, 0, 0, 23000000, 50000000, 1500000000];
-
-this.start = function (player) {
+    start(player) {
     if (player.query_temp("ym_task")) {
         var request = this.requests.get(player.id);
         if (request)
@@ -98,8 +89,7 @@ this.start = function (player) {
     npc.on_died = this.check.bind(this, npc);
     npc.on_kill = this.check_player;
 }
-
-this.to_taofan = function (player) {
+    to_taofan(player) {
     var request = this.requests.get(player.id);
     if (request) {
         let npc = request.npc;
@@ -108,12 +98,11 @@ this.to_taofan = function (player) {
         }
     }
 }
-
-this.query_request = function (me) {
+    query_request(me) {
 
     return this.requests.get(me.id);
 }
-this.set_request = function (me, npc, wz) {
+    set_request(me, npc, wz) {
     this.requests.set(me.id, {
         npc: npc,
         time: Date.now() + 600000,
@@ -121,12 +110,12 @@ this.set_request = function (me, npc, wz) {
         wz: wz
     });
 }
-this.check_player = function (me) {
+    check_player(me) {
     if (me.id != this.query_temp("player")) {
         return me.notify_fail(this.name + "对你喊道：" + me.call(true) + "，别多管闲事！");
     }
 }
-this.remove_request = function (me, isremove) {
+    remove_request(me, isremove) {
     var request = this.requests.get(me.id);
     if (!request) return;
     if (isremove && request.npc) {
@@ -137,8 +126,7 @@ this.remove_request = function (me, isremove) {
     clearTimeout(request.handler);
     this.requests.delete(me.id);
 }
-
-this.check = function (npc, killer, corpse) {
+    check(npc, killer, corpse) {
     var user = npc.query_temp("player");
     if (!killer || killer.id != user || killer.query_temp("ym_task") != npc.id) {
         var real_player = WORLD.getUser(user);
@@ -187,11 +175,18 @@ this.check = function (npc, killer, corpse) {
 
 
 }
-this.clear = function (player, npc) {
+    clear(player, npc) {
     this.giveup(player);
     player.notify("<red>你的追捕任务失败了。</red>");
 }
-this.giveup = function (player) {
+    giveup(player) {
     player.remove_temp("ym_task");
     this.remove_request(player, true);
 }
+}
+
+const TAGS = ['wht', 'hic', 'hiy', 'hiz', 'hio', 'ora'];
+const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];
+const UPGRADE_COUNT = [1, 10, 10, 10, 10, 10];
+const LEVEL_LIMIT = [0, 1000000, 5000000, 17000000, 80000000, 300000000, 1000000000];
+const LEVEL_LIMIT2 = [0, 0, 0, 0, 23000000, 50000000, 1500000000];

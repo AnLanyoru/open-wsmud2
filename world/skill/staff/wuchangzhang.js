@@ -1,8 +1,11 @@
-﻿this.inherits(SKILL);
-this.name = "无常杖";
-this.id = "wuchangzhang";
-this.grade = 2
-this.attack_actions = [
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+
+export default class extends SKILL {
+    name = "无常杖";
+    id = "wuchangzhang";
+    grade = 2;
+    attack_actions = [
     "$N微一躬身，一招<HIG>「庸人自扰」</HIG>，$w带着刺耳的吱吱声，擦地扫向$n的脚踝",
     "$N一招<HIM>「想入非非」</HIM>，右手托住杖端，左掌居中一击，令其凭惯性倒向$n的肩头",
     "$N一招<HIR>「六神不安」</HIR>，举起$w乒乒乓乓地满地乱敲，让$n左闪右避，狼狈不堪",
@@ -16,30 +19,15 @@ this.attack_actions = [
     "$N高举$w，一招<HIG>「人鬼殊途」</HIG>，身形如鬼魅般飘出，对准$n的天灵盖一杖打下",
     "$N一招<HIB>「我入地狱」</HIB>，单腿独立，$w舞成千百根相似，根根砸向$n全身各处要害"
 ];
-
-this.desc = "少林寺七十二绝技之无常杖";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.learn_condition = {
+    desc = "少林寺七十二绝技之无常杖";
+    learn_condition = {
     max_mp: 3000,
     skill: {
         staff: 200
     }
-}
-this.can_enables = ["staff", "parry"];
-this.query_enable_prop = function (lv) {
-    return {
-        staff: {
-            gj: lv + 10,
-            str: Math.round(lv / 6)
-        },
-        parry: {
-            zj: lv + 5,
-            fy: lv + 10
-        }
-    };
-}
-this.slots = [
+};
+    can_enables = ["staff", "parry"];
+    slots = [
     {
         prop: 'wcz_gcd',
         value: (lv) => 2000,
@@ -48,7 +36,7 @@ this.slots = [
         },
     }
 ];
-this.pfm = {
+    pfm = {
     chang:
     {
         name: "无常五化",
@@ -78,3 +66,18 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        staff: {
+            gj: lv + 10,
+            str: Math.round(lv / 6)
+        },
+        parry: {
+            zj: lv + 5,
+            fy: lv + 10
+        }
+    };
+}
+}
+
