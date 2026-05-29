@@ -22,6 +22,17 @@ export class SKILL extends BASE {
     grade = 1;
     /** @type {number} 技能评分 */
     score = 0;
+    /**
+     * 技能学习条件，可包含以下字段:
+     * - skill: {[id: string]: number}  前置技能ID→等级要求
+     * - str1/con1/dex1/int1: number    先天属性(不含装备加成)
+     * - str/con/dex/int: number        总属性(含装备加成)
+     * - gender: number                 性别要求(1男/2女/3无性)
+     * - desc: string                   条件描述(仅展示,不做检查)
+     * - 其他任意key: number            角色属性阈值,如 max_mp: 10000
+     * @type {{[key: string]: any}}
+     */
+    learn_condition = {};
 
     constructor() {
         super();
@@ -389,10 +400,9 @@ export class SKILL extends BASE {
 
     /**
      * 学习条件转字符串
-     * @param {CHARACTER} me
      * @returns {string}
      */
-    condition_tostring(me) {
+    condition_tostring() {
         if (this.learn_condition_string) return this.learn_condition_string;
         const str = [];
         if (this.learn_condition) {
