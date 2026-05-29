@@ -11,6 +11,10 @@ import { ROOM } from "../room/room.js";
 import { UTIL } from "../util/util.js";
 import { OBJ } from "../item/obj.js";
 
+/**
+ * @typedef {{id: string, path: string, prop: number[], temp?: any[], settings?: Object<string, number>, skills?: Object<string, any>, items?: any[], eq?: any[], [key: string]: any}} FOLLOWER_DATA
+ */
+
 export class FOLLOWER extends CHARACTER {
 
     /**
@@ -48,8 +52,6 @@ export class FOLLOWER extends CHARACTER {
 
     /** @type {EQUIPMENT[]|null} 装备列表 */
     equipment = null;
-    /** @type {Object<string, {level: number, exp: number}>|null} 技能映射 */
-    skills = null;
 
     // ============ 物品与设置 ============
 
@@ -64,10 +66,16 @@ export class FOLLOWER extends CHARACTER {
 
     // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
-    /** @type {((me: USER) => void)|null} 亲热回调 — 调用已被注释, 由资源文件设置 */
-    get on_makelove() { return undefined; }
-    /** @type {((me: USER) => void)|null} 主人进入回调 */
-    get on_master_enter() { return undefined; }
+    /**
+     * 亲热回调 — 资源文件覆写
+     * @param {USER} me
+     */
+    on_makelove(me) {return undefined; }
+    /**
+     * 主人进入回调 — 资源文件覆写
+     * @param {USER} me
+     */
+    on_master_enter(me) { }
     /** @type {((dt: number) => void)|null} 心跳回调 */
     get on_heart_beat() { return undefined; }
 
@@ -88,7 +96,7 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 设置随从配置
      * @param {string} name
-     * @param {string|number} value
+     * @param {1|0|"0"|"1"} value
      */
     set_setting(name, value) {
         if (!this.settings) this.settings = {};
@@ -113,15 +121,6 @@ export class FOLLOWER extends CHARACTER {
         }
     }
 
-    /**
-     * 通知失败
-     * @param {string} text
-     * @returns {boolean} false
-     */
-    notify_fail(text) {
-        this.send(text);
-        return false;
-    }
 
     /**
      * 通知消息
@@ -178,7 +177,7 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 从用户数据初始化随从
      * @param {USER} me
-     * @param {Array<{id: string, path: string}>} datas
+     * @param {FOLLOWER_DATA[]} datas
      */
     static INIT_FROM_USER(me, datas) {
 

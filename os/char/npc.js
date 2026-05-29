@@ -55,6 +55,16 @@ export class NPC extends CHARACTER {
     get on_checkskill() { return undefined; }
     /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 — 暂未被调用, 由资源文件设置 */
     get on_pfm() { return undefined; }
+    /**
+     * 亲热回调 — 资源文件覆写
+     * @param {USER} me
+     */
+    on_makelove(me) { return undefined; }
+    /**
+     * 主人进入回调 — 资源文件覆写
+     * @param {USER} me
+     */
+    on_master_enter(me) { return undefined; }
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 
@@ -120,7 +130,7 @@ export class NPC extends CHARACTER {
 
     /**
      * 查询操作命令JSON(缓存)
-     * @param {USER} player - 观察者
+     * @param {CHARACTER} [player] - 观察者
      * @returns {string}
      */
     query_commands(player) {
@@ -133,7 +143,7 @@ export class NPC extends CHARACTER {
 
     /**
      * 构建操作命令JSON
-     * @param {USER} player - 观察者
+     * @param {CHARACTER} player - 观察者
      * @param {boolean} isyb - 是否元宝商人
      * @returns {string} JSON字符串
      */

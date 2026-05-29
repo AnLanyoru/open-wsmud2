@@ -216,6 +216,7 @@ export class CHARACTER extends ITEM {
      * @returns {false} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
      */
     notify_fail(text) {
+        this.send(text);
         return false;
     }
 
