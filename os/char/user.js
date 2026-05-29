@@ -5,21 +5,39 @@ require("./character.js");
 
 USER = class USER extends CHARACTER {
 
+    /**
+     * @param {USER} obj - 要初始化的玩家实例
+     */
     static __initInstance(obj) {
+        /** @type {WebSocket|null} */
         obj.socket = null;
+        /** @type {FAMILY} */
         obj.family = FAMILIES.NONE;
+        /** @type {number} */
         obj.max_item_count = 20;
+        /** @type {number} */
         obj.max_store_count = 20;
+        /** @type {number} */
         obj.money = 0;
+        /** @type {number} */
         obj.request_count = 0;
+        /** @type {number} */
         obj.cash_money = 0;
+        /** @type {number} */
         obj.score = 0;
+        /** @type {Array|null} */
         obj.follower = null;
+        /** @type {string} */
         obj.password = "";
+        /** @type {number} */
         obj.loginTime = 0;
+        /** @type {string|null} */
         obj.id_address = null;
+        /** @type {number} */
         obj.user_level = 0;
+        /** @type {number} */
         obj.eq_group = 0;
+        /** @type {boolean} */
         obj.is_player = true;
     }
 

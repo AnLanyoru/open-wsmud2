@@ -6,6 +6,7 @@ EVENTS = class EVENTS extends BASE {
     /**
      * 添加/更新活动
      * @param {{id: string, check: function(USER): boolean}} item - 活动对象
+     * @returns {void}
      */
     static add(item) {
         if (!item || !item.id) return;
@@ -28,6 +29,7 @@ EVENTS = class EVENTS extends BASE {
      * 通知所有符合条件的玩家
      * @param {{id: string, check: function(USER): boolean}} item - 活动
      * @param {number} act - 操作索引(0添加 1更新 2完成)
+     * @returns {void}
      */
     static notify(item, act) {
         const users = WORLD.USERS;

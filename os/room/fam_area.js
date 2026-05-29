@@ -1,5 +1,6 @@
 /**
  * FAMILY_AREA 门派区域类 - 继承自AREA
+ * @extends {AREA}
  */
 
 FAMILY_AREA = class FAMILY_AREA extends AREA {

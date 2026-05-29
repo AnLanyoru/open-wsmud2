@@ -380,6 +380,7 @@ UTIL = {
     /**
      * 记录日志
      * @param {string} msg
+     * @returns {void}
      */
     log(msg) {
 
@@ -388,7 +389,7 @@ UTIL = {
             content: msg
         });
     },
-    /** 保存日志到文件 */
+    /** @returns {void} 保存日志到文件 */
     saveLog() {
         if (!this.logs) return;
 

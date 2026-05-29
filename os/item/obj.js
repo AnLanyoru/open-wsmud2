@@ -5,20 +5,29 @@
 OBJ = class OBJ extends ITEM {
 
     static __initInstance(obj) {
+        /** @type {string} 单位 */
         obj.unit = "个";
+        /** @type {string} 物品路径 */
         obj.path = null;
+        /** @type {number} 物品数量 */
         obj.count = 1;
+        /** @type {boolean} 是否可堆叠合并 */
         obj.combined = true;
+        /** @type {number} 品级(0-6) */
         obj.grade = 0;
+        /** @type {number} 物件类型标识 */
         obj.otype = 0;
+        /** @type {boolean} 是否可交易 */
         obj.transable = false;
     }
 
+    /** 构造OBJ实例 */
     constructor() {
         super();
         OBJ.__initInstance(this);
     }
 
+    /** @type {boolean} 是否可交易 */
     transable = false;
 
     /**
@@ -238,7 +247,10 @@ OBJ = class OBJ extends ITEM {
         this.on_reload && this.on_reload(me);
     }
 
-    /** 克隆后回调 */
+    /**
+     * 克隆后回调
+     * @returns {void}
+     */
     on_clone() {
 
     }

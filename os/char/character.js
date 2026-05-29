@@ -6,11 +6,19 @@ require("../item");
 
 CHARACTER = class CHARACTER extends ITEM {
 
+    /**
+     * @param {CHARACTER} obj - 要初始化的角色实例
+     */
     static __initInstance(obj) {
+        /** @type {string} */
         obj.name = "生物";
+        /** @type {number} */
         obj.hp = obj.max_hp = 100;
+        /** @type {number} */
         obj.mp = obj.max_mp = 100;
+        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = 20;
+        /** @type {number} */
         obj.money = 0;
     }
 

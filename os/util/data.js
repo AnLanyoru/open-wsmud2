@@ -95,6 +95,7 @@ module.exports = {
      * 本地文件备份角色数据
      * @param {*} stream - 写入流
      * @param {{id: string, name: string, userid: number, title: string, level: number, data: string}} role
+     * @returns {void}
      */
     localBak(stream, role) {
         stream.write('{id:"');

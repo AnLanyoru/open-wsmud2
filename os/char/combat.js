@@ -155,7 +155,10 @@ Object.assign(CHARACTER.prototype, {
         return true;
     },
 
-    /** 结束战斗 */
+    /**
+     * 结束战斗
+     * @returns {boolean} false
+     */
     end_fight() {
         if (this.enemy) this.enemy.length = 0;
         this.release_time = 0;
@@ -242,7 +245,9 @@ Object.assign(CHARACTER.prototype, {
     },
 
 
-    /** 恢复满血满蓝 */
+    /**
+     * 恢复满血满蓝，清除冷却
+     */
     full() {
 
         this.hp = this.max_hp;

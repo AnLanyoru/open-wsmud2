@@ -35,6 +35,7 @@ class wsServer {
      * 启动监听
      * @param {number} port - 端口号
      * @param {function} func - 启动成功回调
+     * @returns {void}
      */
     listen(port, func) {
 
@@ -50,6 +51,7 @@ class wsServer {
      * 发送消息到socket
      * @param {string} msg
      * @param {*} socket
+     * @returns {void}
      */
     send(msg, socket) {
         socket.send(msg);
@@ -71,6 +73,7 @@ module.exports = wsServer;
 /**
  * 客户端连接处理
  * @param {*} socket
+ * @returns {void}
  */
 function onClientConnect(socket) {
 
@@ -120,6 +123,7 @@ const protocols = {
          * WebSocket握手
          * @param {Object<string, string>} header - HTTP头部
          * @param {*} socket
+         * @returns {void}
          */
         handShake(header, socket) {
             const hasher = crypto.createHash("sha1");
@@ -143,6 +147,7 @@ const protocols = {
          * @param {Buffer} data
          * @param {*} socket
          * @param {wsServer} server
+         * @returns {void}
          */
         readData(data, socket, server) {
             let start = 0;
@@ -189,6 +194,7 @@ const protocols = {
          * 发送WebSocket帧
          * @param {string} text
          * @param {*} socket
+         * @returns {void}
          */
         sendData(text, socket) {
             const textBuffer = Buffer.from(text);
@@ -220,9 +226,11 @@ const protocols = {
     /** WebSocket 协议版本00(Hixie) - 已废弃的旧版本 */
     var2: {
         /**
+         * WebSocket Hixie协议握手
          * @param {Object<string, string>} header
          * @param {*} socket
          * @param {Buffer} buffer
+         * @returns {void}
          */
         handShake(header, socket, buffer) {
             const key1 = header["Sec-WebSocket-Key1"];
@@ -265,9 +273,11 @@ const protocols = {
         /** @type {Buffer|null} */
         buffer: null,
         /**
+         * 读取Hixie协议帧数据
          * @param {Buffer} data
          * @param {*} socket
          * @param {wsServer} server
+         * @returns {void}
          */
         readData(data, socket, server) {
             let start = 0;
@@ -285,8 +295,10 @@ const protocols = {
             }
         },
         /**
+         * 发送Hixie协议帧数据
          * @param {string} text
          * @param {*} socket
+         * @returns {void}
          */
         sendData(text, socket) {
             const textBuffer = Buffer.from(text, "utf-8");
@@ -302,9 +314,11 @@ const protocols = {
     /** 原始TCP协议(自定义长度前缀) */
     tcp: {
         /**
+         * 读取TCP协议帧数据
          * @param {Buffer} data
          * @param {*} socket
          * @param {wsServer} server
+         * @returns {void}
          */
         readData(data, socket, server) {
 
@@ -339,8 +353,10 @@ const protocols = {
             }
         },
         /**
+         * 发送TCP协议帧数据
          * @param {string} text
          * @param {*} socket
+         * @returns {void}
          */
         sendData(text, socket) {
             const textBuffer = Buffer.from(text);

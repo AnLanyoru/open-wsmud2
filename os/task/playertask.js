@@ -9,6 +9,9 @@ USERTASK = class USERTASK extends BASE {
         // USERTASK has no instance properties to initialize
     }
 
+    /**
+     * @returns {USERTASK}
+     */
     constructor() {
         super();
         USERTASK.__initInstance(this);
@@ -17,6 +20,7 @@ USERTASK = class USERTASK extends BASE {
     /**
      * 创建回调 - 注册到WORLD.TASKS
      * @param {string} path
+     * @returns {void}
      */
     create(path) {
         WORLD.TASKS.push(this);
@@ -27,6 +31,7 @@ USERTASK = class USERTASK extends BASE {
     /**
      * 任务更新(热更新)
      * @param {string} path
+     * @returns {void}
      */
     update(path) {
         this.on_create && this.on_create();

@@ -157,6 +157,9 @@ Object.assign(CHARACTER.prototype, {
         return ary.join("");
     },
 
+    /**
+     * 查询操作命令(默认空实现)
+     */
     query_commands() {
 
     },

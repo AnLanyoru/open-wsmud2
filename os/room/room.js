@@ -7,7 +7,9 @@ ROOM = class ROOM extends ITEM {
     static __initInstance(obj) {
         obj.name = "房间";
         obj.desc = "";
+        /** @type {ITEM[]} */
         obj.items = [];
+        /** @type {AREA|null} */
         obj.parent = null;
         obj.max_item_count = 50;
     }
@@ -17,6 +19,7 @@ ROOM = class ROOM extends ITEM {
         ROOM.__initInstance(this);
     }
 
+    /** @type {number} */
     max_item_count = 50;
 
     /**
@@ -41,6 +44,7 @@ ROOM = class ROOM extends ITEM {
      * @param {ITEM} obj - 进入的对象
      * @param {boolean} isshow - 是否显示
      * @param {string} in_msg - 进入消息
+     * @returns {void}
      */
     do_enter(obj, isshow, in_msg) {
         this.on_before_enter && this.on_before_enter(obj);
@@ -209,7 +213,7 @@ ROOM = class ROOM extends ITEM {
 
     /**
      * 设置房间物品(创建时调用)
-     * @param {...(string|[string, number])} arguments - 物品路径或[物品路径, 数量]
+     * @param {...(string|[string, number])} names - 物品路径或[物品路径, 数量]
      */
     set_obj(names) {
 
@@ -347,7 +351,10 @@ ROOM = class ROOM extends ITEM {
         this.exits_changed();
     }
 
-    /** 出口变更后通知所有玩家 */
+    /**
+     * 出口变更后通知所有玩家
+     * @returns {void}
+     */
     exits_changed() {
         this.room_exits_json = null;
         for (let i = 0; i < this.items.length; i++) {
@@ -604,7 +611,10 @@ ROOM = class ROOM extends ITEM {
         oldroom.destroy();
     }
 
-    /** 销毁房间 */
+    /**
+     * 销毁房间(清空物品和所有者)
+     * @returns {void}
+     */
     destroy() {
         this.items.length = 0;
         this.owner = null;

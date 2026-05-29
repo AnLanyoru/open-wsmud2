@@ -4,11 +4,19 @@
 
 NPC = class NPC extends CHARACTER {
 
+    /**
+     * @param {NPC} obj - 要初始化的NPC实例
+     */
     static __initInstance(obj) {
+        /** @type {number} */
         obj.hp = obj.max_hp = 100;
+        /** @type {number} */
         obj.mp = obj.max_mp = 100;
+        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
+        /** @type {FAMILY} */
         obj.family = FAMILIES.NONE;
+        /** @type {boolean} */
         obj.auto_pfm = true;
     }
 

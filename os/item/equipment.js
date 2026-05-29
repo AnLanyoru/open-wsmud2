@@ -6,31 +6,49 @@ require("../util/util.js");
 EQUIPMENT = class EQUIPMENT extends OBJ {
 
     static __initInstance(obj) {
+        /** @type {number} 装备类型(WEAPON/CLOTH等) */
         obj.eq_type = EQUIP_TYPE.WEAPON;
+        /** @type {number} 强化等级 */
         obj.level = 0;
+        /** @type {number} 经验值 */
         obj.exp = 0;
+        /** @type {number} 品级(0-6) */
         obj.grade = 0;
+        /** @type {number} 物品数量 */
         obj.count = 1;
+        /** @type {boolean} 是否可堆叠合并 */
         obj.combined = false;
+        /** @type {boolean} 显示动作按钮 */
         obj.showAction = true;
+        /** @type {boolean} 允许战斗中使用 */
         obj.allow_fight = true;
+        /** @type {number} 物件类型标识 */
         obj.otype = 4;
+        /** @type {boolean} 是否为装备 */
         obj.is_equipment = true;
+        /** @type {boolean} 是否可交易 */
         obj.transable = true;
+        /** @type {number[]} 各品级装备价值 */
         obj.VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
+        /** @type {string[]} 装备部位名称 */
         obj.parts = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
+        /** @type {string[]} 品质名称 */
         obj.qualities = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
+        /** @type {number[]} 强化等级参数 */
         obj.levelData = [
             0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
         ];
     }
 
+    /** 构造EQUIPMENT实例 */
     constructor() {
         super();
         EQUIPMENT.__initInstance(this);
     }
 
+    /** @type {boolean} 是否为装备 */
     is_equipment = true;
+    /** @type {boolean} 是否可交易 */
     transable = true;
 
     /**
@@ -305,7 +323,10 @@ EQUIPMENT = class EQUIPMENT extends OBJ {
         0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
     ];
 
-    /** 根据强化等级重新计算属性 */
+    /**
+     * 根据强化等级重新计算属性
+     * @returns {void}
+     */
     levelchange_prop() {
         if (!(this.level >= 0 && this.level < 13)) return;
         const base_props = this.original_prop ?? Object.getPrototypeOf(this).prop;
@@ -371,7 +392,10 @@ EQUIPMENT = class EQUIPMENT extends OBJ {
         }
     }
 
-    /** 清除所有镶嵌宝石 */
+    /**
+     * 清除所有镶嵌宝石
+     * @returns {void}
+     */
     clear_stone() {
         if (!this.st_prop) return;
 

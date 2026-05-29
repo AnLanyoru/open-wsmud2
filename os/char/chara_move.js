@@ -25,6 +25,12 @@ var dirs = {
     "out": "外"
 };
 
+/**
+ * 生成离开房间的消息文本
+ * @param {CHARACTER} player - 离开的角色
+ * @param {string} dir - 方向名称
+ * @returns {string}
+ */
 function sendOutMessage(player, dir) {
     dir = dirs[dir] || "";
     if (player.is_fighting()) {
@@ -43,6 +49,12 @@ function sendOutMessage(player, dir) {
     return player.name + "往" + dir + "离开。";
 }
 
+/**
+ * 生成进入房间的消息文本
+ * @param {CHARACTER} player - 进入的角色
+ * @param {string} dir - 方向名称
+ * @returns {string}
+ */
 function sendInMessage(player, dir) {
     if (player.fight_type) {
         return player.name + "跌跌撞撞地跑了过来，模样有些狼狈。";

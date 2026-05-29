@@ -6,11 +6,15 @@ require("../item/obj.js");
 CORPSE = class CORPSE extends CONTAINER {
 
     static __initInstance(obj) {
+        /** @type {string} 单位 */
         obj.unit = "具";
+        /** @type {number} 物品数量 */
         obj.count = 1;
+        /** @type {boolean} 是否不分配(副本内) */
         obj.no_alloc = false;
     }
 
+    /** 构造CORPSE实例 */
     constructor() {
         super();
         CORPSE.__initInstance(this);
@@ -85,7 +89,10 @@ CORPSE = class CORPSE extends CONTAINER {
         return false;
     }
 
-    /** 尸体消失 */
+    /**
+     * 尸体消失
+     * @returns {void}
+     */
     disappear() {
         if (this.items) this.items.length = 0;
         if (this.environment) {

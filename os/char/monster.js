@@ -7,12 +7,21 @@ require("./character");
 
 MONSTER = class MONSTER extends CHARACTER {
 
+    /**
+     * @param {MONSTER} obj - 要初始化的怪物实例
+     */
     static __initInstance(obj) {
+        /** @type {number} */
         obj.hp = obj.max_hp = 100;
+        /** @type {number} */
         obj.mp = obj.max_mp = 100;
+        /** @type {boolean} */
         obj.auto_pfm = true;
+        /** @type {FAMILY} */
         obj.family = FAMILIES.MONSTER;
+        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = 20;
+        /** @type {boolean} */
         obj.can_speek = false;
     }
 

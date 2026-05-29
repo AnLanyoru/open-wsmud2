@@ -8,8 +8,11 @@ FAMILIES = {};
 FAMILY = class FAMILY extends BASE {
 
     static __initInstance(obj) {
+        /** @type {string[]} */
         obj.titles = [];
+        /** @type {NPC[]} */
         obj.npcs = [];
+        /** @type {string|null} */
         obj.battle_family = null;
         obj.battle_score = 0;
         obj.battle_gift = 0;
