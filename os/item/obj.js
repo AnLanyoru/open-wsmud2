@@ -57,6 +57,10 @@ export class OBJ extends ITEM {
     combine_count = 999;
     /** @type {boolean} 是否已锁定 */
     is_locked = false;
+    /** @type {boolean} 是否为容器 — CONTAINER/CORPSE专属(=true) */
+    is_container = false;
+    /** @type {boolean} 容器是否打开 — CONTAINER/CORPSE专属 */
+    is_open = false;
 
     // ============ 回调函数(由资源文件设置) ============
 
@@ -139,10 +143,11 @@ export class OBJ extends ITEM {
     }
 
     /**
-     * 获取描述文本
+     * 获取描述文本 — CONTAINER/EQUIPMENT/CORPSE覆写用me做上下文过滤
+     * @param {CHARACTER} [me] - 观察者角色
      * @returns {string}
      */
-    get_desc() {
+    get_desc(me) {
         return this.color_name + "\n" + this.desc;
     }
 
@@ -366,14 +371,7 @@ export class OBJ extends ITEM {
             me.send("{type:'removeAction',id:'" + this.id + "'}");
     }
 
-    /** @type {function} 临时数据(复用CHARACTER) */
-    query_temp = globalThis.CHARACTER.prototype.query_temp;
-    /** @type {function} */
-    set_temp = globalThis.CHARACTER.prototype.set_temp;
-    /** @type {function} */
-    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
-    /** @type {function} */
-    add_temp = globalThis.CHARACTER.prototype.add_temp;
+    // query_temp/set_temp/remove_temp/add_temp 已从 ITEM 继承, 不再需要 globalThis 拷贝
 
     /**
      * 根据概率列表创建物品

@@ -32,8 +32,7 @@ export class MONSTER extends CHARACTER {
 
     /** @type {string|null} 死亡后重生房间路径 */
     die_room = null;
-    /** @type {Array|null} 命令JSON缓存 */
-    json = null;
+    // json 从 ITEM 继承(string|null), MONSTER用JSON.stringify()写入字符串
     /** @type {number} 击杀奖励积分 */
     score = 0;
 

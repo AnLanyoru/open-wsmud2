@@ -43,6 +43,8 @@ export class CHARACTER extends ITEM {
     mp = 100;
     /** @type {number} 最大内力 */
     max_mp = 100;
+    /** @type {number} 内力上限(独立于max_mp, 由内功技能加成) — dazuo/makelove使用, USER&FOLLOWER持久化 */
+    limit_mp = 0;
     /** @type {number} 臂力 */
     str = 20;
     /** @type {number} 根骨 */
@@ -53,6 +55,8 @@ export class CHARACTER extends ITEM {
     int = 20;
     /** @type {number} 容貌 */
     per = 20;
+    /** @type {number} 福缘/运气 — USER&FOLLOWER持久化, 影响掉落/暴击等 */
+    kar = 20;
     /** @type {number} 经验值 */
     exp = 0;
     /** @type {number} 潜能值 */
@@ -94,7 +98,7 @@ export class CHARACTER extends ITEM {
     prop = null;
     /** @type {Object<string, *>|null} 临时数据 */
     temp = null;
-    /** @type {Object<string, [string, number]>|null} 战斗属性修饰 */
+    /** @type {[string, number][]|null} 战斗属性修饰 — add_combat_prop推入[name,val]元组, clear时遍历索引回退 */
     combat_props = null;
 
     // ============ 战斗系统属性 ============
@@ -137,6 +141,20 @@ export class CHARACTER extends ITEM {
     damages = null;
     /** @type {boolean} 是否记录伤害统计 — end_fight检查 */
     record_damage = false;
+    /** @type {number} 攻击速度(ms) — recount计算, do_escape/begin_attack使用 */
+    gjsd = 0;
+    /** @type {number} 闪避值 — recount计算, do_escape使用 */
+    ds = 0;
+    /** @type {number} 攻击力 — recount计算 */
+    gj = 0;
+    /** @type {number} 防御力 — recount计算 */
+    fy = 0;
+    /** @type {number} 命中值 — recount计算 */
+    mz = 0;
+    /** @type {number} 招架值 — recount计算 */
+    zj = 0;
+    /** @type {number} 暴击率(%) — recount计算 */
+    bj = 0;
 
     // ============ 社交与移动属性 ============
 
@@ -171,6 +189,10 @@ export class CHARACTER extends ITEM {
     on_heart_beat = null;
     /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
     on_died = null;
+    /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
+    on_fight_over = null;
+    /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
+    on_skillchanged = null;
 
     constructor() {
         super();
@@ -656,67 +678,6 @@ export class CHARACTER extends ITEM {
         this.max_mp += count;
         this.recount();
         this.notify("<hig>你增加了" + count + "点内力。</hig>");
-    }
-
-    /**
-     * 查询临时数据
-     * @template T
-     * @param {string} name - 键名
-     * @param {T} [def] - 默认值
-     * @returns {T}
-     */
-    query_temp(name, def) {
-        if (!this.temp) return def;
-        const item = this.temp[name];
-        if (item && item.e) {
-            if (Date.now() <= item.e) {
-                return item.v;
-            }
-            this.temp[name] = null;
-            return def;
-        }
-        return item ?? def;
-    }
-
-    /**
-     * 设置临时数据
-     * @template T
-     * @param {string} name - 键名
-     * @param {T} value - 值
-     * @param {number} [time] - 有效期(毫秒)，不传则永久存储
-     */
-    set_temp(name, value, time) {
-        if (!this.temp) this.temp = {};
-        if (time) {
-            this.temp[name] = {
-                v: value,
-                e: Date.now() + time
-            };
-        } else {
-            this.temp[name] = value;
-        }
-    }
-
-    /**
-     * 移除临时数据
-     * @param {string} name
-     */
-    remove_temp(name) {
-        if (!this.temp) return;
-        this.temp[name] = null;
-    }
-
-    /**
-     * 累加临时数据
-     * @param {string} name - 键名
-     * @param {number} value - 累加值
-     * @param {number} [time] - 有效期
-     * @returns {number} 累加后的值
-     */
-    add_temp(name, value, time) {
-        const val = this.query_temp(name, 0) + value;
-        this.set_temp(name, val, time);
-        return val;
     }
 
     /**
@@ -2068,26 +2029,6 @@ export class CHARACTER extends ITEM {
         return null;
     }
 
-    /**
-     * 查询状态JSON
-     * @returns {string}
-     */
-    query_status() {
-        const ary = ["{type:\"status\",hp:"];
-        ary.push(this.hp);
-        ary.push(",max_hp:");
-        ary.push(this.max_hp);
-        ary.push(",mp:");
-        ary.push(this.mp);
-        ary.push(",max_mp:");
-        ary.push(this.max_mp);
-        ary.push(",name:\"");
-        ary.push(this.name);
-        ary.push("\",id:\"");
-        ary.push(this.id);
-        ary.push("\"}");
-        return ary.join("");
-    }
 
     /**
      * 查询可执行命令菜单 — 子类覆写接收(me)返回JSON字符串, 基类返回undefined

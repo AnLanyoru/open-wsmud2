@@ -34,6 +34,14 @@ export class ITEM extends BASE {
     money = 0;
     /** @type {ITEM[]|null} 子物品列表 */
     items = null;
+    /** @type {boolean} 是否为货币 — MONEY(=true), OBJ(=false) */
+    is_money = false;
+    /** @type {number} 物品价值(单价) — OBJ/MONEY专属, push_item:311用value*count算总价 */
+    value = 0;
+    /** @type {number} 物品数量 — OBJ子类(=1), push_item:311用value*count算总价 */
+    count = 1;
+    /** @type {boolean} 是否可堆叠 — OBJ(=true), CHARACTER/ROOM(=false) */
+    combined = false;
 
     // ============ 交互相关属性 ============
 
@@ -41,6 +49,102 @@ export class ITEM extends BASE {
     actions = null;
     /** @type {string|null} JSON缓存 */
     json = null;
+
+    // ============ 跨分支公共属性(CHARACTER+OBJ子类共有) ============
+
+    /** @type {string} 描述文本 — CHARACTER/OBJ/ROOM/AREA专属 */
+    desc = "";
+    /** @type {string} 带颜色的名称缓存 — CHARACTER/OBJ/EQUIPMENT专属 */
+    color_name = "";
+    /** @type {Object<string, *>|null} 临时数据 — CHARACTER/OBJ/EQUIPMENT/ROOM专属 */
+    temp = null;
+    /** @type {Object<string, number>|null} 属性加成映射 — CHARACTER/EQUIPMENT专属 */
+    prop = null;
+    /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
+    on_create = null;
+
+    // ============ 堆叠操作(OBJ覆写, ITEM提供安全默认) ============
+
+    /**
+     * 合并物品 — 相同物品合并count和temp, OBJ覆写
+     * @param {ITEM} obj - 要合并的物品
+     */
+    combine(obj) {
+    }
+
+    /**
+     * 拆分堆叠 — 分出count个返回新物品, OBJ覆写
+     * @param {number} count - 拆分数量
+     * @returns {ITEM} 拆分出的物品(或this表示不拆分)
+     */
+    uncombine(count) {
+        return this;
+    }
+
+    // ============ 临时数据存储(所有子类共用, ROOM覆写为副本查抄) ============
+
+    /**
+     * 查询临时数据 — 支持带过期时间的键值对({v, e}), 过期自动清除
+     * @template T
+     * @param {string} name - 键名
+     * @param {T} [def] - 默认值
+     * @returns {T}
+     */
+    query_temp(name, def) {
+        if (!this.temp) return def;
+        const item = this.temp[name];
+        if (item && item.e) {
+            if (Date.now() <= item.e) {
+                return item.v;
+            }
+            this.temp[name] = null;
+            return def;
+        }
+        return item ?? def;
+    }
+
+    /**
+     * 设置临时数据 — 可选有效期, 超时自动失效
+     * @template T
+     * @param {string} name - 键名
+     * @param {T} value - 值
+     * @param {number} [time] - 有效期(毫秒)
+     */
+    set_temp(name, value, time) {
+        if (!this.temp) this.temp = {};
+        if (time) {
+            this.temp[name] = {
+                v: value,
+                e: Date.now() + time
+            };
+        } else {
+            this.temp[name] = value;
+        }
+    }
+
+    /**
+     * 移除临时数据
+     * @param {string} name
+     */
+    remove_temp(name) {
+        if (!this.temp) return;
+        this.temp[name] = null;
+    }
+
+    /**
+     * 累加临时数据
+     * @param {string} name - 键名
+     * @param {number} value - 累加值
+     * @param {number} [time] - 有效期
+     * @returns {number} 累加后的值
+     */
+    add_temp(name, value, time) {
+        const val = this.query_temp(name, 0) + value;
+        this.set_temp(name, val, time);
+        return val;
+    }
+
+    // ============ 生命周期 ============
 
     /**
      * 心跳处理

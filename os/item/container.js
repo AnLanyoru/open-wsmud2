@@ -51,9 +51,11 @@ export class CONTAINER extends OBJ {
 
     /**
      * 查询内容物
+     * @param {USER} me
      * @returns {OBJ[]}
      */
-    query_items() {
+    query_items(me) {
+        // @ts-ignore
         return this.items;
     }
 

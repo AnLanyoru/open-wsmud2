@@ -9,17 +9,19 @@ import util from 'util';
 import JSON5 from 'json5';
 
 /**
- * nodejs自带原型继承扩展
- * @param {function} superCtor - 父类构造函数
+ * nodejs原型继承 — 将superCtor的方法复制到this.prototype
+ * @this {Function} 子类构造函数
+ * @param {Function} superCtor - 父类构造函数
  */
 Function.prototype.inherits = function (superCtor) {
-
     util.inherits(this, superCtor);
 }
 
 /**
- * 从数组中移除元素
- * @param {*} item - 要移除的元素
+ * 从数组中移除元素(首个匹配, ==比较)
+ * @template T
+ * @this {T[]}
+ * @param {T} item - 要移除的元素
  * @returns {boolean} 是否成功移除
  */
 Array.prototype.remove = function (item) {
@@ -32,8 +34,10 @@ Array.prototype.remove = function (item) {
 }
 
 /**
- * 判断数组是否包含元素(严格相等)
- * @param {*} item
+ * 判断数组是否包含元素(严格相等===)
+ * @template T
+ * @this {T[]}
+ * @param {T} item - 要查找的元素
  * @returns {boolean}
  */
 Array.prototype.contain = function (item) {
@@ -47,22 +51,23 @@ Array.prototype.contain = function (item) {
 
 /**
  * 随机获取数组元素
- * @param {number} [index] - 未使用
- * @returns {*}
+ * @template T
+ * @this {T[]}
+ * @param {number} [limit] - 随机范围上限(默认this.length)
+ * @returns {T}
  */
-Array.prototype.random = function (index) {
-    index = index || this.length;
+Array.prototype.random = function (limit) {
+    limit = limit || this.length;
     return this[Math.floor(Math.random() * this.length)];
 }
 
 /**
- * JSON字符串转对象(使用JSON5)
- * @param {string} str
- * @returns {*}
+ * JSON字符串转对象(使用JSON5, 支持宽松语法)
+ * @param {string} str - JSON5字符串
+ * @returns {any} 解析结果(对象/数组/原始值)
  */
 JSON.toObject = function (str) {
     return JSON5.parse(str);
-
 }
 
 export const UTIL = {

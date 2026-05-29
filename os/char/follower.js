@@ -42,8 +42,7 @@ export class FOLLOWER extends CHARACTER {
     listener = null;
     /** @type {Object|null} 主人可见命令JSON缓存 */
     master_json = null;
-    /** @type {Array|null} 公开命令JSON缓存 */
-    json = null;
+    // json 从 ITEM 继承(string|null), FOLLOWER用JSON.stringify()写入字符串
 
     // ============ 战斗与装备 ============
 
