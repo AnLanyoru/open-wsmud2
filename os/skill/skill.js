@@ -22,6 +22,33 @@ export class SKILL extends BASE {
     grade = 1;
     /** @type {number} 技能评分 */
     score = 0;
+    /**
+     * 技能学习条件，可包含以下字段:
+     * - skill: {[id: string]: number}  前置技能ID→等级要求
+     * - str1/con1/dex1/int1: number    先天属性(不含装备加成)
+     * - str/con/dex/int: number        总属性(含装备加成)
+     * - gender: number                 性别要求(1男/2女/3无性)
+     * - desc: string                   条件描述(仅展示,不做检查)
+     * - 其他任意key: number            角色属性阈值,如 max_mp: 10000
+     * @type {{[key: string]: any}}
+     */
+    learn_condition = {};
+    /**
+     * 以下动作数组支持 $ 占位符，由 splitmessage() 运行时替换。
+     * $N=发起者 $n=目标 $P=发起者敬称 $p=目标敬称 $l=攻击部位 $w/$W=发起者武器 $i=目标武器 $T=暗器
+     */
+    /** @type {string[]} 攻击动作 — $N(发起者) $n(目标) $w(发起者武器) $l(攻击部位) */
+    attack_actions = [];
+    /** @type {string[]} 闪避动作 — $p(闪避者) $l(避开部位) */
+    dodge_actions = [];
+    /** @type {string[]} 招架动作 — $p(防御者) $P(攻击者) $w(攻击者武器) $i(防御者武器) */
+    parry_actions = [];
+    /** @type {string[]} 武器对武器招架 — $p(防御者) $i(防御者武器) */
+    weapon_vs_weapon_actions = [];
+    /** @type {string[]} 武器对空手招架 — $p(防御者) $w(攻击者武器) */
+    weapon_vs_unarmed_actions = [];
+    /** @type {string[]} 空手对武器招架 — $p(防御者) $w(攻击者武器) */
+    unarmed_vs_weapon_actions = [];
 
     constructor() {
         super();
@@ -175,21 +202,19 @@ export class SKILL extends BASE {
 
     /**
      * 查询装备属性(子类重写)
-     * @param {number} lv
+     * @param {number} lv - 技能等级
+     * @param {import("../char/character").CHARACTER} [me] - 角色
      * @returns {Object<string, Object>|undefined}
      */
-    query_enable_prop(lv) {
-
-    }
+    query_enable_prop(lv, me) { return undefined; }
 
     /**
      * 查询基础属性(子类重写)
-     * @param {number} lv
+     * @param {number} lv - 技能等级
+     * @param {import("../char/character").CHARACTER} [me] - 角色
      * @returns {Object<string, number>|undefined}
      */
-    query_prop(lv) {
-
-    }
+    query_prop(lv, me) { return undefined; }
 
     /**
      * 查询技能品级(含进阶)
@@ -280,7 +305,7 @@ export class SKILL extends BASE {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop(lv);
+        let prop = this.query_enable_prop(lv, me);
         if (prop) {
             const enable_prop = prop[type];
             if (enable_prop) {
@@ -305,7 +330,7 @@ export class SKILL extends BASE {
     disenable(me, type) {
         this.on_disenable && this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop(lv);
+        let prop = this.query_enable_prop(lv, me);
         if (prop) {
             const enable_prop = prop[type];
             if (enable_prop) {
@@ -389,10 +414,9 @@ export class SKILL extends BASE {
 
     /**
      * 学习条件转字符串
-     * @param {CHARACTER} me
      * @returns {string}
      */
-    condition_tostring(me) {
+    condition_tostring() {
         if (this.learn_condition_string) return this.learn_condition_string;
         const str = [];
         if (this.learn_condition) {
@@ -705,7 +729,7 @@ export class SKILL extends BASE {
             str.push(cc);
             str.push(">\n");
         }
-        prop = this.query_enable_prop(lv, me);
+        prop = this.query_enable_prop(lv);
         let isEnable = this.type === SKILL_TYPES.KNOWLEDGE;
         if (prop) {
             for (let item in prop) {
@@ -879,6 +903,79 @@ export class PERFORM extends BASE {
             }
         }
 
+    }
+
+    // ============ 绝招方法(由extends合并) ============
+
+    /**
+     * 查询出招时间
+     * @param {CHARACTER} me
+     * @param {number} lv
+     * @returns {number}
+     */
+    query_releasetime(me, lv) {
+        var rtime = this.release_time;
+        if (!(rtime >= 0)) rtime = me.gjsd;
+
+        if (this.releasetime_key) {
+            rtime = rtime - me.query_prop("releasetime") - me.query_prop(this.releasetime_key);
+        } else {
+            rtime = rtime - me.query_prop("releasetime");
+        }
+
+        if (this.releasetime_per_key) {
+            rtime = rtime - rtime * (me.query_prop("releasetime_per") + me.query_prop(this.releasetime_per_key)) / 100;
+        } else {
+            rtime = rtime - rtime * (me.query_prop("releasetime_per")) / 100;
+        }
+        if (rtime < 500) return 500;
+        return parseInt(rtime);
+    }
+
+    /**
+     * 查询冷却时间
+     * @param {CHARACTER} me
+     * @param {number} lv
+     * @param {boolean} isref
+     * @returns {number}
+     */
+    query_distime(me, lv, isref) {
+        var dis = this.distime;
+        if (!dis) dis = me.gjsd;
+        if (isref) dis = dis * 2;
+        if (this.distime_key) {
+            dis = dis - me.query_prop("distime") - me.query_prop(this.distime_key);
+        } else {
+            dis = dis - me.query_prop("distime");
+        }
+        if (this.distime_per_key) {
+            dis = dis - dis * (me.query_prop("distime_per") + me.query_prop(this.distime_per_key)) / 100;
+        } else {
+            dis = dis - dis * (me.query_prop("distime_per")) / 100;
+        }
+
+        if (dis < 3000) return 3000;
+        return parseInt(dis);
+    }
+
+    /**
+     * 查询内力消耗
+     * @param {CHARACTER} me
+     * @param {number} lv
+     * @returns {number}
+     */
+    query_mp(me, lv) {
+        var mp = this.mp || 0;
+
+        mp = mp + lv * mp / 20;
+        if (this.expend_mp_per_key) {
+            mp = mp - mp * (me.query_prop("expend_mp_per")
+                + me.query_prop(this.expend_mp_per_key)) / 100;
+        } else {
+            mp = mp - mp * me.query_prop("expend_mp_per") / 100;
+        }
+        if (mp < 0) mp = 0;
+        return parseInt(mp);
     }
 }
 

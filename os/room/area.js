@@ -5,6 +5,7 @@ import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
+import { ROOM } from "./room.js";
 
 export class AREA extends BASE {
 
@@ -80,12 +81,6 @@ export class AREA extends BASE {
 
     /** @type {((user: USER) => void)|null} 登录回调 */
     on_login = null;
-    /** @type {((me: USER) => boolean)|null} 离开回调 */
-    on_leave = null;
-    /** @type {((me: USER) => boolean|void)|null} 进入区域回调 — jh.js/cr.js检查==false阻止进入 */
-    on_enter = null;
-    /** @type {((me: USER) => void)|null} 进入区域后回调 — 暂未被调用, 由资源文件设置 */
-    on_enterd = null;
 
     // ============ 交互属性 ============
 
@@ -123,10 +118,10 @@ export class AREA extends BASE {
 
     /**
      * 玩家离开区域回调
-     * @param {USER} me
+     * @param {import("../char/user").USER} me
+     * @returns {void}
      */
-    on_leaved(me) {
-    }
+    on_leaved(me) { return undefined; }
 
     /**
      * 玩家离开前回调
@@ -139,10 +134,10 @@ export class AREA extends BASE {
 
     /**
      * 玩家进入后回调
-     * @param {USER} me
+     * @param {import("../char/user").USER} me
+     * @returns {void}
      */
-    on_enterd(me) {
-    }
+    on_enterd(me) { return undefined; }
 
     /**
      * 玩家进入前回调
@@ -158,8 +153,7 @@ export class AREA extends BASE {
      * @param {string} path
      * @returns {void}
      */
-    find_area(path) {
-    }
+    find_area(path) { return undefined; }
 
     /**
      * 查询指定难度的通关记录
@@ -295,5 +289,35 @@ export class AREA extends BASE {
      */
     query_actions() {
         return this.actions;
+    }
+
+    // ============ 区域扩展(由extends合并) ============
+
+    /** 通知区域更新 */
+    notify_update() {
+        this.json = null;
+        if (this.is_area)
+            WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
+        else
+            WORLD.send(`{type:"dialog",dialog:"jh",t:"fb",refresh:${this.fb_index}}`);
+    }
+
+    /** @param {CHARACTER} me @returns {string} */
+    query_owner(me) {
+        return me.query_teamid();
+    }
+
+    /** @param {CHARACTER} me */
+    clear_copy(me) {
+        var room = ROOM.Get(this.first)?.query_copy2(me);
+        if (room)
+            room.clear_copy(me);
+    }
+
+    /** @param {CHARACTER} me @returns {boolean} */
+    is_unlock(me) {
+        if (this.jd_index >= 0)
+            return me.isenable_area(this);
+        return (this.unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
     }
 }

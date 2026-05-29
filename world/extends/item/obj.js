@@ -1,13 +1,16 @@
-import { OBJ } from "../../../os/item/obj.js";
-
-OBJ.prototype.format_to_sell = function () {
-
-    return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.value}]`;
-}
-
-
-OBJ.prototype.format_to_pack = function () {
-
-    return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
-}
+/**
+ * 热补丁入口 — OBJ 物品方法
+ * ============================================================
+ * 此文件由 BASE.PRELOAD 动态加载，可在此覆盖 OBJ 原型方法。
+ *
+ * 用法示例:
+ *
+ *   OBJ.prototype.format_to_sell = function () {
+ *       // 新的出售格式输出...
+ *   };
+ *
+ * 可覆盖的方法: format_to_sell, format_to_pack
+ *
+ * @see os/item/obj.js
+ */
 export default function() {}

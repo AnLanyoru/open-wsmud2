@@ -5,8 +5,8 @@ import { CHARACTER } from "./character.js";
 import { ROOM } from "../room/room.js";
 import { OBJ } from "../item/obj.js";
 import { WORLD } from "../world.js";
-import { FAMILIES } from "../skill/family.js";
 import { BASE } from "../base.js";
+import { EQUIPMENT } from "../item/equipment.js";
 
 export class NPC extends CHARACTER {
 
@@ -33,8 +33,7 @@ export class NPC extends CHARACTER {
     chat_chance = 0;
     /** @type {OBJ[]|null} 出售物品列表 */
     sell_list = null;
-    /** @type {Array|null} 命令JSON缓存 */
-    json = null;
+    // json 从 ITEM 继承(string|null), NPC用JSON.stringify()写入字符串
     /** @type {string|null} 死亡后重生房间路径 */
     die_room = null;
     /** @type {boolean} 是否禁止刷新(不重生) */
@@ -299,18 +298,16 @@ export class NPC extends CHARACTER {
 
 
     /**
-     * 创建NPC实例到指定环境
+     * 创建NPC实例到指定环境 — 6处调用均为ROOM, 无CHARACTER调用者
      * @param {string} path - NPC模板路径
-     * @param {ROOM|CHARACTER} env - 目标环境
-     * @param {function(NPC)} [oncreate] - 创建后回调
+     * @param {ROOM} env - 目标房间
+     * @param {((npc: NPC) => void)} [oncreate] - 创建后回调
      * @param {number} [count=1] - 创建数量
      * @returns {NPC}
      */
     static CREATE(path, env, oncreate, count) {
         if (!path || !env) return;
 
-
-        if (env.environment) env = env.environment;
         count = count || 1;
         let obj = null;
         for (let i = 0; i < count; i++) {
@@ -346,28 +343,16 @@ export class NPC extends CHARACTER {
         }
         return base;
     }
+    /**
+     * 发言 — NPC闲聊时调用, 默认空实现由资源文件覆写
+     * @param {string} [msg] - 闲聊消息
+     * @returns {void}
+     */
+    do_say(msg) { return undefined; }
 }
 
 /** @type {string[]} NPC死亡消息 */
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
-
-// ============ Mixin多态方法桩(writable, 供Object.assign覆写) ============
-Object.defineProperties(NPC.prototype, {
-    /** @type {() => boolean} 是否正在战斗 */
-    is_fighting: { value: function () { return false; }, writable: true, configurable: true },
-    /** @type {() => void} 清除所有状态 */
-    clear_status: { value: function () { }, writable: true, configurable: true },
-    /** @type {() => void} 清除跟随关系 */
-    clear_follow: { value: function () { }, writable: true, configurable: true },
-    /** @type {(val: number, notify?: boolean) => void} 增加气血 */
-    add_hp: { value: function (val, notify) { }, writable: true, configurable: true },
-    /** @type {(val: number, notify?: boolean) => void} 增加内力 */
-    add_mp: { value: function (val, notify) { }, writable: true, configurable: true },
-    /** @type {() => CHARACTER|null} 查询当前敌人(combat mixin) */
-    query_enemy: { value: function () { return null; }, writable: true, configurable: true },
-    /** @type {(msg?: string) => void} 发言(由资源文件定义, 完全动态) */
-    do_say: { value: function (msg) { }, writable: true, configurable: true },
-});
 

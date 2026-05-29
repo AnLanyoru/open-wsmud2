@@ -50,9 +50,9 @@ export class BASE {
      * create方法由继承自base类的类自己实现，当对象被从文件创建时候调用
      * @param {string} fname - 该对象的文件的相对路径
      * @param {string} [ctor] - 构造参数
+     * @returns {void}
      */
-    create(fname, ctor) {
-    }
+    create(fname, ctor) { return undefined; }
 
     /**
      * 在time毫秒内用新的func替换旧的fname方法，超时后自动恢复。可用于临时覆盖方法的行为。

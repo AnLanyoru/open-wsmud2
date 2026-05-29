@@ -16,7 +16,7 @@ export default class extends SKILL {
         this.set_default(this.id);
     }
 
-    query_prop(lv) {
+    query_prop(lv, me) {
     return { zj: lv };
 }
 }

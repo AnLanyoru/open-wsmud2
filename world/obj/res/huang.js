@@ -10,6 +10,7 @@ export default class extends OBJ {
     combined = true;
     allow_fight = true;
     transable = true;
+    otype = 3;
 
     on_use(me) {
     me.notify("<hic>你把雄黄捏碎，朝四周撒去。</hic>");

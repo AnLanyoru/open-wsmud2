@@ -58,13 +58,10 @@ export class TASK extends BASE {
     /**
      * 任务启动
      * @param {TASK} [oldtask] - 旧任务(热更新时)
+     * @returns {void}
      */
-    startup() {
-
-    }
+    startup() { return undefined; }
 
     /** @returns {void} 任务停止 */
-    stop() {
-
-    }
+    stop() { return undefined; }
 }

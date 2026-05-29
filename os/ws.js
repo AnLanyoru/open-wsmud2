@@ -2,6 +2,7 @@
  * WebSocket 服务器 - 监听层
  * 封装网络层并桥接到WORLD
  */
+import { WORLD } from "./world.js";
 
 import ws from "./net-ws.js";
 

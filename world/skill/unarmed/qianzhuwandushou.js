@@ -111,7 +111,7 @@ export default class extends SKILL {
     }
 };
 
-    query_prop(lv) {
+    query_prop(lv, me) {
     return {
         per: (-parseInt(lv / 300) - 1)
     };

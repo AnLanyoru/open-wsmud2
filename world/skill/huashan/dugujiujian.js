@@ -161,7 +161,7 @@ export default class extends SKILL {
     }
     return this.attack_actions.random();
 }
-    query_prop(lv) {
+    query_prop(lv, me) {
     return {
         add_sh_per: 5 + parseInt(lv / 300)
     };

@@ -9,6 +9,7 @@ export default class extends OBJ {
     max_level = 100;
     combined = true;
     value = 0;
+    otype = 1;
 
     on_create(path, par) {
     if (!par) return;

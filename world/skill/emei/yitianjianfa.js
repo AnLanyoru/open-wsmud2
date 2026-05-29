@@ -89,7 +89,7 @@ export default class extends SKILL {
     }
 };
 
-    query_prop(lv) {
+    query_prop(lv, me) {
     return {
         diff_fy_per: 5 + parseInt(lv / 300)
     };

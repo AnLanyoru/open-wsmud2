@@ -42,8 +42,7 @@ export class FOLLOWER extends CHARACTER {
     listener = null;
     /** @type {Object|null} 主人可见命令JSON缓存 */
     master_json = null;
-    /** @type {Array|null} 公开命令JSON缓存 */
-    json = null;
+    // json 从 ITEM 继承(string|null), FOLLOWER用JSON.stringify()写入字符串
 
     // ============ 战斗与装备 ============
 
@@ -668,6 +667,13 @@ export class FOLLOWER extends CHARACTER {
      * @param {ROOM} nextrm
      * @returns {boolean}
      */
+    // ============ USER方法代理(由extends合并) ============
+
+    remove_obj(obj, count) { return USER.prototype.remove_obj.call(this, obj, count); }
+    recount() { return USER.prototype.recount.call(this); }
+    items_changed(obj, count) { return USER.prototype.items_changed.call(this, obj, count); }
+    send_commands() { return USER.prototype.send_commands.apply(this, arguments); }
+
     on_master_leave(me, nextrm) {
         if (this.state || !this.team || this.team != me.team) return false;
         if (this.hp <= 0) return false;

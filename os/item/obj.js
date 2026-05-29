@@ -2,9 +2,12 @@
  * OBJ 普通物品基类
  */
 import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
 import { ITEM } from "../item.js";
 import { UTIL } from "../util/util.js";
+
+// 懒加载 WORLD 避免循环依赖: obj.js → world.js → family.js → room.js → obj.js
+let _WORLD = null;
+import("../world.js").then(m => { _WORLD = m.WORLD; });
 
 export class OBJ extends ITEM {
 
@@ -43,7 +46,7 @@ export class OBJ extends ITEM {
     /** @type {boolean} 是否为装备 */
     is_equipment = false;
     /** @type {boolean} 显示动作按钮 */
-    showAction = true;
+    showAction = false;
     /** @type {number} 连续使用间隔(毫秒) */
     distime = 0;
 
@@ -57,21 +60,29 @@ export class OBJ extends ITEM {
     combine_count = 999;
     /** @type {boolean} 是否已锁定 */
     is_locked = false;
+    /** @type {boolean} 是否快捷使用 — EQUIPMENT专属, 装备/卸下时控制快捷按钮 */
+    is_shortcut = false;
+    /** @type {number} 装备部位类型(EQUIP_TYPE) — EQUIPMENT专属, set_objects用eq_type索引装备槽 */
+    eq_type = 0;
+    /** @type {boolean} 是否为容器 — CONTAINER/CORPSE专属(=true) */
+    is_container = false;
+    /** @type {boolean} 容器是否打开 — CONTAINER/CORPSE专属 */
+    is_open = false;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置, getter 返回 undefined 被类方法覆盖) ============
 
-    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 — use.js:64传(me,par), 返回值决定是否广播动作 */
-    on_use = null;
-    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 — 调用已被注释, 资源文件定义为(me,skill,lv) */
-    on_study = null;
-    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 — open.js:14取返回值为OBJ[]或false阻止打开 */
-    on_open = null;
+    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 */
+    get on_use() { return undefined; }
+    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 */
+    get on_study() { return undefined; }
+    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 */
+    get on_open() { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
-    on_init = null;
+    get on_init() { return undefined; }
     /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
-    on_create = null;
+    get on_create() { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
-    on_reload = null;
+    get on_reload() { return undefined; }
 
     /**
      * 初始化回调
@@ -110,7 +121,7 @@ export class OBJ extends ITEM {
 
     /**
      * 查询操作命令
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @returns {string} JSON
      */
     query_commands(me) {
@@ -119,7 +130,7 @@ export class OBJ extends ITEM {
 
     /**
      * 查询描述JSON
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @returns {string} JSON
      */
     query_desc(me) {
@@ -139,10 +150,11 @@ export class OBJ extends ITEM {
     }
 
     /**
-     * 获取描述文本
+     * 获取描述文本 — CONTAINER/EQUIPMENT/CORPSE覆写用me做上下文过滤
+     * @param {CHARACTER} [me] - 观察者角色
      * @returns {string}
      */
-    get_desc() {
+    get_desc(me) {
         return this.color_name + "\n" + this.desc;
     }
 
@@ -215,7 +227,7 @@ export class OBJ extends ITEM {
      * @param {string} otype - 物品路径
      * @param {ITEM} to - 目标容器
      * @param {number} [count=1] - 数量
-     * @returns {OBJ|undefined}
+     * @returns {ITEM|undefined}
      */
     static clone_to(otype, to, count) {
         if (!otype || !to) return;
@@ -253,7 +265,7 @@ export class OBJ extends ITEM {
      * @param {string[]} str - 输出数组
      */
     save_db(str) {
-        str.push('["', this.path, '","', this.id, '",', this.count);
+        str.push('["', this.path, '","', this.id, '",', this.count.toString());
         if (this.is_locked) {
             str.push(',1');
         }
@@ -294,9 +306,7 @@ export class OBJ extends ITEM {
      * 克隆后回调
      * @returns {void}
      */
-    on_clone() {
-
-    }
+    on_clone() { return undefined; }
 
     /**
      * 创建物品实例
@@ -305,7 +315,7 @@ export class OBJ extends ITEM {
      * @returns {OBJ}
      */
     static CREATE(otype, count) {
-        let base = WORLD.OBJ_STROE.get(otype);
+        let base = _WORLD.OBJ_STROE.get(otype);
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype);
             if (!base) throw new Error('没有物品' + otype + "的定义。");
@@ -330,7 +340,7 @@ export class OBJ extends ITEM {
         this.on_create && this.on_create(path, par);
         const cc = grade_color[this.grade];
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
-        WORLD.OBJ_STROE.set(this.path, this);
+        _WORLD.OBJ_STROE.set(this.path, this);
     }
 
     /**
@@ -354,7 +364,7 @@ export class OBJ extends ITEM {
 
     /**
      * 通知客户端物品动作按钮变更
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @param {boolean} isadd
      */
     notify_action(me, isadd) {
@@ -366,18 +376,11 @@ export class OBJ extends ITEM {
             me.send("{type:'removeAction',id:'" + this.id + "'}");
     }
 
-    /** @type {function} 临时数据(复用CHARACTER) */
-    query_temp = globalThis.CHARACTER.prototype.query_temp;
-    /** @type {function} */
-    set_temp = globalThis.CHARACTER.prototype.set_temp;
-    /** @type {function} */
-    remove_temp = globalThis.CHARACTER.prototype.remove_temp;
-    /** @type {function} */
-    add_temp = globalThis.CHARACTER.prototype.add_temp;
+    // query_temp/set_temp/remove_temp/add_temp 已从 ITEM 继承, 不再需要 globalThis 拷贝
 
     /**
      * 根据概率列表创建物品
-     * @param {Array<{odds: number, obj: string, fall_obj: string, count: number, min: number, max: number}>} args - 掉落定义
+     * @param {Array<{odds: number, obj: any, fall_obj: string, count: number, min: number, max: number}>} args - 掉落定义
      * @returns {OBJ[]}
      */
     static create_by_odds(args) {
@@ -392,7 +395,6 @@ export class OBJ extends ITEM {
             per = Math.random() * 10000;
             obj = (drop.odds || 10000) > per ? drop.obj : drop.fall_obj;
             if (obj) {
-                if (drop.min_count) hit_count = 0;
                 let count = drop.count || 1;
                 if (drop.min && drop.max) {
                     count = Math.floor(Math.random() * (drop.max - drop.min + 1)) + drop.min;
@@ -404,6 +406,18 @@ export class OBJ extends ITEM {
             }
         }
         return items;
+    }
+
+    // ============ 格式化方法(由extends合并) ============
+
+    /** @returns {string} */
+    format_to_sell() {
+        return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.value}]`;
+    }
+
+    /** @returns {string} */
+    format_to_pack() {
+        return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
     }
 }
 

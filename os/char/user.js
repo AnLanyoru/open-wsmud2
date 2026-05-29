@@ -9,6 +9,7 @@ import { FAMILIES } from "../skill/family.js";
 import { WORLD } from "../world.js";
 import { CORPSE } from "../item/corpse.js";
 import { SKILL } from "../skill/skill.js";
+import { UTIL } from "../util/util.js";
 import { WEAPON_TYPE } from "../const.js";
 
 export class USER extends CHARACTER {
@@ -426,6 +427,23 @@ export class USER extends CHARACTER {
             this.moveto(rm, null, this.name + "连线进入这个世界。");
         }
         this.check_state();
+        if (this.follower && (!this.environment || this.environment.parent.id !== "home")) {
+            let home = ROOM.Get("home/yuanzi");
+            if (home) {
+                let copy_home = home.query_copy2(this);
+                if (!copy_home) copy_home = home.create_copy2(this);
+                if (copy_home) {
+                    for (let i = 0; i < this.follower.length; i++) {
+                        let npc = FOLLOWER.STORES.get(this.id + "_" + this.follower[i].id);
+                        if (npc && !npc.environment) {
+                            if (!npc.hp) npc.hp = 1;
+                            if (npc.state) npc.set_state(null);
+                            npc.moveto(copy_home);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -569,11 +587,10 @@ export class USER extends CHARACTER {
 
     /**
      * 死亡后回调
-     * @param {CHARACTER} [killer]
+     * @param {import("./character").CHARACTER} [killer]
+     * @returns {void}
      */
-    on_died() {
-
-    }
+    on_died() { return undefined; }
 
     /** 检查并同步玩家状态到客户端 */
     check_state() {
@@ -1147,6 +1164,213 @@ export class USER extends CHARACTER {
             this.recount();
             this.notify_hp();
         }
+    }
+
+    // ============ 玩家方法(由extends合并) ============
+
+    /** 重新计算属性(玩家版本, 含闪避/招架技能加成) */
+    recount() {
+        this.max_hp = parseInt(this.con * 5 + (this.max_mp * this.query_force_rad()
+            + this.query_prop("max_hp") + this.query_prop("con") * this.con) * (100 + this.query_prop("hp_per")) / 100);
+
+        if (this.hp > this.max_hp) this.hp = this.max_hp;
+
+        this.gjsd = 4000 - this.query_prop("gjsd");
+        if (this.gjsd > 500) {
+            this.gjsd = parseInt(this.gjsd - (this.gjsd * this.query_prop("gjsd_per") / 100));
+            if (this.gjsd < 500) this.gjsd = 500;
+        } else {
+            this.gjsd = 500;
+        }
+
+        this.gj = parseInt(this.str + (this.query_prop("gj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("gj_per")) / 100);
+        this.fy = parseInt(((this.str + this.con) / 10 + this.query_prop("fy") + this.query_prop("con") * this.con / 10) * (100 + this.query_prop("fy_per")) / 100);
+        this.mz = parseInt((this.dex / 2 + this.query_prop("mz")) * (100 + this.query_prop("mz_per")) / 100);
+        this.ds = parseInt((this.dex / 2 + this.query_prop("ds") + this.query_prop("dex") * this.dex / 10) * (100 + this.query_prop("ds_per")) / 100);
+        if (this.dodge_skill && this.dodge_skill.on_recount_dodge) {
+            this.ds += this.dodge_skill.on_recount_dodge(this);
+        }
+        this.zj = parseInt((this.str / 2 + this.query_prop("zj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("zj_per")) / 100);
+        if (this.parry_skill && this.parry_skill.on_recount_parry) {
+            this.zj += this.parry_skill.on_recount_parry(this);
+        }
+        this.bj = parseInt(this.dex / 10 + this.query_prop("bj_per"));
+        this.diff_sh_per = this.query_prop('diff_sh_per');
+        this.diff_fy_per = this.query_prop('diff_fy_per');
+    }
+
+    /** 境界提升 */
+    level_up() {
+        if (!this.level) {
+            var sk = this.skill_limit();
+            this.level = 1;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(10000, 10000);
+            var now_sk = this.skill_limit();
+            this.limit_mp += 1000;
+            this.notify("<hiw>你的内力限制增加了1000。</hiw>");
+            this.notify("<hiw>你的技能等级限制增加了" + (now_sk - sk) + "。</hiw>");
+
+        } else if (this.level == 1) {
+            var sk = this.skill_limit();
+            this.level = 2;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(100000, 100000);
+            var now_sk = this.skill_limit();
+            this.limit_mp += 5000;
+            this.notify("<hiw>你的最大内力限制增加了5000。</hiw>");
+            this.notify("<hiw>你的技能等级限制增加了" + (now_sk - sk) + "。</hiw>");
+        } else if (this.level == 2) {
+            var sk = this.skill_limit();
+            this.level = 3;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(200000, 200000);
+            var now_sk = this.skill_limit();
+            this.limit_mp += 10000;
+            this.notify("<hiw>你的最大内力限制增加了10000。</hiw>");
+            this.notify("<hiw>你的技能等级限制增加了" + (now_sk - sk) + "。</hiw>");
+
+        } else if (this.level == 3) {
+            var sk = this.skill_limit();
+            this.level = 4;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(500000, 500000);
+            var now_sk = this.skill_limit();
+            this.limit_mp += 20000;
+            this.notify("<hiw>你的最大内力限制增加了20000。</hiw>");
+            this.notify("<hiw>你的技能等级限制增加了" + (now_sk - sk) + "。</hiw>");
+        } else if (this.level == 4) {
+            var sk = this.skill_limit();
+            this.level = 5;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(1000000, 1000000);
+            var now_sk = this.skill_limit();
+            this.limit_mp += 50000;
+            this.notify("<hiw>你的最大内力限制增加了50000。</hiw>");
+            this.notify("<hiw>你的技能等级限制增加了" + (now_sk - sk) + "。</hiw>");
+        } else if (this.level == 5) {
+            var sk = this.skill_limit();
+            this.level = 6;
+            this.notify("<hiy>恭喜你提升到了" + this.get_level_desc() + "境界。</hiy>");
+            this.add_exp(2000000, 2000000);
+            this.limit_mp += 500000;
+            this.add_temp("fenpei", 1);
+            this.notify("<hiw>你的最大内力限制增加了500000。</hiw>");
+            this.notify("<hiw>你的先天属性增加了1点。</hiw>");
+        }
+        this.color_name = null;
+        this.environment.item_changed(this, true);
+        this.send(`{type:"levelup",level:${this.level}}`);
+    }
+
+    /** @param {CHARACTER} p */
+    is_team(p) {
+        if (!p || !p.team) return;
+        return this.team == p.team;
+    }
+
+    /** @returns {string} */
+    query_teamid() {
+        if (this.team) return this.team.id;
+        return this.id;
+    }
+
+    /** @returns {boolean} */
+    can_trans() {
+        if (!this.environment) return true;
+        if (this.environment.is_fb()) return this.notify_fail("你现在正在副本区域。");
+        if (this.environment.parent.on_leave(this) == false) return false;
+        return true;
+    }
+
+    /** 解锁当前区域 */
+    enable_area() {
+        let area = this.environment.parent;
+        if (!(area.jd_index >= 0)) return;
+        if (!this.query_bool('fb2', area.jd_index)) {
+            this.set_bool('fb2', area.jd_index, true);
+            this.send('<him>你解锁新地图【' + area.name + '】。</him>');
+            this.send(`{type:"dialog",dialog:"jh",unlock2:${this.query_temp('fb2', 0)}}`);
+        }
+    }
+
+    /** @param {*} fb @returns {boolean} */
+    isenable_area(fb) {
+        if (!fb) return false;
+        if (typeof fb === 'number') {
+            return this.query_bool('fb2', fb);
+        }
+        if (!(fb.jd_index >= 0)) return false;
+        return this.query_bool('fb2', fb.jd_index);
+    }
+
+    /** @param {string} key @param {number} index @returns {boolean} */
+    query_bool(key, index) {
+        let step = parseInt(index / 32);
+        if (step > 0) key = key.toString() + step.toString();
+        let num = this.query_temp(key, 0);
+        if (!num) return false;
+        let bit = index % 32;
+        return (num & (1 << bit)) !== 0;
+    }
+
+    /** @param {string} key @param {number} index @param {*} value @param {number} [time] */
+    set_bool(key, index, value, time) {
+        let step = parseInt(index / 32);
+        if (step > 0) key = key.toString() + step.toString();
+        let num = this.query_temp(key, 0);
+        let bit = index % 32;
+        if (value)
+            this.set_temp(key, num | (1 << bit), time);
+        else
+            this.set_temp(key, num & ~(1 << bit), time);
+    }
+
+    /** @param {string} key @param {number} count */
+    clear_bool(key, count) {
+        let num = this.query_temp(key, 0);
+        if (!num) return;
+        for (let i = 0; i < count; i++) {
+            if ((num & (1 << i)) !== 0) {
+                return;
+            }
+        }
+        this.remove_temp(key);
+    }
+
+    /** @param {number} val @returns {boolean} */
+    expend_jingli(val) {
+        if (val > 0 && this.query_jingli() >= val) {
+            var expend = this.query_temp("ex_jl", 0);
+            if (expend >= 200) {
+                var add = this.query_temp("ad_jl", 0);
+                if (add < val) return false;
+                this.add_temp("ad_jl", -val);
+
+            } else {
+                if (expend + val > 200) {
+                    this.set_temp("ex_jl", 200, UTIL.diff_time());
+                    val = val - (200 - expend);
+                    this.add_temp("ad_jl", -val);
+                } else {
+                    this.add_temp("ex_jl", val, UTIL.diff_time());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /** @param {string} id @returns {boolean} */
+    create_for(id) {
+        if (!this.custom_skills) return false;
+        return this.custom_skills.indexOf(id) > -1;
+    }
+
+    /** @returns {number} */
+    query_age() {
+        var dt = Date.now() - this.reg_time * 60000;
+        return 14 + dt / 86400000 / 12 - this.query_prop("age") - this.query_temp("age", 0);
     }
 }
 
