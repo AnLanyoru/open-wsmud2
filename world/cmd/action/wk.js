@@ -79,7 +79,10 @@ function do_diaoyu(me) {
     let obj = me.add_obj(calculate_lv(0));
     if (obj) {
         me.notify("<hig>恭喜你得到一颗" + obj.color_name + "。</hig>");
-    }}
+    } else {
+        me.notify("<hig>你挖了一会儿，发现一些碎石，没有挖到宝贝。</hig>");
+    }
+}
 
 
     var exp = WORLD.DATA.get_exp(me)

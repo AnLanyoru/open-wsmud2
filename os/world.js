@@ -169,7 +169,8 @@ const WORLD = {
         await this.LISTENER.start(this.SERVER.port);
         console.log("服务", this.SERVER.name, "(" + this.SERVERID + ")启动");
         console.log("ws://" + this.SERVER.ip + ":" + this.SERVER.port);
-        this.heart_beat_service = setInterval(WORLD.heart_beat, __CONFIG.HEARTBEAT);
+        this.heartbeat_interval = __CONFIG.HEARTBEAT;
+        this.heart_beat_service = setInterval(WORLD.heart_beat, this.heartbeat_interval);
 
         this.status = __CONFIG.CONNECT_LEVEL ?? 0;
         this.on_startup();
@@ -272,7 +273,6 @@ const WORLD = {
                 avtived_obj.heart_beat(dt);
             }
             WORLD.HEARTBEATCOUNT++;
-            console.log("心跳", WORLD.HEARTBEATCOUNT, "在线", WORLD.CONNECT_COUNT, "用户", WORLD.USERS.length, "房间", WORLD.RUN_ROOMS.length);
             if (WORLD.HEARTBEATCOUNT > 720) {
                 WORLD.HEARTBEATCOUNT = 0;
                 WORLD.save();

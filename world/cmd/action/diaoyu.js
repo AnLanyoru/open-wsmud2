@@ -65,20 +65,18 @@ function calculate_lv(grade) {
     const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17]];
 
     // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
-    let total = 0;
-    let ranges_cumulative = [];
-    const cumulative = [];
+    const ranges_cumulative = [];
+    const rawWeights = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[i];
         if (i >= 1) {
             w = Math.floor(w * (1 + grade * i / 1200));
         }
-        total += w;
         ranges_cumulative.push(ranges[i]);
-        cumulative.push(total);
+        rawWeights.push(w);
     }
 
-    const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, cumulative);
+    const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, rawWeights);
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 function do_diaoyu(me) {
