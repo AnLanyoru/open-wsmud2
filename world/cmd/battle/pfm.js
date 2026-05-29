@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "perform";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_faint = true;
     regex = /^(\w+)\.(.+?)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, sk, pfmid) {
     if (!sk || !pfmid) return me.notify("你要使用什么绝招。");
     if (!me.skills) return me.notify("你目前没有学会任何技能。");

@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "look3";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_state = true;
     regex = /^(?:(\w+)\sof\s)?(\w+)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, index, userid) {
     if (userid.startsWith("fb_")) {
         var area_index = parseInt(userid.substr(3));

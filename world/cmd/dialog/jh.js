@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "jh";
@@ -10,6 +11,9 @@ export default class extends COMMAND {
     fbs = [];
     regex = /^(\w+)?\s?(lock|\d+)?(?:\s(start[1|2|3]?))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, type, arg, isstart) {
     if (!me.is_player) return;
     var unlock = me.query_temp("fb", 0);

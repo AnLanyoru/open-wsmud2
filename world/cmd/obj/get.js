@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "get";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, count, objid, from) {
     if (!objid) return player.notify("你要捡什么东西？");
     var parent = player.environment;

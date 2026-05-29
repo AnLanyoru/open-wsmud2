@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "emote";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_state = true;
     allow_die = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, str) {
 
     if (!str) return me.send(this.emote_data());

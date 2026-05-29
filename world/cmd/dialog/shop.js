@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "shop";
@@ -112,6 +113,9 @@ export default class extends COMMAND {
 
 ];
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, par, count) {
     if (me.query_temp("new")) return me.notify("你先完成新手指导再说。");
     if (!me.is_player) return me.notify("你不能购买。");

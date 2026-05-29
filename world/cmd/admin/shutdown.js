@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "shutdown";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     allow_level = 6;
     handler = 0;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg) {
     if (arg == "stop") {
         if (this.handler) {

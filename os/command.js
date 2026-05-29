@@ -4,6 +4,7 @@
  */
 import { BASE } from "./base.js";
 import { WORLD } from "./world.js";
+import { CHARACTER } from "./char/character.js";
 
 export class COMMAND extends BASE {
 

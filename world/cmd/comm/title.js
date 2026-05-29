@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "title";
     allow_busy = true;
     allow_state = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, index) {
     if (!me.titles) return me.notify("你还没有任何称号。");
     index = parseInt(index);

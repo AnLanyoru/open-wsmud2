@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "answer";
     regex = /^(\w+)(?:\s+(\w+))$/;
     allow_busy = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, objid, par) {
     var obj = me.find_obj(objid, me.environment);
 

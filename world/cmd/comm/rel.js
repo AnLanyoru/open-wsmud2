@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "rel";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_die = true;
     regex = /^(\w+)?(?:\s+(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, type, cmd) {
     if (type === 'marry') {
         return me.send('解除夫妻关系，需要到扬州城的衙门找户部主簿办理。');

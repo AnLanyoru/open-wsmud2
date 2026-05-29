@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "score";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     props = ["hp", "mp", "max_hp", "max_mp", "str", "con",
     "dex", "int", "kar", "gj", "fy", "mz", "zj", "exp", "pot"];
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg) {
     var target = me;
     if (arg) {

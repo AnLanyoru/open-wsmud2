@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "lianxi";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     regex = /^(\w+)(?:\s+(\d+))?$/;
     allow_state = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, skid, par) {
     if (!me.skills) return;
     if (!(me.pot > 0)) return me.send('你的潜能不足。');

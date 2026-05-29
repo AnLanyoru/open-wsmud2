@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "look1";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_state = true;
     regex = /^(\d+)(?:\sof\s(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, index, from) {
     index = parseInt(index);
     if (from) {

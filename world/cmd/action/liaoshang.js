@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "liaoshang";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me) {
     if (me.is_fighting()) return me.notify("战斗中疗伤，你找死吗？");
     if (me.hp >= me.max_hp) return me.notify("<hig>你目前气血充沛，没有受到任何伤害。</hig>");

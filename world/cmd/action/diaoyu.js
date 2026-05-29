@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "diaoyu";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me) {
     if (!me.environment || !me.environment.can_diaoyu)
         return false;

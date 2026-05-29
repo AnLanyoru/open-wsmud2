@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "call";
@@ -9,6 +10,9 @@ export default class extends COMMAND {
     allow_level = 6;
     regex = /^(?:(\w+)\s)?(.+)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, target, arg) {
     try {
         var func = new Function(arg);

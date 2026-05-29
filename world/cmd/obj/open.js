@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "open";
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, objid) {
     var obj = player.find_obj(objid);
     if (!obj) return player.notify("你要打开什么？");

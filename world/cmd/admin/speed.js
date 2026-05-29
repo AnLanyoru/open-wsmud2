@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "speed";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_state = true;
     allow_level = 6;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg) {
         const ms = parseInt(arg);
         if (!(ms >= 100)) {

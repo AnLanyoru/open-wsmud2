@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "systask";
     regex = /(\w+)\s+(\w+)?/;
     allow_level = 6;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg, par) {
     if (!arg) return false;
     var task = TASK.GET(arg);

@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "login";
     allow_login = true;
 
+    /**
+     * @param {CHARACTER} user - 执行命令的角色
+     */
     enter(user, id) {
     if (user.id) return;
 

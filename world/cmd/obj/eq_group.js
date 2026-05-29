@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "eqgroup";
     allow_fight = false;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, par) {
     let index = parseInt(par);
     if (!(index >= 0 && index < 3)) return;

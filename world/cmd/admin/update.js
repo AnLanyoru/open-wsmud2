@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "update";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_die = true;
     allow_level = 6;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg) {
     try {
         if (!arg) return this.notify(me, "路径不合理");

@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "task";
     regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
     allow_state = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, tid, cmd, oid) {
     if (!tid || !cmd) return;
     if (!me.is_player || !WORLD.is_server(me)) return;

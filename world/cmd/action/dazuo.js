@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "dazuo";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me) {
     if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
     if (me.state) return me.notify("你正在" + me.state.title + "，没有时间打坐。");

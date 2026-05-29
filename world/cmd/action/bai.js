@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "bai";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, target) {
     if (!WORLD.is_server(me)) return me.notify("你不能拜师。");
     if (!target) return me.notify("你要拜谁为师？");

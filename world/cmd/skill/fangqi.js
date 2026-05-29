@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "fangqi";
     allow_fight = false;
     regex = /^(\w+)(?:\s+(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, skillid, sid) {
     if (!me.skills) return me.notify("你还不会任何技能。");
     var skill = me.skills[skillid];

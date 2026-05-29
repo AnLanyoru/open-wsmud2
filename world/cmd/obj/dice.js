@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "dice";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     allow_faint = true;
     regex = /^(\d)\s(\w+)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, type, objid) {
     if (!me.team) return me.send("你没有在队伍里。");
     if (!me.team.objs || !me.team.objs.length) return me.send("目前没有等待分配的战利品。");

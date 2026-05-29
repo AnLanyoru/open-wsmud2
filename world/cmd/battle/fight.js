@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "fight";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, argid) {
     if (argid == "none") {
         var items = me.environment.items;

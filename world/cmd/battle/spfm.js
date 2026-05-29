@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "spfm";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     allow_busy = true;
     regex = /(\w+)(?:\s+(\w+))?/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg1, arg2) {
     if (!arg1) return;
     let func = this['set_' + arg1];

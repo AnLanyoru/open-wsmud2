@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "sx";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_die = true;
     regex = /^(\w+)(?:\s+(\w+))?(?:\s+(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, type, par1, par2) {
     if (type === 'greet') {
         this.do_greet(me);

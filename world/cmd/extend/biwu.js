@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "biwu";
@@ -13,6 +14,9 @@ export default class extends COMMAND {
 };
     regex = /^(emei|wudang|shaolin|huashan|xiaoyao|gaibang|shashou|none)?\s*(\d+)(?:\s+(ok))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, fam, type, par) {
 
     if (!me.can_trans()) return;
@@ -360,7 +364,6 @@ export default class extends COMMAND {
 
 const WORLD = globalThis.WORLD;
 const UTIL = globalThis.UTIL;
-const CHARACTER = globalThis.CHARACTER;
 const NPC = globalThis.NPC;
 const USER = globalThis.USER;
 const STATS = WORLD.STATS;

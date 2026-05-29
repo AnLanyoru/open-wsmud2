@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "checkskill";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_die = true;
     regex = /^(\w+)(?:\s(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, skid, from) {
     var skill_base = SKILL.get(skid);
     if (!skill_base) {

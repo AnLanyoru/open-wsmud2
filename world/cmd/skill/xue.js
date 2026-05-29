@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "xue";
@@ -6,6 +7,9 @@ export default class extends COMMAND {
     allow_fight = false;
     regex = /^(?:(\d+)\s)?(\w+)\s+from\s+(.+?)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, par, sk, target) {
     if (!sk) return me.notify("你要学习什么技能？");
     target = me.find_obj(target, me.environment);

@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "unxiangqian";
     regex = /^(\w+)(?:\s+(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, objid, par) {
     if (!objid) {
         var str = ["{type:\"cmds\",items:["];

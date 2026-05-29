@@ -1,10 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "enable";
     regex = /^(\w+?)\s+(.+?)$/;
     allow_fight = false;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, base, skill, no_sent) {
     if (!me.skills) return me.notify("你还不会任何技能。");
     var baseskill = me.skills[base];

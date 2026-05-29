@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "fenpei";
     allow_fight = false;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me) {
     var fen = me.query_temp("fenpei");
     if (!fen) return me.notify("你目前没有可以分配的先天属性。");

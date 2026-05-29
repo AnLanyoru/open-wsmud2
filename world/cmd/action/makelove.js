@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "makelove";
     allow_fight = false;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, oid) {
 
     if (me.environment.parent.id != 'home') return me.notify("这里双修可不太好，找个安全点的地方吧！");

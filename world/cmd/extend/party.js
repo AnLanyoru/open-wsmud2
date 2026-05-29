@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "party";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     admin = true;
     regex = /^(\w+)(?:\s+(.+?))?(?:\s+(\w+))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, cmd, par, par2) {
 
 }

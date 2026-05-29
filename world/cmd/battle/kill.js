@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "kill";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, argid) {
     if (me.state) {
         return me.notify("你现在正在" + me.state.title + ",没时间杀人。");

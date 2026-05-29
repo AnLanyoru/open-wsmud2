@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "createrole";
     allow_login = true;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, pars) {
     if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
     pars = pars.split(' ');

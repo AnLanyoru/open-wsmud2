@@ -1,9 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "sell";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, count, objid, to) {
     var target;
     if (to) {

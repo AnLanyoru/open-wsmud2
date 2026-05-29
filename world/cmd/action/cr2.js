@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "cr2";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_state = true;
     regex = /(\d+)\s(\d+)/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, index, diff) {
     index = parseInt(index);
     let area = AREA.FBS[index];

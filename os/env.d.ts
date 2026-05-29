@@ -555,8 +555,17 @@ declare class FAMILY_AREA extends AREA { }
 // 命令
 // ============================================================
 
+/** BASE 所有类的根基类 */
+declare class BASE {
+    set(pars?: Partial<this> & { [key: string]: any }): void;
+    inherits(child: any, parent: any): void;
+    random(max: number): number;
+    call_out(fn: Function, delay: number): void;
+    create_uid(): string;
+}
+
 /** COMMAND 命令基类 */
-declare class COMMAND {
+declare class COMMAND extends BASE {
     command: string;
     regex: RegExp | null;
     exec: Function | null;

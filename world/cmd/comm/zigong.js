@@ -1,8 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "zigong";
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, arg) {
     if (me.gender == 2) return me.notify("你要割什么？");
     if (me.gender == 3) return me.notify("你都没有了还要割什么？");

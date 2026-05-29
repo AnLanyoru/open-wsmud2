@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "send";
@@ -8,6 +9,9 @@ export default class extends COMMAND {
     allow_level = 6;
     regex = /^(\w+)\s(.+)$/;
 
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
     enter(me, user, arg) {
     if (me && me.user_level < 5) return false;
     if (!arg) return me && me.send("没有消息内容。");

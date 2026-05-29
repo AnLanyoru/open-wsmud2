@@ -1,4 +1,5 @@
 import { COMMAND } from "../../../os/command.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 export default class extends COMMAND {
     command = "shortcut";
@@ -7,6 +8,9 @@ export default class extends COMMAND {
     allow_die = true;
     allow_faint = true;
 
+    /**
+     * @param {CHARACTER} player - 执行命令的角色
+     */
     enter(player, arg) {
     if (!arg) return;
     var obj = player.find_obj(arg);
