@@ -5,8 +5,8 @@ import { CHARACTER } from "./character.js";
 import { ROOM } from "../room/room.js";
 import { OBJ } from "../item/obj.js";
 import { WORLD } from "../world.js";
-import { FAMILIES } from "../skill/family.js";
 import { BASE } from "../base.js";
+import { EQUIPMENT } from "../item/equipment.js";
 
 export class NPC extends CHARACTER {
 
@@ -301,7 +301,7 @@ export class NPC extends CHARACTER {
      * 创建NPC实例到指定环境 — 6处调用均为ROOM, 无CHARACTER调用者
      * @param {string} path - NPC模板路径
      * @param {ROOM} env - 目标房间
-     * @param {function(NPC)} [oncreate] - 创建后回调
+     * @param {((npc: NPC) => void)} [oncreate] - 创建后回调
      * @param {number} [count=1] - 创建数量
      * @returns {NPC}
      */

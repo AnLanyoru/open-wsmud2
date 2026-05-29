@@ -66,44 +66,11 @@ declare const FAMILIES: Record<string, FAMILY>;
 // 全局单例对象(无模块导出)
 // ============================================================
 
-declare const UTIL: {
-    create_id(): string;
-    begin: number;
-    moneyToStr(val: number): string;
-    to_c(val: number): string;
-    inherits(child: any, parent: any): void;
-    weightedChoice<T>(items: T[], weights: number[]): T;
-    random(min: number, max: number): number;
-    require(str: string): any;
-};
+/** UTIL — 类型来自 os/util/util.js 模块导出 */
+declare const UTIL: typeof import("./util/util").UTIL;
 
-declare const WORLD: {
-    USERS: USER[]; COMMANDS: Record<string, COMMAND>;
-    SKILLS: Record<string, SKILL>; ROOMS: Record<string, ROOM>;
-    RUN_ROOMS: ROOM[]; DEFAULT_SKILLS: Record<string, any>;
-    AREAS: AREA[]; TASKS: USERTASK[]; SYSTEMTASKS: TASK[];
-    USER_EVENTS: any[]; OBJ_STROE: Map<string, any>; NPC_STROE: Map<string, any>;
-    HEARTBEATCOUNT: number; RECEIVED: any[]; LOGS: any[];
-    SERVERID: number; SERVERS: any[]; CONNECT_COUNT: number;
-    DATA: any; USERLOGIN: any; DB: any;
-    SocketCount: number; LISTENER: any;
-    max_connect_count: number; max_user_count: number;
-    MESSAGE: any; STATS: any;
-    status: number; heartbeat_interval: number;
-    heart_beat_service: any; SERVER: any;
-    DEFAULT_COMMAND: COMMAND | null;
-    admin_user: number;
-    startup(port: string | number): Promise<void>;
-    close(): Promise<void>;
-    heart_beat(): void;
-    sendAll(msg: string): void;
-    getUser(id: string): USER | undefined;
-    connect(socket: any): void;
-    disconnect(socket: any): void;
-    request(request: string, socket: any): void;
-    save(): void;
-    log(user: any, msg: string, detail?: string): void;
-};
+/** WORLD — 类型来自 os/world.js 模块导出 */
+declare const WORLD: typeof import("./world").WORLD;
 
 // ============================================================
 // 原生原型扩展(util.js)
@@ -118,6 +85,9 @@ interface Array<T> {
 interface Function {
     inherits(superCtor: Function): void;
 }
+
+/** parseInt也接受number(JS自动转字符串, 常见整数截断用法) */
+declare function parseInt(s: string | number, radix?: number): number;
 
 interface JSON {
     toObject(str: string): any;
