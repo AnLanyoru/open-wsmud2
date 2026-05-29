@@ -16,9 +16,6 @@ export class FOLLOWER extends CHARACTER {
     /**
      * @param {FOLLOWER} obj - 要初始化的随从实例
      */
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
 
     // ============ 核心属性 ============
 
@@ -77,7 +74,6 @@ export class FOLLOWER extends CHARACTER {
 
     constructor() {
         super();
-        FOLLOWER.__initInstance(this);
     }
 
     /**

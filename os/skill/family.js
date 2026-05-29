@@ -10,25 +10,23 @@ export const FAMILIES = {};
 
 export class FAMILY extends BASE {
 
-    static __initInstance(obj) {
-        /** @type {string[]} */
-        obj.titles = [];
-        /** @type {NPC[]} */
-        obj.npcs = [];
-        /** @type {string|null} */
-        obj.battle_family = null;
-        obj.battle_score = 0;
-        obj.battle_gift = 0;
-        obj.can_battle = false;
-        obj.query_temp = globalThis.CHARACTER.prototype.query_temp;
-        obj.set_temp = globalThis.CHARACTER.prototype.set_temp;
-        obj.remove_temp = globalThis.CHARACTER.prototype.remove_temp;
-        obj.add_temp = globalThis.CHARACTER.prototype.add_temp;
-    }
+    // ============ 核心属性 ============
+
+    /** @type {string[]} 门派称谓列表 */
+    titles = [];
+    /** @type {NPC[]} 门派NPC列表 */
+    npcs = [];
+    /** @type {string|null} 敌对门派 */
+    battle_family = null;
+    /** @type {number} 门派战积分 */
+    battle_score = 0;
+    /** @type {number} 门派战奖励 */
+    battle_gift = 0;
+    /** @type {boolean} 是否可门派战 */
+    can_battle = false;
 
     constructor() {
         super();
-        FAMILY.__initInstance(this);
     }
 
     /**

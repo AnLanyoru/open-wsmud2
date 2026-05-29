@@ -10,14 +10,9 @@ import { UTIL } from "./util/util.js";
 
 export class ITEM extends BASE {
 
-    static __initInstance(obj) {
-        // ITEM has no instance properties to initialize
-    }
-
     /** 构造ITEM实例 */
     constructor() {
         super();
-        ITEM.__initInstance(this);
     }
 
     // ============ 核心标识属性 ============

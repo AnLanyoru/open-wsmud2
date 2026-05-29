@@ -8,10 +8,6 @@ import { NPC } from "../char/npc.js";
 
 export class AREA extends BASE {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     // ============ 核心属性 ============
 
     /** @type {string} 区域名称 */
@@ -100,7 +96,6 @@ export class AREA extends BASE {
 
     constructor() {
         super();
-        AREA.__initInstance(this);
     }
 
     /**

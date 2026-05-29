@@ -8,26 +8,10 @@ import { SKILL } from "../skill/skill.js";
 
 export class EQUIPMENT extends OBJ {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     /** 构造EQUIPMENT实例 */
     constructor() {
         super();
-        EQUIPMENT.__initInstance(this);
     }
-
-    // ============ 静态数据 ============
-
-    /** @type {string[]} 装备部位名称 */
-    parts = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
-    /** @type {string[]} 品质名称 */
-    qualities = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
-    /** @type {number[]} 各品级装备价值 */
-    VALUES = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
-    /** @type {number[]} 强化等级参数 */
-    levelData = [0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670];
 
     // ============ 装备标识 ============
 

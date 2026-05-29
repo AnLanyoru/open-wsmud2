@@ -7,13 +7,8 @@ import { WORLD } from "./world.js";
 
 export class COMMAND extends BASE {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     constructor() {
         super();
-        COMMAND.__initInstance(this);
     }
 
     // ============ 核心方法(由子类重写) ============

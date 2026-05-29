@@ -16,10 +16,6 @@ export class USER extends CHARACTER {
     /**
      * @param {USER} obj - 要初始化的玩家实例
      */
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     // ============ 玩家标识 ============
 
     /** @type {boolean} 是否为玩家 */

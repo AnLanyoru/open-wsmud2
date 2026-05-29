@@ -8,14 +8,9 @@ import { UTIL } from "../util/util.js";
 
 export class OBJ extends ITEM {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     /** 构造OBJ实例 */
     constructor() {
         super();
-        OBJ.__initInstance(this);
     }
 
     // ============ 核心属性 ============

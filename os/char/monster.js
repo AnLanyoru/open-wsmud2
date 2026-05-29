@@ -14,9 +14,6 @@ export class MONSTER extends CHARACTER {
     /**
      * @param {MONSTER} obj - 要初始化的怪物实例
      */
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
 
     // ============ 核心属性 ============
 
@@ -42,7 +39,6 @@ export class MONSTER extends CHARACTER {
 
     constructor() {
         super();
-        MONSTER.__initInstance(this);
     }
 
     can_speek = false;

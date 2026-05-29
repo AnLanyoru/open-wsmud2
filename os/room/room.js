@@ -10,9 +10,6 @@ import { USER } from "../char/user.js";
 
 export class ROOM extends ITEM {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
 
     // ============ 核心标识属性 ============
 

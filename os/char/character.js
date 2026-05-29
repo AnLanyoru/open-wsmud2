@@ -14,9 +14,6 @@ export class CHARACTER extends ITEM {
     /**
      * @param {CHARACTER} obj - 要初始化的角色实例
      */
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
 
     // ============ 核心标识属性 ============
 
@@ -162,7 +159,6 @@ export class CHARACTER extends ITEM {
 
     constructor() {
         super();
-        CHARACTER.__initInstance(this);
     }
 
     /**

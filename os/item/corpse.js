@@ -6,14 +6,9 @@ import { CONTAINER } from "./container.js";
 
 export class CORPSE extends CONTAINER {
 
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
-
     /** 构造CORPSE实例 */
     constructor() {
         super();
-        CORPSE.__initInstance(this);
     }
 
     // ============ 核心属性 ============

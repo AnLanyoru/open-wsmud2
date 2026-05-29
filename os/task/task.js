@@ -6,16 +6,11 @@ import { WORLD } from "../world.js";
 
 export class TASK extends BASE {
 
-    static __initInstance(obj) {
-        // TASK has no instance properties to initialize
-    }
-
     /**
      * @returns {TASK}
      */
     constructor() {
         super();
-        TASK.__initInstance(this);
     }
 
     /**

@@ -13,9 +13,6 @@ export class NPC extends CHARACTER {
     /**
      * @param {NPC} obj - 要初始化的NPC实例
      */
-    static __initInstance(obj) {
-        // 所有默认值已迁移至class field声明
-    }
 
     // ============ 核心属性 ============
 
@@ -64,7 +61,6 @@ export class NPC extends CHARACTER {
 
     constructor() {
         super();
-        NPC.__initInstance(this);
     }
 
     /**

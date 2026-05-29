@@ -7,16 +7,11 @@ import { WORLD } from "../world.js";
 
 export class USERTASK extends BASE {
 
-    static __initInstance(obj) {
-        // USERTASK has no instance properties to initialize
-    }
-
     /**
      * @returns {USERTASK}
      */
     constructor() {
         super();
-        USERTASK.__initInstance(this);
     }
 
     /**
