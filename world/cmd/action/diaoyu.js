@@ -45,25 +45,75 @@ function on_check(me) {
     }
     me.send(`你正在钓鱼，当前效率${grade}，每10秒获得${exp}经验，${pot}潜能，${str}。`);
 }
+function calculate_lv(grade) {
+    // 权重基准(×10取整)
+    const weights = {
+        white: 7000,   // 0-2
+        green: 2000,   // 3-5
+        blue: 500,     // 6-8
+        yellow: 100,   // 9-11
+        purple: 20,    // 12-14
+        orange: 10,    // 15-17
+    };
+
+    // 根据grade启用对应品质上限（无红色档）
+    let maxTier;
+    if (grade > 30) maxTier = 5;      // 橙色
+    else if (grade > 10) maxTier = 4; // 紫色
+    else if (grade > 1) maxTier = 3;  // 黄色
+    else maxTier = 2;                 // 蓝色
+
+    const tiers = ['white', 'green', 'blue', 'yellow', 'purple', 'orange'];
+    const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17]];
+
+    // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
+    let total = 0;
+    const cumulative = [];
+    for (let i = 0; i <= maxTier; i++) {
+        let w = weights[tiers[i]];
+        if (i >= 1) {
+            w = Math.floor(w * (1 + grade * i / 1200));
+        }
+        total += w;
+        cumulative.push([total, i]);
+    }
+
+    const roll = Math.floor(Math.random() * total);
+    for (const [threshold, idx] of cumulative) {
+        if (roll < threshold) {
+            const [lo, hi] = ranges[idx];
+            return lo + Math.floor(Math.random() * (hi - lo + 1));
+        }
+    }
+
+    return 0;
+}
+
 function do_diaoyu(me) {
-
-
+    let r_i = me.random(100);
+    if (r_i > 89) {
     let er = this.yuer;
-    var obj = me.add_obj('res/yu#' + me.random(18));
+    let grade = me.query_prop('diaoyu1') + er.grade * 5;
+    let lv = calculate_lv(grade);
+    let obj = me.add_obj('res/yu#' + lv);
     if (obj)
         me.send_room("<hig>$N钓到一条" + obj.color_name + "。</hig>");
-    if (er.count > 1)
+    if (er.count > 1) {
         me.remove_obj(er, 1);
-    else {
+    } else {
         me.remove_obj(er);
         er = query_er(me);
-        this.yuer = er;
-    }
+        if (!er) {
+            me.send_room("$N没有鱼饵了，无法继续钓鱼。");
+            me.set_state(null);
+        } else {
+            this.yuer = er;
+        }
+    }}
     var exp = WORLD.DATA.get_exp(me)
         + WORLD.DATA.query_temp("diaoyu_exp", 0);
     var pot = exp + me.query_prop('lsj_qn');
     me.add_exp(exp, pot, 0);
-
 }
 
 function query_er(me) {
