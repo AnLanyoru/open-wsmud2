@@ -63,16 +63,6 @@ declare const BASE_SKILLS: Record<string, string>;
 declare const FAMILIES: Record<string, FAMILY>;
 
 // ============================================================
-// 全局单例对象(无模块导出)
-// ============================================================
-
-/** UTIL — 类型来自 os/util/util.js 模块导出 */
-declare const UTIL: typeof import("./util/util").UTIL;
-
-/** WORLD — 类型来自 os/world.js 模块导出 */
-declare const WORLD: typeof import("./world").WORLD;
-
-// ============================================================
 // 原生原型扩展(util.js)
 // ============================================================
 

@@ -3,6 +3,7 @@
  */
 
 import fs_sync from 'fs';
+import { WORLD } from "../world.js";
 
 const fs = fs_sync.promises;
 

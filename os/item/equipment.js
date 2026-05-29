@@ -156,7 +156,7 @@ export class EQUIPMENT extends OBJ {
 
     /**
      * 装备到角色
-     * @param {CHARACTER} me
+     * @param {USER} me
      * @param {boolean} [notsend]
      * @returns {boolean|undefined}
      */

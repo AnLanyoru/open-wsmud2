@@ -3,6 +3,7 @@
  */
 
 import "./util/util.js";
+import { UTIL } from "./util/util.js";
 import db from "./util/data.js";
 import WORLD_DATA from "./data.js";
 import USERLOGIN_MODULE from "./login.js";

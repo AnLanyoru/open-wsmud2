@@ -7,6 +7,7 @@ import { SKILL } from "../skill/skill.js";
 import { WORLD } from "../world.js";
 import { UTIL } from "../util/util.js";
 import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from "../const.js";
+import { EQUIPMENT } from "../item/equipment.js";
 /** @typedef {import("../room/room.js").ROOM} ROOM */
 /*global CHARACTER ROOM ITEM*/
 
@@ -66,8 +67,6 @@ export class CHARACTER extends ITEM {
 
     // ============ 身份标识 ============
 
-    /** @type {boolean} 是否为玩家 */
-    is_player = false;
     /** @type {number} 用户权限等级 0=普通 6=管理员 */
     user_level = 0;
     /** @type {FAMILY} 所属门派 — call/is_team/send_fam 等5个基类方法使用 */
@@ -83,8 +82,6 @@ export class CHARACTER extends ITEM {
     state = null;
     /** @type {((me: CHARACTER, req: string) => void)|null} 等待用户输入的回调 — character.js:319 传(this, req) */
     wait_input = null;
-    /** @type {boolean} 是否静默消息 */
-    no_message = false;
 
     // ============ 技能与装备 ============
 
@@ -209,14 +206,6 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 通知消息(会检查昏迷状态)
-     * @param {string} msg — USER覆写增加!is_faint守卫, FOLLOWER转发给listener
-     */
-    notify(msg) {
-
-    }
-
-    /**
      * 发送命令列表(客户端交互菜单) — USER覆写用arguments处理变长(命令名, 显示名, ...)偶数对
      * @returns {void}
      */
@@ -328,8 +317,8 @@ export class CHARACTER extends ITEM {
     /**
      * 发送房间消息(支持多视角)
      * @param {string} text - 消息模板
-     * @param {CHARACTER} target - 目标
-     * @param {boolean} [excludeself] - 是否排除自己
+     * @param {CHARACTER?} target - 目标
+     * @param {boolean?} [excludeself] - 是否排除自己
      */
     send_room(text, target, excludeself) {
         if (!this.environment || !text) return;
@@ -502,10 +491,10 @@ export class CHARACTER extends ITEM {
             for (let i = 0; i < this.equipment.length; i++) {
                 const item = this.equipment[i];
                 if (item) {
-                    eqs[i] = OBJ.CREATE(item.path);
+                    eqs[i] = /** @type {EQUIPMENT} */ (/** @type {unknown} */ (OBJ.CREATE(item.path)));
                 }
             }
-            this.equipment = eqs;
+            this.equipment = /** @type {EQUIPMENT[]} */ (/** @type {unknown} */ (eqs));
         }
         if (this.items) {
             const items = [];
@@ -800,7 +789,7 @@ export class CHARACTER extends ITEM {
 
     /**
      * 批量设置技能(NPC初始化用)
-     * @param {...[string, number, (string|string[])]} arguments - [技能ID, 等级, 启用基本技能]
+     * @param {...[string, number, (string|string[])?]} arguments - [技能ID, 等级, 启用基本技能]
      */
     skill_map() {
         this.skills = this.skills || {};
@@ -1471,7 +1460,7 @@ export class CHARACTER extends ITEM {
             if (!obj) continue;
             if (item[2] && obj.is_equipment) {
                 if (!this.equipment) this.equipment = []
-                this.equipment[obj.eq_type] = obj;
+                this.equipment[/** @type {EQUIPMENT} */ (/** @type {unknown} */ (obj)).eq_type] = /** @type {EQUIPMENT} */ (/** @type {unknown} */ (obj));
             } else {
                 this.items.push(obj);
             }

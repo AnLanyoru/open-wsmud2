@@ -108,21 +108,4 @@ export class CONTAINER extends OBJ {
         return this.json;
     }
 
-    /**
-     * 创建容器(含随机物品)
-     * @param {string} name - 容器名
-     * @param {string} desc - 描述
-     * @param {number} lv - 品级
-     * @param {Array<*>} odds - 掉落定义
-     * @returns {CONTAINER}
-     */
-    static CREATE(name, desc, lv, odds) {
-        const obj = OBJ.CREATE("sp/box#lv");
-        obj.items = OBJ.create_by_odds(odds);
-        obj.name = name;
-        obj.desc = desc || obj.desc;
-        obj.grade = lv;
-        obj.create();
-        return obj;
-    }
 }

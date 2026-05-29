@@ -1,3 +1,5 @@
+import { WORLD } from "./world.js";
+
 export default {
     parties: new Map(),
     PAIMAI: new Map(),

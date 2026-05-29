@@ -7,6 +7,7 @@ const require = createRequire(import.meta.url);
 
 import util from 'util';
 import JSON5 from 'json5';
+import { WORLD } from "../world.js";
 
 /**
  * nodejs原型继承 — 将superCtor的方法复制到this.prototype

@@ -58,6 +58,10 @@ export class ITEM extends BASE {
     color_name = "";
     /** @type {Object<string, *>|null} 临时数据 — CHARACTER/OBJ/EQUIPMENT/ROOM专属 */
     temp = null;
+    /** @type {boolean} 是否为玩家 — ROOM遍历items判别, CHARACTER(=false)/USER(=true) */
+    is_player = false;
+    /** @type {boolean} 是否静默消息 — ROOM遍历items过滤旁观者消息 */
+    no_message = false;
     /** @type {Object<string, number>|null} 属性加成映射 — CHARACTER/EQUIPMENT专属 */
     prop = null;
     /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
@@ -145,6 +149,14 @@ export class ITEM extends BASE {
     }
 
     // ============ 生命周期 ============
+
+    /**
+     * 通知消息 — CHARACTER覆写, ROOM::notify遍历items调用
+     * @param {string} msg
+     */
+    notify(msg) {
+
+    }
 
     /**
      * 心跳处理

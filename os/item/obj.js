@@ -57,6 +57,10 @@ export class OBJ extends ITEM {
     combine_count = 999;
     /** @type {boolean} 是否已锁定 */
     is_locked = false;
+    /** @type {boolean} 是否快捷使用 — EQUIPMENT专属, 装备/卸下时控制快捷按钮 */
+    is_shortcut = false;
+    /** @type {number} 装备部位类型(EQUIP_TYPE) — EQUIPMENT专属, set_objects用eq_type索引装备槽 */
+    eq_type = 0;
     /** @type {boolean} 是否为容器 — CONTAINER/CORPSE专属(=true) */
     is_container = false;
     /** @type {boolean} 容器是否打开 — CONTAINER/CORPSE专属 */
