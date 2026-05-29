@@ -17,19 +17,7 @@ export class FOLLOWER extends CHARACTER {
      * @param {FOLLOWER} obj - 要初始化的随从实例
      */
     static __initInstance(obj) {
-        obj.hp = obj.max_hp = 100;
-        obj.mp = obj.max_mp = 100;
-        obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
-        obj.family = FAMILIES.NONE;
-        obj.auto_pfm = true;
-        obj.master = null;
-        obj.level = 3;
-        obj.master_name = null;
-        obj.max_item_count = 10;
-        obj.settings = {
-            auto_kill: 1,
-            auto_dice: 1
-        };
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心属性 ============

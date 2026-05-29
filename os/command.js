@@ -8,8 +8,7 @@ import { WORLD } from "./world.js";
 export class COMMAND extends BASE {
 
     static __initInstance(obj) {
-        obj.allow_fight = true;
-        obj.allow_level = 0;
+        // 所有默认值已迁移至class field声明
     }
 
     constructor() {

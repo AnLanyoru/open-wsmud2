@@ -7,9 +7,7 @@ import { UTIL } from "../util/util.js";
 export class CONTAINER extends OBJ {
 
     static __initInstance(obj) {
-        obj.count = 1;
-        obj.combined = false;
-        obj.is_container = true;
+        // 所有默认值已迁移至class field声明
     }
 
     /** 构造CONTAINER实例 */

@@ -14,11 +14,7 @@ export class NPC extends CHARACTER {
      * @param {NPC} obj - 要初始化的NPC实例
      */
     static __initInstance(obj) {
-        obj.hp = obj.max_hp = 100;
-        obj.mp = obj.max_mp = 100;
-        obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
-        obj.family = FAMILIES.NONE;
-        obj.auto_pfm = true;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心属性 ============
@@ -64,22 +60,7 @@ export class NPC extends CHARACTER {
     /** @type {Function|null} 绝招回调 */
     on_pfm = null;
 
-    // ============ 由mixin/extends提供的多态方法桩(供IDE类型提示) ============
-
-    /** @type {() => boolean} 是否正在战斗 */
-    is_fighting() { return false; }
-    /** @type {() => void} 清除所有状态 */
-    clear_status() { }
-    /** @type {() => void} 清除跟随关系 */
-    clear_follow() { }
-    /** @type {(val: number, notify?: boolean) => void} 增加气血 */
-    add_hp(val, notify) { }
-    /** @type {(val: number, notify?: boolean) => void} 增加内力 */
-    add_mp(val, notify) { }
-    /** @type {() => CHARACTER|null} 查询当前敌人 */
-    query_enemy() { return null; }
-    /** @type {(msg?: string) => void} 发言(由资源文件定义) */
-    do_say(msg) { }
+    // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 
     constructor() {
         super();
@@ -375,5 +356,23 @@ export class NPC extends CHARACTER {
 const DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+
+// ============ Mixin多态方法桩(writable, 供Object.assign覆写) ============
+Object.defineProperties(NPC.prototype, {
+    /** @type {() => boolean} 是否正在战斗(combat mixin) */
+    is_fighting: { value: function () { return false; }, writable: true, configurable: true },
+    /** @type {() => void} 清除所有状态(chara_skill mixin) */
+    clear_status: { value: function () { }, writable: true, configurable: true },
+    /** @type {() => void} 清除跟随关系(chara_move mixin) */
+    clear_follow: { value: function () { }, writable: true, configurable: true },
+    /** @type {(val: number, notify?: boolean) => void} 增加气血(combat mixin) */
+    add_hp: { value: function (val, notify) { }, writable: true, configurable: true },
+    /** @type {(val: number, notify?: boolean) => void} 增加内力(combat mixin) */
+    add_mp: { value: function (val, notify) { }, writable: true, configurable: true },
+    /** @type {() => CHARACTER|null} 查询当前敌人(combat mixin) */
+    query_enemy: { value: function () { return null; }, writable: true, configurable: true },
+    /** @type {(msg?: string) => void} 发言(由资源文件定义, 完全动态) */
+    do_say: { value: function (msg) { }, writable: true, configurable: true },
+});
 
 globalThis.NPC = NPC;

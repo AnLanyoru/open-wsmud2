@@ -17,22 +17,7 @@ export class USER extends CHARACTER {
      * @param {USER} obj - 要初始化的玩家实例
      */
     static __initInstance(obj) {
-        obj.socket = null;
-        obj.family = FAMILIES.NONE;
-        obj.max_item_count = 20;
-        obj.max_store_count = 20;
-        obj.money = 0;
-        obj.request_count = 0;
-        obj.cash_money = 0;
-        obj.score = 0;
-        obj.follower = null;
-        obj.password = "";
-        obj.loginTime = 0;
-        obj.id_address = null;
-        obj.user_level = 0;
-        obj.eq_group = 0;
-        obj.is_player = true;
-        obj.serverid = 0;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 玩家标识 ============

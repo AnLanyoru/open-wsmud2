@@ -11,11 +11,7 @@ import { USER } from "../char/user.js";
 export class ROOM extends ITEM {
 
     static __initInstance(obj) {
-        obj.name = "房间";
-        obj.desc = "";
-        obj.items = [];
-        obj.parent = null;
-        obj.max_item_count = 50;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心标识属性 ============

@@ -15,11 +15,7 @@ export class CHARACTER extends ITEM {
      * @param {CHARACTER} obj - 要初始化的角色实例
      */
     static __initInstance(obj) {
-        obj.name = "生物";
-        obj.hp = obj.max_hp = 100;
-        obj.mp = obj.max_mp = 100;
-        obj.str = obj.con = obj.dex = obj.int = 20;
-        obj.money = 0;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心标识属性 ============
@@ -162,25 +158,7 @@ export class CHARACTER extends ITEM {
     /** @type {Function|null} 死亡后回调(仅NPC) */
     on_died = null;
 
-    // ============ 由mixin/extends提供的多态方法桩(供IDE类型提示) ============
-    // 实际实现通过 Object.assign(CHARACTER.prototype, ...) 或 world/extends/ 注入
-
-    /** @type {(name: string, val?: number, temp?: number) => number} 查询临时属性 */
-    query_temp(name, val, temp) { return 0; }
-    /** @type {(name: string, val: number, append?: boolean) => void} 修改属性加成 */
-    change_prop(name, val, append) { }
-    /** @type {(id: string) => {level: number, exp: number, enable_skill: number}|null} 查询技能 */
-    query_skill(id) { return null; }
-    /** @type {() => void} 初始化技能(根据武器类型选择技能) */
-    init_skill() { }
-    /** @type {() => void} 重新计算战斗属性 */
-    recount() { }
-    /** @type {() => string} 获取第三人称称呼 */
-    call3() { return this.name; }
-    /** @type {() => string} 获取武器名称 */
-    weapon_name() { return ""; }
-    /** @type {() => string} 获取暗器名称 */
-    throwing_name() { return ""; }
+    // ============ 由mixin/extends提供的多态方法(见文件末尾writable定义) ============
 
     constructor() {
         super();
@@ -655,5 +633,27 @@ function splitmessage(me, text, type, target) {
     start < i && str.push(text.substring(start, i));
     return str.join("");
 }
+
+// ============ Mixin多态方法桩(writable, 供Object.assign覆写) ============
+// class语法定义的方法为non-writable, 会被mixin的Object.assign抛TypeError
+// 因此用defineProperties定义writable桩供IDE类型提示
+Object.defineProperties(CHARACTER.prototype, {
+    /** @type {(name: string, val?: number, temp?: number) => number} 查询临时属性(chara_prop mixin) */
+    query_temp: { value: function (name, val, temp) { return 0; }, writable: true, configurable: true },
+    /** @type {(name: string, val: number, append?: boolean) => void} 修改属性加成(chara_prop mixin) */
+    change_prop: { value: function (name, val, append) { }, writable: true, configurable: true },
+    /** @type {(id: string) => {level: number, exp: number, enable_skill: number}|null} 查询技能(chara_skill mixin) */
+    query_skill: { value: function (id) { return null; }, writable: true, configurable: true },
+    /** @type {() => void} 初始化技能(chara_skill mixin) */
+    init_skill: { value: function () { }, writable: true, configurable: true },
+    /** @type {() => void} 重新计算战斗属性(world/extends/char/combat) */
+    recount: { value: function () { }, writable: true, configurable: true },
+    /** @type {() => string} 第三人称称呼(chara_comm mixin) */
+    call3: { value: function () { return this.name; }, writable: true, configurable: true },
+    /** @type {() => string} 武器名称(chara_equip mixin) */
+    weapon_name: { value: function () { return ""; }, writable: true, configurable: true },
+    /** @type {() => string} 暗器名称(chara_equip mixin) */
+    throwing_name: { value: function () { return ""; }, writable: true, configurable: true },
+});
 
 globalThis.CHARACTER = CHARACTER;

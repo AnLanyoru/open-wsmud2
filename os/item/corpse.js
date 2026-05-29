@@ -7,9 +7,7 @@ import { CONTAINER } from "./container.js";
 export class CORPSE extends CONTAINER {
 
     static __initInstance(obj) {
-        obj.unit = "具";
-        obj.count = 1;
-        obj.no_alloc = false;
+        // 所有默认值已迁移至class field声明
     }
 
     /** 构造CORPSE实例 */

@@ -9,18 +9,7 @@ import { NPC } from "../char/npc.js";
 export class AREA extends BASE {
 
     static __initInstance(obj) {
-        obj.rooms = [];
-        obj.map = [];
-        obj.name = "";
-        obj.is_area = false;
-        obj.first = null;
-        obj.is_show = true;
-        obj.is_copy = false;
-        obj.expend = 10;
-        obj.is_multi = false;
-        obj.index = 0;
-        obj.exp = 1000;
-        obj.pot = 1000;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心属性 ============

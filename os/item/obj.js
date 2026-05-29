@@ -9,13 +9,7 @@ import { UTIL } from "../util/util.js";
 export class OBJ extends ITEM {
 
     static __initInstance(obj) {
-        obj.unit = "个";
-        obj.path = null;
-        obj.count = 1;
-        obj.combined = true;
-        obj.grade = 0;
-        obj.otype = 0;
-        obj.transable = false;
+        // 所有默认值已迁移至class field声明
     }
 
     /** 构造OBJ实例 */

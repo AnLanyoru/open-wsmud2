@@ -15,12 +15,7 @@ export class MONSTER extends CHARACTER {
      * @param {MONSTER} obj - 要初始化的怪物实例
      */
     static __initInstance(obj) {
-        obj.hp = obj.max_hp = 100;
-        obj.mp = obj.max_mp = 100;
-        obj.auto_pfm = true;
-        obj.family = FAMILIES.MONSTER;
-        obj.str = obj.con = obj.dex = obj.int = 20;
-        obj.can_speek = false;
+        // 所有默认值已迁移至class field声明
     }
 
     // ============ 核心属性 ============
