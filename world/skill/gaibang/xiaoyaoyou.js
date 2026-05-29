@@ -1,35 +1,25 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "逍遥游";
-this.id = "xiaoyaoyou";
-this.grade = 2;
-this.family = FAMILIES.GAIBANG;
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "逍遥游";
+    id = "xiaoyaoyou";
+    grade = 2;
+    family = FAMILIES.GAIBANG;
+    dodge_actions = [
     "$n一个「蜻蜓点水」，躲过了$N这一招。",
         "$n身形向后一纵，使出一招「细胸巧翻云」，避过了$N的攻击。",
         "$n使出「虚怀若谷」，恰好躲过了$N的攻势。",
         "但是$n身形飘忽，轻轻一纵，早已避开。",
         "$n身形微晃，有惊无险地避开了$N这一招。"
 ];
-this.can_enables = ["dodge"];
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            ds: parseInt(lv * 1.5) + 30,
-            mz: lv + 3
-        }
-    };
-}
-this.learn_condition = {
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         dodge: 200
     }
 };
-this.pfm = {
+    pfm = {
     lingbo:
     {
         name: "仙游",
@@ -58,4 +48,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            ds: parseInt(lv * 1.5) + 30,
+            mz: lv + 3
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;

@@ -1,12 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const AREA = globalThis.AREA; const ROOM = globalThis.ROOM;
-this.inherits(COMMAND);
-this.command = "cr";
-this.allow_fight = true;
-//this.allow_busy = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "cr";
+    allow_fight = true;
+
+    enter(me, arg) {
     if (!me.environment) return;
 
     if (!arg) {
@@ -18,6 +16,14 @@ this.enter = function (me, arg) {
         fb_start(me, arg);
     }
 }
+}
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const UTIL = globalThis.UTIL;
+const FAMILIES = globalThis.FAMILIES;
+const AREA = globalThis.AREA;
+const ROOM = globalThis.ROOM;
 function fb_ok(me) {
     var r = me.query_temp("teamcr");
     if (r == 1) {
@@ -80,7 +86,6 @@ function fb_saodang(me, path, isdiff, count) {
         me.notify(area.name + "扫荡完成。");
     });
 }
-
 function fb_quick(me, area, isdiff) {
 
     var drops = area.query_drops(isdiff, me);
@@ -382,8 +387,6 @@ function fb_over(me) {
         me.notify("你现在还不能离开副本。");
     }
 }
-
-
 function fb_first_check(me, fb, area, diff) {
     if (me.family === FAMILIES.NONE && !me.query_temp('sr')) {
         return;//无门无派的非长期散人不参与
@@ -440,7 +443,6 @@ function fb_first_check(me, fb, area, diff) {
     WORLD.DATA.set_temp(fb_key2, ss_userids);
     fb.parent.notify_update();
 }
-
 function team_name(tms) {
     var str = [];
     for (var i = 0; i < tms.length; i++) {
@@ -489,5 +491,4 @@ function fb_confirm_over(me) {
     }
     me.notify(str.join(""));
     me.send_commands("cr over", "领取奖励并离开副本");
-}
 }

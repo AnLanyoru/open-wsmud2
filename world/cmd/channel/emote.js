@@ -1,14 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "emote";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-const WT_REG = /\s+/;
-this.enter = function (me, str) {
+export default class extends COMMAND {
+    command = "emote";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, str) {
 
     if (!str) return me.send(this.emote_data());
     let paras = str.split(WT_REG);
@@ -25,7 +23,23 @@ this.enter = function (me, str) {
 
     return msg;
 }
+    emote_data(me) {
+    if (this.json) return this.json;
+    var str = ["{type:'emote',items:["];
+    for (var key in emote) {
+        if (str.length > 1) str.push(",");
+        str.push("\"");
+        str.push(key);
+        str.push("\"");
+    }
+    str.push("]}");
+    this.json = str.join("");
+    return this.json;
+}
+}
 
+const WORLD = globalThis.WORLD;
+const WT_REG = /\s+/;
 function splitmessage(me, text, type, target) {
     if (text.length < 3) return text;
     var str = [];
@@ -77,19 +91,6 @@ function splitmessage(me, text, type, target) {
     }
     start < i && str.push(text.substring(start, i));
     return str.join("");
-}
-this.emote_data = function (me) {
-    if (this.json) return this.json;
-    var str = ["{type:'emote',items:["];
-    for (var key in emote) {
-        if (str.length > 1) str.push(",");
-        str.push("\"");
-        str.push(key);
-        str.push("\"");
-    }
-    str.push("]}");
-    this.json = str.join("");
-    return this.json;
 }
 var emote = {
     哈欠: ["$N打了个哈欠，觉得无聊极了。", "$N白了$n一眼，说：$n无聊不无聊啊 ?", "$N打了个哈欠，觉得自己真是无聊透顶。"],
@@ -222,4 +223,3 @@ var emote = {
     惊讶: ["$N惊讶地张着嘴巴，半天也说不出一句话来。", "$N对着$n惊讶地「啊！」了一声。"],
     叹气: ["$N深深地叹了口气。", "$N看着$n，深深地叹了口气。"]
 };
-}

@@ -1,17 +1,14 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(OBJ);
-this.set({
-    unit: "粒",
-    name: "突破丹",
-    grade: 1,
-    desc: "快速突破你的技能，消耗你的潜能使你的某项不高于突破丹品质的技能增加1-5级",
-    value: 1000
-});
-this.transable = true;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "粒";
+    name = "突破丹";
+    grade = 1;
+    desc = "快速突破你的技能，消耗你的潜能使你的某项不高于突破丹品质的技能增加1-5级";
+    value = 1000;
+    transable = true;
+
+    on_use(me) {
     me.notify("你吞下一粒突破丹。")
     if (!(me.pot > 0)) return me.notify("你的潜能不够，好像没什么效果。");
     var list = [];
@@ -40,9 +37,7 @@ this.on_use = function (me) {
     skillbase.add_exp(me, needexp);
     me.pot -= needexp;
 }
-
-const VALUES = [1000, 1000, 10000, 20000, 50000, 100000, 100000];
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = "drug/skill2#1";
         return;
@@ -57,3 +52,7 @@ this.on_create = function (path, par) {
     this.value = VALUES[this.grade];
 }
 }
+
+const SKILL = globalThis.SKILL;
+const SKILL_TYPES = globalThis.SKILL_TYPES;
+const VALUES = [1000, 1000, 10000, 20000, 50000, 100000, 100000];

@@ -1,10 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "packitem";
-this.regex=/^(\w+)\s+(\w+)(?:\s+(\w+))?$/;
-this.enter = function (player,cmd, objid,par) {
+export default class extends COMMAND {
+    command = "packitem";
+    regex = /^(\w+)\s+(\w+)(?:\s+(\w+))?$/;
+
+    enter(player, cmd, objid, par) {
     var obj = player.find_obj(objid);
     if (!obj) return player.notify("你身上没有这个东西。");
 

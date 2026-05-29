@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(COMMAND);
-this.command = "study";
-this.allow_fight = false;
-this.enter = function (me, bookid) {
+export default class extends COMMAND {
+    command = "study";
+    allow_fight = false;
+
+    enter(me, bookid) {
     if (!bookid) return me.notify("你要学习什么技能？");
 
     if (bookid.length < 4) return this.study_from_books(me, bookid);
@@ -26,8 +25,7 @@ this.enter = function (me, bookid) {
     this.study_skill(me, skill, target);
 
 }
-
-this.study_from_books = function (me, bindex) {
+    study_from_books(me, bindex) {
     let books = me.books;
     if (me.master) {
         let user = WORLD.getUser(me.master);
@@ -43,8 +41,7 @@ this.study_from_books = function (me, bindex) {
     var target = { color_name: skill.color_name, max_level: 100, };
     this.study_skill(me, skill, target);
 }
-
-this.study_skill = function (me, skill, target) {
+    study_skill(me, skill, target) {
     if (skill.is_custom && !me.create_for(skill.id)) return me.notify('这是别人自创的武功，目前无法学习。');
 
     if (!checkSkillCount(me, skill.id)) return;
@@ -80,8 +77,11 @@ this.study_skill = function (me, skill, target) {
         },
     });
 }
+}
 
-
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;
+const SKILL_TYPES = globalThis.SKILL_TYPES;
 function checkSkillCount(me, sk) {
     var count = 0;
     for (var skid in me.skills) {
@@ -142,5 +142,4 @@ function do_learn(me) {
         me.add_score(one_score * (this.target.max_level - lv));
         me.send('{type:"dialog",dialog:"skills",id:"' + this.skill_base.id + '",level:' + this.target.max_level + ',exp:0}');
     }
-}
 }

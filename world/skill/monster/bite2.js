@@ -1,22 +1,19 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const SKILL_TYPES = globalThis.SKILL_TYPES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.type = SKILL_TYPES.SKILL;
-this.id = "bite2";
-this.name = "野兽扑咬";
-this.grade = 3;
-this.family = FAMILIES.MONSTER;
-this.desc = "高级动物类技能";
-this.attack_actions = [
+export default class extends SKILL {
+    type = SKILL_TYPES.SKILL;
+    id = "bite2";
+    name = "野兽扑咬";
+    grade = 3;
+    family = FAMILIES.MONSTER;
+    desc = "高级动物类技能";
+    attack_actions = [
     "$N张嘴朝$n的$l咬去", "$N抬起前爪往$n的$l一抓", "$N往$n的$l狠狠的扑了过去",
     "$N跳起来用前抓往$n的$l抓去", "$N猛的扑向$n的$l"
 ];
-this.query_prop = lv => ({ gj: lv * 2, mz: lv * 2, fy: lv * 2, zj: lv * 2, ds: lv * 2 });
-
-this.can_enables = ["bite"];
-this.pfm = {
+    query_prop = lv => ({ gj: lv * 2, mz: lv * 2, fy: lv * 2, zj: lv * 2, ds: lv * 2 });
+    can_enables = ["bite"];
+    pfm = {
     puyao:
     {
         name: "撕咬",
@@ -48,3 +45,7 @@ this.pfm = {
     }
 };
 }
+
+const FAMILIES = globalThis.FAMILIES;
+const SKILL_TYPES = globalThis.SKILL_TYPES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

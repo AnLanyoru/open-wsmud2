@@ -1,17 +1,17 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.unit = "碗";
-this.name = "米饭";
-this.value = 200;
-this.combined = true;
-this.desc = "一碗热气腾腾的白米饭，吃掉后每5秒恢复100点气血。";
-this.action_msg = "吃";
-this.distime = 60000;
-this.transable = true;
-this.recover_hp = 100;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "碗";
+    name = "米饭";
+    value = 200;
+    combined = true;
+    desc = "一碗热气腾腾的白米饭，吃掉后每5秒恢复100点气血。";
+    action_msg = "吃";
+    distime = 60000;
+    transable = true;
+    recover_hp = 100;
+
+    on_use(me) {
     me.send_room("$N吃下一" + this.unit + this.name + "。");
     me.add_status({
         id: "food",
@@ -26,7 +26,7 @@ this.on_use = function (me) {
     });
 
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
 
     if (!par) {
         this.path = path + "#0";

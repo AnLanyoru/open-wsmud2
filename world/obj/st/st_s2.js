@@ -1,22 +1,20 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    name: "贪狼",
-    desc: "一颗神秘的宝石",
-    unit: "块",
-    value: 10000000,
-    transable: true,
-    combined: true,
-    is_stone: true,
-    grade: 6,
-    prop: {
+export default class extends OBJ {
+    name = "贪狼";
+    desc = "一颗神秘的宝石";
+    unit = "块";
+    value = 10000000;
+    transable = true;
+    combined = true;
+    is_stone = true;
+    grade = 6;
+    prop = {
         str: 1
-    }
-});
-this.otype = 2;
-this.on_create = function (path, par) {
+    };
+    otype = 2;
+
+    on_create(path, par) {
     var lv = 0;
     if (par != undefined) {
         par = par.substr(1);

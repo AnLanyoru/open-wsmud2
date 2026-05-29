@@ -1,10 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const SKILL = globalThis.SKILL; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(COMMAND);
-this.command = "zigong";
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "zigong";
+
+    enter(me, arg) {
     if (me.gender == 2) return me.notify("你要割什么？");
     if (me.gender == 3) return me.notify("你都没有了还要割什么？");
     var list = [];
@@ -53,3 +52,6 @@ this.enter = function (me, arg) {
 
 }
 }
+
+const SKILL = globalThis.SKILL;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

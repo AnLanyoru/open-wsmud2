@@ -1,22 +1,19 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const CHARACTER = globalThis.CHARACTER; const NPC = globalThis.NPC; const USER = globalThis.USER;
-this.inherits(COMMAND);
-this.command = "biwu";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.biwu_state = {
+export default class extends COMMAND {
+    command = "biwu";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    biwu_state = {
     allow_busy: false,
     allow_state: false,
     allow_die: false,
     allow_die: false
 };
+    regex = /^(emei|wudang|shaolin|huashan|xiaoyao|gaibang|shashou|none)?\s*(\d+)(?:\s+(ok))?$/;
 
-const STATS = WORLD.STATS;
-this.regex = /^(emei|wudang|shaolin|huashan|xiaoyao|gaibang|shashou|none)?\s*(\d+)(?:\s+(ok))?$/;
-this.enter = function (me, fam, type, par) {
+    enter(me, fam, type, par) {
 
     if (!me.can_trans()) return;
     if (!WORLD.COMMANDS.events.check_command(this.biwu_state, me)) return;
@@ -54,7 +51,7 @@ this.enter = function (me, fam, type, par) {
     this.start_biwu(me, fam, index - 1);
 
 }
-this.start_biwu = function (me, fam, index) {
+    start_biwu(me, fam, index) {
     let tops = STATS.TOPS;
     if (fam) tops = STATS['tops_' + fam.toUpperCase()];
     if (!tops) return me.send('错误的对手，无法挑战。');
@@ -93,8 +90,7 @@ this.start_biwu = function (me, fam, index) {
 
     me.send('{type:"dialog",dialog:"stats",close:true}');
 }
-
-this.surrender = function (me) {
+    surrender(me) {
     // if (!me.fight_type)
     //     return me.send('你还没开始战斗呢。');
     let npc = me.environment.items[1];
@@ -106,8 +102,7 @@ this.surrender = function (me) {
     challenge_over(me, 2);
     challenge_fail(me);
 }
-
-this.on_heart_beat = function (dt) {
+    on_heart_beat(dt) {
     this.biwu_step++;
     if (this.biwu_step < 60) return;
     if (!this.items.length) {
@@ -124,87 +119,7 @@ this.on_heart_beat = function (dt) {
     challenge_fail(me);
     me.notify("<yel>挑战超时，自动离开擂台。</yel>");
 }
-function challenge_end(killer) {
-    if (this.on_die && this.on_die(killer) === false) {
-        this.hp = 1;
-        return false;
-    }
-    let me = killer, npc = this;
-    if (this.is_player) {
-        npc = killer, me = this;
-    }
-    if (me.hp <= 0) me.hp = 1;
-    me.end_fight();
-    npc.end_fight();
-    if (killer === me) {
-        challenge_over(me, 1, npc);
-        challenge_success(me, npc);
-    } else {
-        challenge_over(me, 0, npc);
-        challenge_fail(me, npc);
-        //  me.notify("<cyn>挑战失败，你的积分保持不变。</cyn>");
-    }
-}
-
-function challenge_over(me, result, npc) {
-    me.environment.on_heart_beat = null;
-    me.die = USER.prototype.die
-    me.auto_pfm = false;
-    me.auto_skills = null;
-
-    me.check_pfms = USER.prototype.check_pfms;
-    me.init_pfms = USER.prototype.init_pfms;
-
-    let leitai = me.environment;
-    if (result === 0)
-        me.moveto('yz/leitai/ltx', null, me.name +
-            "被" + npc.name + "一脚踢下了擂台。", 'fightend');
-    else if (result === 1) {
-        me.moveto('yz/leitai/ltx', null, me.name +
-            "走了下来。", 'fightend');
-    } else {
-        me.moveto('yz/leitai/ltx', null, me.name +
-            "被赶下来。", 'fightend');
-    }
-    leitai.items.length = 0;
-    me.clear_downside(true);
-}
-
-function challenge_fail(me, npc) {
-    me.notify("<cyn>挑战失败，擂台积分保持不变。</cyn>");
-    me.remove_temp('biwu_fam');
-}
-
-function challenge_success(me, npc) {
-    const fam = me.query_temp('biwu_fam');
-    let top_key = fam ? "top_fam_sc" : "top_sc";
-    let sc = me.query_temp(top_key, 0);
-    let target_sc = npc.score ?? 0;
-    let add = Math.floor((target_sc - sc) / 2);
-    if (add === 0) {
-        add = 1;
-    }
-    if (add > 0) {
-        sc += add;
-        me.set_temp(top_key, sc);
-    } else {
-        add = 0;
-    }
-    if (fam)
-        me.notify("<hig>挑战成功，当前" + me.family.name + "榜单积分" + sc + "。</hig>");
-    else
-        me.notify("<hig>挑战成功，当前总榜积分" + sc + "。</hig>");
-    if (add > 0)
-        WORLD.COMMANDS.biwu.updatePlayerStats(me, sc, fam);
-    me.remove_temp('biwu_fam');
-}
-
-const COPY_TEMPS = ["copy_pfm_sword",//"copy_pfm",
-    "copy_pfm_unarmed", "jiuyang", "zyy"];
-const COPY_PROPS = ["str", "con", "dex", "int", "gender", "max_mp", "exp", "pot", "kar", "per"
-    , "name", "hp", "max_hp", "mp"];
-
-this.create_npc = function (player, fam) {
+    create_npc(player, fam) {
     var npc = NPC.CLONE('pub/gaoshou1');
     for (var i = 0; i < COPY_PROPS.length; i++) {
         npc[COPY_PROPS[i]] = player[COPY_PROPS[i]];
@@ -265,7 +180,7 @@ this.create_npc = function (player, fam) {
 
     return npc;
 }
-this.recount = function () {
+    recount() {
     this.max_hp = parseInt(this.con * 5 + (this.max_mp * this.query_force_rad() + this.query_prop("max_hp") + this.query_prop("con") * this.con) * (100 + this.query_prop("hp_per")) / 100);
 
     this.max_hp = this.max_hp;
@@ -298,7 +213,7 @@ this.recount = function () {
     this.diff_sh_per += this.query_prop('diff_sh_per2');
 
 }
-this.check_pfms = function (target) {
+    check_pfms(target) {
     if (!this.auto_skills) this.init_pfms()
     if (!this.equipment[0] && this.items[0] && this.random(3) === 0) {
         return this.equip(this.items[0]);
@@ -326,7 +241,7 @@ this.check_pfms = function (target) {
     }
     return CHARACTER.prototype.check_pfms.call(this, target);
 }
-this.init_pfms = function () {
+    init_pfms() {
     CHARACTER.prototype.init_pfms.call(this);
     this.auto_eqs = [];
     for (var i = 1; i < this.equipment.length; i++) {
@@ -335,11 +250,7 @@ this.init_pfms = function () {
         }
     }
 }
-
-
-
-const TOPS = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
-this.setStatsTitle = function (player, index, fam) {
+    setStatsTitle(player, index, fam) {
     if (fam) return;//门派称号先不用
 
     if (index < 10) {
@@ -351,7 +262,7 @@ this.setStatsTitle = function (player, index, fam) {
     else
         player.add_title(null, "top");
 }
-this.checkStats = function (player) {
+    checkStats(player) {
     let top = player.query_temp("top");
     if (top) {
         this.check_fams_stats(player, STATS.TOPS, top);
@@ -362,7 +273,7 @@ this.checkStats = function (player) {
     }
 
 }
-this.check_fams_stats = function (player, tops, top, fam) {
+    check_fams_stats(player, tops, top, fam) {
     let npc = tops[top - 1];
     if (!npc) return;
     let top_key = fam ? "top_fam" : "top";
@@ -377,9 +288,7 @@ this.check_fams_stats = function (player, tops, top, fam) {
         this.setStatsTitle(player, 9999, fam);
     }
 }
-
-
-this.updateTopStats = function (top, index, fam) {
+    updateTopStats(top, index, fam) {
     let top_user = top.userid ? WORLD.getUser(top.userid) : null;
     let top_key = fam ? "top_fam" : "top";
     if (index > 0) {
@@ -398,7 +307,7 @@ this.updateTopStats = function (top, index, fam) {
         }
     }
 }
-this.checkTopindex = function (sc, tops) {
+    checkTopindex(sc, tops) {
     let index = -1;
     for (let i = tops.length - 1; i >= 0; i--) {
         let item = tops[i];
@@ -407,7 +316,7 @@ this.checkTopindex = function (sc, tops) {
     }
     return 0;
 }
-this.updatePlayerStats = function (player, sc, fam) {
+    updatePlayerStats(player, sc, fam) {
 
     //玩家挑战没上榜不用管，挑战失败减分也不会下榜，因为没有记录以下的玩家
     //这里只会上升不会下降
@@ -444,8 +353,90 @@ this.updatePlayerStats = function (player, sc, fam) {
         //  player.notify('<hiy>恭喜你获得称号【' + "天下第" + TOPS[index] + '】</hiy>');
     }
 }
-
-this.biwu_watch = function (me) {
+    biwu_watch(me) {
 
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const CHARACTER = globalThis.CHARACTER;
+const NPC = globalThis.NPC;
+const USER = globalThis.USER;
+const STATS = WORLD.STATS;
+function challenge_end(killer) {
+    if (this.on_die && this.on_die(killer) === false) {
+        this.hp = 1;
+        return false;
+    }
+    let me = killer, npc = this;
+    if (this.is_player) {
+        npc = killer, me = this;
+    }
+    if (me.hp <= 0) me.hp = 1;
+    me.end_fight();
+    npc.end_fight();
+    if (killer === me) {
+        challenge_over(me, 1, npc);
+        challenge_success(me, npc);
+    } else {
+        challenge_over(me, 0, npc);
+        challenge_fail(me, npc);
+        //  me.notify("<cyn>挑战失败，你的积分保持不变。</cyn>");
+    }
+}
+function challenge_over(me, result, npc) {
+    me.environment.on_heart_beat = null;
+    me.die = USER.prototype.die
+    me.auto_pfm = false;
+    me.auto_skills = null;
+
+    me.check_pfms = USER.prototype.check_pfms;
+    me.init_pfms = USER.prototype.init_pfms;
+
+    let leitai = me.environment;
+    if (result === 0)
+        me.moveto('yz/leitai/ltx', null, me.name +
+            "被" + npc.name + "一脚踢下了擂台。", 'fightend');
+    else if (result === 1) {
+        me.moveto('yz/leitai/ltx', null, me.name +
+            "走了下来。", 'fightend');
+    } else {
+        me.moveto('yz/leitai/ltx', null, me.name +
+            "被赶下来。", 'fightend');
+    }
+    leitai.items.length = 0;
+    me.clear_downside(true);
+}
+function challenge_fail(me, npc) {
+    me.notify("<cyn>挑战失败，擂台积分保持不变。</cyn>");
+    me.remove_temp('biwu_fam');
+}
+function challenge_success(me, npc) {
+    const fam = me.query_temp('biwu_fam');
+    let top_key = fam ? "top_fam_sc" : "top_sc";
+    let sc = me.query_temp(top_key, 0);
+    let target_sc = npc.score ?? 0;
+    let add = Math.floor((target_sc - sc) / 2);
+    if (add === 0) {
+        add = 1;
+    }
+    if (add > 0) {
+        sc += add;
+        me.set_temp(top_key, sc);
+    } else {
+        add = 0;
+    }
+    if (fam)
+        me.notify("<hig>挑战成功，当前" + me.family.name + "榜单积分" + sc + "。</hig>");
+    else
+        me.notify("<hig>挑战成功，当前总榜积分" + sc + "。</hig>");
+    if (add > 0)
+        WORLD.COMMANDS.biwu.updatePlayerStats(me, sc, fam);
+    me.remove_temp('biwu_fam');
+}
+const COPY_TEMPS = ["copy_pfm_sword",//"copy_pfm",
+    "copy_pfm_unarmed", "jiuyang", "zyy"];
+const COPY_PROPS = ["str", "con", "dex", "int", "gender", "max_mp", "exp", "pot", "kar", "per"
+    , "name", "hp", "max_hp", "mp"];
+const TOPS = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];

@@ -1,17 +1,14 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "株",
-    name: "当归",
-    desc: "这是一株草药",
-    value: 1000,
-    transable: true,
-});
-this.otype = 3;
+export default class extends OBJ {
+    unit = "株";
+    name = "当归";
+    desc = "这是一株草药";
+    value = 1000;
+    transable = true;
+    otype = 3;
 
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var lv = parseInt(par);

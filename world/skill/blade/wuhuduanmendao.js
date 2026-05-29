@@ -1,13 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "五虎断门刀";
-this.id = "wuhuduanmendao";
-this.grade = 1;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "五虎断门刀";
+    id = "wuhuduanmendao";
+    grade = 1;
+    attack_actions = [
     "$N手中$w斜指，一招「直来直去」，反身一顿，一刀向$n的$l撩去",
     "$N一招「童子挂画」，左右腿虚点，$w一提一收，平刃挥向$n的颈部",
     "$N展身虚步，提腰跃落，一招「推窗望月」，刀锋一卷，拦腰斩向$n",
@@ -20,25 +17,9 @@ this.attack_actions = [
     "$N高高跃起，一招「人头落地」，手中$w直劈向$n的颈部",
     "$N贴地滑行，一招「断子绝孙」，手中$w直撩去$n的裆部"
 ];
-this.desc = "江湖上挺常见的刀法武功，以招式狠辣出名。茅十八的成名绝技。";
-//"\+(\w+)\+"(.+?)"\+NOR\+"
-//<$1>$2</$1>
-this.can_enables = ["blade"];
-this.on_learn = function (me) {
-    if (me.max_mp < 10)
-        return me.notify_fail("你的内力不够。");
-    if (me.query_skill("blade", 1) < 10)
-        return me.notify_fail("你的基础不够，无法领会更高深的技巧。");
-    return true;
-}
-this.query_enable_prop = function (lv) {
-    return {
-        blade: {
-            gj: lv
-        }
-    };
-}
-this.slots = [
+    desc = "江湖上挺常见的刀法武功，以招式狠辣出名。茅十八的成名绝技。";
+    can_enables = ["blade"];
+    slots = [
     {
         prop: 'whd_sh_max',
         value: (lv) => 20,
@@ -54,7 +35,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "断字诀",
@@ -91,4 +72,21 @@ this.pfm = {
         }
     }
 };
+
+    on_learn(me) {
+    if (me.max_mp < 10)
+        return me.notify_fail("你的内力不够。");
+    if (me.query_skill("blade", 1) < 10)
+        return me.notify_fail("你的基础不够，无法领会更高深的技巧。");
+    return true;
 }
+    query_enable_prop(lv) {
+    return {
+        blade: {
+            gj: lv
+        }
+    };
+}
+}
+
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

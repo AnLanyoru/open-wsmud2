@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "buy";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
-this.enter = function (me, count, objid, from) {
+export default class extends COMMAND {
+    command = "buy";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
+
+    enter(me, count, objid, from) {
     var target;
     if (from) {
         target = me.find_obj(from, me.environment);
@@ -83,3 +82,5 @@ this.enter = function (me, count, objid, from) {
     // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
 }
 }
+
+const UTIL = globalThis.UTIL;

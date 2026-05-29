@@ -1,21 +1,18 @@
 import { OBJ } from "../../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    name: "师徒关系解除通知",
-    desc: "",
-    unit: "封",
-    value: 0,
-    grade: 3
-});
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    name = "师徒关系解除通知";
+    desc = "";
+    unit = "封";
+    value = 0;
+    grade = 3;
+
+    on_create(path, par) {
     if (par) {
         this.target = par.substr(1);
     }
 }
-
-this.on_receive = function (me) {
+    on_receive(me) {
     if (!this.target) return;
     if (me.query_temp("tudi") == this.target) {
         var name = me.query_temp("tudi_n");

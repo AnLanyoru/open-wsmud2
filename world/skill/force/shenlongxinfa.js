@@ -1,31 +1,19 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "神龙心法";
-this.id = "shenlongxinfa";
-this.grade = 2;
-this.force_rad = 0.7;
-this.desc = "神龙教的心法，诡异无比";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "神龙心法";
+    id = "shenlongxinfa";
+    grade = 2;
+    force_rad = 0.7;
+    desc = "神龙教的心法，诡异无比";
+    can_enables = ["force"];
+    learn_condition = {
     skill: {
         force: 200
     },
     max_mp: 2000
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            max_hp: lv * 10,
-            limit_mp: lv * 70,
-            desc: "唯一：将你内力的70%转化为气血"
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'slxf_fy',
         value: (lv) => lv,
@@ -42,8 +30,7 @@ this.slots = [
         },
     },
 ];
-
-this.pfm = {
+    pfm = {
     power:
     {
         name: "不死神龙",
@@ -79,4 +66,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            max_hp: lv * 10,
+            limit_mp: lv * 70,
+            desc: "唯一：将你内力的70%转化为气血"
+        }
+    };
+}
 }

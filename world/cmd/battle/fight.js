@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "fight";
-this.enter = function (me, argid) {
+export default class extends COMMAND {
+    command = "fight";
+
+    enter(me, argid) {
     if (argid == "none") {
         var items = me.environment.items;
         for (var i = 0; i < items.length; i++) {

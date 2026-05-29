@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "greet";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "greet";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, arg) {
     if (arg == "master") {
         if (!me.query_temp("shifu")) {
             return me.notify("你还没有师父。");
@@ -71,3 +70,6 @@ this.enter = function (me, arg) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

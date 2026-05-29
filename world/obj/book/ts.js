@@ -1,15 +1,12 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-    const SKILL = globalThis.SKILL;
-this.inherits(OBJ);
-this.set({
-    unit: "份",
-    name: "无效武功",
-    desc: "查看技能提示"
-});
-this.transable = true;
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    unit = "份";
+    name = "无效武功";
+    desc = "查看技能提示";
+    transable = true;
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var skill = SKILL.get(par);
@@ -23,3 +20,5 @@ this.on_create = function (path, par) {
 
 }
 }
+
+const SKILL = globalThis.SKILL;

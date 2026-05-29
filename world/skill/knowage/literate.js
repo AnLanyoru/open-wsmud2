@@ -1,26 +1,12 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(SKILL);
-this.id = "literate";
-this.name = "读书写字";
-this.grade = 0;
-this.desc = "书中自有黄金屋，书中自有颜如玉，多读书会提高自己的悟性，减少技能的学习时间";
-this.type = SKILL_TYPES.KNOWLEDGE;
-this.query_prop = function (lv, me) {
-    let grade = 0;
-    if (me && me.is_player) {
-        grade = this.query_grade(me);
-    }
-
-    return { int: parseInt(lv / (10 - grade)) }
-}
-
-
-
-
-this.slots = [
+export default class extends SKILL {
+    id = "literate";
+    name = "读书写字";
+    grade = 0;
+    desc = "书中自有黄金屋，书中自有颜如玉，多读书会提高自己的悟性，减少技能的学习时间";
+    type = SKILL_TYPES.KNOWLEDGE;
+    slots = [
     {
         prop: "fenjie",
         name: "机关术",
@@ -128,4 +114,15 @@ this.slots = [
         }
     }
 ];
+
+    query_prop(lv, me) {
+    let grade = 0;
+    if (me && me.is_player) {
+        grade = this.query_grade(me);
+    }
+
+    return { int: parseInt(lv / (10 - grade)) }
 }
+}
+
+const SKILL_TYPES = globalThis.SKILL_TYPES;

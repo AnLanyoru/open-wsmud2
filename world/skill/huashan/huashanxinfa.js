@@ -1,18 +1,20 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "华山心法";
-this.id = "huashanxinfa";
-this.grade = 1;
-this.force_rad = 0.5;
-this.desc = "华山派的入门心法";
-this.family = FAMILIES.HUASHAN;
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.query_enable_prop = function (lv) {
+export default class extends SKILL {
+    name = "华山心法";
+    id = "huashanxinfa";
+    grade = 1;
+    force_rad = 0.5;
+    desc = "华山派的入门心法";
+    family = FAMILIES.HUASHAN;
+    can_enables = ["force"];
+    learn_condition = {
+    skill: {
+        force: 50
+    }
+};
+
+    query_enable_prop(lv) {
     return {
         force: {
             max_hp: lv,
@@ -21,9 +23,6 @@ this.query_enable_prop = function (lv) {
         }
     };
 }
-this.learn_condition = {
-    skill: {
-        force: 50
-    }
-};
 }
+
+const FAMILIES = globalThis.FAMILIES;

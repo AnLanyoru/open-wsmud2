@@ -1,14 +1,12 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "华山剑法";
-this.id = "huashanjianfa";
-this.grade = 1;
-this.is_public=true;
-this.family = FAMILIES.HUASHAN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "华山剑法";
+    id = "huashanjianfa";
+    grade = 1;
+    is_public = true;
+    family = FAMILIES.HUASHAN;
+    attack_actions = [
     "$N一招「白云出岫」，手中$w点向$n的$l",
     "$N使出「有凤来仪」，$w闪烁不定，刺向$n的$l",
     "$N一招「天绅倒悬」，$w自上而下划出一个大弧，向$n劈砍下去",
@@ -16,25 +14,15 @@ this.attack_actions = [
     "$N手中的$w一晃，使出「苍松迎客」直刺$n的$l"
 
 ];
-this.desc = "华山派的基础剑法";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["sword"];
-this.learn_condition = {
+    desc = "华山派的基础剑法";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         sword: 50
     }
 };
-
-this.query_enable_prop = function(lv) {
-    return {
-        sword: {
-            gj: lv + 10
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     jiang:
     {
         name: "剑掌五连环",
@@ -61,4 +49,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: lv + 10
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;

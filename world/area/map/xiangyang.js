@@ -1,20 +1,16 @@
 import { AREA } from "../../../os/room/area.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(AREA);
-this.set({
-    id: "xiangyang",
-    name: "襄阳城",
-    desc: "这里是镇守北方的襄阳城，这里常年征战，江湖中能人义士没事都喜欢过来这里支援下坚守此地的郭大侠",
-    is_area: true,
-    first: "xiangyang/guangchang",
-    no_cache: true,
-    index: 8,
-    room_path: "xiangyang/",
-    is_public: true
-});
-this.map = [
+export default class extends AREA {
+    id = "xiangyang";
+    name = "襄阳城";
+    desc = "这里是镇守北方的襄阳城，这里常年征战，江湖中能人义士没事都喜欢过来这里支援下坚守此地的郭大侠";
+    is_area = true;
+    first = "xiangyang/guangchang";
+    no_cache = true;
+    index = 8;
+    room_path = "xiangyang/";
+    is_public = true;
+    map = [
     { n: "中央广场", id: "xiangyang/guangchang", p: [0, 0], exits: ["w", "e", "s", "n"] },
     { n: "东大街", id: "xiangyang/eastjie1", p: [1, 0] },
     { n: "东大街", id: "xiangyang/eastjie2", p: [2, 0], exits: ["w", "e"] },
@@ -66,7 +62,7 @@ this.map = [
     { n: "城墙", id: "xiangyang/walle28", p: [4, 1], exits: ["s", "n"] },
 ];
 
-this.on_enter = function (me) {
+    on_enter(me) {
 
     var status = WORLD.DATA.query_temp("xy_status", 0);
     if (status !== 1) return;
@@ -101,45 +97,7 @@ this.on_enter = function (me) {
     //     // WORLD.DATA.add_temp("xy_users", 1);
     // }
 }
-// function is_bm(user) {
-//     var bm = user.query_temp('xy_bm');
-//     if (!bm) return false;
-//     return Date.now() - bm < 3600000;
-// }
-// this.query_desc = function () {
-//     var str = [this.desc];
-//     str.push("\r\n");
-//     var index = WORLD.DATA.query_temp("xiangyang") + 20;
-//     var status = WORLD.DATA.query_temp("xy_status", 0);
-//     var user_count = WORLD.DATA.query_temp("xy_users", 0);
-//     var pt = WORLD.DATA.query_temp('xy_party');
-//     if (status == 0) {
-//         str.push("<hic>目前襄阳无战事</hic>");
-//     }
-//     else if (status == 1) {
-//         if (pt) {
-//             str.push("<mag>襄阳战事正紧，" + pt + "正在协助守城</mag>");
-//         } else {
-//             str.push("<mag>襄阳战事正紧，目前有" + user_count + "/40位大侠正在参与守城</mag>");
-//         }
-//     }
-
-
-//     else if (status == 12) {
-
-//         str.push("<hig>武神历" + UTIL.to_c(index) + "年蒙古可汗蒙哥被击杀于襄阳城下，襄阳城大获全胜！郭大侠犒赏全军，" + (pt ? pt : "所有玩家") + "获得200军功！</hig>");
-//     } else if (status == 10) {
-
-//         str.push("<hir>武神历" + UTIL.to_c(index) + "年郭大侠战死襄阳，襄阳城失守！</hir>");
-//     } else if (status == 11) {
-
-//         str.push("<hig>武神历" + UTIL.to_c(index) + "年蒙古大军久攻不下从襄阳城撤退，襄阳危机解除！郭大侠犒赏全军，" + (pt ? pt : "所有玩家") + "获得100军功!</hig>");
-//     }
-//     return str.join("");
-// }
-
-
-this.query_actions = function (me) {
+    query_actions(me) {
     let actions = [];
     let index = WORLD.DATA.query_temp("xiangyang") + 20;
     let status = WORLD.DATA.query_temp("xy_status", 0);
@@ -169,3 +127,6 @@ this.query_actions = function (me) {
     return actions;
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

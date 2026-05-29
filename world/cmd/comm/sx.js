@@ -1,21 +1,20 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const EVENTS = globalThis.EVENTS;
-this.inherits(COMMAND);
-this.command = "sx";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(\w+)(?:\s+(\w+))?(?:\s+(\w+))?$/;
-this.enter = function (me, type, par1, par2) {
+export default class extends COMMAND {
+    command = "sx";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(\w+)(?:\s+(\w+))?(?:\s+(\w+))?$/;
+
+    enter(me, type, par1, par2) {
     if (type === 'greet') {
         this.do_greet(me);
     } else {
         this.do_manage(me, par1, par2);
     }
 }
-this.do_greet = function (me) {
+    do_greet(me) {
     let npc = me.family.first_npc;
     if (!npc) return me.send('首席目前不在线。');
     if (me.level > 5) return me.notify("堂堂武神大人就不要凑热闹了好吧。");
@@ -53,7 +52,7 @@ this.do_greet = function (me) {
     }
     me.add_exp(val, val);
 }
-this.check_power = function (me, npc) {
+    check_power(me, npc) {
     if (npc.family != me.family) {
         return me.notify_fail("你又不是" + npc.family.name + "弟子，凑什么热闹。");
     }
@@ -62,16 +61,7 @@ this.check_power = function (me, npc) {
     }
     return true;
 }
-// this.add_action('manage1', null, function (me, paras) {
-
-//     if (!this.check_power(me)) return;
-//     if (WORLD.DATA.query_temp(this.family.id + "_buff", 0))
-//         return me.send('今天已经设置过增益效果了。');
-//     console.log(paras)
-// });
-
-
-this.do_manage = function (me, par1, par2) {
+    do_manage(me, par1, par2) {
     let npc = me.family.first_npc;
     if (!npc) return me.send('你的门派还没有首席弟子。');
     if (!this.check_power(me, npc)) return;
@@ -86,8 +76,7 @@ this.do_manage = function (me, par1, par2) {
     me.send("你是" + npc.title + "，可以更改一些设置。");
     me.send_commands('sx manage buff', '设置增益', 'sx manage battle', '发起门派战争');
 }
-
-this.manage_buff = function (me, par2) {
+    manage_buff(me, par2) {
     let buff = me.family.query_temp("buff", 0);
     if (buff >= 1)
         return me.send('今天已经设置过门派增益了。');
@@ -126,8 +115,7 @@ this.manage_buff = function (me, par2) {
         me.set_temp('qingan', 1, UTIL.diff_time());
     }
 }
-const FAMS = ['WUDANG', 'SHAOLIN', 'HUASHAN', 'EMEI', 'GAIBANG', 'XIAOYAO'];
-this.manage_battle = function (me, par2) {
+    manage_battle(me, par2) {
     if (me.family === FAMILIES.NONE)
         return me.send('你无门无派，要干什么？');
     if (me.family === FAMILIES.SHASHOU)
@@ -173,8 +161,7 @@ this.manage_battle = function (me, par2) {
     me.family.check_battle(me, null, fam);
     me.family.send_channel(me, "所有门下弟子听令，开始进攻" + fam.name);
 }
-
-this.manage_battle2 = function (me, par2) {
+    manage_battle2(me, par2) {
     if (me.family.query_temp("sxwar", 0) >= 5)
         return me.send('杀手楼每天最多可介入5次其他门派的战争。');
     if (me.family.query_temp('battle')) {
@@ -224,3 +211,9 @@ this.manage_battle2 = function (me, par2) {
     });
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const FAMILIES = globalThis.FAMILIES;
+const EVENTS = globalThis.EVENTS;
+const FAMS = ['WUDANG', 'SHAOLIN', 'HUASHAN', 'EMEI', 'GAIBANG', 'XIAOYAO'];

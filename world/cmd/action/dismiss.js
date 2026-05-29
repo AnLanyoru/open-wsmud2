@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const FOLLOWER = globalThis.FOLLOWER;
-this.inherits(COMMAND);
-this.command = "dismiss";
-this.regex = /^(\w+)(\s+ok)?$/;
-this.enter = function (me, objid, isok) {
+export default class extends COMMAND {
+    command = "dismiss";
+    regex = /^(\w+)(\s+ok)?$/;
+
+    enter(me, objid, isok) {
     var npc = me.find_obj(objid, me.environment);
     if (!npc) return me.notify("你要遣散谁？");
     if (!npc.master || npc.master != me.id) return me.notify("你不能遣散" + npc.call3() + "。");
@@ -31,3 +30,5 @@ this.enter = function (me, objid, isok) {
     }
 }
 }
+
+const FOLLOWER = globalThis.FOLLOWER;

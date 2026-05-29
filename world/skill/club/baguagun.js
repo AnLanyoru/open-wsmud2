@@ -1,11 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "八卦棍法";
-this.id = "baguagun";
-this.grade = 2;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "八卦棍法";
+    id = "baguagun";
+    grade = 2;
+    attack_actions = [
     "$N脚踏八卦方位，盘身驻地，一招「削耳撩腮」，手中$w由上至下向$n扫去",
     "$N脚踏八卦方位，反转棍尖，一招「反身劈山」，手中$w竟然用反身刺向$n的胸前",
     "$N一提气，劲贯$w“嗡嗡”做响，一招「上歪门」，自上而下直插$n的头顶",
@@ -15,17 +14,15 @@ this.attack_actions = [
     "$N身形一转，手中$w往后一拖，就在这将退未退之际，一招「峰回路转」，向$n当头砸下"
 
 ];
-this.desc = "温府的一套棍法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["club"];
-this.learn_condition = {
+    desc = "温府的一套棍法";
+    can_enables = ["club"];
+    learn_condition = {
     max_mp: 800,
     skill: {
         club: 250
     }
 };
-this.slots = [
+    slots = [
     {
         prop: 'bgg_mz',
         value: (lv) => 10,
@@ -51,16 +48,7 @@ this.slots = [
         },
     },
 ];
-
-this.query_enable_prop = function (lv) {
-    return {
-        club: {
-            gj: parseInt(lv * 1.2) + 20,
-            mz: parseInt(lv * 1.2) + 20
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     wu:
     {
         name: "八卦八打",
@@ -94,4 +82,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        club: {
+            gj: parseInt(lv * 1.2) + 20,
+            mz: parseInt(lv * 1.2) + 20
+        }
+    };
+}
 }

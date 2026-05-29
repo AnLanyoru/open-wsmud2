@@ -1,8 +1,7 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "林间小径"
-this.desc = "你走在一条小径上，两旁种满了竹子，修篁森森，绿荫满地，除了竹叶声和鸟鸣声，听不到别的动静。";
-this.exits = { "south": "wd/zijin", "north": "wd/xiaolu2" };
+export default class extends ROOM {
+    name = "林间小径";
+    desc = "你走在一条小径上，两旁种满了竹子，修篁森森，绿荫满地，除了竹叶声和鸟鸣声，听不到别的动静。";
+    exits = { "south": "wd/zijin", "north": "wd/xiaolu2" };
 }

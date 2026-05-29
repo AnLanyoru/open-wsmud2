@@ -1,17 +1,14 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
-this.inherits(OBJ);
-this.set({
-    unit: "份",
-    name: "秘籍碎片",
-    desc: "一本武功秘籍",
-    max_level: 100
-});
-this.transable = true;
-this.otype = 1;
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    unit = "份";
+    name = "秘籍碎片";
+    desc = "一本武功秘籍";
+    max_level = 100;
+    transable = true;
+    otype = 1;
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var skill = SKILL.get(par);
@@ -28,5 +25,8 @@ this.on_create = function (path, par) {
     this.value = WORLD.DATA.book_values[this.grade];
 
 }
-const COMBINED = [10, 10, 30, 50, 100, 200, 500];
 }
+
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;
+const COMBINED = [10, 10, 30, 50, 100, 200, 500];

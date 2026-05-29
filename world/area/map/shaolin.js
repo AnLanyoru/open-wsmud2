@@ -1,19 +1,16 @@
 import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
-export default function() {
-this.inherits(FAMILY_AREA);
-this.set({
-    id: "shaolin",
-    name: "少林派",
-    desc: "佛家门派，由域外僧人达摩所创，历史悠久，不仅精研佛法，武功亦是不凡，有天下武功出少林之说",
-    sp: "只收男弟子，需要剃度，防御高，气血长",
-    first: "shaolin/guangchang",
-    is_area: true,
-    index: 2,
-    room_path: "shaolin/",
-    family: "SHAOLIN"
-});
-this.map = [
+export default class extends FAMILY_AREA {
+    id = "shaolin";
+    name = "少林派";
+    desc = "佛家门派，由域外僧人达摩所创，历史悠久，不仅精研佛法，武功亦是不凡，有天下武功出少林之说";
+    sp = "只收男弟子，需要剃度，防御高，气血长";
+    first = "shaolin/guangchang";
+    is_area = true;
+    index = 2;
+    room_path = "shaolin/";
+    family = "SHAOLIN";
+    map = [
     { n: "广场", id: "shaolin/guangchang", p: [0, 5] },
     { n: "山门殿", id: "shaolin/shanmen", p: [0, 4], exits: ["w", "e", "n", "s"] },
     { n: "东侧殿", id: "shaolin/liangong1", p: [1, 4] },

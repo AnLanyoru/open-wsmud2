@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "云龙鞭法";
-this.id = "yunlongbian";
-this.grade = 1;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "云龙鞭法";
+    id = "yunlongbian";
+    grade = 1;
+    attack_actions = [
     "$N单手一扬，一招「开天辟地」，手中$w抖得笔直，对准$n当头罩下",
     "$N身形一转，一招「龙腾四海」，手中$w如矫龙般腾空一卷，猛地击向$n太阳穴",
     "$N唰的一抖长鞭，一招「矫龙出水」，手中$w抖得笔直，刺向$n双眼",
@@ -16,35 +14,15 @@ this.attack_actions = [
     "$N高高跃起，一招「大漠孤烟」，手中$w笔直向$n当头罩下"
 
 ];
-this.desc = "云龙门";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["whip"];
-//this.on_learn = function (me) {
-//    if (me.max_mp < 100)
-//        return me.notify_fail("你的内力不够。");
-//    if (me.query_skill("sword", 1) < 60)
-//        return me.notify_fail("你的基础不够，无法领会更高深的技巧。");
-//    if (me.query_skill("yunlongxinfa", 1) < 60)
-//        return me.notify_fail("你的云龙心法等级不够，无法学习云龙剑。");
-//    return true;
-//}
-this.learn_condition = {
+    desc = "云龙门";
+    can_enables = ["whip"];
+    learn_condition = {
     max_mp: 100,
     skill: {
         whip: 50
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        whip: {
-            gj: parseInt(lv * 1 + 10),
-            mz: lv
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'ylbf_ml',
         value: (lv) => 1000,
@@ -60,7 +38,7 @@ this.slots = [
         },
     }
 ];
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "缠字诀",
@@ -97,4 +75,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        whip: {
+            gj: parseInt(lv * 1 + 10),
+            mz: lv
+        }
+    };
+}
 }

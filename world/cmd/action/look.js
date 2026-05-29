@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "look,l";
-this.allow_busy = true;
-this.allow_state = true;
-this.regex = /^(\w+?)?(?:\sof\s(\w+))?$/;
-//只能看房间里的物品
-this.enter = function (player, objid, from) {
+export default class extends COMMAND {
+    command = "look,l";
+    allow_busy = true;
+    allow_state = true;
+    regex = /^(\w+?)?(?:\sof\s(\w+))?$/;
+
+    enter(player, objid, from) {
     if (!objid) {
 
         //player.notify(parent.items_to_json());
@@ -58,9 +57,7 @@ this.enter = function (player, objid, from) {
 
     //this.exec(player,obj);
 }
-var look_str = ["$N正盯着$n看，不知道在打什么主意。", "$N笑眯眯的看着$n，不知道在想些什么。"];
-
-this.obs = function (me, target) {
+    obs(me, target) {
     let obs = me.query_prop('obs');
     if (!obs || target.is_player || !target.attack_skill) return;
     if (me.query_temp('obs')) return;
@@ -96,6 +93,8 @@ this.obs = function (me, target) {
     }
     me.set_temp('obs', 1, 10000);
 }
+}
+
+var look_str = ["$N正盯着$n看，不知道在打什么主意。", "$N笑眯眯的看着$n，不知道在想些什么。"];
 const PROPS1 = ['hp', 'mp', 'gj', 'fy', 'mz', 'ds', 'zj'];
 const PROPS2 = ['气血', '内力', '攻击', '防御', '命中', '躲闪', '招架'];
-}

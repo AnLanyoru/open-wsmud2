@@ -1,17 +1,15 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "粒",
-    name: "聚气丹",
-    grade: 1,
-    desc: "江湖中各大门派用来给入门弟子快速增加内力的丹药。",
-    value: 1000,
-    add_mp: 10
-});
-this.transable = true;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "粒";
+    name = "聚气丹";
+    grade = 1;
+    desc = "江湖中各大门派用来给入门弟子快速增加内力的丹药。";
+    value = 1000;
+    add_mp = 10;
+    transable = true;
+
+    on_use(me) {
     if (me.max_mp >= me.limit_mp + me.query_prop("limit_mp")) {
         return me.notify_fail("你的经脉容纳不了再多的内力了。");
     }
@@ -19,8 +17,7 @@ this.on_use = function (me) {
     var count = this.random(this.add_mp / 2) + this.add_mp / 2;
     me.add_maxmp(count);
 }
-
-this.on_create = function (path, par) {
+    on_create(path, par) {
     var lv = 0;
     if (!par) {
         this.path = path + "#0";

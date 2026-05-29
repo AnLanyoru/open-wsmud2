@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "qu";
-this.regex = /^(?:(\d+\s+))?(\w+)$/;
-this.enter = function (me, count, arg) {
+export default class extends COMMAND {
+    command = "qu";
+    regex = /^(?:(\d+\s+))?(\w+)$/;
+
+    enter(me, count, arg) {
     if (!me.environment.allow_store) return me.notify("这里没有仓库。");
 
     if (!arg) return me.notify("你要取什么东西？");
@@ -27,3 +26,5 @@ this.enter = function (me, count, arg) {
 
 }
 }
+
+const UTIL = globalThis.UTIL;

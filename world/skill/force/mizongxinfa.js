@@ -1,22 +1,20 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "密宗心法";
-this.id = "mizongxinfa";
-this.grade = 1;
-this.force_rad = 0.6;
-this.desc = "密宗的入门心法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "密宗心法";
+    id = "mizongxinfa";
+    grade = 1;
+    force_rad = 0.6;
+    desc = "密宗的入门心法";
+    can_enables = ["force"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         force:100
     }
 };
-this.query_enable_prop = function (lv) {
+
+    query_enable_prop(lv) {
     return {
         force: {
             max_hp: lv * 3,

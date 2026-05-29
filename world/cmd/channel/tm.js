@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "tm";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, str) {
+export default class extends COMMAND {
+    command = "tm";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, str) {
     if (!str) return;
     if (me.query_temp("no_chat")) return me.notify("你目前被禁言中。");
     if (str.length > 200) return me.notify("你说的太多了。");
@@ -25,3 +24,6 @@ this.enter = function (me, str) {
     me.add_temp('chat2', 1, UTIL.diff_time());
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

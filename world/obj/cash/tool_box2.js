@@ -1,15 +1,13 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    name: "工具包",
-    desc: "里面有一套黄色工具，几个橙色鱼饵，指南",
-    unit: "个",
-    value: 0,
-    grade: 5
-});
-this.on_open = function (me) {
+export default class extends OBJ {
+    name = "工具包";
+    desc = "里面有一套黄色工具，几个橙色鱼饵，指南";
+    unit = "个";
+    value = 0;
+    grade = 5;
+
+    on_open(me) {
     let index = me.add_temp('gjx1', 1);
     let result = [];
     if (index === 1) {

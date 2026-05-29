@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-this.inherits(COMMAND);
-this.command = "shortcut";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (player, arg) {
+export default class extends COMMAND {
+    command = "shortcut";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(player, arg) {
     if (!arg) return;
     var obj = player.find_obj(arg);
     if (!obj) {
@@ -33,3 +32,5 @@ this.enter = function (player, arg) {
     }
 }
 }
+
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;

@@ -1,12 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "say";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, msg) {
+export default class extends COMMAND {
+    command = "say";
+    allow_busy = true;
+    allow_state = true;
+
+    enter(me, msg) {
 
     if (!msg) {
         return me.send_room("$N在自言自语的说些什么。");
@@ -22,3 +21,5 @@ this.enter = function (me, msg) {
     return me.send_room("$N说：" + UTIL.htmlEncode(msg));
 }
 }
+
+const UTIL = globalThis.UTIL;

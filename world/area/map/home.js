@@ -1,15 +1,12 @@
 import { AREA } from "../../../os/room/area.js";
 
-export default function() {
-this.inherits(AREA);
-this.set({
-    name: "住房",
-    room_path: "home/",
-    id: "home",
-    is_copy: true,
-    not_fb: true
-});
-this.map = [{ n: "卧室", id: "home/danjian", p: [0, 0] },
+export default class extends AREA {
+    name = "住房";
+    room_path = "home/";
+    id = "home";
+    is_copy = true;
+    not_fb = true;
+    map = [{ n: "卧室", id: "home/danjian", p: [0, 0] },
 { n: "卧室", id: "home/woshi", p: [4, 0] },
 { n: "院子", id: "home/yuanzi", p: [4, 1], exits: ["w", "e", "n"] },
 { n: "练功房", id: "home/liangong", p: [3, 1] },
@@ -17,7 +14,7 @@ this.map = [{ n: "卧室", id: "home/danjian", p: [0, 0] },
 { n: "小花园", id: "home/huayuan", p: [5, 0] }
 ];
 
-this.query_owner = function (me) {
+    query_owner(me) {
     return me.id;
 }
 }

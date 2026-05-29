@@ -1,15 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "status";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (me, type, tid) {
+export default class extends COMMAND {
+    command = "status";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    enter(me, type, tid) {
     if (type) {
         var target = me;
         if (tid) {
@@ -47,3 +46,5 @@ this.enter = function (me, type, tid) {
     }
 }
 }
+
+const UTIL = globalThis.UTIL;

@@ -1,19 +1,27 @@
 import { TASK } from "../../os/task/task.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC; const AREA = globalThis.AREA; const ROOM = globalThis.ROOM; const EVENTS = globalThis.EVENTS; const COMMAND = globalThis.COMMAND;
-this.inherits(TASK);
-this.id = "xiangyang";
-this.is_start = false;
-this.guards = [];
-this.boss = null;
-this.guard = null;
-this.allow_commands = {
+export default class extends TASK {
+    id = "xiangyang";
+    is_start = false;
+    guards = [];
+    boss = null;
+    guard = null;
+    allow_commands = {
     bm: true,
     reward: true,
     juanxian: true
 };
-this.startup = function () {
+    step = 0;
+    count = 0;
+    create_index = 0;
+    gate_states = [
+    { step: 0, bing: [], dir: "north", enter: "xiangyang/northgate2", name: "北门", wall_count: 0, wall_index: [4, 5, 6, 7, 8, 9, 10, 11] },
+    { step: 0, bing: [], dir: "west", enter: "xiangyang/westgate2", name: "西门", wall_count: 0, wall_index: [11, 1, 2, 13, 14, 15, 16, 17, 18] },
+    { step: 0, bing: [], dir: "south", enter: "xiangyang/southgate2", name: "南门", wall_count: 0, wall_index: [18, 19, 20, 21, 22, 23, 24, 25] },
+    { step: 0, bing: [], dir: "east", enter: "xiangyang/eastgate2", name: "东门", wall_count: 0, wall_index: [25, 26, 27, 28, 1, 2, 3, 4] }
+];
+
+    startup() {
     if (this.start_handler) clearTimeout(this.start_handler);
     var date = new Date();
     var week = date.getDay();
@@ -24,20 +32,17 @@ this.startup = function () {
     this.next_date = next_date;
     //this.start_handler = this.call_out(this.run, next_date - date + 10);
 }
-
-this.can_battle = function () {
+    can_battle() {
     return Date.now() > 1756674000000;
 }
-
-
-this.on_mihan = function () {
+    on_mihan() {
     if (!this.can_battle()) return;
     COMMAND.DO("rumor", "听说郭大侠收到线报蒙古大军近日将会进攻襄阳！");
     WORLD.DATA.set_temp("xy_status", 1);
     this.xy_area.notify_update();
     this.call_out(this.run, 300000);
 }
-this.clear_player = function () {
+    clear_player() {
     let msg =
         JSON.stringify({
             type: "msg", ch: "chat",
@@ -61,13 +66,12 @@ this.clear_player = function () {
         }
     }
 }
-
-this.stop = function () {
+    stop() {
     if (this.start_handler) clearTimeout(this.start_handler);
 
     if (this.check_handler) clearTimeout(this.check_handler);
 }
-this.run = function () {
+    run() {
     this.start_handler = null;
     if (this.is_start) return;
     var index = WORLD.DATA.add_temp("xiangyang", 1) + 20;
@@ -81,7 +85,7 @@ this.run = function () {
     this.create_guards();
     this.call_out(this.create_enemy, 10000);
 }
-this.create_guards = function () {
+    create_guards() {
     this.guard = ROOM.Get("xiangyang/guangchang").find_obj_bypath("xiangyang/guo");
     if (!this.guard) {
         this.guard = NPC.CLONE("xiangyang/guo");
@@ -123,12 +127,7 @@ this.create_guards = function () {
         }
     }
 }
-this.step = 0;
-this.count = 0;
-this.create_index = 0;
-//没隔30秒出现一波5敌人，如果城门被破+10
-//每隔20波增强一波
-this.create_enemy = function (par) {
+    create_enemy(par) {
     if (!this.is_start) return;
     this.create_handler = null;
 
@@ -175,14 +174,12 @@ this.create_enemy = function (par) {
     }
 
 }
-//第一波 每次5个蒙古兵
-this.create_enemy0 = function (par) {
+    create_enemy0(par) {
     for (var i = par.bing.length; i < 5; i++) {
         par.bing.push(this.create_one(5, par.enter_room));
     }
 }
-//第二波 每次4个蒙古兵+1个十夫长
-this.create_enemy1 = function (par) {
+    create_enemy1(par) {
     if (!par.boss) {
         par.boss = this.create_one(4, par.enter_room);
     }
@@ -190,8 +187,7 @@ this.create_enemy1 = function (par) {
         par.bing.push(this.create_one(5, par.enter_room));
     }
 }
-//第三波 每次3个蒙古兵+1个十夫长+1个百夫长
-this.create_enemy2 = function (par) {
+    create_enemy2(par) {
     if (!par.boss) {
         par.boss = this.create_one(3, par.enter_room);
     }
@@ -199,8 +195,7 @@ this.create_enemy2 = function (par) {
         par.bing.push(this.create_one(i == 3 ? 4 : 5, par.enter_room));
     }
 }
-//第四波 每次3个十夫长+1个百夫长+1个千夫长
-this.create_enemy3 = function (par) {
+    create_enemy3(par) {
     if (!par.boss) {
         par.boss = this.create_one(2, par.enter_room);
     }
@@ -208,8 +203,7 @@ this.create_enemy3 = function (par) {
         par.bing.push(this.create_one(i == 3 ? 3 : 4, par.enter_room));
     }
 }
-//第五波 万夫长+2个千夫长
-this.create_enemy4 = function (par) {
+    create_enemy4(par) {
     if (!par.boss) {
         par.boss = this.create_one(1, par.enter_room);
     }
@@ -217,8 +211,7 @@ this.create_enemy4 = function (par) {
         par.bing.push(this.create_one(i == 0 ? 2 : 4, par.enter_room));
     }
 }
-//第五波 万夫长+2个千夫长
-this.create_enemy5 = function (par) {
+    create_enemy5(par) {
     if (!par.boss) {
         par.boss = this.create_one(1, par.enter_room);
     }
@@ -226,7 +219,7 @@ this.create_enemy5 = function (par) {
         par.bing.push(this.create_one(i < 2 ? 2 : 3, par.enter_room));
     }
 }
-this.create_one = function (index, rm, iswall) {
+    create_one(index, rm, iswall) {
     var npc = NPC.CLONE("xiangyang/menggu" + index);
     npc.name = this.create_mgname();
     npc.diff_level = 5 - index;
@@ -253,7 +246,7 @@ this.create_one = function (index, rm, iswall) {
     }
     return npc;
 }
-this.create_mgname = function () {
+    create_mgname() {
     var str = ["完颜", "纥石烈", "兀颜", "纳兰", "阿迭"].random();
     str += UTIL.name2[parseInt(Math.random() * UTIL.name2.length)];
     if (this.random(4) == 1) {
@@ -261,23 +254,17 @@ this.create_mgname = function () {
     }
     return str;
 }
-this.gate_states = [
-    { step: 0, bing: [], dir: "north", enter: "xiangyang/northgate2", name: "北门", wall_count: 0, wall_index: [4, 5, 6, 7, 8, 9, 10, 11] },
-    { step: 0, bing: [], dir: "west", enter: "xiangyang/westgate2", name: "西门", wall_count: 0, wall_index: [11, 1, 2, 13, 14, 15, 16, 17, 18] },
-    { step: 0, bing: [], dir: "south", enter: "xiangyang/southgate2", name: "南门", wall_count: 0, wall_index: [18, 19, 20, 21, 22, 23, 24, 25] },
-    { step: 0, bing: [], dir: "east", enter: "xiangyang/eastgate2", name: "东门", wall_count: 0, wall_index: [25, 26, 27, 28, 1, 2, 3, 4] }
-];
-this.check_enemy = function (me) {
+    check_enemy(me) {
     if (me.is_menggubing) {
         this.do_kill(me);
     }
 }
-this.check_enemy2 = function (me) {
+    check_enemy2(me) {
     if (!this.fight_type && me.is_player) {
         this.do_kill(me);
     }
 }
-this.on_guard_die = function (npc, killer, corpse) {
+    on_guard_die(npc, killer, corpse) {
     if (killer.is_player) {
         // var count = [1, 2, 3, 4, 5, 5][5 - parseInt(npc.path.replace('xiangyang/shouwei', ''))];
         // if (count > 0) {
@@ -311,7 +298,7 @@ this.on_guard_die = function (npc, killer, corpse) {
         }
     }
 }
-this.show_boss = function (gate) {
+    show_boss(gate) {
     if (this.boss) return;
     if (gate)
         this.send_message("襄阳城" + gate.name + "被攻破，蒙古各路大军长驱直入，蒙古大汗蒙哥出现在战场中央。");
@@ -346,7 +333,7 @@ this.show_boss = function (gate) {
     ROOM.Get("xiangyang/guangchang").item_changed(npc, true, npc.name + "出现了。");
     this.check_handler = this.call_out(this.finish.bind(this, 2), 600000);
 }
-this.query_enemycount = function () {
+    query_enemycount() {
     var sum = 0;
     for (var i = 0; i < this.gate_states.length; i++) {
         var gate = this.gate_states[i];
@@ -356,7 +343,7 @@ this.query_enemycount = function () {
     }
     return sum;
 }
-this.on_bing_die = function (npc, killer) {
+    on_bing_die(npc, killer) {
     if (!this.is_start) return;
     if (npc == this.boss) {
         this.finish(1);
@@ -378,7 +365,7 @@ this.on_bing_die = function (npc, killer) {
     }
 
 }
-this.check_move = function (npc) {
+    check_move(npc) {
     if (npc.environment.is("xiangyang/guangchang")) return;
     for (var i = 0; i < npc.environment.items.length; i++) {
         if (npc.environment.items[i].is_dasong) return;
@@ -398,9 +385,7 @@ this.check_move = function (npc) {
             break;
     }
 }
-
-
-this.finish = function (issuc) {
+    finish(issuc) {
     if (!this.is_start) return;
     if (this.check_handler) clearTimeout(this.check_handler);
     for (var i = 0; i < this.gate_states.length; i++) {
@@ -454,11 +439,10 @@ this.finish = function (issuc) {
     WORLD.DATA.remove_temp("xy_users");
     this.call_out(this.reset, 3600000);
 }
-this.send_message = function (str, sendall) {
+    send_message(str, sendall) {
     COMMAND.DO("sys", str);
 }
-
-this.create_event = function (issuc) {
+    create_event(issuc) {
     let desc = null, command = null;
     if (issuc === 1) {
         desc = "襄阳守城活动结束，襄阳城大获全胜，可直接领取犒赏军功！";
@@ -487,22 +471,16 @@ this.create_event = function (issuc) {
         }
     });
 }
-this.reset = function () {
+    reset() {
     this.xy_area.notify_update();
 }
-
-this.jg_limit = function (me) {
+    jg_limit(me) {
     return JUNGONG_LIMITS[me.level];
 }
-
-
-this.is_jgmax = function (me) {
+    is_jgmax(me) {
     return me.query_temp('jg_week', 0) >= JUNGONG_LIMITS[me.level];
 }
-
-const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];//奖励等级对应的每份上限
-const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];//每周功绩上限
-this.reward = function (me, msg = "") {
+    reward(me, msg = "") {
     var status = WORLD.DATA.query_temp("xy_status", 0);
     if (!status) {
         return me.notify(msg + "最近没什么战事，你可以使用你累积的军功兑换物资！");
@@ -532,8 +510,7 @@ this.reward = function (me, msg = "") {
     return me.notify("<hiy>你领取了" + added + "点军功，目前" + max + "。</hiy>");
 
 }
-
-this.bm = function (me, msg = "") {
+    bm(me, msg = "") {
     if (me.query_temp("xy_bm")) {
         return me.notify_fail(msg + "你已经报名守城了。");
     }
@@ -563,24 +540,7 @@ this.bm = function (me, msg = "") {
     me.notify("<hic>你已经报名参与守城，一周内所获军功未到上限前可重复报名。</hic>");
     return true;
 }
-
-function add_jungong(me, count) {
-    let max = JUNGONG_LIMITS[me.level];
-    if (me.query_temp('jg_week', 0) >= max) return false;
-    let value = me.add_temp('jg_week', count, UTIL.diff_week_time());
-    if (value > max) {
-        me.add_temp('jg_week', max - value, UTIL.diff_week_time());
-        count = count + max - value;
-        me.add_temp('jg', count);
-        value = max;
-    } else {
-        me.add_temp('jg', count);
-    }
-    me.notify("<hiy>你获得了" + count + "点军功，本周已获得"
-        + value + "/" + max + "。</hiy>");
-}
-
-this.on_bing_died = function (killer, corpse) {
+    on_bing_died(killer, corpse) {
     if (!killer) return;
     corpse.no_alloc = true;
     corpse.clear_items = clear_items.bind(this, corpse);
@@ -602,13 +562,35 @@ this.on_bing_died = function (killer, corpse) {
             corpse.disappear();
     }
 }
+}
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const UTIL = globalThis.UTIL;
+const NPC = globalThis.NPC;
+const AREA = globalThis.AREA;
+const ROOM = globalThis.ROOM;
+const EVENTS = globalThis.EVENTS;
+const COMMAND = globalThis.COMMAND;
+const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];
+const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];
+function add_jungong(me, count) {
+    let max = JUNGONG_LIMITS[me.level];
+    if (me.query_temp('jg_week', 0) >= max) return false;
+    let value = me.add_temp('jg_week', count, UTIL.diff_week_time());
+    if (value > max) {
+        me.add_temp('jg_week', max - value, UTIL.diff_week_time());
+        count = count + max - value;
+        me.add_temp('jg', count);
+        value = max;
+    } else {
+        me.add_temp('jg', count);
+    }
+    me.notify("<hiy>你获得了" + count + "点军功，本周已获得"
+        + value + "/" + max + "。</hiy>");
+}
 const JUNGONGS = [1, 5, 10, 15, 20, 25, 30];
 const EQ_ODDS = [1500, 2500, 3100, 4050, 5001, 5005];
-//绿 1500-1000
-//蓝 2500-1000  2500-2000
-//黄 3100-1000  3100-2000 3100-3000
-//紫 4050-1000  4050-2000 4050-3000 4050-4000
-
 function is_bm(user) {
     var bm = user.query_temp('xy_bm');
     if (!bm) return false;
@@ -616,7 +598,6 @@ function is_bm(user) {
         >= JUNGONG_LIMITS[user.level]) return false;
     return true;
 }
-
 function query_items(me) {
     if (!this.damages) return;
     var sh = this.damages[me.id];
@@ -663,7 +644,6 @@ function query_items(me) {
 
     return items;
 }
-
 function clear_items(corpse, me) {
     if (this.user_items && this.user_items[me.id]) {
         this.user_items[me.id].length = 0;
@@ -674,5 +654,4 @@ function clear_items(corpse, me) {
             }
         }
     }
-}
 }

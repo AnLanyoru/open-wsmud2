@@ -1,12 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const TASK = globalThis.TASK;
-this.inherits(COMMAND);
-this.command = "systask";
-this.regex = /(\w+)\s+(\w+)?/;
-this.allow_level = 6;
-this.enter = function (me, arg, par) {
+export default class extends COMMAND {
+    command = "systask";
+    regex = /(\w+)\s+(\w+)?/;
+    allow_level = 6;
+
+    enter(me, arg, par) {
     if (!arg) return false;
     var task = TASK.GET(arg);
     if (!task) return false;
@@ -20,7 +19,9 @@ this.enter = function (me, arg, par) {
     if (typeof func !== 'function') return;
     func.call(task, me);
 }
+}
 
+const TASK = globalThis.TASK;
 const BLOCKED_PROPS = {
     constructor: true,
     __proto__: true,
@@ -29,9 +30,7 @@ const BLOCKED_PROPS = {
     toString: true,
     valueOf: true,
 };
-
 const ALLOW_COMMANDS = {
     bm: true,
     reward: true
 };
-}

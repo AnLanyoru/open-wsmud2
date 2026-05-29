@@ -1,14 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "武当长拳";
-this.id = "wudangchangquan";
-this.grade = 1;
-
-this.family = FAMILIES.WUDANG;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "武当长拳";
+    id = "wudangchangquan";
+    grade = 1;
+    family = FAMILIES.WUDANG;
+    attack_actions = [
     "$N力灌右臂，一招「七星手」，一拳直出打向$n的$l",
     "$N身行前探，闪身跨奔$n身侧，一招「推手」，向$n的$l推去",
     "$N双臂微曲，身行晃动，一招「一条鞭」守中带攻打向$n的$l",
@@ -16,24 +13,15 @@ this.attack_actions = [
     "$N施出「雁回头」，纵身跃向空中，双手同时击向$n的$l",
     "$N双臂回环，身行微微后仰，一招「井栏」，缠向$n的双手"
 ];
-this.desc = "武当派入门拳脚功夫";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv  + 7
-        }
-    };
-}
-this.learn_condition = {
+    desc = "武当派入门拳脚功夫";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 500,
     skill: {
         unarmed: 50
     }
 };
-this.pfm = {
+    pfm = {
     bao:
     {
         name: "虎抱头",
@@ -67,4 +55,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv  + 7
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

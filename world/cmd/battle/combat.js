@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const SKILL = globalThis.SKILL; const WEAPON_TYPE = globalThis.WEAPON_TYPE; const USER = globalThis.USER;
-this.inherits(COMMAND);
-this.command = "combat";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, type) {
+export default class extends COMMAND {
+    command = "combat";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, type) {
     if (type=="end") {
         me.combat_info = false;
     } else {
@@ -22,37 +21,8 @@ this.enter = function (me, type) {
         //}
     }
 }
-
-
-//USER.prototype.query_pfms = function () {
-//    if (this.pfm_json) return this.pfm_json;
-//    var obj = {};
-//    obj.type = "perform";
-//    obj.distime = this.gjsd;
-//    obj.items = [];
-//    var skills = this.skills;
-//    if (skills) {
-//        var bases = ["unarmed", "force", "dodge", "parry"];
-//        var weapon = this.query_weapon_type();
-//        if (weapon != WEAPON_TYPE.NONE) bases.push(weapon);
-//        for (var i = 0; i < bases.length; i++) {
-//            var base_skill = skills[bases[i]];
-//            if (base_skill) {
-//                var sp_skill = SKILL.get(base_skill.enable || bases[i]);
-//                if (sp_skill && sp_skill.pfm) {
-//                    for (var p in sp_skill.pfm) {
-//                        var pfmitem = sp_skill.pfm[p];
-//                        obj.items.push({
-//                            name: pfmitem.name,
-//                            distime: pfmitem.distime || 1,
-//                            id: bases[i] + "." + p
-//                        });
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    this.pfm_json = JSON.stringify(obj)
-//    return this.pfm_json;
-//}
 }
+
+const SKILL = globalThis.SKILL;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+const USER = globalThis.USER;

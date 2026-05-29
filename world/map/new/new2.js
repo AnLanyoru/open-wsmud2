@@ -1,13 +1,12 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(ROOM);
-this.name = "训练室"
-this.desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识，就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。";
-this.exits = { "west": "new/new1", "south": "new/new3" };
-this.no_fight = true;
-this.on_enter = function (me) {
+export default class extends ROOM {
+    name = "训练室";
+    desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识，就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。";
+    exits = { "west": "new/new1", "south": "new/new3" };
+    no_fight = true;
+
+    on_enter(me) {
     if (me.is_player) {
         var lv = me.query_temp("new");
         if (lv == 4) {
@@ -32,7 +31,7 @@ this.on_enter = function (me) {
         });
     }
 }
-this.on_leave = function (me, dir) {
+    on_leave(me, dir) {
 
     var lv = me.query_temp("new", 0);
     if (!lv) return true;
@@ -47,7 +46,9 @@ this.on_leave = function (me, dir) {
     return me.notify_fail("你先听完课再乱跑。");
 
 }
+}
 
+const UTIL = globalThis.UTIL;
 function next_guide(me) {
     var obj = me.add_obj("sp/new/ksunarmed", 1);
     if (obj) {
@@ -56,7 +57,6 @@ function next_guide(me) {
         me.notify("<hig>指引者对你说道：打开背包，点击拳脚快速入门，下面会显示物品可用操作，然后点击学习，等你学练会了这个技能再来找我。</hig>");
     }
 }
-
 function next_guide2(me, npc) {
     me.set_temp("new", 5);
     me.notify("<hig>指引者对你说道：接下来你用刚学会的技能去南面的训练室杀掉一个木头人，带点战利品回来。</hig>");
@@ -80,7 +80,6 @@ function next_guide3(me, npc) {
     }
     this.add_action("next", "疗伤完毕", guide_over);
 }
-
 function guide_over(me) {
 
     var lv = me.query_temp("new");
@@ -123,5 +122,4 @@ function ask6(me) {
             me.add_exp(10000, 10000, 10000);
         }
     }, 1000);
-}
 }

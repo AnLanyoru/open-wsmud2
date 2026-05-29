@@ -1,17 +1,17 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.unit = "壶";
-this.name = "米酒";
-this.value = 200;
-this.combined = true;
-this.desc = "一壶醉仙楼的米酒，喝掉后每5秒恢复100点内力。";
-this.action_msg = "喝";
-this.distime = 60000;
-this.recover_mp = 100;
-this.transable = true;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "壶";
+    name = "米酒";
+    value = 200;
+    combined = true;
+    desc = "一壶醉仙楼的米酒，喝掉后每5秒恢复100点内力。";
+    action_msg = "喝";
+    distime = 60000;
+    recover_mp = 100;
+    transable = true;
+
+    on_use(me) {
     me.send_room("$N仰头灌下一" + this.unit + this.name + "。");
     me.add_status({
         id: "drink",
@@ -29,7 +29,7 @@ this.on_use = function (me) {
     });
 
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = path + "#0";
         return;
@@ -38,6 +38,7 @@ this.on_create = function (path, par) {
     var lv = parseInt(par);
     if (!(lv > 0 && lv < 5)) return;
     this.set(OBJS[lv]);
+}
 }
 
 const OBJS = [{
@@ -73,4 +74,3 @@ const OBJS = [{
     unit: "壶",
     grade: 2
 }];
-}

@@ -1,15 +1,13 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "颗",
-    name: "药丸",
-    desc: "一颗神秘的药丸",
-    grade: 1,
-    prop: null
-});
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "颗";
+    name = "药丸";
+    desc = "一颗神秘的药丸";
+    grade = 1;
+    prop = null;
+
+    on_use(me) {
     me.notify("你吞下一颗" + this.color_name + "。");
     if (!this.prop) return;
     me.add_status({
@@ -22,7 +20,7 @@ this.on_use = function (me) {
     });
     return true;
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     var lv = 1;
     var type = 0;
     if (par) {
@@ -38,7 +36,7 @@ this.on_create = function (path, par) {
         init.call(this, lv);
     }
 }
-this.create_type0 = function (lv) {
+    create_type0(lv) {
     this.name = "神力丸";
     var val = [20, 50, 100, 200, 400][lv];
     this.desc = "一颗神秘的药丸，吃了后增加你" + val + "点后天臂力。";
@@ -46,7 +44,7 @@ this.create_type0 = function (lv) {
         str: val
     };
 }
-this.create_type1 = function (lv) {
+    create_type1(lv) {
     this.name = " 风行丹";
     var val = [20, 50, 100, 200, 400][lv];
     this.desc = "一颗神秘的药丸，吃了后增加你" + val + "点后天身法。";
@@ -54,8 +52,7 @@ this.create_type1 = function (lv) {
         dex: val
     };
 }
-
-this.create_type1 = function (lv) {
+    create_type1(lv) {
     this.name = "飞燕丹";
     var val = [20, 50, 100, 200, 400][lv];
     this.desc = "一颗神秘的药丸，吃了后增加你" + val + "点后天身法。";

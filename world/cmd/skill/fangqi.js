@@ -1,12 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(COMMAND);
-this.command = "fangqi";
-this.allow_fight = false;
-this.regex = /^(\w+)(?:\s+(\w+))?$/;
-this.enter = function (me, skillid, sid) {
+export default class extends COMMAND {
+    command = "fangqi";
+    allow_fight = false;
+    regex = /^(\w+)(?:\s+(\w+))?$/;
+
+    enter(me, skillid, sid) {
     if (!me.skills) return me.notify("你还不会任何技能。");
     var skill = me.skills[skillid];
     if (!skill) return me.notify("你还不会这个技能。");
@@ -82,7 +81,7 @@ this.enter = function (me, skillid, sid) {
         }, 3);
     }
 }
-this.reset_skill = function (me, skill, skill_base, level) {
+    reset_skill(me, skill, skill_base, level) {
     if (skill_base.type === SKILL_TYPES.KNOWLEDGE) return me.notify_fail('知识类技能无法重置。');
     if (skill.level <= level) return me.notify("你的" + skill_base.query_color_name(me) + "不用重置等级。");
     let exp = (100 + skill.level) * (skill.level - 100) / 2 * (skill_base.query_grade(me) + 1) * 5;
@@ -117,3 +116,7 @@ this.reset_skill = function (me, skill, skill_base, level) {
     return true;
 }
 }
+
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;
+const SKILL_TYPES = globalThis.SKILL_TYPES;

@@ -1,15 +1,13 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "份",
-    name: "房契",
-    desc: "使用获得扬州城豪华住宅",
-    grade: 3,
-    value: 0
-});
-this.on_use = function (me, par) {
+export default class extends OBJ {
+    unit = "份";
+    name = "房契";
+    desc = "使用获得扬州城豪华住宅";
+    grade = 3;
+    value = 0;
+
+    on_use(me, par) {
     if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
     let home = me.query_temp('home', 0);
     if (home === 2) return me.notify_fail('你已经拥有自己的住宅了。');

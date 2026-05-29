@@ -1,15 +1,118 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "shop";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /(?:(\w+)\s+(\d+))/;
-this.enter = function (me, par, count) {
+export default class extends COMMAND {
+    command = "shop";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /(?:(\w+)\s+(\d+))/;
+    list = null;
+    list_keys = null;
+    idx = null;
+    groups = [
+    [
+        {
+            name: "<hic>扫荡符</hic>", unit: "张", path: "cash/saodang", grade: 2,
+            desc: "可以快速完成副本，前提是这个副本你已经解锁相关单人难度的扫荡模式", value: 1,
+            discount: 0.5,
+            query_discount: query_age_discount,
+            limit: 50, limit_time: 0, limit_key: "shp1"
+        },
+        {
+            name: "<hic>天师符</hic>", unit: "张", grade: 3,
+            path: "cash/tianshifu", desc: "可使你原地复活，不用跑路", value: 5,
+            query_discount: query_age_discount,
+            limit: 10, limit_time: 0, limit_key: "shp2"
+        },
+        {
+            name: "<hig>背包扩充</hig>", unit: "块", grade: 1,
+            path: "cash/pack_add", desc: "使你的背包扩充10格，最大100格", value: 128,
+            limit: 1, limit_time: 1, limit_key: "shp3"
+        },
+        {
+            name: "<hig>仓库扩充</hig>", unit: "块", grade: 1,
+            path: "cash/ck_add", desc: "使你的仓库扩充10格，最大400格", value: 168,
+            limit: 1, limit_time: 1, limit_key: "shp4"
+        },
+        {
+            name: "<hiy>洗髓丹</hiy>", unit: "颗", grade: 3,
+            path: "cash/xi", desc: "重置你的先天属性", value: 128,
+            limit: 5, limit_time: 1, limit_key: "shp5"
+        },
+        {
+            name: "<hic>改名符</hic>", unit: "张", grade: 2,
+            path: "cash/gaiming", limit: 1, limit_time: 2, limit_key: "shp9",
+            desc: "更改你的名字", value: 200
+        },
+        {
+            name: "<hio>叛师符</hio>", unit: "张", grade: 5,
+            path: "cash/tuoli", value: 500,
+            desc: "重新选择你的门派，会遗忘你当前门派的武功，返还你消耗的潜能(不包括100级前的消耗)",
+            limit: 3, limit_time: 2, limit_key: "shp6"
+        },
+        {
+            name: "<hio>变性丹</hio>", unit: "颗", grade: 5, value: 500,
+            path: "cash/bian", desc: "更改性别，会遗忘不符合性别要求的武功，返还你消耗的潜能(不包括100级前的消耗)",
+            limit: 3, limit_time: 2, limit_key: "shp7",
+        }
+
+    ]
+    , [
+        {
+            name: "<hic>扫荡符</hic>", unit: "张", path: "cash/saodang", grade: 2,
+            desc: "可以快速完成副本，前提是这个副本你已经解锁相关单人难度的扫荡模式", value: 1
+        },
+        {
+            name: "<hic>天师符</hic>", unit: "张", grade: 3,
+            path: "cash/tianshifu", desc: "可使你原地复活，不用跑路", value: 5
+        },
+        {
+            name: "<hig>背包扩充</hig>", unit: "块", grade: 1,
+            path: "cash/pack_add", desc: "使你的背包扩充10格，最大100格", value: 32
+        },
+        {
+            name: "<hig>仓库扩充</hig>", unit: "块", grade: 1,
+            path: "cash/ck_add", desc: "使你的仓库扩充10格，最大400格", value: 40
+        },
+        {
+            name: "<hiy>洗髓丹</hiy>", unit: "颗", grade: 3,
+            path: "cash/xi", desc: "重置你的先天属性", value: 80
+        },
+        {
+            name: "<hic>改名符</hic>", unit: "张", grade: 2,
+            path: "cash/gaiming", desc: "更改你的名字", value: 98
+        },
+        {
+            name: "<hio>叛师符</hio>", unit: "张", grade: 5,
+            path: "cash/tuoli",
+            desc: "重新选择你的门派，会遗忘你当前门派的武功，返还你消耗的潜能(不包括100级前的消耗)",
+            value: 300
+        },
+        {
+            name: "<hio>变性丹</hio>", unit: "颗", grade: 5,
+            path: "cash/bian", desc: "更改性别，会遗忘不符合性别要求的武功，返还你消耗的潜能(不包括100级前的消耗)",
+            value: 300
+        },
+        {
+            name: "房契", unit: "颗", grade: 3,
+            path: "cash/fang", desc: "使用后获得扬州城豪华型住宅，拥有自己的练功房，钓鱼采药的小花园，和管家黄金购买的房子无区别。",
+            value: 998, max_key: "shpm1", max: 1,
+            is_show: function (me) {
+                if (me.query_temp('home', 0) === 2) return false;
+                if (me.query_bool('gift', 1)) return false;
+                return true;
+            },
+            on_full: function (me) {
+                me.remove_temp('shpm1');
+                me.set_bool('gift', 1, true);//gift标志0随从包 1房契 2程灵素
+            }
+        }
+    ]
+
+];
+
+    enter(me, par, count) {
     if (me.query_temp("new")) return me.notify("你先完成新手指导再说。");
     if (!me.is_player) return me.notify("你不能购买。");
 
@@ -137,17 +240,7 @@ this.enter = function (me, par, count) {
 
     me.send(str.join(""));
 }
-function format_moneys(me) {
-    return `money:[${me.money},${me.cash_money}]`;
-    //  return `money:[${me.money},${me.cash_money},${me.query_temp('my', 0)}],mtype:"枚<hij>古币</hij>"`;
-}
-
-
-this.list = null;
-
-this.list_keys = null;
-this.idx = null;
-this.load_selllist = function () {
+    load_selllist() {
     this.list = new Map();
     this.list_keys = [];
     this.idx = UTIL.create_id();
@@ -168,8 +261,15 @@ this.load_selllist = function () {
         }
     }
 }
-//去掉元宝，每周兑换，按月领取，黄金频率降低
+}
 
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const UTIL = globalThis.UTIL;
+function format_moneys(me) {
+    return `money:[${me.money},${me.cash_money}]`;
+    //  return `money:[${me.money},${me.cash_money},${me.query_temp('my', 0)}],mtype:"枚<hij>古币</hij>"`;
+}
 function query_age_discount(me) {
     var dt = Date.now() - me.reg_time * 60000;
     let age = Math.floor(dt / 86400000 / 12);
@@ -179,106 +279,3 @@ function query_age_discount(me) {
 }
 const start_date = new Date(2026, 1, 15, 0, 0);
 const end_date = new Date(2026, 1, 24, 0, 0);
-
-this.groups = [
-    [
-        {
-            name: "<hic>扫荡符</hic>", unit: "张", path: "cash/saodang", grade: 2,
-            desc: "可以快速完成副本，前提是这个副本你已经解锁相关单人难度的扫荡模式", value: 1,
-            discount: 0.5,
-            query_discount: query_age_discount,
-            limit: 50, limit_time: 0, limit_key: "shp1"
-        },
-        {
-            name: "<hic>天师符</hic>", unit: "张", grade: 3,
-            path: "cash/tianshifu", desc: "可使你原地复活，不用跑路", value: 5,
-            query_discount: query_age_discount,
-            limit: 10, limit_time: 0, limit_key: "shp2"
-        },
-        {
-            name: "<hig>背包扩充</hig>", unit: "块", grade: 1,
-            path: "cash/pack_add", desc: "使你的背包扩充10格，最大100格", value: 128,
-            limit: 1, limit_time: 1, limit_key: "shp3"
-        },
-        {
-            name: "<hig>仓库扩充</hig>", unit: "块", grade: 1,
-            path: "cash/ck_add", desc: "使你的仓库扩充10格，最大400格", value: 168,
-            limit: 1, limit_time: 1, limit_key: "shp4"
-        },
-        {
-            name: "<hiy>洗髓丹</hiy>", unit: "颗", grade: 3,
-            path: "cash/xi", desc: "重置你的先天属性", value: 128,
-            limit: 5, limit_time: 1, limit_key: "shp5"
-        },
-        {
-            name: "<hic>改名符</hic>", unit: "张", grade: 2,
-            path: "cash/gaiming", limit: 1, limit_time: 2, limit_key: "shp9",
-            desc: "更改你的名字", value: 200
-        },
-        {
-            name: "<hio>叛师符</hio>", unit: "张", grade: 5,
-            path: "cash/tuoli", value: 500,
-            desc: "重新选择你的门派，会遗忘你当前门派的武功，返还你消耗的潜能(不包括100级前的消耗)",
-            limit: 3, limit_time: 2, limit_key: "shp6"
-        },
-        {
-            name: "<hio>变性丹</hio>", unit: "颗", grade: 5, value: 500,
-            path: "cash/bian", desc: "更改性别，会遗忘不符合性别要求的武功，返还你消耗的潜能(不包括100级前的消耗)",
-            limit: 3, limit_time: 2, limit_key: "shp7",
-        }
-
-    ]
-    , [
-        {
-            name: "<hic>扫荡符</hic>", unit: "张", path: "cash/saodang", grade: 2,
-            desc: "可以快速完成副本，前提是这个副本你已经解锁相关单人难度的扫荡模式", value: 1
-        },
-        {
-            name: "<hic>天师符</hic>", unit: "张", grade: 3,
-            path: "cash/tianshifu", desc: "可使你原地复活，不用跑路", value: 5
-        },
-        {
-            name: "<hig>背包扩充</hig>", unit: "块", grade: 1,
-            path: "cash/pack_add", desc: "使你的背包扩充10格，最大100格", value: 32
-        },
-        {
-            name: "<hig>仓库扩充</hig>", unit: "块", grade: 1,
-            path: "cash/ck_add", desc: "使你的仓库扩充10格，最大400格", value: 40
-        },
-        {
-            name: "<hiy>洗髓丹</hiy>", unit: "颗", grade: 3,
-            path: "cash/xi", desc: "重置你的先天属性", value: 80
-        },
-        {
-            name: "<hic>改名符</hic>", unit: "张", grade: 2,
-            path: "cash/gaiming", desc: "更改你的名字", value: 98
-        },
-        {
-            name: "<hio>叛师符</hio>", unit: "张", grade: 5,
-            path: "cash/tuoli",
-            desc: "重新选择你的门派，会遗忘你当前门派的武功，返还你消耗的潜能(不包括100级前的消耗)",
-            value: 300
-        },
-        {
-            name: "<hio>变性丹</hio>", unit: "颗", grade: 5,
-            path: "cash/bian", desc: "更改性别，会遗忘不符合性别要求的武功，返还你消耗的潜能(不包括100级前的消耗)",
-            value: 300
-        },
-        {
-            name: "房契", unit: "颗", grade: 3,
-            path: "cash/fang", desc: "使用后获得扬州城豪华型住宅，拥有自己的练功房，钓鱼采药的小花园，和管家黄金购买的房子无区别。",
-            value: 998, max_key: "shpm1", max: 1,
-            is_show: function (me) {
-                if (me.query_temp('home', 0) === 2) return false;
-                if (me.query_bool('gift', 1)) return false;
-                return true;
-            },
-            on_full: function (me) {
-                me.remove_temp('shpm1');
-                me.set_bool('gift', 1, true);//gift标志0随从包 1房契 2程灵素
-            }
-        }
-    ]
-
-];
-}

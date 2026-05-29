@@ -1,13 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "韦陀棍";
-this.id = "weituogun";
-this.grade = 1;
-this.family = FAMILIES.SHAOLIN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "韦陀棍";
+    id = "weituogun";
+    grade = 1;
+    family = FAMILIES.SHAOLIN;
+    attack_actions = [
     "$N一招<YEL>「黄石纳履」</YEL>，手中$w如蜻蜓点水般，招招向$n的下盘要害点去",
     "$N把$w平提胸口，一拧身，一招<BLU>「勒马停锋」</BLU>，$w猛地撩向$n的颈部",
     "$N一招<HIC>「平地龙飞」</HIC>，全身滴溜溜地在地上打个大转，举棍向$n的胸腹间戳去",
@@ -18,25 +16,15 @@ this.attack_actions = [
     "$N潜运真力，一招<HIW>「苍龙归海」</HIW>，$w顿时长了数丈，矫龙般直射$n的胸口"
 
 ];
-this.desc = "少林寺七十二绝技之韦陀棍";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["club"];
-this.learn_condition = {
+    desc = "少林寺七十二绝技之韦陀棍";
+    can_enables = ["club"];
+    learn_condition = {
     max_mp: 700,
     skill: {
         club: 50
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        club: {
-            gj: lv + 15
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     wu:
     {
         name: "韦陀伏魔",
@@ -73,4 +61,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        club: {
+            gj: lv + 15
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;

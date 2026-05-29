@@ -1,14 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "dice";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\d)\s(\w+)$/;
-this.enter = function (me, type, objid) {
+export default class extends COMMAND {
+    command = "dice";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\d)\s(\w+)$/;
+
+    enter(me, type, objid) {
     if (!me.team) return me.send("你没有在队伍里。");
     if (!me.team.objs || !me.team.objs.length) return me.send("目前没有等待分配的战利品。");
     var item = null;

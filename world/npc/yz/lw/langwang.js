@@ -1,38 +1,37 @@
 import { MONSTER } from "../../../../os/char/monster.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const ROOM = globalThis.ROOM;
-this.inherits(MONSTER);
-this.set({
-    name: "狼王",
-    desc: "一只强壮的野狼，应该是这里的头领，对你龇了龇锋利的尖牙，吐出那长长的血红色的舌头",
-    gender: 1,
-    mp: 100,
-    max_mp: 100,
-    hp: 300,
-    max_hp: 300,
-    score: 20,
-    dex: 16,
-    str: 16
-});
-this.skill_map(
-    ["bite", 10]);
-//drop path,min,max,per
-this.set_drop({
-    obj: "res/pimao1",
-    min: 1,
-    max: 5
-}, {
-    obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/ring", "eq/lv0/tiegun", "eq/lv0/jian", "eq/lv0/jin", "eq/lv0/shoes", "eq/lv0/duanyi", "book/book#dodge"]
+export default class extends MONSTER {
+    name = "狼王";
+    desc = "一只强壮的野狼，应该是这里的头领，对你龇了龇锋利的尖牙，吐出那长长的血红色的舌头";
+    gender = 1;
+    mp = 100;
+    max_mp = 100;
+    hp = 300;
+    max_hp = 300;
+    score = 20;
+    dex = 16;
+    str = 16;
 
-});
+    constructor() {
+        super();
+        this.skill_map(
+            ["bite", 10]);
+        this.set_drop({
+            obj: "res/pimao1",
+            min: 1,
+            max: 5
+        }, {
+            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/ring", "eq/lv0/tiegun", "eq/lv0/jian", "eq/lv0/jin", "eq/lv0/shoes", "eq/lv0/duanyi", "book/book#dodge"]
 
-this.on_died = function (me, corpse) {
+        });
+    }
+
+    on_died(me, corpse) {
     if (me.environment.is_time() && !me.equipment[0]) {
         corpse.items.push(OBJ.CREATE('res/langpi'));
     }
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     if (!this.environment.is_time()) {
         return this.do_kill(me);
     }
@@ -89,14 +88,14 @@ this.on_enter = function (me) {
         }, 2000);
     }
 }
-this.on_langdied = function (me, corpse) {
+    on_langdied(me, corpse) {
     //三区刺激变身
     var npc = me.environment.find_obj_bypath('yz/lw/langwang');
     if (npc && !WORLD.DATA.query_temp('zq7', 0) && me.environment.is_time()) {
         me.environment.create_lw(me, npc, 7, '<hir>$N看到你击杀了小狼，顿时双眼通红咆哮着冲了过来...</hir>\n<wht>一阵烟雾过后，狼王已经消失不见，一只巨大的银色巨狼站在你面前向你咆哮...</wht>');
     }
 }
-this.on_shedied = function (npc, corpse) {
+    on_shedied(npc, corpse) {
     //四区吃蛇变身
     if (npc.is_player) return;
     var me = null;
@@ -113,3 +112,7 @@ this.on_shedied = function (npc, corpse) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const ROOM = globalThis.ROOM;

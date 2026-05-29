@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "lockobj";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-//this.regex = /^(\d)\s(\w+)$/;
-this.enter = function (me, objid) {
+export default class extends COMMAND {
+    command = "lockobj";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(me, objid) {
     var obj = me.find_obj(objid);
     if (!obj) {
         return me.notify("你要锁定什么东西？");

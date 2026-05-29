@@ -1,15 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "pm";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.admin = true;
-this.regex = /^(\w+)(?:\s(\w+))?(?:\s(\w+))?$/;
+export default class extends COMMAND {
+    command = "pm";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    admin = true;
+    regex = /^(\w+)(?:\s(\w+))?(?:\s(\w+))?$/;
 
-this.enter = function (me, type, par, par2) {
+    enter(me, type, par, par2) {
     return me.send('未开放');
 }
 }

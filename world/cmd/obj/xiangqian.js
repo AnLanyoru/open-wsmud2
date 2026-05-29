@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "xiangqian";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, st) {
+export default class extends COMMAND {
+    command = "xiangqian";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    enter(player, objid, st) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要镶嵌什么装备？");
@@ -54,3 +53,5 @@ this.enter = function (player, objid, st) {
 
 }
 }
+
+const WORLD = globalThis.WORLD;

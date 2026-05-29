@@ -1,10 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const NPC = globalThis.NPC;
-this.inherits(COMMAND);
-this.command = "kill";
-this.enter = function (me, argid) {
+export default class extends COMMAND {
+    command = "kill";
+
+    enter(me, argid) {
     if (me.state) {
         return me.notify("你现在正在" + me.state.title + ",没时间杀人。");
     }
@@ -90,3 +89,7 @@ this.enter = function (me, argid) {
 
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const NPC = globalThis.NPC;

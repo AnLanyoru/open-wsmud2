@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(COMMAND);
-this.command = "xue";
-this.allow_state = true;
-this.allow_fight = false;
-this.regex = /^(?:(\d+)\s)?(\w+)\s+from\s+(.+?)$/;
-this.enter = function (me, par, sk, target) {
+export default class extends COMMAND {
+    command = "xue";
+    allow_state = true;
+    allow_fight = false;
+    regex = /^(?:(\d+)\s)?(\w+)\s+from\s+(.+?)$/;
+
+    enter(me, par, sk, target) {
     if (!sk) return me.notify("你要学习什么技能？");
     target = me.find_obj(target, me.environment);
     if (!target) return me.notify("你要跟谁学习技能？");
@@ -104,11 +103,15 @@ this.enter = function (me, par, sk, target) {
     });
 
 }
+}
+
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;
+const SKILL_TYPES = globalThis.SKILL_TYPES;
 const BAN_SKILLS = {
     linshuijing: true,
     guanshanjue: true
 };
-
 function on_check(me) {
 
 
@@ -141,8 +144,6 @@ function on_check(me) {
     str.push('</hic>\n点击学习其他武功可添加到学习队列。');
     me.send(str.join(""));
 }
-
-
 function format_timespan(time, str) {
     if (time < 60) return str.push('少于1分钟');
     if (time > 86400) {
@@ -155,7 +156,6 @@ function format_timespan(time, str) {
     }
     str.push(Math.floor(time / 60), '分钟');
 }
-
 function to_next(me) {
     let state = me.state;
     if (state.queues.length > 0) {
@@ -173,9 +173,6 @@ function to_next(me) {
         return WORLD.check_user_next(me);
     }
 }
-
-
-
 function checkSkillCount(me, sk) {
     var count = 0;
     for (var skid in me.skills) {
@@ -273,12 +270,10 @@ function do_learn(me) {
     this.skill_base.add_exp(me, exp);
 
 }
-
 function count_speed(me) {
     let pot = parseInt((me.int + me.query_prop("int")) *
         (100 + me.query_prop("study_per") + me.family.query_temp('study_per', 0)
             + WORLD.DATA.query_temp("study_per", 0) + me.int) / 100) * 3;
 
     return pot;
-}
 }

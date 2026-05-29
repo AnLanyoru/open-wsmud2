@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "follow";
-this.enter = function (me, objid) {
+export default class extends COMMAND {
+    command = "follow";
+
+    enter(me, objid) {
     if (me.is_player && !me.query_temp("admin")) return false;
     if (!objid) {
         return me.notify("你要跟随谁？");

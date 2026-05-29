@@ -1,19 +1,16 @@
 import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
-export default function() {
-this.inherits(FAMILY_AREA);
-this.set({
-    name: "华山派",
-    id: "huashan",
-    is_area: true,
-    desc: "儒家门派代表，门下子弟大都书生装扮，据传祖师爷是一位风姓书生，本是五岳剑派之首，却因分裂成气剑二宗而式微。",
-    first: "huashan/zhenyue",
-    index: 3,
-    room_path: "huashan/",
-    sp: "剑法突出，伤害高，气血防御低",
-    family: "HUASHAN"
-});
-this.map = [
+export default class extends FAMILY_AREA {
+    name = "华山派";
+    id = "huashan";
+    is_area = true;
+    desc = "儒家门派代表，门下子弟大都书生装扮，据传祖师爷是一位风姓书生，本是五岳剑派之首，却因分裂成气剑二宗而式微。";
+    first = "huashan/zhenyue";
+    index = 3;
+    room_path = "huashan/";
+    sp = "剑法突出，伤害高，气血防御低";
+    family = "HUASHAN";
+    map = [
     { n: "练武场", id: "huashan/lianwu", p: [0, 0], exits: ["n", "s", "e"] },
     { n: "客厅", id: "huashan/keting", p: [0, -1], exits: ["e"] },
     { n: "偏厅", id: "huashan/pianting", p: [1, -1] },

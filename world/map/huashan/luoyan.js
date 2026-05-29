@@ -1,73 +1,37 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-    const BASE = globalThis.BASE; const __PATH = globalThis.__PATH;
-this.inherits(ROOM);
-this.name = "落雁峰"
-this.desc = "南峰又名落雁峰，是华山最高峰。峰头题刻极多，如“太华峰头”、“竣极于天”、“袖拂天星”等，极言华岳之高。环顾四周，皆在足下。寇准诗赞曰：只有天在上，更无山与齐；举头红日近，回首白云低。传说五代时候的隐士陈抟就隐居在这里。宋太祖曾经下诏征他出山作官，他便在这里写下谢诏表说：“一片野心都被白云锁住，九重宠诏休教丹凤衔来”，表示不愿出山做官。";
-this.exits = { "eastdown": "huashan/zhandao" };
+export default class extends ROOM {
+    name = "落雁峰";
+    desc = "南峰又名落雁峰，是华山最高峰。峰头题刻极多，如“太华峰头”、“竣极于天”、“袖拂天星”等，极言华岳之高。环顾四周，皆在足下。寇准诗赞曰：只有天在上，更无山与齐；举头红日近，回首白云低。传说五代时候的隐士陈抟就隐居在这里。宋太祖曾经下诏征他出山作官，他便在这里写下谢诏表说：“一片野心都被白云锁住，九重宠诏休教丹凤衔来”，表示不愿出山做官。";
+    exits = { "eastdown": "huashan/zhandao" };
 
-//this.set_npc("huashan/fengqingyang");
-//this.do_enter = function (obj, isshow, in_msg) {
-//    this.on_before_enter && this.on_before_enter(obj);
-//    if (obj.is_player) {
-//        obj.send(this.to_json(obj));
-//        this.send_exits(obj);
-//    }
-//    this.item_changed(obj, true, in_msg);
-//    this.on_enter && this.on_enter(obj);
-//}
-//this.to_json = function (me) {
+    constructor() {
+        super();
+        this.add_action("jumpup", "跳上去", function (me) {
+            if (me.query_skill("dodge", 0) >= 800) {
 
-//    if (me&& me.level == 4) {
-//        if (this.wsjson) return this.wsjson;
-//        var obj = {};
-//        obj.type = "room";
-//        obj.path = this.path;
-//        obj.name = this.long_name;
-//        obj.desc = this.desc;
-//        obj.commands = [{
-//            cmd: "jumpup",
-//            name: "跳上去"
-//        }];
-//        this.wsjson = JSON.stringify(obj);
-//        return this.wsjson;
-//    }
-//    if (this.json) return this.json;
-//    var obj = {};
-//    obj.type = "room";
-//    obj.path = this.path;
-//    obj.name = this.long_name;
-//    obj.desc = this.desc;
-//    obj.commands = [];
-//    this.json = JSON.stringify(obj);
-//    return this.json;
-//}
+                me.send_room("$N在绝壁前深深地吸了口气，猛地跃了起来。\n只见$N足尖在绝壁半空一点,再飞身跃起，已悠然飘落绝顶。");
+                var rm = ROOM.Get("huashan/jueding");
 
-this.add_action("jumpup", "跳上去", function (me) {
-    if (me.query_skill("dodge", 0) >= 800) {
-
-        me.send_room("$N在绝壁前深深地吸了口气，猛地跃了起来。\n只见$N足尖在绝壁半空一点,再飞身跃起，已悠然飘落绝顶。");
-        var rm = ROOM.Get("huashan/jueding");
-
-        if (this.owner) {
-            rm = rm.query_copy(this.owner) ?? rm;
-        } else {
-            if (rm.items.length > 0) {
-                rm = this.create_jueding(rm);
-                if (!rm) {
-                    return me.notify("那里人太多了，你过不去。");
+                if (this.owner) {
+                    rm = rm.query_copy(this.owner) ?? rm;
+                } else {
+                    if (rm.items.length > 0) {
+                        rm = this.create_jueding(rm);
+                        if (!rm) {
+                            return me.notify("那里人太多了，你过不去。");
+                        }
+                    }
                 }
+
+                me.moveto(rm, null, me.name + "跳了进来。");
+            } else {
+                me.send_room("$N在绝壁前站定,深吸一口气，猛然跃起，可还差一大截呢,看来是轻功不够好。");
             }
-        }
-
-        me.moveto(rm, null, me.name + "跳了进来。");
-    } else {
-        me.send_room("$N在绝壁前站定,深吸一口气，猛然跃起，可还差一大截呢,看来是轻功不够好。");
+        })
     }
-})
 
-this.create_jueding = function (rm) {
+    create_jueding(rm) {
 
     if (!rm.shadow_rooms) rm.shadow_rooms = [];
     for (var i = 0; i < rm.shadow_rooms.length; i++) {
@@ -82,3 +46,6 @@ this.create_jueding = function (rm) {
     return shadow;
 }
 }
+
+const BASE = globalThis.BASE;
+const __PATH = globalThis.__PATH;

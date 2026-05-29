@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC;
-this.inherits(COMMAND);
-this.command = "setting";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(?:(\w+)?\s+(.+))?$/;
-this.enter = function (me, key, value) {
+export default class extends COMMAND {
+    command = "setting";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(?:(\w+)?\s+(.+))?$/;
+
+    enter(me, key, value) {
     if (!me.is_player) return;
     if (!key) {
         var str = ['{type:"setting",items:{'];
@@ -79,7 +78,7 @@ this.enter = function (me, key, value) {
         //}
     }
 }
-this.clear = function (me) {
+    clear(me) {
     let str = [];
     for (let user of WORLD.USERS) {
         if (!user.settings) continue;
@@ -92,6 +91,10 @@ this.clear = function (me) {
     }
     if (me) me.send(str.join(''));
 }
+}
+
+const WORLD = globalThis.WORLD;
+const NPC = globalThis.NPC;
 const setting_keys = {
     'hide_roomdesc': {
         type: "Boolean",
@@ -321,4 +324,3 @@ const setting_keys = {
 
     }
 };
-}

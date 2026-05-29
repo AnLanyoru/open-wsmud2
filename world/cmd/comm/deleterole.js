@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "deleterole";
-this.allow_login = true;
-this.enter = function (me, pars) {
+export default class extends COMMAND {
+    command = "deleterole";
+    allow_login = true;
+
+    enter(me, pars) {
     if (!pars) return;
     var olduser = WORLD.getUser(pars);
     if (olduser) {
@@ -27,3 +26,5 @@ this.enter = function (me, pars) {
     });
 }
 }
+
+const WORLD = globalThis.WORLD;

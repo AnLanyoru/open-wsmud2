@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const FOLLOWER = globalThis.FOLLOWER;
-this.inherits(COMMAND);
-this.command = "relation";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "relation";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, arg) {
 
     var str = ['{"type":"dialog","dialog":"relation"'];
     if (me.query_temp("shifu")) {
@@ -97,3 +96,6 @@ this.enter = function (me, arg) {
     me.send(str.join(""));
 }
 }
+
+const WORLD = globalThis.WORLD;
+const FOLLOWER = globalThis.FOLLOWER;

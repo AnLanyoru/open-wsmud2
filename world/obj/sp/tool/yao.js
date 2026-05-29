@@ -1,16 +1,13 @@
 import { EQUIPMENT } from "../../../../os/item/equipment.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-this.inherits(EQUIPMENT);
-this.set({
-    unit: "本",
-    name: "药王神篇",
-    desc: "毒手药王无嗔大师的著作，里面记载了很多药草知识",
-    value: 1000,
-    eq_type: EQUIP_TYPE.JEWELS
-});
-this.on_create = function (path, par) {
+export default class extends EQUIPMENT {
+    unit = "本";
+    name = "药王神篇";
+    desc = "毒手药王无嗔大师的著作，里面记载了很多药草知识";
+    value = 1000;
+    eq_type = EQUIP_TYPE.JEWELS;
+
+    on_create(path, par) {
     let lv = 1;
     if (par) {
         par = par.substr(1);
@@ -30,3 +27,5 @@ this.on_create = function (path, par) {
     EQUIPMENT.prototype.on_create.apply(this);
 }
 }
+
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;

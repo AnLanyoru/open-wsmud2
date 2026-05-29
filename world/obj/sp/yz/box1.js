@@ -1,15 +1,13 @@
 import { OBJ } from "../../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    name: "小箱子",
-    desc: "这是在崔员外家找到的一个小箱子，不知道里面放了些了什么。",
-    unit: "个",
-    value: 0,
-    grade:2
-});
-this.on_open = function (me) {
+export default class extends OBJ {
+    name = "小箱子";
+    desc = "这是在崔员外家找到的一个小箱子，不知道里面放了些了什么。";
+    unit = "个";
+    value = 0;
+    grade = 2;
+
+    on_open(me) {
     return OBJ.create_by_odds([{
         obj: "money/gold",
         min: 1,

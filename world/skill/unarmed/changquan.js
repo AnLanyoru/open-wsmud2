@@ -1,15 +1,12 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "太祖长拳";
-this.id = "taizuchangquan";
-this.grade = 1;
-
-this.is_public = true;
-this.family = FAMILIES.GAIBANG;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "太祖长拳";
+    id = "taizuchangquan";
+    grade = 1;
+    is_public = true;
+    family = FAMILIES.GAIBANG;
+    attack_actions = [
     "只见$N身形一矮，大喝声中一个『冲天炮』对准$n的鼻子呼地砸了过去",
     "$N左手一分，右拳运气，一招『拔草寻蛇』便往$n的$l招呼过去",
     "$N右拳在$n面门一晃，左掌使了个『叶底偷桃』往$n的$l狠命一抓",
@@ -39,24 +36,15 @@ this.attack_actions = [
     "$N向前一招『双龙探爪』，双手变掌为爪，先右後左，连续向$n的$l击出",
     "$N向前一窜，『猛虎出洞』将左刁手向後回勾，与右刁手同置身后再刁撇而出"
 ];
-this.desc = "相传为宋太祖赵匡胤所创，以攻击迅猛直来直去为其特征，在江湖中颇有声誉";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "相传为宋太祖赵匡胤所创，以攻击迅猛直来直去为其特征，在江湖中颇有声誉";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         unarmed: 100
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 20
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: "tzcq_sh",
         value: lv => lv / 100,
@@ -71,7 +59,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "太祖八式",
@@ -137,4 +125,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 20
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

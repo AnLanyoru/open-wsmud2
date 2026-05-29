@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "秋风拂尘";
-this.id = "qiufengfuchen";
-this.grade = 1;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "秋风拂尘";
+    id = "qiufengfuchen";
+    grade = 1;
+    attack_actions = [
     "$N端坐不动，一招<HIC>「秋风拂叶」</HIC>，手中$w带着一股劲风，击向$n的脸颊",
     "$N单臂一挥，一招<HIW>「玉带围腰」</HIW>，手中$w直绕向$n的身后",
     "$N身形一转，一招<HIB>「流云断川」</HIB>，手中$w如矫龙般腾空一卷，猛地向$n劈头打下",
@@ -15,26 +13,15 @@ this.attack_actions = [
     "$N慢步上前，一招<GRN>「竹影扫阶」</GRN>，手中$w缓缓罩向$n前胸"
 
 ];
-this.desc = "古墓派李莫愁扬名天下的武功。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["whip"];
-//this.on_learn = function (me) {
-//    if (me.max_mp < 100)
-//        return me.notify_fail("你的内力不够。");
-//    if (me.query_skill("sword", 1) < 60)
-//        return me.notify_fail("你的基础不够，无法领会更高深的技巧。");
-//    if (me.query_skill("yunlongxinfa", 1) < 60)
-//        return me.notify_fail("你的云龙心法等级不够，无法学习云龙剑。");
-//    return true;
-//}
-this.learn_condition = {
+    desc = "古墓派李莫愁扬名天下的武功。";
+    can_enables = ["whip"];
+    learn_condition = {
     max_mp: 100,
     skill: {
         whip: 100
     }
 };
-this.slots = [
+    slots = [
     {
         prop: 'qffc_ml',
         value: (lv) => 1000,
@@ -50,15 +37,7 @@ this.slots = [
         },
     },
 ];
-this.query_enable_prop = function (lv) {
-    return {
-        whip: {
-            gj: parseInt(lv * 1 + 10),
-            mz: lv
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "缠字诀",
@@ -95,4 +74,13 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        whip: {
+            gj: parseInt(lv * 1 + 10),
+            mz: lv
+        }
+    };
+}
 }

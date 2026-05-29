@@ -1,11 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "state";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, type) {
+export default class extends COMMAND {
+    command = "state";
+    allow_busy = true;
+    allow_state = true;
+
+    enter(me, type) {
     if (!me.state) return me.send('你没有在忙。');
     if (type === 'stop') {
         if (me.state) {

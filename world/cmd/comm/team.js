@@ -1,15 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "team";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(add|with|remove|out|reply|dismiss|set)?(?:\s(\w+))?$/;
-this.enter = function (me, act, user) {
+export default class extends COMMAND {
+    command = "team";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(add|with|remove|out|reply|dismiss|set)?(?:\s(\w+))?$/;
+
+    enter(me, act, user) {
     if (act) {
         var func = this["team_" + act];
         return func && func.call(this, me, user);
@@ -19,26 +18,7 @@ this.enter = function (me, act, user) {
     }
 
 }
-function teamToString(me) {
-    var str = ['{"type":"dialog","dialog":"team","items":['];
-    if (me.team) {
-        for (var i = 0; i < me.team.length; i++) {
-            var p = me.team[i];
-
-            str.push("{id:\"");
-            str.push(p.id);
-            str.push("\",name:\"");
-            str.push(p.long_name());
-            str.push("\"}");
-            if (i != me.team.length - 1) {
-                str.push(",");
-            }
-        }
-    }
-    str.push("]}");
-    return str.join("");
-}
-this.team_set = function (me, arg) {
+    team_set(me, arg) {
     if (!me.team) return me.notify("你没有组队。");
     if (!arg) {
         me.notify("目前队伍的分配方式是：" + (me.team.free_get ? "自由拾取" : "需求分配"));
@@ -60,7 +40,7 @@ this.team_set = function (me, arg) {
             break;
     }
 }
-this.team_with = function (me, user) {
+    team_with(me, user) {
     var player = me.find_obj(user, me.environment);
     if (!player) return me.notify("没有这个玩家，或者不在线");
     if (player.master != me.id) return me.notify(player.name + "拒绝了你的组队邀请。");
@@ -76,7 +56,7 @@ this.team_with = function (me, user) {
 
     this.team_reply(player, "ok");
 }
-this.team_add = function (me, user) {
+    team_add(me, user) {
     var player = WORLD.getUser(user);
     if (!player) {
         //player = me.find_obj(user, me.environment);
@@ -110,7 +90,7 @@ this.team_add = function (me, user) {
     player.set_temp("team", me.id, 10000);
     me.send("<hig>已经发送对" + player.name + "的组队邀请。</hig>");
 }
-this.team_reply = function (me, act) {
+    team_reply(me, act) {
     var p = me.query_temp("team");
     if (!p) return me.send("没有人邀请你组队，或邀请已过期。");
     var player = WORLD.getUser(p);
@@ -141,6 +121,82 @@ this.team_reply = function (me, act) {
         me.send("<hic>你拒绝了" + player.name + "的邀请。</hic>");
     }
     me.remove_temp("team");
+}
+    team_remove(me, user) {
+    var tm = me.team;
+    if (!tm) return me.notify("你还没有加入队伍。");
+    if (me != tm[0]) return me.notify("你不是队长没有权利移除队员。");
+    for (var i = 1; i < tm.length; i++) {
+        var player = tm[i];
+        if (player.id == user) {
+            if (player.environment && player.environment.is_fb()) return me.notify(player.name + "现在正在副本区域，不能移除。");
+            player.send("<red>你被移除出了队伍。</red>");
+            player.on_teamout && player.on_teamout(me);
+            player.team = null;
+            tm.splice(i, 1);
+
+            me.send_team("<hic>" + player.name + "被移出组队。</hic>");
+            me.send_team('{"type":"dialog","dialog":"team",remove:"' + player.id + '"}');
+            break;
+        }
+    }
+    if (tm.length == 1) {
+        me.send("<hic>你的队伍解散了。</hic>");
+        me.send('{"type":"dialog","dialog":"team",dismiss:true}');
+        tm.length = 0;
+        me.team = null;
+        checkTeamfb(me);
+    }
+}
+    team_dismiss(me) {
+    if (!me.team) return me.notify("你没有加入队伍。");
+    if (me != me.team[0]) return me.notify("你不是队长没有权利解散队伍。");
+    for (var i = 0; i < me.team.length; i++) {
+        var tm = me.team[i];
+        if (tm.environment.is_fb())
+            return me.notify((tm == me ? "你" : tm.name) + "现在正在副本区域，不能解散队伍。");
+    }
+    for (var i = 0; i < me.team.length; i++) {
+        var tm = me.team[i];
+        tm.send("<hic>你的队伍解散了。</hic>");
+        tm.send('{"type":"dialog","dialog":"team",dismiss:true}');
+        if (tm != me) {
+            tm.on_teamout && tm.on_teamout(me);
+            tm.team = null;
+        }
+    }
+
+    me.team.length = 0;
+    me.team = null;
+    checkTeamfb(me);
+}
+    team_out(me) {
+    if (!me.team) return me.notify("你没有加入队伍。");
+    if (me.environment.is_fb()) return me.notify("你现在正在副本区域，不能离开队伍。");
+    me.team_out("退出队伍");
+}
+}
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+function teamToString(me) {
+    var str = ['{"type":"dialog","dialog":"team","items":['];
+    if (me.team) {
+        for (var i = 0; i < me.team.length; i++) {
+            var p = me.team[i];
+
+            str.push("{id:\"");
+            str.push(p.id);
+            str.push("\",name:\"");
+            str.push(p.long_name());
+            str.push("\"}");
+            if (i != me.team.length - 1) {
+                str.push(",");
+            }
+        }
+    }
+    str.push("]}");
+    return str.join("");
 }
 function team_dice(obj) {
     if (!this.objs || this.objs.indexOf(obj) == -1) return;
@@ -174,64 +230,9 @@ function team_dice(obj) {
     player.add_obj(obj);
     player.send_team(player.name + "获得" + UTIL.to_c(obj.count) + obj.unit + obj.color_name + "。");
 }
-this.team_remove = function (me, user) {
-    var tm = me.team;
-    if (!tm) return me.notify("你还没有加入队伍。");
-    if (me != tm[0]) return me.notify("你不是队长没有权利移除队员。");
-    for (var i = 1; i < tm.length; i++) {
-        var player = tm[i];
-        if (player.id == user) {
-            if (player.environment && player.environment.is_fb()) return me.notify(player.name + "现在正在副本区域，不能移除。");
-            player.send("<red>你被移除出了队伍。</red>");
-            player.on_teamout && player.on_teamout(me);
-            player.team = null;
-            tm.splice(i, 1);
-
-            me.send_team("<hic>" + player.name + "被移出组队。</hic>");
-            me.send_team('{"type":"dialog","dialog":"team",remove:"' + player.id + '"}');
-            break;
-        }
-    }
-    if (tm.length == 1) {
-        me.send("<hic>你的队伍解散了。</hic>");
-        me.send('{"type":"dialog","dialog":"team",dismiss:true}');
-        tm.length = 0;
-        me.team = null;
-        checkTeamfb(me);
-    }
-}
-this.team_dismiss = function (me) {
-    if (!me.team) return me.notify("你没有加入队伍。");
-    if (me != me.team[0]) return me.notify("你不是队长没有权利解散队伍。");
-    for (var i = 0; i < me.team.length; i++) {
-        var tm = me.team[i];
-        if (tm.environment.is_fb())
-            return me.notify((tm == me ? "你" : tm.name) + "现在正在副本区域，不能解散队伍。");
-    }
-    for (var i = 0; i < me.team.length; i++) {
-        var tm = me.team[i];
-        tm.send("<hic>你的队伍解散了。</hic>");
-        tm.send('{"type":"dialog","dialog":"team",dismiss:true}');
-        if (tm != me) {
-            tm.on_teamout && tm.on_teamout(me);
-            tm.team = null;
-        }
-    }
-
-    me.team.length = 0;
-    me.team = null;
-    checkTeamfb(me);
-}
-this.team_out = function (me) {
-    if (!me.team) return me.notify("你没有加入队伍。");
-    if (me.environment.is_fb()) return me.notify("你现在正在副本区域，不能离开队伍。");
-    me.team_out("退出队伍");
-}
-
 function checkTeamfb(me) {
     if (me.environment && me.environment.is_fb()) {
         WORLD.COMMANDS['cr'].enter(me, 'over')
         me.notify("<hic>你退出了队伍，自动离开副本。</hic>");
     }
-}
 }

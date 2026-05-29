@@ -1,21 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const ROOM = globalThis.ROOM; const USERTASK = globalThis.USERTASK;
-this.inherits(COMMAND);
-this.command = "goto";
-this.allow_fight = false;
-this.regex = /^(\w+)(?:\s+(\w+))$/;
-this.enter = function (me, arg, par) {
-
-    if (!me.can_trans()) return;
-    let action = this.actions[arg];
-    if (!action) return me.send('没有这个动作设定。');
-    if (action(me, par)) {
-        me.send('{type:"dialog",dialog:"jh",close:true}');
-    }
-}
-this.actions = {
+export default class extends COMMAND {
+    command = "goto";
+    allow_fight = false;
+    regex = /^(\w+)(?:\s+(\w+))$/;
+    actions = {
     home: function (me) {
 
         let home = me.query_temp("home");
@@ -135,6 +124,23 @@ this.actions = {
         task.to_taofan(me);
     }
 };
+
+    enter(me, arg, par) {
+
+    if (!me.can_trans()) return;
+    let action = this.actions[arg];
+    if (!action) return me.send('没有这个动作设定。');
+    if (action(me, par)) {
+        me.send('{type:"dialog",dialog:"jh",close:true}');
+    }
+}
+}
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const FAMILIES = globalThis.FAMILIES;
+const ROOM = globalThis.ROOM;
+const USERTASK = globalThis.USERTASK;
 function find_npc(family, path) {
     for (let item of family.def_npcs) {
         if (path !== item[0]) continue;
@@ -160,4 +166,3 @@ function find_room(area, path) {
 const NPC_ROOMS = {
 
 };
-}

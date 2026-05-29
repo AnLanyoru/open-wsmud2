@@ -1,38 +1,18 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "临济十二庄";
-this.id = "linjizhuang";
-this.grade = 3;
-this.force_rad = 0.7;
-this.desc = "峨眉派内功心法";
-this.family = FAMILIES.EMEI,
-    //"(\w+)"(.+?)"NOR"
-    //<$1>$2</$1>
-    this.can_enables = ["force"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "临济十二庄";
+    id = "linjizhuang";
+    grade = 3;
+    force_rad = 0.7;
+    desc = "峨眉派内功心法";
+    learn_condition = {
     max_mp: 2000,
     skill: {
         force: 200
     }
 };
-
-
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            max_hp: lv * 11,
-            fy: lv,
-            fy_per: 3 + parseInt(lv / 300),
-            limit_mp: lv * 103,
-            desc: "唯一：将你内力的70%转化为气血"
-        }
-    };
-}
-
-this.pfm = {
+    pfm = {
     xi:
     {
         name: "鹤翔庄",
@@ -128,4 +108,23 @@ this.pfm = {
     //        }
     //    }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            max_hp: lv * 11,
+            fy: lv,
+            fy_per: 3 + parseInt(lv / 300),
+            limit_mp: lv * 103,
+            desc: "唯一：将你内力的70%转化为气血"
+        }
+    };
 }
+
+    family = FAMILIES.EMEI;
+    //"(\w+)"(.+?)"NOR"
+    //<$1>$2</$1>
+    can_enables = ["force"];
+}
+
+const FAMILIES = globalThis.FAMILIES;

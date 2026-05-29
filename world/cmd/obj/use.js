@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-this.inherits(COMMAND);
-this.command = "use";
-this.allow_busy = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, par) {
+export default class extends COMMAND {
+    command = "use";
+    allow_busy = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    enter(player, objid, par) {
     var obj = player.find_obj(objid);
 
     var iseq = false;
@@ -71,3 +70,5 @@ this.enter = function (player, objid, par) {
 
 }
 }
+
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;

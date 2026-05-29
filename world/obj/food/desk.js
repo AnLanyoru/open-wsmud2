@@ -1,19 +1,16 @@
 import { CONTAINER } from "../../../os/item/container.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
-this.inherits(CONTAINER);
-this.set({
-    name: "婚宴礼桌",
-    desc: "这是醉仙楼的宴席桌子，上面放满了各种好吃的。",
-    unit: "个",
-    value: 0,
-    grade: 1,
-    combined: false,
-    no_get: true,
-    no_alloc: true
-});
-this.on_create = function (path, par) {
+export default class extends CONTAINER {
+    name = "婚宴礼桌";
+    desc = "这是醉仙楼的宴席桌子，上面放满了各种好吃的。";
+    unit = "个";
+    value = 0;
+    grade = 1;
+    combined = false;
+    no_get = true;
+    no_alloc = true;
+
+    on_create(path, par) {
     var lv = 0;
     if (par) {
         lv = parseInt(par.substr(1));
@@ -21,7 +18,7 @@ this.on_create = function (path, par) {
     }
     this.grade = lv;
 }
-this.query_items = function (me) {
+    query_items(me) {
     if (me.query_temp("get_marry") || !WORLD.DATA.query_temp("marry")) return;
     var items = [];
     var count = 1;
@@ -32,7 +29,10 @@ this.query_items = function (me) {
     }
     return items;
 }
-this.clear_items = function (me) {
+    clear_items(me) {
     me.set_temp("get_marry", 1, 60000 * 30);
 }
 }
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;

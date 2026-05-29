@@ -1,13 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "凌波微步";
-this.id = "lingboweibu";
-this.family = FAMILIES.XIAOYAO;
-this.grade = 3;
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "凌波微步";
+    id = "lingboweibu";
+    family = FAMILIES.XIAOYAO;
+    grade = 3;
+    dodge_actions = [
     "只见$n施展凌波微步，步法轻盈，仿佛轻云之蔽月，不知怎的就到了数丈之外。",
     "$n的身影飘飘兮若流风之回雪，施展的正是凌波微步，$N连$n的衣角都沾不到。",
     "但见$n施展凌波微步，左一转，右一斜，就已经绕到了$N的身後。",
@@ -16,27 +14,14 @@ this.dodge_actions = [
     "$N只觉得眼前一花，头脑发昏，只觉得四面都是$n的身影！",
     "$n左脚轻轻地踏出一步，施展凌波微步，若往若返，把$N牵得团团乱转。"
 ];
-this.can_enables = ["dodge"];
-this.query_prop = function (lv) {
-    return {
-        ds_per: 5 + parseInt(lv / 300)
-    };
-}
-this.query_enable_prop = function (lv) {
-    return {
-        dodge: {
-            dex: parseInt(lv / 5) + 1,
-            ds: parseInt(lv * 1.5) + 100
-        }
-    };
-}
-this.learn_condition = {
+    can_enables = ["dodge"];
+    learn_condition = {
     max_mp: 5000,
     skill: {
         dodge: 400
     }
 };
-this.pfm = {
+    pfm = {
     lingbo:
     {
         name: "凌波",
@@ -74,4 +59,20 @@ this.pfm = {
         }
     }
 };
+
+    query_prop(lv) {
+    return {
+        ds_per: 5 + parseInt(lv / 300)
+    };
 }
+    query_enable_prop(lv) {
+    return {
+        dodge: {
+            dex: parseInt(lv / 5) + 1,
+            ds: parseInt(lv * 1.5) + 100
+        }
+    };
+}
+}
+
+const FAMILIES = globalThis.FAMILIES;

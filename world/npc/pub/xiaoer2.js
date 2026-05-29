@@ -1,19 +1,22 @@
 import { NPC } from "../../../os/char/npc.js";
 
-export default function() {
-this.inherits(NPC);
-this.set({
-    name: "店小二",
-    desc: "这位店小二正笑咪咪地忙著，还不时拿起挂在脖子上的抹布擦脸。",
-    gender: 1,
-    age: 22,
-    per: this.random(20) + 10,
-    mp: 150,
-    max_mp: 150,
-    hp: 150,
-    max_hp: 150,
-});
-this.on_enter = function (me) {
+export default class extends NPC {
+    name = "店小二";
+    desc = "这位店小二正笑咪咪地忙著，还不时拿起挂在脖子上的抹布擦脸。";
+    gender = 1;
+    age = 22;
+    per = this.random(20) + 10;
+    mp = 150;
+    max_mp = 150;
+    hp = 150;
+    max_hp = 150;
+
+    constructor() {
+        super();
+        this.set_goods("food/food#0", "food/food#1", "food/food#2", "food/food#3", "food/food#4", "food/drink#0", "food/drink#1", "food/drink#2", "food/drink#3");
+    }
+
+    on_enter(me) {
     var str = "";
     switch (this.random(2)) {
         case 0:
@@ -27,10 +30,7 @@ this.on_enter = function (me) {
     }
     me.notify(str);
 }
-this.set_goods("food/food#0", "food/food#1", "food/food#2", "food/food#3", "food/food#4", "food/drink#0", "food/drink#1", "food/drink#2", "food/drink#3");
-
-
-this.on_leave = function (me, dir) {
+    on_leave(me, dir) {
 
 }
 }

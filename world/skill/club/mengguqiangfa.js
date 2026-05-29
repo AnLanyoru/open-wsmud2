@@ -1,18 +1,17 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "蒙古骑枪";
-this.id = "mengguqiangfa";
-this.grade = 3;
-this.dodge_actions = [
+export default class extends SKILL {
+    name = "蒙古骑枪";
+    id = "mengguqiangfa";
+    grade = 3;
+    dodge_actions = [
     "$n右脚轻轻一点跃开躲过了$N的攻击。",
     "$n向旁边扑出，顺势一滚，闪到一边。",
     "$n斜里冲前一步，身法诡异，$N这一招落到空处。",
     "$n忽然直身飞入半空，很久也不见人影，半响后竟闪到了$N的背后。",
     "$n突然一个急转身，$N的这一招滑到了一边。",
 ];
-this.attack_actions = [
+    attack_actions = [
     "$N斜里冲前一步，身法诡异，手中$w横扫$n的$l",
     "$N忽然直身飞入半空，很久也不见人影，$n正搜寻间，$N已飞身扑下，$w攻向$n的$l",
     "$N原地一个后滚翻，却在落地的一刹那，身体向$n平飞过去，手中$w指向$n的$l",
@@ -21,31 +20,15 @@ this.attack_actions = [
     "$N手中$w上下翻飞，舞成了一团枪花，这枪花绕$n游走三圈后指向$n的$l"
 
 ];
-this.desc = "蒙古士兵使用的枪法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["club", "parry"];
-this.learn_condition = {
+    desc = "蒙古士兵使用的枪法";
+    can_enables = ["club", "parry"];
+    learn_condition = {
     max_mp: 5000,
     skill: {
         club: 500
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        club: {
-            gj: parseInt(lv * 1.5) + 5,
-            mz: parseInt(lv * 1.5) + 5
-        },
-        parry: {
-            zj: parseInt(lv * 1.5) + 5,
-            fy: parseInt(lv * 1.5) + 5
-        }
-    };
-}
-
-this.slots = [
+    slots = [
     {
         prop: "mgqq_cc",
         value: lv => 1,
@@ -60,8 +43,7 @@ this.slots = [
         }
     }
 ];
-
-this.pfm = {
+    pfm = {
     lian:
     {
         name: "连刺",
@@ -125,4 +107,17 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        club: {
+            gj: parseInt(lv * 1.5) + 5,
+            mz: parseInt(lv * 1.5) + 5
+        },
+        parry: {
+            zj: parseInt(lv * 1.5) + 5,
+            fy: parseInt(lv * 1.5) + 5
+        }
+    };
+}
 }

@@ -1,13 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "actions";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, type) {
+export default class extends COMMAND {
+    command = "actions";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(me, type) {
     //if (!me.actions_changed) return ;
     var str = ["{type:\"actions\",actions:["];
     var items = me.items;

@@ -1,22 +1,13 @@
 import { USERTASK } from "../../os/task/playertask.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(USERTASK);
-this.id = "yamen";
+export default class extends USERTASK {
+    id = "yamen";
 
-
-const TAGS = ['wht', 'hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
-this.query_title = function (me) {
+    query_title(me) {
     let tag = TAGS[me.query_temp('ym_level', 0)];
     return `<${tag}>衙门兼职</${tag}>`;
 }
-
-
-
-const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检', '神捕'];
-
-this.query_desc = function (me) {
+    query_desc(me) {
     let lv = me.query_temp("ym_level", 0);
     if (!(lv > 0)) return;
 
@@ -44,7 +35,7 @@ this.query_desc = function (me) {
     }
     return `你帮衙门追捕逃犯，目前是${TITLES[lv]}职位，可以领取衙门发放的报酬，当前累计${ym}/60。<br><mem>每小时获得一份报酬，通过追捕更高级别的逃犯提高收益等级${mem}</mem>`;
 }
-this.format_time_span = function (time) {
+    format_time_span(time) {
     if (time > 3600000)
         return Math.floor(time / 3600000) + "小时后";
     if (time > 60000)
@@ -52,28 +43,19 @@ this.format_time_span = function (time) {
     return Math.floor(time / 1000) + "秒后";
 
 }
-this.query_ymcount = function (me) {
+    query_ymcount(me) {
     let sm = me.query_temp("ym_tm", 0);
     if (!sm) return 0;
     sm = Math.floor((Date.now() - sm * 100000) / 3600000);
     return Math.min(sm, 60);
 }
-//0 不显示 1，进行中，2.可领取 3.已完成
-this.query_state = function (me) {
+    query_state(me) {
     let lv = me.query_temp("ym_level", 0);
     if (!(lv > 0)) return 0;
     let sm = this.query_ymcount(me);
     return sm > 0 ? 2 : 1;
 }
-
-//100000 1350000 17066666 84375000 312500000  714583333
-//1        2         7      20        45        120
-//100000 700000  2438095  4218750  5208333   600000
-const EXPS = [0, 5000, 8000, 12000, 16000, 20000, 25000];
-const STONES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 60, 70, 80, 90];
-const STONES_PATHS = ["st/st_blu#0", "st/st_gre#0", "st/st_red#0", "st/st_yel#0"];
-
-this.on_finish = function (me) {
+    on_finish(me) {
     let ym_count = this.query_ymcount(me);
     if (!(ym_count > 0)) return false;
     let ym_lv = me.query_temp("ym_level", 0);
@@ -123,8 +105,7 @@ this.on_finish = function (me) {
 
     return true;
 }
-
-this.set_curtm = function (me, count) {
+    set_curtm(me, count) {
 
 
     let tm = me.query_temp("ym_tm", 0);
@@ -139,3 +120,10 @@ this.set_curtm = function (me, count) {
 
 }
 }
+
+const WORLD = globalThis.WORLD;
+const TAGS = ['wht', 'hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
+const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检', '神捕'];
+const EXPS = [0, 5000, 8000, 12000, 16000, 20000, 25000];
+const STONES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 60, 70, 80, 90];
+const STONES_PATHS = ["st/st_blu#0", "st/st_gre#0", "st/st_red#0", "st/st_yel#0"];

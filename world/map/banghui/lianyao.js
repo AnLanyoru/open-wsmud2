@@ -1,18 +1,22 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "炼药房"
-this.desc = "这是你帮会的炼药房，还没进入就先闻到一股浓烈的药草香味，房间里面没有多余的设施，一个大大的炼药炉摆在房子中间，可以同时供多名帮派成员使用。";
-this.exits = { "north": "banghui/yuanzi" };
-this.no_fight = true;
-this.add_action("lianyao", "炼药");
-this.can_lianyao = true;
-this.on_leave = function (me) {
+export default class extends ROOM {
+    name = "炼药房";
+    desc = "这是你帮会的炼药房，还没进入就先闻到一股浓烈的药草香味，房间里面没有多余的设施，一个大大的炼药炉摆在房子中间，可以同时供多名帮派成员使用。";
+    exits = { "north": "banghui/yuanzi" };
+    no_fight = true;
+    can_lianyao = true;
+
+    constructor() {
+        super();
+        this.add_action("lianyao", "炼药");
+    }
+
+    on_leave(me) {
 
     me.remove_status("room");
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     if (me.is_player) {
         let pt = me.query_party();
         if (pt) {

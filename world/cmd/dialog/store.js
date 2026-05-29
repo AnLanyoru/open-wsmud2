@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "store";
-this.regex = /^(?:(\d+)\s)?(\w+)$/;// /^(?:(\d+))?(?:\s+(\w+))?$/;
-this.enter = function (me, count, arg) {
+export default class extends COMMAND {
+    command = "store";
+    regex = /^(?:(\d+)\s)?(\w+)$/;
+
+    enter(me, count, arg) {
     if (arg && arg.length < 2) {
         count = arg;
         arg = null;
@@ -95,8 +94,7 @@ this.enter = function (me, count, arg) {
 
     me.send(str.join(""));
 }
-
-this.store_all = function (target, me) {//target仓库所有人=玩家 me玩家或者随从
+    store_all(target, me) {//target仓库所有人=玩家 me玩家或者随从
     // if (me !== notifier) return;
     if (me.query_temp('store_all'))
         return me.send('背包的道具已经自动合并到仓库中。');
@@ -124,3 +122,6 @@ this.store_all = function (target, me) {//target仓库所有人=玩家 me玩家�
     me.set_temp('store_all', 1, 6000);
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

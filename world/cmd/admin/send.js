@@ -1,16 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
-this.inherits(COMMAND);
-this.command = "send";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_level = 6;
+export default class extends COMMAND {
+    command = "send";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_level = 6;
+    regex = /^(\w+)\s(.+)$/;
 
-this.regex = /^(\w+)\s(.+)$/;
-this.enter = function (me, user, arg) {
+    enter(me, user, arg) {
     if (me && me.user_level < 5) return false;
     if (!arg) return me && me.send("没有消息内容。");
     var msg;
@@ -67,11 +65,12 @@ this.enter = function (me, user, arg) {
     me && me.notify("发送完成，共发送" + users.length);
 
 }
+}
 
-
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
 const RECORD = {
     top: true,
     score: true,
     weapon: true
 };
-}

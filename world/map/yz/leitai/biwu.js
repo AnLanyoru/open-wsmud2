@@ -1,18 +1,21 @@
 import { ROOM } from "../../../../os/room/room.js";
 
-export default function() {
-    const USER = globalThis.USER; const TASK = globalThis.TASK; const COMMAND = globalThis.COMMAND;
-this.inherits(ROOM);
-this.name = "擂台"
-this.desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
-this.exits = { "down": "yz/leitai/ltx" };
-this.max_item_count = 2;
-this.no_save=true;
-this.add_action("fight", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("kill", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("dazuo", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("liaoshang", null, function (me) { return me.notify("你正在比试。") });
-this.on_enter = function (me) {
+export default class extends ROOM {
+    name = "擂台";
+    desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
+    exits = { "down": "yz/leitai/ltx" };
+    max_item_count = 2;
+    no_save = true;
+
+    constructor() {
+        super();
+        this.add_action("fight", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("kill", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("dazuo", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("liaoshang", null, function (me) { return me.notify("你正在比试。") });
+    }
+
+    on_enter(me) {
     me.full();
     if (this.items.length != 2) return;
     var p1 = this.items[0];
@@ -30,7 +33,7 @@ this.on_enter = function (me) {
         }
     );
 }
-this.on_die = function (killer) {
+    on_die(killer) {
     if (!killer) return;
     var p1 = this;
     var p2 = killer;
@@ -48,7 +51,7 @@ this.on_die = function (killer) {
         task.battle_over(p1, p2);
     }
 }
-this.on_leave = function (me, dir) {
+    on_leave(me, dir) {
     if (dir == "out") {
         me.die = USER.prototype.die;
         return true;
@@ -57,3 +60,7 @@ this.on_leave = function (me, dir) {
     return false;
 }
 }
+
+const USER = globalThis.USER;
+const TASK = globalThis.TASK;
+const COMMAND = globalThis.COMMAND;

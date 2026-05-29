@@ -1,16 +1,36 @@
 import { TASK } from "../../os/task/task.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const NPC = globalThis.NPC; const ROOM = globalThis.ROOM; const EVENTS = globalThis.EVENTS;
-this.inherits(TASK);
-this.id = "boss";
-const BOSSTASK = this;
-this.startup = function () {
+export default class extends TASK {
+    id = "boss";
+    quickly = false;
+    boss = null;
+    boss_count = 1;
+    levels = [
+    3, 5, 10, 12, 20, 40
+];
+    player_levels = [
+    1, 1, 1, 2, 2, 2,
+    3, 3, 3, 3
+
+];
+    level_max = [
+    [0, 99], [0, 3], [0, 4], [0, 4], [0, 4], [0, 4]
+];
+    boss_levels = [
+    3, 3, 3, 3, 3,
+    3, 3, 3, 4, 4];
+    boss_min_fb = [
+    1, 4, 6, 7
+];
+    paths = [
+    "yz/lm/zhao", "bj/ao/aobai", "bj/tdh/chen", "bj/shenlong/hong"
+];
+
+    startup() {
     // this.call_out(this.run, this.random(100000));//this.random(600000)+600000
     this.check_time();
 }
-
-this.stop = function () {
+    stop() {
     if (this.time_handler) clearTimeout(this.time_handler);
     if (this.boss && this.boss.length) {
         for (var i = 0; i < this.boss.length; i++) {
@@ -22,7 +42,7 @@ this.stop = function () {
     }
     this.time_handler = null;
 }
-this.check_time = function () {
+    check_time() {
     var dt = new Date();
     var week = dt.getDay();
     var hour = dt.getHours();
@@ -38,17 +58,13 @@ this.check_time = function () {
 
     this.time_handler = this.call_out(this.run, this.next_time - dt);
 }
-this.quickly = false;
-this.boss = null;
-this.boss_count = 1;
-this.quick = function () {
+    quick() {
     if (this.quickly) this.quickly = false;
     else this.quickly = true;
     this.stop();
     this.check_time();
 }
-const BOSS_LEVELS = ["", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
-this.run = function () {
+    run() {
     this.stop();
     this.check_time();
     const list = this.check_users();
@@ -70,7 +86,7 @@ this.run = function () {
         EVENTS.add(this.create_event(bs.event_id, level, desc, rm));
     }
 }
-this.create_event = function (evtid, level, desc, rm) {
+    create_event(evtid, level, desc, rm) {
     return {
         id: evtid,
         name: BOSS_LEVELS[level] + "BOSS挑战",
@@ -91,8 +107,7 @@ this.create_event = function (evtid, level, desc, rm) {
         }
     }
 }
-
-this.check_users = function () {
+    check_users() {
     var list = [];
     for (var i = 0; i < WORLD.USERS.length; i++) {
         var user = WORLD.USERS[i];
@@ -110,7 +125,7 @@ this.check_users = function () {
     }
     return list;
 }
-this.create_boss = function (player_level) {
+    create_boss(player_level) {
     var max_level = this.boss_levels[WORLD.DATA.query_temp("fb_index", 0)];
     if (player_level) {
         var boss_max = this.level_max[player_level][1];
@@ -157,7 +172,7 @@ this.create_boss = function (player_level) {
 
     return boss;
 }
-this.on_kill = function (me) {
+    on_kill(me) {
     if (me.level > this.level) {
         if (this.family == FAMILIES.MONSTER) {
             return me.notify_fail(this.name + "目露凶光狠狠的瞪着你。");
@@ -165,7 +180,26 @@ this.on_kill = function (me) {
         return me.notify_fail(this.name + "对你拱手说道：这位" + me.call() + "，不知" + this.callme() + "有何得罪之处？");
     }
 }
+    on_died(me, corpse) {
+    if (!this.is_party_boss)
+        EVENTS.add(create_finish_event(this));
+    if (!this.damages) return;
+    corpse.no_alloc = true;
+    corpse.clear_items = clear_items.bind(this);
+    corpse.query_items = query_items.bind(this);
+    corpse.query_damage = query_damage.bind(this);
+}
+}
 
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const UTIL = globalThis.UTIL;
+const FAMILIES = globalThis.FAMILIES;
+const NPC = globalThis.NPC;
+const ROOM = globalThis.ROOM;
+const EVENTS = globalThis.EVENTS;
+const BOSSTASK = this;
+const BOSS_LEVELS = ["", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
 function create_finish_event(boss) {
     return {
         id: boss.event_id,
@@ -179,18 +213,6 @@ function create_finish_event(boss) {
             BOSSTASK.boss_auto_drops(me, boss, par);
         }
     }
-}
-
-
-
-this.on_died = function (me, corpse) {
-    if (!this.is_party_boss)
-        EVENTS.add(create_finish_event(this));
-    if (!this.damages) return;
-    corpse.no_alloc = true;
-    corpse.clear_items = clear_items.bind(this);
-    corpse.query_items = query_items.bind(this);
-    corpse.query_damage = query_damage.bind(this);
 }
 function query_damage() {
     var str = [];
@@ -207,16 +229,11 @@ function query_damage() {
     }
     return str.join("");
 }
-
 const BOSS_DROPS = {
     lv1_0: [
         "st/st_red#0", "st/st_gre#0", "st/st_blu#0", "st/st_yel#0"],
 
 };
-
-
-
-
 function query_items(me) {
     if (!this.damages) return;
 
@@ -253,33 +270,8 @@ function query_items(me) {
     this.user_items[me.id] = items;
     return items;
 }
-
-
 function clear_items(me) {
     if (this.user_items) {
         this.user_items[me.id].length = 0;
     }
-}
-
-this.levels = [
-    3, 5, 10, 12, 20, 40
-];
-this.player_levels = [
-    1, 1, 1, 2, 2, 2,
-    3, 3, 3, 3
-
-];
-this.level_max = [
-    [0, 99], [0, 3], [0, 4], [0, 4], [0, 4], [0, 4]
-];
-this.boss_levels = [
-    3, 3, 3, 3, 3,
-    3, 3, 3, 4, 4];
-
-this.boss_min_fb = [
-    1, 4, 6, 7
-];
-this.paths = [
-    "yz/lm/zhao", "bj/ao/aobai", "bj/tdh/chen", "bj/shenlong/hong"
-];
 }

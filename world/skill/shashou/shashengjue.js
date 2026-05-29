@@ -1,33 +1,19 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "杀生决";
-this.id = "shashengjue";
-this.grade = 3;
-this.force_rad = 0.55;
-this.family = FAMILIES.SHASHOU;
-this.desc = "杀手楼的高级内功";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "杀生决";
+    id = "shashengjue";
+    grade = 3;
+    force_rad = 0.55;
+    family = FAMILIES.SHASHOU;
+    desc = "杀手楼的高级内功";
+    can_enables = ["force"];
+    learn_condition = {
     skill: {
         force: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: lv * 1.5 + 2,
-            bj_per: parseInt(lv / 300) + 1,
-            limit_mp: lv * 105,
-            desc: "唯一：将你内力的55%转化为气血"
-        }
-    };
-}
-this.pfm = {
+    pfm = {
 
 
     power:
@@ -100,6 +86,19 @@ this.pfm = {
     }
 };
 
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: lv * 1.5 + 2,
+            bj_per: parseInt(lv / 300) + 1,
+            limit_mp: lv * 105,
+            desc: "唯一：将你内力的55%转化为气血"
+        }
+    };
+}
+}
+
+const FAMILIES = globalThis.FAMILIES;
 const YS_ROOMS = {
     "yz/leitai/leitai": function (me) {
         me.send_room("\n<blk>$N的身形一闪，渐渐模糊不见了。<blk>\n");
@@ -112,4 +111,3 @@ const YS_ROOMS = {
         }
     }
 };
-}

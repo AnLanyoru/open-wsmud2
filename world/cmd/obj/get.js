@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "get";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
-this.enter = function (player, count, objid, from) {
+export default class extends COMMAND {
+    command = "get";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
+
+    enter(player, count, objid, from) {
     if (!objid) return player.notify("你要捡什么东西？");
     var parent = player.environment;
     if (from) {
@@ -72,6 +71,10 @@ this.enter = function (player, count, objid, from) {
         parent.refresh();
     }
 }
+}
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
 function getObj(me, item, parent) {
 
     if (!(item.count > 0)) return true;
@@ -133,5 +136,4 @@ function getObj(me, item, parent) {
     else
         me.send_room("$N捡起" + UTIL.to_c(item.count) + item.unit + item.color_name + "。");
     return true;
-}
 }

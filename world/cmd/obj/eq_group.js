@@ -1,10 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "eqgroup";
-this.allow_fight = false;
-this.enter = function (me, par) {
+export default class extends COMMAND {
+    command = "eqgroup";
+    allow_fight = false;
+
+    enter(me, par) {
     let index = parseInt(par);
     if (!(index >= 0 && index < 3)) return;
 
@@ -30,8 +30,7 @@ this.enter = function (me, par) {
     me.eq_group = index;
     me.send(`{type:"dialog",dialog:"pack",eq_group:${index}}`);
 }
-
-this.save_eqgroup = function (me) {
+    save_eqgroup(me) {
     let eqs = me.eq_groups[me.eq_group];
     if (!eqs) {
         eqs = new Array(me.equipment.length);

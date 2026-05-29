@@ -1,11 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "diaoyu";
+export default class extends COMMAND {
+    command = "diaoyu";
 
-this.enter = function (me) {
+    enter(me) {
     if (!me.environment || !me.environment.can_diaoyu)
         return false;
     var wea = me.query_weapon();
@@ -28,7 +26,10 @@ this.enter = function (me) {
         desc: '["你眼睛一眨也不眨地盯着浮漂，专心致志。","浮漂一上一下的在动，看样子有东西要上钩了！"]',
     });
 }
+}
 
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level]
         + WORLD.DATA.query_temp("diaoyu_exp", 0);
@@ -80,7 +81,6 @@ function calculate_lv(grade) {
     const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, cumulative);
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
-
 function do_diaoyu(me) {
     let r_i = me.random(100);
     if (r_i > 89) {
@@ -108,12 +108,10 @@ function do_diaoyu(me) {
     var pot = exp + me.query_prop('lsj_qn');
     me.add_exp(exp, pot, 0);
 }
-
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {
             return me.items[i];
         }
     }
-}
 }

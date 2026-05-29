@@ -1,69 +1,27 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "小无相功";
-this.id = "xiaowuxianggong";
-this.family = FAMILIES.XIAOYAO;
-this.grade = 4;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "小无相功";
+    id = "xiaowuxianggong";
+    family = FAMILIES.XIAOYAO;
+    grade = 4;
+    attack_actions = [
     "$N挥拳攻击$n的$l", "$N往$n的$l一抓", "$N往$n的$l狠狠地踢了一脚",
     "$N提起拳头往$n的$l捶去", "$N对准$n的$l用力挥出一拳"
 ];
-//this.query_attack_action = function (me,target) {
-//    if (me.attack_skill == target.attack_skill) return this.attack_actions.random();
-//    return target.attack_skill.query_attack_action(me, target);
-//}
-this.attack_actions2 = [
+    attack_actions2 = [
     "$N用$W往$n的$l刺去", "$N用$W往$n的$l砍去", "$N挥动$W,斩向$n的$l"
 ];
-this.query_attack_action = function (me, target) {
-    let type = me.query_weapon_type();
-    if (type === WEAPON_TYPE.NONE)
-        return this.attack_actions.random();
-    return this.attack_actions2.random();
-}
-
-this.desc = "逍遥派的一门奇特武功，其主要特点是不着形相，无迹可寻，可以模仿别人的绝学";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "sword"];//"blade", 
-this.learn_condition = {
+    desc = "逍遥派的一门奇特武功，其主要特点是不着形相，无迹可寻，可以模仿别人的绝学";
+    can_enables = ["unarmed", "sword"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         unarmed: 300,
         parry: 300
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.4) + 20,
-            mz: parseInt(lv * 1.2) + 20
-        },
-        sword: {
-            gj: parseInt(lv * 1.4) + 20,
-            mz: parseInt(lv * 1.2) + 20
-        }
-        // ,
-        // blade: {
-        //     gj: parseInt(lv * 1.4) + 20,
-        //     mz: parseInt(lv * 1.2) + 20
-        // }
-    };
-}
-const ALLOW_TYPES = {
-    sword: "(剑法)",
-    unarmed: "(拳脚)"
-};
-
-const ALLOW_RECORD = {
-    sword: true,
-    unarmed: true
-};
-this.pfm = {
+    pfm = {
     duo:
     {
         name: "无相",
@@ -202,4 +160,39 @@ this.pfm = {
         }
     }
 };
+
+    query_attack_action(me, target) {
+    let type = me.query_weapon_type();
+    if (type === WEAPON_TYPE.NONE)
+        return this.attack_actions.random();
+    return this.attack_actions2.random();
 }
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.4) + 20,
+            mz: parseInt(lv * 1.2) + 20
+        },
+        sword: {
+            gj: parseInt(lv * 1.4) + 20,
+            mz: parseInt(lv * 1.2) + 20
+        }
+        // ,
+        // blade: {
+        //     gj: parseInt(lv * 1.4) + 20,
+        //     mz: parseInt(lv * 1.2) + 20
+        // }
+    };
+}
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;
+const ALLOW_TYPES = {
+    sword: "(剑法)",
+    unarmed: "(拳脚)"
+};
+const ALLOW_RECORD = {
+    sword: true,
+    unarmed: true
+};

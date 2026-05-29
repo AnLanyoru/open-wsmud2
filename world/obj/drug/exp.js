@@ -1,23 +1,21 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "颗",
-    name: "朱果",
-    desc: "一颗红色果子，吃了增加500经验，500潜能",
-    grade: 1,
-    exp: 500,
-    pot: 500,
-    value: 1000
-});
-this.transable = true;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "颗";
+    name = "朱果";
+    desc = "一颗红色果子，吃了增加500经验，500潜能";
+    grade = 1;
+    exp = 500;
+    pot = 500;
+    value = 1000;
+    transable = true;
+
+    on_use(me) {
     me.notify("你吞下一颗" + this.color_name + "。");
     me.add_exp(this.exp, this.pot);
     return true;
 }
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = path + "#0";
         return;

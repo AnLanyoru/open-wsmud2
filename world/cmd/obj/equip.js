@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "eq";
-this.enter = function (me, oid) {
+export default class extends COMMAND {
+    command = "eq";
+
+    enter(me, oid) {
     var obj = me.find_obj(oid);
     if (!obj) {
         return me.notify("你要装备什么？");

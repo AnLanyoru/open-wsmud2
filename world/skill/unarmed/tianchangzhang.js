@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "天长掌法";
-this.id = "tianchangzhang";
-this.grade = 3;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "天长掌法";
+    id = "tianchangzhang";
+    grade = 3;
+    attack_actions = [
     "$N使一招<GRN>「青山隐隐」</GRN>，双手划了个半圈，按向$n的$l",
     "$N使一招<MAG>「云霞出海」</MAG>，左手轻轻一挥，劈向$n的$l",
     "$N右手掌心向外，由右向左，使一招<CYN>「星河鹭起」</CYN>，向$n的$l打去",
@@ -18,26 +16,15 @@ this.attack_actions = [
     "$N一招<CYN>「月华流照」</CYN>，左掌先发而后至，右掌后发而先至",
     "$N双掌缩入袖中，双袖飞起扫向$n的$l，却是一招<HIR>「嫦娥奔月」</HIR>，仪态潇洒",
 ];
-this.desc = "恒山派绝学掌法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "恒山派绝学掌法";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         unarmed: 450
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.2) + 20,
-            fy: parseInt(lv * 1.3) + 20,
-            max_hp: lv * 10
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'str',
         value: (lv) => 1 + Math.floor(lv / 10),
@@ -53,7 +40,7 @@ this.slots = [
         }
     },
 ];
-this.pfm = {
+    pfm = {
     chan:
     {
         name: "天长叠掌",
@@ -79,4 +66,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.2) + 20,
+            fy: parseInt(lv * 1.3) + 20,
+            max_hp: lv * 10
+        }
+    };
+}
 }

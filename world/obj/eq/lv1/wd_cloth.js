@@ -1,18 +1,16 @@
 import { EQUIPMENT } from "../../../../os/item/equipment.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-this.inherits(EQUIPMENT);
-this.set({
-    name: "武当道袍",
-    desc:"这是武当派正式弟子的标准装束。",
-    unit: "件",
-    grade: 1,
-    eq_type: EQUIP_TYPE.CLOTH,
-    value: 10000,
-    prop: {
+export default class extends EQUIPMENT {
+    name = "武当道袍";
+    desc = "这是武当派正式弟子的标准装束。";
+    unit = "件";
+    grade = 1;
+    eq_type = EQUIP_TYPE.CLOTH;
+    value = 10000;
+    prop = {
         fy: 10,
         con:2
-    }
-});
+    };
 }
+
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;

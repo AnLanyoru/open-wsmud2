@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const FAMILIES = globalThis.FAMILIES; const AREA = globalThis.AREA;
-this.inherits(COMMAND);
-this.command = "cr2";
-this.allow_fight = true;
-this.allow_die = true;
-this.allow_state = true;
-this.regex = /(\d+)\s(\d+)/;
-this.enter = function (me, index, diff) {
+export default class extends COMMAND {
+    command = "cr2";
+    allow_fight = true;
+    allow_die = true;
+    allow_state = true;
+    regex = /(\d+)\s(\d+)/;
+
+    enter(me, index, diff) {
     index = parseInt(index);
     let area = AREA.FBS[index];
     if (!area || area.no_fb || !area.is_copy || !DIFFS[diff])
@@ -30,11 +29,7 @@ this.enter = function (me, index, diff) {
     me.send(str.join(""));
 
 }
-const DIFFS = ["普通", "困难", "组队"];
-const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
-    'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];
-
-this.set_fb_first = function (me) {
+    set_fb_first(me) {
 
     let data = [];
     for (let item of FB_DATAS) {
@@ -65,6 +60,15 @@ this.set_fb_first = function (me) {
 
     me.send(str.join(""));
 }
+}
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const FAMILIES = globalThis.FAMILIES;
+const AREA = globalThis.AREA;
+const DIFFS = ["普通", "困难", "组队"];
+const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
+    'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];
 const FB_MAX = {
     HUASHAN: 15,
     XIAOYAO: 18,
@@ -75,4 +79,3 @@ const FB_MAX = {
     SHAOLIN: 13,
     NONE: 12
 };
-}

@@ -1,12 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "makelove";
-this.allow_fight = false;
+export default class extends COMMAND {
+    command = "makelove";
+    allow_fight = false;
 
-this.enter = function (me, oid) {
+    enter(me, oid) {
 
     if (me.environment.parent.id != 'home') return me.notify("这里双修可不太好，找个安全点的地方吧！");
 
@@ -40,7 +38,7 @@ this.enter = function (me, oid) {
 
 
 }
-this.accept = function (me, target) {
+    accept(me, target) {
 
     let name = target.name;
     me.send("<yel>你和" + name + "面对面盘膝坐下，掌心相对，双掌相抵。</yel>");
@@ -66,6 +64,9 @@ this.accept = function (me, target) {
         }
     });
 }
+}
+
+const WORLD = globalThis.WORLD;
 function on_check(me) {
     let speed = parseInt((me.query_skill("force") / 100
         + me.query_prop("shuangxiu")
@@ -121,5 +122,4 @@ function do_dazuo(me) {
             return me.notify_fail("<hic>你觉得你的经脉充盈，已经没有办法再增加内力了。</hic>");
 
     }
-}
 }

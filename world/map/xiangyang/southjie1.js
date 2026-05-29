@@ -1,10 +1,9 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "南大街";
-this.desc = "这是一条宽阔的青石板街道，向南北两头延伸。";
-this.exits = { 
+export default class extends ROOM {
+    name = "南大街";
+    desc = "这是一条宽阔的青石板街道，向南北两头延伸。";
+    exits = { 
     // east: "xiangyang/eastjie2", 
     // west: "xiangyang/guangchang", 
     south: "xiangyang/southjie2", 

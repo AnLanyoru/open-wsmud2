@@ -1,10 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "trade";
-this.allow_fight = false;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "trade";
+    allow_fight = false;
+
+    enter(me, arg) {
     if (!arg) return;
     var target = me.find_obj(arg, me.environment);
     if (!target) {

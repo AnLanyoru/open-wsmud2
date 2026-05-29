@@ -1,10 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "dc";
-this.regex = /(\w+)\s+(\w+)\s*(.+)?/;
-this.enter = function (player, arg, cmd, par) {
+export default class extends COMMAND {
+    command = "dc";
+    regex = /(\w+)\s+(\w+)\s*(.+)?/;
+
+    enter(player, arg, cmd, par) {
     if (!arg || !cmd) return;
     var target = player.find_obj(arg, player.environment);
     if (!target) return player.send("没有这个人。");
@@ -18,6 +18,8 @@ this.enter = function (player, arg, cmd, par) {
     }
     target.set_listener(player, null);
 }
+}
+
 const ALLOW_DC = {
     study: true,
     store: true,
@@ -50,4 +52,3 @@ const ALLOW_DC = {
     lingwu3: true,
     fenjie: true
 };
-}

@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL; const ROOM = globalThis.ROOM; const USER = globalThis.USER;
-this.inherits(COMMAND);
-this.command = "relive";
-this.allow_die = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "relive";
+    allow_die = true;
+
+    enter(me, arg) {
     if (!WORLD.is_server(me)) {
         return WORLD.on_cross_user_relive(me);
     }
@@ -112,3 +111,8 @@ this.enter = function (me, arg) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const ROOM = globalThis.ROOM;
+const USER = globalThis.USER;

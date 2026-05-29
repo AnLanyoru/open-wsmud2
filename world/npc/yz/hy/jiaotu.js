@@ -1,21 +1,39 @@
 import { NPC } from "../../../../os/char/npc.js";
 
-export default function() {
-    const ROOM = globalThis.ROOM; const CORPSE = globalThis.CORPSE;
-this.inherits(NPC);
-this.set({
-    name: "黑鹰教徒",
-    desc: "他们身穿黑袍，持长刀，动作整齐划一",
-    gender: 1,
-    age: 32,
-    per: 22,
-    mp: 1500,
-    max_mp: 1500,
-    hp: 1500,
-    max_hp: 1500
-});
-this.no_refresh = true;
-this.on_heart_beat = function () {
+export default class extends NPC {
+    name = "黑鹰教徒";
+    desc = "他们身穿黑袍，持长刀，动作整齐划一";
+    gender = 1;
+    age = 32;
+    per = 22;
+    mp = 1500;
+    max_mp = 1500;
+    hp = 1500;
+    max_hp = 1500;
+    no_refresh = true;
+
+    constructor() {
+        super();
+        this.skill_map(
+            ["unarmed", 150],
+            ["dodge", 150],
+            ["force", 150],
+            ["parry", 150],
+            ["blade", 150],
+            ["heilongxinfa", 150, "force"],
+            ["wuhuduanmendao", 150, "blade"]);
+        this.set_objects(
+            ["eq/lv0/cloth", 1, 1],
+            ["eq/lv1/dandao", 1, 1]
+        );
+        this.set_drop({
+            obj: "st/xuanjing",
+            min: 1,
+            max: 3
+        });
+    }
+
+    on_heart_beat() {
     let exits = this.environment.move_exits;
     if (!exits || !exits.length) return;
     this.do_command('go', exits.random());
@@ -26,19 +44,13 @@ this.on_heart_beat = function () {
         }
     }
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     if (me.is_player && !this.fight_type) {
         this.send_room("$N喝道：" + me.call(true) + "，哪里来的小毛贼！");
         this.do_kill(me);
     }
 }
-
-
-
-var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
-    "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
-    "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
-this.die = function (killer) {
+    die(killer) {
     if (!this.environment) return;
     if (this.on_die && this.on_die(killer) == false) {
         this.hp = 1;
@@ -58,10 +70,7 @@ this.die = function (killer) {
     this.on_died && this.on_died(killer, corpse);
 
 }
-
-
-
-this.on_died = function (me, corpse) {
+    on_died(me, corpse) {
     let eny = this.enemy[0];
     if (eny && eny.hp > 0 && eny.environment === this.die_room) {
         let count = eny.query_temp('hy_ct', 0);
@@ -77,9 +86,7 @@ this.on_died = function (me, corpse) {
     }
     corpse.items = null;
 }
-const rooms = ['yz/hy/jiaochang1', 'yz/hy/jiaochang3',
-    'yz/hy/jiaochang4', 'yz/hy/jiaochang5'];
-this.relive = function () {
+    relive() {
     if (!this.die_room) return;
     var room = ROOM.Get(rooms.random());
 
@@ -90,22 +97,12 @@ this.relive = function () {
     this.items = null;
     this.skills = null;
 }
-this.skill_map(
-    ["unarmed", 150],
-    ["dodge", 150],
-    ["force", 150],
-    ["parry", 150],
-    ["blade", 150],
-    ["heilongxinfa", 150, "force"],
-    ["wuhuduanmendao", 150, "blade"]);
-this.set_objects(
-    ["eq/lv0/cloth", 1, 1],
-    ["eq/lv1/dandao", 1, 1]
-);
-
-this.set_drop({
-    obj: "st/xuanjing",
-    min: 1,
-    max: 3
-});
 }
+
+const ROOM = globalThis.ROOM;
+const CORPSE = globalThis.CORPSE;
+var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
+    "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
+    "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];
+const rooms = ['yz/hy/jiaochang1', 'yz/hy/jiaochang3',
+    'yz/hy/jiaochang4', 'yz/hy/jiaochang5'];

@@ -1,18 +1,25 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
-this.inherits(OBJ);
-this.set({
-    unit: "本",
-    name: "武功秘籍",
-    desc: "一本武功秘籍",
-    max_level: 100,
-    combined: true,
-    value: 0
-});
-this.otype = 1;
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    unit = "本";
+    name = "武功秘籍";
+    desc = "一本武功秘籍";
+    max_level = 100;
+    combined = true;
+    value = 0;
+    otype = 1;
+
+    constructor() {
+        super();
+        this.add_action('sbook', '存到技能仓库', function (me) {
+            WORLD.COMMANDS.sbook.enter(me, this.id);
+        });
+        this.add_action('split', '拆分', function (me) {
+            WORLD.COMMANDS.sbook.split_book(me, this);
+        });
+    }
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var skill = SKILL.get(par);
@@ -31,21 +38,12 @@ this.on_create = function (path, par) {
     }
     this.value = WORLD.DATA.book_values[this.grade] * COMBINED[this.grade];
 }
-this.on_study = function (me, skill, lv) {
+    on_study(me, skill, lv) {
     if (skill.do_learn && skill.do_learn(me, lv) == false) return false;
     return true;
 }
-
-//const VALUES = [1, 1000, 5000, 10000, 100000, 500000, 2000000];
-const COMBINED = [1, 10, 30, 50, 100, 200, 500];
-
-
-
-this.add_action('sbook', '存到技能仓库', function (me) {
-    WORLD.COMMANDS.sbook.enter(me, this.id);
-});
-
-this.add_action('split', '拆分', function (me) {
-    WORLD.COMMANDS.sbook.split_book(me, this);
-});
 }
+
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;
+const COMBINED = [1, 10, 30, 50, 100, 200, 500];

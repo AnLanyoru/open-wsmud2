@@ -1,16 +1,16 @@
 import { FAMILY } from "../../os/skill/family.js";
 
-export default function() {
-    const MONSTER = globalThis.MONSTER;
-this.inherits(FAMILY);
+export default class extends FAMILY {
+    id = "MONSTER";
+    name = "怪物";
 
-this.id = "MONSTER";
-this.name = "怪物";
-this.call = function (player, isbad) {
+    call(player, isbad) {
     return isbad ? "畜生" : "大仙";
 
 }
-this.call_me = function (player, isbad) {
+    call_me(player, isbad) {
 
 }
 }
+
+const MONSTER = globalThis.MONSTER;

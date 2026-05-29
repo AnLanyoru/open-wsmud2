@@ -1,11 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "wk";
+export default class extends COMMAND {
+    command = "wk";
 
-this.enter = function (me) {
+    enter(me) {
 
     var wea = me.query_weapon();
     if (me.master) {
@@ -42,7 +40,10 @@ this.enter = function (me) {
         on_check: on_check
     });
 }
+}
 
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level]
         + WORLD.DATA.query_temp("kuang_exp", 0);
@@ -72,7 +73,6 @@ function calculate_lv(grade) {
     }
     return UTIL.weightedChoice(items, weights);
 }
-
 function do_diaoyu(me) {
     let r_i = me.random(100);
     if (r_i > 89) {
@@ -88,5 +88,4 @@ function do_diaoyu(me) {
     var pot = exp + me.query_prop('gsj_qn');
     me.add_exp(exp, pot, 0);
 
-}
 }

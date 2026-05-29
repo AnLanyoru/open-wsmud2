@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "drop";
-this.regex = /^(?:(\d+\s))?(.+?)$/;
-this.enter = function (player, count, objid) {
+export default class extends COMMAND {
+    command = "drop";
+    regex = /^(?:(\d+\s))?(.+?)$/;
+
+    enter(player, count, objid) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要丢掉什么东西？");
@@ -17,7 +16,7 @@ this.enter = function (player, count, objid) {
     if (obj.no_drop) return player.notify("这个东西丢不掉。");
     this.exec(player, obj, count);
 }
-this.exec = function (player, obj, count) {
+    exec(player, obj, count) {
     if (!obj || !player.environment) return;
     var drop_count = 1;
     if (count) drop_count = parseInt(count);
@@ -43,3 +42,6 @@ this.exec = function (player, obj, count) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

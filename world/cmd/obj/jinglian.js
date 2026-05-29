@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "jinglian";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, isok) {
+export default class extends COMMAND {
+    command = "jinglian";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    enter(player, objid, isok) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要精炼什么装备？");
@@ -101,11 +100,12 @@ this.enter = function (player, objid, isok) {
     player.notify(str.join(""));
 
 }
+}
 
+const WORLD = globalThis.WORLD;
 function query_level_color(lv) {
     if (!lv) return "";
     var jlcolor = ["", "hig", "hig", "hic", "hic", "hiy", "hiy", "HIZ", "HIZ", "hio", "hio", "ord", "ord"];
     var cc = jlcolor[lv];
     return "<" + cc + ">＋" + lv + " </" + cc + ">";
-}
 }

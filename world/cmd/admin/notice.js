@@ -1,15 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "notice";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_level = 6;
-const MESSAGE = WORLD.MESSAGE;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "notice";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_level = 6;
+
+    enter(me, arg) {
     var nt = {
         content: arg,
         time: Date.now()
@@ -26,8 +24,7 @@ this.enter = function (me, arg) {
     var str = JSON.stringify(item);
     WORLD.sendAll(str);
 }
-
-this.updatelast = function (me) {
+    updatelast(me) {
     MESSAGE.NOTICES[MESSAGE.NOTICES.length - 1].content = `
    古大陆妖族营地在每周快速完成后，仍可以继续手动击杀，直到每周上限。
    降低营地1刷新速度10秒，其他营地暂时关闭
@@ -35,3 +32,6 @@ this.updatelast = function (me) {
     me.send(MESSAGE.NOTICES[MESSAGE.NOTICES.length - 1].content);
 }
 }
+
+const WORLD = globalThis.WORLD;
+const MESSAGE = WORLD.MESSAGE;

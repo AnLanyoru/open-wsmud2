@@ -1,20 +1,23 @@
 import { ROOM } from "../../../../os/room/room.js";
 
-export default function() {
-    const USER = globalThis.USER;
-this.inherits(ROOM);
-this.name = "擂台"
-this.desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
-this.exits = { "down": "yz/leitai/ltx" };
-this.max_item_count = 1;
-this.no_save = true;
-this.add_action("fight", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("kill", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("dazuo", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("liaoshang", null, function (me) { return me.notify("你正在比试。") });
-this.add_action("relive", null, function (me) { return me.notify("你正在比试。") });
-this.start_time = 0;
-this.on_enter = function (me) {
+export default class extends ROOM {
+    name = "擂台";
+    desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
+    exits = { "down": "yz/leitai/ltx" };
+    max_item_count = 1;
+    no_save = true;
+    start_time = 0;
+
+    constructor() {
+        super();
+        this.add_action("fight", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("kill", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("dazuo", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("liaoshang", null, function (me) { return me.notify("你正在比试。") });
+        this.add_action("relive", null, function (me) { return me.notify("你正在比试。") });
+    }
+
+    on_enter(me) {
     if (!me.is_player) return;
     me.die = challenge_over;
     this.start_time = Date.now();
@@ -28,7 +31,7 @@ this.on_enter = function (me) {
         }
     );
 }
-this.on_heart_beat = function (dt) {
+    on_heart_beat(dt) {
     if (this.start_time) {
         if (dt - this.start_time >= 300000) {
 
@@ -63,6 +66,12 @@ this.on_heart_beat = function (dt) {
         }
     }
 }
+    on_leave(me, dir) {
+    return me.notify_fail("你比试完才可以下擂台。");
+}
+}
+
+const USER = globalThis.USER;
 function challenge_over(killer) {
     if (this.environment.items.length != 2) {
         return this.send("比武出现问题，请练习管理解决。");;
@@ -83,8 +92,4 @@ function challenge_over(killer) {
 }
 function move_out() {
     
-}
-this.on_leave = function (me, dir) {
-    return me.notify_fail("你比试完才可以下擂台。");
-}
 }

@@ -1,14 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "劈石破玉拳";
-this.id = "poyuquan";
-this.grade = 1;
-
-this.family = FAMILIES.HUASHAN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "劈石破玉拳";
+    id = "poyuquan";
+    grade = 1;
+    family = FAMILIES.HUASHAN;
+    attack_actions = [
     "$N右脚立定、左脚虚点，一式「起手式」，左右手一高一低，击向$n的$l",
     "$N左脚虚踏，全身右转，一招「石破天惊」，右拳猛地击向$n的$l",
     "$N双手大开大阖，宽打高举，使一招「铁闩横门」，双拳向$n的$l打去",
@@ -18,27 +15,15 @@ this.attack_actions = [
     "$N施出「封闭手」，双拳拳出如风，同时打向$n头，胸，腹三处要害",
     "$N左脚内扣，右腿曲坐，一式「粉石碎玉」，双拳齐齐捶向$n的胸口"
 ];
-this.desc = "华山派拳脚功夫，原为劈石及破玉两路拳法绝学";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "华山派拳脚功夫，原为劈石及破玉两路拳法绝学";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 700,
     skill: {
         unarmed: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv + 20
-        },
-        parry: {
-            zj: lv + 20
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     po:
     {
         name: "破玉",
@@ -106,4 +91,18 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv + 20
+        },
+        parry: {
+            zj: lv + 20
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

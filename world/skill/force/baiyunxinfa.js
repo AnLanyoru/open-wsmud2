@@ -1,34 +1,19 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "白云心法";
-this.id = "baiyunxinfa";
-this.grade = 3;
-this.force_rad = 0.75;
-this.desc = "恒山派的内功心法。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "白云心法";
+    id = "baiyunxinfa";
+    grade = 3;
+    force_rad = 0.75;
+    desc = "恒山派的内功心法。";
+    can_enables = ["force"];
+    learn_condition = {
     max_mp: 50000,
     skill: {
         force: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            gj: parseInt(lv * 1.3) + 10,
-            fy: parseInt(lv * 1.3) + 10,
-            max_hp: lv * 10,
-            limit_mp: lv * 100,
-            desc: "唯一：将你内力的75%转化为气血"
-        },
-    };
-}
-
-this.slots = [
+    slots = [
     {
         prop: "byxf_gj",
         value: lv => 10,
@@ -61,7 +46,7 @@ this.slots = [
         }
     }
 ];
-this.pfm = {
+    pfm = {
     power:
     {
         name: "白云",
@@ -94,4 +79,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            gj: parseInt(lv * 1.3) + 10,
+            fy: parseInt(lv * 1.3) + 10,
+            max_hp: lv * 10,
+            limit_mp: lv * 100,
+            desc: "唯一：将你内力的75%转化为气血"
+        },
+    };
+}
 }

@@ -1,20 +1,17 @@
 import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
-export default function() {
-this.inherits(FAMILY_AREA);
-this.set({
-    id: "shashou",
-    name: "杀手楼",
-    desc: "一个游离在江湖外的神秘组织，法规森严，鲜少参与江湖争斗。",
-    sp: "门下弟子多为杀手，一手暗器功夫出神入化",
-    first: "shashou/damen",
-    is_area: true,
-    is_public: true,
-    index: 7,
-    room_path: "shashou/",
-    family: "SHASHOU"
-});
-this.map = [
+export default class extends FAMILY_AREA {
+    id = "shashou";
+    name = "杀手楼";
+    desc = "一个游离在江湖外的神秘组织，法规森严，鲜少参与江湖争斗。";
+    sp = "门下弟子多为杀手，一手暗器功夫出神入化";
+    first = "shashou/damen";
+    is_area = true;
+    is_public = true;
+    index = 7;
+    room_path = "shashou/";
+    family = "SHASHOU";
+    map = [
     { n: "大门", id: "shaolin/guangchang", p: [0, 0] },
     { n: "大厅", id: "shaolin/shanmen", p: [0, -1], exits: ["s", "nw"] },
     { n: "暗阁", id: "shaolin/liangong1", p: [-1, -2] },

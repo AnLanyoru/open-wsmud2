@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "pack";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "pack";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(me, arg) {
     var target = me;
     if (arg) {
         if (arg == "none") return me.notify('{"type":"dialog","dialog":"pack","money":' + me.money + "}");
@@ -106,3 +105,5 @@ this.enter = function (me, arg) {
     me.send(str.join(""));
 }
 }
+
+const WORLD = globalThis.WORLD;

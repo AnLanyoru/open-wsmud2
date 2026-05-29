@@ -1,12 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "sys";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, msg) {
+export default class extends COMMAND {
+    command = "sys";
+    allow_busy = true;
+    allow_state = true;
+
+    enter(me, msg) {
     if (me) return;
     //if (!msg) {
     //    return;
@@ -19,3 +18,6 @@ this.enter = function (me, msg) {
 
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

@@ -1,23 +1,20 @@
 import { AREA } from "../../../os/room/area.js";
 
-export default function() {
-this.inherits(AREA);
-this.set({
-    id: "zhuang",
-    name: "庄府",
-    desc: "因明史一案被抄家灭族的庄府一众妇孺被何惕守救后就藏在这里，想要伺机刺杀鳌拜",
-    score: 100,
-    is_show: true,
-    first: "bj/zhuang/xiaolu",
-    is_copy: true,
-    expend: 10,
-    exp: 10000,
-    pot: 6000,
-    is_multi: false,
-    room_path: "bj/zhuang/",
-    ss_title: "天下无双"
-});
-this.map = [
+export default class extends AREA {
+    id = "zhuang";
+    name = "庄府";
+    desc = "因明史一案被抄家灭族的庄府一众妇孺被何惕守救后就藏在这里，想要伺机刺杀鳌拜";
+    score = 100;
+    is_show = true;
+    first = "bj/zhuang/xiaolu";
+    is_copy = true;
+    expend = 10;
+    exp = 10000;
+    pot = 6000;
+    is_multi = false;
+    room_path = "bj/zhuang/";
+    ss_title = "天下无双";
+    map = [
      { n: "小路", id: "bj/zhuang/xiaolu", p: [0, 3] },
                     { n: "小路", id: "bj/zhuang/xiaolu2", p: [0, 2], exits: ["s", "n"] },
                     { n: "大门", id: "bj/zhuang/damen", p: [0, 1] },
@@ -28,11 +25,10 @@ this.map = [
                     { n: "走廊", id: "bj/zhuang/changlang", p: [0, -2] },
                     { n: "小屋", id: "bj/zhuang/xiaowu", p: [0, -3], exits: ["s"] }
 ];
-this.drops = [
+    drops = [
     "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"
 ];
-
-this.quick_drops = [
+    quick_drops = [
     {
         obj: "money/silver",
         min: 1,

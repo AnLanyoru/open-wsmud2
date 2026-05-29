@@ -1,16 +1,13 @@
 import { OBJ } from "../../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "个",
-    name: "师门令牌",
-    desc: "可以用来完成师门交给你的任务，限制30难度以前",
-    grade: 1,
-    value: 0
-});
+export default class extends OBJ {
+    unit = "个";
+    name = "师门令牌";
+    desc = "可以用来完成师门交给你的任务，限制30难度以前";
+    grade = 1;
+    value = 0;
 
-this.on_create = function (path, par) {
+    on_create(path, par) {
     if (!par) {
         this.path = path + "#1";
         return;

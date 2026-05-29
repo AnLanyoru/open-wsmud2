@@ -1,10 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const FAMILIES = globalThis.FAMILIES;
-this.inherits(COMMAND);
-this.command = "bai";
-this.enter = function (me, target) {
+export default class extends COMMAND {
+    command = "bai";
+
+    enter(me, target) {
     if (!WORLD.is_server(me)) return me.notify("你不能拜师。");
     if (!target) return me.notify("你要拜谁为师？");
     target = me.find_obj(target, me.environment);
@@ -58,3 +57,6 @@ this.enter = function (me, target) {
     return me.send_room("$n说道：在下才疏学浅，不敢误人子弟。", target);
 }
 }
+
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;

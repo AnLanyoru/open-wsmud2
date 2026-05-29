@@ -1,16 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
-this.inherits(COMMAND);
-this.command = "receive";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\w+)\s(\d+)$/;
-const MESSAGE = WORLD.MESSAGE;
-this.enter = function (me, from, index) {
+export default class extends COMMAND {
+    command = "receive";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)\s(\d+)$/;
+
+    enter(me, from, index) {
     //if (from === 'all') return this.receive_all(me);
 
     if (index !== undefined)
@@ -20,7 +18,7 @@ this.enter = function (me, from, index) {
     else
         this.receive_all(me);
 }
-this.receive_single = function (me, from, index) {
+    receive_single(me, from, index) {
     let msg = MESSAGE.getMessageByIndex(me, from, index);
     if (!msg) return me.send("没有这个消息。");
     if (msg.rec) return me.send("你已经领取了。");
@@ -29,7 +27,7 @@ this.receive_single = function (me, from, index) {
     // if (me.is_full()) return me.send("你身上东西太多了。");
     this.receive_item(me, msg, from, index);
 }
-this.receive_item = function (me, msg, from, index) {
+    receive_item(me, msg, from, index) {
     msg.rec = true;
     for (var i = 0; i < msg.attach.length; i++) {
         var count = msg.attach[i].count || 1;
@@ -47,8 +45,7 @@ this.receive_item = function (me, msg, from, index) {
     }
     me.send('{dialog:"message",type:"dialog",receive:"' + from + '",index:' + index + '}');
 }
-
-this.receive_from = function (me, from) {
+    receive_from(me, from) {
     let stores = MESSAGE.stores.get(me.id);
     if (!stores) return;
     if (me.is_full()) return me.send("你身上东西太多了。");
@@ -66,7 +63,7 @@ this.receive_from = function (me, from) {
         return me.send('领取完毕，共收取' + count + '条消息的附件。');
     return me.send('没有可领取的消息。');
 }
-this.receive_all = function (me) {
+    receive_all(me) {
     let store = MESSAGE.stores.get(me.id);
     if (!store) return;
     if (me.is_full()) return me.send("你身上东西太多了。");
@@ -85,3 +82,7 @@ this.receive_all = function (me) {
     return me.send('没有可领取的消息。');
 }
 }
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const MESSAGE = WORLD.MESSAGE;

@@ -1,64 +1,19 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES;
-this.inherits(SKILL);
-this.name = "北冥神功";
-this.id = "beimingshengong";
-this.grade = 3;
-this.force_rad = 0.75;
-this.family = FAMILIES.XIAOYAO;
-this.desc = "逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["force", "parry"];
-this.learn_condition = {
+export default class extends SKILL {
+    name = "北冥神功";
+    id = "beimingshengong";
+    grade = 3;
+    force_rad = 0.75;
+    family = FAMILIES.XIAOYAO;
+    desc = "逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。";
+    can_enables = ["force", "parry"];
+    learn_condition = {
     skill: {
         force: 300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        force: {
-            con: parseInt(lv / 6) + 2,
-            dex: parseInt(lv / 7) + 2,
-            limit_mp: lv * 105,
-            desc: "当你命中敌人后，会吸取对方内力增加自身最大内力\n唯一：将你内力的75%转化为气血"
-        }, parry: {
-            zj: parseInt(lv * 1.4) + 20,
-            dex: parseInt(lv / 7) + 2,
-            desc: "当你招架成功后会减少敌人" + (lv + 10) + "当前内力"
-        }
-    };
-}
-this.on_parry_over = function (me, target, par) {
-    if (par.is_parry) {
-        target.add_mp(-me.query_skill("beimingshengong", 0) - 10);
-        //me.send_room("<hib>$n顿觉全身内力如水银般循孔飞泄而出！</hib>\n", target);
-    }
-}
-this.do_force_attack = function (me, target) {
-
-    if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
-        if (!me.query_temp("sk_beiming")) {
-            me.set_temp("sk_beiming", 1, 8000);
-            var gj = Math.round(me.query_skill("beimingshengong", 0) / 10);
-            var mp = parseInt((gj * 120) / 100);
-            if (target.max_mp > mp) {
-
-                if (target.mp > mp) {
-                    target.notify("<hir>你顿觉全身内力如水银般循孔飞泄而出！</hir>");
-                    me.notify("<hir>你觉得" + target.name + "的内力自手掌源源不绝地流了进来。</hir>", target);
-
-                    target.mp -= mp;
-                    me.max_mp += gj;
-                }
-            }
-        }
-    }
-    return 0;
-}
-this.pfm = {
+    pfm = {
     //xi:
     //{
     //    name: "<hir>冥字诀</hir>",
@@ -160,4 +115,48 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        force: {
+            con: parseInt(lv / 6) + 2,
+            dex: parseInt(lv / 7) + 2,
+            limit_mp: lv * 105,
+            desc: "当你命中敌人后，会吸取对方内力增加自身最大内力\n唯一：将你内力的75%转化为气血"
+        }, parry: {
+            zj: parseInt(lv * 1.4) + 20,
+            dex: parseInt(lv / 7) + 2,
+            desc: "当你招架成功后会减少敌人" + (lv + 10) + "当前内力"
+        }
+    };
 }
+    on_parry_over(me, target, par) {
+    if (par.is_parry) {
+        target.add_mp(-me.query_skill("beimingshengong", 0) - 10);
+        //me.send_room("<hib>$n顿觉全身内力如水银般循孔飞泄而出！</hib>\n", target);
+    }
+}
+    do_force_attack(me, target) {
+
+    if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
+        if (!me.query_temp("sk_beiming")) {
+            me.set_temp("sk_beiming", 1, 8000);
+            var gj = Math.round(me.query_skill("beimingshengong", 0) / 10);
+            var mp = parseInt((gj * 120) / 100);
+            if (target.max_mp > mp) {
+
+                if (target.mp > mp) {
+                    target.notify("<hir>你顿觉全身内力如水银般循孔飞泄而出！</hir>");
+                    me.notify("<hir>你觉得" + target.name + "的内力自手掌源源不绝地流了进来。</hir>", target);
+
+                    target.mp -= mp;
+                    me.max_mp += gj;
+                }
+            }
+        }
+    }
+    return 0;
+}
+}
+
+const FAMILIES = globalThis.FAMILIES;

@@ -1,19 +1,16 @@
 import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
-export default function() {
-this.inherits(FAMILY_AREA);
-this.set({
-    name: "武当派",
-    id: "wudang",
-    desc: "道家门派，开山祖师张三丰，少年时天赐机缘，得少林觉远大师传授九阳真经，其后多读道藏，于道家练气之术更深有心得，将少林九阳和道家练气之术融会贯通创立武当派。",
-    sp: "气血长防御高，善招架，控制",
-    is_area: true,
-    first: "wd/guangchang",
-    index: 1,
-    room_path: "wd/",
-    family: "WUDANG"
-});
-this.map = [
+export default class extends FAMILY_AREA {
+    name = "武当派";
+    id = "wudang";
+    desc = "道家门派，开山祖师张三丰，少年时天赐机缘，得少林觉远大师传授九阳真经，其后多读道藏，于道家练气之术更深有心得，将少林九阳和道家练气之术融会贯通创立武当派。";
+    sp = "气血长防御高，善招架，控制";
+    is_area = true;
+    first = "wd/guangchang";
+    index = 1;
+    room_path = "wd/";
+    family = "WUDANG";
+    map = [
     { n: "广场", id: "wd/guangchang", p: [0, 0] },
     { n: "三清殿", id: "wd/sanqing", p: [0, -1], exits: ["s"] },
     { n: "石阶", id: "wd/shijie1", p: [-1, 0], exits: ["e", "n", "w"] },

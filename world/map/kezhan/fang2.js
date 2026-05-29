@@ -1,14 +1,13 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "地字号客房";
-this.desc = "这是客栈里的一间客房，房间虽然不大，但是干净整洁。这里的老板为了吸引江湖人士，专门请高人打造了这些客房，这间地字号房间的位置，方位，摆设都是有讲究的，在这里练功会大有裨益。";
-this.exits = { "down": "yz/kedian" };
+export default class extends ROOM {
+    name = "地字号客房";
+    desc = "这是客栈里的一间客房，房间虽然不大，但是干净整洁。这里的老板为了吸引江湖人士，专门请高人打造了这些客房，这间地字号房间的位置，方位，摆设都是有讲究的，在这里练功会大有裨益。";
+    exits = { "down": "yz/kedian" };
+    is_shadow = true;
+    max_item_count = 1;
 
-this.is_shadow = true;
-this.max_item_count = 1;
-this.on_enter = function (me) {
+    on_enter(me) {
     if (check_moveout(me)) {
         me.add_status({
             id: "room",
@@ -23,9 +22,18 @@ this.on_enter = function (me) {
         });
     }
 }
-this.on_leave = function (me) {
+    on_leave(me) {
     me.remove_status("room");
 }
+    on_heart_beat() {
+    for (let item of this.items) {
+        if (item.hp > 0) {
+            return check_moveout(item);
+        }
+    }
+}
+}
+
 function check_moveout(me) {
     if (!me.query_temp("kezhan")) {
         me.moveto("yz/kedian", null, me.name + "走了下来。");
@@ -33,12 +41,4 @@ function check_moveout(me) {
         return false;
     }
     return true;
-}
-this.on_heart_beat = function () {
-    for (let item of this.items) {
-        if (item.hp > 0) {
-            return check_moveout(item);
-        }
-    }
-}
 }

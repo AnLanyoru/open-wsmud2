@@ -1,28 +1,20 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "个",
-    name: "工具自选礼包",
-    desc: "使用后可选择任意一种工具",
-    grade: 1,
-    value: 100
-});
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    unit = "个";
+    name = "工具自选礼包";
+    desc = "使用后可选择任意一种工具";
+    grade = 1;
+    value = 100;
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var lv = parseInt(par);
     if (!(lv > 0 && lv < 6)) return;
     this.grade = lv;
 }
-function wrap_name(text, grade) {
-
-    const level_desc = ["wht", "hig", "hic", "hiy", "hiz", "hio", 'ord'];
-    let tag = level_desc[grade];
-    return `<${tag}>${text}</${tag}>`;
-}
-this.on_use = function (me, par) {
+    on_use(me, par) {
 
     if (!par) {
         var str = ["{type:\"cmds\",items:["];
@@ -46,4 +38,11 @@ this.on_use = function (me, par) {
     me.send('你获得了' + obj.unit_name(1) + "。");
     return true;
 }
+}
+
+function wrap_name(text, grade) {
+
+    const level_desc = ["wht", "hig", "hic", "hiy", "hiz", "hio", 'ord'];
+    let tag = level_desc[grade];
+    return `<${tag}>${text}</${tag}>`;
 }

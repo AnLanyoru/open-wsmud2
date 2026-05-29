@@ -1,15 +1,13 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "颗",
-    name: "洗髓丹",
-    desc: "使用后可以重新设置你的先天属性",
-    grade: 3,
-    value: 0
-});
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "颗";
+    name = "洗髓丹";
+    desc = "使用后可以重新设置你的先天属性";
+    grade = 3;
+    value = 0;
+
+    on_use(me) {
     if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
     var count = me.str + me.con + me.dex + me.int;
     var max = 30 + count - 80;
@@ -18,6 +16,8 @@ this.on_use = function (me) {
     me.send_commands("quxiao", "取消使用");
     return false;
 }
+}
+
 function readnumber(me, cmd) {
     var count = me.str + me.con + me.dex + me.int;
     var max = 30 + count - 80;
@@ -79,5 +79,4 @@ function checkResult(me, str) {
         me.notify("请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20");
         me.send_commands("quxiao", "取消使用");
     }
-}
 }

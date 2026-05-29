@@ -1,26 +1,24 @@
 import { USERTASK } from "../../os/task/playertask.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(USERTASK);
-this.id = "growup";
-this.sort = 1;
-this.query_title = function (player) {
+export default class extends USERTASK {
+    id = "growup";
+    sort = 1;
+
+    query_title(player) {
     var stas = player.query_temp("grow_lv", 0);
     return "<hic>" + temps[stas].title + "</hic>";
 }
-this.query_desc = function (player) {
+    query_desc(player) {
     var stas = player.query_temp("grow_lv", 0);
     return temps[stas].desc;
 }
-this.query_state = function (player) {
+    query_state(player) {
     if (!WORLD.is_server(player)) return 0;
     var stas = player.query_temp("grow_lv", 0);
     if (stas >= temps.length) return 0;
     return temps[stas].check(player);
 }
-
-this.on_finish = function (player) {
+    on_finish(player) {
     if (!WORLD.is_server(player)) return player.notify("你无法完成。");
     var stas = player.query_temp("grow_lv", 0);
     if (stas >= temps.length) return;
@@ -30,6 +28,9 @@ this.on_finish = function (player) {
     player.set_temp("grow_lv", stas + 1);
     return true;
 }
+}
+
+const WORLD = globalThis.WORLD;
 const temps = [
     {
         title: "学会任意一个技能",
@@ -169,4 +170,3 @@ const temps = [
     }
 
 ];
-}

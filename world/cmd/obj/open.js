@@ -1,10 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "open";
-this.enter = function (player, objid) {
+export default class extends COMMAND {
+    command = "open";
+
+    enter(player, objid) {
     var obj = player.find_obj(objid);
     if (!obj) return player.notify("你要打开什么？");
     if (!obj.on_open) return player.notify("这个东西打不开。");
@@ -29,3 +28,5 @@ this.enter = function (player, objid) {
     player.remove_obj(obj,1);
 }
 }
+
+const UTIL = globalThis.UTIL;

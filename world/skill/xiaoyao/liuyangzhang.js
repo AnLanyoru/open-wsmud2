@@ -1,14 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "天山六阳掌";
-this.id = "liuyangzhang";
-this.grade = 3;
-
-this.family = FAMILIES.XIAOYAO;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "天山六阳掌";
+    id = "liuyangzhang";
+    grade = 3;
+    family = FAMILIES.XIAOYAO;
+    attack_actions = [
     "$N一招「<YEL>落日熔金</YEL>」，左掌叠于右掌之上，劈向$n",
     "$N一招「<RED>安禅制毒龙</RED>」，面色凝重，双掌轻飘飘地拍向$n",
     "$N一招「<MAG>日斜归路晚霞明</MAG>」，双掌幻化一片掌影，将$n笼罩于内。",
@@ -20,26 +17,16 @@ this.attack_actions = [
     "$N施出「<HIC>青阳带岁除</HIC>」，右手横扫$n的$l，左手攻向$n的胸口",
     "$N施出「<YEL>阳歌天钧</YEL>」，双掌同时击向$n的$l"
 ];
-this.desc = "逍遥派的天山六阳掌，绝招生死符让人谈虎色变。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition={
+    desc = "逍遥派的天山六阳掌，绝招生死符让人谈虎色变。";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 5000,
     skill: {
         unarmed: 300,
         beimingshengong:300
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.2),
-            mz: parseInt(lv),
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     zhong:
     {
         name: "生死符",
@@ -159,4 +146,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.2),
+            mz: parseInt(lv),
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

@@ -1,22 +1,13 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(SKILL);
-this.id = "lianyao";
-this.name = "炼药术";
-this.grade = 0;
-this.desc = "使用药草制作各种丹药的技能，提高你的炼药成功率";
-this.type = SKILL_TYPES.KNOWLEDGE;
-
-this.query_prop = lv => ({ lianyao1: Math.floor(lv / 200) });
-
-
-
-
-
-
-this.slots = [
+export default class extends SKILL {
+    id = "lianyao";
+    name = "炼药术";
+    grade = 0;
+    desc = "使用药草制作各种丹药的技能，提高你的炼药成功率";
+    type = SKILL_TYPES.KNOWLEDGE;
+    query_prop = lv => ({ lianyao1: Math.floor(lv / 200) });
+    slots = [
     {
         prop: "ly_wd",
         name: "炼药武道",
@@ -62,3 +53,5 @@ this.slots = [
     }
 ];
 }
+
+const SKILL_TYPES = globalThis.SKILL_TYPES;

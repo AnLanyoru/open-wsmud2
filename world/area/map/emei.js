@@ -1,19 +1,16 @@
 import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
-export default function() {
-this.inherits(FAMILY_AREA);
-this.set({
-    id: "emei",
-    name: "峨眉派",
-    desc: "佛家门派，创派祖师是郭襄女侠。郭襄女侠的父亲是郭靖，母亲是黄蓉 。郭襄女侠早年心中念念不忘于神雕大侠杨过，走遍天下，找寻不到。在她四十岁那年，忽然大彻大悟，出家为尼，开创了峨眉一派 。",
-    sp: "只收女弟子，内功普渡众生，招式却以狠辣见长",
-    is_area: true,
-    first: "emei/jinding",
-    index: 4,
-    room_path: "emei/",
-    family: "EMEI"
-});
-this.map = [
+export default class extends FAMILY_AREA {
+    id = "emei";
+    name = "峨眉派";
+    desc = "佛家门派，创派祖师是郭襄女侠。郭襄女侠的父亲是郭靖，母亲是黄蓉 。郭襄女侠早年心中念念不忘于神雕大侠杨过，走遍天下，找寻不到。在她四十岁那年，忽然大彻大悟，出家为尼，开创了峨眉一派 。";
+    sp = "只收女弟子，内功普渡众生，招式却以狠辣见长";
+    is_area = true;
+    first = "emei/jinding";
+    index = 4;
+    room_path = "emei/";
+    family = "EMEI";
+    map = [
     { n: "广场", id: "emei/guangchang", p: [0, 0], exits: ["w", "e", "s", "n"] },
     { n: "庙门", id: "emei/miaomen", p: [0, -1] },
     { n: "睹光台", id: "emei/duguangtai", p: [1, -2] },

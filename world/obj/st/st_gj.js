@@ -1,18 +1,16 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    name: "朱雀之魂",
-    desc: "传说为朱雀残魂所化，非金非石非木，隐隐有朱雀虚影，主毁灭，镇邪祟",
-    unit: "块",
-    value: 10000000,
-    transable: true,
-    is_stone: true,
-    grade: 6
-});
-this.otype = 2;
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    name = "朱雀之魂";
+    desc = "传说为朱雀残魂所化，非金非石非木，隐隐有朱雀虚影，主毁灭，镇邪祟";
+    unit = "块";
+    value = 10000000;
+    transable = true;
+    is_stone = true;
+    grade = 6;
+    otype = 2;
+
+    on_create(path, par) {
     var lv = 5;
     if (!par) {
         lv = 5 - parseInt(Math.log(this.random(400) + 1));

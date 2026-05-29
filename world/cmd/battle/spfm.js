@@ -1,21 +1,21 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "spfm";
-this.allow_die = true;
-this.allow_faint = true;
-this.allow_state = true;
-this.allow_busy = true;
-this.regex = /(\w+)(?:\s+(\w+))?/;
-this.enter = function (me, arg1, arg2) {
+export default class extends COMMAND {
+    command = "spfm";
+    allow_die = true;
+    allow_faint = true;
+    allow_state = true;
+    allow_busy = true;
+    regex = /(\w+)(?:\s+(\w+))?/;
+
+    enter(me, arg1, arg2) {
     if (!arg1) return;
     let func = this['set_' + arg1];
     if (func) {
         func.call(this, me, arg2);
     }
 }
-this.set_qkyz = function (me, arg) {
+    set_qkyz(me, arg) {
     if (!arg || (!(arg > 0))) {
         me.remove_temp('qkyz_m');
         return me.send('<cyn>你将乾坤一掷更改为使用内力，不消耗铜板。</cyn>');

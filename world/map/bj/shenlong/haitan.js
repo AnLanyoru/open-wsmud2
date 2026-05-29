@@ -1,22 +1,36 @@
 import { ROOM } from "../../../../os/room/room.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const NPC = globalThis.NPC;
-this.inherits(ROOM);
-this.name = "海滩";
-this.desc = "这里就是神龙岛了。南边是一望无际的大海；往北则是一片灌木林。岛上的空气似乎又热又闷, 咸湿的海风中带着一股腥臭, 又夹杂了一缕奇特的花香, 闻起来十分怪异，海边泊着一艘大船。";
+export default class extends ROOM {
+    name = "海滩";
+    desc = "这里就是神龙岛了。南边是一望无际的大海；往北则是一片灌木林。岛上的空气似乎又热又闷, 咸湿的海风中带着一股腥臭, 又夹杂了一缕奇特的花香, 闻起来十分怪异，海边泊着一艘大船。";
+    exits = { "north": "bj/shenlong/lin1" };
 
-this.exits = { "north": "bj/shenlong/lin1" };
+    constructor() {
+        super();
+        this.add_action('lkfb', null, function (me, par) {
+            let npc = this.items[0];
+            if (npc && npc.is('penglai/wulang/jiangjiu')) {
+                if (par) {
+                    WORLD.COMMANDS['cr'].enter(me, 'over');
 
+                    me.moveto('penglai/matou');
+                    me.send('你和' + npc.name + '乘坐大船，来到一个偏远神秘的小岛。');
+                    me.enable_area();
+                } else {
+                    me.send('你即将离开这个副本进入公共区域，是否确认？');
+                    me.send_commands('lkfb ok', '确认进入');
+                }
+            }
+        });
+    }
 
-this.on_before_enter = function (me) {
+    on_before_enter(me) {
     if (!me.query_bool('fb2', 3) && me.query_temp('pl_yu')) {
         if (!this.items[0])
             NPC.CREATE('penglai/wulang/jiangjiu', this);
     }
 }
-
-this.on_enter = function (me) {
+    on_enter(me) {
     if (!me.query_bool('fb2', 3) && me.query_temp('pl_yu')) {
         let npc = this.items[0];
         if (npc && npc.is('penglai/wulang/jiangjiu')) {
@@ -25,8 +39,7 @@ this.on_enter = function (me) {
         }
     }
 }
-
-this.to_next = function (me, npc) {
+    to_next(me, npc) {
     if (me.environment !== this || npc.environment !== this)
         return;
     if (me.fight_type || npc.fight_type) return;
@@ -35,19 +48,7 @@ this.to_next = function (me, npc) {
     me.send_commands('lkfb', '同去');
 
 }
-this.add_action('lkfb', null, function (me, par) {
-    let npc = this.items[0];
-    if (npc && npc.is('penglai/wulang/jiangjiu')) {
-        if (par) {
-            WORLD.COMMANDS['cr'].enter(me, 'over');
-
-            me.moveto('penglai/matou');
-            me.send('你和' + npc.name + '乘坐大船，来到一个偏远神秘的小岛。');
-            me.enable_area();
-        } else {
-            me.send('你即将离开这个副本进入公共区域，是否确认？');
-            me.send_commands('lkfb ok', '确认进入');
-        }
-    }
-});
 }
+
+const WORLD = globalThis.WORLD;
+const NPC = globalThis.NPC;

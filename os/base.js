@@ -258,10 +258,10 @@ export class BASE {
      * @returns {BASE}
      */
     static NEW(fname, func, par) {
-        const obj = new BASE();
-        func.apply(obj);
+        const isClass = func.toString().trim().startsWith('class');
+        const obj = isClass ? new func(par) : (() => { const o = new BASE(); func.apply(o); return o; })();
         obj.path = fname;
-        obj.create(fname, par);
+        if (obj.create) obj.create(fname, par);
         return obj;
     }
 

@@ -1,12 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const USERTASK = globalThis.USERTASK;
-this.inherits(COMMAND);
-this.command = "task";
-this.regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
-this.allow_state = true;
-this.enter = function (me, tid, cmd, oid) {
+export default class extends COMMAND {
+    command = "task";
+    regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
+    allow_state = true;
+
+    enter(me, tid, cmd, oid) {
     if (!tid || !cmd) return;
     if (!me.is_player || !WORLD.is_server(me)) return;
     if (tid === 'all') return this.tasks_fin(me);
@@ -37,13 +36,7 @@ this.enter = function (me, tid, cmd, oid) {
 
     }
 }
-const ALLOW_COMMANDS = {
-    start: true,
-    giveup: true,
-    fin: true,
-    fin2: true
-};
-this.task_fin = function (me, task, par) {
+    task_fin(me, task, par) {
     if (task.on_finish(me, par)) {
         const obj = {};
         obj.type = "dialog";
@@ -57,7 +50,7 @@ this.task_fin = function (me, task, par) {
         return me.notify(JSON.stringify(obj));
     }
 }
-this.tasks_fin = function (me) {
+    tasks_fin(me) {
     for (let i = 0; i < WORLD.TASKS.length; i++) {
         const task = WORLD.TASKS[i];
         if (task.query_state(me) === 2) {
@@ -66,3 +59,12 @@ this.tasks_fin = function (me) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const USERTASK = globalThis.USERTASK;
+const ALLOW_COMMANDS = {
+    start: true,
+    giveup: true,
+    fin: true,
+    fin2: true
+};

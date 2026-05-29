@@ -1,11 +1,10 @@
 import { TASK } from "../../os/task/task.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const FAMILIES = globalThis.FAMILIES; const COMMAND = globalThis.COMMAND;
-this.inherits(TASK);
-this.id = "top";
-this.prev_time = 0;
-this.startup = function () {
+export default class extends TASK {
+    id = "top";
+    prev_time = 0;
+
+    startup() {
     var dt = new Date();
     var hour = dt.getHours();
     var day = dt.getDate();
@@ -14,10 +13,10 @@ this.startup = function () {
     var diff_time = dt - Date.now();
     this.time_handler = this.call_out(this.run.bind(this), diff_time);
 }
-this.stop = function () {
+    stop() {
     clearTimeout(this.time_handler);
 }
-this.run = function () {
+    run() {
     this.startup();
     var diff = Date.now() - this.prev_time;
     if (diff < 600000) return;
@@ -28,7 +27,7 @@ this.run = function () {
     COMMAND.DO("sys", "排行榜奖励发放完毕，进入社交系统消息中收取。");
     this.prev_time = Date.now();
 }
-this.send_score = function () {
+    send_score() {
     let data = WORLD.STATS.SC_STATS;
     for (let key of FAMS_TATAS) {
         let stats = data[key];
@@ -50,10 +49,7 @@ this.send_score = function () {
         }
     }
 }
-
-const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
-    'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];
-this.send_tops = function () {
+    send_tops() {
     for (let key of FAMS_TATAS) {
         let tops = WORLD.STATS['tops_' + key];
         if (!tops) continue;
@@ -72,8 +68,7 @@ this.send_tops = function () {
         }
     }
 }
-
-this.send_weapons = function () {
+    send_weapons() {
     const map = {};
     let eqs = WORLD.STATS.EQ_STATS ?? [];
     for (let stats of eqs) {
@@ -105,19 +100,14 @@ this.send_weapons = function () {
         }
     }
 }
-
-
-
-
-this.send_family = function () {
+    send_family() {
 
     for (var name in FAMILIES) {
         var fam = FAMILIES[name];
         this.sort_family(fam);
     }
 }
-//wg_sr
-this.sort_family = function (fam) {
+    sort_family(fam) {
     var list = [];
     var user = null;
     if (fam.tops) {
@@ -180,3 +170,9 @@ this.sort_family = function (fam) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const FAMILIES = globalThis.FAMILIES;
+const COMMAND = globalThis.COMMAND;
+const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
+    'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];

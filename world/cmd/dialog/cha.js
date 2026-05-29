@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const SKILL = globalThis.SKILL;
-this.inherits(COMMAND);
-this.command = "cha,skills";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "cha,skills";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(me, arg) {
     var target = me;
     var isfollower = false;
     if (arg) {
@@ -34,8 +33,7 @@ this.enter = function (me, arg) {
     }
     this.render_skill(me, target, isfollower);
 }
-
-this.render_skill = function (me, target, isfollower) {
+    render_skill(me, target, isfollower) {
     var skills = target.skills;
     var str = ['{"type":"dialog","dialog":"'];
     str.push(me === target ? 'skills' : 'master');
@@ -79,3 +77,6 @@ this.render_skill = function (me, target, isfollower) {
     me.send(str.join(""));
 }
 }
+
+const WORLD = globalThis.WORLD;
+const SKILL = globalThis.SKILL;

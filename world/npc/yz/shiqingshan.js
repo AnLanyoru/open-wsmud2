@@ -1,45 +1,47 @@
 import { NPC } from "../../../os/char/npc.js";
 
-export default function() {
-this.inherits(NPC);
-this.set({
-    name: "史青山",
-    desc: "他就是扬州城的守备，曾经是武当山的俗家弟子，不知为何吃上了朝廷饭。",
-    title: "扬州守备",
-    gender: 1,
-    age: 35,
-    per: 22,
-    mp: 2000,
-    max_mp: 2000,
-    hp: 2000,
-    max_hp: 2000,
-    score: 20
-});
-this.set_objects([
-    "eq/lv1/guanfu", 1, 1
-], [
-    "eq/lv2/jiangjunjian", 1, 1
-]);
-this.set_drop({
-    obj: "money/silver",
-    min: 2,
-    max: 10
-}, {
-    obj: ["eq/lv0/cloth", "eq/lv0/jian", "eq/lv0/dao"],
-    odds: 6000
-}, {
-    obj: ["eq/lv1/guanfu", "eq/lv2/jiangjunjian",
-        "eq/lv1/junfu", "eq/lv1/jundao", "book/book#sword",
-        "eq/lv1/qimeigun", "book/book#blade"],
-    odds: 5000
-});
-this.skill_map(
-    ["unarmed", 200],
-    ["dodge", 200],
-    ["parry", 200],
-    ["sword", 200],
-    ["wudangjianfa", 200, "sword"]);
-this.on_enter = function (me) {
+export default class extends NPC {
+    name = "史青山";
+    desc = "他就是扬州城的守备，曾经是武当山的俗家弟子，不知为何吃上了朝廷饭。";
+    title = "扬州守备";
+    gender = 1;
+    age = 35;
+    per = 22;
+    mp = 2000;
+    max_mp = 2000;
+    hp = 2000;
+    max_hp = 2000;
+    score = 20;
+
+    constructor() {
+        super();
+        this.set_objects([
+            "eq/lv1/guanfu", 1, 1
+        ], [
+            "eq/lv2/jiangjunjian", 1, 1
+        ]);
+        this.set_drop({
+            obj: "money/silver",
+            min: 2,
+            max: 10
+        }, {
+            obj: ["eq/lv0/cloth", "eq/lv0/jian", "eq/lv0/dao"],
+            odds: 6000
+        }, {
+            obj: ["eq/lv1/guanfu", "eq/lv2/jiangjunjian",
+                "eq/lv1/junfu", "eq/lv1/jundao", "book/book#sword",
+                "eq/lv1/qimeigun", "book/book#blade"],
+            odds: 5000
+        });
+        this.skill_map(
+            ["unarmed", 200],
+            ["dodge", 200],
+            ["parry", 200],
+            ["sword", 200],
+            ["wudangjianfa", 200, "sword"]);
+    }
+
+    on_enter(me) {
     if (me.is_player) {
         me.notify("史青山喝道：各将领听令，擅闯军营者格杀勿论！");
         if (!me.query_temp("fb/by/bing")) {
@@ -58,6 +60,8 @@ this.on_enter = function (me) {
     }
 
 }
+}
+
 function check_bing(me) {
     var ishas = false;
     this.each_item(item => {
@@ -76,5 +80,4 @@ function check_bing(me) {
             item.do_kill(me);
         }
     }, this.environment);
-}
 }

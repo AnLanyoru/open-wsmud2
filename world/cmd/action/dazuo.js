@@ -1,10 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "dazuo";
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "dazuo";
+
+    enter(me) {
     if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
     if (me.state) return me.notify("你正在" + me.state.title + "，没有时间打坐。");
     if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会打坐。");
@@ -31,7 +30,9 @@ this.enter = function (me) {
     });
     return true;
 }
+}
 
+const WORLD = globalThis.WORLD;
 function on_check(me) {
     let speed = count_speed(me);
     let str = ['<hic>你正在打坐运功，当你满内力时，每10秒增加', speed, "最大内力，预计"];
@@ -54,8 +55,6 @@ function on_check(me) {
     str.push('达到内力上限', max, '</hic>。');
     me.send(str.join(""));
 }
-
-
 function do_dazuo(me) {
     var max = me.limit_mp + me.query_prop("limit_mp");
 
@@ -94,5 +93,4 @@ function count_speed(me) {
         exp += Math.min(time, prop);
     }
     return exp;
-}
 }

@@ -1,15 +1,16 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "pk";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "pk";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+
+    enter(me) {
     var zc = WORLD.AREAS[6];
 
 }
 }
+
+const WORLD = globalThis.WORLD;

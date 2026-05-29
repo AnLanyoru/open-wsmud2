@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "list";
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "list";
+
+    enter(me, arg) {
     var target = me;
     if (arg) {
         target = me.find_obj(arg, me.environment);

@@ -1,14 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "大力金刚拳";
-this.id = "jingangquan";
-this.grade = 2;
-
-this.family = FAMILIES.SHAOLIN;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "大力金刚拳";
+    id = "jingangquan";
+    grade = 2;
+    family = FAMILIES.SHAOLIN;
+    attack_actions = [
     "$N盘膝而坐，二手合十，一式<HIC>「莲花座」</HIC>，双拳蓄势而发，击向$n的$l",
     "$N一式<HIR>「烈火锥」</HIR>，双掌轮流下击，拳势如焰，吡啪爆响",
     "$N腾空飞起，一式<HIG>「八方雨」</HIG>，双手双腿齐出，令$n无可躲藏",
@@ -18,29 +15,15 @@ this.attack_actions = [
     "$N两目内视，双手内笼，一式<HIY>「天龙唱」</HIY>，四面八方响起震人心魄的龙吟",
     "$N似笑非笑，双拳无形无定，一式「如来笑」，骤然击向$n的前胸"
 ];
-this.desc = "少林寺七十二绝技之大力金刚拳";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed","parry"];
-this.learn_condition = {
+    desc = "少林寺七十二绝技之大力金刚拳";
+    can_enables = ["unarmed","parry"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         unarmed: 140
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 20,
-            str:parseInt(lv/8)+1
-        },
-        parry: {
-            zj: parseInt(lv * 1.2) + 20,
-            fy: lv + 4
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "怒目金刚",
@@ -69,4 +52,20 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 20,
+            str:parseInt(lv/8)+1
+        },
+        parry: {
+            zj: parseInt(lv * 1.2) + 20,
+            fy: lv + 4
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

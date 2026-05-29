@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "鹰爪功";
-this.id = "yingzhuagong";
-this.grade = 2;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "鹰爪功";
+    id = "yingzhuagong";
+    grade = 2;
+    attack_actions = [
     "$N全身拔地而起，半空中一个筋斗，一式「苍鹰袭兔」，迅猛地抓向$n的$l",
     "$N单腿直立，双臂平伸，一式「雄鹰展翅」，双爪一前一后拢向$n的$l",
     "$N一式「拔翅横飞」，全身向斜里平飞，右腿一绷，双爪搭向$n的肩头",
@@ -16,30 +14,15 @@ this.attack_actions = [
     "$N左右手掌爪互逆，一式「搏击长空」，无数道劲气破空而出，迅疾无比地击向$n",
     "$N腾空高飞三丈，一式「鹰扬万里」，天空中顿时显出一个巨灵爪影，缓缓罩向$n"
 ];
-this.desc = "明教的拳脚功夫";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed", "parry"];
-this.learn_condition = {
+    desc = "明教的拳脚功夫";
+    can_enables = ["unarmed", "parry"];
+    learn_condition = {
     max_mp: 1000,
     skill: {
         unarmed: 100
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 10,
-            mz: lv + 100
-        },
-        parry: {
-            zj: lv + 10,
-            max_hp: lv * 8 + 100
-        }
-    };
-}
-
-this.slots = [
+    slots = [
     {
         prop: 'yzg_sh',
         value: (lv) => 10 + Math.floor(lv / 50),
@@ -55,7 +38,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "赤血爪",
@@ -82,4 +65,17 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 10,
+            mz: lv + 100
+        },
+        parry: {
+            zj: lv + 10,
+            max_hp: lv * 8 + 100
+        }
+    };
+}
 }

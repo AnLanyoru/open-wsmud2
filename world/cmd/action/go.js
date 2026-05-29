@@ -1,12 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const ROOM = globalThis.ROOM;
-this.inherits(COMMAND);
-this.command = "go";
-//this.regex = /^(\w+)(?:\s+(n|s|m))?$/;
+export default class extends COMMAND {
+    command = "go";
 
-this.enter = function (me, dir) {
+    enter(me, dir) {
     if (me.hp <= 0) return;
     if (!dir) return me.notify("你要往哪里走？");
     dir = OUTER_DOORS[dir];
@@ -48,7 +45,10 @@ this.enter = function (me, dir) {
     }
     me.moveto(next_room, sendOutMessage(me, dir), sendInMessage(me), dir);
 }
+}
 
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+const ROOM = globalThis.ROOM;
 var OUTER_DOORS = {
 };
 var doors = ["west", "north", "south", "east", "northwest", "southwest", "northeast", "southeast",
@@ -100,7 +100,6 @@ function sendInMessage(player, dir) {
     }
     return face + "走了过来。";
 }
-
 var dirs = {
     "north": "北方",
     "south": "南方",
@@ -136,5 +135,4 @@ function getFace(player) {
         if (v > face2.length - 1) v = face2.length - 1;
         return face2[v];
     }
-}
 }

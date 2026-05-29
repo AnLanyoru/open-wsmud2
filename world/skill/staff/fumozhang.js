@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "伏魔杖";
-this.id = "fumozhang";
-this.grade = 5;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "伏魔杖";
+    id = "fumozhang";
+    grade = 5;
+    attack_actions = [
     "$N使一招「<YEL>黄牛转角</YEL>」，手中$w自下而上，沉猛无比地向$n的小腹挑去",
     "$N快步跨出，一招「<RED>野马追风</RED>」，左手平托$w，右掌猛推杖端，顶向$n的胸口",
     "$N高举$w，一招「<BLK>猛虎跳涧</BLK>」，全身跃起，手中$w搂头盖顶地向$n击去。",
@@ -15,54 +13,15 @@ this.attack_actions = [
     "$N双手和十，躬身一招「<GRN>胡僧托钵</GRN>」，$w自肘弯飞出，拦腰向$n撞去",
     "$N一招「<RED>慈</red><YEL>航</yel><MAG>普<BLU>渡</blu>」，$w如飞龙般自掌中跃出，直向$n的胸口穿入"
 ];
-
-this.desc = "净念禅宗的杖法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.learn_condition = {
+    desc = "净念禅宗的杖法";
+    learn_condition = {
     max_mp: 300,
     skill: {
         staff: 900,
     }
-}
-this.can_enables = ["staff"];
-this.query_enable_prop = function (lv) {
-    return {
-        staff: {
-            gj: parseInt(lv * 1.8) + 10,
-            mz: parseInt(lv * 1.8) + 10,
-            str: parseInt(lv / 3) + 10,
-            con: parseInt(lv / 3) + 10,
-            desc: "当你命中敌人后会降低敌人战斗属性1%,可叠加"
-        }
-    };
-}
-
-this.on_attack_over = function (me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
-        var lv = me.query_skill("fumozhang", 0);
-        lv = 5 + parseInt(lv / 100);
-        target.add_status({
-            id: "fmz",
-            name: "伏魔",
-            desc: "减少战斗属性",
-            duration: 6000,
-            downside: true,
-            count: 1,
-            prop: {
-                gj_per: -1,
-                mz_per: -1,
-                ds_per: -1,
-                zj_per: -1,
-                fy_per: -1
-            },
-            override: 1,
-            max_count: lv
-        });
-    }
-
-}
-this.pfm = {
+};
+    can_enables = ["staff"];
+    pfm = {
     fumo:
     {
         name: "罗汉伏魔",
@@ -96,4 +55,42 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        staff: {
+            gj: parseInt(lv * 1.8) + 10,
+            mz: parseInt(lv * 1.8) + 10,
+            str: parseInt(lv / 3) + 10,
+            con: parseInt(lv / 3) + 10,
+            desc: "当你命中敌人后会降低敌人战斗属性1%,可叠加"
+        }
+    };
 }
+    on_attack_over(me, target, par) {
+    if (!par.is_dodge && !par.is_parry) {
+        var lv = me.query_skill("fumozhang", 0);
+        lv = 5 + parseInt(lv / 100);
+        target.add_status({
+            id: "fmz",
+            name: "伏魔",
+            desc: "减少战斗属性",
+            duration: 6000,
+            downside: true,
+            count: 1,
+            prop: {
+                gj_per: -1,
+                mz_per: -1,
+                ds_per: -1,
+                zj_per: -1,
+                fy_per: -1
+            },
+            override: 1,
+            max_count: lv
+        });
+    }
+
+}
+}
+
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

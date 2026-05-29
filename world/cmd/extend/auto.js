@@ -1,16 +1,19 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "auto";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.admin = true;
-this.enter = function (me, type) {
+export default class extends COMMAND {
+    command = "auto";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    admin = true;
+
+    enter(me, type) {
 
 }
+}
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
 WORLD.check_user_next = function (me) {
 
     var type = me.query_setting("auto_work");
@@ -71,5 +74,4 @@ WORLD.auto_pfm = function (me, target) {
             WORLD.COMMANDS["perform"].enter(target, ps[0], ps[1]);
         }
     }
-}
 }

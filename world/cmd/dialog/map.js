@@ -1,16 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "map";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.map_json;
-this.buffer = {};
-var world_map = null;
-this.enter = function (me, area) {
+export default class extends COMMAND {
+    command = "map";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    map_json;
+    buffer = {};
+
+    enter(me, area) {
     //if (!area) {
     //    if (!this.map_json) this.map_json = getAllMaps(me);
 
@@ -35,10 +33,10 @@ this.enter = function (me, area) {
     this.buffer[area] = this.createMapJson(area_obj, area);
     me.send(this.buffer[area]);
 }
-this.clearCache = function () {
+    clearCache() {
     this.buffer = {};
 }
-this.update_map = function (id, rm, pos) {
+    update_map(id, rm, pos) {
     this.buffer[id] = null;
     if (!rm) {
         var area_obj;
@@ -59,7 +57,7 @@ this.update_map = function (id, rm, pos) {
             rm.items[i].send(str);
     }
 }
-this.createMapJson = function (area_obj, area) {
+    createMapJson(area_obj, area) {
     if (!area_obj) return '{type:"map",maps:[]}';
     var obj = {};
     obj.type = "map";
@@ -67,10 +65,13 @@ this.createMapJson = function (area_obj, area) {
     obj.map = area_obj.map;
     return JSON.stringify(obj);
 }
+}
+
+const WORLD = globalThis.WORLD;
+var world_map = null;
 function getAreaByPath(areas, path) {
     if (!areas) return;
     for (var i = 0; i < areas.length; i++) {
         if (areas[i].path == path) return areas[i];
     }
-}
 }

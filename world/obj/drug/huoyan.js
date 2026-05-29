@@ -1,16 +1,14 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-this.inherits(OBJ);
-this.set({
-    unit: "颗",
-    name: "玲珑火芝",
-    grade: 3,
-    desc: "生长在火山中心的一种灵芝，食用后使人增加内力上限",
-    value: 980000
-});
-this.transable = true;
-this.on_use = function (me) {
+export default class extends OBJ {
+    unit = "颗";
+    name = "玲珑火芝";
+    grade = 3;
+    desc = "生长在火山中心的一种灵芝，食用后使人增加内力上限";
+    value = 980000;
+    transable = true;
+
+    on_use(me) {
 
     me.send_room("<hir>$N拿出一颗玲珑火芝，一口气吞了下去。</hir>");
     var sx = me.random(me.query_skill("force") / 5) + 100;

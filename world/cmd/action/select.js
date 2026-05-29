@@ -1,11 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "select,command";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "select,command";
+    allow_busy = true;
+    allow_state = true;
+
+    enter(me, arg) {
     if (!me.environment) return;
     if (arg) {
         var target = me.environment.find_obj(arg);
@@ -42,7 +42,7 @@ this.enter = function (me, arg) {
         me.notify(me.environment.query_commands(me, true));
     }
 }
-this.exec = function (me, target) {
+    exec(me, target) {
     var str = ['{type:"'];
     str.push(me == target ? 'login"' : 'select"');
     if (target) {

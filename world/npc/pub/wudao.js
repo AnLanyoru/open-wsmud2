@@ -1,42 +1,19 @@
 import { NPC } from "../../../os/char/npc.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(NPC);
-this.set({
-    name: "",
-    desc: "他是武道塔的神秘守护者",
-    title: "武道塔守护者",
-    gender: 1,
-    age: 25,
-    per: this.random(44),
-    mp: 400,
-    max_mp: 400,
-    hp: 400,
-    max_hp: 400,
-    no_refresh: true,
-    no_fight: true
-});
-
-this.init_from = function (player, level) {
-    this.con = this.dex = this.int = this.str = 20 + parseInt(level / 3);
-    if (level > 100) level = 100;
-    const grade1 = Math.floor(level / 10);
-    this.name = UTIL.random_name(this.gender);
-    this.skill_map.apply(this, this.skills_def[grade1]);
-    var color = ["hig", "hic", "hiy", "hiz", "hio", "ora"][parseInt(level / 20)];
-    this.title = "<" + color + ">武道塔守护者</" + color + ">";
-    this.set_objects(['eq/lv0/cloth', 1, 1], ["eq/lv0/jian", 1, 1]);
-
-    this.hp = this.max_hp = 1000 + level * level * 150;
-    this.mp = this.max_mp = parseInt(this.hp / 2);
-    this.init();
-    this.recount();
-
-}
-
-
-this.skills_def = [
+export default class extends NPC {
+    name = "";
+    desc = "他是武道塔的神秘守护者";
+    title = "武道塔守护者";
+    gender = 1;
+    age = 25;
+    per = this.random(44);
+    mp = 400;
+    max_mp = 400;
+    hp = 400;
+    max_hp = 400;
+    no_refresh = true;
+    no_fight = true;
+    skills_def = [
     [
         ["force", 100], ["unarmed", 100], ["sword", 100], ["parry", 100], ["dodge", 100],
         ["hunyuanyiqi", 100, "force"], ["wudangchangquan", 100, "unarmed"], ["huashanshenfa", 100, "dodge"],
@@ -93,4 +70,23 @@ this.skills_def = [
         ["xuantiejianfa", 5000, "sword"], ["qiankundanuoyi", 5000, "parry"], ["lingboweibu2", 5000, "dodge"],
     ]
 ];
+
+    init_from(player, level) {
+    this.con = this.dex = this.int = this.str = 20 + parseInt(level / 3);
+    if (level > 100) level = 100;
+    const grade1 = Math.floor(level / 10);
+    this.name = UTIL.random_name(this.gender);
+    this.skill_map.apply(this, this.skills_def[grade1]);
+    var color = ["hig", "hic", "hiy", "hiz", "hio", "ora"][parseInt(level / 20)];
+    this.title = "<" + color + ">武道塔守护者</" + color + ">";
+    this.set_objects(['eq/lv0/cloth', 1, 1], ["eq/lv0/jian", 1, 1]);
+
+    this.hp = this.max_hp = 1000 + level * level * 150;
+    this.mp = this.max_mp = parseInt(this.hp / 2);
+    this.init();
+    this.recount();
+
 }
+}
+
+const UTIL = globalThis.UTIL;

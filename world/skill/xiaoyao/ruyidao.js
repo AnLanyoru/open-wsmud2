@@ -1,13 +1,11 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const FAMILIES = globalThis.FAMILIES; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "如意刀";
-this.id = "ruyidao";
-this.grade = 1;
-this.family = FAMILIES.XIAOYAO;
-this.attack_actions = [
+export default class extends SKILL {
+    name = "如意刀";
+    id = "ruyidao";
+    grade = 1;
+    family = FAMILIES.XIAOYAO;
+    attack_actions = [
     "$N一磕刀柄，一招「<WHT>若往若返</WHT>」，猛地一个转身，手中$w直向$n斩去",
     "$N把手中的$w一扬，一招「<YEL>峰回路转</YEL>」，手中的刀一个急转，直砍向$n的$l",
     "$N身形陡然滑出数尺，一招「<RED>御风而行</RED>」，刀势如风，手中$w斩向$n的$l",
@@ -19,27 +17,16 @@ this.attack_actions = [
     "$N把$w划了一圈，一招「<HIC>神光离合</HIC>」，$n只觉得全身被笼罩在一团刀气之中。",
     "$N身形一转，一招「<HIB>逍遥自在</HIB>」，$w刀光不定，招招砍向$n的$l要害"
 ];
-
-this.desc = "逍遥派刀法，如意随风，随心如意";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["blade"];
-this.learn_condition = {
+    desc = "逍遥派刀法，如意随风，随心如意";
+    can_enables = ["blade"];
+    learn_condition = {
     max_mp: 500,
     skill: {
         xiaoyaoxinfa: 50,
         blade: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        blade: {
-            gj: lv * 1 + 10,
-            dex: parseInt(lv / 10)
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     suifeng:
     {
         name: "随风起舞式",
@@ -68,4 +55,16 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        blade: {
+            gj: lv * 1 + 10,
+            dex: parseInt(lv / 10)
+        }
+    };
 }
+}
+
+const FAMILIES = globalThis.FAMILIES;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

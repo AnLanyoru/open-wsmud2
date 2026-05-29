@@ -1,54 +1,21 @@
 import { FAMILY } from "../../os/skill/family.js";
 
-export default function() {
-this.inherits(FAMILY);
-
-this.id = "WUDANG";
-this.boss_path = "wudang/zhangsanfeng";
-this.name = "武当派";
-this.top_name = "武当派首席弟子";
-this.top_family = "道宗";
-this.can_battle = true;
-this.def_npcs = [["wudang/daotong", "wd/guangchang"],
+export default class extends FAMILY {
+    id = "WUDANG";
+    boss_path = "wudang/zhangsanfeng";
+    name = "武当派";
+    top_name = "武当派首席弟子";
+    top_family = "道宗";
+    can_battle = true;
+    def_npcs = [["wudang/daotong", "wd/guangchang"],
 ["wudang/song", "wd/sanqing"],
 ["wudang/guxu", "wd/sanqing"],
 ["pub/mpguanli#WUDANG", "wd/shijie1"],
 ["pub/dadizi#WUDANG", "wd/taiziyan"],
 ["wudang/zhangsanfeng", "wd/xiaoyuan"]];
-
-
-this.call = function (player, isbad) {
-    var age = player.query_age();
-    if (player.gender == 2) {
-        if (age < 30) return isbad ? "小妖女" : "小仙姑";
-        else return isbad ? "妖女" : "仙姑";
-    } else {
-        if (age < 30) return isbad ? "死牛鼻子" : "道兄";
-        else return isbad ? "死牛鼻子" : "道长";
-    }
-}
-this.call_me = function (player, isbad) {
-    if (player.gender == 2) {
-        return "贫道";
-    } else {
-        return isbad ? "本山人" : "贫道";
-    }
-}
-this.set_titles("武当派长老", "武当派第一代弟子", "武当派第二代弟子", "武当派第三代弟子", "武当派道童");
-this.on_kill = function (npc, me) {
-    if (this.boss) {
-        this.boss.do_command("chat", me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，武当派众弟子听令，对" + me.family.name + "弟子格杀勿论！");
-    }
-}
-this.boss_guard = ["wd/xiaoyuan", "wd/xiaolu2", "wd/xiaolu"];
-this.guard_rooms = ['wd/zijin', 'wd/santian', 'wd/chaotian', 'wd/hutou'];
-this.on_battle = function (fam) {
-    if (this.boss) {
-        this.boss.do_command("chat", "无量天尊！");
-    }
-}
-
-this.npc_skills = [
+    boss_guard = ["wd/xiaoyuan", "wd/xiaolu2", "wd/xiaolu"];
+    guard_rooms = ['wd/zijin', 'wd/santian', 'wd/chaotian', 'wd/hutou'];
+    npc_skills = [
     ["dodge", 800],
     ["parry", 800],
     ["force", 800],
@@ -62,8 +29,7 @@ this.npc_skills = [
     ["tiyunzong", 800, "dodge"],
     ["taijijian", 800, "sword"],
     ["taijiquan", 800, ["unarmed", "parry"]]];
-
-this.boss_skills = [
+    boss_skills = [
     ["dodge", 800],
     ["parry", 800],
     ["force", 800],
@@ -73,7 +39,7 @@ this.boss_skills = [
     ["tiyunzong2", 800, "dodge"],
     ["taijijian2", 800, "sword"],
     ["taijiquan2", 800, ["unarmed", "parry"]]];
-this.boss_skills2 = [
+    boss_skills2 = [
     ["dodge", 5000],
     ["parry", 5000],
     ["force", 5000],
@@ -83,4 +49,37 @@ this.boss_skills2 = [
     ["tiyunzong2", 5000, "dodge"],
     ["taijijian3", 5000, "sword"],
     ["taijiquan3", 5000, ["unarmed", "parry"]]];
+
+    constructor() {
+        super();
+        this.set_titles("武当派长老", "武当派第一代弟子", "武当派第二代弟子", "武当派第三代弟子", "武当派道童");
+    }
+
+    call(player, isbad) {
+    var age = player.query_age();
+    if (player.gender == 2) {
+        if (age < 30) return isbad ? "小妖女" : "小仙姑";
+        else return isbad ? "妖女" : "仙姑";
+    } else {
+        if (age < 30) return isbad ? "死牛鼻子" : "道兄";
+        else return isbad ? "死牛鼻子" : "道长";
+    }
+}
+    call_me(player, isbad) {
+    if (player.gender == 2) {
+        return "贫道";
+    } else {
+        return isbad ? "本山人" : "贫道";
+    }
+}
+    on_kill(npc, me) {
+    if (this.boss) {
+        this.boss.do_command("chat", me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，武当派众弟子听令，对" + me.family.name + "弟子格杀勿论！");
+    }
+}
+    on_battle(fam) {
+    if (this.boss) {
+        this.boss.do_command("chat", "无量天尊！");
+    }
+}
 }

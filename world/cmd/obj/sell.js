@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "sell";
-this.regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
-this.enter = function (me, count, objid, to) {
+export default class extends COMMAND {
+    command = "sell";
+    regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
+
+    enter(me, count, objid, to) {
     var target;
     if (to) {
         target = me.find_obj(to, me.environment);
@@ -107,3 +106,6 @@ this.enter = function (me, count, objid, to) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;

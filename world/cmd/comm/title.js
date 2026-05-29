@@ -1,11 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "title";
-this.allow_busy = true;
-this.allow_state = true;
-this.enter = function(me, index) {
+export default class extends COMMAND {
+    command = "title";
+    allow_busy = true;
+    allow_state = true;
+
+    enter(me, index) {
     if (!me.titles) return me.notify("你还没有任何称号。");
     index = parseInt(index);
     if (!(index >= 0 && index < me.titles.length)) return me.notify("你没有这个称号。");

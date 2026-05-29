@@ -1,11 +1,9 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "擒龙手";
-this.id = "qinlong";
-this.attack_actions = [
+export default class extends SKILL {
+    name = "擒龙手";
+    id = "qinlong";
+    attack_actions = [
     "$N五指成爪，真气凝聚指尖，一招「龙爪探渊」直取$n的$l",
     "$N身形一闪，左爪虚晃，右爪「擒龙拿珠」猛扣$n的双目",
     "$N爪风呼啸，一式「锁龙缠腕」缠向$n的手腕，势要扣住脉门",
@@ -24,25 +22,16 @@ this.attack_actions = [
     "$N虚踏一步，爪势如电，「捷龙追影」直追$n的$l",
     "$N收爪蓄力，猛地爆发，「擒龙归位」锁向$n的要害 "
 ];
-
-this.desc = "曾经的少林绝技，在前朝覆灭后就随之消失了";
-this.grade = 2;
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "曾经的少林绝技，在前朝覆灭后就随之消失了";
+    grade = 2;
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 10000,
     skill: {
         unarmed: 500
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            mz: parseInt(lv * 1.5) + 20,
-            dex: parseInt(lv / 8) + 3
-        }
-    };
-}
-this.slots = [
+    slots = [
     {
         prop: 'qlz_sh',
         value: (lv) => 100,
@@ -66,7 +55,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     suo:
     {
         name: "锁龙",
@@ -120,4 +109,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            mz: parseInt(lv * 1.5) + 20,
+            dex: parseInt(lv / 8) + 3
+        }
+    };
 }
+}
+
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

@@ -1,13 +1,12 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "score2";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "score2";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+
+    enter(me, arg) {
     var target = me;
     if (arg) {
         target = me.find_obj(arg, me.environment);
@@ -80,3 +79,5 @@ this.enter = function (me, arg) {
     me.send(str.join(""));
 }
 }
+
+const WORLD = globalThis.WORLD;

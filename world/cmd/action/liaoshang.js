@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "liaoshang";
-this.enter = function (me) {
+export default class extends COMMAND {
+    command = "liaoshang";
+
+    enter(me) {
     if (me.is_fighting()) return me.notify("战斗中疗伤，你找死吗？");
     if (me.hp >= me.max_hp) return me.notify("<hig>你目前气血充沛，没有受到任何伤害。</hig>");
     if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会疗伤。");
@@ -34,6 +34,8 @@ this.enter = function (me) {
     });
     return true;
 }
+}
+
 function do_dazuo(me) {
     var diff_hp = me.max_hp - me.hp;
     if (diff_hp > 0) {
@@ -56,5 +58,4 @@ function do_dazuo(me) {
         me.send_message(me.name + "疗伤完毕，脸色看起来好了很多。");
         return false;
     }
-}
 }

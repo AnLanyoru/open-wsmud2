@@ -1,13 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "密宗大手印";
-this.id = "dashouyin";
-this.grade = 1;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "密宗大手印";
+    id = "dashouyin";
+    grade = 1;
+    attack_actions = [
     "$N使出一招<HIC>「莲花合掌印」</HIC>，双掌合十，直直撞向$n的前胸",
     "$N使出一招<HIW>「合掌观音印」</HIW>，飞身跃起，双手如勾，抓向$n的$l",
     "$N使出一招<HIY>「准提佛母印」</HIY>，运力于指，直取$n的$l",
@@ -17,25 +14,15 @@ this.attack_actions = [
     "$N使出一招<HIB>「上乐金刚印」</HIB>，飞身横跃，双掌前后击出，抓向$n的咽喉",
     "$N使出一招<HIW>「六臂智慧印」</HIW>，顿时劲气弥漫，天空中出现无数掌影打向$n的$l"
 ];
-this.desc = "密宗大手印，需要密宗心法支持。";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "密宗大手印，需要密宗心法支持。";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 500,
     skill: {
         unarmed: 50
     }
 };
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: lv * 1 + 20
-        }
-    };
-}
-
-this.slots = [
+    slots = [
     {
         prop: 'dsy_sh1',
         value: (lv) => 1,
@@ -53,7 +40,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "金刚印",
@@ -93,4 +80,14 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: lv * 1 + 20
+        }
+    };
 }
+}
+
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

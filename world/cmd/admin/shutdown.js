@@ -1,15 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "shutdown";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_level = 6;
-this.handler = 0;
-this.enter = function (me, arg) {
+export default class extends COMMAND {
+    command = "shutdown";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_level = 6;
+    handler = 0;
+
+    enter(me, arg) {
     if (arg == "stop") {
         if (this.handler) {
             clearInterval(this.handler);
@@ -30,3 +29,5 @@ this.enter = function (me, arg) {
     });
 }
 }
+
+const WORLD = globalThis.WORLD;

@@ -1,13 +1,16 @@
 import { ROOM } from "../../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "密室"
-this.desc = "这是一间密室，房间很小，设备也很简陋，一张小床，一张单桌，一个大汉站在哪里小心的戒备这你。";
-this.exits = { "out": "yz/lcy/fang2" };
-this.set_npc("yz/lcy/maoshiba");
+export default class extends ROOM {
+    name = "密室";
+    desc = "这是一间密室，房间很小，设备也很简陋，一张小床，一张单桌，一个大汉站在哪里小心的戒备这你。";
+    exits = { "out": "yz/lcy/fang2" };
 
-this.on_enter = function (me) {
+    constructor() {
+        super();
+        this.set_npc("yz/lcy/maoshiba");
+    }
+
+    on_enter(me) {
     if (me.is_player) {
         var mao = this.find_by_path("yz/lcy/maoshiba");
         if (!mao) return;

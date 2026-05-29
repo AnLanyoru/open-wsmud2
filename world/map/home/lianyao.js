@@ -1,22 +1,24 @@
 import { ROOM } from "../../../os/room/room.js";
 
-export default function() {
-this.inherits(ROOM);
-this.name = "炼药房"
-this.desc = "这是你的炼药房，还没进入就先闻到一股浓烈的药草香味，房间里面没有多余的设施，一个大大的炼药炉摆在房子中间。";
-this.exits = { "west": "home/yuanzi" };
+export default class extends ROOM {
+    name = "炼药房";
+    desc = "这是你的炼药房，还没进入就先闻到一股浓烈的药草香味，房间里面没有多余的设施，一个大大的炼药炉摆在房子中间。";
+    exits = { "west": "home/yuanzi" };
+    can_lianyao = true;
 
-this.can_lianyao = true;
-this.add_action("lianyao", "炼药");
-//this.add_action("lianyao2", "研制丹药");
-this.on_leave = function (me) {
+    constructor() {
+        super();
+        this.add_action("lianyao", "炼药");
+    }
+
+    on_leave(me) {
     if (me.master) {
         me.actions = null;
         me.master_json = null;
     }
     me.remove_status("room");
 }
-this.on_enter = function (me) {
+    on_enter(me) {
     if (me.master) {
         me.actions = [
             { cmd: "dc " + me.id + " lianyao", name: "让" + me.name + "炼药" }

@@ -1,17 +1,14 @@
 import { OBJ } from "../../../os/item/obj.js";
 
-export default function() {
-    const SKILL = globalThis.SKILL; const SKILL_TYPES = globalThis.SKILL_TYPES;
-this.inherits(OBJ);
-this.set({
-    unit: "本",
-    name: "武功秘籍",
-    desc: "一本武功秘籍",
-    max_level: 100,
-    combined: true,
-    value: 0
-});
-this.on_create = function (path, par) {
+export default class extends OBJ {
+    unit = "本";
+    name = "武功秘籍";
+    desc = "一本武功秘籍";
+    max_level = 100;
+    combined = true;
+    value = 0;
+
+    on_create(path, par) {
     if (!par) return;
     par = par.substr(1);
     var skill = SKILL.get(par);
@@ -30,7 +27,7 @@ this.on_create = function (path, par) {
     }
     if (!this.grade) this.value = 1000;
 }
-this.on_use = function (me) {
+    on_use(me) {
     
     var skill_base = SKILL.get(this.skill );
     if (!skill_base) return me.notify('你不能从里面学到东西。');
@@ -59,3 +56,6 @@ this.on_use = function (me) {
     me.recount();
 }
 }
+
+const SKILL = globalThis.SKILL;
+const SKILL_TYPES = globalThis.SKILL_TYPES;

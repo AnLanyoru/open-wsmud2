@@ -1,14 +1,13 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const FOLLOWER = globalThis.FOLLOWER;
-this.inherits(COMMAND);
-this.command = "rel";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.regex = /^(\w+)?(?:\s+(\w+))?$/;
-this.enter = function (me, type, cmd) {
+export default class extends COMMAND {
+    command = "rel";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    regex = /^(\w+)?(?:\s+(\w+))?$/;
+
+    enter(me, type, cmd) {
     if (type === 'marry') {
         return me.send('解除夫妻关系，需要到扬州城的衙门找户部主簿办理。');
     }
@@ -74,13 +73,14 @@ this.enter = function (me, type, cmd) {
         }
     }
 }
+}
 
-
+const WORLD = globalThis.WORLD;
+const FOLLOWER = globalThis.FOLLOWER;
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {
             return me.items[i];
         }
     }
-}
 }

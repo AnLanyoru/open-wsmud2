@@ -1,11 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const OBJ = globalThis.OBJ;
-this.inherits(COMMAND);
-this.command = "fenjie";
-this.regex = /^(\w+)(?:\s(\w+))?$/;
-this.enter = function (player, objid, isok) {
+export default class extends COMMAND {
+    command = "fenjie";
+    regex = /^(\w+)(?:\s(\w+))?$/;
+
+    enter(player, objid, isok) {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要分解什么装备？");
@@ -44,10 +43,7 @@ this.enter = function (player, objid, isok) {
     WORLD.add_recover_obj(player, obj, 2, sum_count);
 
 }
-const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
-    'fy', 'fy', 'gj'];
-
-this.fenjie2 = function (player, obj, isok) {
+    fenjie2(player, obj, isok) {
 
     // if (obj.path.startsWith('eq/cp')
     //     || obj.path.startsWith('eq/zb'))
@@ -111,3 +107,8 @@ this.fenjie2 = function (player, obj, isok) {
     return WORLD.add_recover_obj(player, obj, 2, rec_items);
 }
 }
+
+const WORLD = globalThis.WORLD;
+const OBJ = globalThis.OBJ;
+const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
+    'fy', 'fy', 'gj'];

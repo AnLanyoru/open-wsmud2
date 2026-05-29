@@ -1,13 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-    const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(SKILL);
-this.name = "八卦拳";
-this.id = "baguaquan";
-this.grade = 2;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "八卦拳";
+    id = "baguaquan";
+    grade = 2;
+    attack_actions = [
     "$N双掌一错，使出「乾字决」，双拳一上一下对准$n的$l连拍三招",
     "$N绕着$n一转，满场游走，拳出如风，连绵不绝地击向$n，正是八卦拳中的「坤字决」",
     "$N使出一招「巽字决」，左拳虚击$n的前胸，一错身，右拳迅速横扫$n的太阳穴",
@@ -17,17 +14,15 @@ this.attack_actions = [
     "$N一招「离字决」，顿时幻出重重拳影，气势如虹，铺天盖地袭向$n全身",
     "$N微微一笑，手捏「艮字决」，飞身跃起，半空中一脚踢向$n面门，却是个虚招。说时迟那时快，只见$N一个倒翻，双拳已到了$n的$l"
 ];
-this.desc = "以阴阳八卦为基础创造出来的一式拳法";
-//"(\w+)"(.+?)"NOR"
-//<$1>$2</$1>
-this.can_enables = ["unarmed"];
-this.learn_condition = {
+    desc = "以阴阳八卦为基础创造出来的一式拳法";
+    can_enables = ["unarmed"];
+    learn_condition = {
     max_mp: 200,
     skill: {
         unarmed: 300
     }
 };
-this.slots = [
+    slots = [
     {
         prop: 'bgq_mz',
         value: (lv) => 10,
@@ -43,15 +38,7 @@ this.slots = [
         },
     }
 ];
-this.query_enable_prop = function (lv) {
-    return {
-        unarmed: {
-            gj: parseInt(lv * 1.2) + 20,
-            mz: parseInt(lv * 1.2) + 20
-        }
-    };
-}
-this.pfm = {
+    pfm = {
     zhen:
     {
         name: "震字诀",
@@ -85,4 +72,15 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        unarmed: {
+            gj: parseInt(lv * 1.2) + 20,
+            mz: parseInt(lv * 1.2) + 20
+        }
+    };
 }
+}
+
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

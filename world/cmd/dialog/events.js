@@ -1,15 +1,14 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD;
-this.inherits(COMMAND);
-this.command = "events";
-this.allow_busy = true;
-this.allow_state = true;
-this.allow_die = true;
-this.allow_faint = true;
-this.regex = /^(\w+)(?:\s+(\w+))$/;
-this.enter = function (me, type, paras) {
+export default class extends COMMAND {
+    command = "events";
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
+    regex = /^(\w+)(?:\s+(\w+))$/;
+
+    enter(me, type, paras) {
     let events = WORLD.USER_EVENTS;
     if (type) {
         for (let i = 0; i < events.length; i++) {
@@ -44,8 +43,7 @@ this.enter = function (me, type, paras) {
     }
 
 }
-
-this.check_command = function (event, me) {
+    check_command(event, me) {
 
     if (me.hp <= 0 && !event.allow_die) {
         return me.notify_fail("你现在是灵魂状态，不能那么做。");
@@ -67,3 +65,5 @@ this.check_command = function (event, me) {
     return true;
 }
 }
+
+const WORLD = globalThis.WORLD;

@@ -1,12 +1,10 @@
 import { SKILL } from "../../../os/skill/skill.js";
 
-export default function() {
-this.inherits(SKILL);
-this.name = "神龙剑";
-this.id = "shenlongjian";
-this.grade = 1;
-
-this.attack_actions = [
+export default class extends SKILL {
+    name = "神龙剑";
+    id = "shenlongjian";
+    grade = 1;
+    attack_actions = [
     "$N使一式「<BLK>潮泛银海</BLK>」，手中$w疾挽，漫天寒光，隐夹风雷之声，闪电般狂涌向$n的$l",
     "$N错步上前，使出「<RED>银雨飞花</RED>」，手中$w登时剑芒暴射，宛如漫天瑞雪飞洒向$n的$l",
     "$N手中$w一抖，一招「<GRN>花影滨飞</GRN>」，$w犹如狂风扫落叶般急攻向$n的$l",
@@ -17,27 +15,15 @@ this.attack_actions = [
     "$N一式「<YEL>金针渡劫</YEL>」，$w形神合一，把全部真气贯注剑身之上，快如天光乍闪向$n刺去"
 
 ];
-this.desc = "神龙教的剑法";
-//<$1>$2</$1>
-//<$1>$2</$1>
-this.can_enables = ["sword"];
-this.learn_condition = {
+    desc = "神龙教的剑法";
+    can_enables = ["sword"];
+    learn_condition = {
     max_mp: 100,
     skill: {
         sword: 100
     }
 };
-
-this.query_enable_prop = function (lv) {
-    return {
-        sword: {
-            gj: parseInt(lv + 10)
-        }
-    };
-}
-
-
-this.slots = [
+    slots = [
     {
         prop: 'slj_busy',
         value: (lv) => 1000,
@@ -53,7 +39,7 @@ this.slots = [
         },
     },
 ];
-this.pfm = {
+    pfm = {
     jiang:
     {
         name: "神龙天降",
@@ -98,4 +84,12 @@ this.pfm = {
         }
     }
 };
+
+    query_enable_prop(lv) {
+    return {
+        sword: {
+            gj: parseInt(lv + 10)
+        }
+    };
+}
 }

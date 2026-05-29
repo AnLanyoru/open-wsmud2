@@ -1,9 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-this.inherits(COMMAND);
-this.command = "uneq";
-this.enter = function (me, oid) {
+export default class extends COMMAND {
+    command = "uneq";
+
+    enter(me, oid) {
     var obj;
     if (me.equipment) {
         for (var i = 0; i < me.equipment.length; i++) {

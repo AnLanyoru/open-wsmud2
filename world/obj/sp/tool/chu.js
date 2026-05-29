@@ -1,19 +1,14 @@
 import { EQUIPMENT } from "../../../../os/item/equipment.js";
 
-export default function() {
-    const EQUIP_TYPE = globalThis.EQUIP_TYPE; const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-this.inherits(EQUIPMENT);
-this.set({
-    unit: "把",
-    name: "铁镐",
-    desc: "一根精铁制成的铁镐",
-    value: 1000,
-    eq_type: EQUIP_TYPE.WEAPON,
-    weapon_type: WEAPON_TYPE.STAFF,
+export default class extends EQUIPMENT {
+    unit = "把";
+    name = "铁镐";
+    desc = "一根精铁制成的铁镐";
+    value = 1000;
+    eq_type = EQUIP_TYPE.WEAPON;
+    weapon_type = WEAPON_TYPE.STAFF;
 
-});
-
-this.on_create = function (path, par) {
+    on_create(path, par) {
     let lv = 1;
     if (par) {
         par = par.substr(1);
@@ -34,3 +29,6 @@ this.on_create = function (path, par) {
     EQUIPMENT.prototype.on_create.apply(this);
 }
 }
+
+const EQUIP_TYPE = globalThis.EQUIP_TYPE;
+const WEAPON_TYPE = globalThis.WEAPON_TYPE;

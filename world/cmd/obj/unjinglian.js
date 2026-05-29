@@ -1,12 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 
-export default function() {
-    const WORLD = globalThis.WORLD; const UTIL = globalThis.UTIL;
-this.inherits(COMMAND);
-this.command = "unjinglian";
+export default class extends COMMAND {
+    command = "unjinglian";
 
-const MONEYS = [10, 100, 1000, 5000, 10000, 20000, 100000];
-this.enter = function (me, oid) {
+    enter(me, oid) {
     if (oid) {
         var obj = me.find_obj(oid);
         if (!obj) {
@@ -54,3 +51,7 @@ this.enter = function (me, oid) {
     }
 }
 }
+
+const WORLD = globalThis.WORLD;
+const UTIL = globalThis.UTIL;
+const MONEYS = [10, 100, 1000, 5000, 10000, 20000, 100000];

@@ -1,16 +1,14 @@
 import { MONEY } from "../../../os/item/money.js";
 
-export default function() {
-    const UTIL = globalThis.UTIL;
-this.inherits(MONEY);
-this.set({
-    name: "铜板",
-    desc: "虽然少但也是钱",
-    unit: "枚",
-    value: 1,
-});
+export default class extends MONEY {
+    name = "铜板";
+    desc = "虽然少但也是钱";
+    unit = "枚";
+    value = 1;
 
-this.unit_name = function () {
+    unit_name() {
     return UTIL.moneyToStr(this.count);
 }
 }
+
+const UTIL = globalThis.UTIL;
