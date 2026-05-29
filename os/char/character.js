@@ -312,8 +312,8 @@ export class CHARACTER extends ITEM {
     /**
      * 发送房间消息(支持多视角)
      * @param {string} text - 消息模板
-     * @param {CHARACTER} target - 目标
-     * @param {boolean} [excludeself] - 是否排除自己
+     * @param {CHARACTER?} target - 目标
+     * @param {boolean?} [excludeself] - 是否排除自己
      */
     send_room(text, target, excludeself) {
         if (!this.environment || !text) return;
@@ -1443,7 +1443,7 @@ export class CHARACTER extends ITEM {
 
     /**
      * 设置初始佩戴物品
-     * @param {...[string, number, boolean]} arguments - [物品路径, 数量, 是否装备]
+     * @param {...[string, number, 1|0]} arguments - [物品路径, 数量, 是否装备]
      */
     set_objects() {
         if (!arguments.length) return;
