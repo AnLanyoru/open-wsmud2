@@ -5,10 +5,13 @@
 AREA = class AREA extends BASE {
 
     static __initInstance(obj) {
+        /** @type {ROOM[]} */
         obj.rooms = [];
+        /** @type {Array} */
         obj.map = [];
         obj.name = "";
         obj.is_area = false;
+        /** @type {string|null} */
         obj.first = null;
         obj.is_show = true;
         obj.is_copy = false;
@@ -82,6 +85,7 @@ AREA = class AREA extends BASE {
     /**
      * 查找子区域
      * @param {string} path
+     * @returns {void}
      */
     find_area(path) {
     }
@@ -112,7 +116,10 @@ AREA = class AREA extends BASE {
         return this.desc;
     }
 
-    /** 清除缓存 */
+    /**
+     * 清除缓存(重置json和掉落列表)
+     * @returns {void}
+     */
     clear() {
         this.json = null;
         this.drop_list = null;

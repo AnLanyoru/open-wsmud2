@@ -10,6 +10,7 @@ SKILL = class SKILL extends BASE {
     static __initInstance(obj) {
         obj.id = "";
         obj.name = "";
+        /** @type {number} SKILL_TYPES枚举值 */
         obj.type = SKILL_TYPES.SKILL;
         obj.grade = 1;
         obj.score = 0;
@@ -104,6 +105,7 @@ SKILL = class SKILL extends BASE {
     /**
      * 设置为默认技能
      * @param {string} type - 基本技能类型
+     * @returns {void}
      */
     set_default(type) {
         WORLD.DEFAULT_SKILLS[type] = this;
@@ -113,6 +115,7 @@ SKILL = class SKILL extends BASE {
      * 移除技能附加属性
      * @param {CHARACTER} me
      * @param {number} lv - 技能等级
+     * @returns {void}
      */
     release_prop(me, lv) {
         if (!lv) return;
@@ -140,6 +143,7 @@ SKILL = class SKILL extends BASE {
      * 附加技能属性
      * @param {CHARACTER} me
      * @param {number} lv
+     * @returns {void}
      */
     attach_prop(me, lv) {
         if (!lv) return;
@@ -290,6 +294,7 @@ SKILL = class SKILL extends BASE {
      * 取消激活技能
      * @param {CHARACTER} me
      * @param {string} type
+     * @returns {boolean}
      */
     disenable(me, type) {
         this.on_disenable && this.on_disenable(me, type);
@@ -415,6 +420,7 @@ SKILL = class SKILL extends BASE {
      * @param {string[]} str - 输出数组
      * @param {*} skill_item - 技能数据
      * @param {CHARACTER} me
+     * @returns {void}
      */
     item_to_json(str, skill_item, me) {
         str.push('{"id":"');
@@ -563,6 +569,7 @@ SKILL = class SKILL extends BASE {
      * 设置绝招
      * @param {string} name
      * @param {PERFORM} obj
+     * @returns {void}
      */
     set_pfm(name, obj) {
         if (!this.pfm) {
@@ -574,6 +581,7 @@ SKILL = class SKILL extends BASE {
     /**
      * 技能创建回调
      * @param {string} fname
+     * @returns {void}
      */
     create(fname) {
         if (WORLD.SKILLS[this.id]) {
@@ -582,7 +590,10 @@ SKILL = class SKILL extends BASE {
         this.update(fname);
     }
 
-    /** 按品级和基本技能类型存储 */
+    /**
+     * 按品级和基本技能类型存储
+     * @returns {void}
+     */
     store() {
         if (this.type === SKILL_TYPES.KNOWLEDGE
             || this.type === SKILL_TYPES.BASE
@@ -597,6 +608,7 @@ SKILL = class SKILL extends BASE {
     /**
      * 技能注册/更新
      * @param {string} fname
+     * @returns {void}
      */
     update(fname) {
         WORLD.SKILLS[this.id] = this;
@@ -778,6 +790,7 @@ SKILL = class SKILL extends BASE {
      * @param {string[]} str
      * @param {number} lv
      * @param {string} [pname] - 父技能名(引用技能时)
+     * @returns {void}
      */
     query_pfm_desc(me, p_item, str, lv, pname) {
         const canuse = !p_item.check || p_item.check(me, lv) === true;
@@ -836,6 +849,7 @@ PERFORM = class PERFORM extends BASE {
      * @param {CHARACTER} me
      * @param {string} id - 绝招ID
      * @param {number} [add_time] - 增加冷却时间(毫秒), 不传则清除
+     * @returns {void}
      */
     change_distime(me, id, add_time) {
         if (me.is_player) {

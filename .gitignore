@@ -1,7 +1,8 @@
 node_modules/
-log/access.log.1
+log/
 data/database.db
 .env
 www/
 data/100/
 data/def/
+.idea/

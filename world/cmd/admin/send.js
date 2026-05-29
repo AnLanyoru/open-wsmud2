@@ -3,6 +3,7 @@ this.command = "send";
 this.allow_busy = true;
 this.allow_state = true;
 this.allow_die = true;
+this.allow_level = 6;
 
 this.regex = /^(\w+)\s(.+)$/;
 this.enter = function (me, user, arg) {

@@ -12,7 +12,8 @@ this.set({
     con:15,
     max_mp: 100000,
     max_hp: 100000,
-    pfm_rate: 1
+    pfm_rate: 1,
+    max_item_count: 20
 });
 this.set_objects(["eq/lv0/cloth", 1, 1]);
 this.skill_map(

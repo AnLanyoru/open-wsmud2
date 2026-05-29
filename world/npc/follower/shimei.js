@@ -13,7 +13,8 @@ this.set({
     pot: 15000000,
     max_mp: 600000,
     max_hp: 600000,
-    level: 3
+    level: 3,
+    max_item_count: 20
 });
 this.set_objects(["eq/lv0/jian", 1, 1], ["res/cao#18", 1], ["res/cao#22", 1], ["res/cao#19", 1], ["res/cao#20", 1], ["res/cao#21", 1]);
 this.skill_map(

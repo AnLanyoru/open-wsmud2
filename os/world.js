@@ -109,13 +109,20 @@ WORLD = {
     },
     /** @type {number} -1关闭 0正常 >1 用户等级>连接 */
     status: -1,
-    /** 新socket接入计数 */
+    /** @type {*} 心跳服务句柄 */
+    heart_beat_service: null,
+    /** @type {*} 服务器配置 */
+    SERVER: null,
+    /** @type {COMMAND} 默认命令 */
+    DEFAULT_COMMAND: null,
+    /** @returns {void} 新socket接入计数 */
     SocketIn() {
         this.SocketCount++;
     },
     /**
      * 处理客户端连接
      * @param {*} socket
+     * @returns {void}
      */
     connect(socket) {
         if (WORLD.status < 0)
@@ -151,6 +158,7 @@ WORLD = {
     /**
      * 断开连接
      * @param {*} socket
+     * @returns {void}
      */
     disconnect(socket) {
         if (socket.user) {
@@ -167,6 +175,7 @@ WORLD = {
      * 处理客户端请求
      * @param {string} request - 命令字符串
      * @param {*} socket
+     * @returns {void}
      */
     request(request, socket) {
         if (!request) return;
@@ -194,7 +203,7 @@ WORLD = {
             WORLD.saveRequest();
         }
     },
-    /** 保存请求日志 */
+    /** @returns {void} 保存请求日志 */
     saveRequest() {
         db.saveRequest(WORLD.RECEIVED);
         WORLD.RECEIVED.length = 0;
@@ -234,6 +243,7 @@ WORLD = {
     /**
      * 向所有在线用户发送消息
      * @param {string} msg
+     * @returns {void}
      */
     sendAll(msg) {
         for (let i = 0; i < WORLD.USERS.length; i++) {
@@ -266,6 +276,7 @@ WORLD = {
     /**
      * 用户登录事件回调
      * @param {USER} user
+     * @returns {void}
      */
     on_user_login(user) {
 
@@ -273,17 +284,19 @@ WORLD = {
     /**
      * 跨服登录事件回调
      * @param {USER} user
+     * @returns {void}
      */
     on_user_cross_login(user) {
 
     },
-    /** 服务器启动回调 */
+    /** @returns {void} 服务器启动回调 */
     on_startup() {
 
     },
     /**
      * 用户退出事件回调
      * @param {USER} user
+     * @returns {void}
      */
     on_user_quit(user) {
 
@@ -291,6 +304,7 @@ WORLD = {
     /**
      * 用户重连事件回调
      * @param {USER} user
+     * @returns {void}
      */
     on_user_relogin(user) {
 
@@ -298,11 +312,12 @@ WORLD = {
     /**
      * 心跳回调
      * @param {number} dt - 当前时间戳
+     * @returns {void}
      */
     on_heart_beat(user) {
 
     },
-    /** 服务器主心跳 */
+    /** @returns {void} 服务器主心跳 */
     heart_beat() {
         let avtived_obj = null;
         try {
@@ -319,6 +334,7 @@ WORLD = {
                 avtived_obj.heart_beat(dt);
             }
             WORLD.HEARTBEATCOUNT++;
+            console.log("心跳", WORLD.HEARTBEATCOUNT, "在线", WORLD.CONNECT_COUNT, "用户", WORLD.USERS.length, "房间", WORLD.RUN_ROOMS.length);
             if (WORLD.HEARTBEATCOUNT > 720) {
                 WORLD.HEARTBEATCOUNT = 0;
                 WORLD.save();
@@ -333,6 +349,7 @@ WORLD = {
     /**
      * 用户登出处理
      * @param {USER} user
+     * @returns {void}
      */
     login_out(user) {
         this.on_user_quit(user);
@@ -353,6 +370,7 @@ WORLD = {
     /**
      * 向所有用户广播消息
      * @param {string} text
+     * @returns {void}
      */
     send(text) {
         for (let i = 0; i < this.USERS.length; i++) {
@@ -364,6 +382,7 @@ WORLD = {
      * @param {USER|null} user
      * @param {string} cmd
      * @param {string} msg
+     * @returns {void}
      */
     log(user, cmd, msg) {
         WORLD.LOGS.push({
@@ -377,7 +396,7 @@ WORLD = {
             WORLD.LOGS.length = 0;
         }
     },
-    /** 保存日志到文件 */
+    /** @returns {void} 保存日志到文件 */
     saveLog() {
         db.saveLogs(WORLD.LOGS);
         WORLD.LOGS.length = 0;
@@ -417,7 +436,7 @@ WORLD = {
             return false;
         }
     },
-    /** 生成堆内存快照 */
+    /** @returns {void} 生成堆内存快照 */
     writeHeapSnapshot() {
         const v8 = UTIL.require('v8');
         const dt = new Date();
@@ -426,7 +445,7 @@ WORLD = {
         v8.writeHeapSnapshot(fname);
         console.log('快照保存到', fname);
     },
-    /** 加载本地未保存的用户数据 */
+    /** @returns {void} 加载本地未保存的用户数据 */
     loadLocalData() {
         const data = db.getLocalRoles();
         if (!data || !data.length) return;
@@ -442,6 +461,7 @@ WORLD = {
      * 跨服响应回调
      * @param {string} id - 用户ID
      * @param {string} sid - 服务器ID
+     * @returns {void}
      */
     on_cross_response(id, sid) {
         //允许跨服
@@ -459,11 +479,12 @@ WORLD = {
      * @param {CHARACTER} me
      * @param {CHARACTER} killer
      * @param {CORPSE} corpse
+     * @returns {void}
      */
     on_user_die(me, killer, corpse) {
 
     },
-    /** 资源加载完成回调 */
+    /** @returns {void} 资源加载完成回调 */
     on_resource_loaded() {
 
     }

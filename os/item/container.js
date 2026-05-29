@@ -6,16 +6,21 @@ require("./obj.js");
 CONTAINER = class CONTAINER extends OBJ {
 
     static __initInstance(obj) {
+        /** @type {number} 物品数量 */
         obj.count = 1;
+        /** @type {boolean} 是否可堆叠合并 */
         obj.combined = false;
+        /** @type {boolean} 是否为容器 */
         obj.is_container = true;
     }
 
+    /** 构造CONTAINER实例 */
     constructor() {
         super();
         CONTAINER.__initInstance(this);
     }
 
+    /** @type {boolean} 是否为容器 */
     is_container = true;
 
     /**

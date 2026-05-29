@@ -16,7 +16,8 @@ this.set({
     max_mp: 100,
     hp: 100,
     max_hp: 100,
-    level: 3
+    level: 3,
+    max_item_count: 20
 
 });
 this.skill_map(

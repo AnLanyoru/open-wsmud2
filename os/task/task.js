@@ -8,6 +8,9 @@ TASK = class TASK extends BASE {
         // TASK has no instance properties to initialize
     }
 
+    /**
+     * @returns {TASK}
+     */
     constructor() {
         super();
         TASK.__initInstance(this);
@@ -15,6 +18,7 @@ TASK = class TASK extends BASE {
 
     /**
      * 创建回调 - 添加到系统任务列表并启动
+     * @returns {void}
      */
     create() {
         WORLD.SYSTEMTASKS.push(this);
@@ -37,6 +41,7 @@ TASK = class TASK extends BASE {
     /**
      * 任务更新(热更新)
      * @param {string} path
+     * @returns {void}
      */
     update(path) {
         let oldtask = null;
@@ -61,7 +66,7 @@ TASK = class TASK extends BASE {
 
     }
 
-    /** 任务停止 */
+    /** @returns {void} 任务停止 */
     stop() {
 
     }

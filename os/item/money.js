@@ -6,22 +6,33 @@ require("../item/obj.js");
 MONEY = class MONEY extends OBJ {
 
     static __initInstance(obj) {
+        /** @type {boolean} 是否为现金(元宝) */
         obj.is_cash = false;
+        /** @type {boolean} 是否可堆叠合并 */
         obj.combined = true;
+        /** @type {number} 数量 */
         obj.count = 1;
+        /** @type {boolean} 是否为货币 */
         obj.is_money = true;
+        /** @type {boolean} 是否可交易 */
         obj.transable = true;
     }
 
+    /** 构造MONEY实例 */
     constructor() {
         super();
         MONEY.__initInstance(this);
     }
 
+    /** @type {boolean} 是否为货币 */
     is_money = true;
+    /** @type {boolean} 是否可交易 */
     transable = true;
 
-    /** 创建时根据类型设置颜色 */
+    /**
+     * 创建时根据类型设置颜色
+     * @returns {void}
+     */
     create() {
         this.create_id();
         if (this.is_cash) {

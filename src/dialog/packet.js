@@ -564,7 +564,7 @@ const packet_css = `
 }
 
 .obj-list>.lock:before {
-    content: "\e033";
+    content: "\\e033";
     font-family: 'Glyphicons Halflings';
     font-size: 0.8em;
     margin-right: 0.2em;
@@ -692,7 +692,7 @@ const list_css = `
 }
 
 .trade-list>.lock:before {
-    content: "\e033";
+    content: "\\e033";
     font-family: 'Glyphicons Halflings';
     font-size: 0.8em;
     margin-right: 0.2em;

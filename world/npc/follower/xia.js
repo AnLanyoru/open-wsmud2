@@ -14,7 +14,8 @@ this.set({
     max_mp: 20000,
     hp: 20000,
     max_hp: 20000,
-    level: 3
+    level: 3,
+    max_item_count: 20
 });
 this.set_objects([
     "eq/lv0/cloth", 1, 1

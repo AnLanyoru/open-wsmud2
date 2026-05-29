@@ -556,14 +556,14 @@ export default {
         let item = this.selected_item;
         if (!item) return;
         this.edit_elem.show();
-        this.list_elem.hide();
+        this.list_elem.addClass('hide');
         this.edit_elem.attr("sid", this.setting.indexOf(item));
         let elems = this.edit_elem.find('input, textarea, select');
         for (let elem of elems) {
             let val = $(elem).val();
             let val2 = item[elem.getAttribute('prop')];
             if (val2 !== val) {
-                $(elem).val(val2).change();;
+                $(elem).val(val2).change();
             }
         }
 

@@ -51,6 +51,7 @@ module.exports = {
     /**
      * 保存临时数据
      * @param {string[]} str - 输出数组
+     * @returns {void}
      */
     save_temp(str) {
         str.push('temp:', JSON.stringify(this.temp));
@@ -61,8 +62,8 @@ module.exports = {
      */
     async load() {
         const data = await WORLD.DB.readData(__PATH.DATA + "data.js");
-        this.temp = data.temp ?? {};
-        this.on_load(data);
+        this.temp = data?.temp ?? {};
+        this.on_load(data ?? {});
     },
     /**
      * 查询临时数据
@@ -87,6 +88,7 @@ module.exports = {
      * @param {string} name - 键名
      * @param {*} value - 值
      * @param {number} [time] - 有效期(毫秒)
+     * @returns {void}
      */
     set_temp(name, value, time) {
         if (!this.temp) this.temp = {};
@@ -102,6 +104,7 @@ module.exports = {
     /**
      * 移除临时数据
      * @param {string} name
+     * @returns {void}
      */
     remove_temp(name) {
         if (!this.temp) return;
@@ -150,6 +153,7 @@ module.exports = {
     temp_data: {},
     /**
      * 清除统计数据
+     * @returns {void}
      */
     clear_data() {
         this.temp_data = {};
@@ -159,6 +163,7 @@ module.exports = {
      * @param {string} key - 类别
      * @param {USER} user - 用户对象
      * @param {number} val - 累加值
+     * @returns {void}
      */
     add_data(key, user, val) {
         if (!val) return;

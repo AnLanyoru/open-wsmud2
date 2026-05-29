@@ -27,6 +27,7 @@ server.start = async function (port) {
 /**
  * 新连接回调
  * @param {*} socket
+ * @returns {void}
  */
 server.onConnect = function (socket) {
     WORLD.connect(socket);
@@ -35,6 +36,7 @@ server.onConnect = function (socket) {
 /**
  * 新socket进入回调
  * @param {*} socket
+ * @returns {void}
  */
 server.onSocketIn = function (socket) {
 
@@ -46,6 +48,7 @@ server.onSocketIn = function (socket) {
  * 接收消息回调
  * @param {string} msg
  * @param {*} socket
+ * @returns {void}
  */
 server.onReceive = function (msg, socket) {
     WORLD.request(msg, socket);
@@ -53,6 +56,7 @@ server.onReceive = function (msg, socket) {
 
 /**
  * 服务器关闭回调
+ * @returns {void}
  */
 server.onClose = function (msg, socket) {
     console.log("server closed");
@@ -62,6 +66,7 @@ server.onClose = function (msg, socket) {
  * 客户端断开回调
  * @param {*} socket
  * @param {*} e
+ * @returns {void}
  */
 server.onClientClose = function (socket, e) {
 
@@ -75,6 +80,7 @@ server.onClientClose = function (socket, e) {
  * 客户端超时回调
  * @param {*} socket
  * @param {*} e
+ * @returns {void}
  */
 server.onClientTimeout = function (socket, e) {
     if (socket && (!socket.user || !socket.user.id)) {
@@ -86,6 +92,7 @@ server.onClientTimeout = function (socket, e) {
  * 客户端错误回调
  * @param {*} socket
  * @param {*} e
+ * @returns {void}
  */
 server.onClientError = function (socket, e) {
     if (socket && socket.user) {

@@ -6,16 +6,29 @@ require("./user.js");
 
 FOLLOWER = class FOLLOWER extends CHARACTER {
 
+    /**
+     * @param {FOLLOWER} obj - 要初始化的随从实例
+     */
     static __initInstance(obj) {
+        /** @type {number} */
         obj.hp = obj.max_hp = 100;
+        /** @type {number} */
         obj.mp = obj.max_mp = 100;
+        /** @type {number} */
         obj.str = obj.con = obj.dex = obj.int = obj.per = obj.age = 20;
+        /** @type {FAMILY} */
         obj.family = FAMILIES.NONE;
+        /** @type {boolean} */
         obj.auto_pfm = true;
+        /** @type {string|null} */
         obj.master = null;
+        /** @type {number} */
         obj.level = 3;
+        /** @type {string|null} */
         obj.master_name = null;
+        /** @type {number} */
         obj.max_item_count = 10;
+        /** @type {Object} */
         obj.settings = {
             auto_kill: 1,
             auto_dice: 1

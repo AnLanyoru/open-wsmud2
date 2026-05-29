@@ -95,6 +95,7 @@ module.exports = {
      * 本地文件备份角色数据
      * @param {*} stream - 写入流
      * @param {{id: string, name: string, userid: number, title: string, level: number, data: string}} role
+     * @returns {void}
      */
     localBak(stream, role) {
         stream.write('{id:"');
@@ -164,12 +165,14 @@ module.exports = {
         const path = __PATH.DATA + "data.js";
         const dt = new Date();
         const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-        const tempDir = __PATH.DATA + "/temp/";
+        const tempDir = __PATH.DATA + "temp/";
         if (!await this.check_file(tempDir)) {
             await fs.mkdir(tempDir);
         }
         const _dst = tempDir + "temp" + f + ".js";
-        await fs.copyFile(path, _dst);
+        if (await this.check_file(path)) {
+            await fs.copyFile(path, _dst);
+        }
         return fs.writeFile(path, content);
     },
     /**

@@ -13,6 +13,7 @@ ITEM = class ITEM extends BASE {
         // ITEM has no instance properties to initialize
     }
 
+    /** 构造ITEM实例 */
     constructor() {
         super();
         ITEM.__initInstance(this);
@@ -269,6 +270,7 @@ ITEM = class ITEM extends BASE {
 
     /**
      * 创建对象ID
+     * @returns {void}
      */
     create_id() {
         this.id = UTIL.create_id();
@@ -277,6 +279,7 @@ ITEM = class ITEM extends BASE {
 
     /**
      * 刷新缓存
+     * @returns {void}
      */
     refresh() {
         this.json = null;
@@ -337,6 +340,7 @@ ITEM = class ITEM extends BASE {
 
     /**
      * 销毁对象
+     * @returns {void}
      */
     destroy() {
 

@@ -11,7 +11,8 @@ this.set({
     dex: 27,
     int: 27,
     max_mp: 11500,
-    max_hp: 11500
+    max_hp: 11500,
+    max_item_count: 20
 });
 this.set_objects(["eq/lv0/cloth", 1, 1]);
 this.skill_map(

@@ -43,14 +43,60 @@ function on_check(me) {
     me.send(`你正在采药，当前效率${grade}，每10秒获得${exp}经验，${exp}潜能，${str}。`);
 }
 
+function calculate_lv(grade) {
+    // 权重基准(×10取整，保证红色0.1权重变为1)
+    const weights = {
+        white: 7000,   // 0-2
+        green: 2000,   // 3-5
+        blue: 500,     // 6-8
+        yellow: 100,   // 9-11
+        purple: 20,    // 12-14
+        orange: 10,    // 15-17
+        red: 1         // 18-22
+    };
+
+    // 根据grade启用对应品质上限
+    let maxTier;
+    if (grade > 80) maxTier = 6;      // 红色
+    else if (grade > 18) maxTier = 5; // 橙色
+    else if (grade > 10) maxTier = 4; // 紫色
+    else maxTier = 3;                 // 黄色
+
+    const tiers = ['white', 'green', 'blue', 'yellow', 'purple', 'orange', 'red'];
+    const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17], [18, 22]];
+
+    // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
+    let total = 0;
+    const cumulative = [];
+    for (let i = 0; i <= maxTier; i++) {
+        let w = weights[tiers[i]];
+        if (i >= 1) {
+            w = Math.floor(w * (1 + grade * i / 1200));
+        }
+        total += w;
+        cumulative.push([total, i]);
+    }
+
+    const roll = Math.floor(Math.random() * total);
+    for (const [threshold, idx] of cumulative) {
+        if (roll < threshold) {
+            const [lo, hi] = ranges[idx];
+            return lo + Math.floor(Math.random() * (hi - lo + 1));
+        }
+    }
+
+    return 0;
+}
+
 function do_cai(me) {
-    let lv = me.random(18);
+    let r_i = me.random(100);
+    if (r_i > 89) {
     let grade = me.query_prop('caiyao1');
-    lv = lv > grade ? grade : lv;
+    let lv = calculate_lv(grade);
     let obj = me.add_obj('res/cao#' + lv);
     if (obj) {
         me.send_room("<hig>$N采到一株" + obj.color_name + "。</hig>");
-    }
+    }}
     let exp = WORLD.DATA.get_exp(me)
         + WORLD.DATA.query_temp("caiyao_exp", 0);
     let pot = exp + me.query_prop('ly_qn');
