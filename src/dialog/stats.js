@@ -266,9 +266,9 @@ const stats_css = `
 }
 
 .stats-container-left>.stats-silder {
+    overflow-y: auto;
     white-space: nowrap;
     line-height: 2em;
-    width: 5em;
     text-align: center;
     background-color: #111;
     border-radius: 4px;
