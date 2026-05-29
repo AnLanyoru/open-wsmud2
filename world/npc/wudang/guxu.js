@@ -1,4 +1,5 @@
 import { NPC } from "../../../os/char/npc.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends NPC {
     name = "谷虚道长";
@@ -36,4 +37,3 @@ export default class extends NPC {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;

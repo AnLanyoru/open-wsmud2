@@ -1,4 +1,12 @@
 import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { NPC } from "../../../os/char/npc.js";
+import { USER } from "../../../os/char/user.js";
+import { USERTASK } from "../../../os/task/playertask.js";
+import { COMMAND } from "../../../os/command.js";
 
 export default class extends ROOM {
     name = "第一层";
@@ -204,11 +212,3 @@ export default class extends ROOM {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const NPC = globalThis.NPC;
-const USER = globalThis.USER;
-const USERTASK = globalThis.USERTASK;
-const COMMAND = globalThis.COMMAND;

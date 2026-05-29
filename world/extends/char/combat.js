@@ -1,5 +1,5 @@
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-const CHARACTER = globalThis.CHARACTER;
+import { WEAPON_TYPE } from "../../../os/const.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 
 CHARACTER.prototype.recount = function () {

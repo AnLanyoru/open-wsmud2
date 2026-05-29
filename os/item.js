@@ -413,4 +413,3 @@ export class ITEM extends BASE {
         return tmp.join("");
     }
 }
-globalThis.ITEM = ITEM;

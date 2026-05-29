@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends COMMAND {
     command = "sbook";
@@ -106,6 +108,4 @@ export default class extends COMMAND {
 }
 }
 
-const SKILL = globalThis.SKILL;
-const SKILL_TYPES = globalThis.SKILL_TYPES;
 const COMBINED = [10, 10, 30, 50, 100, 200, 500];

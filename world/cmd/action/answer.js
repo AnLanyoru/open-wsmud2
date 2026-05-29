@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { USER } from "../../../os/char/user.js";
 
 export default class extends COMMAND {
     command = "answer";
@@ -18,7 +19,6 @@ export default class extends COMMAND {
 }
 }
 
-const USER = globalThis.USER;
 USER.prototype.send_question = function (npc, list, callbacks) {
     if (!list || !Array.isArray(list)) return;
 

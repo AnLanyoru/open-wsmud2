@@ -1,4 +1,5 @@
 import { EQUIPMENT } from "../../../../os/item/equipment.js";
+import { EQUIP_TYPE } from "../../../../os/const.js";
 
 export default class extends EQUIPMENT {
     unit = "件";
@@ -8,4 +9,3 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.HEAD;
 }
 
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;

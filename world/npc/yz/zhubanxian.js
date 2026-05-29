@@ -1,4 +1,8 @@
 import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { USERTASK } from "../../../os/task/playertask.js";
+import { COMMAND } from "../../../os/command.js";
 
 export default class extends NPC {
     name = "金古易";
@@ -200,10 +204,6 @@ export default class extends NPC {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const USERTASK = globalThis.USERTASK;
-const COMMAND = globalThis.COMMAND;
 function testLevel(me) {
 
     me.send_room("$N向$n恭敬的问道：敢问老先生，" + me.callme() + "武功境界如何？\n", this);

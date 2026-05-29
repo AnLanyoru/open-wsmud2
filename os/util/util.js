@@ -590,4 +590,3 @@ export const UTIL = {
 
 
 };
-globalThis.UTIL = UTIL;

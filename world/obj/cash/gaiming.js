@@ -1,4 +1,7 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -17,9 +20,6 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const SKILL = globalThis.SKILL;
 function readname(me, cmd) {
     if (cmd == "clearwait") {
         me.wait_input = null;

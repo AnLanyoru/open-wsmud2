@@ -1,4 +1,5 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends SKILL {
     name = "叫花棒法";
@@ -69,4 +70,3 @@ export default class extends SKILL {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;

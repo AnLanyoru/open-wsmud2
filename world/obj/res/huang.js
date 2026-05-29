@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { ROOM } from "../../../os/room/room.js";
 
 export default class extends OBJ {
     name = "雄黄";
@@ -33,4 +34,3 @@ export default class extends OBJ {
 }
 }
 
-const ROOM = globalThis.ROOM;

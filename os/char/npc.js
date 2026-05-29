@@ -371,4 +371,3 @@ Object.defineProperties(NPC.prototype, {
     do_say: { value: function (msg) { }, writable: true, configurable: true },
 });
 
-globalThis.NPC = NPC;

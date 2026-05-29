@@ -1,4 +1,5 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends SKILL {
     id = "parry";
@@ -28,4 +29,3 @@ export default class extends SKILL {
     }
 }
 
-const SKILL_TYPES = globalThis.SKILL_TYPES;

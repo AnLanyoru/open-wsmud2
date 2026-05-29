@@ -1,5 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { NPC } from "../../../os/char/npc.js";
+import { USER } from "../../../os/char/user.js";
 
 export default class extends COMMAND {
     command = "biwu";
@@ -362,10 +366,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const NPC = globalThis.NPC;
-const USER = globalThis.USER;
 const STATS = WORLD.STATS;
 function challenge_end(killer) {
     if (this.on_die && this.on_die(killer) === false) {

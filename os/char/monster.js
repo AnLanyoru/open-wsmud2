@@ -189,4 +189,3 @@ const MONSTER_PARTS = [
     { name: "腰间", hert: 0.99, crit: 5 },
 ];
 
-globalThis.MONSTER = MONSTER;

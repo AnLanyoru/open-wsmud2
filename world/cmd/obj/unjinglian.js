@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends COMMAND {
     command = "unjinglian";
@@ -56,6 +58,4 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
 const MONEYS = [10, 100, 1000, 5000, 10000, 20000, 100000];

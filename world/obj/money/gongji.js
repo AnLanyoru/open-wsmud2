@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends OBJ {
     name = "门派功绩";
@@ -15,4 +16,3 @@ export default class extends OBJ {
 }
 }
 
-const UTIL = globalThis.UTIL;

@@ -1,4 +1,7 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { USER } from "../../../../os/char/user.js";
+import { TASK } from "../../../../os/task/task.js";
+import { COMMAND } from "../../../../os/command.js";
 
 export default class extends ROOM {
     name = "擂台";
@@ -61,6 +64,3 @@ export default class extends ROOM {
 }
 }
 
-const USER = globalThis.USER;
-const TASK = globalThis.TASK;
-const COMMAND = globalThis.COMMAND;

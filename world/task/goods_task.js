@@ -1,4 +1,8 @@
 import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { UTIL } from "../../os/util/util.js";
+import { FAMILIES } from "../../os/skill/family.js";
 
 export default class extends TASK {
     id = "goods";
@@ -95,7 +99,3 @@ export default class extends TASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;

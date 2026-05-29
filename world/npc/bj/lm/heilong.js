@@ -1,4 +1,8 @@
 import { MONSTER } from "../../../../os/char/monster.js";
+import { WORLD } from "../../../../os/world.js";
+import { UTIL } from "../../../../os/util/util.js";
+import { EVENTS } from "../../../../os/task/events.js";
+import { COMMAND } from "../../../../os/command.js";
 
 export default class extends MONSTER {
     name = "黑龙";
@@ -134,7 +138,3 @@ export default class extends MONSTER {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const EVENTS = globalThis.EVENTS;
-const COMMAND = globalThis.COMMAND;

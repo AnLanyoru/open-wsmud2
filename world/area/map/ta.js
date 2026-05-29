@@ -1,4 +1,6 @@
 import { AREA } from "../../../os/room/area.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends AREA {
     id = "wudao";
@@ -50,5 +52,3 @@ export default class extends AREA {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;

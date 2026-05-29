@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends OBJ {
     unit = "枚";
@@ -58,4 +59,3 @@ export default class extends OBJ {
 }
 }
 
-const UTIL = globalThis.UTIL;

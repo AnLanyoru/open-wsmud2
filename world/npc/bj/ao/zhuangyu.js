@@ -1,4 +1,5 @@
 import { NPC } from "../../../../os/char/npc.js";
+import { OBJ } from "../../../../os/item/obj.js";
 
 export default class extends NPC {
     name = "庄允城";
@@ -56,4 +57,3 @@ export default class extends NPC {
     }
 }
 
-const OBJ = globalThis.OBJ;

@@ -1,5 +1,5 @@
-const UTIL = globalThis.UTIL;
-const USER = globalThis.USER;
+import { UTIL } from "../../../os/util/util.js";
+import { USER } from "../../../os/char/user.js";
 
 
 USER.prototype.recount = function () {

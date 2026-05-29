@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends ROOM {
     name = "暗阁";
@@ -19,4 +20,3 @@ export default class extends ROOM {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;

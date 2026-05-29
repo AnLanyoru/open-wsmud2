@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "dazuo";
@@ -36,7 +37,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
 function on_check(me) {
     let speed = count_speed(me);
     let str = ['<hic>你正在打坐运功，当你满内力时，每10秒增加', speed, "最大内力，预计"];

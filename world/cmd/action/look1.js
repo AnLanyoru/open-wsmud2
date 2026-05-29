@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "look1";
@@ -38,4 +39,3 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;

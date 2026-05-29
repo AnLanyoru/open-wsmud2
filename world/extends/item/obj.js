@@ -1,4 +1,4 @@
-const OBJ = globalThis.OBJ;
+import { OBJ } from "../../../os/item/obj.js";
 
 OBJ.prototype.format_to_sell = function () {
 

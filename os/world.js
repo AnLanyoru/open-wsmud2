@@ -499,5 +499,4 @@ async function loadResource() {
     }
 }
 
-globalThis.WORLD = WORLD;
 export { WORLD };

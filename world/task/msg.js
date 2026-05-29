@@ -1,4 +1,6 @@
 import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { COMMAND } from "../../os/command.js";
 
 export default class extends TASK {
     id = "msg";
@@ -95,6 +97,4 @@ export default class extends TASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const COMMAND = globalThis.COMMAND;
 const __PATH = globalThis.__PATH;

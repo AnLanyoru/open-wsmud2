@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { NPC } from "../../../os/char/npc.js";
 
 export default class extends ROOM {
     name = "训练室";
@@ -16,4 +17,3 @@ export default class extends ROOM {
 }
 }
 
-const NPC = globalThis.NPC;

@@ -1,5 +1,8 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends COMMAND {
     command = "xue";
@@ -109,9 +112,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const SKILL = globalThis.SKILL;
-const SKILL_TYPES = globalThis.SKILL_TYPES;
 const BAN_SKILLS = {
     linshuijing: true,
     guanshanjue: true

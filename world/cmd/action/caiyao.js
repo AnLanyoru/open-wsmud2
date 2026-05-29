@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "caiyao";
@@ -31,7 +32,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level]
         + WORLD.DATA.query_temp("caiyao_exp", 0)

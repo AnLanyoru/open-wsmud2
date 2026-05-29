@@ -1,4 +1,5 @@
 import { EQUIPMENT } from "../../../../os/item/equipment.js";
+import { EQUIP_TYPE } from "../../../../os/const.js";
 
 export default class extends EQUIPMENT {
     name = "龙纹服";
@@ -28,4 +29,3 @@ export default class extends EQUIPMENT {
 }
 }
 
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;

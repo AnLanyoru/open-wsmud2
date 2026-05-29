@@ -1,4 +1,7 @@
 import { USERTASK } from "../../os/task/playertask.js";
+import { WORLD } from "../../os/world.js";
+import { NPC } from "../../os/char/npc.js";
+import { ROOM } from "../../os/room/room.js";
 
 export default class extends USERTASK {
     id = "yamen2";
@@ -182,9 +185,6 @@ export default class extends USERTASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const NPC = globalThis.NPC;
-const ROOM = globalThis.ROOM;
 const TAGS = ['wht', 'hic', 'hiy', 'hiz', 'hio', 'ora'];
 const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];
 const UPGRADE_COUNT = [1, 10, 10, 10, 10, 10];

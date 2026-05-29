@@ -181,5 +181,3 @@ export class FAMILY extends BASE {
     }
 }
 
-globalThis.FAMILIES = FAMILIES;
-globalThis.FAMILY = FAMILY;

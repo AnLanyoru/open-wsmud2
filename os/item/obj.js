@@ -409,4 +409,3 @@ export class OBJ extends ITEM {
 
 /** @type {string[]} 品级颜色 */
 const grade_color = ["wht", "hig", "hic", "hiy", "HIZ", "hio", "ord"];
-globalThis.OBJ = OBJ;

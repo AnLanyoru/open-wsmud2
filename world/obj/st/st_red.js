@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends OBJ {
     name = "碎裂的红宝石";
@@ -62,4 +63,3 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;

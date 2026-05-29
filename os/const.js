@@ -8,7 +8,6 @@ export const SKILL_TYPES = {
     SKILL: 1,
     KNOWLEDGE: 2
 };
-globalThis.SKILL_TYPES = SKILL_TYPES;
 
 /**
  * 基本技能ID常量
@@ -21,7 +20,6 @@ export const BASE_SKILLS = {
     PARRY: "parry",
     BITE: "bite"
 };
-globalThis.BASE_SKILLS = BASE_SKILLS;
 
 /**
  * 装备类型枚举
@@ -41,7 +39,6 @@ export const EQUIP_TYPE = {
     WAIST: 9,//腰带
     THROWING: 10//
 }
-globalThis.EQUIP_TYPE = EQUIP_TYPE;
 
 /**
  * 武器类型常量
@@ -57,7 +54,6 @@ export const WEAPON_TYPE = {
     WHIP: "whip",
     THROWING: "throwing"
 }
-globalThis.WEAPON_TYPE = WEAPON_TYPE;
 
 /**
  * 属性名称映射表
@@ -146,4 +142,3 @@ export const PROPERTIES = {
     fenjie: "分解获得的玄晶",
 
 };
-globalThis.PROPERTIES = PROPERTIES;

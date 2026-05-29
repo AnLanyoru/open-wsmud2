@@ -1,6 +1,6 @@
-const SKILL = globalThis.SKILL;
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;
-const CHARACTER = globalThis.CHARACTER;
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
+import { CHARACTER } from "../../../os/char/character.js";
 
 CHARACTER.prototype.reauto_attack = function () {
     if (!this.auto_pfm && this.fight_type) {

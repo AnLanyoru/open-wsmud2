@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends COMMAND {
     command = "filter";
@@ -12,7 +13,6 @@ export default class extends COMMAND {
 }
 }
 
-const UTIL = globalThis.UTIL;
 UTIL.check_word = function (str) {
     for (var i = 0; i < UTIL.workds_regex.length; i++) {
         if (UTIL.workds_regex[i].test(str)) {

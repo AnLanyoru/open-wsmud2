@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "info";
@@ -71,7 +72,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
 const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];
 const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];
 const YMTITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检 ', '神捕'];

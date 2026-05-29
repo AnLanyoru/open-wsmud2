@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends OBJ {
     unit = "个";
@@ -18,4 +19,3 @@ export default class extends OBJ {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;

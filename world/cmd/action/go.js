@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { EQUIP_TYPE } from "../../../os/const.js";
+import { ROOM } from "../../../os/room/room.js";
 
 export default class extends COMMAND {
     command = "go";
@@ -51,8 +53,6 @@ export default class extends COMMAND {
 }
 }
 
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-const ROOM = globalThis.ROOM;
 var OUTER_DOORS = {
 };
 var doors = ["west", "north", "south", "east", "northwest", "southwest", "northeast", "southeast",

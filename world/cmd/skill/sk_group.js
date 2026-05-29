@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "skgroup";
@@ -58,7 +59,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
 const SK_TYPES = [
     "force", "unarmed", "dodge", "parry", "sword",
     "blade", "throwing", "staff", "club", "whip"

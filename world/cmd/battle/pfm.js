@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
 export default class extends COMMAND {
     command = "perform";
@@ -152,8 +154,6 @@ export default class extends COMMAND {
 }
 }
 
-const SKILL = globalThis.SKILL;
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;
 const NOWEAPON = {
     "force": true,
     "unarmed": true, "dodge": true,

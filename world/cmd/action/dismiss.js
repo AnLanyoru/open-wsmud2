@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
 export default class extends COMMAND {
     command = "dismiss";
@@ -35,4 +36,3 @@ export default class extends COMMAND {
 }
 }
 
-const FOLLOWER = globalThis.FOLLOWER;

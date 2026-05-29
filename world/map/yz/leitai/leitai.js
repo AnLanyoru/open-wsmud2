@@ -1,4 +1,5 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { WORLD } from "../../../../os/world.js";
 
 export default class extends ROOM {
     name = "擂台";
@@ -9,7 +10,6 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        const WORLD = globalThis.WORLD;
         this.add_action("fight", null, function (me) {
             me.notify("你正在擂台比试。");
             return true;

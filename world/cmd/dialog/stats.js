@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { EQUIP_TYPE } from "../../../os/const.js";
 
 export default class extends COMMAND {
     command = "stats";
@@ -159,8 +161,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;
 const STATS = WORLD.STATS;
 function render_top_item(me, fam, index) { 
     let tops = STATS.TOPS;

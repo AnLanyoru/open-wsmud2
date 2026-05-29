@@ -1,4 +1,5 @@
 import { FAMILY } from "../../os/skill/family.js";
+import { UTIL } from "../../os/util/util.js";
 
 export default class extends FAMILY {
     id = "SHAOLIN";
@@ -102,4 +103,3 @@ export default class extends FAMILY {
 }
 }
 
-const UTIL = globalThis.UTIL;

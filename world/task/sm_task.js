@@ -1,4 +1,5 @@
 import { USERTASK } from "../../os/task/playertask.js";
+import { OBJ } from "../../os/item/obj.js";
 
 export default class extends USERTASK {
     id = "sm";
@@ -142,7 +143,6 @@ export default class extends USERTASK {
 }
 }
 
-const OBJ = globalThis.OBJ;
 const TAGS = ['hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
 const TITLES = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
 const EXPS = [5000, 10000, 12500, 15000, 17500, 20000];

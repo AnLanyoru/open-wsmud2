@@ -1,5 +1,11 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { AREA } from "../../../os/room/area.js";
+import { ROOM } from "../../../os/room/room.js";
 
 export default class extends COMMAND {
     command = "cr";
@@ -22,12 +28,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const AREA = globalThis.AREA;
-const ROOM = globalThis.ROOM;
 function fb_ok(me) {
     var r = me.query_temp("teamcr");
     if (r == 1) {

@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends COMMAND {
     command = "jinglian";
@@ -106,7 +107,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
 function query_level_color(lv) {
     if (!lv) return "";
     var jlcolor = ["", "hig", "hig", "hic", "hic", "hiy", "hiy", "HIZ", "HIZ", "hio", "hio", "ord", "ord"];

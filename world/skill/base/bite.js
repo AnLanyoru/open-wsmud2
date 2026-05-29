@@ -1,4 +1,6 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends SKILL {
     type = SKILL_TYPES.BASE;
@@ -19,5 +21,3 @@ export default class extends SKILL {
     }
 }
 
-const FAMILIES = globalThis.FAMILIES;
-const SKILL_TYPES = globalThis.SKILL_TYPES;

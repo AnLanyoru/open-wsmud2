@@ -124,4 +124,3 @@ export class CONTAINER extends OBJ {
         return obj;
     }
 }
-globalThis.CONTAINER = CONTAINER;

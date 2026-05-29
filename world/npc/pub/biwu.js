@@ -1,4 +1,5 @@
 import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends NPC {
     name = "擂台比武报名";
@@ -46,4 +47,3 @@ export default class extends NPC {
 }
 }
 
-const WORLD = globalThis.WORLD;

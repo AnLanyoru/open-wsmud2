@@ -68,4 +68,3 @@ export class TASK extends BASE {
 
     }
 }
-globalThis.TASK = TASK;

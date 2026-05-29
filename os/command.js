@@ -107,4 +107,3 @@ export class COMMAND extends BASE {
         }
     }
 }
-globalThis.COMMAND = COMMAND;

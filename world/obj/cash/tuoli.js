@@ -1,4 +1,8 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -95,7 +99,3 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const SKILL = globalThis.SKILL;

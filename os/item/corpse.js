@@ -126,4 +126,3 @@ export class CORPSE extends CONTAINER {
         return this.json;
     }
 }
-globalThis.CORPSE = CORPSE;

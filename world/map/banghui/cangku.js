@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends ROOM {
     name = "仓库";
@@ -25,7 +26,6 @@ export default class extends ROOM {
     }
 }
 
-const WORLD = globalThis.WORLD;
 const rollDesc = [
     "$N摸出一枚骰子，指尖一捻便抛向空中，骰子在半空划出一道弧线后坠落",
     "$N将骰子扣在掌心轻轻摇晃，伴随着清脆的碰撞声，骰子在桌面飞速旋转",

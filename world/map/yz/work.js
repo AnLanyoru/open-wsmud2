@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends ROOM {
     name = "谷物加工厂";
@@ -15,7 +16,6 @@ export default class extends ROOM {
     }
 }
 
-const WORLD = globalThis.WORLD;
 function start_work(me) {
     if (me.level > 1) return me.notify("老板嘿嘿一笑：我这里人手已经够了，做义工可没工钱的哟！");
     if (me.gender == 2) return me.notify("老板嘿嘿一笑：我这里可不招女人，你去成衣店和药店看看有没招工的！");

@@ -7,7 +7,7 @@ import { SKILL } from "../skill/skill.js";
 import { WORLD } from "../world.js";
 import { UTIL } from "../util/util.js";
 import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from "../const.js";
-import { ROOM } from "../room/room.js";
+/** @typedef {import("../room/room.js").ROOM} ROOM */
 /*global CHARACTER ROOM ITEM*/
 
 export class CHARACTER extends ITEM {
@@ -66,6 +66,10 @@ export class CHARACTER extends ITEM {
     is_player = false;
     /** @type {number} 用户权限等级 0=普通 6=管理员 */
     user_level = 0;
+    /** @type {FAMILY} 所属门派 — call/is_team/send_fam 等5个基类方法使用 */
+    family = null;
+    /** @type {boolean} 是否禁止战斗 — USER和NPC设置, 多处检查 */
+    no_fight = false;
 
     // ============ 环境与交互 ============
 
@@ -127,6 +131,12 @@ export class CHARACTER extends ITEM {
     is_shadow = 0;
     /** @type {Function|null} 攻击处理器(定时器句柄) */
     attack_handler = null;
+    /** @type {boolean} 自动释放绝招 — NPC/MONSTER/FOLLOWER默认true */
+    auto_pfm = false;
+    /** @type {Object<string, number>|null} 伤害记录(按玩家ID) — notify_hp/end_fight使用 */
+    damages = null;
+    /** @type {boolean} 是否记录伤害统计 — end_fight检查 */
+    record_damage = false;
 
     // ============ 社交与移动属性 ============
 
@@ -140,6 +150,12 @@ export class CHARACTER extends ITEM {
     release_time = 0;
     /** @type {Array|null} 掉落列表 */
     drop_list = null;
+    /** @type {string|null} 主人ID — NPC/FOLLOWER标识所属玩家 */
+    master = null;
+    /** @type {string|null} 死亡复活房间路径 — NPC/MONSTER使用 */
+    die_room = null;
+    /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
+    chat_msg = null;
 
     // ============ 回调函数(由资源文件设置) ============
 
@@ -1726,7 +1742,8 @@ export class CHARACTER extends ITEM {
         const cur_room = this.environment;
         let next_room = rm;
         if (typeof rm === "string") {
-            next_room = ROOM.Get(rm);
+            const _ROOM = /** @type {typeof ROOM} */ (/** @type {*} */ (globalThis).ROOM);
+            next_room = _ROOM.Get(rm);
             if (!next_room) return false;
             if (next_room.parent === cur_room.parent) {
                 if (cur_room.owner) {
@@ -2727,4 +2744,3 @@ const WEAPON_TYPES = {
     "whip": true
 }
 
-globalThis.CHARACTER = CHARACTER;

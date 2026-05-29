@@ -1,5 +1,8 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends COMMAND {
     command = "shop";
@@ -267,9 +270,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
 function format_moneys(me) {
     return `money:[${me.money},${me.cash_money}]`;
     //  return `money:[${me.money},${me.cash_money},${me.query_temp('my', 0)}],mtype:"枚<hij>古币</hij>"`;

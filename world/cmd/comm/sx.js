@@ -1,5 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { EVENTS } from "../../../os/task/events.js";
 
 export default class extends COMMAND {
     command = "sx";
@@ -216,8 +220,4 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const EVENTS = globalThis.EVENTS;
 const FAMS = ['WUDANG', 'SHAOLIN', 'HUASHAN', 'EMEI', 'GAIBANG', 'XIAOYAO'];

@@ -1,7 +1,7 @@
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-const NPC = globalThis.NPC;
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { EQUIP_TYPE } from "../../os/const.js";
+import { NPC } from "../../os/char/npc.js";
 
 
 

@@ -1,4 +1,6 @@
 import { CONTAINER } from "../../../os/item/container.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
 
 export default class extends CONTAINER {
     name = "婚宴礼桌";
@@ -34,5 +36,3 @@ export default class extends CONTAINER {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;

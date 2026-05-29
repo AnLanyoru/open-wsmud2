@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { BASE } from "../../../os/base.js";
 
 export default class extends ROOM {
     name = "落雁峰";
@@ -47,5 +48,4 @@ export default class extends ROOM {
 }
 }
 
-const BASE = globalThis.BASE;
 const __PATH = globalThis.__PATH;

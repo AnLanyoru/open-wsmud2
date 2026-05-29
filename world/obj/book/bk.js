@@ -1,4 +1,6 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -57,5 +59,3 @@ export default class extends OBJ {
 }
 }
 
-const SKILL = globalThis.SKILL;
-const SKILL_TYPES = globalThis.SKILL_TYPES;

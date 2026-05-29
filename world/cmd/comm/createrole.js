@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends COMMAND {
     command = "createrole";
@@ -101,7 +103,5 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
 var name_reg = /^[\u4E00-\u9FA5]{2,5}$/;
 var id_reg = /^[a-z][a-z0-9]{2,9}$/;

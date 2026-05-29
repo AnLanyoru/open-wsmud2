@@ -1,5 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { NPC } from "../../../os/char/npc.js";
+import { BASE } from "../../../os/base.js";
+import { TASK } from "../../../os/task/task.js";
 
 export default class extends COMMAND {
     command = "update";
@@ -121,10 +125,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const NPC = globalThis.NPC;
-const BASE = globalThis.BASE;
-const TASK = globalThis.TASK;
 const __PATH = globalThis.__PATH;
 if (WORLD.COMMANDS.update && WORLD.COMMANDS.update.clear_update) {
     WORLD.COMMANDS.update.clear_update();

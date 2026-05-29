@@ -1,4 +1,6 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { SKILL_TYPES } from "../../../os/const.js";
 
 export default class extends OBJ {
     unit = "粒";
@@ -53,6 +55,4 @@ export default class extends OBJ {
 }
 }
 
-const SKILL = globalThis.SKILL;
-const SKILL_TYPES = globalThis.SKILL_TYPES;
 const VALUES = [1000, 1000, 10000, 20000, 50000, 100000, 100000];

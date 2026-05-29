@@ -71,7 +71,6 @@ export default class wsServer {
         });
     }
 }
-globalThis.wsServer = wsServer;
 
 /**
  * 客户端连接处理

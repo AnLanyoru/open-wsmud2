@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
 export default class extends ROOM {
     name = "院子";
@@ -34,4 +35,3 @@ export default class extends ROOM {
 }
 }
 
-const FOLLOWER = globalThis.FOLLOWER;

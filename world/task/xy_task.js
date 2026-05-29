@@ -1,4 +1,12 @@
 import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { UTIL } from "../../os/util/util.js";
+import { NPC } from "../../os/char/npc.js";
+import { AREA } from "../../os/room/area.js";
+import { ROOM } from "../../os/room/room.js";
+import { EVENTS } from "../../os/task/events.js";
+import { COMMAND } from "../../os/command.js";
 
 export default class extends TASK {
     id = "xiangyang";
@@ -564,14 +572,6 @@ export default class extends TASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const NPC = globalThis.NPC;
-const AREA = globalThis.AREA;
-const ROOM = globalThis.ROOM;
-const EVENTS = globalThis.EVENTS;
-const COMMAND = globalThis.COMMAND;
 const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];
 const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];
 function add_jungong(me, count) {

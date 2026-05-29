@@ -1,4 +1,5 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends SKILL {
     name = "临济十二庄";
@@ -127,4 +128,3 @@ export default class extends SKILL {
     can_enables = ["force"];
 }
 
-const FAMILIES = globalThis.FAMILIES;

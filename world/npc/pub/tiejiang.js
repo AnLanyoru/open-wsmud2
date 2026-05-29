@@ -1,4 +1,8 @@
 import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
+import { UTIL } from "../../../os/util/util.js";
+import { EQUIP_TYPE, WEAPON_TYPE } from "../../../os/const.js";
 
 export default class extends NPC {
     name = "铁匠";
@@ -102,8 +106,3 @@ export default class extends NPC {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;

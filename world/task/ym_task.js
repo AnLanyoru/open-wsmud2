@@ -1,4 +1,5 @@
 import { USERTASK } from "../../os/task/playertask.js";
+import { WORLD } from "../../os/world.js";
 
 export default class extends USERTASK {
     id = "yamen";
@@ -121,7 +122,6 @@ export default class extends USERTASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
 const TAGS = ['wht', 'hig', 'hic', 'hiy', 'hiz', 'hio', 'ord'];
 const TITLES = ['', '衙役', '捕快', '捕头', '总捕头', '巡检', '神捕'];
 const EXPS = [0, 5000, 8000, 12000, 16000, 20000, 25000];

@@ -1,5 +1,5 @@
-const WORLD = globalThis.WORLD;
-const FAMILIES = globalThis.FAMILIES;
+import { WORLD } from "../../os/world.js";
+import { FAMILIES } from "../../os/skill/family.js";
 
 
 WORLD.on_startup = function () {

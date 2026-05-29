@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { USERTASK } from "../../../os/task/playertask.js";
 
 export default class extends COMMAND {
     command = "task";
@@ -64,8 +66,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const USERTASK = globalThis.USERTASK;
 const ALLOW_COMMANDS = {
     start: true,
     giveup: true,

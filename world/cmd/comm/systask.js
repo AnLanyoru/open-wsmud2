@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { TASK } from "../../../os/task/task.js";
 
 export default class extends COMMAND {
     command = "systask";
@@ -25,7 +26,6 @@ export default class extends COMMAND {
 }
 }
 
-const TASK = globalThis.TASK;
 const BLOCKED_PROPS = {
     constructor: true,
     __proto__: true,

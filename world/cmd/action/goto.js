@@ -1,5 +1,10 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { ROOM } from "../../../os/room/room.js";
+import { USERTASK } from "../../../os/task/playertask.js";
 
 export default class extends COMMAND {
     command = "goto";
@@ -140,11 +145,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const ROOM = globalThis.ROOM;
-const USERTASK = globalThis.USERTASK;
 function find_npc(family, path) {
     for (let item of family.def_npcs) {
         if (path !== item[0]) continue;

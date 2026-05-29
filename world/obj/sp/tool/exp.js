@@ -1,4 +1,7 @@
 import { OBJ } from "../../../../os/item/obj.js";
+import { WORLD } from "../../../../os/world.js";
+import { EVENTS } from "../../../../os/task/events.js";
+import { COMMAND } from "../../../../os/command.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -37,6 +40,3 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const EVENTS = globalThis.EVENTS;
-const COMMAND = globalThis.COMMAND;

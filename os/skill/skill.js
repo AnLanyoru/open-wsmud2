@@ -886,5 +886,3 @@ export class PERFORM extends BASE {
 const level_color = ["wht", "hig", "hic", "hiy", "hiz", "hio", "ord"];
 /** @type {string[]} 品级描述 */
 const level_desc = ["基本技能", "普通技能", "高级技能", "稀有武技", "绝世武功", "绝世神功", "无上神武"];
-globalThis.SKILL = SKILL;
-globalThis.PERFORM = PERFORM;

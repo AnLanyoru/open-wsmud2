@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
 export default class extends COMMAND {
     command = "rel";
@@ -79,8 +81,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const FOLLOWER = globalThis.FOLLOWER;
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {

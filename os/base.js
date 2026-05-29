@@ -286,4 +286,3 @@ export class BASE {
         obj.update && obj.update(fname, ary[2]);
     }
 }
-globalThis.BASE = BASE;

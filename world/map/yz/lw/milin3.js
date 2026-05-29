@@ -1,4 +1,7 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { WORLD } from "../../../../os/world.js";
+import { UTIL } from "../../../../os/util/util.js";
+import { COMMAND } from "../../../../os/command.js";
 
 export default class extends ROOM {
     name = "密林深处";
@@ -173,6 +176,3 @@ export default class extends ROOM {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const COMMAND = globalThis.COMMAND;

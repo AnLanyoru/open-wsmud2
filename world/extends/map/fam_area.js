@@ -1,6 +1,6 @@
-const WORLD = globalThis.WORLD;
-const FAMILIES = globalThis.FAMILIES;
-const FAMILY_AREA = globalThis.FAMILY_AREA;
+import { WORLD } from "../../../os/world.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { FAMILY_AREA } from "../../../os/room/fam_area.js";
 
 const stand_actions = [
     ['goto fam1', '练功', '回到你所在门派师父所在位置学习武功'],

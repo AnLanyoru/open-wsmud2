@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
+import { NPC } from "../../../os/char/npc.js";
 
 export default class extends COMMAND {
     command = "ask";
@@ -20,8 +22,6 @@ export default class extends COMMAND {
 }
 }
 
-const UTIL = globalThis.UTIL;
-const NPC = globalThis.NPC;
 var ask_dunno = ["$n摇摇头，说道：没听说过。",
     "$n睁大眼睛望着$N，显然不知道$P在说什么。",
     "$n耸了耸肩，很抱歉地说：无可奉告。",

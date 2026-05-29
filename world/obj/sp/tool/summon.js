@@ -1,4 +1,6 @@
 import { OBJ } from "../../../../os/item/obj.js";
+import { NPC } from "../../../../os/char/npc.js";
+import { TASK } from "../../../../os/task/task.js";
 
 export default class extends OBJ {
     unit = "块";
@@ -23,5 +25,3 @@ export default class extends OBJ {
 }
 }
 
-const NPC = globalThis.NPC;
-const TASK = globalThis.TASK;

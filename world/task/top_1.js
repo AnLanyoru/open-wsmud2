@@ -1,4 +1,7 @@
 import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { FAMILIES } from "../../os/skill/family.js";
+import { COMMAND } from "../../os/command.js";
 
 export default class extends TASK {
     id = "top";
@@ -171,8 +174,5 @@ export default class extends TASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const FAMILIES = globalThis.FAMILIES;
-const COMMAND = globalThis.COMMAND;
 const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
     'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];

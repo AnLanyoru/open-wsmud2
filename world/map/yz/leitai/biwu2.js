@@ -1,4 +1,5 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { USER } from "../../../../os/char/user.js";
 
 export default class extends ROOM {
     name = "擂台";
@@ -71,7 +72,6 @@ export default class extends ROOM {
 }
 }
 
-const USER = globalThis.USER;
 function challenge_over(killer) {
     if (this.environment.items.length != 2) {
         return this.send("比武出现问题，请练习管理解决。");;

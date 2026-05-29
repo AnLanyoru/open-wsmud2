@@ -1,4 +1,5 @@
 import { NPC } from "../../../os/char/npc.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends NPC {
     name = "";
@@ -89,4 +90,3 @@ export default class extends NPC {
 }
 }
 
-const UTIL = globalThis.UTIL;

@@ -1,4 +1,6 @@
 import { NPC } from "../../../os/char/npc.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends NPC {
     name = "店小二";
@@ -73,8 +75,6 @@ export default class extends NPC {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
 function zhudian(me, par) {
     var kd = me.query_temp("kezhan");
     if (kd) {

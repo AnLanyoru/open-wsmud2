@@ -68,7 +68,6 @@ export class EVENTS extends BASE {
  *   query_grade: function(): number
  * }}
  */
-globalThis.EVENTS = EVENTS;
 
 const EVENT_BASE = {
     /** @returns {string} */

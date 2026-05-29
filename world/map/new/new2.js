@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends ROOM {
     name = "训练室";
@@ -48,7 +49,6 @@ export default class extends ROOM {
 }
 }
 
-const UTIL = globalThis.UTIL;
 function next_guide(me) {
     var obj = me.add_obj("sp/new/ksunarmed", 1);
     if (obj) {

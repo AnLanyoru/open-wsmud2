@@ -1,6 +1,6 @@
-const WORLD = globalThis.WORLD;
-const AREA = globalThis.AREA;
-const ROOM = globalThis.ROOM;
+import { WORLD } from "../../../os/world.js";
+import { AREA } from "../../../os/room/area.js";
+import { ROOM } from "../../../os/room/room.js";
 
 AREA.prototype.notify_update = function () {
     this.json = null;

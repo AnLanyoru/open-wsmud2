@@ -1,5 +1,9 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { UTIL } from "../../../os/util/util.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { AREA } from "../../../os/room/area.js";
 
 export default class extends COMMAND {
     command = "cr2";
@@ -66,10 +70,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const AREA = globalThis.AREA;
 const DIFFS = ["普通", "困难", "组队"];
 const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
     'EMEI', 'GAIBANG', 'XIAOYAO', 'SHASHOU', 'NONE'];

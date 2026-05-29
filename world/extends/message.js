@@ -1,4 +1,4 @@
-const WORLD = globalThis.WORLD;
+import { WORLD } from "../../os/world.js";
 
 
 

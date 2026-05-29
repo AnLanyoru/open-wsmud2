@@ -1,4 +1,5 @@
 import { ROOM } from "../../../os/room/room.js";
+import { WORLD } from "../../../os/world.js";
 
 export default class extends ROOM {
     name = "药铺";
@@ -16,7 +17,6 @@ export default class extends ROOM {
     }
 }
 
-const WORLD = globalThis.WORLD;
 function start_work(me) {
     if (me.level > 1) return me.notify("平一指：小店本小利薄，哪里敢劳烦大侠！");
     me.send_room("$N开始在在药店当学徒......", me);

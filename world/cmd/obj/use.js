@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { EQUIP_TYPE } from "../../../os/const.js";
 
 export default class extends COMMAND {
     command = "use";
@@ -75,4 +76,3 @@ export default class extends COMMAND {
 }
 }
 
-const EQUIP_TYPE = globalThis.EQUIP_TYPE;

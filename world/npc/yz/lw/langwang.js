@@ -1,4 +1,7 @@
 import { MONSTER } from "../../../../os/char/monster.js";
+import { WORLD } from "../../../../os/world.js";
+import { OBJ } from "../../../../os/item/obj.js";
+import { ROOM } from "../../../../os/room/room.js";
 
 export default class extends MONSTER {
     name = "狼王";
@@ -113,6 +116,3 @@ export default class extends MONSTER {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const ROOM = globalThis.ROOM;

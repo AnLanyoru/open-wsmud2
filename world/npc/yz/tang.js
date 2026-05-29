@@ -1,4 +1,6 @@
 import { NPC } from "../../../os/char/npc.js";
+import { UTIL } from "../../../os/util/util.js";
+import { TASK } from "../../../os/task/task.js";
 
 export default class extends NPC {
     name = "唐楠";
@@ -63,5 +65,3 @@ export default class extends NPC {
 }
 }
 
-const UTIL = globalThis.UTIL;
-const TASK = globalThis.TASK;

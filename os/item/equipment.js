@@ -606,4 +606,3 @@ export class EQUIPMENT extends OBJ {
 /** @type {string[]} 强化等级图标 */
 const level_desc = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
     "★★★☆", "★★★★", "★★★★☆", "★★★★★", "★★★★★☆", "★★★★★★"];
-globalThis.EQUIPMENT = EQUIPMENT;

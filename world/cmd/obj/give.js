@@ -1,5 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { UTIL } from "../../../os/util/util.js";
 
 export default class extends COMMAND {
     command = "give";
@@ -70,4 +71,3 @@ export default class extends COMMAND {
     }
 }
 
-const UTIL = globalThis.UTIL;

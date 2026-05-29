@@ -42,4 +42,3 @@ export class MONEY extends OBJ {
 
     }
 }
-globalThis.MONEY = MONEY;

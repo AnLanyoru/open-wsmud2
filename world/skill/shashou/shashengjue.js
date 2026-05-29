@@ -1,4 +1,5 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
 
 export default class extends SKILL {
     name = "杀生决";
@@ -98,7 +99,6 @@ export default class extends SKILL {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;
 const YS_ROOMS = {
     "yz/leitai/leitai": function (me) {
         me.send_room("\n<blk>$N的身形一闪，渐渐模糊不见了。<blk>\n");

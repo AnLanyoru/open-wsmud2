@@ -1,4 +1,5 @@
 import { AREA } from "../../../os/room/area.js";
+import { ROOM } from "../../../os/room/room.js";
 
 export default class extends AREA {
     name = "黑鹰校场";
@@ -45,4 +46,3 @@ export default class extends AREA {
 }
 }
 
-const ROOM = globalThis.ROOM;

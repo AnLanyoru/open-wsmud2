@@ -1,4 +1,6 @@
 import { OBJ } from "../../../../os/item/obj.js";
+import { WORLD } from "../../../../os/world.js";
+import { NPC } from "../../../../os/char/npc.js";
 
 export default class extends OBJ {
     unit = "个";
@@ -26,8 +28,6 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const NPC = globalThis.NPC;
 function readname(me, cmd) {
     if (!cmd) return me.send('请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：');
     var ss = cmd.split(' ');

@@ -1,4 +1,6 @@
 import { NPC } from "../../../os/char/npc.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { USERTASK } from "../../../os/task/playertask.js";
 
 export default class extends NPC {
     name = "门派后勤管理员";
@@ -83,8 +85,6 @@ export default class extends NPC {
 }
 }
 
-const FAMILIES = globalThis.FAMILIES;
-const USERTASK = globalThis.USERTASK;
 const NEEDS_GJ = [500, 5000, 10000, 50000, 100000];
 const NEEDS_LEVEL = [0, 3, 4, 5, 6];
 const NEEDS_LEVEL_DESC = [null, "宗师", "武圣", "武帝", "武神"];

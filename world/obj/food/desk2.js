@@ -1,4 +1,5 @@
 import { CONTAINER } from "../../../os/item/container.js";
+import { OBJ } from "../../../os/item/obj.js";
 
 export default class extends CONTAINER {
     name = "餐桌";
@@ -20,4 +21,3 @@ export default class extends CONTAINER {
 }
 }
 
-const OBJ = globalThis.OBJ;

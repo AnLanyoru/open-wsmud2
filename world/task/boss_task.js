@@ -1,4 +1,11 @@
 import { TASK } from "../../os/task/task.js";
+import { WORLD } from "../../os/world.js";
+import { OBJ } from "../../os/item/obj.js";
+import { UTIL } from "../../os/util/util.js";
+import { FAMILIES } from "../../os/skill/family.js";
+import { NPC } from "../../os/char/npc.js";
+import { ROOM } from "../../os/room/room.js";
+import { EVENTS } from "../../os/task/events.js";
 
 export default class extends TASK {
     id = "boss";
@@ -191,13 +198,6 @@ export default class extends TASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
-const UTIL = globalThis.UTIL;
-const FAMILIES = globalThis.FAMILIES;
-const NPC = globalThis.NPC;
-const ROOM = globalThis.ROOM;
-const EVENTS = globalThis.EVENTS;
 const BOSSTASK = this;
 const BOSS_LEVELS = ["", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
 function create_finish_event(boss) {

@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { NPC } from "../../../os/char/npc.js";
 
 export default class extends COMMAND {
     command = "setting";
@@ -97,8 +99,6 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const NPC = globalThis.NPC;
 const setting_keys = {
     'hide_roomdesc': {
         type: "Boolean",

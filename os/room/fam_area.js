@@ -10,4 +10,3 @@ export class FAMILY_AREA extends AREA {
         super();
     }
 }
-globalThis.FAMILY_AREA = FAMILY_AREA;

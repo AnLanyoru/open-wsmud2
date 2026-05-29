@@ -1,4 +1,4 @@
-const EQUIPMENT = globalThis.EQUIPMENT;
+import { EQUIPMENT } from "../../../os/item/equipment.js";
 
 EQUIPMENT.prototype.query_score = function () {
     if (this.grade) {

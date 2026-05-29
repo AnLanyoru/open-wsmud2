@@ -1,4 +1,5 @@
 import { USERTASK } from "../../os/task/playertask.js";
+import { WORLD } from "../../os/world.js";
 
 export default class extends USERTASK {
     id = "growup";
@@ -30,7 +31,6 @@ export default class extends USERTASK {
 }
 }
 
-const WORLD = globalThis.WORLD;
 const temps = [
     {
         title: "学会任意一个技能",

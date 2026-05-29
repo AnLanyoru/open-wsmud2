@@ -1,4 +1,5 @@
 import { FAMILY } from "../../os/skill/family.js";
+import { MONSTER } from "../../os/char/monster.js";
 
 export default class extends FAMILY {
     id = "MONSTER";
@@ -13,4 +14,3 @@ export default class extends FAMILY {
 }
 }
 
-const MONSTER = globalThis.MONSTER;

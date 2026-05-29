@@ -1,4 +1,6 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { FAMILIES } from "../../../os/skill/family.js";
+import { SKILL_TYPES, WEAPON_TYPE } from "../../../os/const.js";
 
 export default class extends SKILL {
     type = SKILL_TYPES.SKILL;
@@ -46,6 +48,3 @@ export default class extends SKILL {
 };
 }
 
-const FAMILIES = globalThis.FAMILIES;
-const SKILL_TYPES = globalThis.SKILL_TYPES;
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;

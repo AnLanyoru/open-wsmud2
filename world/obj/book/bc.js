@@ -1,4 +1,6 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { WORLD } from "../../../os/world.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
 export default class extends OBJ {
     unit = "份";
@@ -27,6 +29,4 @@ export default class extends OBJ {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const SKILL = globalThis.SKILL;
 const COMBINED = [10, 10, 30, 50, 100, 200, 500];

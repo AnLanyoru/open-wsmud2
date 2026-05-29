@@ -297,4 +297,3 @@ export class AREA extends BASE {
         return this.actions;
     }
 }
-globalThis.AREA = AREA;

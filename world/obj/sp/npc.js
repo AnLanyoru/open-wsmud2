@@ -1,4 +1,7 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
+import { NPC } from "../../../os/char/npc.js";
+import { FOLLOWER } from "../../../os/char/follower.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -111,6 +114,3 @@ export default class extends OBJ {
 }
 }
 
-const SKILL = globalThis.SKILL;
-const NPC = globalThis.NPC;
-const FOLLOWER = globalThis.FOLLOWER;

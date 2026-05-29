@@ -1,10 +1,9 @@
-const WORLD = globalThis.WORLD;
-const FAMILIES = globalThis.FAMILIES;
-const NPC = globalThis.NPC;
-const ROOM = globalThis.ROOM;
-const FAMILY = globalThis.FAMILY;
-const EVENTS = globalThis.EVENTS;
-const COMMAND = globalThis.COMMAND;
+import { WORLD } from "../../../os/world.js";
+import { FAMILIES, FAMILY } from "../../../os/skill/family.js";
+import { NPC } from "../../../os/char/npc.js";
+import { ROOM } from "../../../os/room/room.js";
+import { EVENTS } from "../../../os/task/events.js";
+import { COMMAND } from "../../../os/command.js";
 
 FAMILY.prototype.init = function () {
     if (!this.def_npcs) return;

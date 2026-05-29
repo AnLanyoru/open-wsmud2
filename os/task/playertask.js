@@ -100,4 +100,3 @@ export class USERTASK extends BASE {
         }
     }
 }
-globalThis.USERTASK = USERTASK;

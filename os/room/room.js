@@ -1051,4 +1051,5 @@ function getAreaByPath(path) {
         if (items[i].room_path == path) return items[i];
     }
 }
+
 globalThis.ROOM = ROOM;

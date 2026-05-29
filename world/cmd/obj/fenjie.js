@@ -1,5 +1,7 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
+import { WORLD } from "../../../os/world.js";
+import { OBJ } from "../../../os/item/obj.js";
 
 export default class extends COMMAND {
     command = "fenjie";
@@ -112,7 +114,5 @@ export default class extends COMMAND {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;
 const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
     'fy', 'fy', 'gj'];

@@ -1,4 +1,5 @@
 import { SKILL } from "../../../os/skill/skill.js";
+import { WEAPON_TYPE } from "../../../os/const.js";
 
 export default class extends SKILL {
     name = "千蛛万毒手";
@@ -149,4 +150,3 @@ export default class extends SKILL {
 }
 }
 
-const WEAPON_TYPE = globalThis.WEAPON_TYPE;

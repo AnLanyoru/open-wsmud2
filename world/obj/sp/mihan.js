@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { TASK } from "../../../os/task/task.js";
 
 export default class extends OBJ {
     unit = "封";
@@ -14,4 +15,3 @@ export default class extends OBJ {
 }
 }
 
-const TASK = globalThis.TASK;

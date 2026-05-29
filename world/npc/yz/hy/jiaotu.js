@@ -1,4 +1,6 @@
 import { NPC } from "../../../../os/char/npc.js";
+import { ROOM } from "../../../../os/room/room.js";
+import { CORPSE } from "../../../../os/item/corpse.js";
 
 export default class extends NPC {
     name = "黑鹰教徒";
@@ -99,8 +101,6 @@ export default class extends NPC {
 }
 }
 
-const ROOM = globalThis.ROOM;
-const CORPSE = globalThis.CORPSE;
 var DIE_MSG = ["\n$N扑在地上挣扎了几下，腿一伸，口中喷出几口<HIR>鲜血</HIR>，死了！\n",
     "\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n",
     "\n$N口中喷出几口<HIR>鲜血</HIR>，倒在地上,死了！\n"];

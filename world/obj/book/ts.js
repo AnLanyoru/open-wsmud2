@@ -1,4 +1,5 @@
 import { OBJ } from "../../../os/item/obj.js";
+import { SKILL } from "../../../os/skill/skill.js";
 
 export default class extends OBJ {
     unit = "份";
@@ -21,4 +22,3 @@ export default class extends OBJ {
 }
 }
 
-const SKILL = globalThis.SKILL;

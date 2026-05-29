@@ -1,4 +1,6 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { WORLD } from "../../../../os/world.js";
+import { OBJ } from "../../../../os/item/obj.js";
 
 export default class extends ROOM {
     name = "兵器库";
@@ -77,5 +79,3 @@ export default class extends ROOM {
 }
 }
 
-const WORLD = globalThis.WORLD;
-const OBJ = globalThis.OBJ;

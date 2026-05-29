@@ -1,4 +1,5 @@
 import { ROOM } from "../../../../os/room/room.js";
+import { SKILL } from "../../../../os/skill/skill.js";
 
 export default class extends ROOM {
     name = "巷子深处";
@@ -48,7 +49,6 @@ export default class extends ROOM {
 }
 }
 
-const SKILL = globalThis.SKILL;
 function do_work(me) {
     if (me.mp < 10) {
         return me.notify_fail("你感觉自己的力气耗光了，再也推不动了。");
