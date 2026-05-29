@@ -341,7 +341,7 @@ export class ITEM extends BASE {
     }
 
     /**
-     * 获取完整显示名称
+     * 完整显示名称 — getter, 子类可覆写为数据属性
      * @returns {string}
      */
     long_name() {

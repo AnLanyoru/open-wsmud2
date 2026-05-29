@@ -144,7 +144,7 @@ export class CHARACTER extends ITEM {
     follow_target = null;
     /** @type {CHARACTER[]|null} 跟随者列表 */
     follow_targets = null;
-    /** @type {Array|null} 队伍引用 */
+    /** @type {CHARACTER[]|null} 队伍引用 */
     team = null;
     /** @type {number} 武器切换冷却时间戳 */
     release_time = 0;
@@ -179,34 +179,35 @@ export class CHARACTER extends ITEM {
     // ============ 基础方法 ============
 
     /**
-     * 发送消息给自身
-     * @param {string} [msg]
+     * 发送消息给自身(不考虑状态)
+     * @param {string} msg — 所有调用点均传入字符串, USER覆写用socket.send
      */
     send(msg) {
 
     }
 
     /**
-     * 通知消息(考虑状态)
-     * @param {string} [msg]
+     * 通知消息(会检查昏迷状态)
+     * @param {string} msg — USER覆写增加!is_faint守卫, FOLLOWER转发给listener
      */
     notify(msg) {
 
     }
 
     /**
-     * 发送命令列表
+     * 发送命令列表(客户端交互菜单) — USER覆写用arguments处理变长(命令名, 显示名, ...)偶数对
+     * @returns {void}
      */
     send_commands() {
 
     }
 
     /**
-     * 操作失败通知
-     * @param {string} [text]
-     * @returns {boolean} false
+     * 操作失败通知 — 发送错误消息并返回false用于return链
+     * @param {string} text — 错误提示文本, 实际调用均传入字符串
+     * @returns {false} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
      */
-    notify_fail() {
+    notify_fail(text) {
         return false;
     }
 
@@ -216,6 +217,15 @@ export class CHARACTER extends ITEM {
      */
     is_living() {
         return this.hp > 0;
+    }
+
+    /**
+     * 角色死亡处理 — 所有子类覆写, end_attack/combat等调用
+     * @param {CHARACTER} [killer] - 击杀者
+     * @returns {boolean|void} 返回false阻止死亡(如on_die回调拒绝)
+     */
+    die(killer) {
+
     }
 
     /**
@@ -318,9 +328,9 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 查询用户设置
+     * 查询用户设置 — USER/FOLLOWER覆写返回number, 基类返回false
      * @param {string} name - 设置项名称
-     * @returns {boolean|number}
+     * @returns {boolean|number} 基类返回false(boolean), 子类返回0或数值
      */
     query_setting(name) {
         return false;
@@ -774,7 +784,7 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 增加积分(默认空实现, 由USER/NPC重写)
+     * 增加积分 — 仅USER覆写, NPC的score通过add_fbscore独立管理
      * @param {number} val
      */
     add_score(val) {
@@ -2080,9 +2090,11 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 查询操作命令(默认空实现)
+     * 查询可执行命令菜单 — 子类覆写接收(me)返回JSON字符串, 基类返回undefined
+     * @param {CHARACTER} [me] - 观察者角色
+     * @returns {void}
      */
-    query_commands() {
+    query_commands(me) {
 
     }
 

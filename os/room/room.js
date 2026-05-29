@@ -15,8 +15,14 @@ export class ROOM extends ITEM {
 
     /** @type {number} 最大容纳物品/角色数 */
     max_item_count = 50;
-    /** @type {string} 房间全名(含区域前缀) */
-    long_name;
+    /** @type {string} 房间全名(含区域前缀) — 内部赋值用, 外部调long_name() */
+    _room_name;
+
+    /**
+     * 房间完整显示名称 — 覆写ITEM同名方法
+     * @returns {string}
+     */
+    long_name() { return this._room_name; }
     /** @type {string} 房间描述 */
     desc = "";
     /** @type {string} 所属区域路径 */
@@ -24,7 +30,7 @@ export class ROOM extends ITEM {
 
     // ============ 容器与出口 ============
 
-    /** @type {ITEM[]} 房间内的物品和角色 */
+    /** @type {ITEM[]} 房间内的物品和角色 — 运行时CHARACTER或OBJ, is_player/is_equipment判别 */
     items = [];
     /** @type {Object<string, string>|null} 出口映射 {方向: 目标路径} */
     exits = null;
@@ -462,7 +468,7 @@ export class ROOM extends ITEM {
         const obj = {};
         obj.type = "room";
         obj.path = this.path;
-        obj.name = this.long_name;
+        obj.name = this._room_name;
         obj.desc = this.desc;
         obj.commands = [];
         if (this.actions) {
@@ -519,9 +525,9 @@ export class ROOM extends ITEM {
         this.room_exits_json = null;
         const rmname = this.parent.name + "-" + this.name;
         if (this.parent.not_fb || !this.parent.is_copy) {
-            this.long_name = rmname;
+            this._room_name = rmname;
         } else {
-            this.long_name = rmname + "(副本区域)";
+            this._room_name = rmname + "(副本区域)";
         }
         if (obj) {
             for (let i = 0; i < this.items.length; i++) {
@@ -577,15 +583,15 @@ export class ROOM extends ITEM {
             this.parent = base_room.parent;
             if (this.parent.is_copy) {
                 if (this.parent.not_fb) {
-                    this.long_name = base_room.long_name;
+                    this._room_name = base_room._room_name;
                 } else {
-                    this.long_name = base_room.long_name + "(副本区域)";
+                    this._room_name = base_room._room_name + "(副本区域)";
                 }
                 this.create_time = Date.now();
                 this.is_copy_room = true;
             } else {
                 this.is_shadow = true;
-                this.long_name = base_room.long_name;
+                this._room_name = base_room._room_name;
 
             }
             WORLD.RUN_ROOMS.push(this);
@@ -618,10 +624,10 @@ export class ROOM extends ITEM {
                 }
             }
             area.rooms.push(this);
-            this.long_name = area.name + "-" + this.name;
+            this._room_name = area.name + "-" + this.name;
         } else {
 
-            this.long_name = this.name;
+            this._room_name = this.name;
         }
     }
 

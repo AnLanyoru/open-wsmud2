@@ -73,15 +73,15 @@ export default class extends USERTASK {
 
     const rm = ROOM.RANDOM();
     rm.item_changed(npc, true);
-    this.set_request(player, npc, rm.long_name);
+    this.set_request(player, npc, rm.long_name());
 
     if (lv > 0) {
-        player.notify("程药发对你说道：你来的正好，" + npc.name + "作恶多端，还请" + player.call() + "为民除害，听说他最近在" + rm.long_name + "出现过。");
+        player.notify("程药发对你说道：你来的正好，" + npc.name + "作恶多端，还请" + player.call() + "为民除害，听说他最近在" + rm.long_name() + "出现过。");
 
         player.send_commands('goto yamen2', '过去');
     }
     else {
-        player.notify("程药发对你说道：这位" + player.call() + "，你还没加入衙门吧，这样，你去除掉" + npc.name + "，我就收了你，听说他最近在" + rm.long_name + "出现过。");
+        player.notify("程药发对你说道：这位" + player.call() + "，你还没加入衙门吧，这样，你去除掉" + npc.name + "，我就收了你，听说他最近在" + rm.long_name() + "出现过。");
     }
 
     player.set_temp("ym_task", npc.id);

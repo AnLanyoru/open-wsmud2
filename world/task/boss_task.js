@@ -85,7 +85,7 @@ export default class extends TASK {
         bs.event_id = 'boss' + level;
         var rm = ROOM.RANDOM(); //ROOM.Get("yz/nanmen");
         rm.item_changed(bs, true);
-        let desc = '听说' + bs.name + '出现在' + rm.long_name + '一带';
+        let desc = '听说' + bs.name + '出现在' + rm.long_name() + '一带';
         let msg = '{"type":"msg","ch":"rumor","content":"' + desc + '。"}';
         for (var j = 0; j < list[i].length; j++) {
             list[i][j].send(msg);
