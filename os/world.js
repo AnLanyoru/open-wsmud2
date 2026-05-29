@@ -109,6 +109,12 @@ WORLD = {
     },
     /** @type {number} -1关闭 0正常 >1 用户等级>连接 */
     status: -1,
+    /** @type {*} 心跳服务句柄 */
+    heart_beat_service: null,
+    /** @type {*} 服务器配置 */
+    SERVER: null,
+    /** @type {COMMAND} 默认命令 */
+    DEFAULT_COMMAND: null,
     /** @returns {void} 新socket接入计数 */
     SocketIn() {
         this.SocketCount++;

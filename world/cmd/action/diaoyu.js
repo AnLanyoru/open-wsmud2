@@ -68,10 +68,10 @@ function calculate_lv(grade) {
             w = Math.floor(w * (1 + grade * i / 1200));
         }
         total += w;
-        cumulative.push([total, i]);
+        cumulative.push(total);
     }
 
-    const [lo, hi] = ranges[UTIL.weightedRandom(cumulative, total)];
+    const [lo, hi] = ranges[UTIL.weightedChoice(cumulative, ranges)];
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
