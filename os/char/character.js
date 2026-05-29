@@ -317,8 +317,8 @@ export class CHARACTER extends ITEM {
     /**
      * 发送房间消息(支持多视角)
      * @param {string} text - 消息模板
-     * @param {CHARACTER?} target - 目标
-     * @param {boolean?} [excludeself] - 是否排除自己
+     * @param {CHARACTER} target - 目标
+     * @param {boolean} [excludeself] - 是否排除自己
      */
     send_room(text, target, excludeself) {
         if (!this.environment || !text) return;

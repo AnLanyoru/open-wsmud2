@@ -118,7 +118,7 @@ export class OBJ extends ITEM {
 
     /**
      * 查询操作命令
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @returns {string} JSON
      */
     query_commands(me) {
@@ -127,7 +127,7 @@ export class OBJ extends ITEM {
 
     /**
      * 查询描述JSON
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @returns {string} JSON
      */
     query_desc(me) {
@@ -224,7 +224,7 @@ export class OBJ extends ITEM {
      * @param {string} otype - 物品路径
      * @param {ITEM} to - 目标容器
      * @param {number} [count=1] - 数量
-     * @returns {OBJ|undefined}
+     * @returns {ITEM|undefined}
      */
     static clone_to(otype, to, count) {
         if (!otype || !to) return;
@@ -262,7 +262,7 @@ export class OBJ extends ITEM {
      * @param {string[]} str - 输出数组
      */
     save_db(str) {
-        str.push('["', this.path, '","', this.id, '",', this.count);
+        str.push('["', this.path, '","', this.id, '",', this.count.toString());
         if (this.is_locked) {
             str.push(',1');
         }
@@ -363,7 +363,7 @@ export class OBJ extends ITEM {
 
     /**
      * 通知客户端物品动作按钮变更
-     * @param {USER} me
+     * @param {CHARACTER} me
      * @param {boolean} isadd
      */
     notify_action(me, isadd) {
@@ -379,7 +379,7 @@ export class OBJ extends ITEM {
 
     /**
      * 根据概率列表创建物品
-     * @param {Array<{odds: number, obj: string, fall_obj: string, count: number, min: number, max: number}>} args - 掉落定义
+     * @param {Array<{odds: number, obj: any, fall_obj: string, count: number, min: number, max: number}>} args - 掉落定义
      * @returns {OBJ[]}
      */
     static create_by_odds(args) {
@@ -394,7 +394,6 @@ export class OBJ extends ITEM {
             per = Math.random() * 10000;
             obj = (drop.odds || 10000) > per ? drop.obj : drop.fall_obj;
             if (obj) {
-                if (drop.min_count) hit_count = 0;
                 let count = drop.count || 1;
                 if (drop.min && drop.max) {
                     count = Math.floor(Math.random() * (drop.max - drop.min + 1)) + drop.min;
