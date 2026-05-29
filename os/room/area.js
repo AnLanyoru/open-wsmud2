@@ -97,6 +97,17 @@ export class AREA extends BASE {
     on_login = null;
     /** @type {Function|null} 离开回调 */
     on_leave = null;
+    /** @type {Function|null} 进入区域回调 */
+    on_enter = null;
+    /** @type {Function|null} 进入区域后回调 */
+    on_enterd = null;
+
+    // ============ 交互属性 ============
+
+    /** @type {Object<string, {name: string, action: Function}>|null} 区域级命令映射 */
+    actions = null;
+    /** @type {Array|null} 区域掉落物品列表 */
+    drop_items = null;
 
     constructor() {
         super();

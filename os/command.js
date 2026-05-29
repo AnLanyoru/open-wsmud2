@@ -12,6 +12,24 @@ export class COMMAND extends BASE {
         obj.allow_level = 0;
     }
 
+    constructor() {
+        super();
+        COMMAND.__initInstance(this);
+    }
+
+    // ============ 核心方法(由子类重写) ============
+
+    /**
+     * 命令入口方法(由子类定义具体逻辑)
+     * @param {CHARACTER|null} me - 执行命令的角色(可能为null)
+     * @param {string} [arg] - 命令参数
+     * @param {*} [_par2] - 额外参数(COMMAND.DO使用)
+     * @param {*} [_par3] - 额外参数(COMMAND.DO使用)
+     * @returns {boolean|void} 返回false表示命令执行失败
+     */
+    enter(me, arg, _par2, _par3) {
+    }
+
     // ============ 命令标识 ============
 
     /** @type {string} 命令名(逗号分隔多个别名) */

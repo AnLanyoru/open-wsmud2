@@ -157,6 +157,30 @@ export class CHARACTER extends ITEM {
     on_die = null;
     /** @type {Function|null} 复活回调 */
     on_relive = null;
+    /** @type {Function|null} 心跳回调 */
+    on_heart_beat = null;
+    /** @type {Function|null} 死亡后回调(仅NPC) */
+    on_died = null;
+
+    // ============ 由mixin/extends提供的多态方法桩(供IDE类型提示) ============
+    // 实际实现通过 Object.assign(CHARACTER.prototype, ...) 或 world/extends/ 注入
+
+    /** @type {(name: string, val?: number, temp?: number) => number} 查询临时属性 */
+    query_temp(name, val, temp) { return 0; }
+    /** @type {(name: string, val: number, append?: boolean) => void} 修改属性加成 */
+    change_prop(name, val, append) { }
+    /** @type {(id: string) => {level: number, exp: number, enable_skill: number}|null} 查询技能 */
+    query_skill(id) { return null; }
+    /** @type {() => void} 初始化技能(根据武器类型选择技能) */
+    init_skill() { }
+    /** @type {() => void} 重新计算战斗属性 */
+    recount() { }
+    /** @type {() => string} 获取第三人称称呼 */
+    call3() { return this.name; }
+    /** @type {() => string} 获取武器名称 */
+    weapon_name() { return ""; }
+    /** @type {() => string} 获取暗器名称 */
+    throwing_name() { return ""; }
 
     constructor() {
         super();

@@ -64,6 +64,23 @@ export class NPC extends CHARACTER {
     /** @type {Function|null} 绝招回调 */
     on_pfm = null;
 
+    // ============ 由mixin/extends提供的多态方法桩(供IDE类型提示) ============
+
+    /** @type {() => boolean} 是否正在战斗 */
+    is_fighting() { return false; }
+    /** @type {() => void} 清除所有状态 */
+    clear_status() { }
+    /** @type {() => void} 清除跟随关系 */
+    clear_follow() { }
+    /** @type {(val: number, notify?: boolean) => void} 增加气血 */
+    add_hp(val, notify) { }
+    /** @type {(val: number, notify?: boolean) => void} 增加内力 */
+    add_mp(val, notify) { }
+    /** @type {() => CHARACTER|null} 查询当前敌人 */
+    query_enemy() { return null; }
+    /** @type {(msg?: string) => void} 发言(由资源文件定义) */
+    do_say(msg) { }
+
     constructor() {
         super();
         NPC.__initInstance(this);
