@@ -75,7 +75,7 @@ export default class extends COMMAND {
         const data = await WORLD.DB.getRoleData(user.userid, id);
         if (!data) return user.send("{type:'loginerror',msg:'角色读取失败，请重新登陆 '}");
 
-        oldUser = WORLD.getUser(id);
+        const oldUser = WORLD.getUser(id);
         if (oldUser) return user.send("{type:'loginerror',msg:'重复登录'}");
         if (data.pwd !== user.password)
             return user.send("{type:'loginerror',msg:'密码失效，请<CMD onclick=\\'Process.relogin()\\'>重新登录</CMD>'}");

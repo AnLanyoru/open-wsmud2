@@ -174,6 +174,9 @@ export default {
      * @param {string} id
      * @returns {*}
      */
+    getUserByID(id) {
+        return DB.getUserByID(id);
+    },
     getRoleData(userid, id) {
 
         return DB.getData(userid, id);
