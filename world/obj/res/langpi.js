@@ -8,6 +8,7 @@ export default class extends OBJ {
     grade = 1;
     combined = true;
     transable = true;
+    otype = 3;
 
     on_use(me) {
     me.add_status({

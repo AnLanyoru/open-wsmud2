@@ -7,4 +7,5 @@ export default class extends OBJ {
     value = 100;
     combined = true;
     transable = true;
+    otype = 3;
 }

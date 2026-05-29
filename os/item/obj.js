@@ -46,7 +46,7 @@ export class OBJ extends ITEM {
     /** @type {boolean} 是否为装备 */
     is_equipment = false;
     /** @type {boolean} 显示动作按钮 */
-    showAction = true;
+    showAction = false;
     /** @type {number} 连续使用间隔(毫秒) */
     distime = 0;
 

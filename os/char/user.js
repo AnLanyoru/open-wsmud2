@@ -9,6 +9,7 @@ import { FAMILIES } from "../skill/family.js";
 import { WORLD } from "../world.js";
 import { CORPSE } from "../item/corpse.js";
 import { SKILL } from "../skill/skill.js";
+import { UTIL } from "../util/util.js";
 import { WEAPON_TYPE } from "../const.js";
 
 export class USER extends CHARACTER {
@@ -426,6 +427,23 @@ export class USER extends CHARACTER {
             this.moveto(rm, null, this.name + "连线进入这个世界。");
         }
         this.check_state();
+        if (this.follower && (!this.environment || this.environment.parent.id !== "home")) {
+            let home = ROOM.Get("home/yuanzi");
+            if (home) {
+                let copy_home = home.query_copy2(this);
+                if (!copy_home) copy_home = home.create_copy2(this);
+                if (copy_home) {
+                    for (let i = 0; i < this.follower.length; i++) {
+                        let npc = FOLLOWER.STORES.get(this.id + "_" + this.follower[i].id);
+                        if (npc && !npc.environment) {
+                            if (!npc.hp) npc.hp = 1;
+                            if (npc.state) npc.set_state(null);
+                            npc.moveto(copy_home);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
