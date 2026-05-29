@@ -33,6 +33,7 @@
     "vite": "^8.0.14"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "esbuild": "^0.28.0"
   }
 }

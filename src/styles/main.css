@@ -685,3 +685,56 @@
     border-radius: 0.25em;
     border-radius: 0.25em;
 }
+
+@media(min-width: 768px) {
+    body {
+        width: 768px;
+        margin: auto;
+        position: relative;
+    }
+
+    .dialog-stats>.top-item>.top-title {
+        padding-left: 3em;
+        margin-right: 2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .dialog>.dialog-footer>.footer-item {
+        width: 4em;
+    }
+
+    .dialog>.dialog-footer>.eq-group {
+        margin-left: 0.5em;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5em;
+        margin-top: 0.5em;
+    }
+
+    .confirm-count>.btn {
+        width: 3em;
+    }
+
+    .dialog-fb>.fb-left {
+        width: 8em;
+    }
+
+    .stats-container-left>.stats-silder {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+
+    .dialog-list>.otype-list {
+        width: 2.5em;
+    }
+
+    .dialog-list>.otype-list>.otype-item {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+}
