@@ -76,21 +76,14 @@ export class ROOM extends ITEM {
     can_diaoyu = false;
 
     // ============ 回调属性 ============
-
-    /** @type {((obj: import("../char/character.js").CHARACTER, dir: string) => (boolean|void))|null} 离开房间回调 */
-    on_leave;
-    /** @type {((obj: import("../char/character.js").CHARACTER) => void)|null} 进入房间前回调 */
-    on_before_enter;
-    /** @type {((obj: import("../char/character.js").CHARACTER) => void)|null} 进入房间后回调 */
-    on_enter;
-    /** @type {((dt: number) => void)|null} 心跳回调 */
-    on_heart_beat;
-    /** @type {((user: import("../char/user.js").USER) => void)|null} 登录回调 */
-    on_login;
-    /** @type {(() => void)|null} 房间创建回调 */
-    on_create;
-    /** @type {((type: number) => void)|null} 设置难度回调 */
-    on_set_difficulty;
+    // 以下回调为实例属性，外部按需赋值
+    // on_leave(obj, dir)            — 离开房间回调
+    // on_before_enter(obj)         — 进入房间前回调
+    // on_enter(obj)                — 进入房间后回调
+    // on_heart_beat(dt)            — 心跳回调
+    // on_login(user)               — 登录回调
+    // on_create()                  — 房间创建回调
+    // on_set_difficulty(type)      — 设置难度回调
 
     /**
      * 玩家/物件离开房间

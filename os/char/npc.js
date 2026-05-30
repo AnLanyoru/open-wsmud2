@@ -68,19 +68,13 @@ export class NPC extends CHARACTER {
     no_fight = false;
 
     // ============ 回调属性 ============
-
-    /** @type {((me: USER) => (CHARACTER|boolean|void))|null} 查找师傅回调 */
-    on_master;
-    /** @type {((me: CHARACTER) => (boolean|void))|null} 检查技能回调 */
-    on_checkskill;
-    /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 */
-    on_pfm;
-    /** @type {((me: USER) => void)|null} 双修回调 */
-    on_makelove;
-    /** @type {((me: USER) => void)|null} 主人进入回调 */
-    on_master_enter;
-    /** @type {((me: USER, dir: string) => (boolean|void))|null} 玩家离开回调 */
-    on_leave;
+    // 以下回调为实例属性，外部按需赋值
+    // on_master(me)             — 查找师傅回调
+    // on_checkskill(me)         — 检查技能回调
+    // on_pfm(me, target)        — 绝招回调
+    // on_makelove(me)           — 双修回调
+    // on_master_enter(me)       — 主人进入回调
+    // on_leave(me, dir)         — 玩家离开回调
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 

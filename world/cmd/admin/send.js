@@ -22,6 +22,10 @@ export default class extends COMMAND {
     if (is_str && arg[0] != "{") {
         msg = { content: arg, time: Date.now() };
     } else {
+        if (is_str) {
+            // 保护Windows路径分隔符: 将非JSON转义的\替换为\\，防止JSON5吞掉反斜杠
+            arg = arg.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
+        }
         msg = is_str ? JSON.toObject(arg) : arg;
         if (!msg.content || !msg.attach) return me && me.send("格式错误。");
         msg.time = Date.now();

@@ -61,11 +61,8 @@ export class FOLLOWER extends CHARACTER {
     items = null;
 
     // ============ 回调属性 ============
-
-    /** @type {((me: USER) => void)|null} 亲热回调 */
-    on_makelove;
-    /** @type {((me: USER) => void)|null} 主人进入回调 */
-    on_master_enter;
+    // on_makelove(me)       — 亲热回调，外部按需赋值
+    // on_master_enter(me)   — 主人进入回调，外部按需赋值
 
     constructor() {
         super();

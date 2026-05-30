@@ -114,9 +114,7 @@ export class USER extends CHARACTER {
     commands_json = null;
 
     // ============ 回调属性 ============
-
-    /** @type {((killer?: CHARACTER) => void)|null} 死亡后回调 */
-    on_died;
+    // on_died(killer) — 死亡后回调，外部按需赋值
 
     /**
      * 通知消息(玩家状态)

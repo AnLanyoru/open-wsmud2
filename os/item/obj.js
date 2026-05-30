@@ -316,6 +316,7 @@ export class OBJ extends ITEM {
      * @returns {OBJ}
      */
     static CREATE(otype, count) {
+        otype = otype.replace(/\\/g, "/");
         let base = _WORLD.OBJ_STROE.get(otype);
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype);

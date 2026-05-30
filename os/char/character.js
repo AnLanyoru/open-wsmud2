@@ -169,25 +169,16 @@ export class CHARACTER extends ITEM {
     chat_msg = null;
 
     // ============ 回调属性 ============
-
-    /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 */
-    on_create;
-    /** @type {(() => void)|null} 对象克隆回调 */
-    on_clone;
-    /** @type {((killer: CHARACTER) => (boolean|void))|null} 死亡回调，返回false阻止默认死亡处理 */
-    on_die;
-    /** @type {((me: CHARACTER) => void)|null} 团队退出回调 */
-    on_teamout;
-    /** @type {(() => void)|null} 复活回调 */
-    on_relive;
-    /** @type {((dt: number) => void)|null} 心跳回调 */
-    on_heart_beat;
-    /** @type {((killer?: CHARACTER, corpse?: object) => void)|null} 死亡后回调 */
-    on_died;
-    /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 */
-    on_fight_over;
-    /** @type {(() => void)|null} 技能变更回调 */
-    on_skillchanged;
+    // 以下回调为实例属性，外部按需赋值（如 npc.on_die = fn）
+    // on_create(path, par)           — 对象创建回调
+    // on_clone()                    — 对象克隆回调
+    // on_die(killer)                — 死亡回调，返回false阻止默认死亡处理
+    // on_teamout(me)                — 团队退出回调
+    // on_relive()                   — 复活回调
+    // on_heart_beat(dt)             — 心跳回调
+    // on_died(killer, corpse)       — 死亡后回调
+    // on_fight_over(target, win)    — 战斗结束回调
+    // on_skillchanged()             — 技能变更回调（USER覆写为方法）
 
     constructor() {
         super();
