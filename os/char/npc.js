@@ -10,10 +10,6 @@ import { CORPSE } from "../item/corpse.js";
 
 export class NPC extends CHARACTER {
 
-    /**
-     * @param {NPC} obj - 要初始化的NPC实例
-     */
-
     // ============ 核心属性 ============
 
     /** @type {boolean} 是否自动释放绝招 */
@@ -71,30 +67,20 @@ export class NPC extends CHARACTER {
     /** @type {boolean} 禁止战斗标识 */
     no_fight = false;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
+    // ============ 回调属性 ============
 
-    /** @type {((me: USER) => CHARACTER|false|void)|null} 查找师傅回调 — bai.js:38 检查 ==false 拒绝拜师 */
-    on_master(me) { return undefined; }
-    /** @type {((me: CHARACTER) => boolean|void)|null} 检查技能回调 — checkskill.js:35只传1参, skill参数实际未使用 */
-    on_checkskill(me) { return undefined; }
-    /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 — 暂未被调用, 由资源文件设置 */
-    on_pfm(me, target) { return undefined; }
-    /**
-     * 双修回调 — 资源文件覆写
-     * @param {USER} me
-     */
-    on_makelove(me) { return undefined; }
-    /**
-     * 主人进入回调 — 资源文件覆写
-     * @param {USER} me
-     */
-    on_master_enter(me) { return undefined; }
-    /**
-     * 玩家离开回调, 玩家与npc在同一房间玩家要离开时触发 — 资源文件覆写
-     * @param {USER} me
-     * @param {string} dir - 离开方向
-     */
-    on_leave(me, dir) { return undefined; }
+    /** @type {((me: USER) => (CHARACTER|boolean|void))|null} 查找师傅回调 */
+    on_master;
+    /** @type {((me: CHARACTER) => (boolean|void))|null} 检查技能回调 */
+    on_checkskill;
+    /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 */
+    on_pfm;
+    /** @type {((me: USER) => void)|null} 双修回调 */
+    on_makelove;
+    /** @type {((me: USER) => void)|null} 主人进入回调 */
+    on_master_enter;
+    /** @type {((me: USER, dir: string) => (boolean|void))|null} 玩家离开回调 */
+    on_leave;
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 

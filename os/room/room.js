@@ -14,7 +14,6 @@ import("../char/npc.js").then(m => { _NPC = m.NPC; });
 
 export class ROOM extends ITEM {
 
-
     // ============ 核心标识属性 ============
 
     /** @type {number} 最大容纳物品/角色数 */
@@ -69,29 +68,29 @@ export class ROOM extends ITEM {
     /** @type {string|null} 副本持有者ID */
     owner = null;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
-
-    /** @type {((obj: CHARACTER, dir: string) => boolean|void)|null} 离开房间回调 */
-    on_leave(obj, dir) { return undefined; }
-    /** @type {((obj: CHARACTER) => void)|null} 进入房间前回调 */
-    on_before_enter(obj) { return undefined; }
-    /** @type {((obj: CHARACTER) => void)|null} 进入房间后回调 */
-    on_enter(obj) { return undefined; }
-    /** @type {((dt: number) => void)|null} 心跳回调 */
-    on_heart_beat(dt) { return undefined; }
-    /** @type {((user: USER) => void)|null} 登录回调 — ROOM暂未被调用, 仅AREA.on_login被login.js调用 */
-    on_login(user) { return undefined; }
-    /** @type {(() => void)|null} 房间创建回调 — room.js:596/633 无参调用 */
-    on_create() { return undefined; }
-    /** @type {((type: number) => void)|null} 设置难度回调 — room.js:975传入number而非boolean */
-    on_set_difficulty(type) { return undefined; }
-
     // ============ 玩法相关 ============
 
     /** @type {Object<string, *>|null} 副本临时数据 */
     temp = null;
     /** @type {boolean} 是否可钓鱼 */
     can_diaoyu = false;
+
+    // ============ 回调属性 ============
+
+    /** @type {((obj: import("../char/character.js").CHARACTER, dir: string) => (boolean|void))|null} 离开房间回调 */
+    on_leave;
+    /** @type {((obj: import("../char/character.js").CHARACTER) => void)|null} 进入房间前回调 */
+    on_before_enter;
+    /** @type {((obj: import("../char/character.js").CHARACTER) => void)|null} 进入房间后回调 */
+    on_enter;
+    /** @type {((dt: number) => void)|null} 心跳回调 */
+    on_heart_beat;
+    /** @type {((user: import("../char/user.js").USER) => void)|null} 登录回调 */
+    on_login;
+    /** @type {(() => void)|null} 房间创建回调 */
+    on_create;
+    /** @type {((type: number) => void)|null} 设置难度回调 */
+    on_set_difficulty;
 
     /**
      * 玩家/物件离开房间

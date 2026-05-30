@@ -14,9 +14,6 @@ import { WEAPON_TYPE } from "../const.js";
 
 export class USER extends CHARACTER {
 
-    /**
-     * @param {USER} obj - 要初始化的玩家实例
-     */
     // ============ 玩家标识 ============
 
     /** @type {boolean} 是否为玩家 */
@@ -115,6 +112,11 @@ export class USER extends CHARACTER {
     no_combatmsg = false;
     /** @type {Object<string, string>|null} 命令JSON缓存 */
     commands_json = null;
+
+    // ============ 回调属性 ============
+
+    /** @type {((killer?: CHARACTER) => void)|null} 死亡后回调 */
+    on_died;
 
     /**
      * 通知消息(玩家状态)
@@ -582,13 +584,6 @@ export class USER extends CHARACTER {
         WORLD.on_user_die(this, killer);
         this.on_died(killer);
     }
-
-    /**
-     * 死亡后回调
-     * @param {import("./character").CHARACTER} [killer]
-     * @returns {void}
-     */
-    on_died() { return undefined; }
 
     /** 检查并同步玩家状态到客户端 */
     check_state() {

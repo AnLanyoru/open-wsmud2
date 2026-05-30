@@ -83,7 +83,7 @@ export default class extends COMMAND {
             var item = items[i];
             if (i > 0) str.push(",");
             if (item) {
-                str.push(`[${JSON.stringify(item.color_name)},${JSON.stringify(item.id)},${item.grade},${item.on_use ? 1 : 0},${item.is_locked ? 1 : 0}]`);
+                str.push(`[${JSON.stringify(item.color_name ?? "")},${JSON.stringify(item.id ?? "")},${item.grade},${item.on_use ? 1 : 0},${item.is_locked ? 1 : 0}]`);
                 // str.push('{name:"');
                 // str.push(item.color_name);
                 // str.push('",id:"');

@@ -1,5 +1,6 @@
 /**
  * EQUIPMENT 装备类 - 继承自OBJ
+ * @property {((count: number) => Object<string, number>)|undefined} group_prop - 套装属性计算函数，由子类覆写
  */
 import { OBJ } from "./obj.js";
 import { UTIL } from "../util/util.js";
@@ -53,8 +54,6 @@ export class EQUIPMENT extends OBJ {
     hole_count = 0;
     /** @type {Object} 装备条件({skill, str, gender等}) */
     condition = null;
-    /** @type {(count: number) => Object<string, number>} 套装属性计算函数 */
-    group_prop(count){ return undefined; };
     /** @type {string|null} 套装名称 */
     group_name = null;
     /** @type {string} 武器类型(sword/blade/staff等) */

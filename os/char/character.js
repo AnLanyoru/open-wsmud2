@@ -13,10 +13,6 @@ import { EQUIPMENT } from "../item/equipment.js";
 
 export class CHARACTER extends ITEM {
 
-    /**
-     * @param {CHARACTER} obj - 要初始化的角色实例
-     */
-
     // ============ 核心标识属性 ============
 
     /** @type {string} 角色名称 */
@@ -172,26 +168,26 @@ export class CHARACTER extends ITEM {
     /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
     chat_msg = null;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
+    // ============ 回调属性 ============
 
-    /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 — character.js:432 传(path,par), NPC定义可无参 */
-    on_create(path, par) { return undefined; }
-    /** @type {(() => void)|null} 对象克隆回调 — character.js:475 无参调用 */
-    on_clone() { return undefined; }
-    /** @type {((killer: CHARACTER) => boolean|void)|null} 死亡回调 — 返回false阻止默认死亡处理, npc.js:217 传(killer) */
-    on_die(killer) { return undefined; }
-    /** @type {((me: CHARACTER) => void)|null} 团队退出回调 — 返回false阻止默认团队退出处理, npc.js:217 传(killer) */
-    on_teamout(me) { return undefined; }
-    /** @type {(() => void)|null} 复活回调 — 由 force_skill.on_relive/room.on_relive 间接触发 */
-    on_relive() { return undefined; }
-    /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
-    on_heart_beat(dt) { return undefined; }
-    /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
-    on_died(killer, corpse) { return undefined; }
-    /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
-    on_fight_over(target, win) { return undefined; }
-    /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
-    on_skillchanged() { return undefined; }
+    /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 */
+    on_create;
+    /** @type {(() => void)|null} 对象克隆回调 */
+    on_clone;
+    /** @type {((killer: CHARACTER) => (boolean|void))|null} 死亡回调，返回false阻止默认死亡处理 */
+    on_die;
+    /** @type {((me: CHARACTER) => void)|null} 团队退出回调 */
+    on_teamout;
+    /** @type {(() => void)|null} 复活回调 */
+    on_relive;
+    /** @type {((dt: number) => void)|null} 心跳回调 */
+    on_heart_beat;
+    /** @type {((killer?: CHARACTER, corpse?: object) => void)|null} 死亡后回调 */
+    on_died;
+    /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 */
+    on_fight_over;
+    /** @type {(() => void)|null} 技能变更回调 */
+    on_skillchanged;
 
     constructor() {
         super();

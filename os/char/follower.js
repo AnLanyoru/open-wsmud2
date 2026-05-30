@@ -17,10 +17,6 @@ import { OBJ } from "../item/obj.js";
 
 export class FOLLOWER extends CHARACTER {
 
-    /**
-     * @param {FOLLOWER} obj - 要初始化的随从实例
-     */
-
     // ============ 核心属性 ============
 
     /** @type {boolean} 是否自动释放绝招 */
@@ -64,20 +60,12 @@ export class FOLLOWER extends CHARACTER {
     /** @type {OBJ[]|null} 背包物品 */
     items = null;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
+    // ============ 回调属性 ============
 
-    /**
-     * 亲热回调 — 资源文件覆写
-     * @param {USER} me
-     */
-    on_makelove(me) {return undefined; }
-    /**
-     * 主人进入回调 — 资源文件覆写
-     * @param {USER} me
-     */
-    on_master_enter(me) { }
-    /** @type {((dt: number) => void)|null} 心跳回调 */
-    on_heart_beat(dt) { return undefined; }
+    /** @type {((me: USER) => void)|null} 亲热回调 */
+    on_makelove;
+    /** @type {((me: USER) => void)|null} 主人进入回调 */
+    on_master_enter;
 
     constructor() {
         super();

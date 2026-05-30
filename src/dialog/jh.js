@@ -56,6 +56,7 @@ const jh_fam = {
         html.push('</div>');
     },
     show: function (left_panel, right_panel) {
+        if (!this.items) return;
         var html = [];
         for (var i = 0; i < this.items.length; i++) {
             var fb = this.items[i];
@@ -118,6 +119,7 @@ const jh_fb = {
             this.selected_index = unlock;
 
     }, show: function (left_panel, right_panel) {
+        if (!this.items) return;
         this.listElement = left_panel;
         this.descElement = right_panel;
         var html = ["<div class='fb-content'>"];
@@ -229,6 +231,7 @@ const jh_ar = {
             this.items[i].unlock = (unlock & Math.pow(2, i)) !== 0;
         }
     }, show: function (left_panel, right_panel) {
+        if (!this.items) return;
         var html = ["<div class='fb-content'>"];
         let count = Math.max(this.items.length, 10);
         for (var i = 0; i < count; i++) {
