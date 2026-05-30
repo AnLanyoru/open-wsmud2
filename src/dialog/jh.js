@@ -439,8 +439,9 @@ const jh_css = `
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2em), transparent 100%);
-    mask-image: linear-gradient(to right, #000 calc(100% - 2em), transparent 100%);
+    padding-right: 2em;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent calc(100%));
+    mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent calc(100%));
 }
 .fb-actions>.fb-action>.action-desc::-webkit-scrollbar {
     display: none;
