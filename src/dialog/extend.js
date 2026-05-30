@@ -335,6 +335,8 @@ export default {
         if (this.list_elem.is('.hide')) {
             this.list_elem.removeClass('hide');
             this.edit_elem.hide();
+            Dialog.footerElement.find(".footer-item.select").removeClass("select");
+            Dialog.footerElement.find(".footer-item[for='extend']").addClass("select");
             return false;
         }
         this.footer_buttons.remove();
