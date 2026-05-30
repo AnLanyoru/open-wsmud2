@@ -32,6 +32,11 @@ export default class extends TASK {
 
     this.startup();
 }
+    /**
+     * 查询/生成玩家货物列表（带缓存）
+     * @param {CHARACTER} me - 玩家角色
+     * @returns {OBJ[]} 为该玩家生成的物品列表
+     */
     query_goods(me) {
     if (this.customer[me.id]) return this.customer[me.id];
     var ref_count = me.query_temp("ref_count", 0);
@@ -91,6 +96,12 @@ export default class extends TASK {
     this.customer[me.id] = list;
     return list;
 }
+    /**
+     * 设置/清除玩家货物列表
+     * @param {CHARACTER} me - 玩家角色
+     * @param {OBJ[]|null} list - 物品列表，传null清除缓存
+     * @returns {void}
+     */
     set_goods(me, list) {
     this.customer[me.id] = list;
 }

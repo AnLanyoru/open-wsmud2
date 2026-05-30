@@ -144,13 +144,17 @@ export class NPC extends CHARACTER {
 
     /**
      * 设置出售物品列表
-     * @param {...string} arguments - 物品路径列表
+     * @param {...string} items - 物品路径，如 "st/xuanjing", "drug/exp#3"
+     * @returns {void}
      */
-    set_goods() {
-        if (!arguments.length) return;
+    set_goods(...items) {
+        if (!items.length) return;
+        /** @type {OBJ[]} */
         this.sell_list = [];
-        for (let i = 0; i < arguments.length; i++) {
-            const item = arguments[i];
+        for (let i = 0; i < items.length; i++) {
+            /** @type {string} */
+            const item = items[i];
+            /** @type {OBJ} */
             const obj = OBJ.CREATE(item);
             if (!obj) continue;
             obj.count = -1;
