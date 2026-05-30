@@ -1,5 +1,12 @@
 /**
  * OBJ 普通物品基类
+ *
+ * @property {((me: import("../char/character.js").CHARACTER, par?: string) => (boolean|void))} [on_use] - 使用回调
+ * @property {((me: import("../char/character.js").CHARACTER, skill: import("../skill/skill.js").SKILL, lv: number) => (boolean|void))} [on_study] - 修炼回调
+ * @property {((me: import("../char/character.js").CHARACTER) => (import("./obj.js").OBJ[]|false|void))} [on_open] - 打开回调
+ * @property {((me: import("../char/character.js").CHARACTER) => void)} [on_init] - 初始化回调
+ * @property {((path?: string, par?: string) => void)} [on_create] - 创建后回调
+ * @property {((me: import("../char/character.js").CHARACTER) => void)} [on_reload] - 热重载回调
  */
 import { BASE } from "../base.js";
 import { ITEM } from "../item.js";
@@ -68,21 +75,6 @@ export class OBJ extends ITEM {
     is_container = false;
     /** @type {boolean} 容器是否打开 — CONTAINER/CORPSE专属 */
     is_open = false;
-
-    // ============ 回调函数(由资源文件设置, getter 返回 undefined 被类方法覆盖) ============
-
-    /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 */
-    on_use(me, par) { return undefined; }
-    /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 */
-    on_study(me, skill, lv) { return undefined; }
-    /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 */
-    on_open(me) { return undefined; }
-    /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
-    on_init(me) { return undefined; }
-    /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
-    on_create(path, par) { return undefined; }
-    /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
-    on_reload(me) { return undefined; }
 
     /**
      * 初始化回调

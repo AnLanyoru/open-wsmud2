@@ -1,5 +1,15 @@
 /**
  * CHARACTER 生物基类
+ *
+ * @property {((path?: string, par?: string) => void)} [on_create] - 对象创建回调
+ * @property {(() => void)} [on_clone] - 对象克隆回调
+ * @property {((killer: CHARACTER) => (boolean|void))} [on_die] - 死亡回调，返回false阻止默认死亡处理
+ * @property {((me: CHARACTER) => void)} [on_teamout] - 团队退出回调
+ * @property {(() => void)} [on_relive] - 复活回调
+ * @property {((dt: number) => void)} [on_heart_beat] - 心跳回调
+ * @property {((killer?: CHARACTER, corpse?: import("../item/corpse.js").CORPSE) => void)} [on_died] - 死亡后回调
+ * @property {((target: CHARACTER, win: boolean) => void)} [on_fight_over] - 战斗结束回调
+ * @property {(() => void)} [on_skillchanged] - 技能变更回调
  */
 import { ITEM } from "../item.js";
 import { OBJ } from "../item/obj.js";
@@ -167,18 +177,6 @@ export class CHARACTER extends ITEM {
     die_room = null;
     /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
     chat_msg = null;
-
-    // ============ 回调属性 ============
-    // 以下回调为实例属性，外部按需赋值（如 npc.on_die = fn）
-    // on_create(path, par)           — 对象创建回调
-    // on_clone()                    — 对象克隆回调
-    // on_die(killer)                — 死亡回调，返回false阻止默认死亡处理
-    // on_teamout(me)                — 团队退出回调
-    // on_relive()                   — 复活回调
-    // on_heart_beat(dt)             — 心跳回调
-    // on_died(killer, corpse)       — 死亡后回调
-    // on_fight_over(target, win)    — 战斗结束回调
-    // on_skillchanged()             — 技能变更回调（USER覆写为方法）
 
     constructor() {
         super();

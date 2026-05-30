@@ -1,6 +1,8 @@
 /**
  * EQUIPMENT 装备类 - 继承自OBJ
  * @property {((count: number) => Object<string, number>)|undefined} group_prop - 套装属性计算函数，由子类覆写
+ * @property {((me: import("../char/character.js").CHARACTER) => (boolean|void))} [on_eq] - 装备时回调，返回false阻止装备
+ * @property {((me: import("../char/character.js").CHARACTER) => void)} [on_uneq] - 卸下时回调
  */
 import { OBJ } from "./obj.js";
 import { UTIL } from "../util/util.js";
@@ -63,12 +65,6 @@ export class EQUIPMENT extends OBJ {
     /** @type {string} 带颜色的显示名称 */
     color_name;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
-
-    /** @type {((me: CHARACTER) => boolean|void)|null} 装备时回调 — equipment.js:167检查==false阻止装备 */
-    on_eq(me) { return undefined; }
-    /** @type {((me: CHARACTER) => void)|null} 卸下时回调 — equipment.js:210不检查返回值 */
-    on_uneq(me) { return undefined; }
     /** @type {string|null} 自定义装备消息 */
     eq_msg = null;
     /** @type {string|null} 自定义卸下消息 */

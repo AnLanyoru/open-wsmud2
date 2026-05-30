@@ -1,5 +1,13 @@
 /**
  * ROOM 房间类
+ *
+ * @property {((obj: import("../char/character.js").CHARACTER, dir: string) => (boolean|void))} [on_leave] - 离开房间回调
+ * @property {((obj: import("../char/character.js").CHARACTER) => void)} [on_before_enter] - 进入房间前回调
+ * @property {((obj: import("../char/character.js").CHARACTER) => void)} [on_enter] - 进入房间后回调
+ * @property {((dt: number) => void)} [on_heart_beat] - 心跳回调
+ * @property {((user: import("../char/user.js").USER) => void)} [on_login] - 登录回调
+ * @property {(() => void)} [on_create] - 房间创建回调
+ * @property {((type: number) => void)} [on_set_difficulty] - 设置难度回调
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
@@ -74,16 +82,6 @@ export class ROOM extends ITEM {
     temp = null;
     /** @type {boolean} 是否可钓鱼 */
     can_diaoyu = false;
-
-    // ============ 回调属性 ============
-    // 以下回调为实例属性，外部按需赋值
-    // on_leave(obj, dir)            — 离开房间回调
-    // on_before_enter(obj)         — 进入房间前回调
-    // on_enter(obj)                — 进入房间后回调
-    // on_heart_beat(dt)            — 心跳回调
-    // on_login(user)               — 登录回调
-    // on_create()                  — 房间创建回调
-    // on_set_difficulty(type)      — 设置难度回调
 
     /**
      * 玩家/物件离开房间

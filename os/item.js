@@ -4,6 +4,9 @@
  * 1. 直接实现ON_XXXX，cmd里定义的有直接对象的命令推荐这种
  * 2. add_action方式，房间里的指令推荐用这种
  * 3. on(xxx)方式，对房间里的命令的反映
+ *
+ * @property {((player: import("./char/user.js").USER) => boolean|undefined)} [on_get] - 物件拾取回调
+ * @property {((path?: string, par?: string) => void)} [on_create] - 物件创建回调
  */
 import { BASE } from "./base.js";
 import { UTIL } from "./util/util.js";
@@ -72,12 +75,6 @@ export class ITEM extends BASE {
     no_get = false;
     /** @type {boolean} 是否为NPC — NPC(=true), CHARACTER/USER(=false) */
     is_npc = false;
-    /** @type {((player: import("./char/user.js").USER) => boolean|undefined)} 物件拾取回调 — CHARACTER/OBJ/ROOM专属 */
-    on_get(player) { return undefined; }
-
-    /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
-    on_create(path, par) { return undefined; }
-
     // ============ 堆叠操作(OBJ覆写, ITEM提供安全默认) ============
 
     /**

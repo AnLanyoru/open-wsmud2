@@ -1,5 +1,8 @@
 /**
  * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
+ *
+ * @property {((me: import("./user.js").USER) => void)} [on_makelove] - 亲热回调
+ * @property {((me: import("./user.js").USER) => void)} [on_master_enter] - 主人进入回调
  */
 import "../util/util.js";
 import { CHARACTER } from "./character.js";
@@ -59,10 +62,6 @@ export class FOLLOWER extends CHARACTER {
     money = 0;
     /** @type {OBJ[]|null} 背包物品 */
     items = null;
-
-    // ============ 回调属性 ============
-    // on_makelove(me)       — 亲热回调，外部按需赋值
-    // on_master_enter(me)   — 主人进入回调，外部按需赋值
 
     constructor() {
         super();

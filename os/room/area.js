@@ -1,5 +1,9 @@
 /**
  * AREA 区域类 - 管理一组房间
+ *
+ * @property {((user: import("../char/user.js").USER) => void)} [on_login] - 区域登录回调
+ * @property {((me: import("../char/user.js").USER) => void)} [on_leaved] - 玩家离开区域回调
+ * @property {((me: import("../char/user.js").USER) => void)} [on_enterd] - 玩家进入区域回调
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
@@ -77,11 +81,6 @@ export class AREA extends BASE {
     /** @type {number} 副本难度系数 */
     fb_index = 1;
 
-    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
-
-    /** @type {((user: USER) => void)|null} 登录回调 */
-    on_login(user) { return undefined; }
-
     // ============ 交互属性 ============
 
     /** @type {Object<string, {name: string, action: Function}>|null} 区域级命令映射 */
@@ -137,8 +136,6 @@ export class AREA extends BASE {
      * @param {import("../char/user").USER} me
      * @returns {void}
      */
-    on_enterd(me) { return undefined; }
-
     /**
      * 玩家进入前回调
      * @param {USER} me

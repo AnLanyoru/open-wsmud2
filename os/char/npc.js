@@ -1,5 +1,12 @@
 /**
  * NPC 非玩家角色类
+ *
+ * @property {((me: import("./user.js").USER) => (import("./character.js").CHARACTER|false|void))} [on_master] - 查找师傅回调，检查==false拒绝拜师
+ * @property {((me: import("./character.js").CHARACTER) => (boolean|void))} [on_checkskill] - 检查技能回调
+ * @property {((me: import("./character.js").CHARACTER, target: import("./character.js").CHARACTER) => void)} [on_pfm] - 绝招回调
+ * @property {((me: import("./user.js").USER) => void)} [on_makelove] - 双修回调
+ * @property {((me: import("./user.js").USER) => void)} [on_master_enter] - 主人进入回调
+ * @property {((me: import("./user.js").USER, dir: string) => (boolean|void))} [on_leave] - 玩家离开回调
  */
 import { CHARACTER } from "./character.js";
 import { FAMILIES } from "../skill/family.js";
@@ -69,17 +76,6 @@ export class NPC extends CHARACTER {
 
     /** @type {boolean} 禁止战斗标识 */
     no_fight = false;
-
-    // ============ 回调属性 ============
-    // 以下回调为实例属性，外部按需赋值
-    // on_master(me)             — 查找师傅回调
-    // on_checkskill(me)         — 检查技能回调
-    // on_pfm(me, target)        — 绝招回调
-    // on_makelove(me)           — 双修回调
-    // on_master_enter(me)       — 主人进入回调
-    // on_leave(me, dir)         — 玩家离开回调
-
-    // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 
     constructor() {
         super();

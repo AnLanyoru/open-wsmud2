@@ -1,5 +1,7 @@
 /**
  * SKILL 技能基类 & PERFORM 绝招类
+ *
+ * @property {((me: import("../char/character.js").CHARACTER, target: import("../char/character.js").CHARACTER) => void)} [on_enemy_die] - 击杀敌人回调
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
@@ -60,8 +62,6 @@ export class SKILL extends BASE {
      * @param {CHARACTER} target
      * @returns {undefined}
      */
-    on_enemy_die(me, target) { return undefined; }
-
     /**
      * 获取攻击动作描述
      * @param {CHARACTER} me - 攻击者
