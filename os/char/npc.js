@@ -345,6 +345,14 @@ export class NPC extends CHARACTER {
      * @param {number} [count=1] - 创建数量
      * @returns {NPC}
      */
+    /**
+     * 创建NPC实例到指定房间
+     * @param {string} path - NPC模板路径
+     * @param {ROOM} env - 目标房间（必须是ROOM实例，不支持传入CHARACTER自动跳转）
+     * @param {((npc: NPC) => void)} [oncreate] - 创建后回调
+     * @param {number} [count=1] - 创建数量
+     * @returns {NPC}
+     */
     static CREATE(path, env, oncreate, count) {
         if (!path || !env) return;
 

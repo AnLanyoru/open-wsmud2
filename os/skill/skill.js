@@ -579,15 +579,17 @@ export class SKILL extends BASE {
         me.notify('{type:"dialog",dialog:"skills",remove:"' + this.id + '"}');
         const pot = this.query_needexp(skill.level, me);
         const lv = pot * 2 / 5 / (target_skill.grade + 1);
-        skill.level = parseInt(Math.pow(lv, 0.5));
-        skill.exp = 0;
-        me.skills[target_skill.id] = skill;
+        const newSkill = {
+            level: parseInt(Math.pow(lv, 0.5)),
+            exp: 0
+        };
+        me.skills[target_skill.id] = newSkill;
         const str = ['{type:"dialog",dialog:"skills",item:'];
-        target_skill.item_to_json(str, skill, me);
+        target_skill.item_to_json(str, newSkill, me);
         str.push("}");
         me.notify(str.join(""));
-        me.add_score(target_skill.query_score(skill.level, me));
-        target_skill.attach_prop(me, skill.level);
+        me.add_score(target_skill.query_score(newSkill.level, me));
+        target_skill.attach_prop(me, newSkill.level);
         me.recount();
         return true;
     }

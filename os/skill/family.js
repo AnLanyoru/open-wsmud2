@@ -24,6 +24,8 @@ export class FAMILY extends BASE {
 
     // ============ 核心属性 ============
 
+    /** @type {string} 门派名称 */
+    name = "未命名门派";
     /** @type {string[]} 门派称谓列表 */
     titles = [];
     /** @type {NPC[]} 门派NPC列表 */
@@ -222,12 +224,12 @@ export class FAMILY extends BASE {
                 if (!rm) continue;
                 let npc = rm.find_obj_bypath(spath);
                 npc.destroy();
-                npc = _NPC.CREATE(spath, rm);
-                if (npc.is(this.boss_path)) {
-                    this.boss = npc;
+                let new_npc = _NPC.CREATE(spath, rm);
+                if (new_npc.is(this.boss_path)) {
+                    this.boss = new_npc;
                 }
-                npc.on_died = this.on_npc_die;
-                npc.relive = this.on_famnpc_relive;
+                new_npc.on_died = this.on_npc_die;
+                new_npc.relive = this.on_famnpc_relive;
             }
         }
     }

@@ -216,7 +216,7 @@ export class BASE {
             }
         }
 
-        console.error("resource not preloaded: %s", fkey);
+        throw new Error(`resource not preloaded: ${fkey} — 启动时必须先执行 PRELOAD`);
     }
 
     /**
