@@ -1921,6 +1921,7 @@ export class CHARACTER extends ITEM {
      * @returns {string}
      */
     call(isbad) {
+        if (!this.family) return this.gender == 2 ? "姑娘" : "壮士";
         return this.family.call(this, isbad);
     }
 
@@ -1930,6 +1931,7 @@ export class CHARACTER extends ITEM {
      * @returns {string}
      */
     callme(isbad) {
+        if (!this.family) return this.gender == 2 ? "小女子" : "在下";
         return this.family.call_me(this);
     }
 
@@ -1993,6 +1995,7 @@ export class CHARACTER extends ITEM {
      * @param {string} str
      */
     send_fam(str) {
+        if (!this.family) return;
         this.family.send(str);
     }
 

@@ -2,6 +2,7 @@
  * NPC 非玩家角色类
  */
 import { CHARACTER } from "./character.js";
+import { FAMILIES } from "../skill/family.js";
 import { ROOM } from "../room/room.js";
 import { OBJ } from "../item/obj.js";
 import { WORLD } from "../world.js";
@@ -14,6 +15,8 @@ export class NPC extends CHARACTER {
 
     /** @type {boolean} 是否自动释放绝招 */
     auto_pfm = true;
+    /** @type {import("../skill/family.js").FAMILY} */
+    family = FAMILIES.NONE;
     /** @type {string} NPC名称 */
     name;
     /** @type {number} NPC等级 */
