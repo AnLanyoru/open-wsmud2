@@ -85,7 +85,7 @@ export class CHARACTER extends ITEM {
 
     // ============ 技能与装备 ============
 
-    /** @type {Object<string, {level: number, exp: number, enable_skill: number}>|null} 技能映射 */
+    /** @type {Object<string, {level: number, exp: number, enable_skill: string|null}>|null} 技能映射 */
     skills = null;
     /** @type {Array<*>|null} buff/debuff状态列表 */
     status = null;
@@ -167,29 +167,31 @@ export class CHARACTER extends ITEM {
     drop_list = null;
     /** @type {string|null} 主人ID — NPC/FOLLOWER标识所属玩家 */
     master = null;
-    /** @type {string|null} 死亡复活房间路径 — NPC/MONSTER使用 */
+    /** @type {ROOM|null} 死亡复活房间 — NPC/MONSTER使用 */
     die_room = null;
     /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
     chat_msg = null;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 — character.js:432 传(path,par), NPC定义可无参 */
-    on_create = null;
+    get on_create() { return undefined; }
     /** @type {(() => void)|null} 对象克隆回调 — character.js:475 无参调用 */
-    on_clone = null;
+    get on_clone() { return undefined; }
     /** @type {((killer: CHARACTER) => boolean|void)|null} 死亡回调 — 返回false阻止默认死亡处理, npc.js:217 传(killer) */
-    on_die = null;
+    get on_die() { return undefined; }
+    /** @type {((me: CHARACTER) => void)|null} 团队退出回调 — 返回false阻止默认团队退出处理, npc.js:217 传(killer) */
+    get on_teamout() { return undefined; }
     /** @type {(() => void)|null} 复活回调 — 由 force_skill.on_relive/room.on_relive 间接触发 */
-    on_relive = null;
+    get on_relive() { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
-    on_heart_beat = null;
+    get on_heart_beat() { return undefined; }
     /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
-    on_died = null;
+    on_died(killer, corpse) { return undefined; }
     /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
-    on_fight_over = null;
+    get on_fight_over() { return undefined; }
     /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
-    on_skillchanged = null;
+    get on_skillchanged() { return undefined; }
 
     constructor() {
         super();
@@ -213,9 +215,10 @@ export class CHARACTER extends ITEM {
     /**
      * 操作失败通知 — 发送错误消息并返回false用于return链
      * @param {string} text — 错误提示文本, 实际调用均传入字符串
-     * @returns {false} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
+     * @returns {boolean} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
      */
     notify_fail(text) {
+        this.send(text);
         return false;
     }
 
@@ -312,7 +315,7 @@ export class CHARACTER extends ITEM {
     /**
      * 发送房间消息(支持多视角)
      * @param {string} text - 消息模板
-     * @param {CHARACTER} target - 目标
+     * @param {ITEM} [target] - 消息的主要填充$对象
      * @param {boolean} [excludeself] - 是否排除自己
      */
     send_room(text, target, excludeself) {
@@ -797,7 +800,8 @@ export class CHARACTER extends ITEM {
             }
             const skill = {
                 level: item[1] || 1,
-                exp: 0
+                exp: 0,
+                enable_skill: null
             };
             this.skills[skill_base.id] = skill;
             if (item[2]) {
@@ -862,7 +866,8 @@ export class CHARACTER extends ITEM {
         if (!item) {
             item = {
                 level: level,
-                exp: 0
+                exp: 0,
+                enable_skill: null
             };
             this.skills[skid] = item;
             skill_base.attach_prop(this, level);
@@ -1443,7 +1448,7 @@ export class CHARACTER extends ITEM {
 
     /**
      * 设置初始佩戴物品
-     * @param {...[string, number, boolean]} arguments - [物品路径, 数量, 是否装备]
+     * @param {...[string, number, 1|0]} arguments - [物品路径, 数量, 是否装备]
      */
     set_objects() {
         if (!arguments.length) return;
@@ -1908,9 +1913,10 @@ export class CHARACTER extends ITEM {
 
     /**
      * 查询称号
+     * @param {string} type - 称号类型
      * @returns {string|undefined}
      */
-    query_title() {
+    query_title(type) {
         return this.title;
     }
 
@@ -2927,7 +2933,7 @@ export class CHARACTER extends ITEM {
  * @param {CHARACTER} me - 发起者
  * @param {string} text - 消息模板
  * @param {number} type - 视角类型: 1本人 2目标 3第三人称
- * @param {CHARACTER} target - 目标
+ * @param {ITEM} target - 消息的主要填充$目标对象
  * @returns {string}
  */
 function splitmessage(me, text, type, target) {

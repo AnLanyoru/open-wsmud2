@@ -1,21 +1,13 @@
-/**
- * 定义当对象从文件生成时的基类，
- * 当文件内部调用this.inherit(父类名)后，将真正继承父类的原型和实例属性。
- * 但是文件内部不能修改this.prototype，修改将会作用到父类上面。
- * 可以用this.XXX扩展属性和方法
- */
-
 import vm from 'vm';
 import fs from 'fs';
 import { pathToFileURL } from 'url';
 
 export class BASE {
-    static __initInstance(obj) {
-        // BASE has no instance properties to initialize
-    }
 
+    /**
+     * 实例创建时的操作，用于初始化对象属性等，参数由文件路径中的 # 号分隔部分传入
+     */
     constructor() {
-        BASE.__initInstance(this);
     }
 
     /**
@@ -26,23 +18,6 @@ export class BASE {
         if (!pars) return;
         for (let item in pars) {
             this[item] = pars[item];
-        }
-    }
-
-    /**
-     * 动态继承 — 将当前对象原型链指向父类，并调用父类的 __initInstance（类）或构造函数（旧式函数）初始化实例属性
-     *
-     * 调用后 this 将获得父类原型上的所有方法和属性。
-     * @template {{__initInstance?: Function, prototype: object, apply: Function}} T
-     * @param {T} ctor - 父类构造函数（ES6 class 或旧式 function）
-     * @returns {asserts this is T['prototype']}
-     */
-    inherits(ctor) {
-        this.__proto__ = ctor.prototype;
-        if (ctor.__initInstance) {
-            ctor.__initInstance(this);
-        } else {
-            ctor.apply(this);
         }
     }
 
@@ -241,7 +216,7 @@ export class BASE {
             }
         }
 
-        console.error("resource not preloaded: %s", fkey);
+        throw new Error(`resource not preloaded: ${fkey} — 启动时必须先执行 PRELOAD`);
     }
 
     /**

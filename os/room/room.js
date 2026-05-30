@@ -900,13 +900,13 @@ export class ROOM extends ITEM {
 
 
     /**
-     * 查询副本房间的临时数据
-     * @param {USER} me
+     * 查询副本房间的临时数据(按玩家隔离)
      * @param {string} name
      * @param {*} [def]
+     * @param {USER} me
      * @returns {*}
      */
-    query_temp(me, name, def) {
+    query_temp(name, def, me) {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
         if (!first.temp) return;
@@ -922,13 +922,13 @@ export class ROOM extends ITEM {
     }
 
     /**
-     * 设置副本临时数据
-     * @param {USER} me
+     * 设置副本临时数据(按玩家隔离)
      * @param {string} name
      * @param {*} value
      * @param {number} [time]
+     * @param {USER} me
      */
-    set_temp(me, name, value, time) {
+    set_temp(name, value, time, me) {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
         if (!first.temp) first.temp = {};
@@ -943,16 +943,16 @@ export class ROOM extends ITEM {
     }
 
     /**
-     * 累加副本临时数据
-     * @param {USER} me
+     * 累加副本临时数据(按玩家隔离)
      * @param {string} name
      * @param {number} value
      * @param {number} [time]
+     * @param {USER} me
      * @returns {number}
      */
-    add_temp(me, name, value, time) {
-        const val = this.query_temp(me, name, 0) + value;
-        this.set_temp(me, name, val, time);
+    add_temp(name, value, time, me) {
+        const val = this.query_temp(name, 0, me) + value;
+        this.set_temp(name, val, time, me);
         return val;
     }
 

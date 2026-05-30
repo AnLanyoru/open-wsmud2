@@ -1,8 +1,6 @@
 import { COMMAND } from "../../../os/command.js";
 import { CHARACTER } from "../../../os/char/character.js";
 import { UTIL } from "../../../os/util/util.js";
-import { NPC } from "../../../os/char/npc.js";
-
 export default class extends COMMAND {
     command = "ask";
     regex = /^(\w+)\s+about\s+(.+)$/;
@@ -29,13 +27,3 @@ var ask_dunno = ["$n摇摇头，说道：没听说过。",
     "很显然，$n根本不想回答$P的问题。",
     "$n想了一会儿，说道：对不起，你问的事我实在没有印象。",
     "$n睁大眼睛望着$N，这么简单的问题也要问吗？",];
-NPC.prototype.set_ask = function (name, func) {
-    if (!this.question) this.question = {};
-    this.question[name] = func;
-}
-NPC.prototype.on_ask = function (me, par) {
-    if (!this.question) return;
-    var item = this.question[par];
-    if (!item) return;
-    return item.call(this,me);
-}

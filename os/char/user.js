@@ -85,8 +85,6 @@ export class USER extends CHARACTER {
 
     // ============ 技能 ============
 
-    /** @type {Object<string, {level: number, exp: number, enable_skill: number}>|null} 技能映射 */
-    skills = null;
     /** @type {Array|null} 技能组定义 */
     sk_groups = null;
     /** @type {string[]|null} 秘籍列表 */

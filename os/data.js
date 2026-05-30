@@ -159,9 +159,10 @@ const DATA = {
      * 查询临时数据
      * @param {string} name - 键名
      * @param {*} [def] - 默认值
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      * @returns {*}
      */
-    query_temp(name, def) {
+    query_temp(name, def, _me) {
         if (!this.temp) return;
         const item = this.temp[name];
         if (item && item.e) {
@@ -178,9 +179,10 @@ const DATA = {
      * @param {string} name - 键名
      * @param {*} value - 值
      * @param {number} [time] - 有效期(毫秒)
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      * @returns {void}
      */
-    set_temp(name, value, time) {
+    set_temp(name, value, time, _me) {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -206,9 +208,10 @@ const DATA = {
      * @param {string} name - 键名
      * @param {number} value - 累加值
      * @param {number} [time] - 有效期(毫秒)
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      * @returns {number} 累加后的值
      */
-    add_temp(name, value, time) {
+    add_temp(name, value, time, _me) {
         if (!this.temp) this.temp = {};
         const old = this.temp[name];
         if (time) {

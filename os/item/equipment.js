@@ -43,9 +43,11 @@ export class EQUIPMENT extends OBJ {
 
     // ============ 附加属性 ============
 
+    /** @type {number} 装备基础评分 */
+    score = 0
     /** @type {Object<string, number>|null} 装备附加属性(强化) */
     prop = null;
-    /** @type {Array<{prop: Object<string, number>}>|null} 宝石镶嵌属性列表 */
+    /** @type {Array<{id: string, path: string, name: string, prop: Object<string, number>, grade: number}>|null} 宝石镶嵌属性列表 */
     st_prop = null;
     /** @type {number} 宝石孔数量 */
     hole_count = 0;
@@ -62,12 +64,12 @@ export class EQUIPMENT extends OBJ {
     /** @type {string} 带颜色的显示名称 */
     color_name;
 
-    // ============ 回调函数(由资源文件设置) ============
+    // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((me: CHARACTER) => boolean|void)|null} 装备时回调 — equipment.js:167检查==false阻止装备 */
-    on_eq = null;
+    get on_eq() { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 卸下时回调 — equipment.js:210不检查返回值 */
-    on_uneq = null;
+    get on_uneq() { return undefined; }
     /** @type {string|null} 自定义装备消息 */
     eq_msg = null;
     /** @type {string|null} 自定义卸下消息 */
@@ -180,6 +182,7 @@ export class EQUIPMENT extends OBJ {
                         break;
                     case EQUIP_TYPE.CLOTH:
                     case EQUIP_TYPE.SHOES:
+                    // @ts-ignore 裤子没有，预留
                     case EQUIP_TYPE.PANTS:
                         msg = "$N穿上一" + this.unit + this.color_name + "。";
                         break;
@@ -222,6 +225,7 @@ export class EQUIPMENT extends OBJ {
                         break;
                     case EQUIP_TYPE.CLOTH:
                     case EQUIP_TYPE.SHOES:
+                    // @ts-ignore 裤子没有，预留
                     case EQUIP_TYPE.PANTS:
                     case EQUIP_TYPE.WRIST:
                         msg = "$N将" + this.color_name + "脱了下来。";
@@ -259,7 +263,7 @@ export class EQUIPMENT extends OBJ {
                     }
                     break;
                 case "desc":
-                    str.push(desc);
+                    str.push(val);
                     break;
                 case "gender":
                     str.push("性别要求：" + (val == 1 ? "男" : "女"));

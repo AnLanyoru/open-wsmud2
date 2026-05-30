@@ -7,9 +7,6 @@ import { WORLD } from "../world.js";
 
 export class USERTASK extends BASE {
 
-    /**
-     * @returns {USERTASK}
-     */
     constructor() {
         super();
     }
@@ -40,6 +37,12 @@ export class USERTASK extends BASE {
         }
         WORLD.TASKS.push(this);
     }
+
+    /**
+     * 创建回调 - 基类提供空实现, 资源文件覆写
+     * @returns {string|undefined}
+     */
+    on_create() { return undefined; }
 
     /**
      * 查询任务标题
