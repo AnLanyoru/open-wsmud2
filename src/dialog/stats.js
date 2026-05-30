@@ -351,4 +351,13 @@ const stats_css = `
     color: #C0C0C0;
     line-height: 2.5em;
 }
+
+@media (max-width: 480px) {
+    .stats-container-left>.stats-silder {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+}
 `;

@@ -698,4 +698,18 @@ const list_css = `
     margin-right: 0.2em;
     color: var(--border-color);
 
-}`;
+}
+
+@media (max-width: 480px) {
+    .dialog-list>.otype-list {
+        width: 2.5em;
+    }
+
+    .dialog-list>.otype-list>.otype-item {
+        writing-mode: vertical-rl;
+        width: 2em;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+    }
+}
+`;

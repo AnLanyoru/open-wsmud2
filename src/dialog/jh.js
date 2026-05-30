@@ -527,4 +527,10 @@ const jh_css = `
     margin-left: 0.25em;
     opacity: 0.6;
 }
+
+@media (max-width: 480px) {
+    .dialog-fb>.fb-left {
+        width: 8em;
+    }
+}
 `;
