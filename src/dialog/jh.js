@@ -434,10 +434,16 @@ const jh_css = `
 
 .fb-actions>.fb-action>.action-desc {
     flex: 1;
-    text-overflow: ellipsis;
     white-space: nowrap;
     color: gray;
-    overflow: hidden;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2em), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2em), transparent 100%);
+}
+.fb-actions>.fb-action>.action-desc::-webkit-scrollbar {
+    display: none;
 }
 
 .fb-actions>.fb-action>.action-name {
