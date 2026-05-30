@@ -167,7 +167,7 @@ export class CHARACTER extends ITEM {
     drop_list = null;
     /** @type {string|null} 主人ID — NPC/FOLLOWER标识所属玩家 */
     master = null;
-    /** @type {string|null} 死亡复活房间路径 — NPC/MONSTER使用 */
+    /** @type {ROOM|null} 死亡复活房间 — NPC/MONSTER使用 */
     die_room = null;
     /** @type {string[]|null} 闲聊消息列表 — NPC/MONSTER/FOLLOWER使用 */
     chat_msg = null;
@@ -180,6 +180,8 @@ export class CHARACTER extends ITEM {
     get on_clone() { return undefined; }
     /** @type {((killer: CHARACTER) => boolean|void)|null} 死亡回调 — 返回false阻止默认死亡处理, npc.js:217 传(killer) */
     get on_die() { return undefined; }
+    /** @type {((me: CHARACTER) => void)|null} 团队退出回调 — 返回false阻止默认团队退出处理, npc.js:217 传(killer) */
+    get on_teamout() { return undefined; }
     /** @type {(() => void)|null} 复活回调 — 由 force_skill.on_relive/room.on_relive 间接触发 */
     get on_relive() { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
@@ -213,7 +215,7 @@ export class CHARACTER extends ITEM {
     /**
      * 操作失败通知 — 发送错误消息并返回false用于return链
      * @param {string} text — 错误提示文本, 实际调用均传入字符串
-     * @returns {false} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
+     * @returns {boolean} 始终返回false, 调用点用 return this.notify_fail(...) 中断执行
      */
     notify_fail(text) {
         this.send(text);
@@ -313,8 +315,8 @@ export class CHARACTER extends ITEM {
     /**
      * 发送房间消息(支持多视角)
      * @param {string} text - 消息模板
-     * @param {CHARACTER?} target - 目标
-     * @param {boolean?} [excludeself] - 是否排除自己
+     * @param {ITEM} [target] - 消息的主要填充$对象
+     * @param {boolean} [excludeself] - 是否排除自己
      */
     send_room(text, target, excludeself) {
         if (!this.environment || !text) return;
@@ -1909,9 +1911,10 @@ export class CHARACTER extends ITEM {
 
     /**
      * 查询称号
+     * @param {string} type - 称号类型
      * @returns {string|undefined}
      */
-    query_title() {
+    query_title(type) {
         return this.title;
     }
 
@@ -2928,7 +2931,7 @@ export class CHARACTER extends ITEM {
  * @param {CHARACTER} me - 发起者
  * @param {string} text - 消息模板
  * @param {number} type - 视角类型: 1本人 2目标 3第三人称
- * @param {CHARACTER} target - 目标
+ * @param {ITEM} target - 消息的主要填充$目标对象
  * @returns {string}
  */
 function splitmessage(me, text, type, target) {

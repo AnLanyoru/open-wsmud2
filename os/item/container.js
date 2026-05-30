@@ -26,9 +26,10 @@ export class CONTAINER extends OBJ {
 
     /**
      * 禁止直接拾取容器
+     * @param {USER?} player
      * @returns {boolean} false
      */
-    on_get() {
+    on_get(player) {
         return false;
     }
 

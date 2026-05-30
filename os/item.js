@@ -64,6 +64,16 @@ export class ITEM extends BASE {
     no_message = false;
     /** @type {Object<string, number>|null} 属性加成映射 — CHARACTER/EQUIPMENT专属 */
     prop = null;
+    /** @type {boolean} 是否为容器 — CONTAINER(=true), CHARACTER/OBJ(=false) */
+    is_container = false;
+    /** @type {boolean} 是否为角色 — CHARACTER(=true), OBJ/ROOM(=false) */
+    is_character = false;
+    /** @type {boolean} 是否禁止拾取(ROOM内) — CHARACTER/OBJ专属 */
+    no_get = false;
+    /** @type {boolean} 是否为NPC — NPC(=true), CHARACTER/USER(=false) */
+    is_npc = false;
+    /** @type {((player: import("./char/user.js").USER) => boolean|undefined)} 物件拾取回调 — CHARACTER/OBJ/ROOM专属 */
+    on_get(player) { return undefined; }
 
     /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
     get on_create() { return undefined; }
@@ -93,9 +103,10 @@ export class ITEM extends BASE {
      * @template T
      * @param {string} name - 键名
      * @param {T} [def] - 默认值
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      * @returns {T}
      */
-    query_temp(name, def) {
+    query_temp(name, def, _me) {
         if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
@@ -114,8 +125,9 @@ export class ITEM extends BASE {
      * @param {string} name - 键名
      * @param {T} value - 值
      * @param {number} [time] - 有效期(毫秒)
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      */
-    set_temp(name, value, time) {
+    set_temp(name, value, time, _me) {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -141,11 +153,12 @@ export class ITEM extends BASE {
      * @param {string} name - 键名
      * @param {number} value - 累加值
      * @param {number} [time] - 有效期
+     * @param {import("./char/user.js").USER} [_me] - 玩家(ROOM子类用于按人隔离数据)
      * @returns {number} 累加后的值
      */
-    add_temp(name, value, time) {
-        const val = this.query_temp(name, 0) + value;
-        this.set_temp(name, val, time);
+    add_temp(name, value, time, _me) {
+        const val = this.query_temp(name, 0, _me) + value;
+        this.set_temp(name, val, time, _me);
         return val;
     }
 

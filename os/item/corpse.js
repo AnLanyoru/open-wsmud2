@@ -58,13 +58,14 @@ export class CORPSE extends CONTAINER {
             if (!this.no_drops) {
                 this.no_drops = [];
                 for (let i = 0; i < player.team.length; i++) {
-                    if (!this.environment.query_temp(player, player.team[i].id)) {
+                    if (!this.environment.query_temp(player.team[i].id, undefined, player)) {
                         this.no_drops.push(player.team[i].id);
                     }
                 }
                 this.on_getitem = this.check_get;
             }
         }
+        // @ts-ignore
         return this.items;
     }
 

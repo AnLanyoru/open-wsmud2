@@ -30,7 +30,7 @@ export class MONSTER extends CHARACTER {
 
     // ============ 功能属性 ============
 
-    /** @type {string|null} 死亡后重生房间路径 */
+    /** @type {ROOM|null} 死亡后重生房间 */
     die_room = null;
     // json 从 ITEM 继承(string|null), MONSTER用JSON.stringify()写入字符串
     /** @type {number} 击杀奖励积分 */
@@ -39,8 +39,6 @@ export class MONSTER extends CHARACTER {
     constructor() {
         super();
     }
-
-    can_speek = false;
 
     /** 初始化技能为撕咬/闪避/招架/内功 */
     init_skill() {

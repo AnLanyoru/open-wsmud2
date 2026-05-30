@@ -34,7 +34,7 @@ export class NPC extends CHARACTER {
     /** @type {OBJ[]|null} 出售物品列表 */
     sell_list = null;
     // json 从 ITEM 继承(string|null), NPC用JSON.stringify()写入字符串
-    /** @type {string|null} 死亡后重生房间路径 */
+    /** @type {ROOM|null} 死亡后重生房间 */
     die_room = null;
     /** @type {boolean} 是否禁止刷新(不重生) */
     no_refresh = false;
@@ -42,8 +42,32 @@ export class NPC extends CHARACTER {
     score = 0;
     /** @type {string|null} 任务主人ID */
     master = null;
-    /** @type {string|null} 对话问题 */
+    /** @type {Object<string, Function>|null} 对话问题 */
     question = null;
+
+    /**
+     * 设置询问回调
+     * @param {string} name - 询问关键词
+     * @param {(me: CHARACTER) => void} func - 回调函数
+     */
+    set_ask(name, func) {
+        if (!this.question) this.question = {};
+        this.question[name] = func;
+    }
+
+    /**
+     * 处理询问
+     * @param {CHARACTER} me - 询问者
+     * @param {string} par - 询问内容
+     * @returns {void|false}
+     */
+    on_ask(me, par) {
+        if (!this.question) return;
+        var item = this.question[par];
+        if (!item) return;
+        return item.call(this, me);
+    }
+
     /** @type {boolean} 禁止战斗标识 */
     no_fight = false;
 
@@ -56,7 +80,7 @@ export class NPC extends CHARACTER {
     /** @type {((me: CHARACTER, target: CHARACTER) => void)|null} 绝招回调 — 暂未被调用, 由资源文件设置 */
     get on_pfm() { return undefined; }
     /**
-     * 亲热回调 — 资源文件覆写
+     * 双修回调 — 资源文件覆写
      * @param {USER} me
      */
     on_makelove(me) { return undefined; }
@@ -65,6 +89,12 @@ export class NPC extends CHARACTER {
      * @param {USER} me
      */
     on_master_enter(me) { return undefined; }
+    /**
+     * 玩家离开回调, 玩家与npc在同一房间玩家要离开时触发 — 资源文件覆写
+     * @param {USER} me
+     * @param {string} dir - 离开方向
+     */
+    on_leave(me, dir) { return undefined; }
 
     // ============ 由mixin提供的多态方法(见文件末尾writable定义) ============
 

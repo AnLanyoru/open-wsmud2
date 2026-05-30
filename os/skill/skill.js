@@ -55,6 +55,14 @@ export class SKILL extends BASE {
     }
 
     /**
+     * 敌人死亡回调
+     * @param {CHARACTER} me
+     * @param {CHARACTER} target
+     * @returns {undefined}
+     */
+    on_enemy_die(me, target) { return undefined; }
+
+    /**
      * 获取攻击动作描述
      * @param {CHARACTER} me - 攻击者
      * @param {CHARACTER} target - 目标

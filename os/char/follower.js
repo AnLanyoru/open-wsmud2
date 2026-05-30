@@ -336,7 +336,7 @@ export class FOLLOWER extends CHARACTER {
      * 创建随从
      * @param {USER} me
      * @param {{path: string, id: string}} par
-     * @param {function(FOLLOWER)} callback
+     * @param {Function} callback
      */
     static CREATE(me, par, callback) {
         if (!par || !par.path) return;
