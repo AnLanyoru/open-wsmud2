@@ -86,9 +86,10 @@ export class OBJ extends ITEM {
 
     /**
      * 初始化回调
-     * @param {CHARACTER} [me]
+     * @param {...*} [args]
      */
-    init(me) {
+    init(...args) {
+        const me = args[0];
         this.on_init && this.on_init(me);
     }
 

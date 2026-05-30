@@ -178,10 +178,11 @@ export class ITEM extends BASE {
      */
     heart_beat(dt) { return undefined; }
     /**
-     * 初始化
+     * 初始化 — 子类可覆写为任意签名，参数由调用方决定
+     * @param {...*} [_args]
      * @returns {void}
      */
-    init() { return undefined; }
+    init(..._args) { return undefined; }
 
     /**
      * 添加物件可以接收的命令(目标是当前对象的)

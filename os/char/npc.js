@@ -6,7 +6,7 @@ import { ROOM } from "../room/room.js";
 import { OBJ } from "../item/obj.js";
 import { WORLD } from "../world.js";
 import { BASE } from "../base.js";
-import { EQUIPMENT } from "../item/equipment.js";
+import { CORPSE } from "../item/corpse.js";
 
 export class NPC extends CHARACTER {
 
