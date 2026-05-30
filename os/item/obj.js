@@ -420,12 +420,12 @@ export class OBJ extends ITEM {
 
     /** @returns {string} */
     format_to_sell() {
-        return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.value}]`;
+        return `[${JSON.stringify(this.color_name)},${JSON.stringify(this.id)},${this.count},${this.grade},${JSON.stringify(this.unit)},${this.value}]`;
     }
 
     /** @returns {string} */
     format_to_pack() {
-        return `["${this.color_name}","${this.id}",${this.count},${this.grade},"${this.unit}",${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
+        return `[${JSON.stringify(this.color_name)},${JSON.stringify(this.id)},${this.count},${this.grade},${JSON.stringify(this.unit)},${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
     }
 }
 

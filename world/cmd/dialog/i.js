@@ -83,7 +83,7 @@ export default class extends COMMAND {
             var item = items[i];
             if (i > 0) str.push(",");
             if (item) {
-                str.push(`["${item.color_name}","${item.id}",${item.grade},${item.on_use ? 1 : 0},${item.is_locked ? 1 : 0}]`);
+                str.push(`[${JSON.stringify(item.color_name)},${JSON.stringify(item.id)},${item.grade},${item.on_use ? 1 : 0},${item.is_locked ? 1 : 0}]`);
                 // str.push('{name:"');
                 // str.push(item.color_name);
                 // str.push('",id:"');
@@ -102,7 +102,7 @@ export default class extends COMMAND {
     }
     str.push(",max_item_count:");
     str.push(target.max_item_count);
-    if (target === me) {
+    if (target === me && target.eq_group !== undefined) {
         str.push(",eq_group:");
         str.push(target.eq_group);
     }

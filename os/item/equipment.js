@@ -53,8 +53,8 @@ export class EQUIPMENT extends OBJ {
     hole_count = 0;
     /** @type {Object} 装备条件({skill, str, gender等}) */
     condition = null;
-    /** @type {Function|null} 套装属性计算函数 */
-    group_prop = null;
+    /** @type {(count: number) => Object<string, number>} 套装属性计算函数 */
+    group_prop(count){ return undefined; };
     /** @type {string|null} 套装名称 */
     group_name = null;
     /** @type {string} 武器类型(sword/blade/staff等) */

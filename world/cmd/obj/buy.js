@@ -59,19 +59,20 @@ export default class extends COMMAND {
 
         me.money -= need_money;
         me.add_temp('money1', need_money, UTIL.diff_time());
-        sell_obj = me.add_obj(sellitem.path, buy_count);
+        var sell_obj = me.add_obj(sellitem.path, buy_count);
         if (sell_obj) {
             me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
 
             if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
         }
     } else {
+        // 有限库存（含玩家摊位）：需扣减库存并刷新商店界面
         if (sellitem.count >= buy_count) {
             sellitem.count -= buy_count;
             me.money -= need_money;
 
             me.add_temp('money1', need_money, UTIL.diff_time());
-            sell_obj = me.add_obj(sellitem.path, buy_count);
+            var sell_obj = me.add_obj(sellitem.path, buy_count);
             if (sell_obj) {
                 me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
             }
@@ -82,7 +83,6 @@ export default class extends COMMAND {
         } else {
             return me.notify(target.name + "没有那么多的" + sellitem.color_name + "买给你。");
         }
-        //玩家售卖
     }
     // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
 }

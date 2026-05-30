@@ -1,5 +1,3 @@
-import vm from 'vm';
-import fs from 'fs';
 import { pathToFileURL } from 'url';
 
 export class BASE {
@@ -245,19 +243,25 @@ export class BASE {
      * @param {string} path - 基础路径
      * @param {string} fname - 文件名
      */
-    static UPDATE(path, fname) {
+    static async UPDATE(path, fname) {
         let ary = BASE.PATH_REG.exec(fname);
         if (!ary) {
             throw "path " + fname + " is incorrect:";
         }
         fname = ary[1];
         const fkey = path + fname;
-        const data = fs.readFileSync(fkey + ".js");
-        const func = new Function(data);
-        BASE.ITEMS[fkey] = func;
-        const obj = new BASE();
-        func.apply(obj);
-        obj.path = fname;
-        obj.update && obj.update(fname, ary[2]);
+        const filepath = fkey + ".js";
+        try {
+            const mod = await import(pathToFileURL(filepath).href + '?update=' + Date.now());
+            const func = mod.default;
+            if (typeof func === 'function') {
+                BASE.ITEMS[fkey] = func;
+            } else {
+                BASE.ITEMS[fkey] = function () {};
+            }
+        } catch (e) {
+            console.error("update %s error:", filepath, e, e.stack);
+            throw e;
+        }
     }
 }
