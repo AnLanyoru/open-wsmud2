@@ -381,8 +381,15 @@ export class OBJ extends ITEM {
 
     /**
      * 根据概率列表创建物品
-     * @param {Array<{odds: number, obj: any, fall_obj: string, count: number, min: number, max: number}>} args - 掉落定义
-     * @returns {OBJ[]}
+     *
+     * @param {Array<{odds?: number, obj: any, fall_obj?: string, count?: number, min?: number, max?: number}>} args
+     *   掉落配置数组，每项字段：
+     *   - odds     掉落概率（万分比），10000 = 100%，默认 10000
+     *   - obj      命中时生成的物品（字符串 ID 或对象）
+     *   - fall_obj 未命中时的保底物品（字符串 ID 或对象）
+     *   - count    固定生成数量，默认 1（与 min/max 互斥）
+     *   - min/max  随机数量范围 [min, max]（与 count 互斥）
+     * @returns {OBJ[]} 生成的物品数组
      */
     static create_by_odds(args) {
         const items = [];
