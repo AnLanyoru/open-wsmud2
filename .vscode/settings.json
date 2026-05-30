@@ -2,10 +2,12 @@
   "files.exclude": {
     "**/node_modules": true,
     "www": true,
-    "**/.env": true
+    "**/.env": true,
+    "old": true
   },
   "search.exclude": {
     "www": true,
-    "**/.env": true
+    "**/.env": true,
+    "old": true
   }
 }

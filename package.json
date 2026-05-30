@@ -34,7 +34,9 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
+    "@types/node": "^25.9.1",
     "concurrently": "^9.1.2",
-    "esbuild": "^0.28.0"
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.3"
   }
 }
