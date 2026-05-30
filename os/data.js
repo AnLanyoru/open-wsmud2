@@ -163,7 +163,7 @@ const DATA = {
      * @returns {*}
      */
     query_temp(name, def, _me) {
-        if (!this.temp) return;
+        if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
             if (Date.now() <= item.e) {

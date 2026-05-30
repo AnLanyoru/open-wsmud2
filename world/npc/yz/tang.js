@@ -61,6 +61,7 @@ export default class extends NPC {
         return true;
     } else {
         me.notify("唐楠对你说道：这位" + me.call() + "，这次需要" + (cash / 10000) + "两黄金才能刷新了。");
+        return false;
     }
 }
 }
