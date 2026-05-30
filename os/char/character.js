@@ -85,7 +85,7 @@ export class CHARACTER extends ITEM {
 
     // ============ 技能与装备 ============
 
-    /** @type {Object<string, {level: number, exp: number, enable_skill: number}>|null} 技能映射 */
+    /** @type {Object<string, {level: number, exp: number, enable_skill: string|null}>|null} 技能映射 */
     skills = null;
     /** @type {Array<*>|null} buff/debuff状态列表 */
     status = null;
@@ -187,7 +187,7 @@ export class CHARACTER extends ITEM {
     /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
     get on_heart_beat() { return undefined; }
     /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
-    get on_died() { return undefined; }
+    on_died(killer, corpse) { return undefined; }
     /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
     get on_fight_over() { return undefined; }
     /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
@@ -800,7 +800,8 @@ export class CHARACTER extends ITEM {
             }
             const skill = {
                 level: item[1] || 1,
-                exp: 0
+                exp: 0,
+                enable_skill: null
             };
             this.skills[skill_base.id] = skill;
             if (item[2]) {
@@ -865,7 +866,8 @@ export class CHARACTER extends ITEM {
         if (!item) {
             item = {
                 level: level,
-                exp: 0
+                exp: 0,
+                enable_skill: null
             };
             this.skills[skid] = item;
             skill_base.attach_prop(this, level);

@@ -502,7 +502,8 @@ export class SKILL extends BASE {
         if (!skill) {
             skill = {
                 level: 0,
-                exp: 0
+                exp: 0,
+                enable_skill: null
             };
             const str = ['{type:"dialog",dialog:"skills",item:'];
             this.item_to_json(str, skill, me);
@@ -581,7 +582,8 @@ export class SKILL extends BASE {
         const lv = pot * 2 / 5 / (target_skill.grade + 1);
         const newSkill = {
             level: parseInt(Math.pow(lv, 0.5)),
-            exp: 0
+            exp: 0,
+            enable_skill: null
         };
         me.skills[target_skill.id] = newSkill;
         const str = ['{type:"dialog",dialog:"skills",item:'];
