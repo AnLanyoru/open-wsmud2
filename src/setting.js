@@ -36,17 +36,32 @@ const Setting = {
     show_damage: 0,
     no_master: 0,
     no_team: 0,
+    top_safe_distance: 0,
+    bottom_safe_distance: 0,
     no_load: true,
     load: function (data) {
         Dialog.keys.init_key();
         Dialog.extend.init_extend();
-        if (!data) return;
-        for (var key in data) {
-            if (key == "fullscreen") {
-                continue;
+        if (data) {
+            for (var key in data) {
+                if (key == "fullscreen") {
+                    continue;
+                }
+                this.set_prop(key, data[key]);
+                this[key] = data[key];
             }
-            this.set_prop(key, data[key]);
-            this[key] = data[key];
+        }
+        this.loadLocal();
+    },
+    loadLocal: function () {
+        var localKeys = ["top_safe_distance", "bottom_safe_distance"];
+        for (var i = 0; i < localKeys.length; i++) {
+            var val = localStorage.getItem("ui_" + localKeys[i]);
+            if (val !== null) {
+                var num = parseInt(val) || 0;
+                this[localKeys[i]] = num;
+                this.set_prop(localKeys[i], num);
+            }
         }
     }, set_prop: function (key, value) {
         switch (key) {
@@ -149,6 +164,12 @@ const Setting = {
                 } else {
                     Process.ChannelElement.show();
                 }
+                break;
+            case "top_safe_distance":
+                $(".container").css("padding-top", value + "px");
+                break;
+            case "bottom_safe_distance":
+                $(".container").css("padding-bottom", value + "px");
                 break;
 
         }

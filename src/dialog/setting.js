@@ -56,6 +56,11 @@ export default {
                         this.customElement.find("#" + prop).show().val(value != 1 ? value : "");
                     }
                     break;
+                case "top_safe_distance":
+                case "bottom_safe_distance":
+                    item.find(".setting-range").val(value);
+                    item.find(".range-value").text(value);
+                    break;
                 default:
                     if (value == 1) {
                         item.find(".switch ").addClass("on");
@@ -122,6 +127,7 @@ export default {
         if (item == "setting") {
             this.selectitem.on("click", ".switch", this.switchClick);
             this.selectitem.on("click", ".color-item", this.colorClick);
+            this.selectitem.on("input", ".setting-range", this.rangeInput);
         } else if (item == "custom") {
             this.selectitem.on("click", ".switch", this.switchClick);
             this.selectitem.on("click", ".setting-ok", this.save_custom);
@@ -243,6 +249,15 @@ export default {
         }
         e.cancelable = true;
         return false;
+    },
+    rangeInput: function () {
+        var elem = $(this);
+        var forProp = elem.parent().attr("for");
+        var value = parseInt(elem.val()) || 0;
+        Setting[forProp] = value;
+        Setting.set_prop(forProp, value);
+        elem.siblings(".range-value").text(value);
+        localStorage.setItem("ui_" + forProp, value);
     },
     COLORS: {
         "rgb(255, 255, 255)": "#fff",
@@ -636,6 +651,20 @@ const setting_template = `
                     <span class="color-item" value="1.2em">x1.2</span>
                 </span>
             </div>
+            <div class="setting-item" for="top_safe_distance">
+                <span class="title">
+                    顶部安全距离
+                </span>
+                <input type="range" class="setting-range" value="0" min="0" max="100" />
+                <span class="range-value">0</span>
+            </div>
+            <div class="setting-item" for="bottom_safe_distance">
+                <span class="title">
+                    底部安全距离
+                </span>
+                <input type="range" class="setting-range" value="0" min="0" max="100" />
+                <span class="range-value">0</span>
+            </div>
             <h3>游戏设置</h3>
             <div class="setting-item" for="no_master">
                 <span class="title">
@@ -910,6 +939,20 @@ const setting_css = `
     resize: none;
     width: 98%;
     height: 3rem;
+}
+
+.setting .setting-range {
+    flex: 1;
+    max-width: 8em;
+    margin: 0 0.5em;
+    accent-color: #008000;
+    cursor: pointer;
+}
+
+.setting .range-value {
+    width: 2.5em;
+    text-align: center;
+    color: #cecece;
 }
 
 .setting>.setting-ok {
