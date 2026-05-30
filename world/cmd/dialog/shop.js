@@ -229,7 +229,7 @@ export default class extends COMMAND {
         else str.push('[');
         for (let item of this.groups[i]) {
             if (item.is_show && item.is_show(me) === false) continue;
-            str.push('["', item.id, '","', item.name, '","', item.desc, '"');
+            str.push('[', JSON.stringify(item.id ?? ""), ',', JSON.stringify(item.name ?? ""), ',', JSON.stringify(item.desc ?? ""));
             str.push(',', item.value, ',', item.grade, ',');
             if (item.query_discount) str.push(item.query_discount(me));
             else str.push(item.discount ?? 1);

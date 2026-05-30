@@ -172,8 +172,18 @@ export class WSClient {
         if (!evt || !evt.data) return;
         var data = evt.data;
         if (data[0] == '{' || data[0] == '[') {
-            var func = new Function("return " + data + ";");
-            this.OnData(func());
+            try {
+                var func = new Function("return " + data + ";");
+                this.OnData(func());
+            } catch (e) {
+                console.error('OnReceived parse error:', e.message, data.substring(0, 200));
+                try {
+                    this.OnData(JSON.parse(data));
+                } catch (e2) {
+                    console.error('OnReceived JSON parse also failed:', e2.message);
+                    this.OnMessage(data);
+                }
+            }
         } else {
             this.OnMessage(data);
         }

@@ -56,6 +56,7 @@ const jh_fam = {
         html.push('</div>');
     },
     show: function (left_panel, right_panel) {
+        if (!this.items) return;
         var html = [];
         for (var i = 0; i < this.items.length; i++) {
             var fb = this.items[i];
@@ -118,6 +119,7 @@ const jh_fb = {
             this.selected_index = unlock;
 
     }, show: function (left_panel, right_panel) {
+        if (!this.items) return;
         this.listElement = left_panel;
         this.descElement = right_panel;
         var html = ["<div class='fb-content'>"];
@@ -229,6 +231,7 @@ const jh_ar = {
             this.items[i].unlock = (unlock & Math.pow(2, i)) !== 0;
         }
     }, show: function (left_panel, right_panel) {
+        if (!this.items) return;
         var html = ["<div class='fb-content'>"];
         let count = Math.max(this.items.length, 10);
         for (var i = 0; i < count; i++) {
@@ -434,10 +437,17 @@ const jh_css = `
 
 .fb-actions>.fb-action>.action-desc {
     flex: 1;
-    text-overflow: ellipsis;
     white-space: nowrap;
     color: gray;
-    overflow: hidden;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: 2em;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent calc(100%));
+    mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent calc(100%));
+}
+.fb-actions>.fb-action>.action-desc::-webkit-scrollbar {
+    display: none;
 }
 
 .fb-actions>.fb-action>.action-name {
@@ -526,5 +536,11 @@ const jh_css = `
     float: left;
     margin-left: 0.25em;
     opacity: 0.6;
+}
+
+@media (max-width: 480px) {
+    .dialog-fb>.fb-left {
+        width: 8em;
+    }
 }
 `;

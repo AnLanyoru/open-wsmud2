@@ -32,6 +32,11 @@ export default class extends TASK {
 
     this.startup();
 }
+    /**
+     * 查询/生成玩家货物列表（带缓存）
+     * @param {CHARACTER} me - 玩家角色
+     * @returns {OBJ[]} 为该玩家生成的物品列表
+     */
     query_goods(me) {
     if (this.customer[me.id]) return this.customer[me.id];
     var ref_count = me.query_temp("ref_count", 0);
@@ -65,19 +70,19 @@ export default class extends TASK {
         }
         max_count -= 2;
     }
-    if (me.random(3) === 1) {
-        let level = this.random(me.level);
-        let index = this.random(25);
-        list.push(OBJ.CREATE("drug/yf#" + ((index * 5) + level), 1));
-        max_count -= 1;
-    }
-    if (me.random(this.ref_count) > 4) {
-        let level = this.random(me.level);
-        if (level > 3) level = 3;
-        let index = this.random(25);
-        list.push(OBJ.CREATE("drug/yf2#" + ((index * 5) + level), 1));
-        max_count -= 1;
-    }
+    // if (me.random(3) === 1) {
+    //     let level = this.random(me.level);
+    //     let index = this.random(25);
+    //     list.push(OBJ.CREATE("drug/yf#" + ((index * 5) + level), 1));
+    //     max_count -= 1;
+    // }
+    // if (me.random(this.ref_count) > 4) {
+    //     let level = this.random(me.level);
+    //     if (level > 3) level = 3;
+    //     let index = this.random(25);
+    //     list.push(OBJ.CREATE("drug/yf2#" + ((index * 5) + level), 1));
+    //     max_count -= 1;
+    // }
     if (max_count > 0) {
         max_count = Math.min(3, max_count);
         for (let i = 0; i < max_count; i++) {
@@ -91,6 +96,12 @@ export default class extends TASK {
     this.customer[me.id] = list;
     return list;
 }
+    /**
+     * 设置/清除玩家货物列表
+     * @param {CHARACTER} me - 玩家角色
+     * @param {OBJ[]|null} list - 物品列表，传null清除缓存
+     * @returns {void}
+     */
     set_goods(me, list) {
     this.customer[me.id] = list;
 }

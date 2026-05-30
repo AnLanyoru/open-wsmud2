@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "name": "@mud/core",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --outDir dist",
+    "deploy": "node scripts/deploy.mjs",
+    "build:full": "npm run build && npm run deploy"
+  }
+}
