@@ -65,19 +65,19 @@ export default class extends TASK {
         }
         max_count -= 2;
     }
-    if (me.random(3) === 1) {
-        let level = this.random(me.level);
-        let index = this.random(25);
-        list.push(OBJ.CREATE("drug/yf#" + ((index * 5) + level), 1));
-        max_count -= 1;
-    }
-    if (me.random(this.ref_count) > 4) {
-        let level = this.random(me.level);
-        if (level > 3) level = 3;
-        let index = this.random(25);
-        list.push(OBJ.CREATE("drug/yf2#" + ((index * 5) + level), 1));
-        max_count -= 1;
-    }
+    // if (me.random(3) === 1) {
+    //     let level = this.random(me.level);
+    //     let index = this.random(25);
+    //     list.push(OBJ.CREATE("drug/yf#" + ((index * 5) + level), 1));
+    //     max_count -= 1;
+    // }
+    // if (me.random(this.ref_count) > 4) {
+    //     let level = this.random(me.level);
+    //     if (level > 3) level = 3;
+    //     let index = this.random(25);
+    //     list.push(OBJ.CREATE("drug/yf2#" + ((index * 5) + level), 1));
+    //     max_count -= 1;
+    // }
     if (max_count > 0) {
         max_count = Math.min(3, max_count);
         for (let i = 0; i < max_count; i++) {
