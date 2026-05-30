@@ -80,7 +80,7 @@ export class AREA extends BASE {
     // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((user: USER) => void)|null} 登录回调 */
-    get on_login() { return undefined; }
+    on_login(user) { return undefined; }
 
     // ============ 交互属性 ============
 

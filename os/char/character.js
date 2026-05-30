@@ -175,23 +175,23 @@ export class CHARACTER extends ITEM {
     // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((path?: string, par?: string) => void)|null} 对象创建回调 — character.js:432 传(path,par), NPC定义可无参 */
-    get on_create() { return undefined; }
+    on_create(path, par) { return undefined; }
     /** @type {(() => void)|null} 对象克隆回调 — character.js:475 无参调用 */
-    get on_clone() { return undefined; }
+    on_clone() { return undefined; }
     /** @type {((killer: CHARACTER) => boolean|void)|null} 死亡回调 — 返回false阻止默认死亡处理, npc.js:217 传(killer) */
-    get on_die() { return undefined; }
+    on_die(killer) { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 团队退出回调 — 返回false阻止默认团队退出处理, npc.js:217 传(killer) */
-    get on_teamout() { return undefined; }
+    on_teamout(me) { return undefined; }
     /** @type {(() => void)|null} 复活回调 — 由 force_skill.on_relive/room.on_relive 间接触发 */
-    get on_relive() { return undefined; }
+    on_relive() { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 — user.js:723/npc.js:288 每秒传入dt */
-    get on_heart_beat() { return undefined; }
+    on_heart_beat(dt) { return undefined; }
     /** @type {((killer?: CHARACTER, corpse?: CORPSE) => void)|null} 死亡后回调 — npc.js:238传(killer,corpse), user.js:567传(killer) */
     on_died(killer, corpse) { return undefined; }
     /** @type {((target: CHARACTER, win: boolean) => void)|null} 战斗结束回调 — end_attack中调用 */
-    get on_fight_over() { return undefined; }
+    on_fight_over(target, win) { return undefined; }
     /** @type {(() => void)|null} 技能变更回调 — init_skill/weapon_changed中调用 */
-    get on_skillchanged() { return undefined; }
+    on_skillchanged() { return undefined; }
 
     constructor() {
         super();

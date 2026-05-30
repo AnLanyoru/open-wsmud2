@@ -77,7 +77,7 @@ export class FOLLOWER extends CHARACTER {
      */
     on_master_enter(me) { }
     /** @type {((dt: number) => void)|null} 心跳回调 */
-    get on_heart_beat() { return undefined; }
+    on_heart_beat(dt) { return undefined; }
 
     constructor() {
         super();

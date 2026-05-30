@@ -76,7 +76,7 @@ export class ITEM extends BASE {
     on_get(player) { return undefined; }
 
     /** @type {((path?: string, par?: string) => void)|null} 物件创建回调 — CHARACTER/OBJ/ROOM专属 */
-    get on_create() { return undefined; }
+    on_create(path, par) { return undefined; }
 
     // ============ 堆叠操作(OBJ覆写, ITEM提供安全默认) ============
 

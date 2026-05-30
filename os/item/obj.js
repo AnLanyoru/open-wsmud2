@@ -72,17 +72,17 @@ export class OBJ extends ITEM {
     // ============ 回调函数(由资源文件设置, getter 返回 undefined 被类方法覆盖) ============
 
     /** @type {((me: CHARACTER, par?: string) => boolean|void)|null} 使用回调 */
-    get on_use() { return undefined; }
+    on_use(me, par) { return undefined; }
     /** @type {((me: CHARACTER, skill: SKILL, lv: number) => boolean|void)|null} 修炼回调 */
-    get on_study() { return undefined; }
+    on_study(me, skill, lv) { return undefined; }
     /** @type {((me: CHARACTER) => OBJ[]|false|void)|null} 打开回调 */
-    get on_open() { return undefined; }
+    on_open(me) { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 初始化回调 */
-    get on_init() { return undefined; }
+    on_init(me) { return undefined; }
     /** @type {((path: string, par?: string) => void)|null} 创建后回调 */
-    get on_create() { return undefined; }
+    on_create(path, par) { return undefined; }
     /** @type {((me: CHARACTER) => void)|null} 热重载回调 */
-    get on_reload() { return undefined; }
+    on_reload(me) { return undefined; }
 
     /**
      * 初始化回调

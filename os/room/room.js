@@ -72,19 +72,19 @@ export class ROOM extends ITEM {
     // ============ 回调函数(由资源文件设置) — getter形式避免class field遮蔽子类方法 ============
 
     /** @type {((obj: CHARACTER, dir: string) => boolean|void)|null} 离开房间回调 */
-    get on_leave() { return undefined; }
+    on_leave(obj, dir) { return undefined; }
     /** @type {((obj: CHARACTER) => void)|null} 进入房间前回调 */
-    get on_before_enter() { return undefined; }
+    on_before_enter(obj) { return undefined; }
     /** @type {((obj: CHARACTER) => void)|null} 进入房间后回调 */
-    get on_enter() { return undefined; }
+    on_enter(obj) { return undefined; }
     /** @type {((dt: number) => void)|null} 心跳回调 */
-    get on_heart_beat() { return undefined; }
+    on_heart_beat(dt) { return undefined; }
     /** @type {((user: USER) => void)|null} 登录回调 — ROOM暂未被调用, 仅AREA.on_login被login.js调用 */
-    get on_login() { return undefined; }
+    on_login(user) { return undefined; }
     /** @type {(() => void)|null} 房间创建回调 — room.js:596/633 无参调用 */
-    get on_create() { return undefined; }
+    on_create() { return undefined; }
     /** @type {((type: number) => void)|null} 设置难度回调 — room.js:975传入number而非boolean */
-    get on_set_difficulty() { return undefined; }
+    on_set_difficulty(type) { return undefined; }
 
     // ============ 玩法相关 ============
 
