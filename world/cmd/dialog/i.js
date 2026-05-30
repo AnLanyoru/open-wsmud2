@@ -29,7 +29,7 @@ export default class extends COMMAND {
     }
     var str = ['{"type":"dialog","dialog":"'];
 
-    if (target != me) {
+    if (target != me || !me.is_player) {
         str.push('pack2",id:"');
         str.push(target.id);
         str.push('",name:"');

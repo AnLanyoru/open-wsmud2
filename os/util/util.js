@@ -7,6 +7,11 @@ const require = createRequire(import.meta.url);
 
 import util from 'util';
 import JSON5 from 'json5';
+import { PROPERTIES } from "../const.js";
+
+// 懒加载 SKILL 避免循环依赖: util.js → skill.js → character.js → obj.js → item.js → util.js
+let _SKILL = null;
+import("../skill/skill.js").then(m => { _SKILL = m.SKILL; });
 
 /**
  * nodejs原型继承 — 将superCtor的方法复制到this.prototype
@@ -268,7 +273,7 @@ export const UTIL = {
                 case "skill":
                     let skills = prop[item];
                     for (let sk in skills) {
-                        let sk_base = SKILL.get(sk);
+                        let sk_base = _SKILL && _SKILL.get(sk);
                         if (sk_base)
                             str.push(sk_base.name + "：+" + skills[sk] + "级");
                     }
@@ -294,7 +299,7 @@ export const UTIL = {
                             :
                             str.push(PROPERTIES[item] + "：" + prop[item] * count);
                     } else {
-                        p = SKILL.SLOTS[item];
+                        p = _SKILL && _SKILL.SLOTS[item];
                         if (p) {
                             str.push(p.format(prop[item] * count));
                         }
