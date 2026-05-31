@@ -499,7 +499,7 @@ export class SKILL extends BASE {
         str.push(this.query_color_name(me));
         str.push('",grade:', String(this.query_grade(me)));
         str.push(',"level":');
-        str.push(me.query_skill(this.id));
+        str.push(me.query_skill(this.id).toString());
         str.push(',"exp":');
         skill_item.exp = skill_item.exp || 0;
         str.push(String(parseInt(String(skill_item.exp * 100 / this.level_exp(skill_item.level, me)))));
@@ -530,7 +530,8 @@ export class SKILL extends BASE {
      * @param exp
      */
     add_exp(me: CHARACTER, exp: number): boolean | undefined {
-        let skill = me.skills ? me.skills[this.id] : undefined;
+        if (!me.skills) me.skills = {};
+        let skill = me.skills[this.id];
         if (!skill) {
             skill = {
                 level: 0,
@@ -606,7 +607,8 @@ export class SKILL extends BASE {
      * @param target_skill - 目标技能
      */
     grade_up(me: CHARACTER, target_skill: SKILL): boolean {
-        const skill = me.skills ? me.skills[this.id] : undefined;
+        if (!me.skills) return false;
+        const skill = me.skills[this.id];
         if (!skill || !(skill.level >= 1000)) return false;
 
         if (me.remove_skill(this.id) === false) return false;
