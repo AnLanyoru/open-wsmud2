@@ -21,7 +21,7 @@ for (let api of API_PATHS) {
 }
 
 
-app.use(express.static(path.join(__dirname, 'www')));
+app.use(express.static(path.join(__dirname, 'www'), { fallthrough: true }));
 
 
 app.disable('x-powered-by');
