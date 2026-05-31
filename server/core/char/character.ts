@@ -19,6 +19,10 @@ import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
 import { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
+import type { ActionMap } from '../../types/base.js';
+import type { ROOM } from '../room/room.js';
+import type { FAMILY } from '../skill/family.js';
+import type { OddsEntry } from '../item/obj.js';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -138,7 +142,7 @@ export class CHARACTER extends ITEM {
   /** 用户权限等级 0=普通 6=管理员 */
   user_level: number = 0;
   /** 所属门派 */
-  family: any = null;
+  family: FAMILY | null = null;
   /** 是否禁止战斗 */
   no_fight: boolean = false;
 
@@ -150,7 +154,7 @@ export class CHARACTER extends ITEM {
   // ============ 继承自 ITEM 的字段和方法类型声明（在此声明以便类型检查） ============
 
   /** 子物品列表 */
-  items: any[] | null = null;
+  items: ITEM[] | null = null;
   /** 物件路径标识 */
   path!: string;
   /** 物件唯一 ID */
@@ -165,13 +169,13 @@ export class CHARACTER extends ITEM {
   /** JSON 缓存（继承自 ITEM） */
   json: string | null = null;
   /** 可执行命令映射（继承自 ITEM） */
-  actions: Record<string, any> | null = null;
+  actions: ActionMap<this> | null = null;
 
 
   // ============ 环境与交互 ============
 
   /** 当前所在房间 */
-  environment: any = null;
+  environment: ROOM | null = null;
   /** 当前活动状态 */
   state: any = null;
   /** 等待用户输入的回调 */
@@ -184,7 +188,7 @@ export class CHARACTER extends ITEM {
   /** buff/debuff 状态列表 */
   status: CharacterStatus[] | null = null;
   /** 装备列表（按 EQUIP_TYPE 索引） */
-  equipment: (any)[] | null = null;
+  equipment: (EQUIPMENT | null)[] | null = null;
   /** 属性加成映射 */
   prop: Record<string, number> | null = null;
   /** 临时数据 */
@@ -199,15 +203,15 @@ export class CHARACTER extends ITEM {
   /** 敌人列表 */
   enemy: CHARACTER[] | null = null;
   /** 当前攻击技能 */
-  attack_skill: any = null;
+  attack_skill: SKILL | null = null;
   /** 空手技能 */
-  noweapon_skill: any = null;
+  noweapon_skill: SKILL | null = null;
   /** 闪避技能 */
-  dodge_skill: any = null;
+  dodge_skill: SKILL | null = null;
   /** 招架技能 */
-  parry_skill: any = null;
+  parry_skill: SKILL | null = null;
   /** 内功技能 */
-  force_skill: any = null;
+  force_skill: SKILL | null = null;
   /** 自动技能缓存 */
   auto_skills: AutoSkillEntry[] | null = null;
   /** 当前攻击部位 */
@@ -225,7 +229,7 @@ export class CHARACTER extends ITEM {
   /** 分身状态倒计时 */
   is_shadow: number = 0;
   /** 攻击处理器（定时器句柄） */
-  attack_handler: any = null;
+  attack_handler: ReturnType<typeof setTimeout> | null = null;
   /** 自动释放绝招 */
   auto_pfm: boolean = false;
   /** 伤害记录（按玩家 ID） */
@@ -282,18 +286,29 @@ export class CHARACTER extends ITEM {
   /** 自动绝招触发频率 */
   pfm_rate?: number;
 
-  // ============ 回调字段（可选） ============
+  // ============ 回调字段（可选，由资源文件在对象定义时设置） ============
 
+  /** 对象创建后回调 — 触发时机：create() 方法末尾，资源文件加载/热更新实例化对象时 */
   on_create?(path: string, par?: string): void;
+  /** 对象克隆后回调 — 触发时机：clone() 方法末尾，NPC/物品从模板复制到实际场景时 */
   on_clone?(): void;
+  /** 死亡前回调 — 触发时机：die() 方法开头，hp 归零之前；返回 false 可阻止死亡 */
   on_die?(killer: CHARACTER): boolean | void;
+  /** 死亡后回调 — 触发时机：die() 方法末尾，尸体已生成、状态已清除之后 */
   on_died?(killer: CHARACTER | undefined, corpse: any): void;
+  /** 复活回调 — 触发时机：角色复活时（NPC relive 方法调用时） */
   on_relive?(): void;
+  /** 心跳回调 — 触发时机：每帧 heart_beat(dt) 调用时 */
   on_heart_beat?(dt: number): void;
+  /** 离开队伍时回调 — 触发时机：team_out() 中，随从因主人退队而退出时 */
   on_teamout?(me: CHARACTER): void;
+  /** 战斗结束回调 — 触发时机：end_attack() 中，一方获胜（比试血量<30%或击杀后），对方 end_fight 之前 */
   on_fight_over?(target: CHARACTER, win: boolean): void;
+  /** 技能变更回调 — 触发时机：init_skill() 末尾 / weapon_changed() 末尾，切换武器或装备技能后 */
   on_skillchanged?(): void;
+  /** 逃跑回调 — 触发时机：do_escape() 中，敌人尝试逃跑时；返回 false 阻止逃跑 */
   on_escape?(me: CHARACTER): boolean | void;
+  /** 受到伤害回调 — 触发时机：do_attack() 中对目标造成伤害后（hp 实际扣除之前） */
   on_damage?(attacker: CHARACTER, damage: number): void;
 
   constructor() {
@@ -362,7 +377,7 @@ export class CHARACTER extends ITEM {
   find_obj(oid: string, parent?: any): any {
     let items = this.items;
     if (parent) items = parent.items;
-    return (this as any).find_obj_byid(items, oid);
+    return (this as any).find_obj_byid(items, oid) as any;
   }
 
   /**
@@ -469,7 +484,7 @@ export class CHARACTER extends ITEM {
     let cmd = WORLD.COMMANDS[cmdName];
     let pars: any[];
     if (cmd && cmd.regex && str) {
-      pars = cmd.regex.exec(str);
+      pars = cmd.regex.exec(str) as any as any[];
       pars ? (pars[0] = this) : (pars = [this, str]);
     } else {
       pars = [this, str];
@@ -541,7 +556,7 @@ export class CHARACTER extends ITEM {
   create(path: string, par?: string): void {
     if (par) this.path = path + par;
     if (this.on_create) this.on_create(path, par);
-    WORLD.NPC_STROE.set(this.path, this);
+    WORLD.NPC_STROE.set(this.path, this as any);
   }
 
   /**
@@ -562,17 +577,17 @@ export class CHARACTER extends ITEM {
       for (let i = 0; i < this.equipment.length; i++) {
         const item = this.equipment[i];
         if (item) {
-          eqs[i] = OBJ.CREATE(item.path);
+          eqs[i] = OBJ.CREATE(item.path!);
         }
       }
-      this.equipment = eqs;
+      this.equipment = eqs as (EQUIPMENT | null)[];
     }
     if (this.items) {
       const items: any[] = [];
       for (let i = 0; i < this.items.length; i++) {
         items[i] = OBJ.CREATE(this.items[i].path);
       }
-      this.items = items;
+      this.items = items as ITEM[];
     }
     (this as any).create_id();
     this.init();
@@ -595,7 +610,7 @@ export class CHARACTER extends ITEM {
           if (item.on_eq) item.on_eq(this);
           if (item && item.group_name) {
             groups[item.group_name] = (groups[item.group_name] || 0) + 1;
-            const prop = item.group_prop(groups[item.group_name]);
+            const prop = item.group_prop!(groups[item.group_name]);
             if (prop) {
               this.change_prop(prop, true);
             }
@@ -666,12 +681,13 @@ export class CHARACTER extends ITEM {
    * 检查并更新套装属性
    */
   check_groupeq(): void {
+    if (!this.equipment) return;
     const eqs: Record<string, number> = {};
     for (let i = 0; i < this.equipment.length; i++) {
       const item = this.equipment[i];
       if (item && item.group_name) {
         eqs[item.group_name] = (eqs[item.group_name] || 0) + 1;
-        const prop = item.group_prop(eqs[item.group_name]);
+        const prop = item.group_prop!(eqs[item.group_name]);
         if (prop) {
           this.change_prop(prop, true);
         }
@@ -712,7 +728,7 @@ export class CHARACTER extends ITEM {
    * 查询内功加成比例
    */
   query_force_rad(): number {
-    if (this.force_skill && this.force_skill.force_rad) return this.force_skill.force_rad || 0.1;
+    if (this.force_skill && (this.force_skill as Record<string, any>).force_rad) return (this.force_skill as Record<string, any>).force_rad || 0.1;
     return 0.1;
   }
 
@@ -769,19 +785,19 @@ export class CHARACTER extends ITEM {
    * 增加副本分数
    */
   add_fbscore(v: number, max?: number): void {
-    const fb = this.environment.query_fb_first(this.query_teamid());
+    const fb = this.environment!.query_fb_first(this.query_teamid()!);
     if (!fb) return;
-    fb.score = (fb.score || 0) + v;
-    if (max && max > 0 && fb.score > max) fb.score = max;
+    (fb as any).score = ((fb as any).score || 0) + v;
+    if (max && max > 0 && (fb as any).score > max) (fb as any).score = max;
   }
 
   /**
    * 查询副本分数
    */
   query_fbscore(v?: any): number {
-    const first_room = this.environment.query_fb_first(this.query_teamid());
+    const first_room = this.environment!.query_fb_first(this.query_teamid()!);
     if (!first_room) return 0;
-    return first_room.score || 0;
+    return (first_room as any).score || 0;
   }
 
   /**
@@ -896,7 +912,7 @@ export class CHARACTER extends ITEM {
     this.init_skill();
     this.recount();
     this.add_score(-baseskill.query_score(skill.level, this));
-    if (baseskill.on_remove) baseskill.on_remove(this);
+    if (baseskill.on_remove) baseskill.on_remove(this, null as any);
     return true;
   }
 
@@ -1142,8 +1158,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        player.send(msg);
+      if ((player as any).is_player) {
+        (player as any).send(msg);
       }
     }
     return count;
@@ -1169,8 +1185,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        player.send(msg);
+      if ((player as any).is_player) {
+        (player as any).send(msg);
       }
     }
   }
@@ -1195,8 +1211,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        player.send(msg);
+      if ((player as any).is_player) {
+        (player as any).send(msg);
       }
     }
   }
@@ -1215,8 +1231,8 @@ export class CHARACTER extends ITEM {
     const items = this.environment.items;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        player.send(msg);
+      if ((player as any).is_player) {
+        (player as any).send(msg);
       }
     }
   }
@@ -1377,8 +1393,8 @@ export class CHARACTER extends ITEM {
     const items = this.environment.items;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        player.send(msg);
+      if ((player as any).is_player) {
+        (player as any).send(msg);
       }
     }
   }
@@ -1396,11 +1412,9 @@ export class CHARACTER extends ITEM {
 
         if (item.on_interval && !isall) {
           item.over_count = (item.over_count || 0) + 1;
-          if (item.on_interval) {
-            if ((item as any).on_interval(this, item.over_count) === false) {
-              item.duration_count = item.duration_count || 2;
-              item.over_count = item.duration_count;
-            }
+          if ((item as any).on_interval(this, item.over_count) === false) {
+            item.duration_count = item.duration_count || 2;
+            item.over_count = item.duration_count;
           }
           if (item.duration_count === 0 || ((item.duration_count || 0) > 1 && (item.duration_count || 0) > (item.over_count || 0))) {
             if (item.duration)
@@ -1463,9 +1477,9 @@ export class CHARACTER extends ITEM {
       if (!obj) continue;
       if (item[2] && obj.is_equipment) {
         if (!this.equipment) this.equipment = [];
-        this.equipment[obj.eq_type] = obj;
+        this.equipment[obj.eq_type] = obj as EQUIPMENT;
       } else {
-        this.items.push(obj);
+        this.items!.push(obj as ITEM);
       }
     }
   }
@@ -1508,7 +1522,7 @@ export class CHARACTER extends ITEM {
     if (equiped) {
       equiped.uneq(this);
       this.equipment[equiped.eq_type] = null;
-      this.items.push(equiped);
+      this.items!.push(equiped as ITEM);
       if (equiped.eq_type == EQUIP_TYPE.WEAPON) {
         this.remove_status('weapon', true);
       }
@@ -1526,7 +1540,7 @@ export class CHARACTER extends ITEM {
       }
       return false;
     }
-    this.items.remove(obj);
+    this.items!.remove(obj);
     this.equipment[obj.eq_type] = obj;
     if (obj.eq_type === EQUIP_TYPE.WEAPON) this.weapon_changed(true);
     this.recount();
@@ -1610,7 +1624,7 @@ export class CHARACTER extends ITEM {
    */
   weapon_name(): string {
     if (this.equipment && this.equipment[EQUIP_TYPE.WEAPON]) {
-      return this.equipment[EQUIP_TYPE.WEAPON].color_name;
+      return this.equipment[EQUIP_TYPE.WEAPON]!.color_name;
     }
     return '';
   }
@@ -1620,7 +1634,7 @@ export class CHARACTER extends ITEM {
    */
   throwing_name(): string {
     if (this.equipment && this.equipment[EQUIP_TYPE.THROWING]) {
-      return this.equipment[EQUIP_TYPE.THROWING].color_name;
+      return this.equipment[EQUIP_TYPE.THROWING]!.color_name;
     }
     return '';
   }
@@ -1676,7 +1690,7 @@ export class CHARACTER extends ITEM {
       const _ROOM = (globalThis as any).ROOM;
       next_room = _ROOM.Get(rm);
       if (!next_room) return false;
-      if (next_room.parent === cur_room.parent) {
+      if (cur_room && next_room.parent === cur_room.parent) {
         if (cur_room.owner) {
           next_room = next_room.query_copy(cur_room.owner);
         }
@@ -1692,18 +1706,19 @@ export class CHARACTER extends ITEM {
     if (next_room.is_full()) {
       next_room = next_room.create_shadow();
       if (!next_room) {
-        return this.notify('那里人太多了，你过不去。');
+        this.notify('那里人太多了，你过不去。');
+        return false;
       }
     }
     if (cur_room) {
-      if (cur_room.do_leave(this, dir, leave_msg) === false) {
+      if (cur_room.do_leave(this, dir!, leave_msg!) === false) {
         return false;
       }
     }
     next_room.do_enter(this, true, in_msg);
     this.notify_follower(dir);
     if (cur_room && next_room.parent !== cur_room.parent) {
-      cur_room.parent.on_leaved(this);
+      cur_room.parent!.on_leaved?.(this);
     }
   }
 
@@ -1717,7 +1732,7 @@ export class CHARACTER extends ITEM {
         return;
       }
       if (this.follow_target) {
-        this.follow_target.follow_targets.remove(this);
+        this.follow_target.follow_targets!.remove(this);
         this.send_room('$N不再跟随$n一起行动。', this.follow_target);
       }
       this.follow_target = target;
@@ -1731,7 +1746,7 @@ export class CHARACTER extends ITEM {
         this.notify('你目前没有跟随别人一起行动。');
         return;
       }
-      this.follow_target.follow_targets.remove(this);
+      this.follow_target.follow_targets!.remove(this);
       this.send_room('$N不再跟随$n一起行动。', this.follow_target);
       this.follow_target = null;
     }
@@ -1740,7 +1755,7 @@ export class CHARACTER extends ITEM {
   /** 清除所有跟随关系 */
   clear_follow(): void {
     if (this.follow_target) {
-      this.follow_target.follow_targets.remove(this);
+      this.follow_target.follow_targets!.remove(this);
       this.follow_target = null;
     }
     if (this.follow_targets) {
@@ -1765,7 +1780,7 @@ export class CHARACTER extends ITEM {
               continue;
             }
           } else {
-            if (item.environment.is_fb() != this.environment.is_fb()) {
+            if (item.environment.is_fb() != this.environment!.is_fb()) {
               continue;
             }
           }
@@ -1783,7 +1798,7 @@ export class CHARACTER extends ITEM {
   do_escape(): boolean {
     const eny = this.query_enemy();
     if (!eny) return true;
-    if (eny.on_escape) return eny.on_escape(this);
+    if (eny.on_escape) return eny.on_escape(this) ?? true;
     let is_esc = (this as any).random(this.ds / 2) + this.ds > eny.mz;
     if (eny.is_faint) is_esc = true;
     if (!is_esc) {
@@ -1806,7 +1821,7 @@ export class CHARACTER extends ITEM {
     if (!tm) return;
     for (let i = 0; i < tm.length; i++) {
       if (!tm[i].is_player && tm[i].master == this.id) {
-        if (tm[i].on_teamout) tm[i].on_teamout(tm[i]);
+        if (tm[i].on_teamout) tm[i].on_teamout!(tm[i]);
         (this as any).notify(tm[i].name + '退出了队伍。');
         tm[i].team = null;
         tm.splice(i, 1);
@@ -1892,7 +1907,7 @@ export class CHARACTER extends ITEM {
    */
   call(isbad?: boolean): string {
     if (!this.family) return this.gender == 2 ? '姑娘' : '壮士';
-    return this.family.call(this, isbad);
+    return (this.family as Record<string, any>).call(this, isbad);
   }
 
   /**
@@ -1900,7 +1915,7 @@ export class CHARACTER extends ITEM {
    */
   callme(isbad?: boolean): string {
     if (!this.family) return this.gender == 2 ? '小女子' : '在下';
-    return this.family.call_me(this);
+    return (this.family as Record<string, any>).call_me(this);
   }
 
   /**
@@ -1932,7 +1947,7 @@ export class CHARACTER extends ITEM {
   /**
    * 是否是队友
    */
-  is_team(p: CHARACTER): boolean {
+  is_team(p: CHARACTER): boolean | undefined {
     if (!p) return false;
     if (p.team) return this.team == p.team;
     return this.family == p.family;
@@ -2028,11 +2043,11 @@ export class CHARACTER extends ITEM {
     this.add_enemy(target);
     this.fight_type = this.fight_type || 0;
     if (type > this.fight_type) {
-      if (this.force_skill && this.force_skill.on_beginfight) {
-        this.force_skill.on_beginfight(this, target);
+      if (this.force_skill && (this.force_skill as Record<string, any>).on_beginfight) {
+        (this.force_skill as Record<string, any>).on_beginfight(this, target);
       }
-      if (this.attack_skill && this.attack_skill.on_beginfight) {
-        this.attack_skill.on_beginfight(this, target);
+      if (this.attack_skill && (this.attack_skill as Record<string, any>).on_beginfight) {
+        (this.attack_skill as Record<string, any>).on_beginfight(this, target);
       }
       if (!this.fight_type) {
         if (this.attack_handler) clearTimeout(this.attack_handler);
@@ -2096,11 +2111,11 @@ export class CHARACTER extends ITEM {
     const showdamage = type ? type === 'hp' : false;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if (player.is_player) {
-        if (showdamage && this.damages && player.query_setting('show_damage')) {
-          player.send(str + ',damage:' + (this.damages[player.id] || 0) + '}');
+      if ((player as any).is_player) {
+        if (showdamage && this.damages && (player as any).query_setting('show_damage')) {
+          (player as any).send(str + ',damage:' + (this.damages[player.id] || 0) + '}');
         } else {
-          player.send(str + '}');
+          (player as any).send(str + '}');
         }
       }
     }
@@ -2192,8 +2207,8 @@ export class CHARACTER extends ITEM {
   end_attack(target: CHARACTER): boolean | undefined {
     if (!target) return;
     if (!this.fight_type) return;
-    if (this.attack_skill.on_end_attack) {
-      this.attack_skill.on_end_attack(this, target);
+    if ((this.attack_skill as Record<string, any>).on_end_attack) {
+      (this.attack_skill as Record<string, any>).on_end_attack(this, target);
     }
     if (this.fight_type === 1 && target.hp / target.max_hp < 0.3) {
       if (target.hp <= 0) target.hp = 1;
@@ -2208,8 +2223,8 @@ export class CHARACTER extends ITEM {
       return this.end_fight();
     } else if (target.hp <= 0 && target.die(this) !== false) {
       target.end_fight();
-      this.enemy.remove(target);
-      if (!this.enemy.length) {
+      this.enemy!.remove(target);
+      if (!this.enemy!.length) {
         if (this.hp <= 0) {
           this.hp = 1;
         }
@@ -2273,7 +2288,7 @@ export class CHARACTER extends ITEM {
     if (!targets.length) return;
     let attack_msg = par.attack_msg;
     if (attack_msg === undefined) {
-      attack_msg = (par.no_weapon ? this.noweapon_skill : this.attack_skill).query_attack_action(this, targets[0]);
+      attack_msg = (par.no_weapon ? this.noweapon_skill : this.attack_skill)!.query_attack_action(this, targets[0]);
     }
     if (attack_msg !== '') this.send_combat(attack_msg, targets[0]);
     par.attack_msg = '';
@@ -2330,17 +2345,17 @@ export class CHARACTER extends ITEM {
     const weapon = this.query_weapon();
     const attackskill = par.no_weapon ? this.noweapon_skill : this.attack_skill;
 
-    if (attackskill.on_before_attack && !par.is_throwing && !par.no_append_before)
-      attackskill.on_before_attack(this, target, par);
-    if (this.force_skill.on_before_attack && !par.no_append_before) {
-      this.force_skill.on_before_attack(this, target, par);
+    if ((attackskill as Record<string, any>).on_before_attack && !par.is_throwing && !par.no_append_before)
+      (attackskill as Record<string, any>).on_before_attack(this, target, par);
+    if ((this.force_skill as Record<string, any>)?.on_before_attack && !par.no_append_before) {
+      (this.force_skill as Record<string, any>).on_before_attack(this, target, par);
     }
 
     this.attack_part = par.part ?? target.query_part();
 
     let attack_msg = par.attack_msg;
     if (attack_msg === undefined) {
-      attack_msg = attackskill.query_attack_action(this, target);
+      attack_msg = attackskill!.query_attack_action(this, target);
     }
     if (par.attack_before) {
       attack_msg = par.attack_before + attack_msg;
@@ -2375,15 +2390,15 @@ export class CHARACTER extends ITEM {
     }
     if (par.is_dodge) {
       if (par.on_dodge) par.on_dodge(target);
-    } else if (target.dodge_skill.on_dodge) {
-      target.dodge_skill.on_dodge(target, this, par);
+    } else if ((target.dodge_skill as Record<string, any>)?.on_dodge) {
+      (target.dodge_skill as Record<string, any>).on_dodge(target, this, par);
     }
     if (par.is_dodge) {
       sh = 0;
-      this.send_combat((par.miss_msg || target.dodge_skill.query_dodge_action()) + '\n', target);
+      this.send_combat((par.miss_msg || target.dodge_skill!.query_dodge_action()) + '\n', target);
     } else {
-      if (target.parry_skill.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
-        target.parry_skill.on_parry(target, this, par);
+      if ((target.parry_skill as Record<string, any>)?.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
+        (target.parry_skill as Record<string, any>).on_parry(target, this, par);
       }
       if (par.on_parry) {
         par.on_parry(target, par.is_parry);
@@ -2398,8 +2413,8 @@ export class CHARACTER extends ITEM {
           !par.is_throwing) {
           sh += weapon.do_attack(this, target, par);
         }
-        if (attackskill.on_attack && !par.is_throwing) {
-          sh += attackskill.on_attack(this, target, par);
+        if ((attackskill as Record<string, any>).on_attack && !par.is_throwing) {
+          sh += (attackskill as Record<string, any>).on_attack(this, target, par);
         }
         sh = sh * (this.attack_part ? this.attack_part.hert : 1);
         if (!par.no_power) {
@@ -2412,8 +2427,8 @@ export class CHARACTER extends ITEM {
         }
       }
       let power_gj = par.power_gj ?? 0;
-      if (this.force_skill.do_force_attack) {
-        power_gj += this.force_skill.do_force_attack(this, target, par);
+      if ((this.force_skill as Record<string, any>)?.do_force_attack) {
+        power_gj += (this.force_skill as Record<string, any>).do_force_attack(this, target, par);
       }
       if (power_gj > 0 && (!weapon || weapon.weapon_type === WEAPON_TYPE.NONE)) {
         power_gj = power_gj + power_gj * this.query_prop('add_sh_per') / 100;
@@ -2421,9 +2436,9 @@ export class CHARACTER extends ITEM {
           power_gj = power_gj * (150 + (par.add_bjsh_per ?? this.query_prop('add_bjsh_per'))) / 100;
       }
       if (power_gj > 0) sh += power_gj;
-      if (target.force_skill.on_force_parry) {
+      if ((target.force_skill as Record<string, any>)?.on_force_parry) {
         par.power_gj = power_gj;
-        sh -= target.force_skill.on_force_parry(target, this, sh, par);
+        sh -= (target.force_skill as Record<string, any>).on_force_parry(target, this, sh, par);
         if (this.hp <= 0 || !target.fight_type) {
           return;
         }
@@ -2432,7 +2447,7 @@ export class CHARACTER extends ITEM {
         sh = target.damage(sh, this, par.diff_fy);
 
       if (par.is_parry) {
-        this.send_combat((par.parry_msg || target.parry_skill.query_parry_action(target, this, weapon_type)) + '\n', target);
+        this.send_combat((par.parry_msg || target.parry_skill!.query_parry_action(target, this, weapon_type)) + '\n', target);
         if (sh > 0) {
           target.send_combat(query_status_msg(target.hp, target.max_hp));
           if (target.on_damage) target.on_damage(this, sh);
@@ -2449,15 +2464,15 @@ export class CHARACTER extends ITEM {
     }
     if (this.fight_type) {
       if (!par.no_append_target && target.fight_type) {
-        if (target.dodge_skill.on_dodge_over)
-          target.dodge_skill.on_dodge_over(target, this, par);
-        if (!par.is_dodge && target.parry_skill.on_parry_over)
-          target.parry_skill.on_parry_over(target, this, par);
+        if ((target.dodge_skill as Record<string, any>)?.on_dodge_over)
+          (target.dodge_skill as Record<string, any>).on_dodge_over(target, this, par);
+        if (!par.is_dodge && (target.parry_skill as Record<string, any>)?.on_parry_over)
+          (target.parry_skill as Record<string, any>).on_parry_over(target, this, par);
       }
       if (!par.no_append) {
-        if (attackskill.on_attack_over) attackskill.on_attack_over(this, target, par, sh);
-        if (this.force_skill.on_force_over)
-          this.force_skill.on_force_over(this, target, par, sh);
+        if ((attackskill as Record<string, any>).on_attack_over) (attackskill as Record<string, any>).on_attack_over(this, target, par, sh);
+        if ((this.force_skill as Record<string, any>)?.on_force_over)
+          (this.force_skill as Record<string, any>).on_force_over(this, target, par, sh);
       }
     }
     return sh;
@@ -2470,7 +2485,7 @@ export class CHARACTER extends ITEM {
     if (gjmsg) this.send_room(gjmsg);
     const is_dodge = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
     if (is_dodge) {
-      this.send_room((dsmsg || this.dodge_skill.query_dodge_action()), this);
+      this.send_room((dsmsg || this.dodge_skill!.query_dodge_action()), this);
     } else {
       this.send_room(shmsg);
       this.damage(sh);
@@ -2522,11 +2537,11 @@ export class CHARACTER extends ITEM {
       sh = (sh / (sh + fy) * sh);
     sh = sh - this.query_prop('diff_sh');
 
-    if (sh > 0 && this.equipment && this.equipment[1] && this.equipment[1].on_defense) {
-      sh = this.equipment[1].on_defense(this, from, sh);
+    if (sh > 0 && this.equipment && this.equipment[1] && (this.equipment[1] as Record<string, any>).on_defense) {
+      sh = (this.equipment[1] as Record<string, any>).on_defense(this, from, sh);
     }
-    if (sh > 0 && this.force_skill.on_damage) {
-      sh = this.force_skill.on_damage(this, from, sh);
+    if (sh > 0 && (this.force_skill as Record<string, any>)?.on_damage) {
+      sh = (this.force_skill as Record<string, any>).on_damage(this, from, sh);
     }
     if (sh > 0) {
       sh = parseInt(String(sh), 10);
@@ -2552,8 +2567,8 @@ export class CHARACTER extends ITEM {
       const damag = (this.damages[from.id] || 0) + sh;
       this.damages[from.id] = damag;
     }
-    if (this.force_skill.on_damage) {
-      sh = this.force_skill.on_damage(this, from, sh);
+    if ((this.force_skill as Record<string, any>)?.on_damage) {
+      sh = (this.force_skill as Record<string, any>).on_damage(this, from, sh);
       if (!sh) return 0;
     }
     this.add_hp(-sh);
@@ -2566,8 +2581,8 @@ export class CHARACTER extends ITEM {
   damage3(sh: number, from?: CHARACTER): number | undefined {
     if (!(sh > 0)) return;
     this.add_hp(-sh);
-    if (this.force_skill.on_damage) {
-      this.force_skill.on_damage(this, from, 0);
+    if ((this.force_skill as Record<string, any>)?.on_damage) {
+      (this.force_skill as Record<string, any>).on_damage(this, from, 0);
     }
     return sh;
   }
@@ -2629,7 +2644,7 @@ export class CHARACTER extends ITEM {
             target: target,
             gj: this.gj,
             mz: this.mz,
-          });
+          }) ?? 0;
         }
       }
     }
@@ -2648,8 +2663,8 @@ export class CHARACTER extends ITEM {
       this.send_room('<red>$N释放技能' + pfm.name + '，但是没有产生任何效果。</red>\n');
       this.remove_status('bikou');
       isrelease = true;
-    } else if (target && target.parry_skill && target.parry_skill.on_parry_pfm) {
-      isrelease = target.parry_skill.on_parry_pfm(target, this, pfm, level);
+    } else if (target && target.parry_skill && (target.parry_skill as Record<string, any>).on_parry_pfm) {
+      isrelease = (target.parry_skill as Record<string, any>).on_parry_pfm(target, this, pfm, level);
     } else {
       isrelease = pfm.use(this, target, level, sktype) !== false;
     }

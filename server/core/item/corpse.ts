@@ -12,59 +12,59 @@ export class CORPSE extends CONTAINER {
         super();
     }
 
-    // ============ Core properties ============
+    // ============ 核心属性 ============
 
-    /** Unit name */
+    /** 单位名称 */
     unit: string = "具";
-    /** Item count */
+    /** 物品数量 */
     count: number = 1;
-    /** Whether NOT to allocate to team (instance loot) */
+    /** 是否不参与队伍分配（个人拾取） */
     no_alloc: boolean = false;
-    /** Deceased character name */
+    /** 死者名称 */
     owner_name: string | null = null;
-    /** Source character id (set by init) */
+    /** 来源角色 ID（由 init 设置） */
     fromid?: string;
 
     /**
-     * Prevent direct pickup of corpse
+     * 禁止直接拾取尸体
+     * @param player - 玩家对象
      */
     on_get(player: USER): boolean {
         return false;
     }
 
     /**
-     * Initialize corpse from a dead character
-     * @param player - deceased character
-     * @param iskeep - whether to persist (instance loot)
+     * 从死亡角色初始化尸体
+     * @param player - 死亡的角色
+     * @param iskeep - 是否持久保留（副本掉落）
      */
     init(player: CHARACTER, iskeep?: boolean): void {
         this.create_id();
         this.fromid = player.id;
         this.name = player.name + "的尸体";
         this.color_name = "<wht>" + this.name + "</wht>";
-        (this as Record<string, any>).environment = (player as Record<string, any>).environment;
+        (this as any).environment = (player as Record<string, any>).environment;
         this.desc = "然而" + player.call3() + "已经死了，只剩下一具尸体静静地躺在这里。";
-        this.items = player.query_drop();
+        this.items = player.query_drop() as OBJ[] | null;
         if (!iskeep) this.call_out(this.disappear, 60000);
     }
 
     /**
-     * Temporary no-drop list for team loot allocation.
-     * Set dynamically in query_items.
+     * 临时禁止拾取列表（队伍分配时动态设置）
      */
     no_drops: string[] | null = null;
 
     /**
-     * Permission check callback for item pickup.
-     * Set dynamically in query_items.
+     * 物品拾取权限检查回调（队伍分配时动态设置）
      */
     on_getitem: ((player: USER, item: OBJ) => boolean) | null = null;
 
     /**
-     * Query corpse contents (consider team loot restrictions)
+     * 查询尸体内容物（考虑队伍分配限制）
+     * @param player - 玩家对象
      */
     query_items(player: USER): OBJ[] | undefined {
-        const env: any = (this as Record<string, any>).environment;
+        const env: any = (this as any).environment;
         if (env && env.is_fb && env.is_fb() && player.team) {
             if (!this.no_drops) {
                 this.no_drops = [];
@@ -77,12 +77,13 @@ export class CORPSE extends CONTAINER {
                 this.on_getitem = this.check_get.bind(this);
             }
         }
-        return this.items ?? undefined;
+        return (this.items ?? undefined) as OBJ[] | undefined;
     }
 
     /**
-     * Clear corpse items
-     * @param noget - items to keep (non-lootable)
+     * 清空尸体物品
+     * @param me - 角色对象
+     * @param noget - 需保留的物品（未被拾取的）
      */
     clear_items(me: CHARACTER, noget?: OBJ[]): void {
         if (this.items) this.items.length = 0;
@@ -90,7 +91,9 @@ export class CORPSE extends CONTAINER {
     }
 
     /**
-     * Check if player can loot an item
+     * 检查玩家是否可以拾取某件物品
+     * @param player - 玩家对象
+     * @param item - 物品对象
      */
     check_get(player: USER, item: OBJ): boolean {
         if (!this.no_drops) return true;
@@ -100,11 +103,11 @@ export class CORPSE extends CONTAINER {
     }
 
     /**
-     * Corpse disappearance
+     * 尸体消失处理
      */
     disappear(): void {
         if (this.items) this.items.length = 0;
-        const env: any = (this as Record<string, any>).environment;
+        const env: any = (this as any).environment;
         if (env) {
             env.notify("一阵风吹去，" + this.name + "已经不见了。");
             env.item_changed(this, false);
@@ -112,16 +115,17 @@ export class CORPSE extends CONTAINER {
     }
 
     /**
-     * Query description JSON (with no_alloc support)
+     * 查询描述 JSON（支持 no_alloc 控制全部拾取按钮）
+     * @param me - 玩家对象
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: Record<string, any> = {};
+        const obj: Record<string, unknown> = {};
         obj.type = "item";
         obj.desc = this.get_desc(me);
         obj.id = this.id;
-        obj.commands = [];
-        obj.commands.push({
+        (obj as any).commands = [];
+        (obj as any).commands.push({
             cmd: "get all from " + this.id,
             name: "全部拾取"
         });

@@ -40,6 +40,22 @@ import type {
   ServerConfig,
 } from '../types/world.js';
 import type { UID } from '../types/base.js';
+import type { USER } from './char/user.js';
+import type { CHARACTER } from './char/character.js';
+import type { COMMAND } from './command.js';
+import type { SKILL } from './skill/skill.js';
+import type { ROOM } from './room/room.js';
+import type { AREA } from './room/area.js';
+import type { USERTASK } from './task/playertask.js';
+import type { TASK } from './task/task.js';
+import type { OBJ } from './item/obj.js';
+import type { NPC } from './char/npc.js';
+import type { EQUIPMENT } from './item/equipment.js';
+import type { CORPSE } from './item/corpse.js';
+import type { DataObject } from './data.js';
+import type { UserLoginModule } from './login.js';
+import type wsServer from './net-ws.js';
+import type { EventItem } from './task/events.js';
 
 // ============================================================
 // 全局类型声明
@@ -64,29 +80,29 @@ class World implements IWorld {
   // ========== 核心状态 ==========
 
   /** 在线用户列表 */
-  USERS: any[] = [];
+  USERS: USER[] = [];
   /** 命令注册表 (命令名 → COMMAND 实例) */
-  COMMANDS: Record<string, any> = {};
+  COMMANDS: Record<string, COMMAND> = {};
   /** 技能注册表 (技能 ID → SKILL 实例) */
-  SKILLS: Record<string, any> = {};
+  SKILLS: Record<string, SKILL> = {};
   /** 房间注册表 (路径 → ROOM 实例) */
-  ROOMS: Record<string, any> = {};
+  ROOMS: Record<string, ROOM> = {};
   /** 运行中的房间列表（含心跳） */
-  RUN_ROOMS: any[] = [];
+  RUN_ROOMS: ROOM[] = [];
   /** 默认技能注册表 */
-  DEFAULT_SKILLS: Record<string, any> = {};
+  DEFAULT_SKILLS: Record<string, SKILL> = {};
   /** 区域列表 */
-  AREAS: any[] = [];
+  AREAS: AREA[] = [];
   /** 玩家任务列表 */
-  TASKS: any[] = [];
+  TASKS: USERTASK[] = [];
   /** 系统任务列表 */
-  SYSTEMTASKS: any[] = [];
+  SYSTEMTASKS: TASK[] = [];
   /** 用户活动事件列表 */
-  USER_EVENTS: any[] = [];
+  USER_EVENTS: EventItem[] = [];
   /** 物品原型缓存 (path → OBJ 原型) */
-  OBJ_STROE: Map<string, any> = new Map();
+  OBJ_STROE: Map<string, OBJ> = new Map();
   /** NPC 原型缓存 (path → NPC 原型) */
-  NPC_STROE: Map<string, any> = new Map();
+  NPC_STROE: Map<string, NPC> = new Map();
   /** 心跳计数（用于定时保存） */
   HEARTBEATCOUNT: number = 0;
 
@@ -99,7 +115,7 @@ class World implements IWorld {
   /** 当前服务器 ID */
   SERVERID: number = 0;
   /** 所有服务器配置列表 */
-  SERVERS: any[] = [];
+  SERVERS: ServerConfig[] = [];
   /** 当前活跃连接数 */
   CONNECT_COUNT: number = 0;
   /** 累计 socket 接入数 */
@@ -112,13 +128,13 @@ class World implements IWorld {
   // ========== 子系统 ==========
 
   /** 全局持久化数据 */
-  DATA: any = WORLD_DATA;
+  DATA: DataObject = WORLD_DATA;
   /** 登录/会话管理模块 */
-  USERLOGIN: any = USERLOGIN_MODULE;
+  USERLOGIN: UserLoginModule = USERLOGIN_MODULE;
   /** 数据库操作模块 */
-  DB: any = db;
+  DB: Record<string, (...args: any[]) => any> = db;
   /** WebSocket 监听模块 */
-  LISTENER: any = LISTENER_MODULE;
+  LISTENER: wsServer = LISTENER_MODULE;
 
   /**
    * 消息子系统 — 管理用户私信和系统公告
@@ -353,7 +369,7 @@ class World implements IWorld {
      * @param defname - 默认名称
      * @param key - 门派标识
      */
-    load_tops(tops: any[], defname: string, key: string): any[] {
+    load_tops(tops?: any[], defname?: string, key?: string): any[] {
       return [];
     },
     /**
@@ -368,7 +384,7 @@ class World implements IWorld {
      */
     checkStats(player: any): void {
       this.updateScore(player);
-      WORLD.COMMANDS.biwu.checkStats(player);
+      (WORLD.COMMANDS.biwu as Record<string, any>).checkStats(player);
     },
 
     /**
@@ -575,7 +591,7 @@ class World implements IWorld {
   heart_beat_service: ReturnType<typeof setInterval> | null = null;
   heartbeat_interval: number = 1000;
   SERVER: ServerConfig | null = null;
-  DEFAULT_COMMAND: any = null;
+  DEFAULT_COMMAND: COMMAND | null = null;
 
   // ========== 扩展属性 (由 world/extends/world.js 注入) ==========
   [key: string]: any;
@@ -669,7 +685,7 @@ class World implements IWorld {
   async startup(sid?: number): Promise<void> {
     if (sid) {
       sid = parseInt(sid as any);
-      this.SERVERS = await db.getServers();
+      this.SERVERS = (await db.getServers()) as ServerConfig[];
       this.SERVER = this.getServer(sid);
     } else {
       this.SERVER = __CONFIG.def_server;
@@ -706,7 +722,7 @@ class World implements IWorld {
   /**
    * 根据 ID 获取用户
    */
-  getUser(id: string | number): any | undefined {
+  getUser(id: string | number): USER | undefined {
     if (!id) return undefined;
     for (let i = 0; i < this.USERS.length; i++) {
       if (this.USERS[i].id == id) return this.USERS[i];
@@ -717,7 +733,7 @@ class World implements IWorld {
   /**
    * 根据名字查找用户
    */
-  find_user(name: string): any | undefined {
+  find_user(name: string): USER | undefined {
     if (!name) return undefined;
     for (let i = 0; i < this.USERS.length; i++) {
       if (this.USERS[i].name == name) return this.USERS[i];
@@ -726,23 +742,23 @@ class World implements IWorld {
   }
 
   /**
-   * 用户登录事件回调 (由 extends 覆盖)
+   * 用户登录事件回调 — 触发时机：玩家完成登录验证、角色数据加载后（由 extends 覆盖）
    */
-  on_user_login(user: any): void {
+  on_user_login(user: USER): void {
     // stub — overridden by extends
   }
 
   /**
-   * 跨服登录事件回调 (由 extends 覆盖)
+   * 跨服登录事件回调 — 触发时机：玩家从其他服务器跳转登录时（由 extends 覆盖）
    */
-  on_user_cross_login(user: any): void {
+  on_user_cross_login(user: USER): void {
     // stub — overridden by extends
   }
 
   /**
-   * 用户重连事件回调 (由 extends 覆盖)
+   * 用户重连事件回调 — 触发时机：玩家断线后重新连线时（由 extends 覆盖）
    */
-  on_user_relogin(user: any): void {
+  on_user_relogin(user: USER): void {
     // stub — overridden by extends
   }
 
@@ -782,7 +798,7 @@ class World implements IWorld {
   /**
    * 用户登出处理
    */
-  login_out(user: any): void {
+  login_out(user: USER): void {
     this.on_user_quit(user);
     if (user.serverid === this.SERVERID) {
       user.save();
@@ -881,7 +897,7 @@ class World implements IWorld {
       '_' +
       dt.getMinutes() +
       '.heapsnapshot';
-    v8.writeHeapSnapshot(fname);
+    (v8 as any).writeHeapSnapshot(fname);
     console.log('快照保存到', fname);
   }
 
@@ -891,14 +907,14 @@ class World implements IWorld {
   }
 
   /**
-   * 跨服响应回调 (由 extends 覆盖)
+   * 跨服响应回调 — 触发时机：收到其他服务器的跨服消息时（由 extends 覆盖）
    */
   on_cross_response(id: string, sid: string): void {
     // 允许跨服
   }
 
   /**
-   * 是否允许跨服 (由 extends 覆盖)
+   * 是否允许跨服 — 触发时机：玩家跨服登录验证时（由 extends 覆盖）
    */
   can_cross(id: string): boolean {
     // 允许跨服
@@ -906,32 +922,32 @@ class World implements IWorld {
   }
 
   /**
-   * 用户死亡事件回调 (由 extends 覆盖)
+   * 用户死亡事件回调 — 触发时机：玩家 die() 末尾，状态检查和尸体生成之后（由 extends 覆盖）
    */
   on_user_die(me: any, killer: any, corpse: any): void {
     // stub — overridden by extends
   }
 
-  /** 资源加载完成回调 (由 extends 覆盖) */
+  /** 资源加载完成回调 — 触发时机：loadResource() 全部资源文件 preload+create 完成后（由 extends 覆盖） */
   on_resource_loaded(): void {
     // stub — overridden by extends
   }
 
   // ============ WORLD 方法 (由 extends 合并) ============
 
-  /** 服务启动回调 */
+  /** 服务启动回调 — 触发时机：startup() 末尾，资源加载完成、数据恢复后 */
   on_startup(): void {
     for (const fam in FAMILIES) {
       FAMILIES[fam].init();
     }
-    this.COMMANDS.jh.init();
+    (this.COMMANDS.jh as Record<string, any>).init();
   }
 
-  /** 玩家退出时调用 */
-  on_user_quit(user: any): void {
+  /** 玩家退出时调用 — 触发时机：login_out() 中，用户从 USERS 列表移除前 */
+  on_user_quit(user: USER): void {
     if (this.is_server(user)) {
       if (user.query_temp('pt')) {
-        this.COMMANDS['party'].on_user_login(user, false);
+        (this.COMMANDS['party'] as Record<string, any>).on_user_login(user, false);
       }
       this.on_user_save(user);
     } else {
@@ -942,12 +958,12 @@ class World implements IWorld {
     }
   }
 
-  /** 玩家退出或关闭时保存 */
-  on_user_save(user: any): void {
+  /** 玩家退出时保存 — 触发时机：on_user_quit() 末尾（仅本服玩家） */
+  on_user_save(user: USER): void {
     // stub — overridden by extends
   }
 
-  /** 心跳回调 (由 extends 覆盖) */
+  /** 心跳回调 — 触发时机：主心跳循环 heart_beat() 中，遍历所有用户之后（由 extends 覆盖） */
   on_heart_beat(now: number): void {
     // stub — overridden by extends
   }

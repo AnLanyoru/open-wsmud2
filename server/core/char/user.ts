@@ -49,37 +49,57 @@ const DIE_MSG = [
 
 /** 数据库角色记录格式 */
 interface RoleRecord {
+  /** 角色 ID */
   id: string;
+  /** 角色名称 */
   name: string;
+  /** 角色等级 */
   level: number;
+  /** 序列化后的完整角色数据 */
   data: string;
+  /** 用户权限等级 */
   user_level: number;
 }
 
-/** 状态对象 */
+/** 玩家状态对象（打坐/练功/闭关等） */
 interface UserState {
+  /** 状态标题（如 "打坐中"） */
   title: string;
+  /** 状态触发频率（心跳次数） */
   rate?: number;
+  /** 心跳累计计数 */
   heat_count?: number;
+  /** 状态开始时间戳 */
   start_time?: number;
+  /** 状态描述 */
   desc?: string;
+  /** 是否禁止手动停止 */
   no_stop?: boolean;
+  /** 自定义命令 JSON */
   commands?: string;
+  /** 是否允许战斗中执行 */
   allow_fight?: boolean;
+  /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
   on_enter?: (me: CHARACTER, dt?: number) => boolean | void;
+  /** 状态停止回调，isauto 表示是否自动停止 */
   on_stop?: (me: CHARACTER, isauto?: boolean) => boolean | void;
 }
 
 /** 称号条目 */
 interface TitleEntry {
+  /** 称号文本 */
   title: string;
+  /** 称号类型 */
   type: string;
+  /** 是否正在使用 */
   use: boolean;
 }
 
 /** 随从描述 */
 interface FollowerDesc {
+  /** 随从 ID */
   id: string;
+  /** 随从模板路径 */
   path: string;
 }
 
@@ -152,12 +172,12 @@ export class USER extends CHARACTER {
   /** 当前装备组 */
   eq_group: number = 0;
   /** 装备组定义 */
-  eq_groups: any[] | null = null;
+  eq_groups: string[][] | null = null;
 
   // ============ 技能 ============
 
   /** 技能组定义 */
-  sk_groups: any[] | null = null;
+  sk_groups: (string[] | null)[] | null = null;
   /** 秘籍列表 */
   books: string[] | null = null;
 
@@ -169,7 +189,7 @@ export class USER extends CHARACTER {
   // ============ 设置与数据 ============
 
   /** 用户设置 */
-  settings: Record<string, any> | null = null;
+  settings: Record<string, number> | null = null;
   /** 临时数据 */
   temp: Record<string, any> | null = null;
   /** 称号列表 */
@@ -203,7 +223,7 @@ export class USER extends CHARACTER {
    */
   send(text: string): void {
     if (this.socket && text && text.length < 30240) {
-      this.socket.send(text);
+      this.socket.send?.(text);
     }
   }
 
@@ -289,26 +309,26 @@ export class USER extends CHARACTER {
    */
   relogin(newUser: USER): void {
     if (!newUser.socket) return;
-    (newUser.socket as any).user = null;
+    (newUser.socket as { user: USER | null }).user = null;
     this.socket = newUser.socket;
     newUser.socket = null;
-    (this.socket as any).user = this;
+    (this.socket as { user: USER | null }).user = this;
     this.send_loginmessage();
 
     if (!this.environment) {
-      const rm = ROOM.Get(this.quit_room);
+      const rm = ROOM.Get(this.quit_room!);
       if (!rm) {
         this.send('出现错误，请联系管理员报告BUG，谢谢！');
         return;
       }
       this.environment = rm;
     }
-    this.send((this.environment as any).to_json());
-    (this.environment as any).send_exits(this);
-    this.send((this.environment as any).items_to_json());
+    this.send((this.environment as ROOM).to_json());
+    (this.environment as ROOM).send_exits(this);
+    this.send((this.environment as ROOM).items_to_json());
     this.send_room(this.name + '重新连线。');
-    if ((this.environment as any).on_relogin) {
-      (this.environment as any).on_relogin(this);
+    if ((this.environment as unknown as Record<string, unknown>).on_relogin) {
+      ((this.environment as unknown as Record<string, unknown>).on_relogin as (me: USER) => void)(this);
     }
     this.disconnect_time = 0;
     this.check_state();
@@ -319,14 +339,14 @@ export class USER extends CHARACTER {
    * 获取IP地址
    */
   ip(): string {
-    return (this.socket as any).remoteAddress;
+    return this.socket?.remoteAddress ?? '';
   }
 
   /**
    * 获取端口
    */
   port(): number {
-    return (this.socket as any).remotePort;
+    return this.socket?.remotePort ?? 0;
   }
 
   /** 退出游戏 */
@@ -337,8 +357,8 @@ export class USER extends CHARACTER {
       this.environment.item_changed(this, false, this.name + '离开了游戏。');
       this.environment = rm;
       this.clear_follow();
-      this.environment.clear_copy(this);
-      this.environment.parent.on_leaved(this);
+      (this.environment as ROOM).clear_copy(this);
+      (this.environment as ROOM).parent?.on_leaved?.(this);
     }
     this.environment = null;
     this.clear_status();
@@ -348,7 +368,7 @@ export class USER extends CHARACTER {
 
     this.clear_home();
     if (this.socket) {
-      (this.socket as any).user = null;
+      (this.socket as { user: USER | null }).user = null;
       this.socket = null;
     }
   }
@@ -373,7 +393,7 @@ export class USER extends CHARACTER {
     if (this.socket) {
       const socket = this.socket;
       this.socket = null;
-      (socket as any).user = null;
+      (socket as { user: USER | null }).user = null;
       socket.end();
     }
   }
@@ -387,15 +407,15 @@ export class USER extends CHARACTER {
     this.id = role.id;
     this.name = role.name;
     this.level = role.level;
-    const data: any = (JSON as any).toObject(role.data);
+    const data: any = (JSON as { toObject(s: string): Record<string, unknown> }).toObject(role.data);
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      (this as any)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
+      (this as unknown as Record<string, number | undefined>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
     }
     this.quit_room = data.quit_room;
     this.items = this.read_items(data.items);
     this.stores = this.read_items(data.stores);
     this.books = data.books ?? [];
-    this.equipment = this.read_items(data.eq);
+    this.equipment = this.read_items(data.eq) as EQUIPMENT[];
     this.settings = data.settings;
 
     this.skills = data.skills ?? {};
@@ -415,7 +435,7 @@ export class USER extends CHARACTER {
     }
     const fam: any = this.query_temp('family');
     if (fam) {
-      this.family = (FAMILIES as any)[fam] || FAMILIES.NONE;
+      this.family = (FAMILIES as Record<string, FAMILY>)[fam] || FAMILIES.NONE;
     }
     this.user_level = role.user_level;
   }
@@ -468,10 +488,10 @@ export class USER extends CHARACTER {
     WORLD.STATS.checkStats(this);
     this.send_loginmessage();
     if (this.family) this.family.on_login(this);
-    let rm = ROOM.Get((this.query_temp('new') as any) ? 'new/new1' : this.quit_room);
+    let rm = ROOM.Get((this.query_temp('new') as any) ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
     if (!rm || rm.is_fb()) rm = ROOM.Get(DEFAULT_ROOM);
-    if (rm.is_copy()) {
-      let copy_room = rm.query_copy2(this) as any;
+    if (rm!.is_copy()) {
+      let copy_room = rm!.query_copy2(this) as any;
       if (copy_room) {
         this.moveto(copy_room, null as any, this.name + '连线进入这个世界。');
       } else {
@@ -480,14 +500,14 @@ export class USER extends CHARACTER {
           this.items = [];
           (this as any).exp = (this as any).pot = this.money = 0;
         }
-        copy_room = rm.create_copy2(this);
+        copy_room = rm!.create_copy2(this);
         this.moveto(copy_room);
       }
     } else {
       this.moveto(rm, null as any, this.name + '连线进入这个世界。');
     }
     this.check_state();
-    if (this.follower && (!this.environment || (this.environment as any).parent.id !== 'home')) {
+    if (this.follower && (!this.environment || (this.environment as unknown as { parent: { id: string } }).parent.id !== 'home')) {
       const home = ROOM.Get('home/yuanzi');
       if (home) {
         let copy_home = home.query_copy2(this) as any;
@@ -509,23 +529,23 @@ export class USER extends CHARACTER {
   /**
    * 获取玩家存档数据
    */
-  getData(): Record<string, any> {
+  getData(): Record<string, unknown> {
     const str: string[] = ['{prop:['];
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      str.push((this as any)[SAVE_NUMPROP[i]]);
+      str.push(String((this as unknown as Record<string, number | undefined>)[SAVE_NUMPROP[i]]));
       str.push(',');
     }
     str.push('0');
     str.push('],quit_room:"');
     if (this.environment) {
-      if (this.environment.is_fb() || (this.environment as any).no_save
-        || (this.environment as any).parent.no_save) {
-        str.push(this.query_temp('enter_room'));
+      if (this.environment.is_fb() || (this.environment as unknown as Record<string, unknown>).no_save
+        || (this.environment as unknown as { parent: Record<string, unknown> }).parent.no_save) {
+        str.push(this.query_temp('enter_room') as string);
       } else {
-        str.push((this.environment as any).path);
+        str.push((this.environment as ROOM).path);
       }
     } else {
-      str.push(this.query_temp('enter_room', DEFAULT_ROOM));
+      str.push(this.query_temp('enter_room', DEFAULT_ROOM) as string);
     }
     str.push('"');
 
@@ -627,7 +647,7 @@ export class USER extends CHARACTER {
    * 玩家死亡处理
    */
   die(killer: CHARACTER): boolean | undefined {
-    if ((this as any).on_die && (this as any).on_die(killer) === false) {
+    if (this.on_die && this.on_die(killer) === false) {
       this.hp = 1;
       return false;
     }
@@ -636,17 +656,17 @@ export class USER extends CHARACTER {
     this.hp = 0;
     this.mp = 0;
 
-    this.send_room((DIE_MSG as any).random());
+    this.send_room((DIE_MSG as unknown as { random(): string }).random());
     const env = this.environment;
-    if (env.items.length < 10) {
+    if (env && env.items.length < 10) {
       const corpse = new CORPSE();
       corpse.init(this);
       env.item_changed(corpse, true);
     }
-    env.item_changed(this, false);
+    if (env) env.item_changed(this, false);
     this.environment = env;
     this.check_state();
-    WORLD.on_user_die(this, killer);
+    WORLD.on_user_die(this, killer, undefined);
     (this as any).on_died?.(killer);
   }
 
@@ -709,14 +729,14 @@ export class USER extends CHARACTER {
   /**
    * 查询指定类型的称号
    */
-  query_title(type: string): string | null {
-    if (!this.titles) return null;
+  query_title(type: string): string | undefined {
+    if (!this.titles) return undefined;
     for (let i = 0; i < this.titles.length; i++) {
       if (this.titles[i].type == type) {
         return this.titles[i].title;
       }
     }
-    return null;
+    return undefined;
   }
 
   /**
@@ -769,7 +789,7 @@ export class USER extends CHARACTER {
       delete this.settings[name];
     } else {
       if (value == '1') value = 1;
-      this.settings[name] = value;
+      this.settings[name] = value as unknown as number;
     }
 
     this.login_message = null;
@@ -782,17 +802,17 @@ export class USER extends CHARACTER {
    */
   heart_beat(dt: number): void {
     this.request_count = 0;
-    const st = this.state as any;
+    const st = this.state as unknown as UserState;
     if (st && (!this.fight_type || st.allow_fight)) {
-      st.heat_count += 1;
-      if (st.heat_count >= st.rate) {
+      st.heat_count! += 1;
+      if (st.heat_count! >= st.rate!) {
         st.heat_count = 0;
-        if (st.on_enter(this, dt) === false) {
+        if (st.on_enter?.(this as unknown as CHARACTER, dt) === false) {
           this.set_state(null, true);
         }
       }
     }
-    (this as any).on_heart_beat?.(dt);
+    this.on_heart_beat?.(dt);
     if (this.disconnect_time) {
       if (dt - this.disconnect_time > (this.state ? 86400000 : 3600000)) {
         this.quit();
@@ -843,7 +863,7 @@ export class USER extends CHARACTER {
   get_state(): string {
     let str = '';
     if (!this.socket) str += '<red>&lt;断线中&gt;</red>';
-    if (this.state) str += '<hig>&lt;' + (this.state as any).title + '&gt;</hig>';
+    if (this.state) str += '<hig>&lt;' + (this.state as unknown as UserState).title + '&gt;</hig>';
     return str;
   }
 
@@ -882,7 +902,7 @@ export class USER extends CHARACTER {
   /** 初始化用户任务 */
   init_tasks(): void {
     for (let i = 0; i < WORLD.TASKS.length; i++) {
-      const task = WORLD.TASKS[i];
+      const task = WORLD.TASKS[i] as any;
       task.on_start && task.on_start(this);
     }
   }
@@ -891,8 +911,8 @@ export class USER extends CHARACTER {
    * 查询精力值
    */
   query_jingli(): number {
-    const expend: number = this.query_temp('ex_jl') || 0;
-    return 200 - expend + (this.query_temp('ad_jl') || 0);
+    const expend: number = (this.query_temp('ex_jl') as number) || 0;
+    return 200 - expend + ((this.query_temp('ad_jl') as number) || 0);
   }
 
   /**
@@ -1003,7 +1023,7 @@ export class USER extends CHARACTER {
           if (sp_skill && sp_skill.pfm) {
             const sk_level = this.query_skill(base_skill.enable_skill || base_type, 0);
             for (const p in sp_skill.pfm) {
-              const pfmitem = sp_skill.pfm[p];
+              const pfmitem = sp_skill.pfm[p] as any;
               if (pfmitem.check && !pfmitem.check(this, sk_level, base_type)) continue;
               if (pfmitem.enable_skill && pfmitem.enable_skill !== base_type) continue;
               if (str.length > 1) str.push(',');
@@ -1014,7 +1034,7 @@ export class USER extends CHARACTER {
               str.push('"');
               if (pfmitem.distime) {
                 str.push(',distime:');
-                str.push(pfmitem.query_distime(this));
+                str.push((pfmitem as any).query_distime(this));
               }
               str.push('}');
             }
@@ -1057,6 +1077,7 @@ export class USER extends CHARACTER {
     if (!home) return null;
     if (!rm_name) rm_name = home == 1 ? 'home/danjian' : 'home/yuanzi';
     const rm = ROOM.Get(rm_name);
+    if (!rm) return null;
     let my_room = rm.query_copy2(this) as any;
     if (!my_room) {
       my_room = rm.create_copy2(this);
@@ -1080,7 +1101,7 @@ export class USER extends CHARACTER {
    * @returns 是否成功
    */
   add_money(val: number): boolean {
-    const money = parseInt((this.money + val) as any);
+    const money = parseInt(String(this.money + val));
     if (!(money >= 0)) return false;
     this.money = money;
     return true;
@@ -1113,10 +1134,10 @@ export class USER extends CHARACTER {
    */
   can_follow(npc: NPC): boolean {
     if (!this.follower) this.follower = [];
-    const max: number = this.query_temp('max_follower') || 3;
+    const max: number = (this.query_temp('max_follower') as number) || 3;
     if (this.follower.length >= max) return false;
     for (let i = 0; i < this.follower.length; i++) {
-      if (this.follower[i].path == (npc as any).path) {
+      if (this.follower[i].path == (npc as { path: string }).path) {
         return false;
       }
     }
@@ -1129,7 +1150,7 @@ export class USER extends CHARACTER {
   add_follower(npc: NPC): boolean {
     if (!this.can_follow(npc)) return false;
     const item: FollowerDesc = {
-      path: (npc as any).path,
+      path: (npc as { path: string }).path,
       id: npc.id,
     };
     (this.follower as FollowerDesc[]).push(item);
@@ -1316,7 +1337,7 @@ export class USER extends CHARACTER {
       this.notify('<hiw>你的先天属性增加了1点。</hiw>');
     }
     (this as any).color_name = null;
-    this.environment.item_changed(this, true);
+    this.environment!.item_changed(this, true);
     this.send(`{type:"levelup",level:${this.level}}`);
   }
 
@@ -1334,7 +1355,7 @@ export class USER extends CHARACTER {
    * 查询队伍ID
    */
   query_teamid(): string {
-    if (this.team) return (this.team as any).id;
+    if (this.team) return (this.team as unknown as { id: string }).id;
     return this.id;
   }
 
@@ -1344,7 +1365,7 @@ export class USER extends CHARACTER {
   can_trans(): boolean {
     if (!this.environment) return true;
     if (this.environment.is_fb()) return this.notify_fail('你现在正在副本区域。');
-    if ((this.environment as any).parent.on_leave(this) == false) return false;
+    if ((this.environment as unknown as { parent: { on_leave: (me: CHARACTER) => boolean | void } }).parent.on_leave(this) == false) return false;
     return true;
   }
 
@@ -1352,10 +1373,11 @@ export class USER extends CHARACTER {
 
   /** 解锁当前区域 */
   enable_area(): void {
-    const area = (this.environment as any).parent;
-    if (!(area.jd_index >= 0)) return;
-    if (!this.query_bool('fb2', area.jd_index)) {
-      this.set_bool('fb2', area.jd_index, true);
+    const area = (this.environment as ROOM).parent!;
+    const jd_idx = area.jd_index!;
+    if (!(jd_idx >= 0)) return;
+    if (!this.query_bool('fb2', jd_idx)) {
+      this.set_bool('fb2', jd_idx, true);
       this.send('<him>你解锁新地图【' + area.name + '】。</him>');
       this.send(`{type:"dialog",dialog:"jh",unlock2:${this.query_temp('fb2', 0)}}`);
     }
@@ -1377,9 +1399,9 @@ export class USER extends CHARACTER {
    * 按位查询布尔值
    */
   query_bool(key: string, index: number): boolean {
-    let step = parseInt((index / 32) as any);
+    let step = Math.floor(index / 32);
     if (step > 0) key = key.toString() + step.toString();
-    const num: number = this.query_temp(key, 0);
+    const num: number = (this.query_temp(key, 0) as number) || 0;
     if (!num) return false;
     const bit = index % 32;
     return (num & (1 << bit)) !== 0;
@@ -1389,9 +1411,9 @@ export class USER extends CHARACTER {
    * 按位设置布尔值
    */
   set_bool(key: string, index: number, value: any, time?: number): void {
-    let step = parseInt((index / 32) as any);
+    let step = Math.floor(index / 32);
     if (step > 0) key = key.toString() + step.toString();
-    const num: number = this.query_temp(key, 0);
+    const num: number = (this.query_temp(key, 0) as number) || 0;
     const bit = index % 32;
     if (value) {
       this.set_temp(key, num | (1 << bit), time);
@@ -1404,7 +1426,7 @@ export class USER extends CHARACTER {
    * 清除位标记区域
    */
   clear_bool(key: string, count: number): void {
-    const num: number = this.query_temp(key, 0);
+    const num: number = (this.query_temp(key, 0) as number) || 0;
     if (!num) return;
     for (let i = 0; i < count; i++) {
       if ((num & (1 << i)) !== 0) {
@@ -1421,18 +1443,18 @@ export class USER extends CHARACTER {
    */
   expend_jingli(val: number): boolean {
     if (val > 0 && this.query_jingli() >= val) {
-      const expend: number = this.query_temp('ex_jl', 0);
+      const expend: number = (this.query_temp('ex_jl', 0) as number) || 0;
       if (expend >= 200) {
-        const add: number = this.query_temp('ad_jl', 0);
+        const add: number = (this.query_temp('ad_jl', 0) as number) || 0;
         if (add < val) return false;
         this.add_temp('ad_jl', -val);
       } else {
         if (expend + val > 200) {
-          this.set_temp('ex_jl', 200, (UTIL as any).diff_time());
+          this.set_temp('ex_jl', 200, (UTIL as { diff_time(h?: number): number }).diff_time());
           val = val - (200 - expend);
           this.add_temp('ad_jl', -val);
         } else {
-          this.add_temp('ex_jl', val, (UTIL as any).diff_time());
+          this.add_temp('ex_jl', val, (UTIL as { diff_time(h?: number): number }).diff_time());
         }
       }
       return true;
@@ -1444,15 +1466,15 @@ export class USER extends CHARACTER {
    * 检查自定义技能ID
    */
   create_for(id: string): boolean {
-    if (!(this as any).custom_skills) return false;
-    return (this as any).custom_skills.indexOf(id) > -1;
+    if (!(this as { custom_skills?: string[] }).custom_skills) return false;
+    return (this as { custom_skills?: string[] }).custom_skills!.indexOf(id) > -1;
   }
 
   /**
    * 查询玩家年龄
    */
   query_age(): number {
-    const dt = Date.now() - (this as any).reg_time * 60000;
-    return 14 + dt / 86400000 / 12 - this.query_prop('age') - this.query_temp('age', 0);
+    const dt = Date.now() - (this as unknown as Record<string, number>).reg_time * 60000;
+    return 14 + dt / 86400000 / 12 - this.query_prop('age') - (this.query_temp('age', 0) as number);
   }
 }

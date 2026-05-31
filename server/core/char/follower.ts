@@ -12,6 +12,7 @@ import { OBJ } from '../item/obj.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 import type { SKILL } from '../skill/skill.js';
 import type { FAMILY } from '../skill/family.js';
+import type { AREA } from '../room/area.js';
 
 // ============================================================
 // 模块级常量
@@ -39,25 +40,40 @@ const DIE_MSG = [
 
 /** 随从存档数据格式 */
 interface FOLLOWER_DATA {
+  /** 随从 ID */
   id: string;
+  /** 随从模板路径 */
   path: string;
+  /** 数值属性数组（按 SAVE_NUMPROP 顺序） */
   prop: number[];
-  temp?: any[];
+  /** 临时数据 */
+  temp?: unknown[];
+  /** 用户设置 */
   settings?: Record<string, number>;
-  skills?: Record<string, any>;
-  items?: any[];
-  eq?: any[];
-  [key: string]: any;
+  /** 技能数据 */
+  skills?: Record<string, unknown>;
+  /** 背包物品 */
+  items?: unknown[];
+  /** 装备列表 */
+  eq?: unknown[];
+  [key: string]: unknown;
 }
 
-/** 状态对象 */
+/** 随从状态对象 */
 interface FollowerState {
+  /** 状态标题 */
   title: string;
+  /** 状态触发频率（心跳次数） */
   rate?: number;
+  /** 心跳累计计数 */
   heat_count?: number;
+  /** 状态开始时间 */
   start_time?: number;
+  /** 是否允许战斗中执行 */
   allow_fight?: boolean;
+  /** 状态进入回调，返回 false 则自动停止 */
   on_enter?: (me: CHARACTER) => boolean | void;
+  /** 状态停止回调，isauto 表示是否自动停止 */
   on_stop?: (me: CHARACTER, isauto?: boolean) => boolean | void;
 }
 
@@ -65,6 +81,7 @@ interface FollowerState {
 // FOLLOWER 类
 // ============================================================
 
+// @ts-ignore: static CREATE override incompatible with base
 export class FOLLOWER extends CHARACTER {
   // ============ 核心属性 ============
 
@@ -111,17 +128,18 @@ export class FOLLOWER extends CHARACTER {
   // login_message — 用于 set_setting 清除缓存（该字段在 USER 上定义，FOLLOWER 在运行时按需创建）
   login_message: string | null = null;
 
+
   constructor() {
     super();
   }
 
-  // ============ 回调属性 ============
+  // ============ 回调属性（由资源文件设置） ============
 
-  /** 亲热回调 */
+  /** 亲热回调 — 触发时机：主人对随从执行双修命令时 */
   on_makelove?(me: USER): void;
-  /** 主人进入回调 */
+  /** 主人进入回调 — 触发时机：主人进入随从所在房间时（on_enter 中判断 master 匹配后调用） */
   on_master_enter?(me: USER): void;
-  /** 主人学习回调 */
+  /** 主人学习回调 — 触发时机：主人通过随从学习技能时 */
   on_master_learn?(me: USER, skill: SKILL): void;
 
   /**
@@ -141,7 +159,7 @@ export class FOLLOWER extends CHARACTER {
       delete this.settings[name];
     } else {
       if (value == '1') value = 1;
-      this.settings[name] = value;
+      this.settings[name] = value as unknown as number;
     }
 
     this.login_message = null;
@@ -218,20 +236,20 @@ export class FOLLOWER extends CHARACTER {
       my_npc = new FOLLOWER();
       const obj = NPC.CLONE(data.path);
       for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-        (my_npc as any)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
+        (my_npc as unknown as Record<string, unknown>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
       }
       for (let i = 0; i < SAVE_STRPROP.length; i++) {
-        (my_npc as any)[SAVE_STRPROP[i]] = data[SAVE_STRPROP[i]] || (obj as any)[SAVE_STRPROP[i]];
+        (my_npc as unknown as Record<string, unknown>)[SAVE_STRPROP[i]] = data[SAVE_STRPROP[i]] as unknown as string || (obj as unknown as Record<string, unknown>)[SAVE_STRPROP[i]] as unknown as string;
       }
-      (my_npc as any).on_makelove = obj ? (obj as any).on_makelove : null;
-      (my_npc as any).on_master_enter = obj ? (obj as any).on_master_enter : null;
-      my_npc.equipment = data.temp as any;
-      my_npc.settings = data.settings;
-      my_npc.skills = data.skills;
-      my_npc.path = (obj as any).path;
-      my_npc.items = me.read_items(data.items);
-      my_npc.equipment = me.read_items(data.eq) as any;
-      my_npc.level = my_npc.level || (obj as any).level || 3;
+      my_npc.on_makelove = obj ? obj.on_makelove : undefined;
+      my_npc.on_master_enter = obj ? obj.on_master_enter : undefined;
+      my_npc.equipment = data.temp as unknown as EQUIPMENT[] | null;
+      my_npc.settings = data.settings ?? {};
+      my_npc.skills = data.skills as unknown as Record<string, any>;
+      my_npc.path = obj.path;
+      my_npc.items = me.read_items(data.items as unknown as any[][]);
+      my_npc.equipment = me.read_items(data.eq as unknown as any[][]) as unknown as EQUIPMENT[] | null;
+      my_npc.level = my_npc.level || obj.level || 3;
       my_npc.init();
       my_npc.recount();
       my_npc.hp = my_npc.max_hp;
@@ -257,19 +275,19 @@ export class FOLLOWER extends CHARACTER {
     if (!obj) return;
     npc = new FOLLOWER();
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      (npc as any)[SAVE_NUMPROP[i]] = (obj as any)[SAVE_NUMPROP[i]] || 0;
+      (npc as unknown as Record<string, unknown>)[SAVE_NUMPROP[i]] = (obj as unknown as Record<string, unknown>)[SAVE_NUMPROP[i]] || 0;
     }
     for (let i = 0; i < SAVE_STRPROP.length; i++) {
-      (npc as any)[SAVE_STRPROP[i]] = (obj as any)[SAVE_STRPROP[i]] || '';
+      (npc as unknown as Record<string, unknown>)[SAVE_STRPROP[i]] = (obj as unknown as Record<string, unknown>)[SAVE_STRPROP[i]] || '';
     }
-    (npc as any).on_makelove = (obj as any).on_makelove;
-    (npc as any).on_master_enter = (obj as any).on_master_enter;
-    npc.equipment = (obj as any).equipment;
-    npc.skills = (obj as any).skills;
-    npc.items = (obj as any).items;
+    npc.on_makelove = obj.on_makelove;
+    npc.on_master_enter = obj.on_master_enter;
+    npc.equipment = obj.equipment as unknown as EQUIPMENT[] | null;
+    npc.skills = obj.skills;
+    npc.items = obj.items as unknown as OBJ[] | null;
     npc.id = par.id;
-    npc.path = (obj as any).path;
-    npc.level = (obj as any).level || 3;
+    npc.path = obj.path;
+    npc.level = obj.level || 3;
     npc.init();
     npc.recount();
     FOLLOWER.STORES.set(id, npc);
@@ -285,59 +303,61 @@ export class FOLLOWER extends CHARACTER {
     if (!old || !npc) return;
     const copys = ['str', 'con', 'dex', 'int', 'gender', 'kar', 'per', 'name', 'title', 'desc', 'on_master_learn', 'on_master_enter'];
     for (let i = 0; i < copys.length; i++) {
-      (old as any)[copys[i]] = (npc as any)[copys[i]];
+      (old as unknown as Record<string, unknown>)[copys[i]] = (npc as unknown as Record<string, unknown>)[copys[i]];
     }
     if (!old.skills) old.skills = {};
     if (!old.equipment) old.equipment = [];
-    if ((npc as any).equipment && (npc as any).equipment[0]) {
+    if (npc.equipment && npc.equipment[0]) {
       if (old.equipment[0]) {
-        (npc as any).items.push((npc as any).equipment[0]);
+        (npc.items as unknown as unknown[]).push(npc.equipment[0]);
       } else {
-        old.equipment[0] = (npc as any).equipment[0];
+        old.equipment[0] = npc.equipment[0];
       }
-      (npc as any).equipment[0] = null;
+      npc.equipment[0] = null;
     }
     if (!old.items) old.items = [];
-    if ((npc as any).items && (npc as any).items.length) {
-      for (let i = 0; i < (npc as any).items.length; i++) {
-        old.items.push((npc as any).items[i]);
+    if (npc.items && npc.items.length) {
+      for (let i = 0; i < npc.items.length; i++) {
+        old.items.push(npc.items[i] as unknown as OBJ);
       }
-      (npc as any).items.length = 0;
+      npc.items.length = 0;
     }
 
-    for (const sk in (npc as any).skills) {
+    for (const sk in npc.skills) {
       const oldSkill = old.skills[sk];
       if (oldSkill && oldSkill.addin && oldSkill.addin.length) continue;
-      if (!oldSkill || oldSkill.level < (npc as any).skills[sk].level) {
-        old.skills[sk] = (npc as any).skills[sk];
+      if (!oldSkill || (oldSkill.level || 0) < ((npc.skills as Record<string, any>)[sk]?.level || 0)) {
+        (old.skills as Record<string, any>)[sk] = (npc.skills as Record<string, any>)[sk];
       }
     }
-    if ((npc as any).exp > old.exp) old.exp = (npc as any).exp;
-    if ((npc as any).pot > old.pot) old.pot = (npc as any).pot;
-    if ((npc as any).max_mp > old.max_mp) old.max_mp = (npc as any).max_mp;
+    if ((npc.exp || 0) > old.exp) old.exp = npc.exp || 0;
+    if ((npc.pot || 0) > old.pot) old.pot = npc.pot || 0;
+    if ((npc.max_mp || 0) > old.max_mp) old.max_mp = npc.max_mp || 0;
 
     old.prop = {};
     old.init();
     if (old.status) {
       for (let j = old.status.length - 1; j >= 0; j--) {
         const item = old.status[j];
-        old.change_buff(item as any, true, (item as any).count);
+        old.change_buff(item, true, item.count ?? 1);
       }
     }
     old.recount();
     old.master_json = null;
-    old.color_name = null as any;
-    (old as any).on_master_enter = (npc as any).on_master_enter;
-    (old as any).on_makelove = (npc as any).on_makelove;
-    old.path = (npc as any).path;
-    old.level = (npc as any).level > old.level ? (npc as any).level : old.level;
+    old.color_name = null as unknown as string;
+    old.on_master_enter = npc.on_master_enter;
+    old.on_makelove = npc.on_makelove;
+    old.path = npc.path;
+    old.level = npc.level > old.level ? npc.level : old.level;
     if (old.environment) {
       old.environment.item_changed(old, true);
     }
-    for (let i = 0; i < me.follower.length; i++) {
-      if (me.follower[i].id == old.id) {
-        me.follower[i].path = (npc as any).path;
-        break;
+    if (me.follower) {
+      for (let i = 0; i < me.follower.length; i++) {
+        if (me.follower[i].id == old.id) {
+          me.follower[i].path = npc.path;
+          break;
+        }
       }
     }
   }
@@ -368,7 +388,7 @@ export class FOLLOWER extends CHARACTER {
   save(me: USER): string {
     const str: string[] = ['prop:['];
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      str.push(((this as any)[SAVE_NUMPROP[i]] || 0).toString());
+      str.push(((this as unknown as Record<string, unknown>)[SAVE_NUMPROP[i]] || 0).toString());
       str.push(',');
     }
     str.push('0],');
@@ -436,12 +456,12 @@ export class FOLLOWER extends CHARACTER {
    */
   die(killer: CHARACTER): boolean | undefined {
     if (!this.environment) return;
-    if ((this as any).on_die && (this as any).on_die(killer) == false) {
+    if (this.on_die && this.on_die(killer) == false) {
       this.hp = 1;
       return false;
     }
     this.clear_status();
-    this.send_room((DIE_MSG as any).random());
+    this.send_room((DIE_MSG as unknown as { random(): string }).random());
     const corpse = new CORPSE();
     corpse.init(this, false);
     this.environment.item_changed(corpse, true);
@@ -458,24 +478,24 @@ export class FOLLOWER extends CHARACTER {
     if (!this.hp) return;
     if (!this.fight_type) {
       if (this.hp < this.max_hp) {
-        this.add_hp(parseInt((this.max_hp / 3) as any));
+        this.add_hp(Math.floor(this.max_hp / 3));
       }
       if (this.mp < this.max_mp) {
-        this.add_mp(parseInt((this.max_mp / 3) as any));
+        this.add_mp(Math.floor(this.max_mp / 3));
       }
-      if ((this as any).chat_msg) {
+      if ((this as Record<string, any>).chat_msg) {
         const r = this.random(10);
         if (r > 7) {
-          this.send_message((this as any).chat_msg.random());
+          this.send_message((this as Record<string, any>).chat_msg.random());
         }
       }
     }
-    const st = this.state as any;
+    const st = this.state as unknown as FollowerState;
     if (st && (!this.fight_type || st.allow_fight)) {
-      st.heat_count += 1;
-      if (st.heat_count >= st.rate) {
+      st.heat_count! += 1;
+      if (st.heat_count! >= st.rate!) {
         st.heat_count = 0;
-        if (st.on_enter(this) === false) {
+        if (st.on_enter?.(this as unknown as CHARACTER) === false) {
           this.set_state(null, true);
         }
       }
@@ -494,13 +514,13 @@ export class FOLLOWER extends CHARACTER {
         }
       }
     }
-    this.state = state as any;
+    this.state = state as unknown as Record<string, unknown> | null;
     if (state) {
       state.rate = state.rate || 1;
       state.heat_count = 0;
       state.start_time = Date.now();
     }
-    this.color_name = null as any;
+    this.color_name = '';
     this.environment && this.environment.item_changed(this, true);
     this.master_json = null;
   }
@@ -549,14 +569,15 @@ export class FOLLOWER extends CHARACTER {
     if (this.state) {
       json.commands.push({
         cmd: 'dc ' + this.id + ' stopstate',
-        name: '停止' + (this.state as any).title.replace('中', ''),
+        name: '停止' + (this.state as unknown as FollowerState).title.replace('中', ''),
       });
     }
-    if ((this as any).actions) {
-      for (let i = 0; i < (this as any).actions.length; i++) {
+    if ((this as unknown as { actions: { cmd: string; name: string }[] | null }).actions) {
+      const actList = (this as unknown as { actions: { cmd: string; name: string }[] }).actions;
+      for (let i = 0; i < actList.length; i++) {
         json.commands.push({
-          cmd: (this as any).actions[i].cmd,
-          name: (this as any).actions[i].name,
+          cmd: actList[i].cmd,
+          name: actList[i].name,
         });
       }
     }
@@ -656,7 +677,7 @@ export class FOLLOWER extends CHARACTER {
     }
     str.push(this.name);
     if (this.state) {
-      str.push('<hig>&lt;' + (this.state as any).title + '&gt;</hig>');
+      str.push('<hig>&lt;' + (this.state as unknown as FollowerState).title + '&gt;</hig>');
     }
     this.color_name = str.join('');
     return this.color_name;
@@ -669,7 +690,7 @@ export class FOLLOWER extends CHARACTER {
    */
   on_enter(me: USER): void {
     if (me.id == this.master) {
-      (this as any).on_master_enter?.(me);
+      this.on_master_enter?.(me);
     }
   }
 
@@ -681,7 +702,7 @@ export class FOLLOWER extends CHARACTER {
     if (this.hp <= 0) return false;
     if (me.environment === this.environment) return false;
 
-    if (nextrm.is_fb() || (nextrm as any).parent.id == 'home') {
+    if (nextrm.is_fb() || (nextrm.parent as AREA).id == 'home') {
       return true;
     }
 
@@ -691,18 +712,18 @@ export class FOLLOWER extends CHARACTER {
   // ============ USER方法代理 ============
 
   remove_obj(obj: OBJ | string, count?: number): OBJ | undefined {
-    return (USER.prototype as any).remove_obj.call(this, obj, count);
+    return (USER.prototype as unknown as Record<string, Function>).remove_obj.call(this, obj, count);
   }
 
   recount(): void {
-    return (USER.prototype as any).recount.call(this);
+    return (USER.prototype as unknown as Record<string, Function>).recount.call(this);
   }
 
   items_changed(item: OBJ, drop_count?: number): void {
-    return (USER.prototype as any).items_changed.call(this, item, drop_count);
+    return (USER.prototype as unknown as Record<string, Function>).items_changed.call(this, item, drop_count);
   }
 
   send_commands(...args: string[]): void {
-    return (USER.prototype as any).send_commands.apply(this, args);
+    return (USER.prototype as unknown as Record<string, Function>).send_commands.apply(this, args);
   }
 }

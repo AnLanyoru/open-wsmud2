@@ -9,21 +9,21 @@ export class MONEY extends OBJ {
         super();
     }
 
-    // ============ Core properties ============
+    // ============ 核心属性 ============
 
-    /** Whether this is cash (gold ingot) */
+    /** 是否为元宝（充值货币） */
     is_cash: boolean = false;
-    /** Stackable */
+    /** 可堆叠 */
     combined: boolean = true;
-    /** Count */
+    /** 数量 */
     count: number = 1;
-    /** Is money */
+    /** 是否为货币 */
     is_money: boolean = true;
-    /** Tradable */
+    /** 可交易 */
     transable: boolean = true;
 
     /**
-     * Create callback — set color by type / value
+     * 创建回调 — 根据类型/面值设置颜色
      */
     create(): void {
         this.create_id();

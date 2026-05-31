@@ -41,10 +41,10 @@ export class BASE {
      * 批量设置属性 — 将键值对中的属性复制到当前对象
      * @param pars - 键值对（可选）
      */
-    set(pars?: Partial<this> & Record<string, any>): void {
+    set(pars?: Partial<this> & Record<string, unknown>): void {
         if (!pars) return;
         for (const item in pars) {
-            (this as any)[item] = pars[item];
+            (this as Record<string, unknown>)[item] = pars[item];
         }
     }
 
@@ -68,9 +68,9 @@ export class BASE {
      * @param func - 替换的函数
      * @param time - 有效期（毫秒），不传则永久有效
      */
-    add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number): void {
-        if (!(this as any)[fname]) {
-            (this as any)[fname] = (this as any).fire_event.bind(this, fname);
+    add_event(fname: string, func: (this: this, ...args: unknown[]) => unknown, time?: number): void {
+        if (!(this as Record<string, unknown>)[fname]) {
+            (this as Record<string, unknown>)[fname] = (this as unknown as BASE & Record<string, Function>).fire_event.bind(this, fname);
         }
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
@@ -97,8 +97,8 @@ export class BASE {
         }
 
         if (!evts.length) {
-            this._events[name] = undefined as any;
-            (this as any)[name] = null;
+            this._events[name] = undefined as unknown as EventRecord[];
+            (this as Record<string, unknown>)[name] = null;
         }
     }
 
@@ -121,8 +121,8 @@ export class BASE {
             }
         }
         if (!evts.length) {
-            this._events[name] = undefined as any;
-            (this as any)[name] = null;
+            this._events[name] = undefined as unknown as EventRecord[];
+            (this as Record<string, unknown>)[name] = null;
         }
     }
 
@@ -217,7 +217,7 @@ export class BASE {
     static async PRELOAD(fkey: string, filepath: string): Promise<void> {
         try {
             const mod = await import(pathToFileURL(filepath).href);
-            const func = (mod as any).default;
+            const func = (mod as { default?: unknown }).default;
             if (typeof func === 'function') {
                 BASE.ITEMS[fkey] = func;
             } else {
@@ -235,10 +235,11 @@ export class BASE {
      * @param fname - 文件名（可能带 #参数）
      * @returns 新创建的对象
      */
-    static CREATE(path: string, fname: string): any {
+    static CREATE(path: string, fname: string): BASE | undefined {
         const ary = BASE.PATH_REG.exec(fname);
         if (!ary) {
-            return console.error('path %s is incorrect:', path + fname);
+            console.error('path %s is incorrect:', path + fname);
+            return undefined;
         }
         fname = ary[1];
         const paras = ary[2];
@@ -269,10 +270,10 @@ export class BASE {
      * @param par - 构造参数
      * @returns 新创建的对象
      */
-    static NEW(fname: string, func: Function, par?: string): any {
+    static NEW(fname: string, func: Function, par?: string): BASE {
         const isClass = func.toString().trim().startsWith('class');
-        const obj: any = isClass
-            ? new (func as any)(par)
+        const obj: BASE = isClass
+            ? new (func as new (par?: string) => BASE)(par)
             : (() => {
                   const o = new BASE();
                   func.apply(o);
@@ -308,7 +309,7 @@ export class BASE {
             const mod = await import(
                 pathToFileURL(filepath).href + '?update=' + Date.now()
             );
-            const func = (mod as any).default;
+            const func = (mod as { default?: unknown }).default;
             if (typeof func === 'function') {
                 BASE.ITEMS[fkey] = func;
             } else {

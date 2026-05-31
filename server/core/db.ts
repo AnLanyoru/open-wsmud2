@@ -2,36 +2,65 @@
 // 数据持久化模块 - 数据库操作 / 文件备份
 // ============================================================
 
+import type { ServerConfig } from '../types/world.js';
+
 import fs_sync from 'fs';
 import { WORLD } from './world.js';
 
 const fs = fs_sync.promises;
 
+/** 数据库接口（由启动脚本注入到 __CONFIG.DB） */
+interface DBInterface {
+  close(): Promise<void>;
+  getRoles(userid: number, server: number): Promise<RoleData[]>;
+  addRole(role: RoleData): Promise<unknown>;
+  deleteRole(userid: number, roleid: string): Promise<unknown>;
+  saveRole(role: RoleData): Promise<unknown>;
+  getUserByID(id: string): unknown;
+  getData(userid: number, id: string): unknown;
+  updateRoleName(id: string, userid: number, name: string): unknown;
+  updateUserid(id: string, fromuserid: number, touserid: number): unknown;
+  getServers(): ServerConfig[];
+}
+
 /** 数据库实例（由启动脚本注入到 __CONFIG.DB） */
-const DB: any = (globalThis as any).__CONFIG.DB;
+const DB: DBInterface = (globalThis as any).__CONFIG.DB;
 
 /** 角色存档数据 */
 interface RoleData {
+  /** 角色唯一 ID */
   id: string;
+  /** 角色名称 */
   name: string;
+  /** 所属用户 ID */
   userid: number;
+  /** 角色称号 */
   title: string;
+  /** 角色等级 */
   level: number;
+  /** 序列化后的角色完整数据 */
   data: string;
 }
 
 /** 请求日志条目 */
 interface RequestLog {
+  /** 请求时间戳 */
   time: number;
+  /** 用户标识 */
   user: string;
+  /** 执行的命令 */
   cmd: string;
 }
 
 /** 错误日志条目 */
 interface ErrorLog {
+  /** 错误发生时间戳 */
   time: number;
+  /** 用户标识 */
   user: string;
+  /** 执行的命令 */
   cmd: string;
+  /** 错误消息 */
   msg: string;
 }
 
@@ -46,7 +75,7 @@ export default {
    * @param userid - 用户 ID
    * @param server - 服务器 ID
    */
-  getRoles(userid: number, server: number): Promise<any[]> {
+  getRoles(userid: number, server: number): Promise<RoleData[]> {
     return DB.getRoles(userid, server);
   },
 
@@ -54,7 +83,7 @@ export default {
    * 创建新角色
    * @param role - 角色数据
    */
-  async addRole(role: any): Promise<any> {
+  async addRole(role: RoleData): Promise<unknown> {
     return await DB.addRole(role);
   },
 
@@ -63,7 +92,7 @@ export default {
    * @param userid - 用户 ID
    * @param roleid - 角色 ID
    */
-  deleteRole(userid: number, roleid: string): Promise<any> {
+  deleteRole(userid: number, roleid: string): Promise<unknown> {
     return DB.deleteRole(userid, roleid);
   },
 
@@ -71,7 +100,7 @@ export default {
    * 保存角色数据
    * @param role - 角色数据
    */
-  saveRole(role: any): Promise<any> {
+  saveRole(role: RoleData): Promise<unknown> {
     return DB.saveRole(role);
   },
 
@@ -81,7 +110,7 @@ export default {
    */
   async saveRoles(roles: RoleData[]): Promise<void> {
     const dt = new Date();
-    const path = (globalThis as any).__PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
     const stream = fs_sync.createWriteStream(path, { flags: 'a' });
     try {
       stream.write('[');
@@ -125,7 +154,7 @@ export default {
   saveRequest(recs: RequestLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const path = (globalThis as any).__PATH.DATA + "req/request" + f + ".txt";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "req/request" + f + ".txt";
     const ary: (string | number)[] = [];
     for (let i = 0; i < recs.length; i++) {
       const r = recs[i]!;
@@ -146,7 +175,7 @@ export default {
   saveLogs(logs: ErrorLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const path = (globalThis as any).__PATH.DATA + "log/log" + f + ".txt";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "log/log" + f + ".txt";
     const ary: (string | number)[] = [];
     for (let i = 0; i < logs.length; i++) {
       const r = logs[i]!;
@@ -167,10 +196,10 @@ export default {
    * @param content - 序列化后的 JSON 字符串
    */
   async saveData(content: string): Promise<void> {
-    const path = (globalThis as any).__PATH.DATA + "data.js";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "data.js";
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const tempDir = (globalThis as any).__PATH.DATA + "temp/";
+    const tempDir = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "temp/";
     if (!await this.check_file(tempDir)) {
       await fs.mkdir(tempDir);
     }
@@ -185,10 +214,10 @@ export default {
    * 从文件读取全局数据
    */
   async readData(): Promise<any> {
-    const path = (globalThis as any).__PATH.DATA + "data.js";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "data.js";
     try {
       const data = await fs.readFile(path);
-      return (JSON as any).toObject(data);
+      return (JSON as unknown as { toObject: (str: Buffer) => unknown }).toObject(data);
     } catch (error) {
       console.error('数据读取失败', path, error);
     }
@@ -198,7 +227,7 @@ export default {
    * 根据 ID 获取用户
    * @param id - 用户 ID
    */
-  getUserByID(id: string): any {
+  getUserByID(id: string): unknown {
     return DB.getUserByID(id);
   },
 
@@ -207,7 +236,7 @@ export default {
    * @param userid - 用户 ID
    * @param id - 角色 ID
    */
-  getRoleData(userid: number, id: string): any {
+  getRoleData(userid: number, id: string): unknown {
     return DB.getData(userid, id);
   },
 
@@ -217,7 +246,7 @@ export default {
    * @param userid - 用户 ID
    * @param name - 新名称
    */
-  change_name(id: string, userid: number, name: string): any {
+  change_name(id: string, userid: number, name: string): unknown {
     return DB.updateRoleName(id, userid, name);
   },
 
@@ -227,7 +256,7 @@ export default {
    * @param fromuserid - 原用户 ID
    * @param touserid - 目标用户 ID
    */
-  change_userid(id: string, fromuserid: number, touserid: number): any {
+  change_userid(id: string, fromuserid: number, touserid: number): unknown {
     return DB.updateUserid(id, fromuserid, touserid);
   },
 
@@ -249,23 +278,23 @@ export default {
    * 并从模板目录复制默认数据文件
    */
   async initDataDir(): Promise<void> {
-    (globalThis as any).__PATH.BASE_DATA = (globalThis as any).__PATH.DATA;
-    (globalThis as any).__PATH.DATA = (globalThis as any).__PATH.DATA + WORLD.SERVERID + "/";
+    (globalThis as { __PATH: Record<string, string> }).__PATH.BASE_DATA = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA;
+    (globalThis as { __PATH: Record<string, string> }).__PATH.DATA = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + WORLD.SERVERID + "/";
 
-    if (!await this.check_file((globalThis as any).__PATH.DATA)) {
+    if (!await this.check_file((globalThis as { __PATH: Record<string, string> }).__PATH.DATA)) {
       console.log('创建备份文件夹....');
-      await fs.mkdir((globalThis as any).__PATH.DATA);
+      await fs.mkdir((globalThis as { __PATH: Record<string, string> }).__PATH.DATA);
     }
     for (const sub of ['bak', 'log', 'req', 'temp']) {
-      const dir = (globalThis as any).__PATH.DATA + sub;
+      const dir = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + sub;
       if (!await this.check_file(dir)) {
         await fs.mkdir(dir);
       }
     }
-    const paths = await fs.readdir((globalThis as any).__PATH.DEF_DATA);
+    const paths = await fs.readdir((globalThis as { __PATH: Record<string, string> }).__PATH.DEF_DATA);
     for (let i = 0; i < paths.length; i++) {
-      const _src = (globalThis as any).__PATH.DEF_DATA + paths[i];
-      const _dst = (globalThis as any).__PATH.DATA + paths[i];
+      const _src = (globalThis as { __PATH: Record<string, string> }).__PATH.DEF_DATA + paths[i];
+      const _dst = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + paths[i];
       if (!await this.check_file(_dst)) {
         const stat = await fs.stat(_src);
         if (stat.isFile()) {
@@ -282,7 +311,7 @@ export default {
   /**
    * 获取服务器列表
    */
-  getServers(): any {
+  getServers(): unknown {
     return DB.getServers();
   },
 };

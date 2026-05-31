@@ -28,9 +28,9 @@ const FAMS_TATAS: string[] = [
 
 export interface DataObject {
     /** 队伍数据 */
-    parties: Map<string, any>;
+    parties: Map<string, unknown>;
     /** 拍卖数据 */
-    PAIMAI: Map<string, any>;
+    PAIMAI: Map<string, unknown>;
     /** 运行时临时数据 */
     temp: Record<string, any>;
     /** 经验等级倍率表 */
@@ -40,14 +40,14 @@ export interface DataObject {
     /** 书籍价值表 */
     book_values: number[];
     /** 静态属性映射 */
-    PROPS: Record<string, any>;
+    PROPS: Record<string, unknown>;
     /** 统计用临时数据存储 */
     temp_data: Record<string, Record<string, { name: string; value: number }>>;
 
     /** 根据玩家等级获取随机经验 */
-    get_exp(me: any): number;
+    get_exp(me: { random(n: number): number; level: number }): number;
     /** 加载全局数据时的回调 */
-    on_load(data: any): void;
+    on_load(data: Record<string, any>): void;
     /** 保存全局数据时的回调 */
     on_save(str: string[]): void;
     /** 创建默认排行榜 */
@@ -57,27 +57,27 @@ export interface DataObject {
     /** 创建默认分数统计 */
     create_def_scs(): void;
     /** 重置家族排行 */
-    reset_famtops(me: any, fam: any): void;
+    reset_famtops(me: { id: string; remove_temp(name: string): void }, fam: { id: string; name: string }): void;
     /** 保存全局数据到数据库 */
-    save(): Promise<any>;
+    save(): Promise<void>;
     /** JSON.stringify 替换函数 */
-    temp_replacer(key: string, value: any): any;
+    temp_replacer(_key: string, value: unknown): unknown;
     /** 保存临时数据到字符串数组 */
     save_temp(str: string[]): void;
     /** 从数据库加载全局数据 */
     load(): Promise<void>;
     /** 查询临时数据 */
-    query_temp(name: string, def?: any, _me?: any): any;
+    query_temp(name: string, def?: unknown, _me?: unknown): unknown;
     /** 设置临时数据 */
-    set_temp(name: string, value: any, time?: number, _me?: any): void;
+    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void;
     /** 移除临时数据 */
     remove_temp(name: string): void;
     /** 累加临时数据 */
-    add_temp(name: string, value: number, time?: number, _me?: any): number;
+    add_temp(name: string, value: number, time?: number, _me?: unknown): number;
     /** 清除统计数据 */
     clear_data(): void;
     /** 添加统计数据 */
-    add_data(key: string, user: any, val: number): void;
+    add_data(key: string, user: { id: string; name: string }, val: number): void;
     /** 查询最大值 */
     query_max_data(key: string): { name: string; value: number } | undefined;
     /** 查询最小值 */
@@ -113,15 +113,15 @@ const DATA: DataObject = {
      * 根据玩家等级获取随机经验值
      * @param me - 玩家角色
      */
-    get_exp(me: any): number {
-        return me.random(5) + (this.exps as number[])[(me as any).level];
+    get_exp(me: { random(n: number): number; level: number }): number {
+        return me.random(5) + (this.exps as number[])[me.level];
     },
 
     /**
      * 全局数据加载回调 — 恢复排行榜、消息、装备统计等
      * @param data - 从 data.js 读取的原始数据
      */
-    on_load(data: any): void {
+    on_load(data: Record<string, any>): void {
         WORLD.MESSAGE.load(data);
         this.remove_temp('xy_status');
         this.remove_temp('xy_users');
@@ -137,7 +137,7 @@ const DATA: DataObject = {
             const tops = data['tops_' + key];
             WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
                 tops,
-                (FAMILIES as any)[key].name + '弟子',
+                (FAMILIES as Record<string, { name: string }>)[key].name + '弟子',
                 key,
             );
         }
@@ -180,8 +180,8 @@ const DATA: DataObject = {
     create_def_tops(): void {
         for (const key of FAMS_TATAS) {
             WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
-                null,
-                (FAMILIES as any)[key].name + '弟子',
+                undefined,
+                (FAMILIES as Record<string, { name: string }>)[key].name + '弟子',
             );
         }
     },
@@ -212,7 +212,7 @@ const DATA: DataObject = {
      * @param me - 玩家角色
      * @param fam - 门派对象
      */
-    reset_famtops(me: any, fam: any): void {
+    reset_famtops(me: { id: string; remove_temp(name: string): void }, fam: { id: string; name: string }): void {
         me.remove_temp('top_fam_sc');
         me.remove_temp('top_fam');
         const tops = WORLD.STATS['tops_' + fam.id];
@@ -241,7 +241,7 @@ const DATA: DataObject = {
     /**
      * 保存全局数据到数据库（含临时数据和排行榜等）
      */
-    async save(): Promise<any> {
+    async save(): Promise<void> {
         const str: string[] = ['{'];
         this.save_temp(str);
         this.on_save(str);
@@ -252,8 +252,8 @@ const DATA: DataObject = {
     /**
      * JSON.stringify 替换函数 — 保留带有过期时间的值不变
      */
-    temp_replacer(_key: string, value: any): any {
-        if (value && value.e) {
+    temp_replacer(_key: string, value: unknown): unknown {
+        if (typeof value === 'object' && value !== null && 'e' in value) {
             // 保留带有过期时间的值不变
         }
         return value;
@@ -282,7 +282,7 @@ const DATA: DataObject = {
      * @param def - 默认值（键不存在时返回）
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
-    query_temp(name: string, def?: any, _me?: any): any {
+    query_temp(name: string, def?: unknown, _me?: unknown): unknown {
         if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
@@ -302,7 +302,7 @@ const DATA: DataObject = {
      * @param time - 过期时间（ms），不传则永不过期
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
-    set_temp(name: string, value: any, time?: number, _me?: any): void {
+    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -331,7 +331,7 @@ const DATA: DataObject = {
      * @param _me - 玩家对象（兼容 ROOM.add_temp 签名）
      * @returns 累加后的值
      */
-    add_temp(name: string, value: number, time?: number, _me?: any): number {
+    add_temp(name: string, value: number, time?: number, _me?: unknown): number {
         if (!this.temp) this.temp = {};
         const old = this.temp[name];
         if (time) {
@@ -373,7 +373,7 @@ const DATA: DataObject = {
      * @param user - 玩家
      * @param val - 增加值
      */
-    add_data(key: string, user: any, val: number): void {
+    add_data(key: string, user: { id: string; name: string }, val: number): void {
         if (!val) return;
         let data = this.temp_data[key];
         if (!data) data = this.temp_data[key] = {};

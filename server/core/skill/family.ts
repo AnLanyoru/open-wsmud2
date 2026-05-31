@@ -8,14 +8,17 @@ import { UTIL } from "../util.js";
 import { ROOM } from "../room/room.js";
 import { EVENTS } from "../task/events.js";
 import { COMMAND } from "../command.js";
-
-// CHARACTER 仅运行时使用(避免 family.ts → character.ts 循环导致 TDZ)
-let _CHARACTER: any = null;
-import("../char/character.js").then((m: any) => { _CHARACTER = m.CHARACTER; });
+import type { NPC } from '../char/npc.js';
+import type { SKILL } from './skill.js';
+import type { AREA } from '../room/area.js';
 
 // 懒加载 NPC 避免循环依赖: family.ts → npc.ts → character.ts (TDZ)
-let _NPC: any = null;
-import("../char/npc.js").then((m: any) => { _NPC = m.NPC; });
+let _NPC: {
+    CLONE: (path: string, ...args: any[]) => any;
+    CREATE: (path: string, room?: any) => any;
+    GET: (path: string) => any;
+} | null = null;
+import("../char/npc.js").then((m: Record<string, unknown>) => { _NPC = m.NPC as any; });
 
 export class FAMILY extends BASE {
 
@@ -26,7 +29,7 @@ export class FAMILY extends BASE {
     /** 门派称谓列表 */
     titles: string[] = [];
     /** 门派NPC列表 */
-    npcs: any[] = [];
+    npcs: NPC[] = [];
     /** 敌对门派 */
     battle_family: string | null = null;
     /** 门派战积分 */
@@ -41,28 +44,28 @@ export class FAMILY extends BASE {
     /** 门派ID */
     id: string = "";
     /** 临时数据 */
-    temp: any = null;
+    temp: Record<string, unknown> | null = null;
     /** 门派战结算 */
     battle_settle?: number;
-    /** 击杀回调 */
-    on_kill?: (killer: any, victim: any) => void;
+    /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
+    on_kill?: (killer: Record<string, any>, victim: Record<string, any>) => void;
 
     // ============ 资源文件设置属性 ============
 
     /** 门派武功列表 */
-    skills: any[] = [];
-    skills2: any[] = [];
-    skills3: any[] = [];
-    skills4: any[] = [];
-    skills0: any[] = [];
+    skills: SKILL[] = [];
+    skills2: SKILL[] = [];
+    skills3: SKILL[] = [];
+    skills4: SKILL[] = [];
+    skills0: SKILL[] = [];
     /** 默认NPC定义 */
-    def_npcs?: any[];
+    def_npcs?: [string, string][];
     /** 掌门NPC路径 */
     boss_path?: string;
     /** 掌门NPC */
-    boss?: any;
+    boss?: NPC;
     /** 首席弟子NPC */
-    first_npc?: any;
+    first_npc?: NPC;
     /** 首席弟子称谓 */
     top_name?: string;
     /** 是否已初始化首席弟子 */
@@ -70,13 +73,13 @@ export class FAMILY extends BASE {
     /** 首席弟子经验值 */
     first_npc_exp?: number;
     /** 掌门护卫房间配置 */
-    boss_guard?: any[];
+    boss_guard?: string[];
     /** 守卫掌门NPC */
-    battle_boss?: any;
+    battle_boss?: NPC;
     /** 创建NPC的定时器句柄 */
-    create_handler?: any;
+    create_handler?: ReturnType<typeof setTimeout>;
     /** 门派所属区域 */
-    area: any = null;
+    area: AREA | null = null;
     /** 门派性别(用于生成名字) */
     gender?: number;
     /** 门派功绩排行榜 */
@@ -84,10 +87,10 @@ export class FAMILY extends BASE {
 
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
-    query_temp: (name: string, def?: any, _me?: any) => any = ITEM.prototype.query_temp as any;
-    set_temp: (name: string, value: any, time?: number, _me?: any) => void = ITEM.prototype.set_temp as any;
+    query_temp: (name: string, def?: unknown, _me?: unknown) => unknown = ITEM.prototype.query_temp as any;
+    set_temp: (name: string, value: unknown, time?: number, _me?: unknown) => void = ITEM.prototype.set_temp as any;
     remove_temp: (name: string) => void = ITEM.prototype.remove_temp as any;
-    add_temp: (name: string, value: number, time?: number, _me?: any) => number = ITEM.prototype.add_temp as any;
+    add_temp: (name: string, value: number, time?: number, _me?: unknown) => number = ITEM.prototype.add_temp as any;
 
     constructor() {
         super();
@@ -158,7 +161,7 @@ export class FAMILY extends BASE {
      * @param me
      * @param sc
      */
-    add_score(me: any, sc: number): void {
+    add_score(me: Record<string, any>, sc: number): void {
         this.battle_score += sc;
     }
 
@@ -168,10 +171,14 @@ export class FAMILY extends BASE {
      * 向CHARACTER.prototype添加send_fam方法
      */
     static addSendFamToCharacter(): void {
-        // 使用as any绕过CHARACTER类型的只读限制
-        (_CHARACTER as any).prototype.send_fam = function (this: any, str: string) {
-            this.family.send(str);
-        };
+        import("../char/character.js").then((m: Record<string, unknown>) => {
+            const CHAR = m.CHARACTER as { prototype: Record<string, any> } | undefined;
+            if (CHAR && CHAR.prototype) {
+                CHAR.prototype.send_fam = function (this: Record<string, any>, str: string) {
+                    this.family.send(str);
+                };
+            }
+        });
     }
 
     // ============ NPC管理 ============
@@ -180,43 +187,43 @@ export class FAMILY extends BASE {
      * 创建门派随机名字
      */
     create_name(): string {
-        return UTIL.random_name(this.gender);
+        return UTIL.random_name(this.gender ?? 0);
     }
 
     /**
      * 随机查询指定品级的技能
      * @param grade - 品级
      */
-    query_skill(grade: number): any {
-        if (!(this as any).skill_levels) {
-            (this as any).skill_levels = [];
+    query_skill(grade: number): SKILL | undefined {
+        if (!(this as Record<string, any>).skill_levels) {
+            (this as Record<string, any>).skill_levels = [];
             for (let i = 0; i < this.skills.length; i++) {
-                if (!(this as any).skill_levels[this.skills[i].grade]) {
-                    (this as any).skill_levels[this.skills[i].grade] = [];
+                if (!(this as Record<string, any>).skill_levels[this.skills[i].grade]) {
+                    (this as Record<string, any>).skill_levels[this.skills[i].grade] = [];
                 }
-                (this as any).skill_levels[this.skills[i].grade].push(this.skills[i]);
+                (this as Record<string, any>).skill_levels[this.skills[i].grade].push(this.skills[i]);
             }
         }
-        if (grade >= (this as any).skill_levels.length) grade = (this as any).skill_levels.length - 1;
-        return (this as any).skill_levels[grade].random();
+        if (grade >= (this as Record<string, any>).skill_levels.length) grade = (this as Record<string, any>).skill_levels.length - 1;
+        return (this as Record<string, any>).skill_levels[grade].random();
     }
 
     /**
      * 查询指定品级的所有技能
      * @param grade
      */
-    query_skills(grade: number): any[] {
-        if (!(this as any).skill_levels) {
-            (this as any).skill_levels = [];
+    query_skills(grade: number): SKILL[] {
+        if (!(this as Record<string, any>).skill_levels) {
+            (this as Record<string, any>).skill_levels = [];
             for (let i = 0; i < this.skills.length; i++) {
-                if (!(this as any).skill_levels[this.skills[i].grade]) {
-                    (this as any).skill_levels[this.skills[i].grade] = [];
+                if (!(this as Record<string, any>).skill_levels[this.skills[i].grade]) {
+                    (this as Record<string, any>).skill_levels[this.skills[i].grade] = [];
                 }
-                (this as any).skill_levels[this.skills[i].grade].push(this.skills[i]);
+                (this as Record<string, any>).skill_levels[this.skills[i].grade].push(this.skills[i]);
             }
         }
-        if (grade >= (this as any).skill_levels.length) grade = (this as any).skill_levels.length - 1;
-        return (this as any).skill_levels[grade];
+        if (grade >= (this as Record<string, any>).skill_levels.length) grade = (this as Record<string, any>).skill_levels.length - 1;
+        return (this as Record<string, any>).skill_levels[grade];
     }
 
     /**
@@ -224,7 +231,7 @@ export class FAMILY extends BASE {
      * @param me
      * @param count
      */
-    add_gongji(me: any, count: number): void {
+    add_gongji(me: Record<string, any>, count: number): void {
         if (!count) return;
         me.add_temp("gongji", count);
         if (count < 0) return;
@@ -244,7 +251,7 @@ export class FAMILY extends BASE {
         for (let item of this.def_npcs) {
             let rm = ROOM.Get(item[1]);
             if (!rm) throw new Error('房间' + item[1] + "不存在");
-            let npc = _NPC.CLONE(item[0]);
+            let npc = _NPC!.CLONE(item[0]);
             if (!npc) throw new Error('npc ' + item[0] + "不存在");
             rm.items.push(npc);
             rm.max_item_count = 100;
@@ -266,7 +273,7 @@ export class FAMILY extends BASE {
                 if (!rm) continue;
                 let npc = rm.find_obj_bypath(spath);
                 if (npc) npc.destroy();
-                let new_npc = _NPC.CREATE(spath, rm);
+                let new_npc = _NPC!.CREATE(spath, rm);
                 if ((new_npc as any).is(this.boss_path)) {
                     this.boss = new_npc;
                 }
@@ -279,7 +286,7 @@ export class FAMILY extends BASE {
     /**
      * 门派NPC复活回调(这里的this通过bind绑定到NPC实例)
      */
-    on_famnpc_relive(this: any): void {
+    on_famnpc_relive(this: Record<string, any>): void {
         if (!this.die_room) return;
         this.die_room.item_changed(this, true);
         this.die_room = null;
@@ -292,7 +299,7 @@ export class FAMILY extends BASE {
     /**
      * 门派NPC死亡回调(这里的this通过bind绑定到NPC实例)
      */
-    on_npc_die(this: any, me: any): void {
+    on_npc_die(this: Record<string, any>, me: Record<string, any>): void {
         var fam = FAMILIES[this.family.id];
         if (!me) return;
         var fam2 = FAMILIES[me.family.id];
@@ -312,7 +319,7 @@ export class FAMILY extends BASE {
     }
 
     /** @param npc @param killer @param target */
-    check_battle(npc: any, killer: any, target?: FAMILY): void {
+    check_battle(npc: Record<string, any>, killer: Record<string, any>, target?: FAMILY): void {
         var to_fam = killer ? killer.family : target;
         if (!to_fam || !to_fam.can_battle || !this.can_battle) return;
 
@@ -324,7 +331,7 @@ export class FAMILY extends BASE {
         to_fam.battle_family = this.id;
         if (killer) {
             if (npc !== this.boss) {
-                this.on_kill(npc, killer);
+                this.on_kill?.(npc, killer);
             } else if (this.first_npc) {
                 this.first_npc
                     .do_command("chat",
@@ -346,9 +353,9 @@ export class FAMILY extends BASE {
         this.set_temp("battle", 1, 3600000);
         this.call_out(this.battle_over, 30 * 60000, "timeout");
 
-        this.area.rooms[0].create_copy(this.id, 0);
+        this.area!.rooms[0].create_copy(this.id, 0);
 
-        this.area.notify_update();
+        this.area!.notify_update();
 
         this.create_guards();
         this.create_npcs();
@@ -366,24 +373,24 @@ export class FAMILY extends BASE {
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: "进入战场",
-            check: (me: any) => me.family === this,
-            on_command: function (me: any) {
+            check: (me: Record<string, any>) => me.family === this,
+            on_command: function (me: Record<string, any>) {
                 me.do_command('goto', 'fam3');
             }
         }
     }
 
     /** @param rm @returns ROOM */
-    get_room(rm: any): any {
+    get_room(rm: Record<string, any>): ROOM | undefined {
         return rm.query_copy(this.id);
     }
 
     /** 创建门派守卫NPC */
     create_guards(): void {
-        if (!this.boss_guard) return;
+        if (!this.boss_guard || !this.boss) return;
 
-        var boss_room = this.get_room(ROOM.Get(this.boss_guard[0]));
-        var npc = _NPC.CLONE("pub/menpai");
+        var boss_room = this.get_room(ROOM.Get(this.boss_guard[0])!);
+        var npc = _NPC!.CLONE("pub/menpai");
         npc.init_from(this, 5);
         npc.name = this.boss.name;
         npc.desc = this.boss.desc;
@@ -392,46 +399,47 @@ export class FAMILY extends BASE {
         npc.age = this.boss.age;
         npc.gender = this.boss.gender;
         this.npcs.push(npc);
-        boss_room.item_changed(npc, true);
+        if (boss_room) boss_room.item_changed(npc, true);
 
         this.battle_boss = npc;
         for (var i = 0; i < this.boss_guard.length; i++) {
             for (var j = 0; j < 2; j++) {
-                npc = _NPC.CLONE("pub/menpai");
+                npc = _NPC!.CLONE("pub/menpai");
                 npc.init_from(this, i == 0 ? 4 : 3);
-                var rm = this.get_room(ROOM.Get(this.boss_guard[i]));
-
-                this.npcs.push(npc);
-                rm.item_changed(npc, true);
+                var rm = this.get_room(ROOM.Get(this.boss_guard[i])!);
+                if (rm) {
+                    this.npcs.push(npc);
+                    rm.item_changed(npc, true);
+                }
             }
         }
     }
 
     /** @param npc */
-    remove_npcs(npc: any): void {
-        this.npcs.remove(npc);
+    remove_npcs(npc: Record<string, any>): void {
+        this.npcs.remove(npc as any);
         if (this.battle_boss) {
             this.battle_boss.remove_status("boss");
         }
     }
 
     /** @param level @returns NPC */
-    create_npc(level: number): any {
-        var npc = _NPC.CLONE("pub/menpai");
+    create_npc(level: number): NPC | undefined {
+        var npc = _NPC!.CLONE("pub/menpai");
         npc.init_from(this, level);
         return npc;
     }
 
     /** 持续创建门派NPC */
     create_npcs(): void {
-        if (this.npcs.length < 27) {
+        if (this.npcs.length < 27 && this.area) {
             let count = 27 - this.npcs.length;
             for (let i = 0; i < count; i++) {
                 let lv = i > 15 ? 2 : (i < 8 ? 0 : 1);
                 let rm = this.get_room(this.area.rooms.random());
                 let npc = this.create_npc(lv);
-                this.npcs.push(npc);
-                rm.item_changed(npc, true);
+                if (npc) this.npcs.push(npc);
+                if (rm && npc) rm.item_changed(npc, true);
             }
             if (this.battle_boss) {
                 this.battle_boss.add_status({
@@ -460,7 +468,7 @@ export class FAMILY extends BASE {
         if (!this.battle_family) return;
         var fam = FAMILIES[this.battle_family];
         if (!fam) return;
-        this.battle_family = null as any;
+        this.battle_family = null as unknown as string;
         if (this.create_handler) clearTimeout(this.create_handler);
         for (var i = 0; i < this.npcs.length; i++) {
             if (this.npcs[i].hp > 0) {
@@ -506,17 +514,17 @@ export class FAMILY extends BASE {
             }
         }
         if (this.battle_boss)
-            this.battle_boss.destroy();
-        this.battle_boss = null;
-        this.area.notify_update();
+            this.battle_boss!.destroy();
+        this.battle_boss = null as any;
+        this.area!.notify_update();
         this.call_out(this.clear_room, 300000);
         EVENTS.remove(this.id + "_bat");
     }
 
     /** 清理门派战场副本房间 */
     clear_room(): void {
-        const rm = this.area.rooms[0];
-        rm.clear_by_area(rm.parent, this.id);
+        const rm = this.area!.rooms[0];
+        rm.clear_by_area((rm as any).parent, this.id);
     }
 
     /** @param suc @param target_fam @returns Object */
@@ -527,12 +535,12 @@ export class FAMILY extends BASE {
             id: this.id + "_settle",
             name: "门派战争",
             desc: "你的门派和" + target_fam.name + "战斗结束了，" + msg,
-            time: this.temp!["battle"].e,
+            time: (this.temp as any)["battle"].e,
             grade: 2,
             command: "领取战利品",
-            check: (me: any) => me.family === this,
-            on_command: (me: any) => {
-                this.battle_settle(me)
+            check: (me: Record<string, any>) => me.family === this,
+            on_command: (me: Record<string, any>) => {
+                (this as any).battle_settle(me)
             }
         }
     }
@@ -546,8 +554,8 @@ export class FAMILY extends BASE {
     }
 
     /** @param me */
-    on_login(me: any): void {
-        if (this.first_npc && me.id == this.first_npc.userid) {
+    on_login(me: Record<string, any>): void {
+        if (this.first_npc && me.id == (this.first_npc as any).userid) {
             if (!this.is_init_first)
                 this.init_dadizi(this.first_npc, me);
             this.send('{type:"msg",ch:"fam",content:"' + this.first_npc.title + me.name + '上线了。",uid:0,name:"",fam:"' + this.name + '"}');
@@ -565,24 +573,26 @@ export class FAMILY extends BASE {
         WORLD.DATA.set_temp(this.id + "_top", id);
         WORLD.DATA.set_temp(this.id + "_top_name", name);
         if (this.first_npc) {
-            if (this.first_npc.environment.is_shadow) {
+            if (this.first_npc.environment && (this.first_npc.environment as any).is_shadow) {
                 var rm = ROOM.Get(this.first_npc.environment.path);
-                var npc = rm.find_obj_bypath('pub/dadizi#' + this.id);
-                if (npc) {
-                    this.first_npc = npc;
-                } else {
-                    this.first_npc = null as any;
-                    return;
+                if (rm) {
+                    var npc = rm.find_obj_bypath('pub/dadizi#' + this.id) as any;
+                    if (npc) {
+                        this.first_npc = npc;
+                    } else {
+                        this.first_npc = undefined as any;
+                        return;
+                    }
                 }
             }
-            this.init_dadizi(this.first_npc, WORLD.getUser(id));
-            this.area.notify_update();
+            this.init_dadizi(this.first_npc as any, WORLD.getUser(id));
+            this.area?.notify_update();
         }
     }
 
     /** @param npc @param me */
-    init_dadizi(npc: any, me?: any): void {
-        this.first_npc = npc;
+    init_dadizi(npc: Record<string, any>, me?: Record<string, any>): void {
+        this.first_npc = npc as any;
         npc.name = WORLD.DATA.query_temp(this.id + "_top_name") || this.top_name;
         npc.title = this.top_name;
         npc.userid = WORLD.DATA.query_temp(this.id + "_top");
@@ -614,13 +624,13 @@ export class FAMILY extends BASE {
     }
 
     /** @param me @param msg */
-    send_channel(me: any, msg: string): void {
+    send_channel(me: Record<string, any>, msg: string): void {
         var msg = '{type:"msg",ch:"fam",content:"' + msg + '",fam:"' + this.name + '", name:"' + (me ? me.name : "门派管理") + '" }';
         this.send(msg);
     }
 
     /** @param me @returns string */
-    query_task_title(me: any): string {
+    query_task_title(me: Record<string, any>): string {
         let level = me.query_temp('sm_level', 0);
         return me.family.name + TITLES[level];
     }
@@ -643,7 +653,7 @@ export class FAMILY extends BASE {
 
     /** @returns string */
     static SAVE(): string {
-        var obj: Record<string, any> = {};
+        var obj: Record<string, unknown> = {};
         for (var key in FAMILIES) {
             var fam = FAMILIES[key];
             if (fam.tops) {
@@ -674,4 +684,4 @@ export const FAMILIES: Record<string, FAMILY> = { NONE: new FAMILY() };
 const TITLES: string[] = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
 
 // 使FAMILIES全局可用
-(globalThis as any).FAMILIES = FAMILIES;
+(globalThis as Record<string, unknown>).FAMILIES = FAMILIES;

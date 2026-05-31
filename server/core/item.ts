@@ -114,7 +114,7 @@ export class ITEM extends BASE {
      * @param def - 默认值
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    query_temp(name: string, def?: any, _me?: any): any {
+    query_temp(name: string, def?: unknown, _me?: unknown): unknown {
         if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
@@ -134,7 +134,7 @@ export class ITEM extends BASE {
      * @param time - 有效期（毫秒）
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    set_temp(name: string, value: any, time?: number, _me?: any): void {
+    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -163,7 +163,7 @@ export class ITEM extends BASE {
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      * @returns 累加后的值
      */
-    add_temp(name: string, value: number, time?: number, _me?: any): number {
+    add_temp(name: string, value: number, time?: number, _me?: unknown): number {
         const val = (this.query_temp(name, 0, _me) as number) + value;
         this.set_temp(name, val, time, _me);
         return val;
@@ -191,7 +191,7 @@ export class ITEM extends BASE {
      * 初始化 — 子类可覆写
      * @param _args - 参数列表
      */
-    init(..._args: any[]): void {
+    init(..._args: unknown[]): void {
         return undefined;
     }
 
@@ -207,7 +207,7 @@ export class ITEM extends BASE {
     add_action(
         cmd: string,
         name: string,
-        func: (this: this, ...args: any[]) => any,
+        func: (this: this, ...args: unknown[]) => unknown,
     ): ActionDef<this> | undefined {
         if (!cmd) return;
         if (!this.actions) this.actions = {};
@@ -256,7 +256,7 @@ export class ITEM extends BASE {
      * @param cmdName - 命令名
      * @param pars - 参数列表
      */
-    exec(cmdName: string, pars: any[]): any {
+    exec(cmdName: string, pars: unknown[]): unknown {
         if (this.actions) {
             const cmd = this.actions[cmdName];
             if (cmd && cmd.action) {
@@ -370,7 +370,7 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 移除的物品
      */
-    remove_item(obj: ITEM, count?: number): ITEM | null | undefined {
+    remove_item(obj: ITEM, count: number = 0): ITEM | null | undefined {
         if (!obj || !this.items) return;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
@@ -435,7 +435,7 @@ export class ITEM extends BASE {
      * 创建对象 ID
      */
     create_id(): void {
-        this.id = (UTIL as any).create_id();
+        this.id = (UTIL as { create_id(): string }).create_id();
     }
 
     /**
@@ -459,7 +459,7 @@ export class ITEM extends BASE {
         const id = this.id;
         if (!id) return;
         const time = parseInt(id.substr(4), 16);
-        return new Date(time * 1000 + (UTIL as any).begin);
+        return new Date(time * 1000 + (UTIL as { begin: number }).begin);
     }
 
     /**

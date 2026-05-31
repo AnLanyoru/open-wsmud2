@@ -10,20 +10,20 @@ import JSON5 from 'json5';
 import { PROPERTIES } from './const.js';
 
 // 懒加载 SKILL 避免循环依赖
-let _SKILL: typeof import('./skill/skill.js').SKILL | null = null;
-import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
+let _SKILL: Record<string, Function> | null = null;
+import('./skill/skill.js').then(m => { _SKILL = m.SKILL as unknown as Record<string, Function>; });
 
 // ============================================================
 // 原型扩展 (副作用)
 // ============================================================
 
 /** Function.prototype.inherits — 原型继承工具 */
-(Function.prototype as any).inherits = function (superCtor: Function): void {
-  util.inherits(this as any, superCtor);
+(Function.prototype as unknown as Record<string, Function>).inherits = function (this: Function, superCtor: Function): void {
+  util.inherits(this as unknown as Function, superCtor);
 };
 
 /** Array.prototype.remove — 移除第一个匹配元素 */
-(Array.prototype as any).remove = function <T>(item: T): boolean {
+(Array.prototype as unknown as Record<string, Function>).remove = function <T>(this: T[], item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] == item) {
       this.splice(i, 1);
@@ -34,7 +34,7 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
 };
 
 /** Array.prototype.contain — 是否包含元素 */
-(Array.prototype as any).contain = function <T>(item: T): boolean {
+(Array.prototype as unknown as Record<string, Function>).contain = function <T>(this: T[], item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] === item) {
       return true;
@@ -44,13 +44,13 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
 };
 
 /** Array.prototype.random — 随机获取数组元素 */
-(Array.prototype as any).random = function <T>(limit?: number): T {
+(Array.prototype as unknown as Record<string, Function>).random = function <T>(this: T[], limit?: number): T {
   limit = limit || this.length;
   return this[Math.floor(Math.random() * this.length)] as T;
 };
 
 /** JSON.toObject — 使用 JSON5 解析（支持尾逗号等） */
-(JSON as any).toObject = function (str: string): any {
+(JSON as unknown as Record<string, Function>).toObject = function (str: string): unknown {
   return JSON5.parse(str);
 };
 
@@ -66,7 +66,7 @@ export const UTIL = {
    * require 模块加载包装
    * @param str - 模块名
    */
-  require(str: string): any {
+  require(str: string): unknown {
     return require(str);
   },
 
@@ -187,7 +187,7 @@ export const UTIL = {
    * @param sp - 分隔符（默认换行）
    * @param count - 倍率（默认 1）
    */
-  prop_toString(prop: Record<string, any> | null, sp?: string, count?: number): string {
+  prop_toString(prop: Record<string, unknown> | null, sp?: string, count?: number): string {
     if (!prop) return "";
     const str: string[] = [];
     count = count || 1;
@@ -225,7 +225,7 @@ export const UTIL = {
         case "skill": {
           let skills = prop[item] as Record<string, number>;
           for (let sk in skills) {
-            let sk_base = _SKILL && (_SKILL as any).get(sk);
+            let sk_base = _SKILL && (_SKILL as Record<string, Function>).get(sk);
             if (sk_base) str.push(sk_base.name + "：+" + skills[sk] + "级");
           }
           break;
@@ -247,9 +247,9 @@ export const UTIL = {
               ? str.push(PROPERTIES[item] + "：+" + val * count)
               : str.push(PROPERTIES[item] + "：" + val * count);
           } else {
-            p = _SKILL && (_SKILL as any).SLOTS[item];
+            p = _SKILL && (_SKILL as Record<string, Function>).SLOTS[item];
             if (p) {
-              str.push((p as any).format(val * count));
+              str.push((p as unknown as { format(v: number): string }).format(val * count));
             }
           }
           break;
@@ -319,7 +319,7 @@ export const UTIL = {
     if (!this.logs.length) return;
     const fs = require("fs") as typeof import('fs');
     const dt = new Date();
-    const path = (globalThis as any).__PATH.DATA + "log/";
+    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "log/";
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }

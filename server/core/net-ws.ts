@@ -13,33 +13,45 @@ import fs from 'fs';
 // Socket 类型 — net.Socket + 自定义扩展属性
 // ============================================================
 
+/** WebSocket/TCP Socket 扩展类型 */
 export interface WsSocket {
+  /** 远程地址 */
   remoteAddress?: string;
+  /** 设置超时 */
   setTimeout(ms: number, callback?: () => void): this;
+  /** 结束连接 */
   end(data?: string | Buffer, encoding?: string): this;
+  /** 销毁连接 */
   destroy(): this;
+  /** 写入数据 */
   write(data: string | Buffer): boolean;
-  on(event: string, handler: (...args: any[]) => void): this;
-  removeListener(event: string, handler: (...args: any[]) => void): this;
-  /** 自定义: 发送消息 */
+  /** 注册事件监听 */
+  on(event: string, handler: (...args: unknown[]) => void): this;
+  /** 移除事件监听 */
+  removeListener(event: string, handler: (...args: unknown[]) => void): this;
+  /** 发送消息（由 onClientConnect 注入） */
   send?: (msg: string) => void;
-  /** 自定义: 协议处理器 */
+  /** 当前使用的协议处理器 */
   protocol?: WsProtocol;
-  /** 自定义: HTTP 请求头 */
+  /** HTTP 请求头（WebSocket 握手阶段解析） */
   requestHeader?: Record<string, string>;
-  /** 自定义: TCP 未读完数据缓存 */
+  /** TCP 未读完的数据缓存 */
   unread_data?: Buffer | null;
-  /** 自定义: 所属用户 */
-  user?: any;
-  /** 自定义: 关联的跨服连接 */
-  oserver?: any;
+  /** 所属用户对象 */
+  user?: Record<string, unknown> | null;
+  /** 关联的跨服连接 */
+  oserver?: Record<string, unknown> | null;
+  /** 是否已销毁 */
   destroyed?: boolean;
 }
 
-/** 协议接口 */
+/** 通信协议接口 */
 export interface WsProtocol {
+  /** 发送数据帧 */
   sendData: (text: string, socket: WsSocket) => void;
+  /** WebSocket 握手（TCP 协议无需） */
   handShake?: (header: Record<string, string>, socket: WsSocket, data?: Buffer) => void;
+  /** 读取并解析收到的数据 */
   readData: (data: Buffer, socket: WsSocket, server: wsServer) => void;
 }
 
@@ -67,7 +79,7 @@ export default class wsServer {
   /** 是否启用 SSL */
   ssl: boolean;
   /** 底层 TCP/TLS 服务器实例 */
-  tcpServer?: any;
+  tcpServer?: { close(cb: () => void): void; on(event: string, cb: () => void): void };
 
   // === 事件回调（外部可覆盖） ===
 
@@ -136,7 +148,7 @@ export default class wsServer {
    */
   close(): Promise<void> {
     return new Promise((resolve) => {
-      this.tcpServer.close(resolve);
+      this.tcpServer!.close(resolve);
     });
   }
 }
@@ -192,7 +204,7 @@ function onClientConnect(this: wsServer, socket: WsSocket): void {
 
 const protocols: {
   var1: Required<WsProtocol>;
-  var2: Required<WsProtocol>;
+  var2: Required<WsProtocol> & { buffer: Buffer | null };
   tcp: WsProtocol;
 } = {
   /** WebSocket 协议版本 13 (RFC 6455) */
@@ -293,11 +305,11 @@ const protocols: {
       const key2 = header['Sec-WebSocket-Key2'];
       const origin = header['Origin'];
 
-      let n1 = getNumber(key1);
+      let n1: any = getNumber(key1);
       n1 = parseInt(n1);
       n1 = n1 / getSpace(key1);
 
-      let n2 = getNumber(key2);
+      let n2: any = getNumber(key2);
       n2 = parseInt(n2);
       n2 = n2 / getSpace(key2);
 
@@ -307,8 +319,8 @@ const protocols: {
       buffer.copy(buf, 8, buffer.length - 8, buffer.length);
 
       let hasherbs = crypto.createHash('md5');
-      hasherbs = hasherbs.update(buf);
-      hasherbs = hasherbs.digest();
+      hasherbs.update(buf);
+      const digestResult = hasherbs.digest();
 
       const host = 'ws://' + header['Host'] + '/';
       const headers = [
@@ -320,7 +332,7 @@ const protocols: {
         '\r\n',
       ];
       socket.write(headers.join('\r\n'));
-      socket.write(hasherbs);
+      socket.write(digestResult);
     },
 
     buffer: null as Buffer | null,

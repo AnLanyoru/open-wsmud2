@@ -24,7 +24,7 @@ export class TASK extends BASE {
      */
     static GET(id: string): TASK | undefined {
         for (let i = 0; i < WORLD.SYSTEMTASKS.length; i++) {
-            if (WORLD.SYSTEMTASKS[i].id == id) {
+            if ((WORLD.SYSTEMTASKS[i] as any).id == id) {
                 return WORLD.SYSTEMTASKS[i];
             }
         }
@@ -62,12 +62,12 @@ export class TASK extends BASE {
      * 查询玩家货物列表（子类重写）
      * @param me - 玩家角色
      */
-    query_goods(me: any): any[] | undefined { return undefined; }
+    query_goods(me: Record<string, any>): unknown[] | undefined { return undefined; }
 
     /**
      * 设置/清除玩家货物缓存（子类重写）
      * @param me - 玩家角色
      * @param list - 物品列表，传null清除缓存
      */
-    set_goods(me: any, list: any[] | null): void { return undefined as unknown as void; }
+    set_goods(me: Record<string, any>, list: unknown[] | null): void { return undefined as unknown as void; }
 }

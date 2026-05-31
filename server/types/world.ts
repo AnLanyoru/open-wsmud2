@@ -166,7 +166,7 @@ export interface StatsSystem {
   WEAPON: WeaponRankEntry[];
   EQ_STATS: WeaponRankEntry[][];
   SC_STATS: Record<string, ScoreRankEntry[]>;
-  load_tops(tops: StatsTopEntry[], defname: string, key: string): StatsTopEntry[];
+  load_tops(tops?: StatsTopEntry[], defname?: string, key?: string): StatsTopEntry[];
   loadTopUser(data: any, npc: NPC): void;
   checkStats(player: USER): void;
   saveTops(tops: StatsTopEntry[]): string;

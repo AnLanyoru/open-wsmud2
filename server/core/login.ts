@@ -3,39 +3,66 @@
  */
 
 import crypto from 'crypto';
+import type { WsSocket } from './net-ws.js';
 import { WORLD } from './world.js';
 
 // Global __CONFIG is set by the bootstrap script
-declare global {
-  const __CONFIG: {
-    DESIV: Buffer;
-    [key: string]: any;
-  };
-}
+declare var __CONFIG: {
+  DESIV: Buffer;
+  [key: string]: unknown;
+};
 
+/** 登录用户对象（由数据库查询返回） */
 export interface LoginUser {
-  // Minimal interface for loginuser objects
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
+/** 最小化用户参数类型（用于各方法签名） */
+interface LoginUserParam {
+  userid?: number;
+  send(msg: string): void;
+  socket?: { end(): void; remoteAddress?: string } | null;
+  user_level?: number;
+  wait_input: ((...args: any[]) => void) | null;
+  password?: string;
+  loginTime?: number;
+  ip_address?: string;
+  serverid?: number;
+}
+
+/** 解密后的会话数据 */
 export interface DecryptedSession {
+  /** 用户 ID */
   id: number;
+  /** 用户名 */
   name: string;
+  /** 密码 */
   pwd: string;
+  /** 登录时间戳 */
   loginTime: number;
+  /** 用户权限等级 */
   level: number;
 }
 
+/** 用户登录模块接口 */
 export interface UserLoginModule {
+  /** 同 ID 最大同时连接数 */
   max_idcount: number;
+  /** 同 IP 最大同时连接数 */
   max_ipcount: number;
 
-  login_error(user: any, msg: string, close?: boolean): false;
+  /** 登录错误处理，@param user 用户对象，@param msg 错误消息，@param close 是否关闭连接 */
+  login_error(user: LoginUserParam, msg: string, close?: boolean): false;
+  /** 解密用户会话信息，@param key 加密密钥，@param session Base64 加密数据 */
   encryptUser(key: string, session: string): DecryptedSession | null;
+  /** 检查用户合法性，@param loginuser 登录用户对象，@param id 用户 ID */
   check_user(loginuser: LoginUser, id: number): boolean;
-  check_session(user: any, str: string): Promise<false | undefined>;
-  wait_login(user: any, str: string): void;
-  load_roles(user: any): Promise<void>;
+  /** 检查用户会话有效性，@param user 用户对象，@param str 会话字符串 */
+  check_session(user: LoginUserParam, str: string): Promise<false | undefined>;
+  /** 等待用户登录选择，@param user 用户对象，@param str 命令字符串 */
+  wait_login(user: LoginUserParam, str: string): void;
+  /** 加载用户角色列表，@param user 用户对象 */
+  load_roles(user: LoginUserParam): Promise<void>;
 }
 
 const USERLOGIN: UserLoginModule = {
@@ -51,7 +78,7 @@ const USERLOGIN: UserLoginModule = {
    * @param close - 是否关闭连接 (默认 true)
    * @returns false
    */
-  login_error(user: any, msg: string, close: boolean = true): false {
+  login_error(user: LoginUserParam, msg: string, close: boolean = true): false {
     user.send(`{type:'loginerror',msg:'${msg}'}`);
     if (close) {
       user.socket?.end();
@@ -103,17 +130,17 @@ const USERLOGIN: UserLoginModule = {
    * @param user - 用户对象
    * @param str - 会话字符串
    */
-  async check_session(user: any, str: string): Promise<false | undefined> {
+  async check_session(user: LoginUserParam, str: string): Promise<false | undefined> {
     if (user.userid) {
       return this.login_error(user, '参数错误');
     }
-    str = str.split(' ');
+    const parts = str.split(' ');
 
-    if (str.length < 2) {
+    if (parts.length < 2) {
       return this.login_error(user, '参数错误');
     }
 
-    const cookieUser = this.encryptUser(str[0], str[1]);
+    const cookieUser = this.encryptUser(parts[0], parts[1]);
     if (!cookieUser || cookieUser.id === 0) {
       return this.login_error(
         user,
@@ -140,13 +167,13 @@ const USERLOGIN: UserLoginModule = {
     user.userid = cookieUser.id;
     user.password = cookieUser.pwd;
     user.loginTime = cookieUser.loginTime;
-    user.ip_address = user.socket.remoteAddress;
+    user.ip_address = user.socket?.remoteAddress ?? '';
 
-    if (cookieUser.id !== (WORLD as any).admin_user) {
+    if (cookieUser.id !== (WORLD as unknown as { admin_user: number }).admin_user) {
       if (WORLD.CONNECT_COUNT > WORLD.max_connect_count) {
         return this.login_error(user, '服务器人数过多，请稍后再试。');
       }
-      if (str.length === 2 && WORLD.USERS.length > WORLD.max_user_count) {
+      if (parts.length === 2 && WORLD.USERS.length > WORLD.max_user_count) {
         return this.login_error(user, '服务器人数过多，请稍后再试。');
       }
       if (!WORLD.before_login(user)) {
@@ -155,21 +182,22 @@ const USERLOGIN: UserLoginModule = {
     }
 
     if (str.length === 4) {
-      if (parseInt(str[3]) !== WORLD.SERVERID) {
+      if (parseInt(parts[3]) !== WORLD.SERVERID) {
         return this.login_error(user, '参数错误。');
       }
-      const data = (WORLD as any).can_cross(str[2]);
+      const data = (WORLD as { can_cross(id: string): boolean }).can_cross(parts[2]);
       if (!data) {
         return this.login_error(user, '不允许登录');
       }
-      (WORLD as any).on_user_cross_login(user, data);
+      (WORLD as { on_user_cross_login(u: LoginUserParam, d: unknown): void }).on_user_cross_login(user, data);
       return;
     } else {
       user.serverid = WORLD.SERVERID;
     }
 
-    if (str[2]) {
-      return this.wait_login(user, 'login ' + str[2]);
+    if (parts[2]) {
+      this.wait_login(user, 'login ' + parts[2]);
+      return;
     }
     await this.load_roles(user);
     user.wait_input = this.wait_login;
@@ -180,7 +208,7 @@ const USERLOGIN: UserLoginModule = {
    * @param user - 用户对象
    * @param str - 命令字符串
    */
-  wait_login(user: any, str: string): void {
+  wait_login(user: LoginUserParam, str: string): void {
     if (!str) return;
     const i = str.indexOf(' ');
     let cmd = str;
@@ -190,8 +218,8 @@ const USERLOGIN: UserLoginModule = {
       pars = str.substr(i + 1);
     }
     const command = WORLD.COMMANDS[cmd];
-    if (command && (command as any).allow_login) {
-      (WORLD.COMMANDS[cmd] as any).enter(user, pars);
+    if (command && (command as { allow_login?: boolean }).allow_login) {
+      (WORLD.COMMANDS[cmd] as { enter(u: LoginUserParam, p: string): void }).enter(user, pars);
     }
   },
 
@@ -199,7 +227,7 @@ const USERLOGIN: UserLoginModule = {
    * 加载用户角色列表
    * @param user - 用户对象
    */
-  async load_roles(user: any): Promise<void> {
+  async load_roles(user: LoginUserParam): Promise<void> {
     try {
       const roles = await WORLD.DB.getRoles(user.userid, user.serverid);
 
@@ -220,10 +248,10 @@ const USERLOGIN: UserLoginModule = {
         str.push(']}');
         user.send(str.join(''));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(user.userid, '角色读取 ', error);
-      WORLD.log(null, '登陆失败：' + user.userid, error.message);
-      return this.login_error(user, '数据读取失败');
+      WORLD.log(null, '登陆失败：' + user.userid, (error as Error).message);
+      this.login_error(user, '数据读取失败');
     }
   },
 };

@@ -17,12 +17,17 @@ import type { USER } from '../char/user.js';
 const level_desc: string[] = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
     "★★★☆", "★★★★", "★★★★☆", "★★★★★", "★★★★★☆", "★★★★★★"];
 
-/** Stored gem entry */
+/** 镶嵌宝石条目 */
 export interface StoneEntry {
+    /** 宝石 ID */
     id: string;
+    /** 宝石模板路径 */
     path: string;
+    /** 宝石显示名称（含颜色和属性描述） */
     name: string;
+    /** 宝石属性加成 */
     prop: Record<string, number>;
+    /** 宝石品级 */
     grade: number;
 }
 
@@ -32,76 +37,76 @@ export class EQUIPMENT extends OBJ {
         super();
     }
 
-    // ============ Equipment flags ============
+    // ============ 装备标志 ============
 
-    /** Whether this is equipment */
+    /** 是否为装备 */
     is_equipment: boolean = true;
-    /** Whether tradable */
+    /** 是否可交易 */
     transable: boolean = true;
-    /** Equipment slot type (WEAPON / CLOTH / etc.) */
+    /** 装备槽位类型（WEAPON/CLOTH 等） */
     eq_type: number = EQUIP_TYPE.WEAPON;
 
-    // ============ Equipment stats ============
+    // ============ 装备数值 ============
 
-    /** Enhancement level */
+    /** 强化等级 */
     level: number = 0;
-    /** Equipment exp */
+    /** 装备经验值 */
     exp: number = 0;
-    /** Grade (0-6) */
+    /** 品级（0-6） */
     grade: number = 0;
-    /** Item count (always 1 for equipment) */
+    /** 物品数量（装备始终为 1） */
     count: number = 1;
-    /** Not stackable */
+    /** 不可堆叠 */
     combined: boolean = false;
-    /** Show action button */
+    /** 显示快捷操作按钮 */
     showAction: boolean = true;
-    /** Allow use during combat */
+    /** 允许战斗中操作 */
     allow_fight: boolean = true;
-    /** Object type identifier */
+    /** 物件类型标识 */
     otype: number = 4;
 
     // ============ Attached properties ============
 
-    /** Base equipment score */
+    /** 基础装备评分 */
     score: number = 0;
-    /** Attached properties (enhancement) */
-    prop: Record<string, number> | null = null;
-    /** Socketed gem properties */
+    /** 附加属性（强化加成） */
+    prop: Record<string, any> | null = null;
+    /** 镶嵌宝石属性列表 */
     st_prop: StoneEntry[] | null = null;
-    /** Number of gem sockets */
+    /** 剩余宝石孔数 */
     hole_count: number = 0;
-    /** Equip conditions ({skill, str, gender, etc.}) */
+    /** 装备条件（技能、属性、性别等） */
     condition: Record<string, any> | null = null;
-    /** Set group name */
+    /** 套装组名 */
     group_name: string | null = null;
-    /** Weapon type (sword / blade / staff / etc.) */
+    /** 武器类型（sword/blade/staff 等） */
     weapon_type: string = "";
-    /** Original properties (for enhancement calculation) */
+    /** 原始属性（用于强化计算基准） */
     original_prop: Record<string, any> | null = null;
-    /** Color-tagged display name */
+    /** 带颜色标签的显示名称 */
     color_name: string = "";
 
-    /** Custom equip message */
+    /** 自定义装备消息 */
     eq_msg: string | null = null;
-    /** Custom unequip message */
+    /** 自定义卸下消息 */
     uneq_msg: string | null = null;
 
-    // ============ Callbacks ============
+    // ============ 回调函数（由资源文件覆写） ============
 
-    /** Group property calculator — overridden by subclasses */
+    /** 套装属性计算 — 触发时机：get_desc()/check_group() 查询套装效果时；传入已装备同套装件数 */
     group_prop?: (count: number) => Record<string, number> | undefined | void;
-    /** Equip callback — return false to block */
+    /** 装备时回调 — 触发时机：eq() 开头，条件检查通过后、属性加成应用前；返回 false 阻止装备 */
     on_eq?: ((me: CHARACTER) => boolean | void);
-    /** Unequip callback */
+    /** 卸下时回调 — 触发时机：uneq() 开头，属性移除之前 */
     on_uneq?: ((me: CHARACTER) => void);
 
     /**
-     * Apply/remove equipment attached properties
-     * @param me - target character
-     * @param is_attach - true = attach, false = remove
+     * 应用/移除装备附加属性
+     * @param me - 目标角色
+     * @param is_attach - true 附加，false 移除
      */
     change_prop(me: CHARACTER, is_attach: boolean): void {
-        me.change_prop(this.prop, is_attach);
+        if (this.prop) me.change_prop(this.prop, is_attach);
         if (this.st_prop) {
             for (let i = 0; i < this.st_prop.length; i++) {
                 me.change_prop(this.st_prop[i].prop, is_attach);
@@ -110,11 +115,13 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Notify client about action button change (based on equip state)
+     * 通知客户端快捷按钮变更（基于装备状态）
+     * @param me - 目标角色
+     * @param isadd - true 添加按钮，false 移除按钮
      */
     notify_action(me: CHARACTER, isadd: boolean): void {
         if (!this.on_use) return;
-        isadd = (me as Record<string, any>).equipment?.[this.eq_type] === this;
+        isadd = me.equipment?.[this.eq_type] === this;
         if (isadd)
             me.send("{type:'addAction',id:'" + this.id + "',name:'" + this.name + "',distime:" + (this.distime || 0) + "}");
         else
@@ -122,8 +129,9 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Check equip conditions
-     * @returns true if all conditions pass
+     * 检查装备条件
+     * @param me - 目标角色
+     * @returns true 表示所有条件满足
      */
     check(me: CHARACTER): boolean {
         if (!this.condition) return true;
@@ -134,7 +142,7 @@ export class EQUIPMENT extends OBJ {
                     for (const sk in val) {
                         if (me.query_skill(sk, 0) < val[sk]) {
                             const sk_base = SKILL.get(sk);
-                            return me.notify_fail("你的" + sk_base.color_name + "等级不够" + val[sk] + "，无法装备" + this.color_name + "。");
+                            return me.notify_fail("你的" + (sk_base ? sk_base.color_name : sk) + "等级不够" + val[sk] + "，无法装备" + this.color_name + "。");
                         }
                     }
                     break;
@@ -143,7 +151,7 @@ export class EQUIPMENT extends OBJ {
                 case "dex1":
                 case "int1":
                     if ((me as Record<string, any>)[key.replace("1", "")] < val) {
-                        return me.notify_fail("你的先天" + (PROPERTIES as Record<string, string>)[key] + "不够" + val + "，无法装备" + this.color_name + "。");
+                        return me.notify_fail("你的先天" + (PROPERTIES as Record<string, string>)[key] || key + "不够" + val + "，无法装备" + this.color_name + "。");
                     }
                     break;
                 case "str":
@@ -172,9 +180,9 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Equip onto a character
-     * @param me - target user
-     * @param notsend - skip room messages
+     * 装备到角色身上
+     * @param me - 目标玩家
+     * @param notsend - 是否跳过房间广播消息
      */
     eq(me: USER, notsend?: boolean): boolean | undefined {
         if (this.check(me) === false) {
@@ -219,7 +227,9 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Unequip from a character
+     * 从角色身上卸下装备
+     * @param me - 目标角色
+     * @param notsend - 是否跳过房间广播消息
      */
     uneq(me: CHARACTER, notsend?: boolean): void {
         if (this.on_uneq) this.on_uneq(me);
@@ -257,7 +267,8 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Text description of equip conditions
+     * 装备条件文本描述
+     * @param str - 输出字符串数组
      */
     condition_tostring(str: string[]): void {
         if (!this.condition) return;
@@ -267,7 +278,7 @@ export class EQUIPMENT extends OBJ {
                 case "skill":
                     for (const sk in val) {
                         const sk_base = SKILL.get(sk);
-                        str.push(sk_base.name + "要求：" + val[sk] + "级");
+                        str.push((sk_base ? sk_base.name : sk) + "要求：" + val[sk] + "级");
                     }
                     break;
                 case "desc":
@@ -284,13 +295,14 @@ export class EQUIPMENT extends OBJ {
         }
     }
 
-    /** Slot names indexed by eq_type */
+    /** 装备部位名称（按 eq_type 索引） */
     parts: string[] = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
-    /** Quality names indexed by grade */
+    /** 品质名称（按 grade 索引） */
     qualities: string[] = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
 
     /**
-     * Full equipment description
+     * 完整装备描述
+     * @param me - 查看的角色
      */
     get_desc(me: CHARACTER): string {
         const str: string[] = [this.color_name];
@@ -326,14 +338,15 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Query quality name
+     * 查询品质名称
      */
     query_quality(): string {
         return this.qualities[this.grade] ?? "普通";
     }
 
     /**
-     * Level up (enhancement)
+     * 强化升级
+     * @param lev - 目标强化等级
      */
     level_up(lev: number): void {
         const cc = this.query_grade_color();
@@ -344,17 +357,17 @@ export class EQUIPMENT extends OBJ {
         this.json = null;
     }
 
-    /** Enhancement level threshold data */
+    /** 强化等级阈值数据（每级所需的强化经验） */
     levelData: number[] = [
         0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
     ];
 
     /**
-     * Recalculate properties based on enhancement level
+     * 根据强化等级重新计算属性
      */
     levelchange_prop(): void {
         if (!(this.level >= 0 && this.level < 13)) return;
-        const base_props: Record<string, any> = this.original_prop ?? Object.getPrototypeOf(this).prop ?? {};
+        const base_props: Record<string, any> = (this.original_prop ?? (Object.getPrototypeOf(this) as any).prop ?? {});
         const val = this.levelData[this.level];
         for (const key in base_props) {
             const value = base_props[key];
@@ -418,7 +431,7 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Clear all socketed gems
+     * 清除所有已镶嵌宝石
      */
     clear_stone(): void {
         if (!this.st_prop) return;
@@ -427,7 +440,8 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Socket a gem into this equipment
+     * 镶嵌宝石到此装备
+     * @param stone - 宝石物品
      */
     push_stone(stone: OBJ): boolean | undefined {
         if (!stone || !stone.prop) return false;
@@ -454,7 +468,8 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Clone equipment (preserve enhancement and gems)
+     * 克隆装备（保留强化等级和宝石）
+     * @param me - 可选，用于触发 on_reload 回调
      */
     clone(me?: CHARACTER): EQUIPMENT {
         const obj = OBJ.CREATE(this.path!) as EQUIPMENT;
@@ -468,10 +483,11 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Serialize equipment for database
+     * 序列化装备数据用于数据库存储
+     * @param str - 输出字符串数组
      */
     save_db(str: string[]): void {
-        str.push('["', this.path ?? '', '","', this.id, '",', this.level);
+        str.push('["', this.path ?? '', '","', this.id, '",', String(this.level));
         if (this.st_prop && this.st_prop.length) {
             str.push(",[");
             for (let i = 0; i < this.st_prop.length; i++) {
@@ -488,12 +504,13 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Restore equipment from database record
+     * 从数据库记录恢复装备
+     * @param data - 数据库记录数组
      */
-    load_db(data: any[]): void {
-        this.id = data[1];
-        if (data[2] > 0) {
-            this.level = data[2];
+    load_db(data: unknown[]): void {
+        this.id = data[1] as string;
+        if ((data[2] as number) > 0) {
+            this.level = data[2] as number;
         }
         for (let i = 3; i < data.length; i++) {
             const value = data[i];
@@ -512,7 +529,8 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Post-load callback — reapply enhancement
+     * 加载后回调 — 重新应用强化等级
+     * @param me - 目标角色
      */
     on_load(me: CHARACTER): void {
         if (this.on_reload) this.on_reload(me);
@@ -521,26 +539,31 @@ export class EQUIPMENT extends OBJ {
         }
     }
 
-    /** Equipment values by grade */
+    /** 各品级装备基础价值 */
     VALUES: number[] = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
 
     /**
-     * Create callback — set value by grade
+     * 创建回调 — 根据品级设置售价
+     * @param path - 资源路径
+     * @param par - 构造参数
      */
     on_create(path: string, par?: string): void {
         this.value = this.VALUES[this.grade] ?? 0;
     }
 
     /**
-     * Query set bonus description
+     * 查询套装加成描述
+     * @param me - 目标角色
+     * @param str - 输出字符串数组
      */
     query_group_desc(me: CHARACTER, str: string[]): void {
         if (!this.group_prop || !this.group_name) return;
         let count = 0;
-        if (me && (me as Record<string, any>).equipment) {
-            const equip: any[] = (me as Record<string, any>).equipment;
+        if (me && me.equipment) {
+            const equip: (EQUIPMENT | null)[] = me.equipment;
             for (let i = 0; i < equip.length; i++) {
-                if (equip[i] && equip[i].group_name === this.group_name) {
+                const eq = equip[i];
+                if (eq && eq.group_name === this.group_name) {
                     count++;
                 }
             }
@@ -564,16 +587,17 @@ export class EQUIPMENT extends OBJ {
     }
 
     /**
-     * Check and update set bonus effects
-     * @param me - character
-     * @param isadd - true = equip, false = unequip
+     * 检查并更新套装效果
+     * @param me - 目标角色
+     * @param isadd - true 装备中，false 卸下中
      */
     check_group(me: CHARACTER, isadd: boolean): void {
         if (!this.group_prop || !this.group_name) return;
         let count = isadd ? 1 : 0;
-        const equip: any[] = (me as Record<string, any>).equipment ?? [];
+        const equip: (EQUIPMENT | null)[] = me.equipment ?? [];
         for (let i = 0; i < equip.length; i++) {
-            if (equip[i] && equip[i].group_name === this.group_name) {
+            const eq = equip[i];
+            if (eq && eq.group_name === this.group_name) {
                 count++;
             }
         }
@@ -583,10 +607,10 @@ export class EQUIPMENT extends OBJ {
         }
     }
 
-    // ============ Score calculation ============
+    // ============ 评分计算 ============
 
     /**
-     * Calculate equipment score
+     * 计算装备评分
      */
     query_score(): number {
         if (this.grade) {

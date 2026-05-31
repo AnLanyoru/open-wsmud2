@@ -6,6 +6,7 @@ import { CHARACTER } from './character.js';
 
 // @ts-ignore - Legacy JS module
 import { FAMILIES } from '../skill/family.js';
+import type { FAMILY } from '../skill/family.js';
 // @ts-ignore - Legacy JS module
 import { ROOM } from '../room/room.js';
 // @ts-ignore - Legacy JS module
@@ -16,6 +17,7 @@ import { WORLD } from '../world.js';
 import { BASE } from '../base.js';
 // @ts-ignore - Legacy JS module
 import { CORPSE } from '../item/corpse.js';
+import type { ActionMap } from '../../types/base.js';
 
 declare var __PATH: Record<string, string>;
 
@@ -23,6 +25,7 @@ declare var __PATH: Record<string, string>;
 // NPC 类
 // ============================================================
 
+// @ts-ignore: static CREATE override incompatible with base
 export class NPC extends CHARACTER {
 
   // ============ 核心属性 ============
@@ -30,7 +33,7 @@ export class NPC extends CHARACTER {
   /** 是否自动释放绝招 */
   auto_pfm: boolean = true;
   /** 所属门派 */
-  family: any = FAMILIES.NONE;
+  family: FAMILY = FAMILIES.NONE;
   /** NPC 名称 */
   name!: string;
   /** NPC 等级 */
@@ -45,9 +48,9 @@ export class NPC extends CHARACTER {
   /** 闲聊触发概率（百分比） */
   chat_chance: number = 0;
   /** 出售物品列表 */
-  sell_list: any[] | null = null;
+  sell_list: OBJ[] | null = null;
   /** 死亡后重生房间 */
-  die_room: any = null;
+  die_room: ROOM | null = null;
   /** 是否禁止刷新（不重生） */
   no_refresh: boolean = false;
   /** 击杀奖励积分 */
@@ -63,20 +66,20 @@ export class NPC extends CHARACTER {
   /** 是否为 NPC */
   is_npc: boolean = true;
 
-  // ============ 回调字段 ============
+  // ============ 回调字段（由资源文件设置） ============
 
-  /** 查询师傅回调（返回 false 拒绝拜师） */
-  on_master?: (me: any) => CHARACTER | false | void;
-  /** 检查技能回调 */
+  /** 拜师回调 — 触发时机：玩家执行 bai 命令时；返回 CHARACTER 可指定师傅，返回 false 拒绝拜师 */
+  on_master?: (me: Record<string, any>) => CHARACTER | false | void;
+  /** 检查技能/学习回调 — 触发时机：玩家执行 cha 命令查看可学技能时；返回 false 阻止学习 */
   on_checkskill?: (me: CHARACTER) => boolean | void;
-  /** 绝招触发回调 */
+  /** 绝招触发回调 — 触发时机：NPC 自动释放绝招之前 */
   on_pfm?: (me: CHARACTER, target: CHARACTER) => void;
-  /** 双修回调 */
-  on_makelove?: (me: any) => void;
-  /** 主人进入回调 */
-  on_master_enter?: (me: any) => void;
-  /** 玩家离开回调（返回 false 阻止离开） */
-  on_leave?: (me: any, dir: string) => boolean | void;
+  /** 双修回调 — 触发时机：玩家对 NPC 执行双修命令时 */
+  on_makelove?: (me: Record<string, any>) => void;
+  /** 主人进入回调 — 触发时机：主人（master）进入 NPC 所在房间时 */
+  on_master_enter?: (me: Record<string, any>) => void;
+  /** 玩家离开回调 — 触发时机：玩家从 NPC 所在房间离开时；返回 false 阻止离开 */
+  on_leave?: (me: Record<string, any>, dir: string) => boolean | void;
 
   constructor() {
     super();
@@ -237,7 +240,7 @@ export class NPC extends CHARACTER {
   /**
    * 更新房间内交互命令
    */
-  update_action(acts: Record<string, any>): void {
+  update_action(acts: ActionMap<NPC>): void {
     this.json = null;
     this.actions = acts;
   }
@@ -251,7 +254,7 @@ export class NPC extends CHARACTER {
    */
   die(killer?: CHARACTER): boolean | undefined {
     if (!this.environment) return;
-    if (this.on_die && this.on_die(killer) == false) {
+    if (this.on_die && this.on_die(killer!) == false) {
       this.hp = 1;
       return false;
     }
@@ -265,11 +268,11 @@ export class NPC extends CHARACTER {
     this.die_room = this.environment;
     this.environment.item_changed(corpse, true);
     this.environment.item_changed(this, false);
-    if (isinfb && this.score && killer && (killer as any).add_fbscore) {
-      (killer as any).add_fbscore(this.score);
+    if (isinfb && this.score && killer && (killer as Record<string, any>).add_fbscore) {
+      (killer as Record<string, any>).add_fbscore(this.score);
     }
     if (!isinfb && !this.no_refresh && !this.master && !this.die_room.is_shadow) {
-      (this as any).call_out(this.relive.bind(this), this.on_master ? 60000 : 300000);
+      this.call_out(this.relive.bind(this), this.on_master ? 60000 : 300000);
     }
     if (this.on_died) this.on_died(killer, corpse);
     WORLD.auto_get(killer, corpse, this);
@@ -282,6 +285,7 @@ export class NPC extends CHARACTER {
   relive(): void {
     if (!this.die_room) return;
     const room = ROOM.Get(this.die_room.path);
+    if (!room) return;
     const obj = room.find_obj_bypath(this.path);
     if (obj) return;
     const npc = NPC.CLONE(this.path);
@@ -345,7 +349,7 @@ export class NPC extends CHARACTER {
   /**
    * 创建 NPC 实例到指定房间
    */
-  static CREATE(path: string, env: any, oncreate?: (npc: NPC) => void, count?: number): NPC | undefined {
+  static CREATE(path: string, env: ROOM, oncreate?: (npc: NPC) => void, count?: number): NPC | undefined {
     if (!path || !env) return;
     count = count || 1;
     let obj: NPC | undefined;

@@ -11,29 +11,30 @@ export class CONTAINER extends OBJ {
         super();
     }
 
-    // ============ Core properties ============
+    // ============ 核心属性 ============
 
-    /** Whether this is a container */
+    /** 是否为容器 */
     is_container: boolean = true;
-    /** Item count */
+    /** 物品数量 */
     count: number = 1;
-    /** Not stackable */
+    /** 不可堆叠 */
     combined: boolean = false;
-    /** Max contained items */
+    /** 最大容纳物品数 */
     max_item_count: number = 50;
-    /** Whether opened */
+    /** 是否已打开 */
     is_open: boolean = false;
 
     /**
-     * Prevent direct pickup of container
+     * 禁止直接拾取容器
+     * @param player - 玩家对象
      */
     on_get(player: USER): boolean {
         return false;
     }
 
     /**
-     * Set initial contents.
-     * Accepts variadic args: item-path strings or [path, count] tuples.
+     * 设置初始物品，支持变长参数：物品路径字符串 或 [路径, 数量]
+     * @param args - 物品路径或 [路径, 数量] 元组
      */
     set_items(...args: (string | [string, number])[]): void {
         for (let i = 0; i < args.length; i++) {
@@ -49,14 +50,16 @@ export class CONTAINER extends OBJ {
     }
 
     /**
-     * Query contained items
+     * 查询容器内物品
+     * @param me - 玩家对象
      */
     query_items(me: USER): OBJ[] | undefined {
-        return this.items ?? undefined;
+        return (this.items ?? undefined) as OBJ[] | undefined;
     }
 
     /**
-     * Get description text with contents listing
+     * 获取带物品列表的描述文本
+     * @param me - 玩家对象
      */
     get_desc(me: USER): string {
         const str: string[] = [this.color_name, this.desc];
@@ -74,23 +77,25 @@ export class CONTAINER extends OBJ {
     }
 
     /**
-     * Clear all contained items
+     * 清空容器内所有物品
+     * @param me - 玩家对象
      */
     clear_items(me: USER): void {
         if (this.items) this.items.length = 0;
     }
 
     /**
-     * Query description JSON (with "get all" command)
+     * 查询描述 JSON（含"全部拾取"按钮）
+     * @param me - 玩家对象
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: Record<string, any> = {};
+        const obj: Record<string, unknown> = {};
         obj.type = "item";
         obj.id = this.id;
         obj.desc = this.get_desc(me);
-        obj.commands = [];
-        obj.commands.push({
+        (obj as any).commands = [];
+        (obj as any).commands.push({
             cmd: "get all from " + this.id,
             name: "全部拾取"
         });

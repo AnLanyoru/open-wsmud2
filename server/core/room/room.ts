@@ -6,22 +6,24 @@ import { WORLD } from "../world.js";
 import { ITEM } from "../item.js";
 import { OBJ } from "../item/obj.js";
 import type { AREA } from "./area.js";
+import type { CHARACTER } from "../char/character.js";
+import type { NPC } from "../char/npc.js";
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
 
-// 懒加载 USER/NPC 避免循环依赖
-let _USER: any = null;
-let _NPC: any = null;
-import("../char/user.js").then((m: any) => { _USER = m.USER; });
-import("../char/npc.js").then((m: any) => { _NPC = m.NPC; });
+// 懒加载 NPC 避免循环依赖
+let _NPC: {
+    CLONE: (path: string, ...args: any[]) => any;
+} | null = null;
+import("../char/npc.js").then((m: Record<string, unknown>) => { _NPC = m.NPC as any; });
 
 /**
  * 隐藏物品被look时的描述
  * @param this - 隐藏物品对象
  * @param player - 查看的玩家
  */
-function on_look_hidden_item(this: any, player: any): string {
+function on_look_hidden_item(this: Record<string, any>, player: Record<string, any>): string {
     if (this.json) return this.json;
     const json: Record<string, any> = {};
     json.type = "item";
@@ -49,7 +51,7 @@ function getAreaByPath(path: string): AREA | undefined {
     path = path.substr(0, index + 1);
     const items = WORLD.AREAS;
     for (let i = 0; i < items.length; i++) {
-        if ((items[i] as any).room_path == path) return items[i] as any;
+        if ((items[i] as AREA).room_path == path) return items[i] as AREA;
     }
 }
 
@@ -70,25 +72,25 @@ export class ROOM extends ITEM {
     /** 房间描述 */
     desc: string = "";
     /** 所属区域路径(由资源文件设置) */
-    area: any;
+    area: AREA | null;
 
     // ============ 容器与出口 ============
 
     /** 房间内的物品和角色 — 运行时CHARACTER或OBJ */
-    items: any[] = [];
+    items: (CHARACTER | OBJ | NPC)[] = [];
     /** 出口映射 {方向: 目标路径} */
     exits: Record<string, string> | null = null;
     /** 出口JSON缓存 */
     room_exits_json: string | null = null;
     /** 隐藏物品映射 */
-    hidden_items: any[] | null = null;
+    hidden_items: Record<string, unknown>[] | null = null;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
 
     // ============ 层级关系 ============
 
     /** 所属区域 */
-    parent: any = null;
+    parent: AREA | null = null;
 
     // ============ 副本与镜像 ============
 
@@ -117,23 +119,23 @@ export class ROOM extends ITEM {
     // ============ 公共房间缓存(静态) ============
 
     /** 公共房间列表(由RANDOM静态方法管理) */
-    static public_rooms: any[] | null = null;
+    static public_rooms: ROOM[] | null = null;
 
-    // ============ 回调(由资源文件设置) ============
+    // ============ 回调（由资源文件设置） ============
 
-    /** 离开房间回调 */
-    on_leave?: (obj: any, dir: string) => boolean | void;
-    /** 进入房间前回调 */
-    on_before_enter?: (obj: any) => void;
-    /** 进入房间后回调 */
-    on_enter?: (obj: any) => void;
-    /** 心跳回调 */
+    /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
+    on_leave?: (obj: Record<string, any>, dir: string) => boolean | void;
+    /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
+    on_before_enter?: (obj: Record<string, any>) => void;
+    /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
+    on_enter?: (obj: Record<string, any>) => void;
+    /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
     on_heart_beat?: (dt: number) => void;
-    /** 登录回调 */
-    on_login?: (user: any) => void;
-    /** 房间创建回调 */
+    /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
+    on_login?: (user: Record<string, any>) => void;
+    /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
-    /** 设置难度回调 */
+    /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
     on_set_difficulty?: (type: number) => void;
 
     // ============ 核心方法 ============
@@ -144,7 +146,7 @@ export class ROOM extends ITEM {
      * @param dir - 离开方向
      * @param leave_msg - 离开消息
      */
-    do_leave(obj: any, dir: string, leave_msg: string): boolean | undefined {
+    do_leave(obj: Record<string, any>, dir: string, leave_msg: string): boolean | undefined {
         if (this.on_leave && this.on_leave(obj, dir) == false) {
             return false;
         }
@@ -159,7 +161,7 @@ export class ROOM extends ITEM {
      * @param isshow - 是否显示
      * @param in_msg - 进入消息
      */
-    do_enter(obj: any, isshow: boolean, in_msg: string): void {
+    do_enter(obj: Record<string, any>, isshow: boolean, in_msg: string): void {
         this.on_before_enter && this.on_before_enter(obj);
         if (obj.is_player) {
             obj.send(this.to_json());
@@ -177,7 +179,7 @@ export class ROOM extends ITEM {
      * @param changed_msg - 变更消息(广播给房间内玩家)
      * @param dir - 移动方向
      */
-    item_changed(obj: any, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
+    item_changed(obj: Record<string, any>, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
         if (!obj) return;
         let msg: string | undefined;
         let obj_index = -1, isshow = !obj.query_temp('hidden');
@@ -189,18 +191,18 @@ export class ROOM extends ITEM {
             }
             if (item.is_player && isshow) {
                 if (!msg) msg = this.item_json(obj, isin);
-                item.send(msg);
+                (item as any).send(msg);
 
-                if (changed_msg && item != obj && !item.query_setting("off_move")) {
-                    item.send(changed_msg);
+                if (changed_msg && item != obj && !(item as any).query_setting("off_move")) {
+                    (item as any).send(changed_msg);
                 }
 
             } else {
-                if (obj.hp) {
-                    if (isin && item.on_enter) {
-                        item.on_enter(obj);
-                    } else if (!isin && item.on_leave) {
-                        if (item.on_leave(obj, dir) == false) return false;
+                if ((obj as any).hp) {
+                    if (isin && (item as any).on_enter) {
+                        (item as any).on_enter(obj);
+                    } else if (!isin && (item as any).on_leave) {
+                        if ((item as any).on_leave(obj, dir) == false) return false;
                     }
                 }
             }
@@ -209,8 +211,8 @@ export class ROOM extends ITEM {
         if (isin) {
             obj.environment = this;
             if (obj_index == -1) {
-                this.items.push(obj);
-                if (obj.is_player) obj.send(this.items_to_json());
+                this.items.push(obj as any);
+                if ((obj as any).is_player) (obj as any).send(this.items_to_json());
 
             } else if (obj.is_player) {
                 if (!msg) msg = this.item_json(obj, isin);
@@ -227,7 +229,7 @@ export class ROOM extends ITEM {
      * @param item - 物件
      * @param isin - 是否进入
      */
-    item_json(item: any, isin: boolean): string {
+    item_json(item: Record<string, any>, isin: boolean): string {
         if (!item) return "";
         const str: string[] = [];
         if (isin) {
@@ -266,7 +268,7 @@ export class ROOM extends ITEM {
     items_to_json(): string {
         const str: string[] = ['{"type":"items","items":['];
         for (let i = 0; i < this.items.length; i++) {
-            const item = this.items[i];
+            const item = this.items[i] as any;
             if (!item.is_hidden()) {
                 str.push("{id:\"");
                 str.push(item.id);
@@ -306,14 +308,14 @@ export class ROOM extends ITEM {
      * 设置房间NPC(创建时调用)
      * @param arguments - NPC路径或[NPC路径, 数量]
      */
-    set_npc(...args: any[]): void {
+    set_npc(...args: (string | [string, number])[]): void {
         for (let i = 0; i < args.length; i++) {
             let name = args[i];
             if (typeof name == "string") name = [name, 1];
             const obj_path = name[0];
             if (!obj_path) continue;
             for (let j = 0; j < name[1]; j++) {
-                const obj = _NPC.CLONE(obj_path);
+                const obj = _NPC!.CLONE(obj_path);
                 if (obj) {
                     this.items.push(obj);
                     obj.environment = this;
@@ -326,7 +328,7 @@ export class ROOM extends ITEM {
      * 设置房间物品(创建时调用)
      * @param names - 物品路径或[物品路径, 数量]
      */
-    set_obj(...names: any[]): void {
+    set_obj(...names: (string | [string, number])[]): void {
         for (let i = 0; i < arguments.length; i++) {
             let name = arguments[i];
             if (typeof name == "string") name = [name, 1];
@@ -344,7 +346,7 @@ export class ROOM extends ITEM {
      * @param desc - 描述
      * @param commands - 命令列表
      */
-    set_item(id: string, name: string, desc: string, commands?: any[]): any {
+    set_item(id: string, name: string, desc: string, commands?: any[]): Record<string, any> {
         this.hidden_items = this.hidden_items || [];
 
         if (commands && typeof commands[0] == "string") {
@@ -362,7 +364,7 @@ export class ROOM extends ITEM {
         this.hidden_items.push(hidden_item);
         if (commands) {
             for (let j = 0; j < commands.length; j++) {
-                this.add_action(commands[j][0], null, commands[j][2]);
+                this.add_action(commands[j][0], null as any, commands[j][2]);
             }
         }
         return hidden_item;
@@ -387,7 +389,7 @@ export class ROOM extends ITEM {
      * 根据路径查找物件
      * @param path
      */
-    find_by_path(path: string): any | undefined {
+    find_by_path(path: string): Record<string, any> | undefined {
         const items = this.items;
         if (!items) return;
         for (let i = 0; i < items.length; i++) {
@@ -469,7 +471,7 @@ export class ROOM extends ITEM {
      * 向玩家发送出口信息
      * @param player
      */
-    send_exits(player: any): void {
+    send_exits(player: Record<string, any>): void {
         player.send(this.exitsto_roomjson());
     }
 
@@ -506,7 +508,7 @@ export class ROOM extends ITEM {
         obj.commands = [];
         if (this.actions) {
             for (let cmd in this.actions) {
-                const name = (this.actions as any)[cmd].name;
+                const name = (this.actions as Record<string, any>)[cmd].name;
                 if (name)
                     obj.commands.push({
                         cmd: cmd,
@@ -514,7 +516,7 @@ export class ROOM extends ITEM {
                     });
             }
         }
-        if (this.is_copy_room && !(this.parent as any).not_fb) {
+        if (this.is_copy_room && !(this.parent as AREA)!.not_fb) {
             obj.commands.push({
                 cmd: "cr",
                 name: "完成副本"
@@ -536,7 +538,7 @@ export class ROOM extends ITEM {
         if (this.actions) {
             for (let cmd in this.actions) {
                 json.commands.push({
-                    name: (this.actions as any)[cmd].name,
+                    name: (this.actions as Record<string, any>)[cmd].name,
                     cmd: cmd
                 });
             }
@@ -550,12 +552,12 @@ export class ROOM extends ITEM {
      * 刷新房间数据(热更新)
      * @param obj
      */
-    refresh(obj?: any): void {
+    refresh(obj?: Record<string, any>): void {
         this.json = null;
         this.commands_json = null;
         this.room_exits_json = null;
-        const rmname = this.parent.name + "-" + this.name;
-        if (this.parent.not_fb || !this.parent.is_copy) {
+        const rmname = this.parent!.name + "-" + this.name;
+        if (this.parent!.not_fb || !this.parent!.is_copy) {
             this._room_name = rmname;
         } else {
             this._room_name = rmname + "(副本区域)";
@@ -563,9 +565,9 @@ export class ROOM extends ITEM {
         if (obj) {
             for (let i = 0; i < this.items.length; i++) {
                 if (this.items[i].is_player) {
-                    this.items[i].send(this.to_json());
+                    (this.items[i] as any).send(this.to_json());
                     this.send_exits(this.items[i]);
-                    this.items[i].send(this.items_to_json());
+                    (this.items[i] as any).send(this.items_to_json());
                 }
             }
         }
@@ -577,7 +579,7 @@ export class ROOM extends ITEM {
     get_path(): string {
         if (this.path) return this.path;
         let str = this.name;
-        let area = this.area;
+        let area: any = this.area;
         while (area) {
             str = area.name + "-" + str;
             area = area.parent;
@@ -590,7 +592,7 @@ export class ROOM extends ITEM {
      * 查询复活房间路径
      */
     query_recover_room(): string {
-        let area = this.parent;
+        let area: any = this.parent;
         while (area) {
             if (area.recover_room) {
                 return area.recover_room;
@@ -609,7 +611,7 @@ export class ROOM extends ITEM {
 
         if (base_room) {
             this.parent = base_room.parent;
-            if (this.parent.is_copy) {
+            if (this.parent && this.parent.is_copy) {
                 if (this.parent.not_fb) {
                     this._room_name = base_room._room_name;
                 } else {
@@ -638,7 +640,7 @@ export class ROOM extends ITEM {
 
         const area = getAreaByPath(this.path);
 
-        this.parent = area;
+        this.parent = area ?? null;
         if (!area || !area.is_copy) {
             WORLD.RUN_ROOMS.push(this);
         }
@@ -666,17 +668,17 @@ export class ROOM extends ITEM {
         const oldroom = WORLD.ROOMS[file];
         this.initBaseRoom(file);
         if (!oldroom) return;
-        if ((oldroom as any).copy_rooms) {
+        if ((oldroom as Record<string, any>).copy_rooms) {
             this.copy_rooms = {};
-            for (let key in (oldroom as any).copy_rooms) {
-                const rm = (oldroom as any).copy_rooms[key];
+            for (let key in (oldroom as Record<string, any>).copy_rooms) {
+                const rm = (oldroom as Record<string, any>).copy_rooms[key];
                 const newRm = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
                 this.replaceRoom(rm, newRm);
                 newRm.owner = key;
                 if (!this.copy_rooms) this.copy_rooms = {};
                 this.copy_rooms[key] = newRm;
             }
-            (oldroom as any).copy_rooms = null;
+            (oldroom as Record<string, any>).copy_rooms = null;
         } else {
             if (ROOM.public_rooms) {
                 for (let i = 0; i < ROOM.public_rooms.length; i++) {
@@ -694,7 +696,7 @@ export class ROOM extends ITEM {
      * @param oldroom
      * @param newRoom
      */
-    replaceRoom(oldroom: any, newRoom: any): void {
+    replaceRoom(oldroom: Record<string, any>, newRoom: Record<string, any>): void {
         const items = oldroom.items;
         for (let i = 0; i < items.length; i++) {
             if (items[i].is_player || items[i].master) {
@@ -753,7 +755,7 @@ export class ROOM extends ITEM {
      * 查询副本入口房间
      * @param id - 队伍/用户ID
      */
-    query_fb_first(id: string): any {
+    query_fb_first(id: string): ROOM | undefined {
         if (!this.parent || !this.parent.is_copy || !this.parent.rooms) return;
         return this.parent.rooms[0].query_copy(id);
     }
@@ -762,7 +764,7 @@ export class ROOM extends ITEM {
      * 查询副本房间
      * @param id
      */
-    query_copy(id: string): any {
+    query_copy(id: string): ROOM | undefined {
         if (!this.copy_rooms) this.copy_rooms = {};
         return (this.copy_rooms as Record<string, any>)[id];
     }
@@ -771,8 +773,8 @@ export class ROOM extends ITEM {
      * 根据用户查找对应副本
      * @param user
      */
-    query_copy2(user: any): any {
-        const id = this.parent.query_owner(user);
+    query_copy2(user: Record<string, any>): ROOM | undefined {
+        const id = (this.parent as any)?.query_owner(user);
         if (!id) return this;
         return this.query_copy(id);
     }
@@ -781,9 +783,9 @@ export class ROOM extends ITEM {
      * 清除副本区域
      * @param me
      */
-    clear_copy(me: any): void {
+    clear_copy(me: Record<string, any>): void {
         if (!this.owner) return;
-        const id = this.parent.query_owner(me);
+        const id = (this.parent as any)?.query_owner(me);
         if (id !== this.owner) return;
         const name = "fb/";
         for (let key in me.temp) {
@@ -800,7 +802,7 @@ export class ROOM extends ITEM {
                 }
             }
         }
-        this.clear_by_area(this.parent, this.owner);
+        this.clear_by_area(this.parent as any, this.owner);
     }
 
     /**
@@ -808,8 +810,8 @@ export class ROOM extends ITEM {
      * @param me
      * @param diff_type - 难度
      */
-    create_copy2(me: any, diff_type?: number): any {
-        const id = this.parent.query_owner(me);
+    create_copy2(me: Record<string, any>, diff_type?: number): ROOM | undefined {
+        const id = (this.parent as any)?.query_owner(me);
         if (!id) return;
         return this.create_copy(id, diff_type || 0);
     }
@@ -819,7 +821,7 @@ export class ROOM extends ITEM {
      * @param id - 副本所有者ID
      * @param diff_type - 难度
      */
-    create_copy(id: string, diff_type: number): any {
+    create_copy(id: string, diff_type: number): ROOM | undefined {
         if (!this.parent) return;
         this.create_by_area(this.parent, id, diff_type);
         return this.query_copy(id);
@@ -831,13 +833,13 @@ export class ROOM extends ITEM {
      * @param id
      * @param diff_type
      */
-    create_by_area(area: any, id: string, diff_type: number): void {
+    create_by_area(area: Record<string, any>, id: string, diff_type?: number): void {
         if (area.rooms) {
             for (let i = 0; i < area.rooms.length; i++) {
                 const base_room = area.rooms[i];
                 const copy_room = BASE.CREATE(__PATH.MAP, base_room.path) as ROOM;
                 if (!copy_room) continue;
-                copy_room.set_difficulty(diff_type);
+                if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
                 if (!base_room.copy_rooms) base_room.copy_rooms = {};
                 base_room.copy_rooms[id] = copy_room;
                 copy_room.owner = id;
@@ -853,7 +855,7 @@ export class ROOM extends ITEM {
     /**
      * 创建房间投影(人满时)
      */
-    create_shadow(): any {
+    create_shadow(): ROOM | undefined {
         if (this.is_copy_room || this.no_shadow) return;
 
         if (!this.shadow_rooms) this.shadow_rooms = [];
@@ -874,7 +876,7 @@ export class ROOM extends ITEM {
      * @param area
      * @param id
      */
-    clear_by_area(area: any, id: string): void {
+    clear_by_area(area: Record<string, any>, id: string): void {
         if (area.rooms) {
             for (let i = 0; i < area.rooms.length; i++) {
                 const base_room = area.rooms[i];
@@ -902,9 +904,9 @@ export class ROOM extends ITEM {
      * 根据路径获取房间
      * @param path
      */
-    static Get(path: string): any {
+    static Get(path: string): ROOM | undefined {
         const rm = WORLD.ROOMS[path];
-        if (!rm) return console.log("room %s is not exist", path);
+        if (!rm) { console.log("room %s is not exist", path); return undefined; }
         return rm;
     }
 
@@ -914,8 +916,8 @@ export class ROOM extends ITEM {
      * @param def
      * @param me
      */
-    query_temp(name: string, def?: any, me?: any): any {
-        const first = this.query_fb_first(me.query_teamid());
+    query_temp(name: string, def?: unknown, me?: Record<string, any>): unknown {
+        const first = this.query_fb_first(me!.query_teamid());
         if (!first) return;
         if (!first.temp) return;
         const item = first.temp[name];
@@ -936,8 +938,8 @@ export class ROOM extends ITEM {
      * @param time
      * @param me
      */
-    set_temp(name: string, value: any, time?: number, me?: any): void {
-        const first = this.query_fb_first(me.query_teamid());
+    set_temp(name: string, value: unknown, time?: number, me?: Record<string, any>): void {
+        const first = this.query_fb_first(me!.query_teamid());
         if (!first) return;
         if (!first.temp) first.temp = {};
         if (time) {
@@ -957,8 +959,8 @@ export class ROOM extends ITEM {
      * @param time
      * @param me
      */
-    add_temp(name: string, value: number, time?: number, me?: any): number {
-        const val = this.query_temp(name, 0, me) + value;
+    add_temp(name: string, value: number, time?: number, me?: Record<string, any>): number {
+        const val = (this.query_temp(name, 0, me) as number) + value;
         this.set_temp(name, val, time, me);
         return val;
     }
@@ -966,7 +968,7 @@ export class ROOM extends ITEM {
     /**
      * 随机获取一个公共房间
      */
-    static RANDOM(): any {
+    static RANDOM(): ROOM | undefined {
         if (!this.public_rooms) {
             this.public_rooms = [];
             for (let i = 0; i < WORLD.AREAS.length; i++) {
@@ -997,8 +999,8 @@ export class ROOM extends ITEM {
      */
     send(msg: string): void {
         for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player) {
-                this.items[i].send(msg);
+            if ((this.items[i] as any).is_player) {
+                (this.items[i] as any).send(msg);
             }
         }
     }
@@ -1006,10 +1008,10 @@ export class ROOM extends ITEM {
     /**
      * 查找房间中第一个玩家
      */
-    find_me(): any {
+    find_me(): ROOM | undefined {
         for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player) {
-                return this.items[i];
+            if ((this.items[i] as any).is_player) {
+                return this.items[i] as any;
             }
         }
     }
@@ -1018,9 +1020,9 @@ export class ROOM extends ITEM {
      * 查询房间(考虑副本)
      * @param id - 房间路径
      */
-    query(id: string): any {
+    query(id: string): ROOM | undefined {
         const room = ROOM.Get(id);
-        if (!room) return null;
+        if (!room) return undefined;
         if (this.owner) {
             return room.query_copy(this.owner);
         }
@@ -1028,4 +1030,4 @@ export class ROOM extends ITEM {
     }
 }
 
-(globalThis as any).ROOM = ROOM;
+(globalThis as Record<string, unknown>).ROOM = ROOM;

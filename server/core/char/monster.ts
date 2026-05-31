@@ -12,6 +12,8 @@ import { BASE_SKILLS } from '../const.js';
 import { CORPSE } from '../item/corpse.js';
 // @ts-ignore - Legacy JS module
 import { WORLD } from '../world.js';
+// @ts-ignore - Legacy JS module
+import { ROOM } from '../room/room.js';
 
 // ============================================================
 // MONSTER 类
@@ -35,7 +37,7 @@ export class MONSTER extends CHARACTER {
   // ============ 功能属性 ============
 
   /** 死亡后重生房间 */
-  die_room: any = null;
+  die_room: ROOM | null = null;
   /** 击杀奖励积分 */
   score: number = 0;
 
@@ -119,7 +121,7 @@ export class MONSTER extends CHARACTER {
    */
   die(killer?: CHARACTER): boolean | undefined {
     if (!this.environment) return;
-    if (this.on_die && this.on_die(killer) === false) {
+    if (this.on_die && killer && this.on_die(killer) === false) {
       this.hp = 1;
       return false;
     }
@@ -133,7 +135,7 @@ export class MONSTER extends CHARACTER {
     this.environment.item_changed(corpse, true);
     this.environment.item_changed(this, false);
     if (isinfb && this.score && killer) {
-      (killer as any).add_fbscore(this.score);
+      killer.add_fbscore(this.score);
     }
     if (this.on_died) this.on_died(killer, corpse);
     WORLD.auto_get(killer, corpse, this);
@@ -169,7 +171,7 @@ export class MONSTER extends CHARACTER {
         this.add_mp(parseInt(String(this.max_mp / 2), 10));
       }
       if (this.chat_msg) {
-        const r = (this as any).random(10);
+        const r = this.random(10);
         if (r > 5)
           this.send_message(this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)]);
       }

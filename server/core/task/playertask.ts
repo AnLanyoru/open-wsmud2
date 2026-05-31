@@ -7,7 +7,7 @@ import { WORLD } from "../world.js";
 
 export class USERTASK extends BASE {
 
-    /** 任务创建回调(资源文件设置) */
+    /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
     on_create?: () => string | void;
 
     constructor() {
@@ -46,7 +46,7 @@ export class USERTASK extends BASE {
     /**
      * 开始任务
      */
-    start(): any { return undefined; }
+    start(player?: Record<string, any>): unknown { return undefined; }
 
     /**
      * 查询任务描述
@@ -64,9 +64,9 @@ export class USERTASK extends BASE {
      * @param id - 任务ID
      * @param player - 玩家
      */
-    static RUN(id: string, player: any): any {
+    static RUN(id: string, player: Record<string, any>): unknown {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
-            if (WORLD.TASKS[i].id == id) {
+            if ((WORLD.TASKS[i] as any).id == id) {
                 return WORLD.TASKS[i].start(player);
             }
         }
@@ -79,7 +79,7 @@ export class USERTASK extends BASE {
      */
     static GET(id: string): USERTASK | undefined {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
-            if (WORLD.TASKS[i].id == id) {
+            if ((WORLD.TASKS[i] as any).id == id) {
                 return WORLD.TASKS[i];
             }
         }

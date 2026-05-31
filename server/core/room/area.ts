@@ -5,10 +5,13 @@ import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
+import type { ROOM } from "./room.js";
 
-// 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts(import type)
-let _ROOM: any = null;
-import("./room.js").then((m: any) => { _ROOM = m.ROOM; });
+// 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
+let _ROOM: {
+    Get: (path: string) => any;
+} | null = null;
+import("./room.js").then((m: Record<string, unknown>) => { _ROOM = m.ROOM as any; });
 
 export class AREA extends BASE {
 
@@ -28,11 +31,11 @@ export class AREA extends BASE {
     // ============ 房间管理 ============
 
     /** 区域内的房间列表 */
-    rooms: any[] = [];
+    rooms: ROOM[] = [];
     /** 子区域列表(由extends设置) */
-    areas: any[] | null = null;
+    areas: AREA[] | null = null;
     /** 小地图数据 */
-    map: any[] = [];
+    map: unknown[] = [];
     /** 默认入口房间路径 */
     first: string | null = null;
 
@@ -58,13 +61,13 @@ export class AREA extends BASE {
     // ============ 掉落相关 ============
 
     /** 掉落列表缓存 */
-    drop_list: any[] | null = null;
+    drop_list: unknown[] | null = null;
     /** 困难模式掉落列表缓存 */
-    diff_drop_list: any[] | null = null;
+    diff_drop_list: unknown[] | null = null;
     /** 普通模式NPC掉落配置 */
-    drop_npcs0: any[] | null = null;
+    drop_npcs0: unknown[] | null = null;
     /** 困难模式NPC掉落配置 */
-    drop_npcs1: any[] | null = null;
+    drop_npcs1: unknown[] | null = null;
 
     // ============ 门派与社交 ============
 
@@ -76,7 +79,7 @@ export class AREA extends BASE {
     // ============ 缓存 ============
 
     /** JSON缓存 */
-    json: any = null;
+    json: string | null = null;
     /** 所属区域路径(用于快速查找) */
     room_path: string | null = null;
     /** 副本难度系数 */
@@ -85,9 +88,9 @@ export class AREA extends BASE {
     // ============ 交互属性 ============
 
     /** 区域级命令映射 */
-    actions: any = null;
+    actions: Record<string, unknown> | null = null;
     /** 区域掉落物品列表 */
-    drop_items: any[] | null = null;
+    drop_items: unknown[] | null = null;
 
     // ============ 动态属性(由资源文件设置) ============
 
@@ -96,14 +99,12 @@ export class AREA extends BASE {
     /** 解锁关卡索引 */
     unlock_index?: number;
 
-    // ============ 回调(由资源文件设置) ============
+    // ============ 回调（由资源文件设置） ============
 
-    /** 区域登录回调 */
-    on_login?: (user: any) => void;
-    /** 玩家离开区域回调 */
-    on_leaved?: (me: any) => void;
-    /** 玩家进入区域回调 */
-    on_enterd?: (me: any) => void;
+    /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
+    on_login?: (user: Record<string, any>) => void;
+    /** 玩家进入后回调 — 触发时机：玩家首次进入该区域房间后 */
+    on_enterd?: (me: Record<string, any>) => void;
 
     constructor() {
         super();
@@ -135,13 +136,13 @@ export class AREA extends BASE {
      * 玩家离开区域回调
      * @param me
      */
-    on_leaved(me: any): void { return undefined as any; }
+    on_leaved(me: Record<string, any>): void { return undefined as any; }
 
     /**
      * 玩家离开前回调
      * @param me
      */
-    on_leave(me: any): boolean {
+    on_leave(me: Record<string, any>): boolean {
         return true;
     }
 
@@ -149,7 +150,7 @@ export class AREA extends BASE {
      * 玩家进入后回调
      * @param me
      */
-    on_enter(me: any): boolean {
+    on_enter(me: Record<string, any>): boolean {
         return true;
     }
 
@@ -157,13 +158,13 @@ export class AREA extends BASE {
      * 查找子区域
      * @param path
      */
-    find_area(path: string): any { return undefined; }
+    find_area(path: string): AREA | undefined { return undefined; }
 
     /**
      * 查询指定难度的通关记录
      * @param diff
      */
-    is_record(diff: number): any {
+    is_record(diff: number): unknown {
         return (this as Record<string, any>)["record_" + diff];
     }
 
@@ -195,15 +196,15 @@ export class AREA extends BASE {
      * 查询普通掉落列表
      * @param isdiff
      */
-    query_drops(isdiff?: boolean): any[] | null {
+    query_drops(isdiff?: boolean): unknown[] | null {
         if (isdiff) return this.query_diff_drops();
         if (this.drop_list) return this.drop_list;
         const items: any[] = [];
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if (rm.items[j].drop_list) {
-                    items.push(rm.items[j].drop_list);
+                if ((rm.items[j] as any).drop_list) {
+                    items.push((rm.items[j] as any).drop_list);
                 }
             }
         }
@@ -217,10 +218,10 @@ export class AREA extends BASE {
      * @param npcs
      * @param items
      */
-    query_npc_drops(npcs: any[] | null, items: any[]): void {
+    query_npc_drops(npcs: unknown[] | null, items: unknown[]): void {
         if (!npcs || !npcs.length) return;
         for (let i = 0; i < npcs.length; i++) {
-            const npc = NPC.GET(npcs[i]);
+            const npc = NPC.GET(npcs[i] as string);
             if (!npc || !npc.drop_list) continue;
             items.push(npc.drop_list);
         }
@@ -229,14 +230,14 @@ export class AREA extends BASE {
     /**
      * 查询困难模式掉落
      */
-    query_diff_drops(): any[] | null {
+    query_diff_drops(): unknown[] | null {
         if (this.diff_drop_list) return this.diff_drop_list;
         const items: any[] = [];
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if (rm.items[j].drop_list) {
-                    items.push(rm.items[j].drop_list);
+                if ((rm.items[j] as any).drop_list) {
+                    items.push((rm.items[j] as any).drop_list);
                 }
             }
         }
@@ -261,7 +262,7 @@ export class AREA extends BASE {
                         room.parent = this;
                     }
                 }
-                old_area.rooms = null;
+                old_area.rooms = null as any;
                 if (this.family) {
                     FAMILIES[this.family].area = this;
                 }
@@ -274,14 +275,14 @@ export class AREA extends BASE {
     /**
      * 查询掉落物品列表
      */
-    query_drop_items(): any[] | null {
+    query_drop_items(): unknown[] | null {
         return this.drop_items;
     }
 
     /**
      * 查询区域命令
      */
-    query_actions(): any {
+    query_actions(me?: any): any {
         return this.actions;
     }
 
@@ -297,22 +298,22 @@ export class AREA extends BASE {
     }
 
     /** @param me */
-    query_owner(me: any): string {
+    query_owner(me: { query_teamid(): string }): string {
         return me.query_teamid();
     }
 
     /** @param me */
-    clear_copy(me: any): void {
+    clear_copy(me: Record<string, any>): void {
         if (!_ROOM) return;
-        const room = _ROOM.Get(this.first)?.query_copy2(me);
+        const room = _ROOM.Get(this.first!)?.query_copy2(me);
         if (room)
             room.clear_copy(me);
     }
 
     /** @param me */
-    is_unlock(me: any): boolean {
-        if ((this as any).jd_index >= 0)
+    is_unlock(me: Record<string, any>): boolean {
+        if ((this as { jd_index?: number }).jd_index! >= 0)
             return me.isenable_area(this);
-        return ((this as any).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
+        return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
     }
 }
