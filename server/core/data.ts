@@ -28,9 +28,9 @@ const FAMS_TATAS: string[] = [
 
 export interface DataObject {
     /** 队伍数据 */
-    parties: Map<string, unknown>;
+    parties: Map<string, any>;
     /** 拍卖数据 */
-    PAIMAI: Map<string, unknown>;
+    PAIMAI: Map<string, any>;
     /** 运行时临时数据 */
     temp: Record<string, any>;
     /** 经验等级倍率表 */
@@ -40,7 +40,7 @@ export interface DataObject {
     /** 书籍价值表 */
     book_values: number[];
     /** 静态属性映射 */
-    PROPS: Record<string, unknown>;
+    PROPS: Record<string, any>;
     /** 统计用临时数据存储 */
     temp_data: Record<string, Record<string, { name: string; value: number }>>;
 

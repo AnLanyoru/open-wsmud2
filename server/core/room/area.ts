@@ -13,7 +13,7 @@ import type { CHARACTER } from "../char/character.js";
 let _ROOM: {
     Get: (path: string) => any;
 } | null = null;
-import("./room.js").then((m: Record<string, unknown>) => { _ROOM = m.ROOM as any; });
+import("./room.js").then((m: Record<string, any>) => { _ROOM = m.ROOM as any; });
 
 export class AREA extends BASE {
 
@@ -37,7 +37,7 @@ export class AREA extends BASE {
     /** 子区域列表(由extends设置) */
     areas: AREA[] | null = null;
     /** 小地图数据 */
-    map: unknown[] = [];
+    map: any[] = [];
     /** 默认入口房间路径 */
     first: string | null = null;
 
@@ -63,13 +63,13 @@ export class AREA extends BASE {
     // ============ 掉落相关 ============
 
     /** 掉落列表缓存 */
-    drop_list: unknown[] | null = null;
+    drop_list: any[] | null = null;
     /** 困难模式掉落列表缓存 */
-    diff_drop_list: unknown[] | null = null;
-    /** 普通模式NPC掉落配置 */
-    drop_npcs0: unknown[] | null = null;
-    /** 困难模式NPC掉落配置 */
-    drop_npcs1: unknown[] | null = null;
+    diff_drop_list: any[] | null = null;
+    /** 普通模式NPC掉落配置(NPC路径列表) */
+    drop_npcs0: string[] | null = null;
+    /** 困难模式NPC掉落配置(NPC路径列表) */
+    drop_npcs1: string[] | null = null;
 
     // ============ 门派与社交 ============
 
@@ -90,9 +90,9 @@ export class AREA extends BASE {
     // ============ 交互属性 ============
 
     /** 区域级命令映射 */
-    actions: Record<string, unknown> | null = null;
+    actions: Record<string, any> | null = null;
     /** 区域掉落物品列表 */
-    drop_items: unknown[] | null = null;
+    drop_items: any[] | null = null;
 
     // ============ 动态属性(由资源文件设置) ============
 
@@ -198,7 +198,7 @@ export class AREA extends BASE {
      * 查询普通掉落列表
      * @param isdiff
      */
-    query_drops(isdiff?: boolean): unknown[] | null {
+    query_drops(isdiff?: boolean): any[] | null {
         if (isdiff) return this.query_diff_drops();
         if (this.drop_list) return this.drop_list;
         const items: any[] = [];
@@ -220,7 +220,7 @@ export class AREA extends BASE {
      * @param npcs
      * @param items
      */
-    query_npc_drops(npcs: unknown[] | null, items: unknown[]): void {
+    query_npc_drops(npcs: string[] | null, items: any[]): void {
         if (!npcs || !npcs.length) return;
         for (let i = 0; i < npcs.length; i++) {
             const npc = NPC.GET(npcs[i] as string);
@@ -232,7 +232,7 @@ export class AREA extends BASE {
     /**
      * 查询困难模式掉落
      */
-    query_diff_drops(): unknown[] | null {
+    query_diff_drops(): any[] | null {
         if (this.diff_drop_list) return this.diff_drop_list;
         const items: any[] = [];
         for (let i = 0; i < this.rooms.length; i++) {
@@ -277,7 +277,7 @@ export class AREA extends BASE {
     /**
      * 查询掉落物品列表
      */
-    query_drop_items(): unknown[] | null {
+    query_drop_items(): any[] | null {
         return this.drop_items;
     }
 

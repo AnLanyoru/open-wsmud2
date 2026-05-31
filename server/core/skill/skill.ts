@@ -75,7 +75,7 @@ export class SKILL extends BASE {
     /** 绝招字典(由资源文件设置) */
     pfm: Record<string, PERFORM> | null = null;
     /** 进阶属性槽位(由资源文件设置) */
-    slots: unknown[] | null = null;
+    slots: any[] | null = null;
 
     // ============ 配置属性(由资源文件设置) ============
 

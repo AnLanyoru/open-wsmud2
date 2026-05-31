@@ -8,6 +8,7 @@ import type { EQUIPMENT } from '../item/equipment.js';
 import { CORPSE } from '../item/corpse.js';
 import { SKILL } from '../skill/skill.js';
 import type { FAMILY } from '../skill/family.js';
+import type { AREA } from '../room/area.js';
 import { FOLLOWER } from './follower.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
@@ -327,8 +328,8 @@ export class USER extends CHARACTER {
     (this.environment as ROOM).send_exits(this);
     this.send((this.environment as ROOM).items_to_json());
     this.send_room(this.name + '重新连线。');
-    if ((this.environment as unknown as Record<string, unknown>).on_relogin) {
-      ((this.environment as unknown as Record<string, unknown>).on_relogin as (me: USER) => void)(this);
+    if ((this.environment as ROOM & { on_relogin?: (me: USER) => void }).on_relogin) {
+      (this.environment as ROOM & { on_relogin?: (me: USER) => void }).on_relogin!(this);
     }
     this.disconnect_time = 0;
     this.check_state();
@@ -407,9 +408,9 @@ export class USER extends CHARACTER {
     this.id = role.id;
     this.name = role.name;
     this.level = role.level;
-    const data: any = (JSON as { toObject(s: string): Record<string, unknown> }).toObject(role.data);
+    const data: any = JSON.toObject(role.data);
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      (this as unknown as Record<string, number | undefined>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
+      (this as Record<string, any>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
     }
     this.quit_room = data.quit_room;
     this.items = this.read_items(data.items);
@@ -520,7 +521,7 @@ export class USER extends CHARACTER {
       this.moveto(rm, "", this.name + '连线进入这个世界。');
     }
     this.check_state();
-    if (this.follower && (!this.environment || (this.environment as unknown as { parent: { id: string } }).parent.id !== 'home')) {
+    if (this.follower && (!this.environment || (this.environment as ROOM).parent?.id !== 'home')) {
       const home = ROOM.Get('home/yuanzi');
       if (home) {
         let copy_home = home.query_copy2(this);
@@ -542,17 +543,17 @@ export class USER extends CHARACTER {
   /**
    * 获取玩家存档数据
    */
-  getData(): Record<string, unknown> {
+  getData(): Record<string, any> {
     const str: string[] = ['{prop:['];
     for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-      str.push(String((this as unknown as Record<string, number | undefined>)[SAVE_NUMPROP[i]]));
+      str.push(String((this as Record<string, any>)[SAVE_NUMPROP[i]]));
       str.push(',');
     }
     str.push('0');
     str.push('],quit_room:"');
     if (this.environment) {
-      if (this.environment.is_fb() || (this.environment as unknown as Record<string, unknown>).no_save
-        || (this.environment as unknown as { parent: Record<string, unknown> }).parent.no_save) {
+      if (this.environment.is_fb() || (this.environment as ROOM & { no_save?: boolean }).no_save
+        || (this.environment.parent as AREA & { no_save?: boolean }).no_save) {
         str.push(this.query_temp('enter_room') as string);
       } else {
         str.push((this.environment as ROOM).path);
@@ -670,7 +671,7 @@ export class USER extends CHARACTER {
     this.hp = 0;
     this.mp = 0;
 
-    this.send_room((DIE_MSG as unknown as { random(): string }).random());
+    this.send_room((DIE_MSG as any as string[]).random());
     const env = this.environment;
     if (env && env.items.length < 10) {
       const corpse = new CORPSE();
@@ -803,7 +804,7 @@ export class USER extends CHARACTER {
       delete this.settings[name];
     } else {
       if (value == '1') value = 1;
-      this.settings[name] = value as unknown as number;
+      this.settings[name] = value as number;
     }
 
     this.login_message = null;
@@ -816,12 +817,12 @@ export class USER extends CHARACTER {
    */
   heart_beat(dt: number): void {
     this.request_count = 0;
-    const st = this.state as unknown as UserState;
+    const st = this.state as UserState;
     if (st && (!this.fight_type || st.allow_fight)) {
       st.heat_count! += 1;
       if (st.heat_count! >= st.rate!) {
         st.heat_count = 0;
-        if (st.on_enter?.(this as unknown as CHARACTER, dt) === false) {
+        if (st.on_enter?.(this, dt) === false) {
           this.set_state(null, true);
         }
       }
@@ -877,7 +878,7 @@ export class USER extends CHARACTER {
   get_state(): string {
     let str = '';
     if (!this.socket) str += '<red>&lt;断线中&gt;</red>';
-    if (this.state) str += '<hig>&lt;' + (this.state as unknown as UserState).title + '&gt;</hig>';
+    if (this.state) str += '<hig>&lt;' + (this.state as UserState).title + '&gt;</hig>';
     return str;
   }
 
@@ -1371,7 +1372,7 @@ export class USER extends CHARACTER {
    * 查询队伍ID
    */
   query_teamid(): string {
-    if (this.team) return (this.team as unknown as { id: string }).id;
+    if (this.team) return (this.team as CHARACTER[] & { id?: string }).id || this.id;
     return this.id;
   }
 
@@ -1381,7 +1382,7 @@ export class USER extends CHARACTER {
   can_trans(): boolean {
     if (!this.environment) return true;
     if (this.environment.is_fb()) return this.notify_fail('你现在正在副本区域。');
-    if ((this.environment as unknown as { parent: { on_leave: (me: CHARACTER) => boolean | void } }).parent.on_leave(this) == false) return false;
+    if ((this.environment as ROOM).parent?.on_leave?.(this) == false) return false;
     return true;
   }
 
@@ -1490,7 +1491,7 @@ export class USER extends CHARACTER {
    * 查询玩家年龄
    */
   query_age(): number {
-    const dt = Date.now() - (this as unknown as Record<string, number>).reg_time * 60000;
+    const dt = Date.now() - (this as Record<string, any>).reg_time * 60000;
     return 14 + dt / 86400000 / 12 - this.query_prop('age') - (this.query_temp('age', 0) as number);
   }
 }

@@ -268,7 +268,7 @@ export class ITEM extends BASE {
      * @param cmdName - 命令名
      * @param pars - 参数列表
      */
-    exec(cmdName: string, pars: unknown[]): unknown {
+    exec(cmdName: string, pars: unknown[]): any {
         if (this.actions) {
             const cmd = this.actions[cmdName];
             if (cmd && cmd.action) {

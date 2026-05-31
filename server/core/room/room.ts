@@ -17,7 +17,7 @@ declare const __PATH: Record<string, string>;
 let _NPC: {
     CLONE: (path: string, ...args: any[]) => any;
 } | null = null;
-import("../char/npc.js").then((m: Record<string, unknown>) => { _NPC = m.NPC as any; });
+import("../char/npc.js").then((m: Record<string, any>) => { _NPC = m.NPC as any; });
 
 /**
  * 隐藏物品被look时的描述
@@ -84,7 +84,7 @@ export class ROOM extends ITEM {
     /** 出口JSON缓存 */
     room_exits_json: string | null = null;
     /** 隐藏物品映射 */
-    hidden_items: Record<string, unknown>[] | null = null;
+    hidden_items: Record<string, any>[] | null = null;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
 
@@ -1011,10 +1011,10 @@ export class ROOM extends ITEM {
     /**
      * 查找房间中第一个玩家
      */
-    find_me(): ROOM | undefined {
+    find_me(): CHARACTER | undefined {
         for (let i = 0; i < this.items.length; i++) {
             if (this.items[i].is_player) {
-                return this.items[i] as unknown as ROOM;
+                return this.items[i] as unknown as CHARACTER;
             }
         }
     }
@@ -1033,4 +1033,4 @@ export class ROOM extends ITEM {
     }
 }
 
-(globalThis as Record<string, unknown>).ROOM = ROOM;
+(globalThis as Record<string, any>).ROOM = ROOM;

@@ -13,13 +13,13 @@ const fs = fs_sync.promises;
 interface DBInterface {
   close(): Promise<void>;
   getRoles(userid: number, server: number): Promise<RoleData[]>;
-  addRole(role: RoleData): Promise<unknown>;
-  deleteRole(userid: number, roleid: string): Promise<unknown>;
-  saveRole(role: RoleData): Promise<unknown>;
-  getUserByID(id: string): unknown;
-  getData(userid: number, id: string): unknown;
-  updateRoleName(id: string, userid: number, name: string): unknown;
-  updateUserid(id: string, fromuserid: number, touserid: number): unknown;
+  addRole(role: RoleData): Promise<RoleData>;
+  deleteRole(userid: number, roleid: string): Promise<void>;
+  saveRole(role: RoleData): Promise<void>;
+  getUserByID(id: string): any;
+  getData(userid: number, id: string): any;
+  updateRoleName(id: string, userid: number, name: string): any;
+  updateUserid(id: string, fromuserid: number, touserid: number): any;
   getServers(): ServerConfig[];
 }
 
@@ -83,7 +83,7 @@ export default {
    * 创建新角色
    * @param role - 角色数据
    */
-  async addRole(role: RoleData): Promise<unknown> {
+  async addRole(role: RoleData): Promise<RoleData> {
     return await DB.addRole(role);
   },
 
@@ -92,7 +92,7 @@ export default {
    * @param userid - 用户 ID
    * @param roleid - 角色 ID
    */
-  deleteRole(userid: number, roleid: string): Promise<unknown> {
+  deleteRole(userid: number, roleid: string): Promise<void> {
     return DB.deleteRole(userid, roleid);
   },
 
@@ -100,7 +100,7 @@ export default {
    * 保存角色数据
    * @param role - 角色数据
    */
-  saveRole(role: RoleData): Promise<unknown> {
+  saveRole(role: RoleData): Promise<void> {
     return DB.saveRole(role);
   },
 
@@ -227,7 +227,7 @@ export default {
    * 根据 ID 获取用户
    * @param id - 用户 ID
    */
-  getUserByID(id: string): unknown {
+  getUserByID(id: string): any {
     return DB.getUserByID(id);
   },
 
@@ -236,7 +236,7 @@ export default {
    * @param userid - 用户 ID
    * @param id - 角色 ID
    */
-  getRoleData(userid: number, id: string): unknown {
+  getRoleData(userid: number, id: string): any {
     return DB.getData(userid, id);
   },
 
@@ -246,7 +246,7 @@ export default {
    * @param userid - 用户 ID
    * @param name - 新名称
    */
-  change_name(id: string, userid: number, name: string): unknown {
+  change_name(id: string, userid: number, name: string): any {
     return DB.updateRoleName(id, userid, name);
   },
 
@@ -256,7 +256,7 @@ export default {
    * @param fromuserid - 原用户 ID
    * @param touserid - 目标用户 ID
    */
-  change_userid(id: string, fromuserid: number, touserid: number): unknown {
+  change_userid(id: string, fromuserid: number, touserid: number): any {
     return DB.updateUserid(id, fromuserid, touserid);
   },
 
@@ -311,7 +311,7 @@ export default {
   /**
    * 获取服务器列表
    */
-  getServers(): unknown {
+  getServers(): ServerConfig[] {
     return DB.getServers();
   },
 };

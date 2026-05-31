@@ -205,7 +205,7 @@ export class OBJ extends ITEM {
             this.count -= spcount;
             return item;
         }
-        return undefined as unknown as ITEM;
+        return undefined as any as ITEM;
     }
 
     /**
@@ -351,7 +351,7 @@ export class OBJ extends ITEM {
         otype = otype.replace(/\\/g, "/");
         let base = _WORLD?.OBJ_STROE.get(otype) as OBJ | undefined;
         if (!base) {
-            base = BASE.CREATE(__PATH.OBJ, otype) as unknown as OBJ;
+            base = BASE.CREATE(__PATH.OBJ, otype) as OBJ;
             if (!base) throw new Error('没有物品' + otype + "的定义。");
         }
         // Prototypal clone: create a new object inheriting from the cached prototype

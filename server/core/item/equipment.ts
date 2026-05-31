@@ -509,7 +509,7 @@ export class EQUIPMENT extends OBJ {
      * 从数据库记录恢复装备
      * @param data - 数据库记录数组
      */
-    load_db(data: unknown[]): void {
+    load_db(data: any[]): void {
         this.id = data[1] as string;
         if ((data[2] as number) > 0) {
             this.level = data[2] as number;

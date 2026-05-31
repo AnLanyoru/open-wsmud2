@@ -55,6 +55,7 @@ export interface JSONCache {
 
 /** 动作定义 (用于 ITEM.add_action) */
 export interface ActionDef<TThis = unknown> {
+  cmd: string;
   name: string;
   action: (this: TThis, ...args: any[]) => unknown;
 }

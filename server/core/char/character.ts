@@ -560,7 +560,7 @@ export class CHARACTER extends ITEM {
   create(path: string, par?: string): void {
     if (par) this.path = path + par;
     if (this.on_create) this.on_create(path, par);
-    WORLD.NPC_STROE.set(this.path, this as unknown as NPC);
+    WORLD.NPC_STROE.set(this.path, this as any as NPC);
   }
 
   /**

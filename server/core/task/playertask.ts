@@ -12,9 +12,9 @@ export class USERTASK extends BASE {
     /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
     on_create?: () => string | void;
     /** 任务启动回调（由资源文件动态注入） */
-    on_start?: (player: Record<string, any>) => unknown;
+    on_start?: (player: Record<string, any>) => any;
     /** 任务完成回调（由资源文件动态注入） */
-    on_finish?: (player: Record<string, any>) => unknown;
+    on_finish?: (player: Record<string, any>) => any;
 
     constructor() {
         super();
@@ -53,7 +53,7 @@ export class USERTASK extends BASE {
      * 玩家开始任务 — 子类覆写
      * @param player - 玩家角色
      */
-    start(player?: Record<string, any>): unknown { return undefined; }
+    start(player?: Record<string, any>): any { return undefined; }
 
     /**
      * 查询任务描述 — 子类覆写
@@ -71,7 +71,7 @@ export class USERTASK extends BASE {
      * @param id - 任务 ID
      * @param player - 玩家角色
      */
-    static RUN(id: string, player: Record<string, any>): unknown {
+    static RUN(id: string, player: Record<string, any>): any {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
             if (WORLD.TASKS[i].id == id) {
                 return WORLD.TASKS[i].start(player);

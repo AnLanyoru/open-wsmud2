@@ -9,12 +9,12 @@ import { WORLD } from './world.js';
 // Global __CONFIG is set by the bootstrap script
 declare var __CONFIG: {
   DESIV: Buffer;
-  [key: string]: unknown;
+  [key: string]: any;
 };
 
 /** 登录用户对象（由数据库查询返回） */
 export interface LoginUser {
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 /** 最小化用户参数类型（用于各方法签名） */
@@ -169,7 +169,7 @@ const USERLOGIN: UserLoginModule = {
     user.loginTime = cookieUser.loginTime;
     user.ip_address = user.socket?.remoteAddress ?? '';
 
-    if (cookieUser.id !== (WORLD as unknown as { admin_user: number }).admin_user) {
+    if (cookieUser.id !== WORLD.admin_user) {
       if (WORLD.CONNECT_COUNT > WORLD.max_connect_count) {
         return this.login_error(user, '服务器人数过多，请稍后再试。');
       }
@@ -189,7 +189,7 @@ const USERLOGIN: UserLoginModule = {
       if (!data) {
         return this.login_error(user, '不允许登录');
       }
-      (WORLD as { on_user_cross_login(u: LoginUserParam, d: unknown): void }).on_user_cross_login(user, data);
+      WORLD.on_user_cross_login(user, data);
       return;
     } else {
       user.serverid = WORLD.SERVERID;

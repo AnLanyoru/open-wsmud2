@@ -20,7 +20,7 @@ let _NPC: {
     CREATE: (path: string, room?: any) => any;
     GET: (path: string) => any;
 } | null = null;
-import("../char/npc.js").then((m: Record<string, unknown>) => { _NPC = m.NPC as any; });
+import("../char/npc.js").then((m: Record<string, any>) => { _NPC = m.NPC as any; });
 
 export class FAMILY extends BASE {
 
@@ -46,7 +46,7 @@ export class FAMILY extends BASE {
     /** 门派ID */
     id: string = "";
     /** 临时数据（带过期时间为 TempValue 包装，否则为原始值） */
-    temp: Record<string, TempValue | unknown> | null = null;
+    temp: Record<string, TempValue | any> | null = null;
     /** 按品级缓存的技能索引 */
     skill_levels: SKILL[][] | null = null;
     /** 门派战结算回调 — 触发时机：玩家领取门派战战利品时 */
@@ -102,10 +102,10 @@ export class FAMILY extends BASE {
 
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
-    query_temp: (name: string, def?: unknown, _me?: unknown) => unknown = ITEM.prototype.query_temp as any;
-    set_temp: (name: string, value: unknown, time?: number, _me?: unknown) => void = ITEM.prototype.set_temp as any;
+    query_temp: <T = any>(name: string, def?: T) => T | undefined = ITEM.prototype.query_temp as any;
+    set_temp: (name: string, value: any, time?: number) => void = ITEM.prototype.set_temp as any;
     remove_temp: (name: string) => void = ITEM.prototype.remove_temp as any;
-    add_temp: (name: string, value: number, time?: number, _me?: unknown) => number = ITEM.prototype.add_temp as any;
+    add_temp: (name: string, value: number, time?: number) => number = ITEM.prototype.add_temp as any;
 
     constructor() {
         super();
@@ -186,7 +186,7 @@ export class FAMILY extends BASE {
      * 向CHARACTER.prototype添加send_fam方法
      */
     static addSendFamToCharacter(): void {
-        import("../char/character.js").then((m: Record<string, unknown>) => {
+        import("../char/character.js").then((m: Record<string, any>) => {
             const CHAR = m.CHARACTER as { prototype: Record<string, any> } | undefined;
             if (CHAR && CHAR.prototype) {
                 CHAR.prototype.send_fam = function (this: Record<string, any>, str: string) {
@@ -514,7 +514,7 @@ export class FAMILY extends BASE {
         if (!this.battle_family) return;
         var fam = FAMILIES[this.battle_family];
         if (!fam) return;
-        this.battle_family = null as unknown as string;
+        this.battle_family = null!;
         if (this.create_handler) clearTimeout(this.create_handler);
         for (var i = 0; i < this.npcs.length; i++) {
             if (this.npcs[i].hp > 0) {
@@ -737,7 +737,7 @@ export class FAMILY extends BASE {
      * @returns JSON 字符串
      */
     static SAVE(): string {
-        var obj: Record<string, unknown> = {};
+        var obj: Record<string, any> = {};
         for (var key in FAMILIES) {
             var fam = FAMILIES[key];
             if (fam.tops) {
@@ -771,4 +771,4 @@ export const FAMILIES: Record<string, FAMILY> = { NONE: new FAMILY() };
 const TITLES: string[] = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
 
 // 使FAMILIES全局可用
-(globalThis as Record<string, unknown>).FAMILIES = FAMILIES;
+(globalThis as Record<string, any>).FAMILIES = FAMILIES;

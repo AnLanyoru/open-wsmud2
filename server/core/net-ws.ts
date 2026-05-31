@@ -26,9 +26,9 @@ export interface WsSocket {
   /** 写入数据 */
   write(data: string | Buffer): boolean;
   /** 注册事件监听 */
-  on(event: string, handler: (...args: unknown[]) => void): this;
+  on(event: string, handler: (...args: any[]) => void): this;
   /** 移除事件监听 */
-  removeListener(event: string, handler: (...args: unknown[]) => void): this;
+  removeListener(event: string, handler: (...args: any[]) => void): this;
   /** 发送消息（由 onClientConnect 注入） */
   send?: (msg: string) => void;
   /** 当前使用的协议处理器 */
@@ -38,9 +38,9 @@ export interface WsSocket {
   /** TCP 未读完的数据缓存 */
   unread_data?: Buffer | null;
   /** 所属用户对象 */
-  user?: Record<string, unknown> | null;
+  user?: Record<string, any> | null;
   /** 关联的跨服连接 */
-  oserver?: Record<string, unknown> | null;
+  oserver?: Record<string, any> | null;
   /** 是否已销毁 */
   destroyed?: boolean;
 }

@@ -8,6 +8,19 @@ import { pathToFileURL } from 'url';
 // 内部类型
 // ============================================================
 
+/** 工厂函数（旧式 JS 风格，this 即为新对象） */
+type FactoryFunc = (this: BASE, par?: string) => void;
+/** 构造函数（ES class） */
+type CtorFunc = new (par?: string) => BASE;
+
+/**
+ * 判断 function 是否为 class constructor。
+ * isClass 被用于 class/factory 分支选择，其在 Module 阶段固定，通过 toString 判断即可。
+ */
+function isConstructor(fn: Function): fn is CtorFunc {
+    return fn.toString().trim().startsWith('class');
+}
+
 /** 事件处理记录 */
 interface EventRecord {
     func: (...args: any[]) => any;
@@ -43,10 +56,10 @@ export class BASE {
      * 批量设置属性 — 将键值对中的属性复制到当前对象
      * @param pars - 键值对（可选）
      */
-    set(pars?: Partial<this> & Record<string, unknown>): void {
+    set(pars?: Partial<this> & Record<string, any>): void {
         if (!pars) return;
         for (const item in pars) {
-            (this as Record<string, unknown>)[item] = pars[item];
+            this[item] = pars[item];
         }
     }
 
@@ -70,9 +83,9 @@ export class BASE {
      * @param func - 替换的函数
      * @param time - 有效期（毫秒），不传则永久有效
      */
-    add_event(fname: string, func: (this: this, ...args: unknown[]) => unknown, time?: number): void {
-        if (!(this as Record<string, unknown>)[fname]) {
-            (this as Record<string, unknown>)[fname] = (this as unknown as BASE & Record<string, Function>).fire_event.bind(this, fname);
+    add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number): void {
+        if (!this[fname]) {
+            this[fname] = this.fire_event.bind(this, fname);
         }
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
@@ -99,8 +112,8 @@ export class BASE {
         }
 
         if (!evts.length) {
-            this._events[name] = undefined as unknown as EventRecord[];
-            (this as Record<string, unknown>)[name] = null;
+            delete this._events[name];
+            this[name] = null;
         }
     }
 
@@ -123,8 +136,8 @@ export class BASE {
             }
         }
         if (!evts.length) {
-            this._events[name] = undefined as unknown as EventRecord[];
-            (this as Record<string, unknown>)[name] = null;
+            delete this._events[name];
+            this[name] = null;
         }
     }
 
@@ -205,8 +218,8 @@ export class BASE {
     // 静态成员 — 资源加载和对象工厂
     // ============================================================
 
-    /** 已加载资源缓存: 路径 -> 编译后的函数/类 */
-    static ITEMS: Record<string, Function> = {};
+    /** 已加载资源缓存: 路径 -> 构造函数或工厂函数 */
+    static ITEMS: Record<string, CtorFunc | FactoryFunc> = {};
 
     /** 文件路径解析正则: 路径/#参数 */
     static PATH_REG: RegExp = /^(\w+(?:\/\w+)*)(#\w+)?$/;
@@ -219,12 +232,12 @@ export class BASE {
     static async PRELOAD(fkey: string, filepath: string): Promise<void> {
         try {
             const mod = await import(pathToFileURL(filepath).href);
-            const func = (mod as { default?: unknown }).default;
+            const func = mod.default;
             if (typeof func === 'function') {
-                BASE.ITEMS[fkey] = func;
+                BASE.ITEMS[fkey] = func as CtorFunc | FactoryFunc;
             } else {
                 // extends/ files: side-effects ran on import
-                BASE.ITEMS[fkey] = function () { /* stub */ };
+                BASE.ITEMS[fkey] = function (this: BASE) { /* stub */ } as FactoryFunc;
             }
         } catch (e) {
             console.error('preload %s error:', filepath, e, (e as Error).stack);
@@ -268,14 +281,13 @@ export class BASE {
     /**
      * 实例化对象
      * @param fname - 文件名
-     * @param func - 编译后的构造函数/工厂函数
+     * @param func - class 构造函数或工厂函数
      * @param par - 构造参数
      * @returns 新创建的对象
      */
-    static NEW(fname: string, func: Function, par?: string): BASE {
-        const isClass = func.toString().trim().startsWith('class');
-        const obj: BASE = isClass
-            ? new (func as new (par?: string) => BASE)(par)
+    static NEW(fname: string, func: CtorFunc | FactoryFunc, par?: string): BASE {
+        const obj: BASE = isConstructor(func)
+            ? new func(par)
             : (() => {
                   const o = new BASE();
                   func.apply(o);
@@ -311,7 +323,7 @@ export class BASE {
             const mod = await import(
                 pathToFileURL(filepath).href + '?update=' + Date.now()
             );
-            const func = (mod as { default?: unknown }).default;
+            const func = (mod as { default?: Function }).default;
             if (typeof func === 'function') {
                 BASE.ITEMS[fkey] = func;
             } else {

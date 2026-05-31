@@ -22,7 +22,7 @@ export class COMMAND extends BASE {
      * @param _par3 - extra param (COMMAND.DO usage)
      * @returns false indicates command failure
      */
-    enter(me: CHARACTER | null, arg?: string, _par2?: unknown, _par3?: unknown): boolean | void {
+    enter(me: CHARACTER | null, arg?: string, _par2?: string, _par3?: string): boolean | void {
         return undefined;
     }
 
@@ -35,7 +35,7 @@ export class COMMAND extends BASE {
     /** Bound exec function (on target prototype) */
     exec: Function | null = null;
     /** Map JSON cache (set by subclasses e.g. jh, dialog/map) */
-    map_json?: unknown;
+    map_json?: any;
 
     // ============ Permission control ============
 
@@ -63,7 +63,7 @@ export class COMMAND extends BASE {
     for_item(item: Function, name?: string): void {
         if (this.exec) {
             name = name || this.command;
-            (item.prototype as Record<string, unknown>)["do_" + name] = this.exec;
+            (item.prototype as Record<string, any>)["do_" + name] = this.exec;
         }
     }
 
@@ -104,10 +104,10 @@ export class COMMAND extends BASE {
      * @param par2 - extra
      * @param par3 - extra
      */
-    static DO(cmd: string, par1?: unknown, par2?: unknown, par3?: unknown): void {
+    static DO(cmd: string, par1?: string, par2?: string, par3?: string): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
-            cmdObj.enter(null, par1 as string | undefined, par2, par3);
+            cmdObj.enter(null, par1, par2, par3);
         }
     }
 }

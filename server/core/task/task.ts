@@ -55,23 +55,23 @@ export class TASK extends BASE {
      * 任务启动回调 — 子类覆写实现具体逻辑（如设置定时器、初始化状态）
      * @param oldtask - 旧任务实例（热更新时传入，用于迁移状态）
      */
-    startup(oldtask?: TASK): void { return undefined as unknown as void; }
+    startup(oldtask?: TASK): void { return undefined; }
 
     /**
      * 任务停止回调 — 子类覆写清理定时器等资源
      */
-    stop(): void { return undefined as unknown as void; }
+    stop(): void { return undefined; }
 
     /**
      * 查询玩家货物列表 — 子类覆写（如押镖任务的货物）
      * @param me - 玩家角色
      */
-    query_goods(me: Record<string, any>): unknown[] | undefined { return undefined; }
+    query_goods(me: Record<string, any>): any[] | undefined { return undefined; }
 
     /**
      * 设置/清除玩家货物缓存 — 子类覆写
      * @param me - 玩家角色
      * @param list - 物品列表，传 null 清除缓存
      */
-    set_goods(me: Record<string, any>, list: unknown[] | null): void { return undefined as unknown as void; }
+    set_goods(me: Record<string, any>, list: any[] | null): void { return undefined; }
 }

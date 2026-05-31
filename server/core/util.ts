@@ -11,7 +11,7 @@ import { PROPERTIES } from './const.js';
 
 // 懒加载 SKILL 避免循环依赖
 let _SKILL: Record<string, Function> | null = null;
-import('./skill/skill.js').then(m => { _SKILL = m.SKILL as unknown as Record<string, Function>; });
+import('./skill/skill.js').then(m => { _SKILL = m.SKILL as any as Record<string, Function>; });
 
 // ============================================================
 // 原型扩展 (副作用)
@@ -50,7 +50,7 @@ Array.prototype.random = function <T>(this: T[], limit?: number): T {
 };
 
 /** JSON.toObject — 使用 JSON5 解析（支持尾逗号等） */
-JSON.toObject = function (str: string): unknown {
+JSON.toObject = function (str: string): any {
   return JSON5.parse(str);
 };
 
@@ -66,7 +66,7 @@ export const UTIL = {
    * require 模块加载包装
    * @param str - 模块名
    */
-  require(str: string): unknown {
+  require(str: string): any {
     return require(str);
   },
 
@@ -187,7 +187,7 @@ export const UTIL = {
    * @param sp - 分隔符（默认换行）
    * @param count - 倍率（默认 1）
    */
-  prop_toString(prop: Record<string, unknown> | null, sp?: string, count?: number): string {
+  prop_toString(prop: Record<string, any> | null, sp?: string, count?: number): string {
     if (!prop) return "";
     const str: string[] = [];
     count = count || 1;
@@ -249,7 +249,7 @@ export const UTIL = {
           } else {
             p = _SKILL && _SKILL.SLOTS[item];
             if (p) {
-              str.push((p as unknown as { format(v: number): string }).format(val * count));
+              str.push((p as any as { format(v: number): string }).format(val * count));
             }
           }
           break;
