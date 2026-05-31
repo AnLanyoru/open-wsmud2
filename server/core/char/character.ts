@@ -459,8 +459,8 @@ export class CHARACTER extends ITEM {
       this.wait_input.apply(this, [this, req]);
       return;
     }
-    let cmd: string | undefined = undefined;
-    let pars: string | undefined = undefined;
+    let cmd = '';
+    let pars = '';
     let start = 0;
     let i = 0;
     for (; i < req.length; i++) {
@@ -481,11 +481,12 @@ export class CHARACTER extends ITEM {
    * 执行解析后的命令
    */
   do_command(cmdName: string, str?: string): void {
+    str = str || '';
     let cmd = WORLD.COMMANDS[cmdName];
-    let pars: any[];
+    let pars: [CHARACTER, ...string[]];
     if (cmd && cmd.regex && str) {
-      pars = cmd.regex.exec(str) as any as any[];
-      pars ? (pars[0] = this) : (pars = [this, str]);
+      const match = cmd.regex.exec(str);
+      pars = match ? [this, ...match.slice(1)] : [this, str];
     } else {
       pars = [this, str];
     }
@@ -495,7 +496,7 @@ export class CHARACTER extends ITEM {
     cmd = cmd || WORLD.DEFAULT_COMMAND;
     if (cmd) {
       if (!this.check_command(cmd)) return;
-      if (cmd.enter.apply(cmd, pars) !== false) {
+      if ((cmd.enter as Function).apply(cmd, pars) !== false) {
         return;
       }
     }
@@ -510,7 +511,7 @@ export class CHARACTER extends ITEM {
   /**
    * 对某物件执行命令
    */
-  do_item_action(item: any, cmd: string, pars: any[]): boolean {
+  do_item_action(item: any, cmd: string, pars: [CHARACTER, ...any[]]): boolean {
     if (!item || !item.actions) return false;
     const cmdItem = item.actions[cmd];
     if (!cmdItem || !cmdItem.action) return false;

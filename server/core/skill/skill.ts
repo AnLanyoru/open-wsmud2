@@ -6,6 +6,7 @@ import { WORLD } from "../world.js";
 import { UTIL } from "../util.js";
 import { FAMILIES } from "./family.js";
 import type { FAMILY } from './family.js';
+import type { CHARACTER } from '../char/character.js';
 
 // 从 os/const.js 导入常量
 // 注意: 这些常量应被迁移到 server/core/const.ts
@@ -67,7 +68,7 @@ export class SKILL extends BASE {
     /** 技能描述 */
     desc: string = "";
     /** 技能被移除时回调 — 触发时机：玩家 remove_skill() 末尾，技能属性已释放、从技能表删除后 */
-    on_remove?: (me: Record<string, any>, skill: Record<string, any>) => boolean | void;
+    on_remove?: (me: CHARACTER, skill: Record<string, any>) => boolean | void;
 
     // ============ 绝招与技能槽 ============
 
@@ -96,17 +97,17 @@ export class SKILL extends BASE {
     // ============ 回调（由资源文件设置） ============
 
     /** 激活技能回调 — 触发时机：enable() 开头，技能装备到基本技能类型时；返回 false 阻止激活 */
-    on_enable?: (me: Record<string, any>, type: string) => boolean | void;
+    on_enable?: (me: CHARACTER, type: string) => boolean | void;
     /** 取消激活回调 — 触发时机：disenable() 开头，技能从基本技能类型卸下时 */
-    on_disenable?: (me: Record<string, any>, type: string) => void;
+    on_disenable?: (me: CHARACTER, type: string) => void;
     /** 学习技能回调 — 触发时机：玩家执行学习命令时（do_learn() 开头）；返回 false 阻止学习 */
-    on_learn?: (me: Record<string, any>) => boolean | void;
+    on_learn?: (me: CHARACTER) => boolean | void;
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
-    query_enable_prop?: (lv: number, me?: Record<string, any>) => Record<string, unknown> | undefined;
+    query_enable_prop?: (lv: number, me?: CHARACTER) => Record<string, unknown> | undefined;
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
-    query_prop?: (lv: number, me?: Record<string, any>) => Record<string, unknown> | undefined;
+    query_prop?: (lv: number, me?: CHARACTER) => Record<string, unknown> | undefined;
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
-    on_enemy_die?: (me: Record<string, any>, target: Record<string, any>) => void;
+    on_enemy_die?: (me: CHARACTER, target: CHARACTER) => void;
 
     constructor() {
         super();
@@ -119,7 +120,7 @@ export class SKILL extends BASE {
      * @param me - 攻击者
      * @param target - 目标
      */
-    query_attack_action(me: Record<string, any>, target: Record<string, any>): string {
+    query_attack_action(me: CHARACTER, target: CHARACTER): string {
         if (this.attack_actions)
             return this.attack_actions.random();
         return "";
@@ -141,7 +142,7 @@ export class SKILL extends BASE {
      * @param target - 攻击者
      * @param w2 - 攻击者武器
      */
-    query_parry_action(me: Record<string, any>, target: Record<string, any>, w2?: Record<string, any>): string {
+    query_parry_action(me: CHARACTER, target: CHARACTER, w2?: Record<string, any>): string {
         const w1 = me.query_weapon();
         w2 = w2 || target.query_weapon();
         let act: string[] | undefined;
@@ -173,7 +174,7 @@ export class SKILL extends BASE {
      * @param lv - 当前等级
      * @param me
      */
-    level_exp(lv: number, me?: Record<string, any>): number {
+    level_exp(lv: number, me?: CHARACTER): number {
         const grd = this.query_grade(me);
         return (lv + 1) * (grd + 1) * 5;
     }
@@ -183,7 +184,7 @@ export class SKILL extends BASE {
      * @param level
      * @param me
      */
-    query_needexp(level: number, me?: Record<string, any>): number {
+    query_needexp(level: number, me?: CHARACTER): number {
         if (level > 100) {
             const grd = this.query_grade(me);
             const exp = (100 + level) * (level - 100) / 2;
@@ -208,7 +209,7 @@ export class SKILL extends BASE {
      * @param me
      * @param lv - 技能等级
      */
-    release_prop(me: Record<string, any>, lv: number): void {
+    release_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
         let prop = this.query_prop ? this.query_prop(lv, me) : undefined;
         if (prop) {
@@ -235,7 +236,7 @@ export class SKILL extends BASE {
      * @param me
      * @param lv
      */
-    attach_prop(me: Record<string, any>, lv: number): void {
+    attach_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
         let prop = this.query_prop ? this.query_prop(lv, me) : undefined;
         if (prop) {
@@ -263,7 +264,7 @@ export class SKILL extends BASE {
      * 查询技能品级(含进阶)
      * @param me
      */
-    query_grade(me?: Record<string, any>): number {
+    query_grade(me?: CHARACTER): number {
         if (!me) return this.grade;
         const sk = me.skills ? me.skills[this.id] : undefined;
         let lv = this.grade;
@@ -280,7 +281,7 @@ export class SKILL extends BASE {
      * 获取技能颜色名称
      * @param me
      */
-    query_color_name(me?: Record<string, any>): string {
+    query_color_name(me?: CHARACTER): string {
         const desc = level_color[this.query_grade(me)] || "wht";
         return "<" + desc + ">" + this.name + "</" + desc + ">";
     }
@@ -292,7 +293,7 @@ export class SKILL extends BASE {
      * @param me
      * @param lv
      */
-    query_addin_prop(me: Record<string, any>, lv: number): Record<string, number> | undefined {
+    query_addin_prop(me: CHARACTER, lv: number): Record<string, number> | undefined {
         const sk = me.skills ? me.skills[this.id] : undefined;
         if (sk && sk.addin && sk.addin.length) {
             const prop: Record<string, number> = {};
@@ -316,7 +317,7 @@ export class SKILL extends BASE {
      * 检查技能是否已装备到某个基本技能
      * @param me
      */
-    is_enable(me: Record<string, any>): boolean {
+    is_enable(me: CHARACTER): boolean {
         if (this.type !== SKILL_TYPES.SKILL) return true;
         const skill = me.skills ? me.skills[this.id] : undefined;
         if (!skill || !this.can_enables) return false;
@@ -331,7 +332,7 @@ export class SKILL extends BASE {
      * @param me
      * @param baseskill
      */
-    is_enable2(me: Record<string, any>, baseskill: string): boolean {
+    is_enable2(me: CHARACTER, baseskill: string): boolean {
         const skill = me.skills ? me.skills[this.id] : undefined;
         return skill ? skill[baseskill] : false;
     }
@@ -341,7 +342,7 @@ export class SKILL extends BASE {
      * @param me
      * @param type - 基本技能类型
      */
-    enable(me: Record<string, any>, type: string): boolean {
+    enable(me: CHARACTER, type: string): boolean {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
@@ -366,7 +367,7 @@ export class SKILL extends BASE {
      * @param me
      * @param type
      */
-    disenable(me: Record<string, any>, type: string): boolean {
+    disenable(me: CHARACTER, type: string): boolean {
         this.on_disenable && this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
         let prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
@@ -392,7 +393,7 @@ export class SKILL extends BASE {
      * 检查并执行学习条件
      * @param me
      */
-    do_learn(me: Record<string, any>): boolean | undefined {
+    do_learn(me: CHARACTER): boolean | undefined {
         if (this.on_learn && this.on_learn(me) === false) return false;
         if (this.learn_condition) {
             for (let key in this.learn_condition) {
@@ -490,7 +491,7 @@ export class SKILL extends BASE {
      * @param skill_item - 技能数据
      * @param me
      */
-    item_to_json(str: string[], skill_item: Record<string, any>, me: Record<string, any>): void {
+    item_to_json(str: string[], skill_item: Record<string, any>, me: CHARACTER): void {
         str.push('{"id":"');
         str.push(this.id);
 
@@ -528,7 +529,7 @@ export class SKILL extends BASE {
      * @param me
      * @param exp
      */
-    add_exp(me: Record<string, any>, exp: number): boolean | undefined {
+    add_exp(me: CHARACTER, exp: number): boolean | undefined {
         let skill = me.skills ? me.skills[this.id] : undefined;
         if (!skill) {
             skill = {
@@ -578,7 +579,7 @@ export class SKILL extends BASE {
      * @param lv
      * @param me
      */
-    query_score(lv: number, me?: Record<string, any>): number {
+    query_score(lv: number, me?: CHARACTER): number {
         if (lv <= 100) return 0;
         return (lv - 100) * this.query_one_score(me);
     }
@@ -587,7 +588,7 @@ export class SKILL extends BASE {
      * 查询每级积分
      * @param me
      */
-    query_one_score(me?: Record<string, any>): number {
+    query_one_score(me?: CHARACTER): number {
         let sc = 0;
         if (this.type === SKILL_TYPES.SKILL) {
             sc = this.query_grade(me);
@@ -604,7 +605,7 @@ export class SKILL extends BASE {
      * @param me
      * @param target_skill - 目标技能
      */
-    grade_up(me: Record<string, any>, target_skill: SKILL): boolean {
+    grade_up(me: CHARACTER, target_skill: SKILL): boolean {
         const skill = me.skills ? me.skills[this.id] : undefined;
         if (!skill || !(skill.level >= 1000)) return false;
 
@@ -755,7 +756,7 @@ export class SKILL extends BASE {
      * @param me
      * @param lv
      */
-    query_desc(me: Record<string, any>, lv: number): string {
+    query_desc(me: CHARACTER, lv: number): string {
         const str: string[] = [];
         const grd = this.query_grade(me);
         const cc = level_color[grd] || "wht";
@@ -868,7 +869,7 @@ export class SKILL extends BASE {
      * @param lv
      * @param pname - 父技能名(引用技能时)
      */
-    query_pfm_desc(me: Record<string, any>, p_item: Record<string, any>, str: string[], lv: number, pname?: string): void {
+    query_pfm_desc(me: CHARACTER, p_item: Record<string, any>, str: string[], lv: number, pname?: string): void {
         const canuse = !p_item.check || p_item.check(me, lv) === true;
         let color = canuse ? "hic" : "red";
         if (pname) color = 'hir';
@@ -942,7 +943,7 @@ export class PERFORM extends BASE {
     /** 使用类型 */
     use_type: string = "";
     /** 使用条件检查函数 */
-    check?: (me: Record<string, any>, lv: number) => boolean | string;
+    check?: (me: CHARACTER, lv: number) => boolean | string;
     /** 使用条件描述(不满足时显示) */
     use_condition: string = "";
     /** 是否禁止自动释放 */
@@ -967,11 +968,11 @@ export class PERFORM extends BASE {
     // ============ 回调（由资源文件设置） ============
 
     /** 使用绝招回调 — 触发时机：玩家/NPC 释放绝招时 */
-    on_use?: (me: Record<string, any>, target: Record<string, any>, lv: number) => void;
+    on_use?: (me: CHARACTER, target: CHARACTER, lv: number) => void;
     /** 绝招伤害回调 — 触发时机：绝招每次造成伤害时（do_attack 中伤害计算后） */
-    on_attack?: (me: Record<string, any>, target: Record<string, any>, lv: number, damage: number) => void;
+    on_attack?: (me: CHARACTER, target: CHARACTER, lv: number, damage: number) => void;
     /** 查询绝招描述回调 — 触发时机：cha 命令查看技能详情时（query_pfm_desc 调用） */
-    query_desc?: (me: Record<string, any>, lv: number) => string;
+    query_desc?: (me: CHARACTER, lv: number) => string;
 
     constructor() {
         super();
@@ -995,7 +996,7 @@ export class PERFORM extends BASE {
      * 查询绝招名称
      * @param me
      */
-    query_name(me?: Record<string, any>): string {
+    query_name(me?: CHARACTER): string {
         return this.name;
     }
 
@@ -1007,7 +1008,7 @@ export class PERFORM extends BASE {
      * @param id - 绝招ID
      * @param add_time - 增加冷却时间(毫秒), 不传则清除
      */
-    change_distime(me: Record<string, any>, id: string, add_time?: number): void {
+    change_distime(me: CHARACTER, id: string, add_time?: number): void {
         if (me.is_player) {
             const dis_time = me.temp ? me.temp["pfm/" + id] : undefined;
             if (dis_time) {
@@ -1039,7 +1040,7 @@ export class PERFORM extends BASE {
      * @param me
      * @param lv
      */
-    query_releasetime(me: Record<string, any>, lv: number): number {
+    query_releasetime(me: CHARACTER, lv: number): number {
         var rtime = this.release_time;
         if (!(rtime >= 0)) rtime = me.gjsd;
 
@@ -1064,7 +1065,7 @@ export class PERFORM extends BASE {
      * @param lv
      * @param isref - 是否为引用技能
      */
-    query_distime(me: Record<string, any>, lv: number, isref?: boolean): number {
+    query_distime(me: CHARACTER, lv: number, isref?: boolean): number {
         var dis = this.distime;
         if (!dis) dis = me.gjsd;
         if (isref) dis = dis * 2;
@@ -1088,7 +1089,7 @@ export class PERFORM extends BASE {
      * @param me
      * @param lv
      */
-    query_mp(me: Record<string, any>, lv: number): number {
+    query_mp(me: CHARACTER, lv: number): number {
         var mp = this.mp || 0;
 
         mp = mp + lv * mp / 20;
