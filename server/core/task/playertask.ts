@@ -1,7 +1,6 @@
 /**
  * USERTASK 玩家任务基类
  */
-import { UTIL } from "../util.js";
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 

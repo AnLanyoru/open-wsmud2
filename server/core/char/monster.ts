@@ -5,15 +5,13 @@
 import { CHARACTER } from './character.js';
 
 // @ts-ignore - Legacy JS module
-import { FAMILIES } from '../skill/family.js';
-// @ts-ignore - Legacy JS module
 import { BASE_SKILLS } from '../const.js';
 // @ts-ignore - Legacy JS module
 import { CORPSE } from '../item/corpse.js';
 // @ts-ignore - Legacy JS module
 import { WORLD } from '../world.js';
 // @ts-ignore - Legacy JS module
-import { ROOM } from '../room/room.js';
+import type { ROOM } from '../room/room.js';
 
 // ============================================================
 // MONSTER 类

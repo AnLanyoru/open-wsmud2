@@ -3,20 +3,13 @@
 // ============================================================
 
 // Legacy JS runtime imports (will be replaced during migration)
-// @ts-ignore
 import { ITEM } from '../item.js';
-// @ts-ignore
 import { OBJ } from '../item/obj.js';
-// @ts-ignore
 import { SKILL } from '../skill/skill.js';
-// @ts-ignore
 import { WORLD } from '../world.js';
-// @ts-ignore
 import { UTIL } from '../util.js';
-// @ts-ignore
 import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
-// @ts-ignore
-import { EQUIPMENT } from '../item/equipment.js';
+import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
