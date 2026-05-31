@@ -237,6 +237,7 @@ export class ITEM extends BASE {
             }
         } else {
             act = {
+                cmd,
                 name: name,
                 action: func,
             };
