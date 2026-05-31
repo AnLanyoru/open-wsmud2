@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import { TASK } from "../../os/task/task.js";
 import { WORLD } from "../../os/world.js";
 import { COMMAND } from "../../os/command.js";
