@@ -504,7 +504,7 @@ export class USER extends CHARACTER {
     let rm = ROOM.Get(this.query_temp('new') ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
     if (!rm || rm.is_fb()) rm = ROOM.Get(DEFAULT_ROOM);
     if (rm!.is_copy()) {
-      let copy_room = rm!.query_copy2(this) as any;
+      let copy_room = rm!.query_copy2(this);
       if (copy_room) {
         this.moveto(copy_room, "", this.name + '连线进入这个世界。');
       } else {
@@ -620,7 +620,7 @@ export class USER extends CHARACTER {
       str.push(FOLLOWER.SAVE(this));
     }
     str.push(',eq_groups:[');
-    const eqGroups = this.eq_groups as any[];
+    const eqGroups = this.eq_groups;
     if (eqGroups) {
       for (let i = 0; i < eqGroups.length; i++) {
         if (i > 0) str.push(',');
@@ -629,12 +629,13 @@ export class USER extends CHARACTER {
       }
     }
     str.push('],sk_groups:[');
-    const skGroups = this.sk_groups as any[];
+    const skGroups = this.sk_groups;
     if (skGroups) {
       for (let i = 0; i < skGroups.length; i++) {
         if (i > 0) str.push(',');
-        if (!skGroups[i]) str.push('0');
-        else str.push('["', skGroups[i].join('","'), '"]');
+        const item = skGroups[i];
+        if (!item) str.push('0');
+        else str.push('["', item.join('","'), '"]');
       }
     }
     str.push(']}');
@@ -847,7 +848,7 @@ export class USER extends CHARACTER {
       }
       this.send('{type:"state"}');
     }
-    this.state = state as any;
+    this.state = state;
     if (state) {
       state.rate = state.rate || 1;
       state.heat_count = 0;

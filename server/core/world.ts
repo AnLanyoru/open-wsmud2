@@ -8,6 +8,7 @@
  */
 
 import { createRequire } from 'module';
+import v8 from 'v8';
 const require = createRequire(import.meta.url);
 
 import { pathToFileURL } from 'url';
@@ -159,7 +160,7 @@ class World implements IWorld {
       }
       let store = user.get(from.id);
       if (!store) {
-        store = { name: from.name, items: [] as any[] };
+        store = { name: from.name, items: [] };
         user.set(from.id, store);
       }
       msg.index = store.items.length;
@@ -882,7 +883,6 @@ class World implements IWorld {
 
   /** 生成堆内存快照 */
   writeHeapSnapshot(): void {
-    const v8 = UTIL.require('v8');
     const dt = new Date();
     const fname =
       __PATH.DATA +
@@ -897,7 +897,7 @@ class World implements IWorld {
       '_' +
       dt.getMinutes() +
       '.heapsnapshot';
-    (v8 as any).writeHeapSnapshot(fname);
+    v8.writeHeapSnapshot(fname);
     console.log('快照保存到', fname);
   }
 

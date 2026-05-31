@@ -1414,7 +1414,7 @@ export class CHARACTER extends ITEM {
 
         if (item.on_interval && !isall) {
           item.over_count = (item.over_count || 0) + 1;
-          if ((item as any).on_interval(this, item.over_count) === false) {
+          if (item.on_interval(this, item.over_count) === false) {
             item.duration_count = item.duration_count || 2;
             item.over_count = item.duration_count;
           }
@@ -2460,7 +2460,7 @@ export class CHARACTER extends ITEM {
           target.send_combat(query_status_msg(target.hp, target.max_hp));
           if (target.on_damage) target.on_damage(this, sh);
         } else {
-          this.send_combat('结果没有造成任何伤害。\n', true as any);
+          this.send_combat('结果没有造成任何伤害。\n', target);
         }
       }
     }

@@ -132,11 +132,11 @@ export const UTIL = {
   },
 
   /** 中文数字字符 */
-  C_STR: "零一二三四五六七八九" as string,
+  C_STR: "零一二三四五六七八九",
   /** 中文数位（十百千万亿） */
-  C_STR2: ["", "十", "百", "千", "万", "亿"] as string[],
+  C_STR2: ["", "十", "百", "千", "万", "亿"],
   /** 中文大数位（万/亿） */
-  C_STR3: ["", "万", "亿"] as string[],
+  C_STR3: ["", "万", "亿"],
 
   /**
    * 数字转中文
@@ -225,7 +225,7 @@ export const UTIL = {
         case "skill": {
           let skills = prop[item] as Record<string, number>;
           for (let sk in skills) {
-            let sk_base = _SKILL && (_SKILL as Record<string, Function>).get(sk);
+            let sk_base = _SKILL && _SKILL.get(sk);
             if (sk_base) str.push(sk_base.name + "：+" + skills[sk] + "级");
           }
           break;
@@ -247,7 +247,7 @@ export const UTIL = {
               ? str.push(PROPERTIES[item] + "：+" + val * count)
               : str.push(PROPERTIES[item] + "：" + val * count);
           } else {
-            p = _SKILL && (_SKILL as Record<string, Function>).SLOTS[item];
+            p = _SKILL && _SKILL.SLOTS[item];
             if (p) {
               str.push((p as unknown as { format(v: number): string }).format(val * count));
             }
@@ -328,9 +328,9 @@ export const UTIL = {
   },
 
   /** ID 可用字符集（36 进制） */
-  idstr: "0123456789abcdefghijklmnopqrstuvwxwz" as string,
+  idstr: "0123456789abcdefghijklmnopqrstuvwxwz",
   /** 基准时间戳（用于缩短 ID 长度） */
-  begin: 1490276099978 as number,
+  begin: 1490276099978,
 
   /**
    * 生成唯一对象 ID（时间戳 + 随机字符）
