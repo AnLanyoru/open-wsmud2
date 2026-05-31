@@ -46,7 +46,9 @@ export default class extends COMMAND {
         }
         var path = __PATH.WORLD + arg.substr(0, index + 1);
         var fname = arg.substr(index + 1);
-        return BASE.UPDATE(path, fname);
+        return BASE.UPDATE(path, fname).then(() => {
+            BASE.CREATE(path, fname);
+        });
     }
 
     notify(me, msg) {
@@ -56,14 +58,8 @@ export default class extends COMMAND {
 
     update_npc(me, path) {
         this.do_update(me, "npc/" + path).then(() => {
-            let npc = me.environment.find_obj_bypath(path);
-            if (npc) {
-                npc.destroy();
-                NPC.CREATE(path, me.environment);
-            }
             let map = WORLD.NPC_STROE;
-            npc = map.get(path);
-            if (!npc || !npc.on_create) return;
+            map.delete(path);
             let keys = map.keys();
             let prefix = path + "#";
             for (let key of keys) {
@@ -71,6 +67,11 @@ export default class extends COMMAND {
                     map.delete(key);
                     me.send('delete' + key);
                 }
+            }
+            let npc = me.environment.find_obj_bypath(path);
+            if (npc) {
+                npc.destroy();
+                NPC.CREATE(path, me.environment);
             }
         }).catch(e => {
             console.log(e);
@@ -81,8 +82,7 @@ export default class extends COMMAND {
     update_obj(me, path) {
         this.do_update(me, "obj/" + path).then(() => {
             let map = WORLD.OBJ_STROE;
-            let obj = map.get(path);
-            if (!obj || !obj.on_create) return;
+            map.delete(path);
             let keys = map.keys();
             let prefix = path + "#";
             for (let key of keys) {

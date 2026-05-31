@@ -23,7 +23,6 @@ export default class extends NPC {
     this.desc = (this.gender == 2 ? "她" : "他") + "是" + player.name + "正在追捕的逃犯";
 
     this.name = UTIL.random_name(this.gender);
-
     this.hp = this.max_hp = 1200;
     this.pfm_rate = 1;
     this.mp = this.max_mp = this.max_hp;
