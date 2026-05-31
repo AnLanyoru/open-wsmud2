@@ -297,7 +297,7 @@ export class USER extends CHARACTER {
         this.no_message = this.settings['no_message'] == 1;
       }
       str.push(',id:"');
-      str.push(this.id, '",level:', this.level.toString());
+      str.push(this.id, '",name:"', this.name, '",level:', this.level.toString());
       str.push('}');
       this.login_message = str.join('');
     }
