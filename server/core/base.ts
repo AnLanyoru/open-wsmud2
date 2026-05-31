@@ -325,7 +325,7 @@ export class BASE {
             );
             const func = (mod as { default?: Function }).default;
             if (typeof func === 'function') {
-                BASE.ITEMS[fkey] = func;
+                BASE.ITEMS[fkey] = func as CtorFunc | FactoryFunc;
             } else {
                 BASE.ITEMS[fkey] = function () { /* stub */ };
             }
