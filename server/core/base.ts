@@ -327,7 +327,7 @@ export class BASE {
             if (typeof func === 'function') {
                 BASE.ITEMS[fkey] = func as CtorFunc | FactoryFunc;
             } else {
-                BASE.ITEMS[fkey] = function () { /* stub */ };
+                BASE.ITEMS[fkey] = function (this: BASE) { /* stub */ } as FactoryFunc;
             }
         } catch (e) {
             console.error('update %s error:', filepath, e, (e as Error).stack);

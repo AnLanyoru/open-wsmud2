@@ -752,7 +752,7 @@ class World implements IWorld {
   /**
    * 跨服登录事件回调 — 触发时机：玩家从其他服务器跳转登录时（由 extends 覆盖）
    */
-  on_user_cross_login(user: USER): void {
+  on_user_cross_login(user: any, _data?: any): void {
     // stub — overridden by extends
   }
 

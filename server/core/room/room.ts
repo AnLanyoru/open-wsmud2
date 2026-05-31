@@ -149,7 +149,7 @@ export class ROOM extends ITEM {
      * @param dir - 离开方向
      * @param leave_msg - 离开消息
      */
-    do_leave(obj: Record<string, any>, dir: string, leave_msg: string): boolean | undefined {
+    do_leave(obj: OBJ | CHARACTER | NPC | USER, dir: string, leave_msg: string): boolean | undefined {
         if (this.on_leave && this.on_leave(obj, dir) == false) {
             return false;
         }
@@ -164,7 +164,7 @@ export class ROOM extends ITEM {
      * @param isshow - 是否显示
      * @param in_msg - 进入消息
      */
-    do_enter(obj: Record<string, any>, isshow: boolean, in_msg: string): void {
+    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg: string): void {
         this.on_before_enter && this.on_before_enter(obj);
         if (obj.is_player) {
             obj.send(this.to_json());
@@ -182,7 +182,7 @@ export class ROOM extends ITEM {
      * @param changed_msg - 变更消息(广播给房间内玩家)
      * @param dir - 移动方向
      */
-    item_changed(obj: Record<string, any>, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
+    item_changed(obj: OBJ | CHARACTER | NPC | USER, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
         if (!obj) return;
         let msg: string | undefined;
         let obj_index = -1, isshow = !obj.query_temp('hidden');
@@ -193,6 +193,7 @@ export class ROOM extends ITEM {
                 continue;
             }
             if (item.is_player && isshow) {
+                item as USER;
                 if (!msg) msg = this.item_json(obj, isin);
                 item.send(msg);
 
@@ -201,11 +202,11 @@ export class ROOM extends ITEM {
                 }
 
             } else {
-                if (obj.hp) {
+                if (obj.is_character) {
                     if (isin && (item.on_enter)) {
                         item.on_enter(obj);
                     } else if (!isin && item.on_leave) {
-                        if (item.on_leave(obj, dir) == false) return false;
+                        if (item.on_leave(obj, dir || '') == false) return false;
                     }
                 }
             }
@@ -218,7 +219,7 @@ export class ROOM extends ITEM {
                 if (obj.is_player) obj.send(this.items_to_json());
 
             } else if (obj.is_player) {
-                if (!msg) msg = this.item_json(obj, isin);
+                if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
                 obj.send(msg);
             }
         } else if (obj_index > -1) {
@@ -232,7 +233,7 @@ export class ROOM extends ITEM {
      * @param item - 物件
      * @param isin - 是否进入
      */
-    item_json(item: Record<string, any>, isin: boolean): string {
+    item_json(item: OBJ | CHARACTER | NPC, isin: boolean): string {
         if (!item) return "";
         const str: string[] = [];
         if (isin) {
@@ -245,16 +246,17 @@ export class ROOM extends ITEM {
             if (item.is_player) {
                 str.push(",p:1");
             }
-            if (item.appdend_status) {
+            if (item.is_character) {
+                const ch = item as CHARACTER;
                 str.push(",mp:");
-                str.push(item.mp);
+                str.push(String(ch.mp));
                 str.push(",hp:");
-                str.push(item.hp);
+                str.push(String(ch.hp));
                 str.push(",max_mp:");
-                str.push(item.max_mp);
+                str.push(String(ch.max_mp));
                 str.push(",max_hp:");
-                str.push(item.max_hp);
-                item.appdend_status(str);
+                str.push(String(ch.max_hp));
+                if (ch.appdend_status) ch.appdend_status(str);
             }
             str.push("}");
         } else {
@@ -271,7 +273,7 @@ export class ROOM extends ITEM {
     items_to_json(): string {
         const str: string[] = ['{"type":"items","items":['];
         for (let i = 0; i < this.items.length; i++) {
-            const item = this.items[i];
+            const item: Record<string, any> = this.items[i];
             if (!item.is_hidden()) {
                 str.push("{id:\"");
                 str.push(item.id);

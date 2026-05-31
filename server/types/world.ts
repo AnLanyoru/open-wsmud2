@@ -234,7 +234,7 @@ export interface IWorld {
   getUser(id: UID | number): USER | undefined;
   find_user(name: string): USER | undefined;
   on_user_login(user: USER): void;
-  on_user_cross_login(user: USER): void;
+  on_user_cross_login(user: any, data?: any): void;
   on_user_relogin(user: USER): void;
   heart_beat(): void;
   login_out(user: USER): void;
