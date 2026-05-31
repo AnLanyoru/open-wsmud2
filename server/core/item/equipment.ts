@@ -369,7 +369,7 @@ export class EQUIPMENT extends OBJ {
      */
     levelchange_prop(): void {
         if (!(this.level >= 0 && this.level < 13)) return;
-        const base_props: Record<string, any> = (this.original_prop ?? (Object.getPrototypeOf(this) as any).prop ?? {});
+        const base_props: Record<string, any> = (this.original_prop ?? Object.getPrototypeOf(this).prop ?? {});
         const val = this.levelData[this.level];
         for (const key in base_props) {
             const value = base_props[key];

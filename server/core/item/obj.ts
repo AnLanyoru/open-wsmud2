@@ -120,6 +120,10 @@ export class OBJ extends ITEM {
     on_reload?(me: CHARACTER): void;
     /** 拾取回调，返回 false 阻止拾取 */
     on_get?(player: CHARACTER): boolean | void;
+    /** 有角色进入房间回调 — 触发时机：有 HP 的角色进入本物品所在房间时 */
+    on_enter?(obj: Record<string, any>): void;
+    /** 有角色离开房间回调 — 触发时机：有 HP 的角色从本物品所在房间离开时；返回 false 阻止离开 */
+    on_leave?(obj: Record<string, any>, dir: string): boolean | void;
 
     /**
      * 初始化钩子

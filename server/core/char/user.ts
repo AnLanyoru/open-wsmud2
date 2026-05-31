@@ -501,30 +501,30 @@ export class USER extends CHARACTER {
     WORLD.STATS.checkStats(this);
     this.send_loginmessage();
     if (this.family) this.family.on_login(this);
-    let rm = ROOM.Get((this.query_temp('new') as any) ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
+    let rm = ROOM.Get(this.query_temp('new') ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
     if (!rm || rm.is_fb()) rm = ROOM.Get(DEFAULT_ROOM);
     if (rm!.is_copy()) {
       let copy_room = rm!.query_copy2(this) as any;
       if (copy_room) {
-        this.moveto(copy_room, null as any, this.name + '连线进入这个世界。');
+        this.moveto(copy_room, "", this.name + '连线进入这个世界。');
       } else {
         if (this.query_temp('new')) {
           this.set_temp('new', 1);
           this.items = [];
-          (this as any).exp = (this as any).pot = this.money = 0;
+          this.exp = this.pot = this.money = 0;
         }
         copy_room = rm!.create_copy2(this);
         this.moveto(copy_room);
       }
     } else {
-      this.moveto(rm, null as any, this.name + '连线进入这个世界。');
+      this.moveto(rm, "", this.name + '连线进入这个世界。');
     }
     this.check_state();
     if (this.follower && (!this.environment || (this.environment as unknown as { parent: { id: string } }).parent.id !== 'home')) {
       const home = ROOM.Get('home/yuanzi');
       if (home) {
-        let copy_home = home.query_copy2(this) as any;
-        if (!copy_home) copy_home = home.create_copy2(this) as any;
+        let copy_home = home.query_copy2(this);
+        if (!copy_home) copy_home = home.create_copy2(this);
         if (copy_home) {
           for (let i = 0; i < this.follower.length; i++) {
             const npc = FOLLOWER.STORES.get(this.id + '_' + this.follower[i].id);
@@ -680,7 +680,7 @@ export class USER extends CHARACTER {
     this.environment = env;
     this.check_state();
     WORLD.on_user_die(this, killer, undefined);
-    (this as any).on_died?.(killer);
+    this.on_died?.(killer, undefined);
   }
 
   /**
@@ -777,7 +777,7 @@ export class USER extends CHARACTER {
         }
       }
       this.title = title;
-      (this as any).color_name = null;
+      this.color_name = '';
       if (this.environment) {
         this.environment.item_changed(this, true);
       }
@@ -864,7 +864,7 @@ export class USER extends CHARACTER {
       }
       this.send(msg + '}');
     }
-    (this as any).color_name = null;
+    this.color_name = '';
     if (this.environment) {
       this.environment.item_changed(this, true);
     }
@@ -884,7 +884,7 @@ export class USER extends CHARACTER {
    * 获取完整显示名称(含颜色)
    */
   long_name(): string {
-    if (!(this as any).color_name) {
+    if (!this.color_name) {
       const cc = this.get_level_color();
       const str: string[] = [];
       if (cc) {
@@ -906,17 +906,17 @@ export class USER extends CHARACTER {
         str.push(cc);
         str.push('>');
       }
-      (this as any).color_name = str.join('');
+      this.color_name = str.join('');
       this.commands_json = null;
     }
-    return (this as any).color_name + this.get_state();
+    return this.color_name + this.get_state();
   }
 
   /** 初始化用户任务 */
   init_tasks(): void {
     for (let i = 0; i < WORLD.TASKS.length; i++) {
-      const task = WORLD.TASKS[i] as any;
-      task.on_start && task.on_start(this);
+      const task = WORLD.TASKS[i];
+      task.on_start?.(this);
     }
   }
 
@@ -1030,13 +1030,13 @@ export class USER extends CHARACTER {
       for (let i = 0; i < bases.length; i++) {
         const base_type = bases[i];
         if (!base_type) continue;
-        const base_skill = (this.skills as any)[base_type];
+        const base_skill = this.skills[base_type];
         if (base_skill) {
           const sp_skill = SKILL.get(base_skill.enable_skill || base_type);
           if (sp_skill && sp_skill.pfm) {
             const sk_level = this.query_skill(base_skill.enable_skill || base_type, 0);
             for (const p in sp_skill.pfm) {
-              const pfmitem = sp_skill.pfm[p] as any;
+              const pfmitem = sp_skill.pfm[p];
               if (pfmitem.check && !pfmitem.check(this, sk_level, base_type)) continue;
               if (pfmitem.enable_skill && pfmitem.enable_skill !== base_type) continue;
               if (str.length > 1) str.push(',');
@@ -1047,24 +1047,26 @@ export class USER extends CHARACTER {
               str.push('"');
               if (pfmitem.distime) {
                 str.push(',distime:');
-                str.push((pfmitem as any).query_distime(this));
+                str.push(pfmitem.query_distime(this).toString());
               }
               str.push('}');
             }
           }
-          const pfmitem = this.query_ref_skill((this.skills as any)[base_skill.enable_skill]);
-          if (pfmitem && pfmitem.enable_skill && pfmitem.enable_skill === bases[i]) {
-            if (str.length > 1) str.push(',');
-            str.push('{id:"');
-            str.push(bases[i] + '.ref');
-            str.push('",name:"');
-            str.push(pfmitem.query_name(this, base_type));
-            str.push('"');
-            if (pfmitem.distime) {
-              str.push(',distime:');
-              str.push(pfmitem.query_distime(this, this.query_skill(base_skill.enable_skill), true));
+          if (base_skill.enable_skill) {
+            const pfmitem = this.query_ref_skill(this.skills[base_skill.enable_skill]);
+            if (pfmitem && pfmitem.enable_skill && pfmitem.enable_skill === bases[i]) {
+              if (str.length > 1) str.push(',');
+              str.push('{id:"');
+              str.push(bases[i] + '.ref');
+              str.push('",name:"');
+              str.push(pfmitem.query_name(this, base_type));
+              str.push('"');
+              if (pfmitem.distime) {
+                str.push(',distime:');
+                str.push(pfmitem.query_distime(this, this.query_skill(base_skill.enable_skill), true));
+              }
+              str.push('}');
             }
-            str.push('}');
           }
         }
       }
@@ -1091,7 +1093,7 @@ export class USER extends CHARACTER {
     if (!rm_name) rm_name = home == 1 ? 'home/danjian' : 'home/yuanzi';
     const rm = ROOM.Get(rm_name);
     if (!rm) return null;
-    let my_room = rm.query_copy2(this) as any;
+    let my_room = rm.query_copy2(this);
     if (!my_room) {
       my_room = rm.create_copy2(this);
     }
@@ -1167,7 +1169,7 @@ export class USER extends CHARACTER {
       id: npc.id,
     };
     (this.follower as FollowerDesc[]).push(item);
-    FOLLOWER.INIT(this, item as any);
+    FOLLOWER.INIT(this, item);
     return true;
   }
 
@@ -1177,7 +1179,7 @@ export class USER extends CHARACTER {
   clear_home(clear_follower: boolean = true): void {
     let home = ROOM.Get('home/yuanzi');
     if (home) {
-      home = home.query_copy(this.id) as any;
+      home = home.query_copy(this.id);
       if (home) home.clear_copy(this);
     }
     if (clear_follower) {
@@ -1239,7 +1241,7 @@ export class USER extends CHARACTER {
         + (this.max_mp * this.query_force_rad()
           + this.query_prop('max_hp')
           + this.query_prop('con') * this.con)
-        * (100 + this.query_prop('hp_per')) / 100) as any,
+        * (100 + this.query_prop('hp_per')) / 100),
     );
 
     if (this.hp > this.max_hp) this.hp = this.max_hp;
@@ -1247,7 +1249,7 @@ export class USER extends CHARACTER {
     this.gjsd = 4000 - this.query_prop('gjsd');
     if (this.gjsd > 500) {
       this.gjsd = parseInt(
-        (this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100)) as any,
+        (this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100)),
       );
       if (this.gjsd < 500) this.gjsd = 500;
     } else {
@@ -1257,39 +1259,39 @@ export class USER extends CHARACTER {
     this.gj = parseInt(
       (this.str
         + (this.query_prop('gj') + this.query_prop('str') * this.str / 10)
-        * (100 + this.query_prop('gj_per')) / 100) as any,
+        * (100 + this.query_prop('gj_per')) / 100),
     );
     this.fy = parseInt(
       (((this.str + this.con) / 10
         + this.query_prop('fy')
         + this.query_prop('con') * this.con / 10)
-        * (100 + this.query_prop('fy_per')) / 100) as any,
+        * (100 + this.query_prop('fy_per')) / 100),
     );
     this.mz = parseInt(
       ((this.dex / 2 + this.query_prop('mz'))
-        * (100 + this.query_prop('mz_per')) / 100) as any,
+        * (100 + this.query_prop('mz_per')) / 100),
     );
     this.ds = parseInt(
       ((this.dex / 2
         + this.query_prop('ds')
         + this.query_prop('dex') * this.dex / 10)
-        * (100 + this.query_prop('ds_per')) / 100) as any,
+        * (100 + this.query_prop('ds_per')) / 100),
     );
-    if ((this as any).dodge_skill && (this as any).dodge_skill.on_recount_dodge) {
-      this.ds += (this as any).dodge_skill.on_recount_dodge(this);
+    if (this.dodge_skill?.on_recount_dodge) {
+      this.ds += this.dodge_skill.on_recount_dodge(this);
     }
     this.zj = parseInt(
       ((this.str / 2
         + this.query_prop('zj')
         + this.query_prop('str') * this.str / 10)
-        * (100 + this.query_prop('zj_per')) / 100) as any,
+        * (100 + this.query_prop('zj_per')) / 100),
     );
-    if ((this as any).parry_skill && (this as any).parry_skill.on_recount_parry) {
-      this.zj += (this as any).parry_skill.on_recount_parry(this);
+    if (this.parry_skill?.on_recount_parry) {
+      this.zj += this.parry_skill.on_recount_parry(this);
     }
     this.bj = parseInt(this.dex / 10 + this.query_prop('bj_per'));
-    (this as any).diff_sh_per = this.query_prop('diff_sh_per');
-    (this as any).diff_fy_per = this.query_prop('diff_fy_per');
+    this.diff_sh_per = this.query_prop('diff_sh_per');
+    this.diff_fy_per = this.query_prop('diff_fy_per');
   }
 
   /** 境界提升 */
@@ -1349,7 +1351,7 @@ export class USER extends CHARACTER {
       this.notify('<hiw>你的最大内力限制增加了500000。</hiw>');
       this.notify('<hiw>你的先天属性增加了1点。</hiw>');
     }
-    (this as any).color_name = null;
+    this.color_name = '';
     this.environment!.item_changed(this, true);
     this.send(`{type:"levelup",level:${this.level}}`);
   }

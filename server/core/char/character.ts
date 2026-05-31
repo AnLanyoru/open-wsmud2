@@ -314,6 +314,10 @@ export class CHARACTER extends ITEM {
   on_escape?(me: CHARACTER): boolean | void;
   /** 受到伤害回调 — 触发时机：do_attack() 中对目标造成伤害后（hp 实际扣除之前） */
   on_damage?(attacker: CHARACTER, damage: number): void;
+  /** 有角色进入房间回调 — 触发时机：其他有 HP 的角色进入本角色所在房间时 */
+  on_enter?(obj: Record<string, any>): void;
+  /** 有角色离开房间回调 — 触发时机：其他有 HP 的角色从本角色所在房间离开时；返回 false 阻止离开 */
+  on_leave?(obj: Record<string, any>, dir: string): boolean | void;
 
   constructor() {
     super();
@@ -1156,8 +1160,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        (player as any).send(msg);
+      if (player.is_player) {
+        player.send(msg);
       }
     }
     return count;
@@ -1183,8 +1187,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        (player as any).send(msg);
+      if (player.is_player) {
+        player.send(msg);
       }
     }
   }
@@ -1209,8 +1213,8 @@ export class CHARACTER extends ITEM {
     const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        (player as any).send(msg);
+      if (player.is_player) {
+        player.send(msg);
       }
     }
   }
@@ -1229,8 +1233,8 @@ export class CHARACTER extends ITEM {
     const items = this.environment.items;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        (player as any).send(msg);
+      if (player.is_player) {
+        player.send(msg);
       }
     }
   }
@@ -1391,8 +1395,8 @@ export class CHARACTER extends ITEM {
     const items = this.environment.items;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        (player as any).send(msg);
+      if (player.is_player) {
+        player.send(msg);
       }
     }
   }
@@ -2109,11 +2113,11 @@ export class CHARACTER extends ITEM {
     const showdamage = type ? type === 'hp' : false;
     for (let i = 0; i < items.length; i++) {
       const player = items[i];
-      if ((player as any).is_player) {
-        if (showdamage && this.damages && (player as any).query_setting('show_damage')) {
-          (player as any).send(str + ',damage:' + (this.damages[player.id] || 0) + '}');
+      if (player.is_player) {
+        if (showdamage && this.damages && player.query_setting('show_damage')) {
+          player.send(str + ',damage:' + (this.damages[player.id] || 0) + '}');
         } else {
-          (player as any).send(str + '}');
+          player.send(str + '}');
         }
       }
     }

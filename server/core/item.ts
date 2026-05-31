@@ -78,6 +78,8 @@ export class ITEM extends BASE {
     is_npc: boolean = false;
     /** 当前所在环境（房间） */
     environment: ROOM | null = null;
+    /** 掉落列表 */
+    drop_list: any[] | null = null;
 
     // ============ 子类共享属性（OBJ / EQUIPMENT 等） ============
 
@@ -89,6 +91,13 @@ export class ITEM extends BASE {
     grade: number = 0;
     /** 物件类型标识 */
     otype: number = 0;
+
+    // ============ 消息发送（桩方法，由 CHARACTER 覆写） ============
+
+    /** 发送消息到客户端（桩方法，玩家/NPC 子类覆写） */
+    send(_msg: string): void {}
+    /** 查询用户设置（桩方法，玩家子类覆写） */
+    query_setting(_name: string): boolean | number { return false; }
 
     // ============ 堆叠操作 ============
 

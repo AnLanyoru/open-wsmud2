@@ -8,6 +8,7 @@ import { OBJ } from "../item/obj.js";
 import type { AREA } from "./area.js";
 import type { CHARACTER } from "../char/character.js";
 import type { NPC } from "../char/npc.js";
+import type { USER } from "../char/user.js";
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -193,18 +194,18 @@ export class ROOM extends ITEM {
             }
             if (item.is_player && isshow) {
                 if (!msg) msg = this.item_json(obj, isin);
-                (item as any).send(msg);
+                item.send(msg);
 
-                if (changed_msg && item != obj && !(item as any).query_setting("off_move")) {
-                    (item as any).send(changed_msg);
+                if (changed_msg && item != obj && !item.query_setting("off_move")) {
+                    item.send(changed_msg);
                 }
 
             } else {
-                if ((obj as any).hp) {
-                    if (isin && (item as any).on_enter) {
-                        (item as any).on_enter(obj);
-                    } else if (!isin && (item as any).on_leave) {
-                        if ((item as any).on_leave(obj, dir) == false) return false;
+                if (obj.hp) {
+                    if (isin && (item.on_enter)) {
+                        item.on_enter(obj);
+                    } else if (!isin && item.on_leave) {
+                        if (item.on_leave(obj, dir) == false) return false;
                     }
                 }
             }
@@ -213,8 +214,8 @@ export class ROOM extends ITEM {
         if (isin) {
             obj.environment = this;
             if (obj_index == -1) {
-                this.items.push(obj as any);
-                if ((obj as any).is_player) (obj as any).send(this.items_to_json());
+                this.items.push(obj as CHARACTER | OBJ | NPC);
+                if (obj.is_player) obj.send(this.items_to_json());
 
             } else if (obj.is_player) {
                 if (!msg) msg = this.item_json(obj, isin);
@@ -270,7 +271,7 @@ export class ROOM extends ITEM {
     items_to_json(): string {
         const str: string[] = ['{"type":"items","items":['];
         for (let i = 0; i < this.items.length; i++) {
-            const item = this.items[i] as any;
+            const item = this.items[i];
             if (!item.is_hidden()) {
                 str.push("{id:\"");
                 str.push(item.id);
@@ -366,7 +367,7 @@ export class ROOM extends ITEM {
         this.hidden_items.push(hidden_item);
         if (commands) {
             for (let j = 0; j < commands.length; j++) {
-                this.add_action(commands[j][0], null as any, commands[j][2]);
+                this.add_action(commands[j][0], "", commands[j][2]);
             }
         }
         return hidden_item;
@@ -567,9 +568,9 @@ export class ROOM extends ITEM {
         if (obj) {
             for (let i = 0; i < this.items.length; i++) {
                 if (this.items[i].is_player) {
-                    (this.items[i] as any).send(this.to_json());
+                    this.items[i].send(this.to_json());
                     this.send_exits(this.items[i]);
-                    (this.items[i] as any).send(this.items_to_json());
+                    this.items[i].send(this.items_to_json());
                 }
             }
         }
@@ -775,8 +776,8 @@ export class ROOM extends ITEM {
      * 根据用户查找对应副本
      * @param user
      */
-    query_copy2(user: Record<string, any>): ROOM | undefined {
-        const id = (this.parent as any)?.query_owner(user);
+    query_copy2(user: USER): ROOM | undefined {
+        const id = this.parent?.query_owner(user);
         if (!id) return this;
         return this.query_copy(id);
     }
@@ -785,9 +786,9 @@ export class ROOM extends ITEM {
      * 清除副本区域
      * @param me
      */
-    clear_copy(me: Record<string, any>): void {
+    clear_copy(me: USER): void {
         if (!this.owner) return;
-        const id = (this.parent as any)?.query_owner(me);
+        const id = this.parent?.query_owner(me);
         if (id !== this.owner) return;
         const name = "fb/";
         for (let key in me.temp) {
@@ -804,7 +805,7 @@ export class ROOM extends ITEM {
                 }
             }
         }
-        this.clear_by_area(this.parent as any, this.owner);
+        this.parent && this.clear_by_area(this.parent, this.owner);
     }
 
     /**
@@ -812,8 +813,8 @@ export class ROOM extends ITEM {
      * @param me
      * @param diff_type - 难度
      */
-    create_copy2(me: Record<string, any>, diff_type?: number): ROOM | undefined {
-        const id = (this.parent as any)?.query_owner(me);
+    create_copy2(me: USER, diff_type?: number): ROOM | undefined {
+        const id = this.parent?.query_owner(me);
         if (!id) return;
         return this.create_copy(id, diff_type || 0);
     }
@@ -1001,8 +1002,8 @@ export class ROOM extends ITEM {
      */
     send(msg: string): void {
         for (let i = 0; i < this.items.length; i++) {
-            if ((this.items[i] as any).is_player) {
-                (this.items[i] as any).send(msg);
+            if (this.items[i].is_player) {
+                this.items[i].send(msg);
             }
         }
     }
@@ -1012,8 +1013,8 @@ export class ROOM extends ITEM {
      */
     find_me(): ROOM | undefined {
         for (let i = 0; i < this.items.length; i++) {
-            if ((this.items[i] as any).is_player) {
-                return this.items[i] as any;
+            if (this.items[i].is_player) {
+                return this.items[i] as unknown as ROOM;
             }
         }
     }

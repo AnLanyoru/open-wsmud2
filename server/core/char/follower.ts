@@ -344,7 +344,7 @@ export class FOLLOWER extends CHARACTER {
     }
     old.recount();
     old.master_json = null;
-    old.color_name = null as unknown as string;
+    old.color_name = '';
     old.on_master_enter = npc.on_master_enter;
     old.on_makelove = npc.on_makelove;
     old.path = npc.path;

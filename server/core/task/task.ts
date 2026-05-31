@@ -26,7 +26,7 @@ export class TASK extends BASE {
      */
     static GET(id: string): TASK | undefined {
         for (let i = 0; i < WORLD.SYSTEMTASKS.length; i++) {
-            if ((WORLD.SYSTEMTASKS[i] as any).id == id) {
+            if (WORLD.SYSTEMTASKS[i].id == id) {
                 return WORLD.SYSTEMTASKS[i];
             }
         }

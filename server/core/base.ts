@@ -25,6 +25,8 @@ export class BASE {
 
     // ============ 实例字段 ============
 
+    /** 对象ID（由资源文件动态注入） */
+    id?: string;
     /** 资源路径（由 static NEW 在实例化后设置） */
     path?: string;
 

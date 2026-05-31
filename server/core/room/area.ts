@@ -6,6 +6,7 @@ import { WORLD } from "../world.js";
 import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
 import type { ROOM } from "./room.js";
+import type { USER } from "../char/user.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
@@ -102,9 +103,9 @@ export class AREA extends BASE {
     // ============ 回调（由资源文件设置） ============
 
     /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
-    on_login?: (user: Record<string, any>) => void;
+    on_login?: (user: USER) => void;
     /** 玩家进入后回调 — 触发时机：玩家首次进入该区域房间后 */
-    on_enterd?: (me: Record<string, any>) => void;
+    on_enterd?: (me: USER) => void;
 
     constructor() {
         super();
@@ -136,13 +137,13 @@ export class AREA extends BASE {
      * 玩家离开区域回调
      * @param me
      */
-    on_leaved(me: Record<string, any>): void { return undefined as any; }
+    on_leaved(me: USER): void { return undefined; }
 
     /**
      * 玩家离开前回调
      * @param me
      */
-    on_leave(me: Record<string, any>): boolean {
+    on_leave(me: USER): boolean {
         return true;
     }
 
@@ -150,7 +151,7 @@ export class AREA extends BASE {
      * 玩家进入后回调
      * @param me
      */
-    on_enter(me: Record<string, any>): boolean {
+    on_enter(me: USER): boolean {
         return true;
     }
 
@@ -203,8 +204,8 @@ export class AREA extends BASE {
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if ((rm.items[j] as any).drop_list) {
-                    items.push((rm.items[j] as any).drop_list);
+                if (rm.items[j].drop_list) {
+                    items.push(rm.items[j].drop_list);
                 }
             }
         }
@@ -236,8 +237,8 @@ export class AREA extends BASE {
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if ((rm.items[j] as any).drop_list) {
-                    items.push((rm.items[j] as any).drop_list);
+                if (rm.items[j].drop_list) {
+                    items.push(rm.items[j].drop_list);
                 }
             }
         }
@@ -251,7 +252,7 @@ export class AREA extends BASE {
      * @param path
      */
     update(path: string): void {
-        (WORLD.COMMANDS as any)["jh"].map_json = null;
+        WORLD.COMMANDS["jh"].map_json = null;
         for (let i = 0; i < WORLD.AREAS.length; i++) {
             if (WORLD.AREAS[i].path == path) {
                 const old_area = WORLD.AREAS[i];
@@ -262,7 +263,7 @@ export class AREA extends BASE {
                         room.parent = this;
                     }
                 }
-                old_area.rooms = null as any;
+                old_area.rooms = [];
                 if (this.family) {
                     FAMILIES[this.family].area = this;
                 }
@@ -303,7 +304,7 @@ export class AREA extends BASE {
     }
 
     /** @param me */
-    clear_copy(me: Record<string, any>): void {
+    clear_copy(me: USER): void {
         if (!_ROOM) return;
         const room = _ROOM.Get(this.first!)?.query_copy2(me);
         if (room)
@@ -311,9 +312,9 @@ export class AREA extends BASE {
     }
 
     /** @param me */
-    is_unlock(me: Record<string, any>): boolean {
+    is_unlock(me: USER): boolean {
         if ((this as { jd_index?: number }).jd_index! >= 0)
             return me.isenable_area(this);
-        return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0);
+        return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
     }
 }

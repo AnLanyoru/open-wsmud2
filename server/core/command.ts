@@ -34,6 +34,8 @@ export class COMMAND extends BASE {
     regex: RegExp | null = null;
     /** Bound exec function (on target prototype) */
     exec: Function | null = null;
+    /** Map JSON cache (set by subclasses e.g. jh, dialog/map) */
+    map_json?: unknown;
 
     // ============ Permission control ============
 

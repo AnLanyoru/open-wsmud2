@@ -57,6 +57,8 @@ export class NPC extends CHARACTER {
   score: number = 0;
   /** 任务主人 ID */
   master: string | null = null;
+  /** 关联玩家 ID（首席弟子 NPC 绑定） */
+  userid?: string;
   /** 对话问题 */
   question: Record<string, (me: CHARACTER) => void> | null = null;
 
@@ -78,9 +80,6 @@ export class NPC extends CHARACTER {
   on_makelove?: (me: Record<string, any>) => void;
   /** 主人进入回调 — 触发时机：主人（master）进入 NPC 所在房间时 */
   on_master_enter?: (me: Record<string, any>) => void;
-  /** 玩家离开回调 — 触发时机：玩家从 NPC 所在房间离开时；返回 false 阻止离开 */
-  on_leave?: (me: Record<string, any>, dir: string) => boolean | void;
-
   constructor() {
     super();
   }
@@ -122,7 +121,7 @@ export class NPC extends CHARACTER {
 
   /** 随机发送闲聊消息 */
   do_chat_msg(): void {
-    if (!this.is_fighting() && (this as any).is_living && this.chat_msg) {
+    if (!this.is_fighting() && this.is_living() && this.chat_msg) {
       this.do_say(this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)]);
     }
   }
@@ -322,7 +321,7 @@ export class NPC extends CHARACTER {
         this.add_mp(parseInt(String(this.max_mp / 2), 10));
       }
       if (this.chat_msg) {
-        if ((this as any).random(10) > 8)
+        if (this.random(10) > 8)
           this.send_message(this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)]);
       }
       if (this.on_heart_beat) this.on_heart_beat(dt);

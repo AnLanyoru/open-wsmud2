@@ -11,6 +11,10 @@ export class USERTASK extends BASE {
 
     /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
     on_create?: () => string | void;
+    /** 任务启动回调（由资源文件动态注入） */
+    on_start?: (player: Record<string, any>) => unknown;
+    /** 任务完成回调（由资源文件动态注入） */
+    on_finish?: (player: Record<string, any>) => unknown;
 
     constructor() {
         super();
@@ -69,7 +73,7 @@ export class USERTASK extends BASE {
      */
     static RUN(id: string, player: Record<string, any>): unknown {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
-            if ((WORLD.TASKS[i] as any).id == id) {
+            if (WORLD.TASKS[i].id == id) {
                 return WORLD.TASKS[i].start(player);
             }
         }
@@ -82,7 +86,7 @@ export class USERTASK extends BASE {
      */
     static GET(id: string): USERTASK | undefined {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
-            if ((WORLD.TASKS[i] as any).id == id) {
+            if (WORLD.TASKS[i].id == id) {
                 return WORLD.TASKS[i];
             }
         }

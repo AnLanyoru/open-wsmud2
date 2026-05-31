@@ -139,6 +139,10 @@ export class SKILL extends BASE {
     on_parry_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 绝招招架回调（返回是否招架成功） */
     on_parry_pfm?: (target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number) => boolean;
+    /** 重算闪避回调（由资源文件动态注入） */
+    on_recount_dodge?: (me: CHARACTER) => number;
+    /** 重算招架回调（由资源文件动态注入） */
+    on_recount_parry?: (me: CHARACTER) => number;
     /** 内功加成比例 */
     force_rad?: number;
 
@@ -681,11 +685,11 @@ export class SKILL extends BASE {
      * @param name
      * @param obj
      */
-    set_pfm(name: string, obj: Record<string, unknown>): void {
+    set_pfm(name: string, obj: PERFORM): void {
         if (!this.pfm) {
             this.pfm = {};
         }
-        this.pfm[name] = obj as any;
+        this.pfm[name] = obj;
     }
 
     // ============ 生命周期 ============
@@ -709,9 +713,9 @@ export class SKILL extends BASE {
             || this.type === SKILL_TYPES.BASE
         ) return;
         for (let i = 0; i < this.can_enables.length; i++) {
-            if (!(SKILL as any)[this.can_enables[i]]) (SKILL as any)[this.can_enables[i]] = new Array(7);
-            if (!(SKILL as any)[this.can_enables[i]][this.grade]) (SKILL as any)[this.can_enables[i]][this.grade] = [];
-            (SKILL as any)[this.can_enables[i]][this.grade].push(this);
+            if (!SKILL[this.can_enables[i]]) SKILL[this.can_enables[i]] = new Array(7);
+            if (!SKILL[this.can_enables[i]][this.grade]) SKILL[this.can_enables[i]][this.grade] = [];
+            SKILL[this.can_enables[i]][this.grade].push(this);
         }
     }
 
@@ -757,7 +761,7 @@ export class SKILL extends BASE {
             for (let key in this.pfm) {
                 const raw = this.pfm[key];
                 // 将普通对象转换为PERFORM实例(替代原JS的__proto__赋值)
-                const pfm = PERFORM.fromPlain(raw as any);
+                const pfm = PERFORM.fromPlain(raw);
                 if (pfm.enable_skill === 'sword' || pfm.enable_skill === 'blade' || pfm.enable_skill === 'whip'
                     || pfm.enable_skill === 'staff' || pfm.enable_skill === 'club') {
                     pfm.is_weapon = true;
@@ -829,7 +833,7 @@ export class SKILL extends BASE {
                 const skItem = SKILL.get(item);
                 str.push(skItem ? skItem.name : item);
                 str.push("时：\n");
-                str.push(UTIL.prop_toString(prop[item] as any));
+                str.push(UTIL.prop_toString(prop[item]));
                 str.push("</");
                 str.push(is_enable ? cc : "blk");
                 str.push(">\n");
@@ -887,7 +891,7 @@ export class SKILL extends BASE {
      */
     query_slot(index: number): any {
         if (index < 500) {
-            return SKILL.PROPERTIES ? (SKILL as any).PROPERTIES[index] : undefined;
+            return SKILL.PROPERTIES ? SKILL.PROPERTIES[index] : undefined;
         } else {
             return this.slots ? this.slots[index - 500] : null;
         }
@@ -978,7 +982,7 @@ export class PERFORM extends BASE {
     /** 使用类型 */
     use_type: string = "";
     /** 使用条件检查函数 */
-    check?: (me: CHARACTER, lv: number) => boolean | string;
+    check?: (me: CHARACTER, lv: number, base_type?: string) => boolean | string;
     /** 使用条件描述(不满足时显示) */
     use_condition: string = "";
     /** 是否禁止自动释放 */
@@ -1018,11 +1022,11 @@ export class PERFORM extends BASE {
      * 替代原JS中 pfm.__proto__ = PERFORM.prototype 的模式
      * @param obj - 资源文件中的绝招定义对象
      */
-    static fromPlain(obj: Record<string, unknown>): PERFORM {
+    static fromPlain(obj: PERFORM): PERFORM {
         const pfm = new PERFORM();
         // 复制所有可枚举属性(包含函数)
         for (const key of Object.keys(obj)) {
-            (pfm as any)[key] = obj[key];
+            pfm[key] = obj[key];
         }
         return pfm;
     }
@@ -1030,8 +1034,9 @@ export class PERFORM extends BASE {
     /**
      * 查询绝招名称
      * @param me
+     * @param base_type - 基本技能类型
      */
-    query_name(me?: CHARACTER): string {
+    query_name(me?: CHARACTER, base_type?: string): string {
         return this.name;
     }
 
@@ -1058,11 +1063,11 @@ export class PERFORM extends BASE {
         } else if (me.auto_skills) {
             for (let i = 0; i < me.auto_skills.length; i++) {
                 const item = me.auto_skills[i];
-                if ((item as any).pfm === this) {
+                if (item.pfm === this) {
                     if (add_time)
-                        (item as any).release_time += add_time;
+                        item.release_time += add_time;
                     else
-                        (item as any).release_time = 0;
+                        item.release_time = 0;
                 }
             }
         }
@@ -1100,7 +1105,7 @@ export class PERFORM extends BASE {
      * @param lv
      * @param isref - 是否为引用技能
      */
-    query_distime(me: CHARACTER, lv: number, isref?: boolean): number {
+    query_distime(me: CHARACTER, lv?: number, isref?: boolean): number {
         var dis = this.distime;
         if (!dis) dis = me.gjsd;
         if (isref) dis = dis * 2;
