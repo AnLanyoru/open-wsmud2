@@ -98,7 +98,7 @@ export default class extends NPC {
         var obj = OBJ.CREATE("eq/cp#" + arg);
         obj.set_temp("name", str);
         WORLD.COMMANDS.duanzao.default_template(obj, EQUIP_TYPE.WEAPON);
-        obj.on_reload(me);
+        if (obj.on_reload) obj.on_reload(me);
         me.add_obj(obj);
         me.notify("铁匠说道：不错，这是你要的。");
         me.notify("铁匠给你" + obj.unit_name() + "。");

@@ -448,6 +448,18 @@ const setting_template = `
                     </span>
                 </span>
             </div>
+            <div class="setting-item" for="float_dialog">
+                <span class="title">
+                    NPC对话选项显示为浮动窗口
+                </span>
+                <span class="switch">
+                    <span class="switch-button">
+                    </span>
+                    <span class="switch-text">
+                        关
+                    </span>
+                </span>
+            </div>
 
             <h3>战斗信息</h3>
 

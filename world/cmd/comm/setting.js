@@ -292,6 +292,11 @@ const setting_keys = {
         desc: "屏蔽帮派频道"
 
     },
+    'float_dialog': {
+        type: "Boolean",
+        desc: "NPC对话选项浮动显示"
+
+    },
     'auto_get': {
         type: "Boolean",
         desc: "击杀NPC后自动拾取战利品"

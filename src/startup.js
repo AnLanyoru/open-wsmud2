@@ -5,9 +5,10 @@ import './styles/main.css';
 import './styles/dialog.css';
 import $ from 'jquery';
 globalThis['$'] = $;
-import { SendCommand, ReceiveMessage } from './client.js';
+import { SendCommand, ReceiveMessage, hide2show } from './client.js';
 globalThis['SendCommand'] = SendCommand;
 globalThis['ReceiveMessage'] = ReceiveMessage;
+globalThis['hide2show'] = hide2show;
 
 import { Confirm, Warn } from './confirm.js';
 import Dialog from './dialog/base.js';

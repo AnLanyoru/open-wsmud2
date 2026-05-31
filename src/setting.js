@@ -38,6 +38,7 @@ const Setting = {
     no_team: 0,
     top_safe_distance: 0,
     bottom_safe_distance: 0,
+    float_dialog: 0,
     no_load: true,
     load: function (data) {
         Dialog.keys.init_key();

@@ -7,6 +7,7 @@ import MAP from './map.js';
 import SCRIPT from './script.js';
 import { roles } from './login/index.js';
 import { SERVERS } from "./login/server.js";
+import FloatDialog from './floatdialog.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = { append: (div) => $(".content-message").append(div) };
@@ -407,6 +408,12 @@ const Process = {
         Combat.ShowActions(data);
     }, cmds: function (data) {
         if (!data.items) return;
+        if (Setting.float_dialog == 1) {
+            var text = Process._lastMessageText || '';
+            Process._lastMessageText = '';
+            FloatDialog.add(text, data);
+            return;
+        }
         var html = ["<div class='item-commands'>"];
         if (!data.items.length) data.items = [data.items];
         for (var i = 0; i < data.items.length; i++) {

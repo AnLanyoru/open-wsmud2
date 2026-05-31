@@ -40,13 +40,13 @@ export default class extends COMMAND {
         try {
             var dbUser = await WORLD.DB.getUserByID(user.userid);
             if (!dbUser || dbUser.pwd !== user.password) {
-                return user.send("{type:'loginerror',msg:'密码已修改，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+                return user.send("{type:'loginerror',msg:'密码已修改，请<CMD onclick=\\'hide2show(\"#login_panel\")\\'>重新登录</CMD>'}");
             }
         } catch (e) {
             return user.send("{type:'loginerror',msg:'登录验证失败'}");
         }
         if (oldUser.loginTime > user.loginTime) {
-            return user.send("{type:'loginerror',msg:'已有更新的登录，请<CMD onclick=\\'HideAndShow(\"#login_panel\")\\'>重新登录</CMD>'}");
+            return user.send("{type:'loginerror',msg:'已有更新的登录，请<CMD onclick=\\'hide2show(\"#login_panel\")\\'>重新登录</CMD>'}");
         }
         oldUser.password = user.password;
         oldUser.loginTime = user.loginTime;

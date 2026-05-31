@@ -144,7 +144,7 @@ const USERLOGIN: UserLoginModule = {
     if (!cookieUser || cookieUser.id === 0) {
       return this.login_error(
         user,
-        `登录参数错误，请使用账号密码<CMD onclick=\\'HideAndShow("#login_panel")\\'>重新登录</CMD>`
+        `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`
       );
     }
 
@@ -153,7 +153,7 @@ const USERLOGIN: UserLoginModule = {
       if (!dbUser || dbUser.pwd !== cookieUser.pwd) {
         return this.login_error(
           user,
-          `密码已修改，请<CMD onclick=\\'HideAndShow("#login_panel")\\'>重新登录</CMD>`,
+          `密码已修改，请<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
           true
         );
       }
