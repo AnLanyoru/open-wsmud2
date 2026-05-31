@@ -248,7 +248,7 @@ export class FOLLOWER extends CHARACTER {
       my_npc.skills = data.skills as unknown as Record<string, any>;
       my_npc.path = obj.path;
       my_npc.items = me.read_items(data.items as unknown as any[][]);
-      my_npc.equipment = me.read_items(data.eq as unknown as any[][]) as unknown as EQUIPMENT[] | null;
+      my_npc.equipment = me.read_equipment(data.eq as unknown as any[][]);
       my_npc.level = my_npc.level || obj.level || 3;
       my_npc.init();
       my_npc.recount();

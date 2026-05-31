@@ -415,7 +415,7 @@ export class USER extends CHARACTER {
     this.items = this.read_items(data.items);
     this.stores = this.read_items(data.stores);
     this.books = data.books ?? [];
-    this.equipment = this.read_items(data.eq) as EQUIPMENT[];
+    this.equipment = this.read_equipment(data.eq);
     this.settings = data.settings;
 
     this.skills = data.skills ?? {};
@@ -466,10 +466,7 @@ export class USER extends CHARACTER {
     if (!items) return objs;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
-      if (!item) {
-        objs.push(null as any);
-        continue;
-      }
+      if (!item) continue;
       const obj = OBJ.CREATE(item[0]);
       if (obj) {
         obj.load_db(item);
@@ -478,6 +475,22 @@ export class USER extends CHARACTER {
       }
     }
     return objs;
+  }
+
+  read_equipment(items: any[][] | undefined): EQUIPMENT[] {
+    const eqs: EQUIPMENT[] = [];
+    if (!items) return eqs;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item) continue;
+      const obj = OBJ.CREATE(item[0]) as EQUIPMENT | null;
+      if (obj && obj.is_equipment) {
+        obj.load_db(item);
+        obj.on_load(this);
+        eqs[obj.eq_type] = obj;
+      }
+    }
+    return eqs;
   }
 
   /** 执行登录初始化 */
