@@ -45,6 +45,8 @@ export class FAMILY extends BASE {
     id: string = "";
     /** 临时数据 */
     temp: Record<string, unknown> | null = null;
+    /** 按品级缓存的技能索引 */
+    skill_levels: SKILL[][] | null = null;
     /** 门派战结算 */
     battle_settle?: number;
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
@@ -52,11 +54,15 @@ export class FAMILY extends BASE {
 
     // ============ 资源文件设置属性 ============
 
-    /** 门派武功列表 */
+    /** 门派武功列表（普通技能，按品级排序） */
     skills: SKILL[] = [];
+    /** 门派进阶武功列表（source_skill 来源，非终极） */
     skills2: SKILL[] = [];
+    /** 门派终极进阶武功列表（source_skill 来源且 is_ultimate） */
     skills3: SKILL[] = [];
+    /** 门派终极武功列表（无 source_skill 且 is_ultimate） */
     skills4: SKILL[] = [];
+    /** 门派隐藏/知识类技能列表（type=KNOWLEDGE 或 is_hidden） */
     skills0: SKILL[] = [];
     /** 默认NPC定义 */
     def_npcs?: [string, string][];
@@ -198,21 +204,29 @@ export class FAMILY extends BASE {
     }
 
     /**
+     * 确保技能品级索引已构建
+     */
+    private _ensure_skill_levels(): SKILL[][] {
+        if (!this.skill_levels) {
+            this.skill_levels = [];
+            for (let i = 0; i < this.skills.length; i++) {
+                if (!this.skill_levels[this.skills[i].grade]) {
+                    this.skill_levels[this.skills[i].grade] = [];
+                }
+                this.skill_levels[this.skills[i].grade].push(this.skills[i]);
+            }
+        }
+        return this.skill_levels;
+    }
+
+    /**
      * 随机查询指定品级的技能
      * @param grade - 品级
      */
     query_skill(grade: number): SKILL | undefined {
-        if (!(this as Record<string, any>).skill_levels) {
-            (this as Record<string, any>).skill_levels = [];
-            for (let i = 0; i < this.skills.length; i++) {
-                if (!(this as Record<string, any>).skill_levels[this.skills[i].grade]) {
-                    (this as Record<string, any>).skill_levels[this.skills[i].grade] = [];
-                }
-                (this as Record<string, any>).skill_levels[this.skills[i].grade].push(this.skills[i]);
-            }
-        }
-        if (grade >= (this as Record<string, any>).skill_levels.length) grade = (this as Record<string, any>).skill_levels.length - 1;
-        return (this as Record<string, any>).skill_levels[grade].random();
+        const levels = this._ensure_skill_levels();
+        if (grade >= levels.length) grade = levels.length - 1;
+        return levels[grade].random();
     }
 
     /**
@@ -220,17 +234,9 @@ export class FAMILY extends BASE {
      * @param grade
      */
     query_skills(grade: number): SKILL[] {
-        if (!(this as Record<string, any>).skill_levels) {
-            (this as Record<string, any>).skill_levels = [];
-            for (let i = 0; i < this.skills.length; i++) {
-                if (!(this as Record<string, any>).skill_levels[this.skills[i].grade]) {
-                    (this as Record<string, any>).skill_levels[this.skills[i].grade] = [];
-                }
-                (this as Record<string, any>).skill_levels[this.skills[i].grade].push(this.skills[i]);
-            }
-        }
-        if (grade >= (this as Record<string, any>).skill_levels.length) grade = (this as Record<string, any>).skill_levels.length - 1;
-        return (this as Record<string, any>).skill_levels[grade];
+        const levels = this._ensure_skill_levels();
+        if (grade >= levels.length) grade = levels.length - 1;
+        return levels[grade];
     }
 
     /**
@@ -252,7 +258,10 @@ export class FAMILY extends BASE {
 
     // ============ 门派方法(由extends合并) ============
 
-    /** 初始化门派NPC */
+    /**
+     * 初始化门派NPC — 遍历 def_npcs 配置，克隆 NPC 到对应房间，
+     * 绑定死亡/复活回调，并识别掌门 boss
+     */
     init(): void {
         if (!this.def_npcs) return;
         for (let item of this.def_npcs) {
@@ -271,7 +280,10 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param path */
+    /**
+     * 热更新门派 NPC — 根据路径前缀匹配并重建指定 NPC
+     * @param path - NPC 资源路径前缀
+     */
     update_npc(path: string): void {
         for (let item of this.def_npcs!) {
             let spath = item[0];
@@ -325,7 +337,12 @@ export class FAMILY extends BASE {
         fam.check_battle(this, me);
     }
 
-    /** @param npc @param killer @param target */
+    /**
+     * 检查并触发门派战 — NPC 被杀后调用，满足条件时开启门派战争
+     * @param npc - 被杀的 NPC
+     * @param killer - 击杀者（玩家）
+     * @param target - 目标门派（当 killer 为空时使用）
+     */
     check_battle(npc: Record<string, any>, killer: Record<string, any>, target?: FAMILY): void {
         var to_fam = killer ? killer.family : target;
         if (!to_fam || !to_fam.can_battle || !this.can_battle) return;
@@ -354,7 +371,10 @@ export class FAMILY extends BASE {
         to_fam.send("<hiy>\n你的门派和" + this.name + "的战斗开始了，请回门派防守或者进攻对方门派。\n战斗时间30分钟，结束条件是对方或己方掌门被击杀。</hiy>");
     }
 
-    /** @param fam */
+    /**
+     * 开始门派战 — 创建副本房间、生成守卫 NPC、注册活动事件
+     * @param fam - 敌对门派
+     */
     begin_attack(fam: FAMILY): void {
         this.battle_score = 0;
         this.set_temp("battle", 1, 3600000);
@@ -370,7 +390,10 @@ export class FAMILY extends BASE {
         EVENTS.add(this.create_event());
     }
 
-    /** @returns Object */
+    /**
+     * 创建门派战活动事件 — 供 EVENTS.add 注册到活动面板
+     * @returns 活动事件对象
+     */
     create_event(): any {
         let target_fam = FAMILIES[this.battle_family!];
         return {
@@ -387,7 +410,11 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param rm @returns ROOM */
+    /**
+     * 获取门派副本房间 — 根据门派 ID 查询对应副本
+     * @param rm - 基础房间
+     * @returns 副本房间实例
+     */
     get_room(rm: Record<string, any>): ROOM | undefined {
         return rm.query_copy(this.id);
     }
@@ -422,7 +449,10 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param npc */
+    /**
+     * 移除门派 NPC — 从 npcs 列表中移除，并清除 boss 状态 buff
+     * @param npc - 要移除的 NPC
+     */
     remove_npcs(npc: Record<string, any>): void {
         this.npcs.remove(npc as any);
         if (this.battle_boss) {
@@ -430,7 +460,11 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param level @returns NPC */
+    /**
+     * 创建单个门派 NPC（按等级）
+     * @param level - NPC 等级（0-2 决定品级）
+     * @returns 创建的 NPC 实例
+     */
     create_npc(level: number): NPC | undefined {
         var npc = _NPC!.CLONE("pub/menpai");
         npc.init_from(this, level);
@@ -470,7 +504,10 @@ export class FAMILY extends BASE {
         this.create_handler = this.call_out(this.create_npcs, 200000);
     }
 
-    /** @param suc_type */
+    /**
+     * 门派战结束处理 — 清理 NPC、计算胜负、发放奖励
+     * @param suc_type - 结束类型: "suc"=击杀对方掌门获胜, "die"/"fail"=本方掌门被杀, "timeout"=超时按积分判
+     */
     battle_over(suc_type: string): void {
         if (!this.battle_family) return;
         var fam = FAMILIES[this.battle_family];
@@ -534,7 +571,12 @@ export class FAMILY extends BASE {
         rm.clear_by_area((rm as any).parent, this.id);
     }
 
-    /** @param suc @param target_fam @returns Object */
+    /**
+     * 创建门派战结算事件
+     * @param suc - 胜利加成百分比（0/20/50）
+     * @param target_fam - 敌对门派
+     * @returns 结算活动事件对象
+     */
     finish_event(suc: number, target_fam: FAMILY): any {
         let msg = suc > 0 ? "你的门派占得优势，所有弟子获得鼓舞，练功效率+" +
             suc + "%。" : "你的门派没有取得优势。";
@@ -552,7 +594,10 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param t */
+    /**
+     * 添加门派战胜利 buff — 设置练功/学习/打坐效率加成
+     * @param t - 加成百分比
+     */
     add_battle_status(t: number): void {
         this.battle_gift = t;
         this.add_temp("lianxi_per", t, 3600000);
@@ -560,7 +605,10 @@ export class FAMILY extends BASE {
         this.add_temp("dazuo_per", t, 3600000);
     }
 
-    /** @param me */
+    /**
+     * 玩家登录门派回调 — 首席弟子上线时广播门派消息
+     * @param me - 登录的玩家
+     */
     on_login(me: Record<string, any>): void {
         if (this.first_npc && me.id == (this.first_npc as any).userid) {
             if (!this.is_init_first)
@@ -569,7 +617,11 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param id @param name */
+    /**
+     * 设置首席弟子 — 保存到全局数据并初始化 NPC 属性
+     * @param id - 玩家 ID
+     * @param name - 玩家名称
+     */
     set_dadizi(id: string, name: string): void {
         this.tops = {};
 
@@ -597,7 +649,11 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @param npc @param me */
+    /**
+     * 初始化首席弟子 NPC — 复制目标玩家属性、技能、装备到 NPC
+     * @param npc - 首席弟子 NPC 实例
+     * @param me - 目标玩家（可选，用于首次初始化）
+     */
     init_dadizi(npc: Record<string, any>, me?: Record<string, any>): void {
         this.first_npc = npc as any;
         npc.name = WORLD.DATA.query_temp(this.id + "_top_name") || this.top_name;
@@ -630,26 +686,41 @@ export class FAMILY extends BASE {
         this.first_npc_exp = npc.exp;
     }
 
-    /** @param me @param msg */
+    /**
+     * 发送门派频道消息
+     * @param me - 发送者（null 则为门派管理）
+     * @param msg - 消息内容
+     */
     send_channel(me: Record<string, any>, msg: string): void {
         var msg = '{type:"msg",ch:"fam",content:"' + msg + '",fam:"' + this.name + '", name:"' + (me ? me.name : "门派管理") + '" }';
         this.send(msg);
     }
 
-    /** @param me @returns string */
+    /**
+     * 查询玩家在门派的师门任务称谓
+     * @param me - 玩家
+     * @returns 完整的师门称谓（如"武当入门弟子"）
+     */
     query_task_title(me: Record<string, any>): string {
         let level = me.query_temp('sm_level', 0);
         return me.family.name + TITLES[level];
     }
 
-    /** @param level @returns string */
+    /**
+     * 查询指定品级师门任务称谓
+     * @param level - 品级（0-5）
+     * @returns 称谓文本
+     */
     query_job_title(level: number): string {
         return TITLES[level];
     }
 
     // ============ 静态方法(由extends合并) ============
 
-    /** @param path */
+    /**
+     * 热更新所有门派中匹配路径的 NPC
+     * @param path - NPC 资源路径前缀
+     */
     static UPDATE_NPC(path: string): void {
         for (let key in FAMILIES) {
             let fam = FAMILIES[key];
@@ -658,7 +729,10 @@ export class FAMILY extends BASE {
         }
     }
 
-    /** @returns string */
+    /**
+     * 序列化所有门派持久数据（排行榜、临时数据等）
+     * @returns JSON 字符串
+     */
     static SAVE(): string {
         var obj: Record<string, unknown> = {};
         for (var key in FAMILIES) {
@@ -671,7 +745,10 @@ export class FAMILY extends BASE {
         return JSON.stringify(obj);
     }
 
-    /** @param str */
+    /**
+     * 从 JSON 字符串恢复门派持久数据
+     * @param str - JSON 字符串
+     */
     static LOAD(str: string): void {
         var obj = (JSON as any).toObject(str);
         if (!obj) return;

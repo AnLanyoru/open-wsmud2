@@ -1,5 +1,8 @@
 /**
- * USERTASK 玩家任务基类
+ * USERTASK 玩家任务基类 — 玩家个人任务（师门任务、日常任务等）
+ *
+ * 生命周期: create() → [玩家 start()] → 任务进行 → [完成/放弃]
+ * 热更新: update() 替换 WORLD.TASKS 中的旧实例
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
@@ -14,8 +17,8 @@ export class USERTASK extends BASE {
     }
 
     /**
-     * 创建回调 - 注册到WORLD.TASKS
-     * @param path
+     * 创建回调 — 注册到 WORLD.TASKS 列表
+     * @param path - 任务资源文件路径
      */
     create(path: string): void {
         WORLD.TASKS.push(this);
@@ -23,8 +26,8 @@ export class USERTASK extends BASE {
     }
 
     /**
-     * 任务更新(热更新)
-     * @param path
+     * 任务热更新 — 替换 WORLD.TASKS 中同路径的旧实例
+     * @param path - 任务资源文件路径
      */
     update(path: string): void {
         this.on_create && this.on_create();
@@ -38,30 +41,31 @@ export class USERTASK extends BASE {
     }
 
     /**
-     * 查询任务标题
+     * 查询任务标题 — 子类覆写
      */
     query_title(): string | undefined { return undefined; }
 
     /**
-     * 开始任务
+     * 玩家开始任务 — 子类覆写
+     * @param player - 玩家角色
      */
     start(player?: Record<string, any>): unknown { return undefined; }
 
     /**
-     * 查询任务描述
+     * 查询任务描述 — 子类覆写
      */
     query_desc(): string | undefined { return undefined; }
 
     /**
-     * 查询任务状态
-     * @returns 0不显示 1进行中 2可领取 3已完成
+     * 查询任务状态 — 子类覆写
+     * @returns 0=不显示 1=进行中 2=可领取 3=已完成
      */
     query_state(): number | undefined { return undefined; }
 
     /**
-     * 运行指定ID的任务
-     * @param id - 任务ID
-     * @param player - 玩家
+     * 运行指定 ID 的任务（对玩家触发）
+     * @param id - 任务 ID
+     * @param player - 玩家角色
      */
     static RUN(id: string, player: Record<string, any>): unknown {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
@@ -73,8 +77,8 @@ export class USERTASK extends BASE {
     }
 
     /**
-     * 根据ID获取任务
-     * @param id
+     * 根据 ID 获取玩家任务
+     * @param id - 任务 ID
      */
     static GET(id: string): USERTASK | undefined {
         for (let i = 0; i < WORLD.TASKS.length; i++) {

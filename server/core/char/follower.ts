@@ -483,10 +483,10 @@ export class FOLLOWER extends CHARACTER {
       if (this.mp < this.max_mp) {
         this.add_mp(Math.floor(this.max_mp / 3));
       }
-      if ((this as Record<string, any>).chat_msg) {
+      if (this.chat_msg) {
         const r = this.random(10);
         if (r > 7) {
-          this.send_message((this as Record<string, any>).chat_msg.random());
+          this.send_message(this.chat_msg.random());
         }
       }
     }

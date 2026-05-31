@@ -65,30 +65,30 @@ export class EQUIPMENT extends OBJ {
     /** 物件类型标识 */
     otype: number = 4;
 
-    // ============ Attached properties ============
+    // ============ 附加属性 ============
 
-    /** 基础装备评分 */
+    /** 基础装备评分（按品级 * 100 计算） */
     score: number = 0;
-    /** 附加属性（强化加成） */
+    /** 附加属性（强化加成，由 levelchange_prop 动态计算） */
     prop: Record<string, any> | null = null;
     /** 镶嵌宝石属性列表 */
     st_prop: StoneEntry[] | null = null;
     /** 剩余宝石孔数 */
     hole_count: number = 0;
-    /** 装备条件（技能、属性、性别等） */
+    /** 装备条件（skill 技能要求、str/con/dex/int 属性要求、gender 性别要求等） */
     condition: Record<string, any> | null = null;
-    /** 套装组名 */
+    /** 套装组名（同组名装备可触发套装效果） */
     group_name: string | null = null;
-    /** 武器类型（sword/blade/staff 等） */
+    /** 武器类型（sword/blade/staff/throwing 等，由 WEAPON_TYPE 常量映射） */
     weapon_type: string = "";
-    /** 原始属性（用于强化计算基准） */
+    /** 原始属性（资源文件定义的初始 prop，用于强化计算基准） */
     original_prop: Record<string, any> | null = null;
-    /** 带颜色标签的显示名称 */
+    /** 带颜色标签的显示名称（含强化前缀如 ★☆） */
     color_name: string = "";
 
-    /** 自定义装备消息 */
+    /** 自定义装备消息（替代默认装备广播） */
     eq_msg: string | null = null;
-    /** 自定义卸下消息 */
+    /** 自定义卸下消息（替代默认卸下广播） */
     uneq_msg: string | null = null;
 
     // ============ 回调函数（由资源文件覆写） ============
@@ -297,9 +297,9 @@ export class EQUIPMENT extends OBJ {
         }
     }
 
-    /** 装备部位名称（按 eq_type 索引） */
+    /** 装备部位名称（按 EQUIP_TYPE 索引: 0=武器 1=衣服 … 10=暗器） */
     parts: string[] = ['武器', '衣服', '鞋', '头部', '披风', '戒指', '项链', '饰品', '护腕', '腰带', '暗器'];
-    /** 品质名称（按 grade 索引） */
+    /** 品质名称（按 grade 品级索引: 0=普通 … 6=神器） */
     qualities: string[] = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
 
     /**
@@ -359,7 +359,7 @@ export class EQUIPMENT extends OBJ {
         this.json = null;
     }
 
-    /** 强化等级阈值数据（每级所需的强化经验） */
+    /** 强化等级阈值数据（levelData[level] = 该等级所需累计强化经验，共 0-12 级） */
     levelData: number[] = [
         0, 10, 20, 40, 70, 110, 160, 220, 290, 370, 460, 560, 670
     ];
@@ -541,7 +541,7 @@ export class EQUIPMENT extends OBJ {
         }
     }
 
-    /** 各品级装备基础价值 */
+    /** 各品级装备基础价值（按 grade 索引: 0=100 … 6=1 亿） */
     VALUES: number[] = [100, 1000, 2000, 10000, 100000, 1000000, 100000000];
 
     /**

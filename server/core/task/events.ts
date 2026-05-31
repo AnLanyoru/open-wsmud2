@@ -5,27 +5,40 @@ import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 
 /**
- * 活动项接口
+ * 活动项接口 — 活动面板中的单个活动/事件条目
  */
 export interface EventItem {
+    /** 活动唯一 ID */
     id: string;
+    /** 活动名称 */
     name?: string;
+    /** 活动描述 */
     desc?: string;
+    /** 活动结束时间戳 */
     time?: number;
+    /** 活动品级（影响面板排序和颜色） */
     grade?: number;
     /** 活动操作按钮文本 */
     command?: string;
-    /** 检查玩家是否可参与 */
+    /** 检查玩家是否可参与 — 返回 true 表示该玩家可见此活动 */
     check?: (user: Record<string, any>) => boolean;
     /** 活动按钮点击回调 — 触发时机：玩家在活动面板中点击该活动按钮时 */
     on_command?: (me: Record<string, any>) => void;
+    /** 查询活动描述（由 EVENT_BASE 原型提供默认实现） */
     query_desc(): string;
+    /** 查询活动品级（由 EVENT_BASE 原型提供默认实现） */
     query_grade(): number;
 }
 
+/**
+ * EVENTS 活动事件管理器 — 管理活动面板的增删改通知
+ *
+ * 所有方法均为静态方法，不实例化。
+ * 通过 WORLD.USER_EVENTS 维护活动列表，变更时广播通知符合条件的在线玩家。
+ */
 export class EVENTS extends BASE {
 
-    /** 活动操作类型 */
+    /** 活动操作类型（add/update/finish，对应客户端不同的展示效果） */
     static ACTIONS: string[] = ['add', 'update', 'finish'];
 
     /**
@@ -80,7 +93,8 @@ export class EVENTS extends BASE {
 }
 
 /**
- * 活动基础原型对象
+ * 活动基础原型对象 — 通过 Object.setPrototypeOf 注入到每个活动项，
+ * 提供 query_desc / query_grade 默认实现
  */
 const EVENT_BASE = {
     query_desc(this: any): string {

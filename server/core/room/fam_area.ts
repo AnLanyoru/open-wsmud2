@@ -13,7 +13,11 @@ export class FAMILY_AREA extends AREA {
 
     // ============ 门派区域扩展(由extends合并) ============
 
-    /** @param me */
+    /**
+     * 查询门派区域操作按钮 — 返回练功/后勤/战场/请安等标准操作
+     * @param me - 玩家对象
+     * @returns 操作按钮列表 [[cmd, name, desc], ...]
+     */
     query_actions(me: any): any[] {
         let actions: any[] = [];
         for (let item of stand_actions) {
@@ -36,7 +40,9 @@ export class FAMILY_AREA extends AREA {
         return actions;
     }
 
-    /** 通知区域更新 */
+    /**
+     * 通知客户端门派区域数据更新
+     */
     notify_update(): void {
         this.json = null;
         WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
