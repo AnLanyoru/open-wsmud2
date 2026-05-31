@@ -213,7 +213,7 @@ export class OBJ extends ITEM {
             const val = source[key];
             if (val && typeof val === "number") {
                 const thisVal = target[key];
-                if (thisVal === undefined || thisVal === null) {
+                if (!thisVal) {
                     target[key] = val;
                 } else if (typeof thisVal === "number") {
                     target[key] = thisVal > val ? thisVal : val;

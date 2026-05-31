@@ -116,9 +116,13 @@ export class FOLLOWER extends CHARACTER {
   }
 
   // ============ 回调属性 ============
-  // on_makelove?(me: USER): void — 亲热回调
-  // on_master_enter?(me: USER): void — 主人进入回调
-  // on_master_learn?(me: USER, skill: SKILL): void — 主人学习回调
+
+  /** 亲热回调 */
+  on_makelove?(me: USER): void;
+  /** 主人进入回调 */
+  on_master_enter?(me: USER): void;
+  /** 主人学习回调 */
+  on_master_learn?(me: USER, skill: SKILL): void;
 
   /**
    * 查询随从设置

@@ -50,6 +50,7 @@ import type { UID } from '../types/base.js';
 // 常量
 // ============================================================
 
+/** 排行榜保存时需复制的玩家属性列表 */
 const COPY_PROPS = [
   'str', 'con', 'dex', 'int', 'gender', 'max_mp', 'exp', 'pot',
   'kar', 'per', 'hp', 'max_hp', 'mp', 'age', 'score',
@@ -61,40 +62,79 @@ const COPY_PROPS = [
 
 class World implements IWorld {
   // ========== 核心状态 ==========
+
+  /** 在线用户列表 */
   USERS: any[] = [];
+  /** 命令注册表 (命令名 → COMMAND 实例) */
   COMMANDS: Record<string, any> = {};
+  /** 技能注册表 (技能 ID → SKILL 实例) */
   SKILLS: Record<string, any> = {};
+  /** 房间注册表 (路径 → ROOM 实例) */
   ROOMS: Record<string, any> = {};
+  /** 运行中的房间列表（含心跳） */
   RUN_ROOMS: any[] = [];
+  /** 默认技能注册表 */
   DEFAULT_SKILLS: Record<string, any> = {};
+  /** 区域列表 */
   AREAS: any[] = [];
+  /** 玩家任务列表 */
   TASKS: any[] = [];
+  /** 系统任务列表 */
   SYSTEMTASKS: any[] = [];
+  /** 用户活动事件列表 */
   USER_EVENTS: any[] = [];
+  /** 物品原型缓存 (path → OBJ 原型) */
   OBJ_STROE: Map<string, any> = new Map();
+  /** NPC 原型缓存 (path → NPC 原型) */
   NPC_STROE: Map<string, any> = new Map();
+  /** 心跳计数（用于定时保存） */
   HEARTBEATCOUNT: number = 0;
 
   // ========== 服务器状态 ==========
+
+  /** 请求日志缓冲 */
   RECEIVED: ReceivedLog[] = [];
+  /** 错误日志缓冲 */
   LOGS: LogEntry[] = [];
+  /** 当前服务器 ID */
   SERVERID: number = 0;
+  /** 所有服务器配置列表 */
   SERVERS: any[] = [];
+  /** 当前活跃连接数 */
   CONNECT_COUNT: number = 0;
+  /** 累计 socket 接入数 */
   SocketCount: number = 0;
+  /** 最大连接数 */
   max_connect_count: number = 1100;
+  /** 最大同时在线用户数 */
   max_user_count: number = 5100;
 
   // ========== 子系统 ==========
+
+  /** 全局持久化数据 */
   DATA: any = WORLD_DATA;
+  /** 登录/会话管理模块 */
   USERLOGIN: any = USERLOGIN_MODULE;
+  /** 数据库操作模块 */
   DB: any = db;
+  /** WebSocket 监听模块 */
   LISTENER: any = LISTENER_MODULE;
 
+  /**
+   * 消息子系统 — 管理用户私信和系统公告
+   */
   MESSAGE: MessageSystem = {
+    /** 用户消息存储: toUserId → Map<fromUserId, MessageStoreEntry> */
     stores: new Map<UID, Map<UID, MessageStoreEntry>>(),
+    /** 系统公告列表 */
     NOTICES: [] as MessageEntry[],
 
+    /**
+     * 向指定用户推送消息
+     * @param toid - 接收者 ID
+     * @param from - 发送者（含 id / name）
+     * @param msg - 消息内容
+     */
     pushUserMessage(toid: UID, from: any, msg: any): void {
       let user = this.stores.get(toid);
       if (!user) {
@@ -110,6 +150,10 @@ class World implements IWorld {
       store.items.push(msg);
     },
 
+    /**
+     * 获取用户的消息列表摘要（每个发送者取最后一条 + 最新公告）
+     * @param me - 当前用户
+     */
     getUserMessages(me: any): any[] {
       const store = this.stores.get(me.id);
       const newMessages: any[] = [];
@@ -142,6 +186,12 @@ class World implements IWorld {
       return newMessages;
     },
 
+    /**
+     * 获取指定发送者的历史消息（最多 13 条，30 天内的）
+     * @param me - 当前用户
+     * @param from - 发送者 ID（或 "notice" 查公告）
+     * @param count - 偏移量（跳过的条数）
+     */
     getMessageFromID(me: any, from: string, count?: number): any[] {
       let items: any[] = [];
       if (from !== 'notice') {
@@ -165,6 +215,12 @@ class World implements IWorld {
       return ary;
     },
 
+    /**
+     * 根据索引获取单条消息
+     * @param me - 当前用户
+     * @param from - 发送者 ID
+     * @param index - 消息索引
+     */
     getMessageByIndex(me: any, from: string, index: number): any | undefined {
       const store = this.stores.get(me.id);
       if (!store) return undefined;
@@ -172,6 +228,9 @@ class World implements IWorld {
       return list?.items[index];
     },
 
+    /**
+     * 序列化所有用户消息为 JSON 字符串（用于持久化）
+     */
     save(): string {
       const str: string[] = ['['];
       const now = Date.now();
@@ -228,11 +287,18 @@ class World implements IWorld {
       return str.join('');
     },
 
+    /**
+     * 序列化公告列表为 JSON（最多保留 500 条）
+     */
     saveNotice(): string {
       if (this.NOTICES.length > 500) this.NOTICES.splice(0, this.NOTICES.length - 500);
       return JSON.stringify(this.NOTICES);
     },
 
+    /**
+     * 从持久化数据恢复消息和公告
+     * @param data - 原始持久化数据
+     */
     load(data: any): void {
       this.NOTICES = data.notices ?? [];
       const sts = data.messages ?? [];
@@ -264,27 +330,51 @@ class World implements IWorld {
     },
   };
 
+  /**
+   * 排行榜/统计子系统 — 管理玩家属性排行、装备评分、分数排行
+   */
   STATS: StatsSystem = {
+    /** 玩家属性排行榜（按门派分组） */
     TOPS: [],
+    /** 经验排行（预留） */
     EXP: [],
+    /** 总积分排行 */
     SCORE: [],
+    /** 武器排行 */
     WEAPON: [],
+    /** 各部位装备评分排行（11 个部位） */
     EQ_STATS: [],
+    /** 各门派积分排行 */
     SC_STATS: {} as Record<string, any[]>,
 
-    // load_tops / loadTopUser 实现在 world/extends/stats.js 中覆盖
+    /**
+     * 加载排行榜数据（由 world/extends/stats.js 覆盖实现）
+     * @param tops - 原始排行数据
+     * @param defname - 默认名称
+     * @param key - 门派标识
+     */
     load_tops(tops: any[], defname: string, key: string): any[] {
       return [];
     },
+    /**
+     * 加载排行用户数据（由 world/extends/stats.js 覆盖实现）
+     */
     loadTopUser(data: any, npc: any): void {
       // stub — overridden by extends
     },
 
+    /**
+     * 检查并更新玩家排行榜
+     */
     checkStats(player: any): void {
       this.updateScore(player);
       WORLD.COMMANDS.biwu.checkStats(player);
     },
 
+    /**
+     * 序列化排行榜数据为 JSON 字符串
+     * @param tops - 排行榜数组
+     */
     saveTops(tops: any[]): string {
       const str: string[] = ['['];
       for (let i = 0; i < tops.length; i++) {
@@ -329,14 +419,27 @@ class World implements IWorld {
       return str.join('');
     },
 
+    /**
+     * 序列化武器排行
+     */
     saveWeapon(): string {
       return JSON.stringify(this.WEAPON);
     },
 
+    /**
+     * 序列化积分排行
+     */
     saveScore(): string {
       return JSON.stringify(this.SCORE);
     },
 
+    /**
+     * 更新装备排行中的单件装备
+     * @param me - 玩家
+     * @param wea - 装备
+     * @param ary - 排行数组
+     * @returns 更新后的排行项，或 undefined
+     */
     updateEqitem(me: any, wea: any, ary: any[]): any | undefined {
       const score = wea.query_score();
       if (!score) return undefined;
@@ -394,6 +497,11 @@ class World implements IWorld {
       return undefined;
     },
 
+    /**
+     * 更新武器排行
+     * @param me - 玩家
+     * @param wea - 武器
+     */
     updateWeapon(me: any, wea: any): void {
       if (!WORLD.is_server(me)) return;
       const eqs = this.EQ_STATS[wea.eq_type];
@@ -402,6 +510,11 @@ class World implements IWorld {
       }
     },
 
+    /**
+     * 按分数排序更新排行榜中的单个用户
+     * @param me - 玩家
+     * @param ary - 排行数组
+     */
     updateScoreItem(me: any, ary: any[]): void {
       const score = me.score;
       let cur_index = -1;
@@ -443,6 +556,10 @@ class World implements IWorld {
       }
     },
 
+    /**
+     * 更新玩家积分排行（总排行 + 门派排行）
+     * @param me - 玩家
+     */
     updateScore(me: any): void {
       if (!WORLD.is_server(me)) return;
       const ary = this.SCORE;

@@ -43,6 +43,10 @@ export class FAMILY_AREA extends AREA {
     }
 }
 
+/**
+ * 门派区域标准操作按钮
+ * [命令前缀, 按钮名, 描述文本]
+ */
 const stand_actions: [string, string, string][] = [
     ['goto fam1', '练功', '回到你所在门派师父所在位置学习武功'],
     ['goto fam2', '后勤', '前往当前门派后勤管理的位置']

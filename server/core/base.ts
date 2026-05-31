@@ -114,7 +114,7 @@ export class BASE {
         const dt = Date.now();
         for (let i = 0; i < evts.length; i++) {
             if (evts[i].time > dt) {
-                if (evts[i].func.call(this) === false) return false;
+                if (!evts[i].func.call(this)) return false;
             } else {
                 evts.splice(i, 1);
                 i--;

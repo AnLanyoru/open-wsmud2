@@ -784,7 +784,7 @@ export class SKILL extends BASE {
             str.push(cc);
             str.push(">\n");
         }
-        prop = this.query_enable_prop ? this.query_enable_prop(lv) : undefined;
+        prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
         let isEnable = this.type === SKILL_TYPES.KNOWLEDGE;
         if (prop) {
             for (let item in prop) {
