@@ -999,13 +999,13 @@ export class USER extends CHARACTER {
       if (item.is_equipment) {
         str.push(',can_eq:1');
       }
-      if ((item as any).on_use) {
+      if (item.on_use) {
         str.push(',can_use:1');
       }
-      if ((item as any).on_study) {
+      if (item.on_study) {
         str.push(',can_study:1');
       }
-      if ((item as any).on_open) {
+      if (item.on_open) {
         str.push(',can_open:1');
       }
       if (item.combine_count) {

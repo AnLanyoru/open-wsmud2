@@ -53,9 +53,9 @@ interface FOLLOWER_DATA {
   /** 技能数据 */
   skills?: Record<string, unknown>;
   /** 背包物品 */
-  items?: unknown[];
+  items?: unknown[][];
   /** 装备列表 */
-  eq?: unknown[];
+  eq?: unknown[][];
   [key: string]: unknown;
 }
 
@@ -247,8 +247,8 @@ export class FOLLOWER extends CHARACTER {
       my_npc.settings = data.settings ?? {};
       my_npc.skills = data.skills as unknown as Record<string, any>;
       my_npc.path = obj.path;
-      my_npc.items = me.read_items(data.items as unknown as any[][]);
-      my_npc.equipment = me.read_equipment(data.eq as unknown as any[][]);
+      my_npc.items = me.read_items(data.items);
+      my_npc.equipment = me.read_equipment(data.eq);
       my_npc.level = my_npc.level || obj.level || 3;
       my_npc.init();
       my_npc.recount();

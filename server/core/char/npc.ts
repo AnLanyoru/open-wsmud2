@@ -338,7 +338,7 @@ export class NPC extends CHARACTER {
    * 发言 - NPC 闲聊时调用，默认空实现由资源文件覆写
    */
   do_say(msg?: string): void {
-    return undefined as any;
+    return undefined;
   }
 
   // ================================================================

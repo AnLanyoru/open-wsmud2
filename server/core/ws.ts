@@ -37,7 +37,7 @@ server.onConnect = function (this: void, socket: WsSocket): void {
  * 新 socket 进入回调 (TCP 连接建立时)
  */
 server.onSocketIn = function (this: void, socket: WsSocket): void {
-  (WORLD as any).SocketIn(socket);
+  WORLD.SocketIn(socket);
 };
 
 /**

@@ -16,6 +16,7 @@ import type { ActionMap } from '../../types/base.js';
 import type { ROOM as RoomClass } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { OddsEntry } from '../item/obj.js';
+import type { NPC } from './npc.js';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -559,8 +560,7 @@ export class CHARACTER extends ITEM {
   create(path: string, par?: string): void {
     if (par) this.path = path + par;
     if (this.on_create) this.on_create(path, par);
-    // NPC 类型与 CHARACTER 循环依赖，此处用 any 桥接
-    WORLD.NPC_STROE.set(this.path, this as any);
+    WORLD.NPC_STROE.set(this.path, this as unknown as NPC);
   }
 
   /**
@@ -2074,7 +2074,7 @@ export class CHARACTER extends ITEM {
     if (this.fight_type == 2 && this.query_enemy() == target) return;
     this.begin_attack(target, 2);
     target.begin_attack(this, 2);
-    (target as any).notify('<hir>看起来' + this.name + '想杀死你！</hir>\n');
+    target.notify('<hir>看起来' + this.name + '想杀死你！</hir>\n');
     this.notify('<hir>看起来' + target.name + '想杀死你！</hir>\n');
   }
 

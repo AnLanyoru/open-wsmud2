@@ -330,7 +330,7 @@ class World implements IWorld {
           };
           for (let k = 0; k < ust.items.length; k++) {
             const msg = ust.items[k];
-            (obj.items as any[]).push({
+            obj.items.push({
               content: msg.content,
               time: msg.time,
               rec: msg.rec,
@@ -601,7 +601,7 @@ class World implements IWorld {
   // ================================================================
 
   /** 新 socket 接入计数 */
-  SocketIn(): void {
+  SocketIn(socket?: any): void {
     this.SocketCount++;
   }
 
