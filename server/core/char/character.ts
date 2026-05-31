@@ -370,7 +370,7 @@ export class CHARACTER extends ITEM {
   find_obj(oid: string, parent?: any): any {
     let items = this.items;
     if (parent) items = parent.items;
-    return (this as any).find_obj_byid(items, oid) as any;
+    return items ? this.find_obj_byid(items, oid) : undefined;
   }
 
   /**
@@ -583,7 +583,7 @@ export class CHARACTER extends ITEM {
       }
       this.items = items as ITEM[];
     }
-    (this as any).create_id();
+    this.create_id();
     this.init();
     this.recount();
     this.hp = this.max_hp;
@@ -637,10 +637,10 @@ export class CHARACTER extends ITEM {
    */
   add_exp(exp?: number, pot?: number, money?: number): void {
     if (exp) {
-      exp += (this as any).query_temp('exp_up', 0);
+      exp += this.query_temp('exp_up', 0) ?? 0;
     }
     if (pot) {
-      pot += (this as any).query_temp('pot_up', 0);
+      pot += this.query_temp('pot_up', 0) ?? 0;
     }
     const str: string[] = ['<hig>你获得了'];
     if (exp) {
@@ -732,7 +732,7 @@ export class CHARACTER extends ITEM {
   add_maxmp(count: number): void {
     this.max_mp += count;
     this.recount();
-    (this as any).notify('<hig>你增加了' + count + '点内力。</hig>');
+    this.notify('<hig>你增加了' + count + '点内力。</hig>');
   }
 
   /**
@@ -1101,7 +1101,7 @@ export class CHARACTER extends ITEM {
           item.count = (item.count || 0) + (buff.count || 1);
           clearTimeout(item.handler);
           if (item.duration)
-            item.handler = (this as any).call_out(this.remove_status.bind(this), item.duration, sid);
+            item.handler = this.call_out(this.remove_status.bind(this), item.duration, sid);
           this.change_buff(item, true, buff.count || 1);
           item.start_time = buff.start_time;
           this.status_changed(item, 'refresh');
@@ -1110,7 +1110,7 @@ export class CHARACTER extends ITEM {
           this.change_buff(item, false, item.count || 1);
           this.status_changed(item, 'remove');
           if (buff.duration)
-            buff.handler = (this as any).call_out(this.remove_status.bind(this), buff.duration, sid);
+            buff.handler = this.call_out(this.remove_status.bind(this), buff.duration, sid);
           this.status[i] = buff;
           buff.start_time = buff.start_time;
           this.change_buff(buff, true, buff.count || 1);
@@ -1123,7 +1123,7 @@ export class CHARACTER extends ITEM {
       }
     }
     if (buff.duration)
-      buff.handler = (this as any).call_out(this.remove_status.bind(this), buff.duration, sid);
+      buff.handler = this.call_out(this.remove_status.bind(this), buff.duration, sid);
     this.status.push(buff);
     this.change_buff(buff, true, buff.count || 1);
     this.status_changed(buff, 'add');
@@ -1273,7 +1273,7 @@ export class CHARACTER extends ITEM {
       if (this.hp > 0 && buff.finish_msg) {
         this.send_room(buff.finish_msg);
       }
-      (this as any).remove_temp(buff.id);
+      this.remove_temp(buff.id);
     }
   }
 
@@ -1412,7 +1412,7 @@ export class CHARACTER extends ITEM {
           }
           if (item.duration_count === 0 || ((item.duration_count || 0) > 1 && (item.duration_count || 0) > (item.over_count || 0))) {
             if (item.duration)
-              item.handler = (this as any).call_out(this.remove_status.bind(this), item.duration, sid);
+              item.handler = this.call_out(this.remove_status.bind(this), item.duration, sid);
             return;
           }
         }
@@ -1428,7 +1428,7 @@ export class CHARACTER extends ITEM {
             this._splice_status(i, item);
           } else {
             if (item.duration)
-              item.handler = (this as any).call_out(this.remove_status.bind(this), item.duration, sid);
+              item.handler = this.call_out(this.remove_status.bind(this), item.duration, sid);
             item.start_time = Date.now();
             this.status_changed(item, 'refresh');
           }
@@ -1499,7 +1499,7 @@ export class CHARACTER extends ITEM {
     if (obj.eq_type === EQUIP_TYPE.WEAPON) this.weapon_changed(false);
     this.recount();
     if (recover_time > 0 && this.is_player) {
-      (this as any).set_temp('eq_wea', obj.id, 60000);
+      this.set_temp('eq_wea', obj.id, 60000);
     }
   }
 
@@ -1546,7 +1546,7 @@ export class CHARACTER extends ITEM {
         this.release_time = 3000 + Date.now();
         this.send('{type:"dispfm",rtime:3000}');
       }
-      if ((this as any).query_temp('jxtm')) {
+      if (this.query_temp('jxtm')) {
         this.remove_status('force');
       }
     }
@@ -1793,7 +1793,7 @@ export class CHARACTER extends ITEM {
     const eny = this.query_enemy();
     if (!eny) return true;
     if (eny.on_escape) return eny.on_escape(this) ?? true;
-    let is_esc = (this as any).random(this.ds / 2) + this.ds > eny.mz;
+    let is_esc = this.random(this.ds / 2) + this.ds > eny.mz;
     if (eny.is_faint) is_esc = true;
     if (!is_esc) {
       this.send_room('<cyn>$N转身想跑，$n一把拦住$P：想跑？没门！\n</cyn>', eny);
@@ -1816,7 +1816,7 @@ export class CHARACTER extends ITEM {
     for (let i = 0; i < tm.length; i++) {
       if (!tm[i].is_player && tm[i].master == this.id) {
         if (tm[i].on_teamout) tm[i].on_teamout!(tm[i]);
-        (this as any).notify(tm[i].name + '退出了队伍。');
+        this.notify(tm[i].name + '退出了队伍。');
         tm[i].team = null;
         tm.splice(i, 1);
         i--;
@@ -1935,7 +1935,7 @@ export class CHARACTER extends ITEM {
    * 是否隐藏
    */
   is_hidden(): boolean {
-    return this.hp <= 0 || (this as any).query_temp('hidden');
+    return this.hp <= 0 || !!this.query_temp('hidden');
   }
 
   /**
@@ -2004,7 +2004,7 @@ export class CHARACTER extends ITEM {
    * 格式化装备显示
    */
   format_equipments(call3: string, str: string[], eqcmd?: string): void {
-    if ((this as any).query_setting('hide_equip')) {
+    if (this.query_setting('hide_equip')) {
       str.push('看样子', call3, '不想让别人看自己的装备。');
     } else if (this.equipment && this.equipment.length) {
       const eqstr: string[] = [];
@@ -2045,7 +2045,7 @@ export class CHARACTER extends ITEM {
       }
       if (!this.fight_type) {
         if (this.attack_handler) clearTimeout(this.attack_handler);
-        this.attack_handler = (this as any).call_out(this.auto_attack.bind(this), Math.random() * this.gjsd);
+        this.attack_handler = this.call_out(this.auto_attack.bind(this), Math.random() * this.gjsd);
         this.send('{type:"combat",start:1}');
       }
       this.fight_type = type;
@@ -2067,7 +2067,7 @@ export class CHARACTER extends ITEM {
     this.begin_attack(target, 2);
     target.begin_attack(this, 2);
     (target as any).notify('<hir>看起来' + this.name + '想杀死你！</hir>\n');
-    (this as any).notify('<hir>看起来' + target.name + '想杀死你！</hir>\n');
+    this.notify('<hir>看起来' + target.name + '想杀死你！</hir>\n');
   }
 
   /**
@@ -2241,7 +2241,7 @@ export class CHARACTER extends ITEM {
   full(): void {
     this.hp = this.max_hp;
     this.mp = this.max_mp;
-    (this as any).clear_distime();
+    this.clear_distime();
     this.release_time = 0;
     this.notify_hp();
   }
@@ -2320,7 +2320,7 @@ export class CHARACTER extends ITEM {
    * 暴击判定
    */
   crit(target: CHARACTER, part: AttackPart | null, bj_per: number): boolean {
-    if ((this as any).random(100) < bj_per + (part ? part.crit : 0) - target.query_prop('diff_bj')) {
+    if (this.random(100) < bj_per + (part ? part.crit : 0) - target.query_prop('diff_bj')) {
       return true;
     }
     return false;
@@ -2609,13 +2609,13 @@ export class CHARACTER extends ITEM {
       return;
     }
     if (this.is_faint) {
-      this.attack_handler = (this as any).call_out(this.auto_attack.bind(this), this.is_faint);
+      this.attack_handler = this.call_out(this.auto_attack.bind(this), this.is_faint);
       return;
     }
     if (this.release_time) {
       const diff_time = this.release_time - Date.now();
       if (diff_time > 0) {
-        this.attack_handler = (this as any).call_out(this.auto_attack.bind(this), diff_time);
+        this.attack_handler = this.call_out(this.auto_attack.bind(this), diff_time);
         return;
       }
       this.release_time = 0;
@@ -2628,7 +2628,7 @@ export class CHARACTER extends ITEM {
           // intentional no-op
         }
       } else {
-        this.attack_handler = (this as any).call_out(this.auto_attack.bind(this), this.is_busy);
+        this.attack_handler = this.call_out(this.auto_attack.bind(this), this.is_busy);
         return;
       }
     } else {
@@ -2643,7 +2643,7 @@ export class CHARACTER extends ITEM {
       }
     }
     if (!sh || this.end_attack(target)) {
-      this.attack_handler = (this as any).call_out(this.auto_attack.bind(this), this.gjsd);
+      this.attack_handler = this.call_out(this.auto_attack.bind(this), this.gjsd);
     }
   }
 
@@ -2664,7 +2664,7 @@ export class CHARACTER extends ITEM {
     }
     if (isrelease !== false) {
       this.add_mp(-(pfm.query_mp(this, level) || 0));
-      (this as any).set_temp('used_pfm', pfm.id, 20000);
+      this.set_temp('used_pfm', pfm.id, 20000);
       return true;
     }
     return false;
@@ -2678,7 +2678,7 @@ export class CHARACTER extends ITEM {
     if (!this.auto_skills) return false;
     this.attack_count = this.attack_count || this.pfm_rate || 3;
 
-    if ((this as any).random(this.attack_count) !== 0) {
+    if (this.random(this.attack_count) !== 0) {
       this.attack_count--;
       return false;
     }
@@ -2791,7 +2791,7 @@ export class CHARACTER extends ITEM {
 
   /**
    * 随机数（继承自 BASE，此处声明避免类型错误）
-   * 使用 (this as any).random(n) 调用继承的原型方法
+   * 使用 this.random(n) 调用继承的原型方法
    */
   private _random(n: number): number {
     return Math.floor(Math.random() * n);

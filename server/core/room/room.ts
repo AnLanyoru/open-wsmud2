@@ -916,7 +916,7 @@ export class ROOM extends ITEM {
      * @param def
      * @param me
      */
-    query_temp(name: string, def?: unknown, me?: Record<string, any>): unknown {
+    query_temp<T = unknown>(name: string, def?: T, me?: Record<string, any>): T | undefined {
         const first = this.query_fb_first(me!.query_teamid());
         if (!first) return;
         if (!first.temp) return;

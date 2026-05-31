@@ -103,9 +103,9 @@ export class SKILL extends BASE {
     /** 学习技能回调 — 触发时机：玩家执行学习命令时（do_learn() 开头）；返回 false 阻止学习 */
     on_learn?: (me: CHARACTER) => boolean | void;
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
-    query_enable_prop?: (lv: number, me?: CHARACTER) => Record<string, unknown> | undefined;
+    query_enable_prop?: (lv: number, me?: CHARACTER) => Record<string, Record<string, any>> | undefined;
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
-    query_prop?: (lv: number, me?: CHARACTER) => Record<string, unknown> | undefined;
+    query_prop?: (lv: number, me?: CHARACTER) => Record<string, any> | undefined;
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
     on_enemy_die?: (me: CHARACTER, target: CHARACTER) => void;
 
@@ -211,22 +211,22 @@ export class SKILL extends BASE {
      */
     release_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
-        let prop = this.query_prop ? this.query_prop(lv, me) : undefined;
-        if (prop) {
-            me.change_prop(prop, false);
+        const base_prop = this.query_prop ? this.query_prop(lv, me) : undefined;
+        if (base_prop) {
+            me.change_prop(base_prop, false);
         }
-        prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
-        if (prop) {
-            for (let item in prop) {
+        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        if (enable_prop) {
+            for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
-                    me.change_prop(prop[item], false);
+                    me.change_prop(enable_prop[item], false);
                 }
             }
         }
-        prop = this.query_addin_prop(me, lv);
-        if (prop) {
+        const addin_prop = this.query_addin_prop(me, lv);
+        if (addin_prop) {
             if (this.is_enable(me)) {
-                me.change_prop(prop, false);
+                me.change_prop(addin_prop, false);
             }
         }
     }
@@ -238,22 +238,22 @@ export class SKILL extends BASE {
      */
     attach_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
-        let prop = this.query_prop ? this.query_prop(lv, me) : undefined;
-        if (prop) {
-            me.change_prop(prop, true);
+        const base_prop = this.query_prop ? this.query_prop(lv, me) : undefined;
+        if (base_prop) {
+            me.change_prop(base_prop, true);
         }
-        prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
-        if (prop) {
-            for (let item in prop) {
+        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        if (enable_prop) {
+            for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
-                    me.change_prop(prop[item], true);
+                    me.change_prop(enable_prop[item], true);
                 }
             }
         }
-        prop = this.query_addin_prop(me, lv);
-        if (prop) {
+        const addin_prop = this.query_addin_prop(me, lv);
+        if (addin_prop) {
             if (this.is_enable(me)) {
-                me.change_prop(prop, true);
+                me.change_prop(addin_prop, true);
             }
         }
     }
@@ -346,17 +346,17 @@ export class SKILL extends BASE {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
-        if (prop) {
-            const enable_prop = prop[type];
-            if (enable_prop) {
-                me.change_prop(enable_prop, true);
+        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        if (enable_prop) {
+            const type_prop = enable_prop[type];
+            if (type_prop) {
+                me.change_prop(type_prop, true);
             }
         }
-        prop = this.query_addin_prop(me, lv);
-        if (prop) {
+        const addin_prop = this.query_addin_prop(me, lv);
+        if (addin_prop) {
             if (!this.is_enable(me)) {
-                me.change_prop(prop, true);
+                me.change_prop(addin_prop, true);
             }
         }
         return true;
@@ -370,18 +370,18 @@ export class SKILL extends BASE {
     disenable(me: CHARACTER, type: string): boolean {
         this.on_disenable && this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
-        let prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
-        if (prop) {
-            const enable_prop = prop[type];
-            if (enable_prop) {
-                me.change_prop(enable_prop, false);
+        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        if (enable_prop) {
+            const type_prop = enable_prop[type];
+            if (type_prop) {
+                me.change_prop(type_prop, false);
             }
         }
 
-        prop = this.query_addin_prop(me, lv);
-        if (prop) {
+        const addin_prop = this.query_addin_prop(me, lv);
+        if (addin_prop) {
             if (!this.is_enable(me)) {
-                me.change_prop(prop, false);
+                me.change_prop(addin_prop, false);
             }
         }
         return true;

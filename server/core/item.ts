@@ -117,7 +117,7 @@ export class ITEM extends BASE {
      * @param def - 默认值
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    query_temp(name: string, def?: unknown, _me?: unknown): unknown {
+    query_temp<T = unknown>(name: string, def?: T, _me?: unknown): T | undefined {
         if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
