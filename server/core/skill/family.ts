@@ -85,6 +85,13 @@ export class FAMILY extends BASE {
     /** 门派功绩排行榜 */
     tops?: Record<string, { name: string; score: number }>;
 
+    // ============ 回调（由资源文件设置） ============
+
+    /** 门派称谓回调 — 传入角色，返回该角色在门派的称呼 */
+    call?: (me: Record<string, any>, isbad?: boolean) => string;
+    /** 自称回调 — 传入角色，返回该角色在门派的自称 */
+    call_me?: (me: Record<string, any>) => string;
+
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
     query_temp: (name: string, def?: unknown, _me?: unknown) => unknown = ITEM.prototype.query_temp as any;

@@ -156,7 +156,7 @@ export interface StatusDef {
   is_faint?: boolean;
   override?: number;
   count?: number;
-  on_interval?: (me: CHARACTER, status: StatusDef) => void;
+  on_interval?: (me: CHARACTER, over_count: number) => boolean | void;
   on_attach?: (me: CHARACTER) => void;
   on_expire?: (me: CHARACTER) => void;
   start_time?: number;

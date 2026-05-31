@@ -41,6 +41,17 @@ interface AttackPart {
   crit: number;
 }
 
+interface CommandDef {
+  regex?: RegExp;
+  enter: (me: CHARACTER, ...args: string[]) => boolean | void;
+  allow_level?: number;
+  allow_die?: boolean;
+  allow_faint?: boolean;
+  allow_state?: boolean;
+  allow_fight?: boolean;
+  allow_busy?: boolean;
+}
+
 interface AutoSkillEntry {
   pfm: any;
   level: number;
@@ -315,16 +326,12 @@ export class CHARACTER extends ITEM {
   /**
    * 发送消息给自身（不考虑状态）
    */
-  send(msg: string): void {
-    return undefined as any;
-  }
+  send(_msg: string): void {}
 
   /**
    * 发送命令列表（客户端交互菜单）
    */
-  send_commands(): void {
-    return undefined as any;
-  }
+  send_commands(): void {}
 
   /**
    * 操作失败通知
@@ -344,9 +351,7 @@ export class CHARACTER extends ITEM {
   /**
    * 角色死亡处理
    */
-  die(killer?: CHARACTER): boolean | void {
-    return undefined as any;
-  }
+  die(_killer?: CHARACTER): boolean | void {}
 
   /**
    * 是否在指定路径的房间
@@ -475,7 +480,7 @@ export class CHARACTER extends ITEM {
    */
   do_command(cmdName: string, str?: string): void {
     str = str || '';
-    let cmd = WORLD.COMMANDS[cmdName];
+    let cmd: CommandDef | undefined = WORLD.COMMANDS[cmdName] as CommandDef | undefined;
     let pars: [CHARACTER, ...string[]];
     if (cmd && cmd.regex && str) {
       const match = cmd.regex.exec(str);
@@ -486,10 +491,10 @@ export class CHARACTER extends ITEM {
     if (this.do_item_action(this.environment, cmdName, pars)) {
       return;
     }
-    cmd = cmd || WORLD.DEFAULT_COMMAND;
+    cmd = cmd || (WORLD.DEFAULT_COMMAND as CommandDef | undefined);
     if (cmd) {
       if (!this.check_command(cmd)) return;
-      if ((cmd.enter as Function).apply(cmd, pars) !== false) {
+      if (cmd.enter.apply(cmd, pars) !== false) {
         return;
       }
     }
@@ -516,8 +521,8 @@ export class CHARACTER extends ITEM {
   /**
    * 检查命令是否允许执行
    */
-  check_command(cmd: any): boolean {
-    if (cmd.allow_level > this.user_level) {
+  check_command(cmd: CommandDef): boolean {
+    if ((cmd.allow_level ?? 0) > this.user_level) {
       this.send('什么？');
       return false;
     }
@@ -550,6 +555,7 @@ export class CHARACTER extends ITEM {
   create(path: string, par?: string): void {
     if (par) this.path = path + par;
     if (this.on_create) this.on_create(path, par);
+    // NPC 类型与 CHARACTER 循环依赖，此处用 any 桥接
     WORLD.NPC_STROE.set(this.path, this as any);
   }
 
@@ -722,7 +728,7 @@ export class CHARACTER extends ITEM {
    * 查询内功加成比例
    */
   query_force_rad(): number {
-    if (this.force_skill && (this.force_skill as Record<string, any>).force_rad) return (this.force_skill as Record<string, any>).force_rad || 0.1;
+    if (this.force_skill?.force_rad) return this.force_skill.force_rad || 0.1;
     return 0.1;
   }
 
@@ -781,25 +787,23 @@ export class CHARACTER extends ITEM {
   add_fbscore(v: number, max?: number): void {
     const fb = this.environment!.query_fb_first(this.query_teamid()!);
     if (!fb) return;
-    (fb as any).score = ((fb as any).score || 0) + v;
-    if (max && max > 0 && (fb as any).score > max) (fb as any).score = max;
+    fb.score = (fb.score || 0) + v;
+    if (max && max > 0 && fb.score! > max) fb.score = max;
   }
 
   /**
    * 查询副本分数
    */
-  query_fbscore(v?: any): number {
+  query_fbscore(_v?: any): number {
     const first_room = this.environment!.query_fb_first(this.query_teamid()!);
     if (!first_room) return 0;
-    return (first_room as any).score || 0;
+    return first_room.score || 0;
   }
 
   /**
    * 增加积分（仅 USER 覆写）
    */
-  add_score(val: number): void {
-    return undefined as any;
-  }
+  add_score(_val: number): void {}
 
   // ================================================================
   // 战斗临时属性
@@ -906,7 +910,7 @@ export class CHARACTER extends ITEM {
     this.init_skill();
     this.recount();
     this.add_score(-baseskill.query_score(skill.level, this));
-    if (baseskill.on_remove) baseskill.on_remove(this, null as any);
+    if (baseskill.on_remove) baseskill.on_remove(this, null);
     return true;
   }
 
