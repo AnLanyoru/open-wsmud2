@@ -76,8 +76,10 @@ class ServerPage extends Page {
 
   displayServer() {
     if (!SERVERS) return;
-    var islocal = location.hostname.startsWith('127.0.0.1')
-      || location.hostname.startsWith('localhost');
+    var islocal = location.hostname === '127.0.0.1'
+      || location.hostname === 'localhost'
+      || location.hostname === '0.0.0.0'
+      || location.hostname === '::1';
     var istest = location.search.startsWith('?test');
     var html = [];
     var named = import.meta.env.VITE_GAME_NAME || "MUD游戏";

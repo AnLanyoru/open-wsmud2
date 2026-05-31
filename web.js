@@ -7,8 +7,6 @@ const pinoHttp = require('pino-http');
 require('dotenv').config();
 globalThis['__CONFIG'] = require('./config');
 
-__CONFIG.init();
-
 const app = express();
 const HOST = __CONFIG.WEB_HOST;
 const PORT = __CONFIG.WEB_PORT;
@@ -131,10 +129,13 @@ const server = http.createServer(app);
 
 
 // 启动服务器
-server.listen(PORT, HOST, () => {
-    console.log(`Server running on http://${HOST}:${PORT}`);
-    console.log(`Static files served from ${path.join(__dirname, 'www')}`);
-});
+(async () => {
+    await __CONFIG.init();
+    server.listen(PORT, HOST, () => {
+        console.log(`Server running on http://${HOST}:${PORT}`);
+        console.log(`Static files served from ${path.join(__dirname, 'www')}`);
+    });
+})();
 
 process.on('uncaughtException', (error) => {
     console.error('未捕获的异常:', error);

@@ -684,12 +684,11 @@ class World implements IWorld {
    * @param sid - 可选服务器 ID
    */
   async startup(sid?: number): Promise<void> {
+    this.SERVERS = (await db.getServers()) as ServerConfig[];
     if (sid) {
-      sid = parseInt(sid);
-      this.SERVERS = (await db.getServers()) as ServerConfig[];
-      this.SERVER = this.getServer(sid);
+      this.SERVER = this.getServer(parseInt(sid));
     } else {
-      this.SERVER = __CONFIG.def_server;
+      this.SERVER = (this.SERVERS.find(s => s.isdef) || this.SERVERS[0]) as ServerConfig;
     }
 
     if (!this.SERVER) throw new Error('服务器设置错误，无法启动');

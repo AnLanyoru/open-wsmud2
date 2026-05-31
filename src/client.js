@@ -152,6 +152,9 @@ export function showLoader(msg, elem) {
 let wsindex = 0;
 export class WSClient {
     constructor(ip, port) {
+        if (ip === '127.0.0.1' || ip === '0.0.0.0') {
+            ip = location.hostname;
+        }
         this.IP = ip;
         this.Port = port;
     }

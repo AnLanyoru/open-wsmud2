@@ -43,6 +43,7 @@ export interface ServerConfig {
   id: number;
   name: string;
   istest: boolean;
+  isdef: boolean;
 }
 
 /** 全局配置 */

@@ -1,5 +1,6 @@
 node_modules/
 log/
+database.db
 data/database.db
 .env
 www/
