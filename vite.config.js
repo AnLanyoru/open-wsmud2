@@ -1,4 +1,11 @@
 import { defineConfig } from 'vite';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const raw = process.env.STARTUP_URL || 'http://localhost';
+const hasProtocol = raw.includes('://');
+const startupUrl = `${hasProtocol ? raw : 'http://' + raw}:${process.env.WEB_PORT || '8088'}`;
 
 export default defineConfig({
   root: './src/',
@@ -18,6 +25,6 @@ export default defineConfig({
   },
   server: {
     port: 3333,
-    open: true
+    open: startupUrl
   }
 });

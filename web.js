@@ -10,6 +10,7 @@ globalThis['__CONFIG'] = require('./config');
 __CONFIG.init();
 
 const app = express();
+const HOST = __CONFIG.WEB_HOST;
 const PORT = __CONFIG.WEB_PORT;
 const API_PATHS = ['./api/user', './api/game'];
 const APIS = {
@@ -130,8 +131,8 @@ const server = http.createServer(app);
 
 
 // 启动服务器
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
     console.log(`Static files served from ${path.join(__dirname, 'www')}`);
 });
 

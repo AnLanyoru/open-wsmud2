@@ -11,6 +11,7 @@ module.exports = {
         if (!this.SESSION_SECRET) throw new Error('缺少环境配置SESSION_SECRET');
         await this.DB.connect('database.db');
     },
+    WEB_HOST: process.env.WEB_HOST || "0.0.0.0",
     WEB_PORT: parseInt(process.env.WEB_PORT),
     CONNECT_LEVEL: 0,
     MD5: process.env.MD5_PREFIX,
@@ -20,10 +21,10 @@ module.exports = {
     DESIV: process.env.DESIV ? Buffer.from(process.env.DESIV, 'utf8') : null,
 
     def_server: {
-        ip: "127.0.0.1",
+        ip: process.env.WS_HOST || "127.0.0.1",
         port: parseInt(process.env.WS_PORT),
         id: 100,
-        name: "本地测试",
+        name: process.env.SERVER_NAME || "本地测试",
         istest: true
     }
 };

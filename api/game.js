@@ -9,6 +9,9 @@ class GameAPI extends APIBASE {
     async servers(user) {
         if (!SERVERS) {
             SERVERS = await DB.getServers();
+            if (!SERVERS) SERVERS = [];
+            const hasDef = SERVERS.some(s => s.id === __CONFIG.def_server.id);
+            if (!hasDef) SERVERS.push(__CONFIG.def_server);
         }
         return SERVERS;
     }

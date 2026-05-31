@@ -79,11 +79,8 @@ class ServerPage extends Page {
     var islocal = location.hostname.startsWith('127.0.0.1')
       || location.hostname.startsWith('localhost');
     var istest = location.search.startsWith('?test');
-    if (islocal) {
-      SERVERS.push({ id: 100, name: "本地测试1", ip: "127.0.0.1", port: 31300 });
-    }
     var html = [];
-    var named = "武神传说2";
+    var named = import.meta.env.VITE_GAME_NAME || "MUD游戏";
     for (var i = 0; i < SERVERS.length; i++) {
       if (!istest && !islocal && SERVERS[i].istest) continue;
       html.push("<li class='role-item");

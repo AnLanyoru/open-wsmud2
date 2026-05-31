@@ -158,7 +158,7 @@ export class WSClient {
     Connect(callback) {
         try {
             var pol = location.protocol == "http:" ? "ws" : "wss";
-            this.ws = new WebSocket('ws://' + this.IP + ':' + this.Port);
+            this.ws = new WebSocket(pol + '://' + this.IP + ':' + this.Port);
             this.ws.onopen = this.OnConnect;
             this.ws.onclose = this.OnClose.bind(this);
             this.ws.onerror = this.OnError;
