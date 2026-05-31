@@ -70,7 +70,7 @@ interface CharacterStatus extends StatusDef {
   ig_control?: boolean;
   duration_count?: number;
   over_count?: number;
-  override?: boolean;
+  override?: number;
   start_time?: number;
   count?: number;
 }
@@ -321,7 +321,7 @@ export class CHARACTER extends ITEM {
   /**
    * 操作失败通知
    */
-  notify_fail(text: string): false {
+  notify_fail(text: string): boolean {
     this.send(text);
     return false;
   }
@@ -444,8 +444,8 @@ export class CHARACTER extends ITEM {
       this.wait_input.apply(this, [this, req]);
       return;
     }
-    let cmd: string | null = null;
-    let pars: string | null = null;
+    let cmd: string | undefined = undefined;
+    let pars: string | undefined = undefined;
     let start = 0;
     let i = 0;
     for (; i < req.length; i++) {
@@ -1050,7 +1050,7 @@ export class CHARACTER extends ITEM {
     if (this.hp <= 0) return false;
     if (!this.status) this.status = [];
     const sid = buff.id;
-    buff.override = buff.override || false;
+    buff.override = buff.override || 0;
     buff.count = buff.count || 1;
     buff.max_count = buff.max_count || 10;
 
@@ -1083,11 +1083,8 @@ export class CHARACTER extends ITEM {
     for (let i = 0; i < this.status.length; i++) {
       if (this.status[i].id == sid) {
         const item = this.status[i];
-        if (item.override != buff.override) return false;
-        if (item.override == false) {
-          return false;
-        }
-        if (item.override == true) {
+        if (item.override !== buff.override) return false;
+        if (item.override === 1) {
           if (item.max_count && item.max_count <= (item.count || 0)) {
             return false;
           }
@@ -1098,7 +1095,7 @@ export class CHARACTER extends ITEM {
           this.change_buff(item, true, buff.count || 1);
           item.start_time = buff.start_time;
           this.status_changed(item, 'refresh');
-        } else {
+        } else if (item.override === 2) {
           if (item.handler) clearTimeout(item.handler);
           this.change_buff(item, false, item.count || 1);
           this.status_changed(item, 'remove');
@@ -1108,6 +1105,9 @@ export class CHARACTER extends ITEM {
           buff.start_time = buff.start_time;
           this.change_buff(buff, true, buff.count || 1);
           this.status_changed(buff, 'add');
+        } else {
+          // override === 0 或未知值：幂等，拒绝
+          return false;
         }
         return;
       }

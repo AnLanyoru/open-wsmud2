@@ -7,8 +7,10 @@ import { WORLD } from './world.js';
 
 const fs = fs_sync.promises;
 
+/** 数据库实例（由启动脚本注入到 __CONFIG.DB） */
 const DB: any = (globalThis as any).__CONFIG.DB;
 
+/** 角色存档数据 */
 interface RoleData {
   id: string;
   name: string;
@@ -18,12 +20,14 @@ interface RoleData {
   data: string;
 }
 
+/** 请求日志条目 */
 interface RequestLog {
   time: number;
   user: string;
   cmd: string;
 }
 
+/** 错误日志条目 */
 interface ErrorLog {
   time: number;
   user: string;
@@ -32,26 +36,49 @@ interface ErrorLog {
 }
 
 export default {
+  /** 关闭数据库连接 */
   close(): Promise<void> {
     return DB.close();
   },
 
+  /**
+   * 获取用户的所有角色
+   * @param userid - 用户 ID
+   * @param server - 服务器 ID
+   */
   getRoles(userid: number, server: number): Promise<any[]> {
     return DB.getRoles(userid, server);
   },
 
+  /**
+   * 创建新角色
+   * @param role - 角色数据
+   */
   async addRole(role: any): Promise<any> {
     return await DB.addRole(role);
   },
 
+  /**
+   * 删除角色
+   * @param userid - 用户 ID
+   * @param roleid - 角色 ID
+   */
   deleteRole(userid: number, roleid: string): Promise<any> {
     return DB.deleteRole(userid, roleid);
   },
 
+  /**
+   * 保存角色数据
+   * @param role - 角色数据
+   */
   saveRole(role: any): Promise<any> {
     return DB.saveRole(role);
   },
 
+  /**
+   * 批量保存角色并写入本地备份文件
+   * @param roles - 角色数据列表
+   */
   async saveRoles(roles: RoleData[]): Promise<void> {
     const dt = new Date();
     const path = (globalThis as any).__PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
@@ -70,6 +97,11 @@ export default {
     }
   },
 
+  /**
+   * 将单个角色数据写入备份流
+   * @param stream - 写入流
+   * @param role - 角色数据
+   */
   localBak(stream: fs_sync.WriteStream, role: RoleData): void {
     stream.write('{id:"');
     stream.write(role.id);
@@ -86,6 +118,10 @@ export default {
     stream.write('},');
   },
 
+  /**
+   * 保存请求日志到文件
+   * @param recs - 请求日志列表
+   */
   saveRequest(recs: RequestLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
@@ -103,6 +139,10 @@ export default {
     return fs.appendFile(path, ary.join(""));
   },
 
+  /**
+   * 保存错误日志到文件
+   * @param logs - 错误日志列表
+   */
   saveLogs(logs: ErrorLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
@@ -122,6 +162,10 @@ export default {
     return fs.appendFile(path, ary.join(""));
   },
 
+  /**
+   * 保存全局数据到文件（带本地备份）
+   * @param content - 序列化后的 JSON 字符串
+   */
   async saveData(content: string): Promise<void> {
     const path = (globalThis as any).__PATH.DATA + "data.js";
     const dt = new Date();
@@ -137,6 +181,9 @@ export default {
     return fs.writeFile(path, content);
   },
 
+  /**
+   * 从文件读取全局数据
+   */
   async readData(): Promise<any> {
     const path = (globalThis as any).__PATH.DATA + "data.js";
     try {
@@ -147,22 +194,47 @@ export default {
     }
   },
 
+  /**
+   * 根据 ID 获取用户
+   * @param id - 用户 ID
+   */
   getUserByID(id: string): any {
     return DB.getUserByID(id);
   },
 
+  /**
+   * 获取角色存档数据
+   * @param userid - 用户 ID
+   * @param id - 角色 ID
+   */
   getRoleData(userid: number, id: string): any {
     return DB.getData(userid, id);
   },
 
+  /**
+   * 修改角色名
+   * @param id - 角色 ID
+   * @param userid - 用户 ID
+   * @param name - 新名称
+   */
   change_name(id: string, userid: number, name: string): any {
     return DB.updateRoleName(id, userid, name);
   },
 
+  /**
+   * 迁移角色到另一个用户
+   * @param id - 角色 ID
+   * @param fromuserid - 原用户 ID
+   * @param touserid - 目标用户 ID
+   */
   change_userid(id: string, fromuserid: number, touserid: number): any {
     return DB.updateUserid(id, fromuserid, touserid);
   },
 
+  /**
+   * 检查文件或目录是否存在
+   * @param path - 路径
+   */
   async check_file(path: string): Promise<boolean> {
     try {
       await fs.access(path);
@@ -172,6 +244,10 @@ export default {
     }
   },
 
+  /**
+   * 初始化数据目录结构 — 创建服务器数据目录及 bak/log/req/temp 子目录，
+   * 并从模板目录复制默认数据文件
+   */
   async initDataDir(): Promise<void> {
     (globalThis as any).__PATH.BASE_DATA = (globalThis as any).__PATH.DATA;
     (globalThis as any).__PATH.DATA = (globalThis as any).__PATH.DATA + WORLD.SERVERID + "/";
@@ -203,6 +279,9 @@ export default {
     }
   },
 
+  /**
+   * 获取服务器列表
+   */
   getServers(): any {
     return DB.getServers();
   },

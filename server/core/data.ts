@@ -87,24 +87,40 @@ export interface DataObject {
 const DATA: DataObject = {
     // ============ 字段 ============
 
+    /** 队伍数据 */
     parties: new Map(),
+    /** 拍卖数据 */
     PAIMAI: new Map(),
+    /** 运行时临时数据（持久化到 data.js） */
     temp: {},
+    /** 经验等级倍率表（按 level 索引） */
     exps: [15, 20, 30, 40, 50, 100, 200, 80, 90, 100, 110, 120, 130],
 
+    /** 宝石价值表（按 grade 索引） */
     stone_values: [1000, 5000, 30000, 150000, 1000000, 10000000],
+    /** 书籍价值表（按 grade 索引） */
     book_values: [1, 1000, 5000, 10000, 100000, 500000, 2000000],
 
+    /** 静态属性映射 */
     PROPS: {},
 
+    /** 统计用临时数据存储 */
     temp_data: {},
 
     // ============ 方法 ============
 
+    /**
+     * 根据玩家等级获取随机经验值
+     * @param me - 玩家角色
+     */
     get_exp(me: any): number {
         return me.random(5) + (this.exps as number[])[(me as any).level];
     },
 
+    /**
+     * 全局数据加载回调 — 恢复排行榜、消息、装备统计等
+     * @param data - 从 data.js 读取的原始数据
+     */
     on_load(data: any): void {
         WORLD.MESSAGE.load(data);
         this.remove_temp('xy_status');
@@ -135,6 +151,10 @@ const DATA: DataObject = {
         console.log('全局数据已加载');
     },
 
+    /**
+     * 全局数据保存回调 — 序列化排行榜、消息、装备统计到字符串数组
+     * @param str - 输出字符串数组
+     */
     on_save(str: string[]): void {
         str.push(',tops:', WORLD.STATS.saveTops(WORLD.STATS.TOPS));
 
@@ -154,6 +174,9 @@ const DATA: DataObject = {
         str.push(',score_stats:', JSON.stringify(WORLD.STATS.SC_STATS ?? {}));
     },
 
+    /**
+     * 为所有门派创建默认排行榜（初始时无数据）
+     */
     create_def_tops(): void {
         for (const key of FAMS_TATAS) {
             WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
@@ -163,6 +186,9 @@ const DATA: DataObject = {
         }
     },
 
+    /**
+     * 创建默认装备统计结构（11 个部位各 10 个空位）
+     */
     create_def_eqs(): void {
         WORLD.STATS.EQ_STATS = new Array(11);
         for (let i = 0; i < 11; i++) {
@@ -171,6 +197,9 @@ const DATA: DataObject = {
         WORLD.STATS.EQ_STATS[0] = WORLD.STATS.WEAPON;
     },
 
+    /**
+     * 创建默认分数统计结构（各门派 20 个空位）
+     */
     create_def_scs(): void {
         WORLD.STATS.SC_STATS = {};
         for (const key of FAMS_TATAS) {
@@ -178,6 +207,11 @@ const DATA: DataObject = {
         }
     },
 
+    /**
+     * 重置指定门派的排行榜（玩家退出门派时调用）
+     * @param me - 玩家角色
+     * @param fam - 门派对象
+     */
     reset_famtops(me: any, fam: any): void {
         me.remove_temp('top_fam_sc');
         me.remove_temp('top_fam');
@@ -204,6 +238,9 @@ const DATA: DataObject = {
         }
     },
 
+    /**
+     * 保存全局数据到数据库（含临时数据和排行榜等）
+     */
     async save(): Promise<any> {
         const str: string[] = ['{'];
         this.save_temp(str);
@@ -212,6 +249,9 @@ const DATA: DataObject = {
         return WORLD.DB.saveData(str.join(''));
     },
 
+    /**
+     * JSON.stringify 替换函数 — 保留带有过期时间的值不变
+     */
     temp_replacer(_key: string, value: any): any {
         if (value && value.e) {
             // 保留带有过期时间的值不变
@@ -219,16 +259,29 @@ const DATA: DataObject = {
         return value;
     },
 
+    /**
+     * 序列化临时数据到字符串数组
+     * @param str - 输出字符串数组
+     */
     save_temp(str: string[]): void {
         str.push('temp:', JSON.stringify(this.temp));
     },
 
+    /**
+     * 从数据库加载全局数据
+     */
     async load(): Promise<void> {
         const data = await WORLD.DB.readData(__PATH.DATA + 'data.js');
         this.temp = data?.temp ?? {};
         this.on_load(data ?? {});
     },
 
+    /**
+     * 查询临时数据（支持带过期时间的值）
+     * @param name - 键名
+     * @param def - 默认值（键不存在时返回）
+     * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
+     */
     query_temp(name: string, def?: any, _me?: any): any {
         if (!this.temp) return def;
         const item = this.temp[name];
@@ -239,9 +292,16 @@ const DATA: DataObject = {
             delete this.temp[name];
             return def;
         }
-        return item ?? def;
+        return item || def;
     },
 
+    /**
+     * 设置临时数据
+     * @param name - 键名
+     * @param value - 值
+     * @param time - 过期时间（ms），不传则永不过期
+     * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
+     */
     set_temp(name: string, value: any, time?: number, _me?: any): void {
         if (!this.temp) this.temp = {};
         if (time) {
@@ -254,11 +314,23 @@ const DATA: DataObject = {
         }
     },
 
+    /**
+     * 移除临时数据（设为 null 而非 delete，保留键位用于 JSON 序列化）
+     * @param name - 键名
+     */
     remove_temp(name: string): void {
         if (!this.temp) return;
         this.temp[name] = null;
     },
 
+    /**
+     * 累加临时数据（数值类型）
+     * @param name - 键名
+     * @param value - 累加值
+     * @param time - 过期时间（ms）
+     * @param _me - 玩家对象（兼容 ROOM.add_temp 签名）
+     * @returns 累加后的值
+     */
     add_temp(name: string, value: number, time?: number, _me?: any): number {
         if (!this.temp) this.temp = {};
         const old = this.temp[name];
@@ -288,10 +360,19 @@ const DATA: DataObject = {
         }
     },
 
+    /**
+     * 清除所有统计数据
+     */
     clear_data(): void {
         this.temp_data = {};
     },
 
+    /**
+     * 添加统计数据（按用户汇总）
+     * @param key - 统计键
+     * @param user - 玩家
+     * @param val - 增加值
+     */
     add_data(key: string, user: any, val: number): void {
         if (!val) return;
         let data = this.temp_data[key];
@@ -301,6 +382,10 @@ const DATA: DataObject = {
         userData.value += val;
     },
 
+    /**
+     * 查询统计数据中值最大的条目
+     * @param key - 统计键
+     */
     query_max_data(key: string): { name: string; value: number } | undefined {
         const data = this.temp_data[key];
         if (!data) return undefined;
@@ -313,6 +398,10 @@ const DATA: DataObject = {
         return best ?? undefined;
     },
 
+    /**
+     * 查询统计数据中值最小的条目
+     * @param key - 统计键
+     */
     query_min_data(key: string): { name: string; value: number } | undefined {
         const data = this.temp_data[key];
         if (!data) return undefined;

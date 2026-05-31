@@ -47,6 +47,7 @@ export interface WsProtocol {
 // WebSocket 帧类型
 // ============================================================
 
+/** WebSocket 帧类型常量 (RFC 6455) */
 const FrameTypes = {
   Continuation: 0,
   Text: 1,
@@ -69,14 +70,24 @@ export default class wsServer {
   tcpServer?: any;
 
   // === 事件回调（外部可覆盖） ===
+
+  /** 服务器关闭回调 */
   onClose: () => void = () => {};
+  /** 服务器错误回调 */
   onError: (err: Error) => void = () => {};
+  /** 新 socket 接入回调 */
   onSocketIn: (socket: WsSocket) => void = () => {};
+  /** 新连接建立回调（WebSocket 握手完成） */
   onConnect: (socket: WsSocket) => void = () => {};
+  /** WebSocket 消息接收回调 */
   onReceive: (msg: string, socket: WsSocket) => void = () => {};
+  /** TCP 消息接收回调 */
   onTcpReceive: (msg: string, socket: WsSocket) => void = () => {};
+  /** 客户端错误回调 */
   onClientError: (socket: WsSocket, err: Error) => void = () => {};
+  /** 客户端断开回调 */
   onClientClose: (socket: WsSocket, hadError?: Error) => void = () => {};
+  /** 客户端超时回调 */
   onClientTimeout: (socket: WsSocket, err?: Error) => void = () => {};
 
   /** 启动监听 — ws.ts 中动态赋值 */
@@ -134,6 +145,11 @@ export default class wsServer {
 // 客户端连接处理
 // ============================================================
 
+/**
+ * 客户端连接处理 — 绑定 send、设置超时、自动识别协议
+ * @this wsServer 实例
+ * @param socket - 客户端 socket
+ */
 function onClientConnect(this: wsServer, socket: WsSocket): void {
   socket.send = function (this: WsSocket, msg: string): void {
     if (msg) {

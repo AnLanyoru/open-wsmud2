@@ -154,7 +154,7 @@ export interface StatusDef {
   prop?: Record<string, number>;
   is_busy?: boolean;
   is_faint?: boolean;
-  override?: boolean;
+  override?: number;
   count?: number;
   on_interval?: (me: CHARACTER, status: StatusDef) => void;
   on_attach?: (me: CHARACTER) => void;

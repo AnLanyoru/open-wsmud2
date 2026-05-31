@@ -39,7 +39,9 @@ export interface UserLoginModule {
 }
 
 const USERLOGIN: UserLoginModule = {
+  /** 同 ID 最大同时连接数 */
   max_idcount: 10,
+  /** 同 IP 最大同时连接数 */
   max_ipcount: 12,
 
   /**

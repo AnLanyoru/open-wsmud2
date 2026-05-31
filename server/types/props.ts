@@ -89,15 +89,15 @@ export const enum SkillType {
 export const enum EquipType {
   WEAPON = 0,
   CLOTH = 1,
-  HEAD = 2,
-  NECK = 3,
-  WRIST = 4,
-  HAND = 5,
-  RING = 6,
-  WAIST = 7,
-  BOOT = 8,
-  ARMOR = 9,
-  FACE = 10,
+  SHOES = 2,
+  HEAD = 3,
+  CAPE = 4,
+  RING = 5,
+  NECKLACE = 6,
+  JEWELS = 7,
+  WRIST = 8,
+  WAIST = 9,
+  THROWING = 10,
 }
 
 /** 物品类型 */

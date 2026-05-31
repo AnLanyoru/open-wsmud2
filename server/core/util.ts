@@ -17,10 +17,12 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
 // 原型扩展 (副作用)
 // ============================================================
 
+/** Function.prototype.inherits — 原型继承工具 */
 (Function.prototype as any).inherits = function (superCtor: Function): void {
   util.inherits(this as any, superCtor);
 };
 
+/** Array.prototype.remove — 移除第一个匹配元素 */
 (Array.prototype as any).remove = function <T>(item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] == item) {
@@ -31,6 +33,7 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
   return false;
 };
 
+/** Array.prototype.contain — 是否包含元素 */
 (Array.prototype as any).contain = function <T>(item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] === item) {
@@ -40,11 +43,13 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
   return false;
 };
 
+/** Array.prototype.random — 随机获取数组元素 */
 (Array.prototype as any).random = function <T>(limit?: number): T {
   limit = limit || this.length;
   return this[Math.floor(Math.random() * this.length)] as T;
 };
 
+/** JSON.toObject — 使用 JSON5 解析（支持尾逗号等） */
 (JSON as any).toObject = function (str: string): any {
   return JSON5.parse(str);
 };
@@ -54,16 +59,28 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL; });
 // ============================================================
 
 export const UTIL = {
+  /** 空函数占位 */
   empty(): void {},
 
+  /**
+   * require 模块加载包装
+   * @param str - 模块名
+   */
   require(str: string): any {
     return require(str);
   },
 
+  /** 是否礼包期间（始终 false） */
   is_gift(): boolean {
     return false;
   },
 
+  /**
+   * 基于玩家 ID 和时间的加权随机
+   * @param me - 玩家（需含 id）
+   * @param max - 最大值（取模）
+   * @param rate - 时间分片间隔（ms），默认 86400000（一天）
+   */
   wrandom(me: { id: string }, max: number, rate: number = 86400000): number {
     let key = parseInt(me.id[0]!, 36);
     if (!(key >= 0)) key = 1;
@@ -71,6 +88,10 @@ export const UTIL = {
     return time % max;
   },
 
+  /**
+   * 货币数值转中文显示
+   * @param value - 货币值（1=铜板, 100=白银, 10000=黄金）
+   */
   moneyToStr(value: number): string {
     if (!value) return "";
     const str: string[] = [];
@@ -88,6 +109,10 @@ export const UTIL = {
     return str.join("");
   },
 
+  /**
+   * 毫秒转中文时间跨度
+   * @param time - 毫秒数
+   */
   timeSpan(time: number): string {
     const str: (string | number)[] = [];
     if (time > 86400000) {
@@ -106,10 +131,17 @@ export const UTIL = {
     return str.join("");
   },
 
+  /** 中文数字字符 */
   C_STR: "零一二三四五六七八九" as string,
+  /** 中文数位（十百千万亿） */
   C_STR2: ["", "十", "百", "千", "万", "亿"] as string[],
+  /** 中文大数位（万/亿） */
   C_STR3: ["", "万", "亿"] as string[],
 
+  /**
+   * 数字转中文
+   * @param num - 数字
+   */
   to_c(num: number): string {
     if (!num) return "";
     let str = "";
@@ -140,11 +172,21 @@ export const UTIL = {
     return str;
   },
 
+  /**
+   * HTML 实体编码（转义 < 和 >）
+   * @param str - 原始字符串
+   */
   htmlEncode(str: string): string {
     if (!str) return str;
     return str.replace(/>/g, "&gt;").replace(/</g, "&lt;");
   },
 
+  /**
+   * 属性映射格式化为可读字符串
+   * @param prop - 属性映射
+   * @param sp - 分隔符（默认换行）
+   * @param count - 倍率（默认 1）
+   */
   prop_toString(prop: Record<string, any> | null, sp?: string, count?: number): string {
     if (!prop) return "";
     const str: string[] = [];
@@ -217,6 +259,10 @@ export const UTIL = {
     return str.join(sp || "\n");
   },
 
+  /**
+   * 计算到下一个指定小时的毫秒数
+   * @param next_hour - 目标小时（默认 5）
+   */
   diff_time(next_hour?: number): number {
     next_hour = next_hour ?? 5;
     let dt = new Date();
@@ -227,6 +273,10 @@ export const UTIL = {
     return dt.getTime() - Date.now();
   },
 
+  /**
+   * 计算到下周指定小时的毫秒数
+   * @param next_hour - 目标小时（默认 5）
+   */
   diff_week_time(next_hour?: number): number {
     next_hour = next_hour ?? 5;
     const date = new Date();
@@ -239,6 +289,10 @@ export const UTIL = {
     return next_date.getTime() - Date.now();
   },
 
+  /**
+   * 计算到下月 1 日指定小时的毫秒数
+   * @param next_hour - 目标小时（默认 5）
+   */
   diff_month_time(next_hour?: number): number {
     next_hour = next_hour ?? 5;
     let date = new Date();
@@ -249,12 +303,18 @@ export const UTIL = {
     return next_date.getTime() - Date.now();
   },
 
+  /** 日志缓冲 */
   logs: [] as Array<{ dt: () => number; content: string }>,
 
+  /**
+   * 添加日志到缓冲
+   * @param msg - 日志内容
+   */
   log(msg: string): void {
     this.logs.push({ dt: Date.now, content: msg });
   },
 
+  /** 保存日志缓冲到文件 */
   saveLog(): void {
     if (!this.logs.length) return;
     const fs = require("fs") as typeof import('fs');
@@ -267,9 +327,14 @@ export const UTIL = {
     fs.writeFileSync(path, JSON.stringify(this.logs));
   },
 
+  /** ID 可用字符集（36 进制） */
   idstr: "0123456789abcdefghijklmnopqrstuvwxwz" as string,
+  /** 基准时间戳（用于缩短 ID 长度） */
   begin: 1490276099978 as number,
 
+  /**
+   * 生成唯一对象 ID（时间戳 + 随机字符）
+   */
   create_id(): string {
     const str: string[] = [];
     for (let i = 0; i < 4; i++) {
@@ -279,6 +344,11 @@ export const UTIL = {
     return str.join("");
   },
 
+  /**
+   * 生成随机中文名字
+   * @param s - 性别（0=女 非0=男）
+   * @param t - 名字字数（1 或 2，默认随机）
+   */
   random_name(s: number, t?: number): string {
     t = t ?? (Math.floor(Math.random() * 2) + 1);
     const str: string[] = [];
@@ -305,11 +375,19 @@ export const UTIL = {
     return str.join("");
   },
 
+  /** 复姓字库 */
   name0: "万俟司马上官欧阳夏侯诸葛闻人东方赫连皇甫尉迟公羊澹台公冶宗政濮阳淳于单于太叔申屠公孙仲孙轩辕令狐锺离宇文长孙慕容鲜于闾丘司徒司空丌官司寇子车颛孙端木巫马公西乐正公良拓拔夹谷谷梁梁丘左丘东门西门",
+  /** 单姓字库 */
   name1: "赵钱孙李周吴郑王冯陈楮卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎",
+  /** 男名字库 */
   name2: "世舜丞主产仁仇仓仕仞任伋众伸佐佺侃侪促俟信俣修倝倡倧偿储僖僧僳儒俊伟列则刚创前剑助劭势勘参叔吏嗣士壮孺守宽宾宋宗宙宣实宰尊峙峻崇崈川州巡帅庚战才承拯操斋昌晁暠曹曾珺玮珹琒琛琩琮琸瑎玚璟璥瑜生畴矗矢石磊砂碫示社祖祚祥禅稹穆竣竦综缜绪舱舷船蚩襦轼辑轩子杰榜碧葆莱蒲天乐东钢铎铖铠铸铿锋镇键镰馗旭骏骢骥驹驾骄诚诤赐慕端征坚建弓强彦御悍擎攀旷昂晷健冀凯劻啸柴木林森朴骞寒函高魁魏鲛鲲鹰丕乒候冕勰备宪宾密封山峰弼彪彭旁日明昪昴胜汉涵汗浩涛淏清澜浦澉澎澔瀚瀛灏沧虚豪豹辅辈迈邶合部阔雄霆震韩俯颁颇频颔风飒飙飚马亮仑仝代儋利力劼勒卓哲喆展帝弛弢弩彰征律德志忠思振挺掣旲旻昊昮晋晟晸朕朗段殿泰滕炅炜煜煊炎选玄勇君稼黎利贤谊金鑫辉墨欧有友闻问",
+  /** 女名字库 */
   name3: "筠柔竹霭凝晓欢霄枫芸菲寒伊亚宜姬舒影荔技思丽秀娟英华慧巧美娜静淑惠珠翠雅芝玉萍红娥玲芬芳燕彩春菊勤珍贞莉兰凤洁梅琳素云莲真环雪荣妹霞香月莺媛艳瑞凡佳嘉琼桂娣叶璧璐娅琦晶妍茜秋珊莎锦黛青倩婷姣婉娴瑾颖露瑶怡婵雁蓓纨仪荷丹蓉眉君琴蕊薇菁梦岚苑婕馨瑗琰韵融园艺咏卿聪澜纯毓悦昭冰爽琬茗羽希宁欣飘育滢馥",
 
+  /**
+   * 获取公历日期对应的农历日期
+   * @param date - 公历日期（默认当前时间）
+   */
   getLunar(date?: Date): { year: number; month: number; day: number; isLeap: boolean } {
     date = date || new Date();
     const lunarInfo = [
@@ -387,6 +465,10 @@ export const UTIL = {
     return new Lunar(date.getFullYear(), date.getMonth(), date.getDate());
   },
 
+  /**
+   * 判断当前是否为农历十五（带缓存，有效期到下次整点）
+   * @param dt - 参考时间（默认当前）
+   */
   async isLunar15(dt?: Date): Promise<boolean> {
     const { WORLD } = await import('./world.js');
     let issuc = WORLD.DATA.query_temp('lunar15', 0) as number;
@@ -406,6 +488,10 @@ export const UTIL = {
     return issuc > 0;
   },
 
+  /**
+   * 从数组中均匀随机选取一个元素
+   * @param arr - 候选数组
+   */
   choice<T>(arr: T[]): T {
     if (!Array.isArray(arr) || arr.length === 0) {
       throw new Error('候选数组不能为空');
@@ -414,6 +500,11 @@ export const UTIL = {
     return arr[idx]!;
   },
 
+  /**
+   * 加权随机选取（使用前缀和 + 二分查找）
+   * @param items - 候选数组
+   * @param weights - 权重数组
+   */
   weightedChoice<T>(items: T[], weights: number[]): T {
     if (!Array.isArray(items) || !Array.isArray(weights)) {
       throw new Error('items 和 weights 必须为数组');

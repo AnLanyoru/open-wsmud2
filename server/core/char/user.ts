@@ -193,7 +193,7 @@ export class USER extends CHARACTER {
    * 通知消息(玩家状态)
    */
   notify(text: string): void {
-    if (this.socket && !this.is_faint && text && text.length < 30240) {
+    if (this.socket && this.socket.send && !this.is_faint && text && text.length < 30240) {
       this.socket.send(text);
     }
   }
@@ -209,10 +209,10 @@ export class USER extends CHARACTER {
 
   /**
    * 发送失败通知
-   * @returns false
+   * @returns boolean 是否发送成功(总是返回false，方便调用时直接return)
    */
   notify_fail(text: string): boolean {
-    if (this.socket && !this.is_faint) {
+    if (this.socket && this.socket.send && !this.is_faint) {
       this.socket.send(text);
     }
     return false;
