@@ -1665,7 +1665,7 @@ export class CHARACTER extends ITEM {
   /**
    * 查询掉落物品
    */
-  query_drop(): any[] | undefined {
+  query_drop(): OBJ[] | undefined {
     if (!this.drop_list) return;
     return OBJ.create_by_odds(this.drop_list);
   }

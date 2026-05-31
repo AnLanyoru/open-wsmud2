@@ -6,6 +6,7 @@ import { BASE } from './base.js';
 
 import { UTIL } from './util.js';
 
+import type { ROOM } from './room/room.js';
 import type { ActionDef, ActionMap } from '../types/base.js';
 
 // ============================================================
@@ -75,6 +76,8 @@ export class ITEM extends BASE {
     no_get: boolean = false;
     /** 是否为 NPC */
     is_npc: boolean = false;
+    /** 当前所在环境（房间） */
+    environment: ROOM | null = null;
 
     // ============ 子类共享属性（OBJ / EQUIPMENT 等） ============
 

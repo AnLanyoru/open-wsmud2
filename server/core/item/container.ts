@@ -5,6 +5,14 @@ import { OBJ } from './obj.js';
 import { UTIL } from '../util.js';
 import type { USER } from '../char/user.js';
 
+/** 物品/容器描述 JSON 结构 */
+export interface ItemDescJson {
+    type: string;
+    id: string;
+    desc: string;
+    commands: Array<{ cmd: string; name: string }>;
+}
+
 export class CONTAINER extends OBJ {
 
     constructor() {
@@ -90,12 +98,13 @@ export class CONTAINER extends OBJ {
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: Record<string, unknown> = {};
-        obj.type = "item";
-        obj.id = this.id;
-        obj.desc = this.get_desc(me);
-        (obj as any).commands = [];
-        (obj as any).commands.push({
+        const obj: ItemDescJson = {
+            type: "item",
+            id: this.id,
+            desc: this.get_desc(me),
+            commands: [],
+        };
+        obj.commands.push({
             cmd: "get all from " + this.id,
             name: "全部拾取"
         });

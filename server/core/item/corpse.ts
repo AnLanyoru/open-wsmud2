@@ -3,6 +3,7 @@
  */
 import type { OBJ } from './obj.js';
 import { CONTAINER } from './container.js';
+import type { ItemDescJson } from './container.js';
 import type { CHARACTER } from '../char/character.js';
 import type { USER } from '../char/user.js';
 
@@ -43,9 +44,9 @@ export class CORPSE extends CONTAINER {
         this.fromid = player.id;
         this.name = player.name + "的尸体";
         this.color_name = "<wht>" + this.name + "</wht>";
-        (this as any).environment = (player as Record<string, any>).environment;
+        this.environment = player.environment;
         this.desc = "然而" + player.call3() + "已经死了，只剩下一具尸体静静地躺在这里。";
-        this.items = player.query_drop() as OBJ[] | null;
+        this.items = player.query_drop() ?? null;
         if (!iskeep) this.call_out(this.disappear, 60000);
     }
 
@@ -64,7 +65,7 @@ export class CORPSE extends CONTAINER {
      * @param player - 玩家对象
      */
     query_items(player: USER): OBJ[] | undefined {
-        const env: any = (this as any).environment;
+        const env = this.environment;
         if (env && env.is_fb && env.is_fb() && player.team) {
             if (!this.no_drops) {
                 this.no_drops = [];
@@ -107,7 +108,7 @@ export class CORPSE extends CONTAINER {
      */
     disappear(): void {
         if (this.items) this.items.length = 0;
-        const env: any = (this as any).environment;
+        const env = this.environment;
         if (env) {
             env.notify("一阵风吹去，" + this.name + "已经不见了。");
             env.item_changed(this, false);
@@ -120,12 +121,13 @@ export class CORPSE extends CONTAINER {
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: Record<string, unknown> = {};
-        obj.type = "item";
-        obj.desc = this.get_desc(me);
-        obj.id = this.id;
-        (obj as any).commands = [];
-        (obj as any).commands.push({
+        const obj: ItemDescJson = {
+            type: "item",
+            desc: this.get_desc(me),
+            id: this.id,
+            commands: [],
+        };
+        obj.commands.push({
             cmd: "get all from " + this.id,
             name: "全部拾取"
         });
