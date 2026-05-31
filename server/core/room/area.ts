@@ -7,6 +7,7 @@ import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
 import type { ROOM } from "./room.js";
 import type { USER } from "../char/user.js";
+import type { CHARACTER } from "../char/character.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
@@ -104,8 +105,8 @@ export class AREA extends BASE {
 
     /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
     on_login?: (user: USER) => void;
-    /** 玩家进入后回调 — 触发时机：玩家首次进入该区域房间后 */
-    on_enterd?: (me: USER) => void;
+    /** 人物进入后回调 — 触发时机：人物首次进入该区域房间后 */
+    on_enterd?: (me: CHARACTER) => void;
 
     constructor() {
         super();
@@ -134,24 +135,24 @@ export class AREA extends BASE {
     }
 
     /**
-     * 玩家离开区域回调
+     * 人物离开区域回调
      * @param me
      */
-    on_leaved(me: USER): void { return undefined; }
+    on_leaved(me: CHARACTER): void { return undefined; }
 
     /**
-     * 玩家离开前回调
+     * 人物离开前回调
      * @param me
      */
-    on_leave(me: USER): boolean {
+    on_leave(me: CHARACTER): boolean {
         return true;
     }
 
     /**
-     * 玩家进入后回调
+     * 人物进入后回调
      * @param me
      */
-    on_enter(me: USER): boolean {
+    on_enter(me: CHARACTER): boolean {
         return true;
     }
 
@@ -162,11 +163,11 @@ export class AREA extends BASE {
     find_area(path: string): AREA | undefined { return undefined; }
 
     /**
-     * 查询指定难度的通关记录
+     * 查询指定难度的通关记录 是否通关
      * @param diff
      */
-    is_record(diff: number): unknown {
-        return (this as Record<string, any>)["record_" + diff];
+    is_record(diff: number): boolean {
+        return this["record_" + diff];
     }
 
     /**
