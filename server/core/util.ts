@@ -18,12 +18,12 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL as unknown as Record<str
 // ============================================================
 
 /** Function.prototype.inherits — 原型继承工具 */
-(Function.prototype as unknown as Record<string, Function>).inherits = function (this: Function, superCtor: Function): void {
-  util.inherits(this as unknown as Function, superCtor);
+Function.prototype.inherits = function (this: Function, superCtor: Function): void {
+  util.inherits(this, superCtor);
 };
 
 /** Array.prototype.remove — 移除第一个匹配元素 */
-(Array.prototype as unknown as Record<string, Function>).remove = function <T>(this: T[], item: T): boolean {
+Array.prototype.remove = function <T>(this: T[], item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] == item) {
       this.splice(i, 1);
@@ -34,7 +34,7 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL as unknown as Record<str
 };
 
 /** Array.prototype.contain — 是否包含元素 */
-(Array.prototype as unknown as Record<string, Function>).contain = function <T>(this: T[], item: T): boolean {
+Array.prototype.contain = function <T>(this: T[], item: T): boolean {
   for (let i = 0; i < this.length; i++) {
     if (this[i] === item) {
       return true;
@@ -44,13 +44,13 @@ import('./skill/skill.js').then(m => { _SKILL = m.SKILL as unknown as Record<str
 };
 
 /** Array.prototype.random — 随机获取数组元素 */
-(Array.prototype as unknown as Record<string, Function>).random = function <T>(this: T[], limit?: number): T {
+Array.prototype.random = function <T>(this: T[], limit?: number): T {
   limit = limit || this.length;
   return this[Math.floor(Math.random() * this.length)] as T;
 };
 
 /** JSON.toObject — 使用 JSON5 解析（支持尾逗号等） */
-(JSON as unknown as Record<string, Function>).toObject = function (str: string): unknown {
+JSON.toObject = function (str: string): unknown {
   return JSON5.parse(str);
 };
 
@@ -319,7 +319,7 @@ export const UTIL = {
     if (!this.logs.length) return;
     const fs = require("fs") as typeof import('fs');
     const dt = new Date();
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "log/";
+    const path = __PATH.DATA + "log/";
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }

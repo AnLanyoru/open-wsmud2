@@ -614,7 +614,7 @@ export class SKILL extends BASE {
         const pot = this.query_needexp(skill.level, me);
         const lv = pot * 2 / 5 / (target_skill.grade + 1);
         const newSkill: any = {
-            level: parseInt(Math.pow(lv, 0.5) as any),
+            level: parseInt(Math.pow(lv, 0.5)),
             exp: 0,
             enable_skill: null
         };
@@ -888,7 +888,7 @@ export class SKILL extends BASE {
         str.push("</");
         str.push(color);
         str.push(">");
-        if (pname) lv = parseInt(lv / 2 as any);
+        if (pname) lv = parseInt(lv / 2);
         str.push("\n内力消耗：");
         str.push(p_item.query_mp(me, lv));
         str.push("\t出招时间：");

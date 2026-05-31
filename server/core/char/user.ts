@@ -1274,7 +1274,7 @@ export class USER extends CHARACTER {
     if ((this as any).parry_skill && (this as any).parry_skill.on_recount_parry) {
       this.zj += (this as any).parry_skill.on_recount_parry(this);
     }
-    this.bj = parseInt((this.dex / 10 + this.query_prop('bj_per')) as any);
+    this.bj = parseInt(this.dex / 10 + this.query_prop('bj_per'));
     (this as any).diff_sh_per = this.query_prop('diff_sh_per');
     (this as any).diff_fy_per = this.query_prop('diff_fy_per');
   }

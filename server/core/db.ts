@@ -24,7 +24,7 @@ interface DBInterface {
 }
 
 /** 数据库实例（由启动脚本注入到 __CONFIG.DB） */
-const DB: DBInterface = (globalThis as any).__CONFIG.DB;
+const DB: DBInterface = __CONFIG.DB;
 
 /** 角色存档数据 */
 interface RoleData {
@@ -110,7 +110,7 @@ export default {
    */
   async saveRoles(roles: RoleData[]): Promise<void> {
     const dt = new Date();
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
+    const path = __PATH.DATA + "bak/data" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() + "-" + dt.getHours() + ".js";
     const stream = fs_sync.createWriteStream(path, { flags: 'a' });
     try {
       stream.write('[');
@@ -154,7 +154,7 @@ export default {
   saveRequest(recs: RequestLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "req/request" + f + ".txt";
+    const path = __PATH.DATA + "req/request" + f + ".txt";
     const ary: (string | number)[] = [];
     for (let i = 0; i < recs.length; i++) {
       const r = recs[i]!;
@@ -175,7 +175,7 @@ export default {
   saveLogs(logs: ErrorLog[]): Promise<void> {
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "log/log" + f + ".txt";
+    const path = __PATH.DATA + "log/log" + f + ".txt";
     const ary: (string | number)[] = [];
     for (let i = 0; i < logs.length; i++) {
       const r = logs[i]!;
@@ -196,10 +196,10 @@ export default {
    * @param content - 序列化后的 JSON 字符串
    */
   async saveData(content: string): Promise<void> {
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "data.js";
+    const path = __PATH.DATA + "data.js";
     const dt = new Date();
     const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
-    const tempDir = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "temp/";
+    const tempDir = __PATH.DATA + "temp/";
     if (!await this.check_file(tempDir)) {
       await fs.mkdir(tempDir);
     }
@@ -214,10 +214,10 @@ export default {
    * 从文件读取全局数据
    */
   async readData(): Promise<any> {
-    const path = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + "data.js";
+    const path = __PATH.DATA + "data.js";
     try {
       const data = await fs.readFile(path);
-      return (JSON as unknown as { toObject: (str: Buffer) => unknown }).toObject(data);
+      return JSON.toObject(data.toString());
     } catch (error) {
       console.error('数据读取失败', path, error);
     }
@@ -278,23 +278,23 @@ export default {
    * 并从模板目录复制默认数据文件
    */
   async initDataDir(): Promise<void> {
-    (globalThis as { __PATH: Record<string, string> }).__PATH.BASE_DATA = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA;
-    (globalThis as { __PATH: Record<string, string> }).__PATH.DATA = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + WORLD.SERVERID + "/";
+    __PATH.BASE_DATA = __PATH.DATA;
+    __PATH.DATA = __PATH.DATA + WORLD.SERVERID + "/";
 
-    if (!await this.check_file((globalThis as { __PATH: Record<string, string> }).__PATH.DATA)) {
+    if (!await this.check_file(__PATH.DATA)) {
       console.log('创建备份文件夹....');
-      await fs.mkdir((globalThis as { __PATH: Record<string, string> }).__PATH.DATA);
+      await fs.mkdir(__PATH.DATA);
     }
     for (const sub of ['bak', 'log', 'req', 'temp']) {
-      const dir = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + sub;
+      const dir = __PATH.DATA + sub;
       if (!await this.check_file(dir)) {
         await fs.mkdir(dir);
       }
     }
-    const paths = await fs.readdir((globalThis as { __PATH: Record<string, string> }).__PATH.DEF_DATA);
+    const paths = await fs.readdir(__PATH.DEF_DATA);
     for (let i = 0; i < paths.length; i++) {
-      const _src = (globalThis as { __PATH: Record<string, string> }).__PATH.DEF_DATA + paths[i];
-      const _dst = (globalThis as { __PATH: Record<string, string> }).__PATH.DATA + paths[i];
+      const _src = __PATH.DEF_DATA + paths[i];
+      const _dst = __PATH.DATA + paths[i];
       if (!await this.check_file(_dst)) {
         const stat = await fs.stat(_src);
         if (stat.isFile()) {

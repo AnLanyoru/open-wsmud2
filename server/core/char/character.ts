@@ -13,7 +13,7 @@ import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
-import type { ROOM } from '../room/room.js';
+import type { ROOM as RoomClass } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { OddsEntry } from '../item/obj.js';
 
@@ -168,7 +168,7 @@ export class CHARACTER extends ITEM {
   // ============ 环境与交互 ============
 
   /** 当前所在房间 */
-  environment: ROOM | null = null;
+  environment: RoomClass | null = null;
   /** 当前活动状态 */
   state: any = null;
   /** 等待用户输入的回调 */
@@ -1681,7 +1681,7 @@ export class CHARACTER extends ITEM {
     const cur_room = this.environment;
     let next_room = rm;
     if (typeof rm === 'string') {
-      const _ROOM = (globalThis as any).ROOM;
+      const _ROOM = ROOM;
       next_room = _ROOM.Get(rm);
       if (!next_room) return false;
       if (cur_room && next_room.parent === cur_room.parent) {

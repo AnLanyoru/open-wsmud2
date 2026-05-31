@@ -2,6 +2,14 @@
 // 全局类型声明 — 原型扩展 + 运行时全局变量
 // ============================================================
 
+// --- parseInt 扩展重载 — 接受 number（防御性编程） ---
+declare function parseInt(s: string | number, radix?: number): number;
+
+// --- Function 原型扩展 (来自 util.ts) ---
+interface Function {
+  inherits(superCtor: Function): void;
+}
+
 // --- 数组原型扩展 (来自 util.ts) ---
 interface Array<T> {
   remove(item: T): boolean;

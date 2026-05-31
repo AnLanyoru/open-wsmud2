@@ -684,7 +684,7 @@ class World implements IWorld {
    */
   async startup(sid?: number): Promise<void> {
     if (sid) {
-      sid = parseInt(sid as any);
+      sid = parseInt(sid);
       this.SERVERS = (await db.getServers()) as ServerConfig[];
       this.SERVER = this.getServer(sid);
     } else {
