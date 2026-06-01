@@ -33,6 +33,10 @@ export interface DataObject {
     PAIMAI: Map<string, any>;
     /** 运行时临时数据 */
     temp: Record<string, any>;
+    /** 活动开始时间戳（世界活动用） */
+    act_stime?: number;
+    /** 活动结束时间戳（世界活动用） */
+    act_etime?: number;
     /** 经验等级倍率表 */
     exps: number[];
     /** 宝石价值表 */

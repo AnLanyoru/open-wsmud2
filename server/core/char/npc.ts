@@ -68,10 +68,39 @@ export class NPC extends CHARACTER {
   /** 是否为 NPC */
   is_npc: boolean = true;
 
+  // ============ 运行时动态属性（由任务/战斗系统注入） ============
+
+  /** 难度等级（BOSS/襄阳守城动态设置） */
+  diff_level?: number;
+  /** 自动绝招释放概率（0-1） */
+  pfm_rate?: number;
+  /** 襄阳守城：是否大宋守军 */
+  is_dasong?: boolean;
+  /** 襄阳守城：是否蒙古兵 */
+  is_menggubing?: boolean;
+  /** 襄阳守城：所属城门索引 */
+  gate_index?: number;
+  /** 襄阳守城：是否城墙守军 */
+  iswall?: boolean;
+  /** BOSS任务：BOSS等级索引 */
+  boss_index?: number;
+  /** BOSS任务：最小副本索引 */
+  min_fbindex?: number;
+  /** BOSS任务：关联活动事件ID */
+  event_id?: string;
+  /** 掉落分配：是否禁止队伍分配 */
+  no_alloc?: boolean;
+  /** 追杀任务：玩家查询（npc.query_temp("player")）复用 CHARACTER 的 query_temp */
+
+  // ============ 运行时方法（由资源文件注入） ============
+
+  /** 根据玩家属性初始化 NPC（衙门/追杀 NPC 用） */
+  init_from(player: Record<string, any>, ...args: any[]): void {}
+
   // ============ 回调字段（由资源文件设置） ============
 
   /** 拜师回调 — 触发时机：玩家执行 bai 命令时；返回 CHARACTER 可指定师傅，返回 false 拒绝拜师 */
-  on_master?: (me: Record<string, any>) => CHARACTER | false | void;
+  on_master?(me: Record<string, any>): CHARACTER | false | void;
   /** 检查技能/学习回调 — 触发时机：玩家执行 cha 命令查看可学技能时；返回 false 阻止学习 */
   on_checkskill?: (me: CHARACTER) => boolean | void;
   /** 绝招触发回调 — 触发时机：NPC 自动释放绝招之前 */
@@ -80,6 +109,8 @@ export class NPC extends CHARACTER {
   on_makelove?: (me: Record<string, any>) => void;
   /** 主人进入回调 — 触发时机：主人（master）进入 NPC 所在房间时 */
   on_master_enter?: (me: Record<string, any>) => void;
+  /** 击杀回调 — 触发时机：BOSS/任务 NPC 被击杀时（由 world/ 资源文件设置） */
+  on_kill?(killer: Record<string, any>): void;
   constructor() {
     super();
   }

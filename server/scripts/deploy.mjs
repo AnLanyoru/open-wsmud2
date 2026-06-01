@@ -1,7 +1,7 @@
 /**
  * deploy.mjs — 将编译产物从 server/dist/core/ 部署到 os/
  */
-import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { dirname, join, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -56,3 +56,38 @@ writeFileSync(dataJs, "export { default } from '../db.js';\n", 'utf-8');
 
 console.log(`部署完成: ${count} 个文件复制到 ${DEST}`);
 console.log(`  wrapper: os/util/data.js`);
+
+// ============================================================
+// Phase 2: 部署 server/dist/res/ → world/ (路径重写 core/ → os/)
+// ============================================================
+const RES_SRC = join(ROOT, 'server', 'dist', 'res');
+const RES_DEST = join(ROOT, 'world');
+
+if (existsSync(RES_SRC)) {
+  const resFiles = walkDir(RES_SRC);
+  let resCount = 0;
+
+  for (const src of resFiles) {
+    if (!src.endsWith('.js') && !src.endsWith('.js.map')) continue;
+
+    const rel = relative(RES_SRC, src);
+    const dest = join(RES_DEST, rel);
+    const destDir = dirname(dest);
+
+    if (!existsSync(destDir)) {
+      mkdirSync(destDir, { recursive: true });
+    }
+
+    if (src.endsWith('.js')) {
+      // 重写 import 路径: core/ → os/
+      let content = readFileSync(src, 'utf-8');
+      content = content.replace(/(from\s+["'](?:\.\.\/)+)core\//g, '$1os/');
+      writeFileSync(dest, content, 'utf-8');
+    } else {
+      copyFileSync(src, dest);
+    }
+    resCount++;
+  }
+
+  console.log(`资源部署完成: ${resCount} 个文件复制到 ${RES_DEST} (路径已重写)`);
+}

@@ -103,9 +103,9 @@ export class SKILL extends BASE {
     /** 学习技能回调 — 触发时机：玩家执行学习命令时（do_learn() 开头）；返回 false 阻止学习 */
     on_learn?: (me: CHARACTER) => boolean | void;
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
-    query_enable_prop?: (lv: number, me?: CHARACTER) => Record<string, Record<string, any>> | undefined;
+    query_enable_prop(lv: number, me?: CHARACTER): Record<string, Record<string, any>> | undefined { return undefined; }
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
-    query_prop?: (lv: number, me?: CHARACTER) => Record<string, any> | undefined;
+    query_prop(lv: number, me?: CHARACTER): Record<string, any> | undefined { return undefined; }
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
     on_enemy_die?: (me: CHARACTER, target: CHARACTER) => void;
 
@@ -248,11 +248,11 @@ export class SKILL extends BASE {
      */
     release_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
-        const base_prop = this.query_prop ? this.query_prop(lv, me) : undefined;
+        const base_prop = this.query_prop(lv, me);
         if (base_prop) {
             me.change_prop(base_prop, false);
         }
-        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        const enable_prop = this.query_enable_prop(lv, me);
         if (enable_prop) {
             for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
@@ -275,11 +275,11 @@ export class SKILL extends BASE {
      */
     attach_prop(me: CHARACTER, lv: number): void {
         if (!lv) return;
-        const base_prop = this.query_prop ? this.query_prop(lv, me) : undefined;
+        const base_prop = this.query_prop(lv, me);
         if (base_prop) {
             me.change_prop(base_prop, true);
         }
-        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        const enable_prop = this.query_enable_prop(lv, me);
         if (enable_prop) {
             for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
@@ -383,7 +383,7 @@ export class SKILL extends BASE {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
-        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        const enable_prop = this.query_enable_prop(lv, me);
         if (enable_prop) {
             const type_prop = enable_prop[type];
             if (type_prop) {
@@ -407,7 +407,7 @@ export class SKILL extends BASE {
     disenable(me: CHARACTER, type: string): boolean {
         this.on_disenable && this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
-        const enable_prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        const enable_prop = this.query_enable_prop(lv, me);
         if (enable_prop) {
             const type_prop = enable_prop[type];
             if (type_prop) {
@@ -811,7 +811,7 @@ export class SKILL extends BASE {
 
         str.push(this.desc);
         str.push("\n");
-        let prop = this.query_prop ? this.query_prop(lv, me) : undefined;
+        let prop = this.query_prop(lv, me);
         if (prop) {
             str.push("<");
             str.push(cc);
@@ -821,7 +821,7 @@ export class SKILL extends BASE {
             str.push(cc);
             str.push(">\n");
         }
-        prop = this.query_enable_prop ? this.query_enable_prop(lv, me) : undefined;
+        prop = this.query_enable_prop(lv, me);
         let isEnable = this.type === SKILL_TYPES.KNOWLEDGE;
         if (prop) {
             for (let item in prop) {

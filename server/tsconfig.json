@@ -23,6 +23,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["core/**/*.ts", "types/**/*.ts", "globals.d.ts"],
+  "include": ["core/**/*.ts", "types/**/*.ts", "res/**/*.ts", "globals.d.ts"],
   "exclude": ["dist", "node_modules"]
 }

@@ -127,11 +127,11 @@ export class ROOM extends ITEM {
     // ============ 回调（由资源文件设置） ============
 
     /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
-    on_leave?: (obj: Record<string, any>, dir: string) => boolean | void;
+    on_leave(obj: Record<string, any>, dir: string): boolean | void { return; }
     /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
-    on_before_enter?: (obj: Record<string, any>) => void;
+    on_before_enter(obj: Record<string, any>): void { return; }
     /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
-    on_enter?: (obj: Record<string, any>) => void;
+    on_enter(obj: Record<string, any>): void { return; }
     /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
     on_heart_beat?: (dt: number) => void;
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
@@ -150,7 +150,7 @@ export class ROOM extends ITEM {
      * @param leave_msg - 离开消息
      */
     do_leave(obj: OBJ | CHARACTER | NPC | USER, dir: string, leave_msg: string): boolean | undefined {
-        if (this.on_leave && this.on_leave(obj, dir) == false) {
+        if (this.on_leave(obj, dir) == false) {
             return false;
         }
         if (this.item_changed(obj, false, leave_msg, dir) == false) {
@@ -171,7 +171,7 @@ export class ROOM extends ITEM {
             this.send_exits(obj);
         }
         this.item_changed(obj, true, in_msg);
-        this.on_enter && this.on_enter(obj);
+        this.on_enter(obj);
     }
 
     /**

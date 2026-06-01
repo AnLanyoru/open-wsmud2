@@ -1,0 +1,18 @@
+import { EQUIPMENT } from "../../../../core/item/equipment.js";
+import { EQUIP_TYPE } from "../../../../core/const.js";
+
+export default class extends EQUIPMENT {
+    name = "神龙靴";
+    desc = "神龙教管理层的制服靴子";
+    unit = "件";
+    grade = 2;
+    eq_type = EQUIP_TYPE.SHOES;
+    value = 30000;
+    hole_count = 1;
+    prop = {
+        fy: 25,
+        max_hp:180,
+        dex: 6
+    };
+}
+

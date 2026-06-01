@@ -8,6 +8,11 @@ import { WORLD } from "../world.js";
 
 export class TASK extends BASE {
 
+    /** 定时器句柄（子类用于存放 setTimeout/setInterval 返回值） */
+    time_handler: ReturnType<typeof setTimeout> | null = null;
+    /** 备用定时器句柄 */
+    handler: ReturnType<typeof setTimeout> | null = null;
+
     constructor() {
         super();
     }

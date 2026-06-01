@@ -1,0 +1,38 @@
+import { CONTAINER } from "../../../core/item/container.js";
+import { WORLD } from "../../../core/world.js";
+import { OBJ } from "../../../core/item/obj.js";
+
+export default class extends CONTAINER {
+    name = "婚宴礼桌";
+    desc = "这是醉仙楼的宴席桌子，上面放满了各种好吃的。";
+    unit = "个";
+    value = 0;
+    grade = 1;
+    combined = false;
+    no_get = true;
+    no_alloc = true;
+
+    on_create(path, par) {
+    var lv = 0;
+    if (par) {
+        lv = parseInt(par.substr(1));
+        if (!(lv > 0 && lv < 6)) lv = 0;
+    }
+    this.grade = lv;
+}
+    query_items(me) {
+    if (me.query_temp("get_marry") || !WORLD.DATA.query_temp("marry")) return;
+    var items = [];
+    var count = 1;
+    if (me.id == WORLD.DATA.query_temp("mar1") || me.id == WORLD.DATA.query_temp("mar2")) count = 3;
+    for (var i = 0; i < this.grade; i++) {
+        var obj = OBJ.CREATE("food/marry#" + (this.random(3) + 3 * i), count);
+        items.push(obj);
+    }
+    return items;
+}
+    clear_items(me) {
+    me.set_temp("get_marry", 1, 60000 * 30);
+}
+}
+

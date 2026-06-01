@@ -543,4 +543,7 @@ export const UTIL = {
 
     return items[left]!;
   },
+
+  /** 敏感词替换（由 world/cmd/channel/filter.js 注入实现） */
+  replace_word(str: string): string { return str; },
 };

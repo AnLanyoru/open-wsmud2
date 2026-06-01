@@ -52,7 +52,7 @@ export class FAMILY extends BASE {
     /** 门派战结算回调 — 触发时机：玩家领取门派战战利品时 */
     battle_settle?: (...args: any[]) => void;
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
-    on_kill?: (killer: Record<string, any>, victim: Record<string, any>) => void;
+    on_kill(killer: Record<string, any>, victim: Record<string, any>): void {}
 
     // ============ 资源文件设置属性 ============
 
@@ -67,7 +67,7 @@ export class FAMILY extends BASE {
     /** 门派隐藏/知识类技能列表（type=KNOWLEDGE 或 is_hidden） */
     skills0: SKILL[] = [];
     /** 默认NPC定义 */
-    def_npcs?: [string, string][];
+    def_npcs?: string[][];
     /** 掌门NPC路径 */
     boss_path?: string;
     /** 掌门NPC */
@@ -93,12 +93,12 @@ export class FAMILY extends BASE {
     /** 门派功绩排行榜 */
     tops?: Record<string, { name: string; score: number }>;
 
-    // ============ 回调（由资源文件设置） ============
+    // ============ 回调（由资源文件覆写为方法） ============
 
     /** 门派称谓回调 — 传入角色，返回该角色在门派的称呼 */
-    call?: (me: Record<string, any>, isbad?: boolean) => string;
+    call(me: Record<string, any>, isbad?: boolean): string { return ''; }
     /** 自称回调 — 传入角色，返回该角色在门派的自称 */
-    call_me?: (me: Record<string, any>) => string;
+    call_me(me: Record<string, any>, isbad?: boolean): string { return ''; }
 
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
@@ -115,11 +115,10 @@ export class FAMILY extends BASE {
 
     /**
      * 设置门派称谓
-     * @param arguments - 称谓列表
      */
-    set_titles(): void {
-        for (let i = 0; i < arguments.length; i++) {
-            this.titles.push(arguments[i]);
+    set_titles(...args: string[]): void {
+        for (let i = 0; i < args.length; i++) {
+            this.titles.push(args[i]);
         }
     }
 
@@ -201,7 +200,7 @@ export class FAMILY extends BASE {
     /**
      * 创建门派随机名字
      */
-    create_name(): string {
+    create_name(npc?: Record<string, any>): string {
         return UTIL.random_name(this.gender ?? 0);
     }
 
@@ -396,7 +395,7 @@ export class FAMILY extends BASE {
      * 创建门派战活动事件 — 供 EVENTS.add 注册到活动面板
      * @returns 活动事件对象
      */
-    create_event(): any {
+    create_event(fam?: FAMILY): any {
         let target_fam = FAMILIES[this.battle_family!];
         return {
             id: this.id + "_bat",

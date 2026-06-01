@@ -24,10 +24,10 @@ export interface EventItem {
     check?: (user: Record<string, any>) => boolean;
     /** 活动按钮点击回调 — 触发时机：玩家在活动面板中点击该活动按钮时 */
     on_command?: (me: Record<string, any>) => void;
-    /** 查询活动描述（由 EVENT_BASE 原型提供默认实现） */
-    query_desc(): string;
-    /** 查询活动品级（由 EVENT_BASE 原型提供默认实现） */
-    query_grade(): number;
+    /** 查询活动描述（由 EVENTS.add 通过 EVENT_BASE 原型注入默认实现） */
+    query_desc?(): string;
+    /** 查询活动品级（由 EVENTS.add 通过 EVENT_BASE 原型注入默认实现） */
+    query_grade?(): number;
 }
 
 /**

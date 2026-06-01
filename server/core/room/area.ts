@@ -318,4 +318,7 @@ export class AREA extends BASE {
             return me.isenable_area(this);
         return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
     }
+
+    /** 按 ID 获取副本区域（由 world/cmd/dialog/jh.js 注入实现） */
+    static Get_FB(_id: string): AREA | undefined { return undefined; }
 }

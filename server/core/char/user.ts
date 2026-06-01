@@ -142,6 +142,8 @@ export class USER extends CHARACTER {
   request_count: number = 0;
   /** 等待用户输入的回调 */
   wait_input: ((me: CHARACTER, req: string) => void) | null = null;
+  /** 向玩家发送选择题（由 world/cmd/action/answer.js 注入 USER.prototype） */
+  send_question?(npc: any, list: any[], callbacks: any[]): void;
 
   // ============ 权限与状态 ============
 
