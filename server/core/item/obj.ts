@@ -91,8 +91,6 @@ export class OBJ extends ITEM {
     json: string | null = null;
     /** 临时数据 */
     temp: Record<string, any> | null = null;
-    /** 最大堆叠数量 */
-    combine_count: number = 999;
     /** 是否已锁定 */
     is_locked: boolean = false;
     /** 是否快捷栏物品 — EQUIPMENT 专用 */
@@ -103,6 +101,14 @@ export class OBJ extends ITEM {
     is_container: boolean = false;
     /** 容器是否已打开 — CONTAINER/CORPSE 专用 */
     is_open: boolean = false;
+
+    // =========== 技能书特有属性 ============
+    /** 技能书/残页记录的技能id */
+    skill?: string;
+    /** 合成的物品路径 */
+    combine_to?: string;
+    /** 合成所需数量 */
+    combine_count: number = 999;
 
     // ============ 回调函数（由资源文件或子类设置） ============
 

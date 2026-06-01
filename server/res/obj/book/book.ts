@@ -13,10 +13,10 @@ export default class extends OBJ {
 
     constructor() {
         super();
-        this.add_action('sbook', '存到技能仓库', function (me) {
+        this.add_action('sbook', '存到技能仓库',  (me) => {
             WORLD.COMMANDS.sbook.enter(me, this.id);
         });
-        this.add_action('split', '拆分', function (me) {
+        this.add_action('split', '拆分',  (me) => {
             WORLD.COMMANDS.sbook.split_book(me, this);
         });
     }

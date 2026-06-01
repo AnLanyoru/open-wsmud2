@@ -5,6 +5,7 @@
 import { BASE } from './base.js';
 import { WORLD } from './world.js';
 import type { CHARACTER } from './char/character.js';
+import type { OBJ } from './item/obj.js';
 
 export class COMMAND extends BASE {
 
@@ -82,6 +83,8 @@ export class COMMAND extends BASE {
     allow_level: number = 0;
     /** 允许在登录前执行 */
     allow_login: boolean = false;
+    /** 拆分动作 */
+    split_book(player: CHARACTER, book: OBJ): void {}
 
     /**
      * 命令状态检查，可由子类通过 overrides 覆写允许标志

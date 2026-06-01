@@ -8,11 +8,11 @@ export default class extends COMMAND {
     allow_login = true;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, pars) {
+    enter(me: CHARACTER, par: string) {
     if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
-    pars = pars.split(' ');
+    let pars = par.split(' ');
     var name = pars[0], gender = parseInt(pars[1]),
         str = parseInt(pars[2]), con = parseInt(pars[3]), dex = parseInt(pars[4]), int = parseInt(pars[5]);
 

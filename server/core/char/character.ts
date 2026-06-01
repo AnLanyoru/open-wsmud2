@@ -249,6 +249,7 @@ export type TeamData = CHARACTER[] & {
     objs?: { id: string; color_name: string; unit: string; dice: { users: string[]; num: number; user: string } }[];
 };
 
+/** 角色类 */
 // ITEM 来自旧版 JS 模块，运行时路径正确
 export class CHARACTER extends ITEM {
 

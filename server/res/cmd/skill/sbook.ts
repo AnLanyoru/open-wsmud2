@@ -21,10 +21,10 @@ export default class extends COMMAND {
     if (!arg) return this.render_books(player);
     if (arg === 'clear') return this.clear_base(player);
     if (arg.length < 4) return this.check_books(player, arg);
-    const book = player.find_obj(arg);
+    const book = player.find_obj(arg) as OBJ;
     if (!book || !book.path.startsWith('book/book#'))
         return player.send('你要存储什么秘籍？');
-    var skill = SKILL.get(book.skill);
+    var skill = SKILL.get(book.skill!);
     if (!skill) return player.send('没有这个武功可以存储。');
     if (skill.type === SKILL_TYPES.BASE) {
         player.send('基础武功不用保存。');
@@ -39,9 +39,9 @@ export default class extends COMMAND {
     }
     else {
         if (!player.books) player.books = [];
-        if (player.books.indexOf(book.skill) > -1)
+        if (player.books.indexOf(book.skill!) > -1)
             return player.send('你的书架上已经有' + skill.color_name + "了。");
-        player.books.push(book.skill);
+        player.books.push(book.skill!);
         player.send('<hic>你将' + book.unit_name(1) + '存放到书架。</hic>');
         player.remove_obj(book, 1);
         player.send(`{"type":"dialog","dialog":"skills","book":["${skill.name}",${skill.grade},${player.books.length - 1}]}`);
@@ -106,11 +106,11 @@ export default class extends COMMAND {
     return false;
 
 }
-    split_book(player: USER, book: BOOK) {
+    split_book(player: USER, book: OBJ) {
     let books = player.books ?? [];
-    if (books.indexOf(book.skill) < 0) return player.notify('你只能把已经存放到书架的' + book.color_name + "拆分为秘籍残页。");
+    if (books.indexOf(book.skill!) < 0) return player.notify('你只能把已经存放到书架的' + book.color_name + "拆分为秘籍残页。");
 
-    let skill = SKILL.get(book.skill);
+    let skill = SKILL.get(book.skill!);
     if (!skill) return player.notify('没有这个武功秘籍。');
     if (skill.grade < 1) return player.notify('基础功法和知识类秘籍不能拆分。');
     let count = COMBINED[skill.grade];

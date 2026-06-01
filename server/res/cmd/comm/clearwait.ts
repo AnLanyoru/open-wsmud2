@@ -5,9 +5,9 @@ export default class extends COMMAND {
     command = "clearwait";
 
     /**
-     * @param {CHARACTER} player - 执行命令的角色
+     * @param player - 执行命令的角色
      */
-    enter(player, arg, par) {
+    enter(player: CHARACTER) {
     player.wait_input = null;
 }
 }
