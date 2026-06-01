@@ -335,20 +335,36 @@ export class NPC extends CHARACTER {
     if (obj) return;
     const npc = NPC.CLONE(this.path);
     room.item_changed(npc, true);
-    this.die_room = null;
-    this.equipment = null;
-    this.items = null;
-    this.skills = null;
+    this.dispose();
   }
 
   /**
-   * 销毁 NPC
+   * 销毁 NPC（从房间移除）
    */
   destroy(msg?: string): void {
     if (this.environment) {
       this.environment.item_changed(this, false, msg);
     }
     this.clear_follow();
+  }
+
+  /**
+   * 彻底释放旧对象引用，确保 GC 可回收。
+   * 仅应在旧 NPC 已被新克隆体替代后调用（如 relive）。
+   */
+  private dispose(): void {
+    if (this.attack_handler) {
+      clearTimeout(this.attack_handler);
+      this.attack_handler = null;
+    }
+    if (this.enemy) this.enemy.length = 0;
+    this.fight_type = 0;
+    this.die_room = undefined;
+    this.environment = undefined;
+    this.equipment = null;
+    this.items = null;
+    this.skills = null;
+    this.json = null;
   }
 
   // ================================================================

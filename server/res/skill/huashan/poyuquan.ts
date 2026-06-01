@@ -1,5 +1,5 @@
 import { SKILL } from "../../../core/skill/skill.js";
-import type { EnablePropMap, LearnCondition } from "../../../core/skill/skill.js";
+import type { EnablePropMap, LearnCondition, PERFORM } from "../../../core/skill/skill.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 import { WEAPON_TYPE } from "../../../core/const.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
@@ -27,7 +27,7 @@ export default class extends SKILL {
             unarmed: 50
         }
     };
-    pfm_set = {
+    pfm_set: Record<string, Partial<PERFORM>> = {
         po: {
             name: "破玉",
             distime: 16000,
@@ -56,7 +56,7 @@ export default class extends SKILL {
             enable_skill: "unarmed",
             weapon_type: WEAPON_TYPE.UNARMED,
             mp: 25,
-            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+            use: function (me, target, lv) {
                 let par: DoAttackPar = {
                     gj: me.gj,
                     mz: me.mz,
