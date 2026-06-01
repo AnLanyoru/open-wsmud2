@@ -26,6 +26,9 @@ export class CORPSE extends CONTAINER {
     /** 来源角色 ID（由 init 设置） */
     fromid?: string;
 
+    /** BOSS任务：伤害查询回调（由资源文件动态设置） */
+    query_damage?: () => string;
+
     /**
      * 禁止直接拾取尸体
      * @param player - 玩家对象

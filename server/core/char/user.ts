@@ -121,8 +121,6 @@ export class USER extends CHARACTER {
   name!: string;
   /** 角色等级 */
   level: number = 0;
-  /** 角色称号 */
-  title?: string;
   /** 所属门派 */
   family: FAMILY = FAMILIES.NONE;
 
@@ -182,7 +180,7 @@ export class USER extends CHARACTER {
   /** 技能组定义 */
   sk_groups: (string[] | null)[] | null = null;
   /** 秘籍列表 */
-  books: string[] | null = null;
+  books: string[] = [];
 
   // ============ 社交与随从 ============
 
@@ -759,9 +757,9 @@ export class USER extends CHARACTER {
   /**
    * 添加称号
    */
-  add_title(title: string, type: string): void {
+  add_title(title: string | null, type: string): void {
     if (!this.titles) this.titles = [];
-    const obj: { title: string; type: string; use?: boolean } = { title, type };
+    const obj  = { title, type, use: false };
     for (let i = 0; i < this.titles.length; i++) {
       if (this.titles[i].type == type) {
         obj.use = this.titles[i].use;
@@ -780,7 +778,7 @@ export class USER extends CHARACTER {
           title = this.titles[0].title;
         }
       }
-      this.title = title;
+      this.title = title ?? undefined;
       this.color_name = '';
       if (this.environment) {
         this.environment.item_changed(this, true);
@@ -1047,11 +1045,11 @@ export class USER extends CHARACTER {
               str.push('{id:"');
               str.push(base_type + '.' + p);
               str.push('",name:"');
-              str.push(pfmitem.query_name(this, base_type));
+              str.push(pfmitem.query_name?.(this, base_type) || "");
               str.push('"');
               if (pfmitem.distime) {
                 str.push(',distime:');
-                str.push(pfmitem.query_distime(this).toString());
+                str.push(pfmitem.query_distime?.(this).toString() || "0");
               }
               str.push('}');
             }
@@ -1063,7 +1061,7 @@ export class USER extends CHARACTER {
               str.push('{id:"');
               str.push(bases[i] + '.ref');
               str.push('",name:"');
-              str.push(pfmitem.query_name(this, base_type));
+              str.push(pfmitem.query_name?.(this, base_type) || "");
               str.push('"');
               if (pfmitem.distime) {
                 str.push(',distime:');

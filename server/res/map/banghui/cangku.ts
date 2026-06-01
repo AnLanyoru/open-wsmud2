@@ -1,7 +1,8 @@
 import { ROOM } from "../../../core/room/room.js";
 import { WORLD } from "../../../core/world.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
-export default class extends ROOM {
+export default class MapRoom extends ROOM {
     name = "仓库";
     desc = "这里是你帮派的仓库，一扇厚厚的铁门紧锁着，里面堆满了你们帮会的战利品，仓库管理员可以在这里选择怎么处理这些战利品。";
     exits = { "south": "banghui/juyitang" };
@@ -9,16 +10,16 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("roll", "掷骰子", function (me, par) {
+        this.add_action("roll", "掷骰子", function (this: MapRoom, me: CHARACTER) {
             let rad = me.random(100) + 1;
 
             me.send_room(rollDesc.random() + "，稳稳停在了" + rad + "点。");
         });
-        this.add_action("pandian", "仓库盘点", function (me, par) {
+        this.add_action("pandian", "仓库盘点", function (this: MapRoom, me: CHARACTER) {
             WORLD.COMMANDS["party"].enter(me, 'stores');
 
         });
-        this.add_action("alloc", "分配战利品", function (me, par) {
+        this.add_action("alloc", "分配战利品", function (this: MapRoom, me: CHARACTER) {
 
             WORLD.COMMANDS["party"].enter(me, 'alloc');
 

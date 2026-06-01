@@ -12,7 +12,7 @@ export default class extends SKILL {
         "但是$n身子一侧，闪了开去。",
         "但是被$p及时避开。",
         "但是$n已有准备，不慌不忙的躲开。"];
-    query_prop = lv => ({ dex: parseInt(lv / 10) });
+    query_prop(lv: number): Record<string, any> { return { dex: Math.floor(lv / 10) }; }
 
     constructor() {
         super();

@@ -12,7 +12,7 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, tid) {
-    let str = [];
+    let str: string[] = [];
     let notifier = me;
     if (tid) {
         if (me.user_level > 0) {
@@ -24,13 +24,13 @@ export default class extends COMMAND {
 
     str.push(me.color_name, '\n');
 
-    str.push('武道塔进度', me.query_temp('wd_level', 0), '层，已累积', this.query_wdcount(me), '份奖励\n');
+    str.push('武道塔进度', String(me.query_temp('wd_level', 0)), '层，已累积', String(this.query_wdcount(me)), '份奖励\n');
 
-    str.push('武道残页总量', me.query_temp('wds', 0), '\n');
+    str.push('武道残页总量', String(me.query_temp('wds', 0)), '\n');
     str.push('门派职位等级', me.family.query_task_title(me),
-        '，已累积', this.query_smcount(me), '份师门物资\n');
+        '，已累积', String(this.query_smcount(me)), '份师门物资\n');
     str.push('衙门职位等级', YMTITLES[me.query_temp('ym_level', 0)],
-        '，已累积', this.query_ymcount(me), '份奖励\n');
+        '，已累积', String(this.query_ymcount(me)), '份奖励\n');
 
     str.push('今日副本次数', me.query_temp('fb_count_day', 0), '/20', '\n');
     str.push('BOSS挑战', me.query_temp('bcc', 0), '/5', '\n');
@@ -47,9 +47,9 @@ export default class extends COMMAND {
         str.push('获取帝魄碎片', me.query_temp('mpcd', 0), '/1\n');
 
     str.push('获取额外', me.query_temp('sssc', 0), '/', 500 + me.query_prop('shashou'), '师门功绩\n');
-    str.push('本周已经获取襄阳军功', me.query_temp('jg_week', 0), '/', JUNGONG_LIMITS[me.level], '\n');
+    str.push('本周已经获取襄阳军功', String(me.query_temp('jg_week', 0)), '/', String(JUNGONG_LIMITS[me.level]), '\n');
 
-    str.push('已领取', me.query_temp('xy_hd', 0) * REWARDS_LIMIT[me.level], '/', REWARDS_LIMIT[me.level] * 5, '奖励军功\n');
+    str.push('已领取', String(me.query_temp('xy_hd', 0) * REWARDS_LIMIT[me.level]), '/', String(REWARDS_LIMIT[me.level] * 5), '奖励军功\n');
     notifier.send(str.join(""));
 }
     query_wdcount(me) {

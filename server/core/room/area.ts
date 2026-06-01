@@ -1,13 +1,13 @@
 /**
  * AREA 区域类 - 管理一组房间
  */
-import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 import { FAMILIES } from "../skill/family.js";
 import { NPC } from "../char/npc.js";
 import type { ROOM } from "./room.js";
 import type { USER } from "../char/user.js";
 import type { CHARACTER } from "../char/character.js";
+import type { SKILL } from "../skill/skill.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
@@ -15,10 +15,12 @@ let _ROOM: {
 } | null = null;
 import("./room.js").then((m: Record<string, any>) => { _ROOM = m.ROOM as any; });
 
-export class AREA extends BASE {
+export class AREA {
 
     // ============ 核心属性 ============
 
+    /** 资源路径(由资源加载系统设置) */
+    path?: string;
     /** 区域名称 */
     name: string = "";
     /** 区域ID */
@@ -93,6 +95,8 @@ export class AREA extends BASE {
     actions: Record<string, any> | null = null;
     /** 区域掉落物品列表 */
     drop_items: any[] | null = null;
+    /** 区域掉落列表（资源文件直接定义） */
+    drops?: string[];
 
     // ============ 动态属性(由资源文件设置) ============
 
@@ -100,6 +104,30 @@ export class AREA extends BASE {
     jd_index?: number;
     /** 解锁关卡索引 */
     unlock_index?: number;
+    /** 是否锁定（暂未开放） */
+    is_lock?: boolean;
+    /** 是否有困难难度 */
+    is_diffi?: boolean;
+    /** 首通称号 */
+    ss_title?: string;
+    /** 副本计数键名（替代默认 fbc_0_ 前缀） */
+    count_key?: string;
+    /** 起始房间路径 */
+    start_room?: string;
+    /** 是否禁用缓存 */
+    no_cache?: boolean;
+    /** 是否禁止组队 */
+    no_team?: boolean;
+    /** 特殊属性（由资源文件设置，用于 dialog JSON） */
+    sp?: string | Record<string, unknown>;
+    /** 在 getAllMaps 遍历中设置的区域索引 */
+    area_index?: number;
+    /** 门派武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills?: SKILL[];
+    /** 门派进阶武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills2?: SKILL[];
+    /** 门派终极武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills4?: SKILL[];
 
     // ============ 回调（由资源文件设置） ============
 
@@ -108,13 +136,8 @@ export class AREA extends BASE {
     /** 人物进入后回调 — 触发时机：人物首次进入该区域房间后 */
     on_enterd?: (me: CHARACTER) => void;
 
-    constructor() {
-        super();
-    }
-
     /**
      * 区域创建回调
-     * @param path
      */
     create(path: string): void {
         WORLD.AREAS.push(this);
@@ -144,7 +167,7 @@ export class AREA extends BASE {
      * 人物离开前回调
      * @param me
      */
-    on_leave(me: CHARACTER): boolean {
+    on_leave(me: CHARACTER): boolean | void {
         return true;
     }
 
@@ -152,7 +175,7 @@ export class AREA extends BASE {
      * 人物进入后回调
      * @param me
      */
-    on_enter(me: CHARACTER): boolean {
+    on_enter(me: CHARACTER): boolean | void {
         return true;
     }
 
@@ -300,8 +323,8 @@ export class AREA extends BASE {
     }
 
     /** @param me */
-    query_owner(me: { query_teamid(): string }): string {
-        return me.query_teamid();
+    query_owner(me: { query_teamid(): string | null }): string {
+        return me.query_teamid() || "";
     }
 
     /** @param me */
@@ -319,6 +342,15 @@ export class AREA extends BASE {
         return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
     }
 
+    /** 快速扫荡回调 */
+    on_quick?(me: CHARACTER): boolean | void;
+    /** 快速扫荡结束回调 */
+    on_quick_over?(me: CHARACTER): void;
+    /** 副本分数 */
+    score?: number;
+
     /** 按 ID 获取副本区域（由 world/cmd/dialog/jh.js 注入实现） */
     static Get_FB(_id: string): AREA | undefined { return undefined; }
+    /** 副本区域索引 */
+    static FBS: AREA[] | undefined;
 }

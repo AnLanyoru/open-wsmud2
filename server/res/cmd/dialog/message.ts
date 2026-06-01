@@ -18,9 +18,10 @@ export default class extends COMMAND {
         if (!arg2) return this.delete_all(me);
         return this.delete_from(me, arg2);
     }
-    var obj = {};
-    obj.type = "dialog";
-    obj.dialog = "message";
+    var obj: { type: string; dialog: string; items?: any; id?: string; messages?: any } = {
+        type: "dialog",
+        dialog: "message",
+    };
     if (arg) {
         obj.items = MESSAGE.getMessageFromID(me, arg);
         obj.id = arg;

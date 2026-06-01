@@ -17,19 +17,19 @@ export default class extends COMMAND {
      */
     enter(me, index, diff) {
     index = parseInt(index);
-    let area = AREA.FBS[index];
+    let area = AREA.FBS?.[index];
     if (!area || area.no_fb || !area.is_copy || !DIFFS[diff])
         return me.send('你要看哪个副本？');
     index = area.fb_index;
     let key = "fb_first_" + (index + 1) + "_" + diff;
-    let name = WORLD.DATA.query_temp(key);
+    let name = String(WORLD.DATA.query_temp(key) ?? '');
     let fbname = area.name + DIFFS[diff] + "模式";
     if (!name) return me.send(fbname + "尚未完成首杀。");
-    let str = ['<hic>', fbname, '由' + name + "首次通过。</hic>\n"];
+    let str: string[] = ['<hic>', fbname, '由' + name + "首次通过。</hic>\n"];
     if (diff < 2) {
         for (let fam of FAMS_TATAS) {
             key = "fb_first_" + fam + "_" + (index + 1) + "_" + diff; //每个门派的
-            name = WORLD.DATA.query_temp(key);
+            name = String(WORLD.DATA.query_temp(key) ?? '');
             if (!name) str.push(FAMILIES[fam].name, '尚未完成门派首杀。\n');
             else str.push('<hic>', FAMILIES[fam].name, '弟子', name, '完成门派首杀。</hic>\n');
         }
@@ -39,18 +39,18 @@ export default class extends COMMAND {
 }
     set_fb_first(me) {
 
-    let data = [];
+    const data: { [key: string]: { name?: string } }[] = [];
     for (let item of FB_DATAS) {
         let index = parseInt(item.fb);
         let fbs = data[index];
         if (!fbs) fbs = data[index] = {};
         fbs[item.family] = item;
     }
-    let str = [];
+    const str: string[] = [];
     for (let i = 0; i < 18; i++) {
-        let area = AREA.FBS[i];
+        let area = AREA.FBS?.[i];
         if (!area || !area.is_copy || area.not_fb) continue;
-        let fbs = data[i] ?? {};
+        let fbs: { [key: string]: { name?: string } } = data[i] ?? {};
         for (let item of FAMS_TATAS) {
             if (!fbs[item]) {
                 if (FB_MAX[item] <= i) continue;
@@ -60,8 +60,8 @@ export default class extends COMMAND {
             }
             let fam = FAMILIES[item];
             let key = "fb_first_" + item + "_" + (i + 1) + "_0"; //每个门派的
-            WORLD.DATA.set_temp(key, fbs[item].name);
-            str.push(area.name, fam.name, '设置首通', fbs[item].name, '\n');
+            WORLD.DATA.set_temp(key, fbs[item].name ?? '');
+            str.push(area.name, fam.name, '设置首通', fbs[item].name ?? '', '\n');
         }
 
     }
@@ -69,6 +69,9 @@ export default class extends COMMAND {
     me.send(str.join(""));
 }
 }
+
+/** 首杀数据（由外部填充） */
+const FB_DATAS: { fb: string; family: string; name?: string }[] = [];
 
 const DIFFS = ["普通", "困难", "组队"];
 const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',

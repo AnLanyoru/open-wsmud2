@@ -6,15 +6,18 @@
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
+import type { CHARACTER } from "../char/character.js";
 
 export class USERTASK extends BASE {
 
     /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
-    on_create(player?: Record<string, any>): any { return undefined; }
+    on_create(player?: CHARACTER): any { return undefined; }
     /** 任务启动回调（由资源文件动态注入） */
-    on_start(player?: Record<string, any>): any { return undefined; }
+    on_start(player?: CHARACTER): any { return undefined; }
     /** 任务完成回调（由资源文件动态注入） */
-    on_finish(player?: Record<string, any>): any { return undefined; }
+    on_finish(player?: CHARACTER, par?: string): any { return undefined; }
+    /** 放弃任务回调（由资源文件动态注入） */
+    giveup?(player?: CHARACTER): any;
 
     constructor() {
         super();
@@ -47,31 +50,32 @@ export class USERTASK extends BASE {
     /**
      * 查询任务标题 — 子类覆写
      */
-    query_title(player?: Record<string, any>): string | undefined { return undefined; }
+    query_title(player?: CHARACTER): string | undefined { return undefined; }
 
     /**
      * 玩家开始任务 — 子类覆写
      * @param player - 玩家角色
+     * @param target - 可选目标
      */
-    start(player?: Record<string, any>): any { return undefined; }
+    start(player?: CHARACTER, target?: CHARACTER | null): any { return undefined; }
 
     /**
      * 查询任务描述 — 子类覆写
      */
-    query_desc(player?: Record<string, any>): string | undefined { return undefined; }
+    query_desc(player?: CHARACTER): string | undefined { return undefined; }
 
     /**
      * 查询任务状态 — 子类覆写
      * @returns 0=不显示 1=进行中 2=可领取 3=已完成
      */
-    query_state(player?: Record<string, any>): number | undefined { return undefined; }
+    query_state(player?: CHARACTER): number | undefined { return undefined; }
 
     /**
      * 运行指定 ID 的任务（对玩家触发）
      * @param id - 任务 ID
      * @param player - 玩家角色
      */
-    static RUN(id: string, player: Record<string, any>): any {
+    static RUN(id: string, player: CHARACTER): any {
         for (let i = 0; i < WORLD.TASKS.length; i++) {
             if (WORLD.TASKS[i].id == id) {
                 return WORLD.TASKS[i].start(player);

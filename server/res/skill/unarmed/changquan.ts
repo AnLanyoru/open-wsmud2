@@ -1,4 +1,4 @@
-import { SKILL } from "../../../core/skill/skill.js";
+import { SKILL, PERFORM } from "../../../core/skill/skill.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 import { WEAPON_TYPE } from "../../../core/const.js";
 
@@ -70,7 +70,7 @@ export default class extends SKILL {
         weapon_type: WEAPON_TYPE.UNARMED,
         mp: 20,
         release_time: 8000,
-        use: function (me, target, lv) {
+        use: function (this: PERFORM, me, target, lv) {
 
             me.send_room("<hiy>只见$N跨立马步，稳定下盘，双拳有章有法的依次击向$n全身各处。</hiy>", target);
             target = null;
@@ -78,7 +78,7 @@ export default class extends SKILL {
             var txt = ["一", "二", "三", "四", "五", "六", "七", "八"];
 
             let gj = me.gj + me.gj * me.query_prop('tzcq_sh') / 100;
-            var time = this.query_releasetime(me, lv);
+            var time = this.query_releasetime?.(me, lv) ?? 0;
             time -= time * me.query_prop('tzcq_rt') / 100;
             if (time > 80) {
                 me.is_rash = time;
@@ -121,8 +121,8 @@ export default class extends SKILL {
 
 
         },
-        query_desc: function (me, lv) {
-            var t = this.query_releasetime(me, lv);
+        query_desc: function (this: PERFORM, me, lv) {
+            var t = this.query_releasetime?.(me, lv) ?? 0;
             return "跨立马步，稳定下盘，放弃防御专注进攻，" + Math.floor(t / 100) / 10 + "秒内快速出拳8次，攻击期间你无法躲闪";
         }
     }

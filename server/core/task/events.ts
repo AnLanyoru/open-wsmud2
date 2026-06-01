@@ -1,7 +1,6 @@
 /**
  * EVENTS 活动事件管理
  */
-import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
 
 /**
@@ -36,7 +35,7 @@ export interface EventItem {
  * 所有方法均为静态方法，不实例化。
  * 通过 WORLD.USER_EVENTS 维护活动列表，变更时广播通知符合条件的在线玩家。
  */
-export class EVENTS extends BASE {
+export class EVENTS {
 
     /** 活动操作类型（add/update/finish，对应客户端不同的展示效果） */
     static ACTIONS: string[] = ['add', 'update', 'finish'];

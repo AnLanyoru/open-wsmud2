@@ -17,6 +17,8 @@ import type { ROOM as RoomClass } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { OddsEntry } from '../item/obj.js';
 import type { NPC } from './npc.js';
+import type { GameSocket } from '../../types/world.js';
+import { StdioNull } from 'node:child_process';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -29,58 +31,200 @@ declare global {
 // 本地类型定义
 // ============================================================
 
-interface SkillData {
+export interface SkillData {
+  /** 技能等级 */
   level: number;
+  /** 技能经验值 */
   exp: number;
+  /** 启用的关联技能 ID（指向基本技能，非 null 表示已装备到某个基本技能上） */
   enable_skill: string | null;
-  [key: string]: any;
+
+  // === 启用标记：当前技能被装备到哪个基本技能（key=基本技能ID，value=true/false） ===
+  /** 是否启用为内功（force） */
+  force?: boolean;
+  /** 是否启用为轻功（dodge） */
+  dodge?: boolean;
+  /** 是否启用为招架（parry） */
+  parry?: boolean;
+  /** 是否启用为撕咬（bite） */
+  bite?: boolean;
+  /** 是否启用为空手（unarmed） */
+  unarmed?: boolean;
+  /** 是否启用为剑法（sword） */
+  sword?: boolean;
+  /** 是否启用为刀法（blade） */
+  blade?: boolean;
+  /** 是否启用为杖法（staff） */
+  staff?: boolean;
+  /** 是否启用为棍法（club） */
+  club?: boolean;
+  /** 是否启用为鞭法（whip） */
+  whip?: boolean;
+  /** 是否启用为暗器（throwing） */
+  throwing?: boolean;
+
+  // === 运行时状态 ===
+  /** 是否暂时禁用（管理员标记） */
+  disable?: boolean;
+  /** 融合技能引用路径（格式：skill_id/action_name） */
+  ref?: string;
+  /** 技能进阶槽位 ID 列表（影响技能 grade 和附加属性） */
+  addin?: string[];
 }
 
 interface AttackPart {
+  /** 部位名称 */
   name: string;
+  /** 伤害倍率 */
   hert: number;
+  /** 暴击率加成 */
   crit: number;
 }
 
+/** do_attack() 的参数对象 — 双向通信：输入字段由调用方设置，输出字段由 do_attack 写入 */
+export interface DoAttackPar {
+  // === 输入：基础 ===
+  /** 攻击目标（若缺省则取当前敌人） */
+  target?: CHARACTER;
+  /** 攻击力（默认 this.gj） */
+  gj?: number;
+  /** 命中值（默认 this.mz） */
+  mz?: number;
+
+  // === 输入：消息 ===
+  /** 攻击消息；undefined=自动生成 ""=不显示 */
+  attack_msg?: string;
+  /** 闪避消息 */
+  miss_msg?: string;
+  /** 招架消息 */
+  parry_msg?: string;
+  /** 伤害消息（可被 on_parry 回调改写） */
+  damage_msg?: string;
+  /** 拼接到 attack_msg 之前的前置文本 */
+  attack_before?: string;
+
+  // === 输入：攻击类型标记 ===
+  /** 强制空手攻击（不读取武器） */
+  no_weapon?: boolean;
+  /** 暗器攻击 */
+  is_throwing?: boolean;
+
+  // === 输入：技能回调控制 ===
+  /** 跳过 on_attack_over / on_force_over */
+  no_append?: boolean;
+  /** 跳过目标的 on_dodge_over / on_parry_over */
+  no_append_target?: boolean;
+  /** 跳过 on_before_attack */
+  no_append_before?: boolean;
+
+  // === 输入：战斗判定控制 ===
+  /** 目标不可闪避 */
+  no_dodge?: boolean;
+  /** 目标不可招架 */
+  no_parry?: boolean;
+  /** 跳过暴击和 add_sh_per 计算 */
+  no_power?: boolean;
+  /** 指定攻击部位（默认随机） */
+  part?: AttackPart;
+
+  // === 输入：伤害计算覆写 ===
+  /** 暴击率覆写（默认 this.bj），输出时补默认值 */
+  bj?: number;
+  /** 额外暴击伤害百分比 */
+  add_bjsh_per?: number;
+  /** 自定义暴击判定函数 */
+  cirt?: (target: CHARACTER, part: AttackPart | null, bj_per: number) => boolean;
+  /** 内功附加伤害（输出回写供 on_force_parry 读取） */
+  power_gj?: number;
+  /** 忽视防御百分比（0-100） */
+  diff_fy?: number;
+
+  // === 输入：回调（this 绑定为 par 自身） ===
+  /** 目标招架时回调 */
+  on_parry?: (target: CHARACTER, is_parry: boolean) => void;
+  /** 目标闪避时回调 */
+  on_dodge?: (target: CHARACTER) => void;
+
+  // === 输出字段（do_attack 内部写入，调用方读取） ===
+  /** 本次攻击是否被闪避 */
+  is_dodge?: boolean;
+  /** 本次攻击是否被招架 */
+  is_parry?: boolean;
+  /** 本次攻击是否暴击 */
+  iscirt?: boolean;
+}
+
 interface CommandDef {
+  /** 参数正则匹配 */
   regex?: RegExp;
+  /** 命令执行函数 */
   enter: (me: CHARACTER, ...args: string[]) => boolean | void;
+  /** 所需最低权限等级 */
   allow_level?: number;
+  /** 是否允许死亡状态执行 */
   allow_die?: boolean;
+  /** 是否允许昏迷状态执行 */
   allow_faint?: boolean;
+  /** 是否允许活动中执行 */
   allow_state?: boolean;
+  /** 是否允许战斗中执行 */
   allow_fight?: boolean;
+  /** 是否允许忙乱中执行 */
   allow_busy?: boolean;
 }
 
 interface AutoSkillEntry {
+  /** 绝招对象 */
   pfm: any;
+  /** 技能等级 */
   level: number;
+  /** 唯一标识（基础技能/绝招 ID） */
   id: string;
+  /** 所属技能类型 */
   type: string;
+  /** 是否为引用绝招 */
   is_ref: boolean;
+  /** 冷却结束时间戳 */
   release_time: number;
+  /** 是否禁用 */
   ban_use?: boolean;
 }
 
 /** 角色状态 — StatusDef 的运行时扩展 */
 interface CharacterStatus extends StatusDef {
+  /** 最大叠加层数 */
   max_count?: number;
+  /** 是否不受减免影响 */
   no_diff?: boolean;
+  /** 是否为负面状态 */
   downside?: boolean;
+  /** 定时器句柄 */
   handler?: any;
+  /** 是否仅战斗期间有效 */
   only_combat?: boolean;
+  /** 是否不可被清除 */
   no_clear?: boolean;
+  /** 状态施加时的消息 */
   start_msg?: string;
+  /** 状态结束时的消息 */
   finish_msg?: string;
+  /** 是否为闪避状态 */
   is_miss?: boolean;
+  /** 是否为鲁莽状态 */
   is_rash?: boolean;
+  /** 是否为分身状态 */
   is_shadow?: boolean;
+  /** 是否免疫控制 */
   ig_control?: boolean;
+  /** 间隔触发次数上限 */
   duration_count?: number;
+  /** 已触发的间隔次数 */
   over_count?: number;
+  /** 叠加模式：0=不可叠加 1=叠加层数 2=刷新持续时间 */
   override?: number;
+  /** 状态开始时间戳 */
   start_time?: number;
+  /** 当前叠加层数 */
   count?: number;
 }
 
@@ -90,6 +234,20 @@ declare var __PATH: Record<string, string>;
 // ============================================================
 // CHARACTER 类
 // ============================================================
+
+/**
+ * Team array type — CHARACTER array with extra properties set by team commands at runtime.
+ */
+export type TeamData = CHARACTER[] & {
+    /** 是否允许自由拾取 */
+    free_get?: boolean;
+    /** 队伍唯一 ID */
+    id?: string;
+    /** 战利品分配函数 */
+    alloc?: (obj: any) => void;
+    /** 战利品分配列表（dice 命令用） */
+    objs?: { id: string; color_name: string; unit: string; dice: { users: string[]; num: number; user: string } }[];
+};
 
 // @ts-ignore - ITEM 来自旧版 JS 模块，运行时路径正确
 export class CHARACTER extends ITEM {
@@ -150,6 +308,8 @@ export class CHARACTER extends ITEM {
   family: FAMILY | null = null;
   /** 是否禁止战斗 */
   no_fight: boolean = false;
+  /** 所属服务器 ID（USER 子类设置） */
+  serverid: number = 0;
 
   /** 是否为角色 */
   is_character: boolean = true;
@@ -180,7 +340,7 @@ export class CHARACTER extends ITEM {
   // ============ 环境与交互 ============
 
   /** 当前所在房间 */
-  environment: RoomClass | null = null;
+  environment?: RoomClass;
   /** 当前活动状态 */
   state: any = null;
   /** 等待用户输入的回调 */
@@ -268,17 +428,19 @@ export class CHARACTER extends ITEM {
   /** 跟随者列表 */
   follow_targets: CHARACTER[] | null = null;
   /** 队伍引用 */
-  team: CHARACTER[] | null = null;
+  team: TeamData | null = null;
   /** 武器切换冷却时间戳 */
   release_time: number = 0;
   /** 掉落列表 */
-  drop_list: any[] | null = null;
+  drop_list?: any[];
   /** 主人 ID */
-  master: string | null = null;
+  master?: string;
   /** 死亡复活房间 */
-  die_room: any = null;
+  die_room?: RoomClass;
   /** 闲聊消息列表 */
-  chat_msg: string[] | null = null;
+  chat_msg?: string[];
+  /** 网络连接（USER 子类实现） */
+  socket?: GameSocket;
 
   // ============ 动态字段（由方法设置） ============
 
@@ -286,6 +448,10 @@ export class CHARACTER extends ITEM {
   sum_damages?: number;
   /** 自动绝招计数器 */
   attack_count?: number;
+  /** 技能组配置（由 sk_group 命令使用） */
+  sk_groups?: (string[] | null)[];
+  /** 书架存储的秘籍 ID 列表（由 sbook 命令使用） */
+  books?: string[];
   /** 是否拥有忙乱时可用的绝招 */
   busy_pfm?: boolean;
   /** 自动绝招触发频率 */
@@ -307,6 +473,8 @@ export class CHARACTER extends ITEM {
   on_heart_beat?(dt: number): void;
   /** 离开队伍时回调 — 触发时机：team_out() 中，随从因主人退队而退出时 */
   on_teamout?(me: CHARACTER): void;
+  /** 加入队伍时回调 — 触发时机：加入队伍时 */
+  on_teamin?(me: CHARACTER): void;
   /** 战斗结束回调 — 触发时机：end_attack() 中，一方获胜（比试血量<30%或击杀后），对方 end_fight 之前 */
   on_fight_over?(target: CHARACTER, win: boolean): void;
   /** 技能变更回调 — 触发时机：init_skill() 末尾 / weapon_changed() 末尾，切换武器或装备技能后 */
@@ -319,6 +487,35 @@ export class CHARACTER extends ITEM {
   on_enter?(obj: Record<string, any>): void;
   /** 有角色离开房间回调 — 触发时机：其他有 HP 的角色从本角色所在房间离开时；返回 false 阻止离开 */
   on_leave?(obj: Record<string, any>, dir: string): boolean | void;
+
+  /** 检查是否可传送（USER 实现，biwu 等系统检查） */
+  can_trans?(): boolean;
+  /** 添加称号（USER 实现，biwu 等系统调用） */
+  add_title?(title: string | null, type: string): void;
+  /** 进入公共区域（USER 实现，map 文件调用） */
+  enable_area?(): void;
+  /** 查询精力（USER 实现，jh/shop 等系统调用） */
+  query_jingli?(): number;
+  /** 检查区域是否已解锁（USER 实现，jh 系统调用） */
+  isenable_area?(fb: any): boolean;
+  /** 元宝数量（USER 实现，shop 等系统使用） */
+  cash_money?: number;
+  /** 扣除元宝（USER 实现，shop 等系统调用） */
+  add_cash?(count: number, desc?: string): void;
+  /** 按位查询布尔值（USER 实现，shop 等系统使用） */
+  query_bool?(key: string, index: number): boolean;
+  /** 按位设置布尔值（USER 实现，shop 等系统使用） */
+  set_bool?(key: string, index: number, value: unknown, time?: number): void;
+  /** 回家（NPC/玩家专用，资源文件注入） */
+  go_home?(): void;
+  /** 清理房屋（NPC/玩家专用，资源文件注入） */
+  clear_home?(flag: boolean): void;
+  /** 添加跟随者 — 资源文件注入返回 boolean */
+  add_follower?(npc: NPC): boolean;
+  /** 查询帮派（由 party 系统注入） */
+  query_party?(): any;
+  /** 传授技能回调 — 触发时机：xue 命令中教师角色执行时会调用 */
+  do_teach?(me: CHARACTER, skill: import("../skill/skill.js").SKILL, lv: number): boolean | void;
 
   constructor() {
     super();
@@ -336,7 +533,7 @@ export class CHARACTER extends ITEM {
   /**
    * 发送命令列表（客户端交互菜单）
    */
-  send_commands(): void {}
+  send_commands(...args: string[]): void {}
 
   /**
    * 操作失败通知
@@ -376,11 +573,13 @@ export class CHARACTER extends ITEM {
 
   /**
    * 根据 ID 查找物品
+   * @param oid 物品 ID
+   * @param parent 
    */
-  find_obj(oid: string, parent?: any): any {
+  find_obj(oid: string, parent?: ITEM | RoomClass): ITEM | null {
     let items = this.items;
     if (parent) items = parent.items;
-    return items ? this.find_obj_byid(items, oid) : undefined;
+    return items ? this.find_obj_byid(items, oid) : null;
   }
 
   /**
@@ -2337,7 +2536,7 @@ export class CHARACTER extends ITEM {
   /**
    * 执行一次攻击
    */
-  do_attack(par: any): number | void {
+  do_attack(par: DoAttackPar): number | void {
     if (this.is_faint || this.hp <= 0 || !this.fight_type) return;
     let target = par.target;
     if (!target) {
@@ -2456,7 +2655,7 @@ export class CHARACTER extends ITEM {
         }
       } else {
         if (sh > 0) {
-          this.send_combat(damage_msg(sh, par.is_throwing ? WEAPON_TYPE.THROWING : weapon_type, target, par.iscirt, par.damage_msg), target);
+          this.send_combat(damage_msg(sh, par.is_throwing ? WEAPON_TYPE.THROWING : weapon_type, target, par.iscirt ?? false, par.damage_msg), target);
           target.send_combat(query_status_msg(target.hp, target.max_hp));
           if (target.on_damage) target.on_damage(this, sh);
         } else {
@@ -2681,7 +2880,7 @@ export class CHARACTER extends ITEM {
   /**
    * 检查并释放自动绝招
    */
-  check_pfms(target: CHARACTER): boolean {
+  check_pfms(target: CHARACTER): boolean | undefined {
     if (!this.auto_skills) this.init_pfms();
     if (!this.auto_skills) return false;
     this.attack_count = this.attack_count || this.pfm_rate || 3;

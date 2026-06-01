@@ -12,6 +12,28 @@ export class COMMAND extends BASE {
     biwu_record?: Record<string, any>;
     /** 进入副本回调（由 world/cmd/extend/ex.js 注入） */
     on_enter_fb?(me: CHARACTER | null, env: any): void;
+    /** 清理邮件（由 checkorg 命令注入） */
+    cmd_clearmail?(): void;
+    /** 清理商店（由 checkorg 命令注入） */
+    cmd_clearstore?(): void;
+    /** 积分奖励（由 reward 命令注入） */
+    score_reward?(i: number): Record<string, unknown>;
+    /** 排行榜奖励（由 reward 命令注入） */
+    top_reward?(i: number): Record<string, unknown>;
+    /** 更新玩家排行榜（由 biwu 命令注入） */
+    updatePlayerStats?(player: Record<string, any>, sc: number, fam?: string): void;
+    /** 检查排行（由 biwu 命令注入） */
+    checkStats?(player: Record<string, any>): void;
+    /** 获取当前技能组索引（由 sk_group 命令注入） */
+    cur_eqs?(me: CHARACTER): number;
+    /** 清除延迟更新（由 update 命令注入） */
+    clear_update?(): void;
+    /** 锻造命令属性（由 duanzao 命令注入） */
+    PROPS?: Record<string, unknown>;
+    /** 锻造材料需求计算（由 duanzao 命令注入） */
+    sum_needs?(prop: unknown, level: number): number;
+    /** 默认锻造属性（由 duanzao 命令注入） */
+    DEFAULT_PROPS?: Record<string | number, string | null>;
 
     constructor() {
         super();
@@ -27,7 +49,7 @@ export class COMMAND extends BASE {
      * @param _par3 - extra param (COMMAND.DO usage)
      * @returns false indicates command failure
      */
-    enter(me: CHARACTER | null, arg?: string, _par2?: string, _par3?: string): boolean | void {
+    enter(me: CHARACTER | null, arg?: unknown, _par2?: unknown, _par3?: unknown): boolean | void {
         return undefined;
     }
 
@@ -37,10 +59,12 @@ export class COMMAND extends BASE {
     command!: string;
     /** Parameter regex pattern */
     regex: RegExp | null = null;
-    /** Bound exec function (on target prototype) */
-    exec: Function | null = null;
+    /** Bound exec function (on target prototype) — subclasses define exec() as method */
+    exec?(...args: unknown[]): unknown;
     /** Map JSON cache (set by subclasses e.g. jh, dialog/map) */
     map_json?: any;
+    /** JSON cache (used by emote_data etc.) */
+    json?: string;
 
     // ============ Permission control ============
 
@@ -109,7 +133,7 @@ export class COMMAND extends BASE {
      * @param par2 - extra
      * @param par3 - extra
      */
-    static DO(cmd: string, par1?: string, par2?: string, par3?: string): void {
+    static DO(cmd: string, par1?: unknown, par2?: unknown, par3?: unknown): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
             cmdObj.enter(null, par1, par2, par3);

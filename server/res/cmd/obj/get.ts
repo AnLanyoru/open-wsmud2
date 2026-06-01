@@ -25,7 +25,7 @@ export default class extends COMMAND {
             var items = container.query_items(player);
             if (!items || !items.length) return player.notify("那里面没有东西。");
             if (player.is_full()) return player.notify("你身上东西太多了。");
-            var no_get = [];
+            var no_get: import("../../../core/item.js").ITEM[] = [];
             for (var i = 0; i < items.length; i++) {
                 if (!getObj(player, items[i], container)) {
                     no_get.push(items[i]);
@@ -80,7 +80,7 @@ function getObj(me, item, parent) {
         if (parent.on_getitem && parent.on_getitem(me, item) === false) return false;
         me.add_obj(item);
     } else {
-        var list = [];
+        var list: CHARACTER[] = [];
         for (var i = 0; i < me.team.length; i++) {
             var tm = me.team[i];
             if (tm.environment && tm.environment.parent === me.environment.parent) {

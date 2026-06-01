@@ -1,5 +1,6 @@
 import { USERTASK } from "../../core/task/playertask.js";
 import { OBJ } from "../../core/item/obj.js";
+import type { OddsEntry } from "../../core/item/obj.js";
 
 export default class extends USERTASK {
     id = "sm";
@@ -77,23 +78,23 @@ export default class extends USERTASK {
     me.add_exp(exp, pot);
 
 
-    var list: any = [];
+    var list: string[] = [];
     for (var i = 0; i < me.family.skills2.length; i++) {
         if (!me.skills[me.family.skills2[i].id]) {
             list.push(me.family.skills2[i].id);
         }
     }
-    let items: any = [];
+    let oddsItems: OddsEntry[] = [];
     let count = sm;
     while (count > 0) {
         if (count >= 10) {
-            items.push({
+            oddsItems.push({
                 obj: list.length > 0 ? "book/up" :
                     "drug/limit_mp#" + Math.min(4, sm_level)
             });
             count -= 10;
         } else {
-            items.push({
+            oddsItems.push({
                 obj: list.length > 0 ? "book/up" :
                     "drug/limit_mp#" + Math.min(4, sm_level),
                 odds: count * 1000
@@ -101,11 +102,11 @@ export default class extends USERTASK {
             count = 0;
         }
     }
-    items = OBJ.create_by_odds(items);
-    for (var i = 0; i < items.length; i++) {
-        var item = me.add_obj(items[i]);
+    const createdItems = OBJ.create_by_odds(oddsItems);
+    for (var i = 0; i < createdItems.length; i++) {
+        var item = me.add_obj(createdItems[i]);
         if (item) {
-            me.send("你获得了" + (items[i] as any).unit_name() + "。");
+            me.send("你获得了" + item.unit_name() + "。");
         }
     }
 

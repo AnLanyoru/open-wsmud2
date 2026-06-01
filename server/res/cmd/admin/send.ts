@@ -17,7 +17,7 @@ export default class extends COMMAND {
     enter(me, user, arg) {
     if (me && me.user_level < 5) return false;
     if (!arg) return me && me.send("没有消息内容。");
-    var msg;
+    var msg: any;
     var is_str = typeof arg == "string";
     if (is_str && arg[0] != "{") {
         msg = { content: arg, time: Date.now() };
@@ -31,43 +31,67 @@ export default class extends COMMAND {
         msg.time = Date.now();
         for (var i = 0; i < msg.attach.length; i++) {
             let attach = msg.attach[i];
-            var obj = OBJ.CREATE(attach.obj, attach.count);
-            if (obj) {
-                attach.name = obj.unit_name(attach.count);
+            var objItem = OBJ.CREATE(attach.obj, attach.count);
+            if (objItem) {
+                attach.name = objItem.unit_name(attach.count);
             }
         }
     }
-    var users = [];
+    var users: CHARACTER[] = [];
     if (user == "all") {
         users = WORLD.USERS;
     } else {
         var player = WORLD.getUser(user);
-        if (!player) player = { id: user };
-        users.push(player);
+        if (!player) {
+            var dummyUser = new CHARACTER();
+            dummyUser.id = user;
+            users.push(dummyUser);
+        } else {
+            users.push(player);
+        }
     }
 
-    var obj = {};
-    obj.type = "dialog";
-    obj.dialog = "message";
-    obj.message = {
-        id: msg.from || "system",
-        name: msg.from_name || "系统",
-        content: msg.content,
-        time: msg.time,
-        attach: msg.attach
+    var msgObj: {
+        type: string;
+        dialog: string;
+        message: {
+            id?: string;
+            name?: string;
+            content: string;
+            time: number;
+            attach: any[];
+            index?: number;
+        };
+    } = {
+        type: "dialog",
+        dialog: "message",
+        message: {
+            id: msg.from || "system",
+            name: msg.from_name || "系统",
+            content: msg.content,
+            time: msg.time,
+            attach: msg.attach
+        }
     };
     for (var i = 0; i < users.length; i++) {
-        let user_msg = {
+        let user_msg: {
+            time: number;
+            content: string;
+            attach: any[];
+            index?: number;
+        } = {
             time: msg.time,
             content: msg.content,
             attach: msg.attach
         };
-        let mail_type = obj.message.id;
+        let mail_type = msgObj.message.id || "";
         WORLD.MESSAGE.pushUserMessage(users[i].id, {
-            id: mail_type, name: obj.message.name
+            id: mail_type, name: msgObj.message.name || ""
         }, user_msg);
-        obj.message.index = user_msg.index;
-        if (users[i].socket) users[i].send(JSON.stringify(obj));
+        msgObj.message.index = user_msg.index;
+        if (users[i].socket) {
+            users[i].send(JSON.stringify(msgObj));
+        }
         if (RECORD[mail_type]) {
             WORLD.log(users[i], mail_type, msg.content);
         }

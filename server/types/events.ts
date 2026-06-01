@@ -111,7 +111,7 @@ export interface SkillCallbacks {
   /** 招架回调 */
   on_force_parry?: (me: CHARACTER, target: CHARACTER, sh: number) => number;
   /** 查询启用属性 */
-  query_enable_prop?: (lv: number) => Record<string, Record<string, number | string>>;
+  query_enable_prop?: (lv: number) => Record<string, Record<string, number | string>>; // 见 skill.ts EnablePropMap
   /** 查询属性 */
   query_prop?: (me: CHARACTER, lv: number) => Record<string, number>;
 }

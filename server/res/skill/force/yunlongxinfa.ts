@@ -44,7 +44,7 @@ export default class extends SKILL {
         use: function (me, target, lv) {
 
             me.send_room("<hir>$N长吸一口气，运起云龙神功已将全身潜力尽数提起！</hir>");
-            const prop = {
+            const prop: { gj: number; mz?: number } = {
                 gj: lv,
             };
             const is_mz = me.query_prop('ylxf_mz');

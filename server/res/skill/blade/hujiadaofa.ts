@@ -15,7 +15,7 @@ export default class extends SKILL {
     "$N一招<GRN>「春风送暖」</GRN>，左脚跃步落地，$w顺势往前，挟风声劈向$n的$l",
     "$N募的使一招<HIM>「八方藏刀」</HIM>，顿时剑光中无数朵刀花从四面八方涌向$n全身"
 ];
-    parry_actions = SKILL.get("parry").parry_actions;
+    parry_actions = SKILL.get("parry")?.parry_actions || [];
     desc = "关外胡家赖以成名的刀法，为胡家始祖飞天狐狸所创。胡斐据家传刀谱练成后与金面佛苗人凤的苗家剑齐名天下。";
     can_enables = ["blade", "parry"];
     learn_condition = {

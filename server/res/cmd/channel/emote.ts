@@ -15,7 +15,7 @@ export default class extends COMMAND {
 
     if (!str) return me.send(this.emote_data());
     let paras = str.split(WT_REG);
-    let target = null, emts = null;
+    let target: typeof me | undefined, emts: string[] | undefined;
     if (paras.length > 1) {
         emts = emote[paras[0]];
         target = WORLD.find_user(paras[1]);
@@ -28,7 +28,7 @@ export default class extends COMMAND {
 
     return msg;
 }
-    emote_data(me) {
+    emote_data(me?: CHARACTER) {
     if (this.json) return this.json;
     var str = ["{type:'emote',items:["];
     for (var key in emote) {
@@ -46,7 +46,7 @@ export default class extends COMMAND {
 const WT_REG = /\s+/;
 function splitmessage(me, text, type, target) {
     if (text.length < 3) return text;
-    var str = [];
+    const str: string[] = [];
     var start = 0;
     for (var i = 0; i < text.length; i++) {
         if (text[i] == "$") {

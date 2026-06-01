@@ -1,23 +1,23 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { UTIL } from "../../../core/util/util.js";
+import { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "buy";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
-    enter(me, count, objid, from) {
-    var target;
+    enter(me: CHARACTER, count: string, objid: string, from: string): void {
+    var target: any;
     if (from) {
-        target = me.find_obj(from, me.environment);
+        target = me.find_obj(from, me.environment!);
         if (!target) {
-            return me.notify("你要从哪买东西？");
+            me.notify("你要从哪买东西？");
+            return;
         }
         if (target == me) {
-            return me.notify("你自己的东西还用得着买吗？");
+            me.notify("你自己的东西还用得着买吗？");
+            return;
         }
     }
     var buy_count = 1;
@@ -30,26 +30,29 @@ export default class extends COMMAND {
     }
     if (selllist === true) return;
     if (!selllist) {
-        return me.notify(target.name + "不出售任何东西。");
+        me.notify(target.name + "不出售任何东西。");
+        return;
     }
-    var sellitem = null;
+    var sellitem: OBJ | null = null;
     for (var i = 0; i < selllist.length; i++) {
         if (selllist[i].id == objid) {
             sellitem = selllist[i];
             break;
         }
     }
-    if (!sellitem) return me.notify(target.name + "不出售这个东西。");
+    if (!sellitem) { me.notify(target.name + "不出售这个东西。"); return; }
     if (!sellitem.combined && buy_count > 1) {
         buy_count = 1;
         me.notify("<cyn>不可堆叠道具最大购买数量1</cyn>");
     }
     if (me.is_full(sellitem.combined ? 0 : buy_count)) {
-        return me.notify("你拿不下那么多东西。");
+        me.notify("你拿不下那么多东西。");
+        return;
     }
     var need_money = sellitem.value * buy_count;
     if (need_money > (me.money || 0)) {
-        return me.notify("你没有那么多的钱。");
+        me.notify("你没有那么多的钱。");
+        return;
     }
     if (target.before_sell_item) {
         if (target.before_sell_item(me, sellitem, buy_count) === false)
@@ -81,10 +84,10 @@ export default class extends COMMAND {
 
             if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
         } else {
-            return me.notify(target.name + "没有那么多的" + sellitem.color_name + "买给你。");
+            me.notify(target.name + "没有那么多的" + sellitem.color_name + "买给你。");
+            return;
         }
     }
     // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
 }
 }
-

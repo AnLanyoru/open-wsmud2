@@ -1,4 +1,6 @@
 import { OBJ } from "../../../../core/item/obj.js";
+import { ITEM } from "../../../../core/item.js";
+import { CHARACTER } from "../../../../core/char/character.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -12,13 +14,14 @@ export default class extends OBJ {
 
     constructor() {
         super();
-        this.add_action("si", "撕封皮", function (me) {
-            var items = [];
+        this.add_action("si", "撕封皮", function (this: OBJ, me: CHARACTER, par: string) {
+            var items: ITEM[] = [];
 
+            if (!me.items) return;
             for (var i = 0; i < me.items.length; i++) {
-                if (me.items[i].jing_index) {
-
-                    items[me.items[i].jing_index - 1] = me.items[i];
+                var jingIndex = me.items[i].jing_index;
+                if (jingIndex) {
+                    items[jingIndex - 1] = me.items[i];
                 }
             }
             for (var i = 0; i < items.length; i++) {
@@ -34,7 +37,7 @@ export default class extends OBJ {
             }
             me.set_temp("map42", 1);
         });
-        this.add_action("he", "兑换", function (me, par) {
+        this.add_action("he", "兑换", function (this: OBJ, me: CHARACTER, par: string) {
             me.send('如果你有多余的其他经书，可以每五本兑换一本其他经书。');
             if (this.count > 4) {
                 if (!par) {
@@ -43,7 +46,7 @@ export default class extends OBJ {
                     for (let i = 1; i <= 8; i++) {
                         if (i === this.jing_index) continue;
                         if (str.length > 1) str.push(',');
-                        str.push("{cmd:\"packitem he ", this.id, " ", i, '",name:"四十二章经', names[i - 1], '"}');
+                        str.push("{cmd:\"packitem he ", this.id ?? '', " ", String(i), '",name:"四十二章经', names[i - 1], '"}');
                     }
                     str.push("]}");
                     me.send(str.join(""));
@@ -54,15 +57,15 @@ export default class extends OBJ {
                     if (index === this.jing_index)
                         return me.send('你不能兑换自己。');
 
-                    me.remove_obj(this, 5);
-                    let obj = me.add_obj('sp/bj/jing#' + index);
+                    me.remove_obj(this.path!, 5);
+                    let obj = me.add_obj('sp/bj/jing#' + index)!;
                     me.send('你使用' + this.unit_name(5) + "兑换了" + obj.unit_name(1) + "。");
                 }
             }
         });
     }
 
-    on_create(path, par) {
+    on_create(path: string, par?: string): void {
     if (!par) return;
     var lv = parseInt(par.substr(1));
     this.jing_index = lv;

@@ -25,7 +25,8 @@ export default class extends COMMAND {
         }
         target.stores = target.stores || [];
         if (arg === 'all') return this.store_all(target, me);
-        let move_item = me.find_obj(arg), store_item = null;
+        let move_item = me.find_obj(arg);
+        let store_item: import("../../../core/item.js").ITEM | null = null;
         if (!move_item) return me.notify("你要存什么东西？");
 
         const st = { items: target.stores, push_item: me.push_item };

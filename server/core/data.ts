@@ -169,8 +169,8 @@ const DATA: DataObject = {
 
         for (const key of FAMS_TATAS) {
             const tops = WORLD.STATS['tops_' + key];
-            if (tops) {
-                str.push(',tops_', key, ':', WORLD.STATS.saveTops(tops));
+            if (tops && Array.isArray(tops)) {
+                str.push(',tops_', key, ':', WORLD.STATS.saveTops(tops as StatsTopEntry[]));
             }
         }
         str.push(',eq_stats:', JSON.stringify(WORLD.STATS.EQ_STATS ?? []));

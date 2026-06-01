@@ -35,11 +35,12 @@ export default class extends COMMAND {
             let evt = events[i];
             if (evt.check && !evt.check(me))
                 continue;
-            if (evt.time > 0 && evt.time < now) {
+            if ((evt.time ?? 0) > 0 && (evt.time ?? 0) < now) {
                 continue;
             }
             if (str.length > 1) str.push(',');
-            str.push(`["${evt.id}","${evt.name}","${evt.query_desc(me)}",${evt.query_grade(me)},${evt.time},"${evt.command ?? ""}"]`);
+            const evtTime = evt.time ?? 0;
+            str.push(`["${evt.id}","${evt.name}","${evt.query_desc?.(me) ?? ""}",${evt.query_grade?.(me) ?? 0},${evtTime},"${evt.command ?? ""}"]`);
         }
 
         str.push(']}');

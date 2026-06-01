@@ -44,8 +44,8 @@ export default class extends COMMAND {
     var str = ['{"type":"dialog","dialog":"'];
     str.push(me === target ? 'skills' : 'master');
     str.push('","items":[');
+    var skill_count = 0;
     if (skills) {
-        var skill_count = 0;
         for (var skid in skills) {
             var skill_base = SKILL.get(skid);
             if (!skill_base) continue;
@@ -76,7 +76,7 @@ export default class extends COMMAND {
             str.push("\"");
         }
     } else {
-        str.push(',sk_group:', WORLD.COMMANDS.skgroup.cur_eqs(me));
+        str.push(',sk_group:', String(WORLD.COMMANDS.skgroup.cur_eqs?.(me) ?? 0));
     }
 
     str.push("}");

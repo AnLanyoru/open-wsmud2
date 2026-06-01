@@ -42,7 +42,7 @@ export default class extends SKILL {
             me.send_room("<hic>$N喉间发出一声低沉吼叫，内息如墨自丹田翻涌而上游走全身！！</hic>");
 
             const time = 10000 + lv * 10;
-            const prop = {
+            const prop: { fy: number; diff_sh?: number } = {
                 fy: lv,
             };
             const is_fy = me.query_prop('hl_fy');

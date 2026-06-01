@@ -9,21 +9,21 @@ export default class extends COMMAND {
     allow_state = true;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, tid, cmd, oid) {
+    enter(me: CHARACTER, tid?: string, cmd?: string, oid?: string): void {
     if (!tid || !cmd) return;
     if (!me.is_player || !WORLD.is_server(me)) return;
     if (tid === 'all') return this.tasks_fin(me);
-    let task = USERTASK.GET(tid);
+    const task = USERTASK.GET(tid);
     if (!task) return me.notify("没有这个任务。");
-    let target = null;
+    let target: CHARACTER | null = null;
     if (!oid && !(ALLOW_COMMANDS[cmd])) {
         oid = cmd;
         cmd = 'start';
     }
     if (oid) {
-        target = me.find_obj(oid, me.environment);
+        target = me.find_obj(oid, me.environment) as CHARACTER | null;
         if (!target) return me.notify("这里没有这个人。");
     }
     switch (cmd) {
@@ -34,7 +34,7 @@ export default class extends COMMAND {
             task.start(me, target);
             break;
         case "giveup":
-            task.giveup(me);
+            task.giveup!(me);
             break;
         case "fin2":
             this.task_fin(me, task, 'ok');
@@ -42,21 +42,22 @@ export default class extends COMMAND {
 
     }
 }
-    task_fin(me, task, par) {
+    task_fin(me: CHARACTER, task: USERTASK, par?: string): void {
     if (task.on_finish(me, par)) {
-        const obj = {};
-        obj.type = "dialog";
-        obj.dialog = "tasks";
-        obj.id = task.id;
-        obj.state = task.query_state(me);
+        const obj: Record<string, unknown> = {
+            type: "dialog",
+            dialog: "tasks",
+            id: task.id,
+            state: task.query_state(me),
+        };
         if (obj.state) {
             obj.title = task.query_title(me);
             obj.desc = task.query_desc(me);
         }
-        return me.notify(JSON.stringify(obj));
+        me.notify(JSON.stringify(obj));
     }
 }
-    tasks_fin(me) {
+    tasks_fin(me: CHARACTER): void {
     for (let i = 0; i < WORLD.TASKS.length; i++) {
         const task = WORLD.TASKS[i];
         if (task.query_state(me) === 2) {
@@ -66,7 +67,7 @@ export default class extends COMMAND {
 }
 }
 
-const ALLOW_COMMANDS = {
+const ALLOW_COMMANDS: Record<string, boolean> = {
     start: true,
     giveup: true,
     fin: true,

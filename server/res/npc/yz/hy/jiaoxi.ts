@@ -1,5 +1,8 @@
 import { NPC } from "../../../../core/char/npc.js";
+import { WORLD } from "../../../../core/world.js";
+import { OBJ } from "../../../../core/item/obj.js";
 import { ROOM } from "../../../../core/room/room.js";
+import { CHARACTER } from "../../../../core/char/character.js";
 
 export default class extends NPC {
     name = "黑鹰教习";
@@ -39,32 +42,33 @@ export default class extends NPC {
         });
     }
 
-    on_kill(me) {
+    on_kill(me: CHARACTER): void {
     if (!this.fight_type) {
         let rooms = ['yz/hy/jiaochang1', 'yz/hy/jiaochang3',
             'yz/hy/jiaochang4', 'yz/hy/jiaochang5'];
         this.send_room('$N大声喊道：小的们，来活了！');
-        let list = [];
+        let list: CHARACTER[] = [];
         for (let path of rooms) {
             let room = ROOM.Get(path);
+            if (!room) continue;
             for (let item of room.items) {
-                if (!item.fight_type && item.hp > 0 && item.is('yz/hy/jiaotu')) {
+                if (item instanceof CHARACTER && !item.fight_type && item.hp > 0 && item.is('yz/hy/jiaotu')) {
                     list.push(item);
                 }
             }
         }
         for (let item of list) {
-            item.moveto(this.environment, item.name + '冲了过来。');
+            item.moveto(this.environment!, item.name + '冲了过来。');
             item.do_kill(me);
         }
     }
 
 }
-    on_died(me, corpse) {
-    let eny = this.enemy[0];
+    on_died(me: CHARACTER | undefined, corpse: any): void {
+    let eny = this.enemy![0];
     if (eny && eny.hp > 0 && eny.environment === this.die_room) {
 
-        let count = eny.query_temp('hy_ct', 0);
+        let count = eny.query_temp('hy_ct', 0) ?? 0;
         if (count > 0) {
             eny.add_exp(0, 10000);
             eny.add_temp('hy_ct', -1);
@@ -78,4 +82,3 @@ export default class extends NPC {
     corpse.items = null;
 }
 }
-

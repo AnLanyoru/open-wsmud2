@@ -1,15 +1,16 @@
 import { ROOM } from "../../../../core/room/room.js";
 import { WORLD } from "../../../../core/world.js";
 import { OBJ } from "../../../../core/item/obj.js";
+import type { CHARACTER } from "../../../../core/char/character.js";
 
-export default class extends ROOM {
+export default class MapRoom extends ROOM {
     name = "兵器库";
     desc = "这里是兵器库，到处银光闪闪，让人眼花缭乱。宝刀、宝剑、金箍棒，大刀、长剑、哨棒，短刀、短剑、短棍，各色各样的兵器应有尽有，你一时不知道挑什么好。";
     exits = { "north": "yz/by/bingying" };
 
     constructor() {
         super();
-        this.add_action("search", "搜索", function (me) {
+        this.add_action("search", "搜索", function (this: MapRoom, me: CHARACTER) {
 
             if (me.query_temp("by_search")) {
                 if (me.equipment && me.equipment[0] && me.equipment[0].is('eq/lv1/qianjinquan')) {
@@ -19,7 +20,7 @@ export default class extends ROOM {
                 }
                 return me.notify("你仔细搜了下，发现这里已经已经被洗劫一空了，剩下的都是些破铜烂铁。");
             }
-            var odds = [
+            var odds: { obj: string | string[]; min?: number; max?: number; odds?: number }[] = [
                 {
                     obj: "st/xuanjing",
                     min: 1,
@@ -49,7 +50,7 @@ export default class extends ROOM {
             }
 
         });
-        this.add_action('pushmen', null, function (me) {
+        this.add_action('pushmen', null, function (this: MapRoom, me: CHARACTER) {
             if (me.equipment && me.equipment[0] && me.equipment[0].is('eq/lv1/qianjinquan')) {
 
                 me.send('你将手上的' + me.equipment[0].color_name + "严丝合缝的塞入墙上的孔洞，轻轻一扭，只听到咔嚓几声，地板打开一个大洞。");
@@ -59,23 +60,25 @@ export default class extends ROOM {
             }
             return me.send('你要打什么？');
         });
-        this.add_action('lkfb', null, function (me, par) {
+        this.add_action('lkfb', null, function (this: MapRoom, me: CHARACTER, par?: string) {
 
             WORLD.COMMANDS['cr'].enter(me, 'over');
 
-            me.moveto(ROOM.Get('yz/hy/tongdao'));
+            var rm = ROOM.Get('yz/hy/tongdao');
+            if (rm) {
+                me.moveto(rm);
+            }
             me.send('你从兵器库钻入一个狭长的甬道。');
-            me.enable_area();
+            if (me.enable_area) me.enable_area();
         });
     }
 
-    on_leave(me, dir) {
-    if (dir === 'down') {
-        me.notify('你即将离开这个副本进入公共区域，是否确认？');
-        me.send_commands('lkfb', '确定离开');
-        return false;
+    on_leave(me: CHARACTER, dir: string) {
+        if (dir === 'down') {
+            me.notify('你即将离开这个副本进入公共区域，是否确认？');
+            me.send_commands('lkfb', '确定离开');
+            return false;
+        }
+
     }
-
 }
-}
-

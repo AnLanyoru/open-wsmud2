@@ -4,7 +4,6 @@ import { FAMILIES } from "../../../core/skill/family.js";
 export default class extends SKILL {
     name = "太极神功";
     id = "taijishengong";
-    family = "武当派";
     can_enables = ["force"];
     family = FAMILIES.WUDANG;
     grade = 3;

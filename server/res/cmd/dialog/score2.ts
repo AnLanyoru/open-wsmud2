@@ -31,29 +31,29 @@ export default class extends COMMAND {
     str.push("\",add_sh:\"");
     str.push(target.query_prop("add_sh_per"));
     str.push("%\",diff_fy:\"");
-    str.push(parseInt(target.diff_fy_per * 100) / 100);
+    str.push(String(Math.floor(target.diff_fy_per * 100) / 100));
     str.push("%\",add_bj:\"");
     str.push(target.query_prop("add_bjsh_per") + 150);
     str.push("%\",diff_sh:\"");
-    str.push(target.query_prop("diff_sh"));
+    str.push(String(target.query_prop("diff_sh")));
     str.push("+");
-    str.push(parseInt(target.diff_sh_per * 100) / 100);
+    str.push(String(Math.floor(target.diff_sh_per * 100) / 100));
     str.push("%\",diff_bj:\"");
-    str.push(target.query_prop("diff_bj"));
+    str.push(String(target.query_prop("diff_bj")));
     str.push("%\",releasetime:\"");
-    str.push(target.query_prop("releasetime") / 1000);
+    str.push(String(target.query_prop("releasetime") / 1000));
     str.push("秒+");
-    str.push(target.query_prop("releasetime_per"));
+    str.push(String(target.query_prop("releasetime_per")));
     str.push("%\",busy:\"");
-    str.push(target.query_prop("busy") / 1000);
+    str.push(String(target.query_prop("busy") / 1000));
     str.push("秒+");
-    str.push(target.query_prop("busy_per"));
+    str.push(String(target.query_prop("busy_per")));
     str.push("%\",diff_busy:\"");
-    str.push(target.query_prop("diff_busy") / 1000);
+    str.push(String(target.query_prop("diff_busy") / 1000));
     str.push("秒+");
-    str.push(target.query_prop("diff_busy_per"));
+    str.push(String(target.query_prop("diff_busy_per")));
     str.push("%\",distime:\"");
-    str.push(target.query_prop("distime") / 1000);
+    str.push(String(target.query_prop("distime") / 1000));
     str.push("秒+");
     str.push(target.query_prop("distime_per"));
     str.push("%\",expend_mp:\"");
@@ -61,22 +61,22 @@ export default class extends COMMAND {
     str.push("+");
     str.push(target.query_prop("expend_mp_per"));
     str.push("%\",dazuo_per:\"");
-    str.push(target.query_prop("dazuo_per"), '%');
+    str.push(String(target.query_prop("dazuo_per")), '%');
     let per = WORLD.DATA.query_temp('dazuo_per', 0) + target.family.query_temp('dazuo_per', 0);
     if (per > 0) {
-        str.push('+', per, '%');
+        str.push('+', String(per), '%');
     }
     str.push('",study_per:"');
-    str.push(target.query_prop("study_per") + me.int, '%');
+    str.push(String(target.query_prop("study_per") + me.int), '%');
     per = WORLD.DATA.query_temp('study_per', 0) + target.family.query_temp('study_per', 0);
     if (per > 0) {
-        str.push('+', per, '%');
+        str.push('+', String(per), '%');
     }
     str.push('",lianxi_per:"');
-    str.push(target.query_prop("lianxi_per") + me.int * 2, '%');
+    str.push(String(target.query_prop("lianxi_per") + me.int * 2), '%');
     per = WORLD.DATA.query_temp('lianxi_per', 0) + target.family.query_temp('lianxi_per', 0);
     if (per > 0) {
-        str.push('+', per, '%');
+        str.push('+', String(per), '%');
     }
     str.push('",downside_per:"');
     str.push(target.query_prop("diff_downside_per"));

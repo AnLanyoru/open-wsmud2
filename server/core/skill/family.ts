@@ -53,6 +53,8 @@ export class FAMILY extends BASE {
     battle_settle?: (...args: any[]) => void;
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
     on_kill(killer: Record<string, any>, victim: Record<string, any>): void {}
+    /** 货物缓存（由 goods 任务设置） */
+    customer?: Record<string, any>;
 
     // ============ 资源文件设置属性 ============
 

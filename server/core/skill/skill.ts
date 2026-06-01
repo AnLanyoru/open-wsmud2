@@ -8,6 +8,146 @@ import { FAMILIES } from "./family.js";
 import type { FAMILY } from './family.js';
 import type { CHARACTER } from '../char/character.js';
 
+/**
+ * query_enable_prop 内层返回值：属性名→加成数值
+ * 这些属性通过 change_prop → add_prop 写入角色 prop 字典，由 recount() 读取计算六大战斗属性
+ */
+export interface EnablePropValues {
+    /** 攻击力 */
+    gj?: number;
+    /** 攻击力百分比 */
+    gj_per?: number;
+    /** 命中值 */
+    mz?: number;
+    /** 命中值百分比 */
+    mz_per?: number;
+    /** 防御力 */
+    fy?: number;
+    /** 防御力百分比 */
+    fy_per?: number;
+    /** 闪避值 */
+    ds?: number;
+    /** 闪避值百分比 */
+    ds_per?: number;
+    /** 招架值 */
+    zj?: number;
+    /** 招架值百分比 */
+    zj_per?: number;
+    /** 臂力 */
+    str?: number;
+    /** 身法 */
+    dex?: number;
+    /** 根骨 */
+    con?: number;
+    /** 悟性 */
+    int?: number;
+    /** 暴击率百分比 */
+    bj_per?: number;
+    /** 攻击速度(减少延迟ms) */
+    gjsd?: number;
+    /** 攻击速度百分比 */
+    gjsd_per?: number;
+    /** 最大气血 */
+    max_hp?: number;
+    /** 最大内力 */
+    max_mp?: number;
+    /** 内力上限(独立于max_mp，由内功加成) */
+    limit_mp?: number;
+    /** 附加伤害百分比 */
+    add_sh_per?: number;
+    /** 伤害减免百分比 */
+    diff_sh_per?: number;
+    /** 忽视目标防御百分比 */
+    diff_fy_per?: number;
+    /** 描述文字(仅展示，不参与属性计算) */
+    desc?: string;
+}
+
+/** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
+export interface EnablePropMap {
+    /** 空手技能 */
+    unarmed?: EnablePropValues;
+    /** 招架技能 */
+    parry?: EnablePropValues;
+    /** 内功技能 */
+    force?: EnablePropValues;
+    /** 轻功技能 */
+    dodge?: EnablePropValues;
+    /** 剑法技能 */
+    sword?: EnablePropValues;
+    /** 刀法技能 */
+    blade?: EnablePropValues;
+    /** 杖法技能 */
+    staff?: EnablePropValues;
+    /** 棍法技能 */
+    club?: EnablePropValues;
+    /** 鞭法技能 */
+    whip?: EnablePropValues;
+    /** 暗器技能 */
+    throwing?: EnablePropValues;
+    /** 噬咬技能(怪物专用) */
+    bite?: EnablePropValues;
+    /** 允许 for...in 动态遍历时的字符串索引 */
+    [key: string]: EnablePropValues | undefined;
+}
+
+/** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
+export interface SkillAndLevel {
+    /** 空手技能 */
+    unarmed?: number;
+    /** 招架技能 */
+    parry?: number;
+    /** 内功技能 */
+    force?: number;
+    /** 轻功技能 */
+    dodge?: number;
+    /** 剑法技能 */
+    sword?: number;
+    /** 刀法技能 */
+    blade?: number;
+    /** 杖法技能 */
+    staff?: number;
+    /** 棍法技能 */
+    club?: number;
+    /** 鞭法技能 */
+    whip?: number;
+    /** 暗器技能 */
+    throwing?: number;
+    /** 噬咬技能(怪物专用) */
+    bite?: number;
+    /** 允许 for...in 动态遍历时的字符串索引 */
+    [key: string]: number | undefined;
+}
+
+/** 技能学习条件 */
+export interface LearnCondition {
+    /** 前置技能ID → 等级要求 */
+    skill?: SkillAndLevel;
+    /** 先天臂力(不含装备加成) */
+    str1?: number;
+    /** 先天根骨(不含装备加成) */
+    con1?: number;
+    /** 先天身法(不含装备加成) */
+    dex1?: number;
+    /** 先天悟性(不含装备加成) */
+    int1?: number;
+    /** 总臂力(含装备加成) */
+    str?: number;
+    /** 总根骨(含装备加成) */
+    con?: number;
+    /** 总身法(含装备加成) */
+    dex?: number;
+    /** 总悟性(含装备加成) */
+    int?: number;
+    /** 性别要求(1男/2女/3无性) */
+    gender?: number;
+    /** 条件描述(仅展示,不做检查) */
+    desc?: string;
+    /** 最大内力 */
+    max_mp?: number;
+    /** 其他角色属性阈值(如门派贡献、等级等) 自己写新的，别乱用any */
+}
+
 // 从 os/const.js 导入常量
 // 注意: 这些常量应被迁移到 server/core/const.ts
 const SKILL_TYPES = { BASE: 0, SKILL: 1, KNOWLEDGE: 2 } as const;
@@ -36,7 +176,6 @@ export class SKILL extends BASE {
     grade: number = 1;
     /** 技能评分 */
     score: number = 0;
-
     /**
      * 技能学习条件，可包含以下字段:
      * - skill: {[id: string]: number}  前置技能ID→等级要求
@@ -46,7 +185,7 @@ export class SKILL extends BASE {
      * - desc: string                   条件描述(仅展示,不做检查)
      * - 其他任意key: number            角色属性阈值
      */
-    learn_condition: Record<string, any> = {};
+    learn_condition?: LearnCondition;
 
     // ============ 动作描述(支持$占位符) ============
 
@@ -73,7 +212,7 @@ export class SKILL extends BASE {
     // ============ 绝招与技能槽 ============
 
     /** 绝招字典(由资源文件设置) */
-    pfm: Record<string, PERFORM> | null = null;
+    pfm?: Record<string, PERFORM>;
     /** 进阶属性槽位(由资源文件设置) */
     slots: any[] | null = null;
 
@@ -89,6 +228,10 @@ export class SKILL extends BASE {
     is_ultimate?: boolean;
     /** 是否隐藏 */
     is_hidden?: boolean;
+    /** 是否为自创武功（由 checkskill 等系统检查） */
+    is_custom?: boolean;
+    /** 可练习的最低等级（由 lianxi 命令使用） */
+    lianxi_level?: number;
     /** 技能颜色名称缓存 */
     color_name: string = "";
     /** 学习条件字符串缓存 */
@@ -99,11 +242,13 @@ export class SKILL extends BASE {
     /** 激活技能回调 — 触发时机：enable() 开头，技能装备到基本技能类型时；返回 false 阻止激活 */
     on_enable?: (me: CHARACTER, type: string) => boolean | void;
     /** 取消激活回调 — 触发时机：disenable() 开头，技能从基本技能类型卸下时 */
-    on_disenable?: (me: CHARACTER, type: string) => void;
+    on_disenable(me: CHARACTER, type: string): void { }
     /** 学习技能回调 — 触发时机：玩家执行学习命令时（do_learn() 开头）；返回 false 阻止学习 */
-    on_learn?: (me: CHARACTER) => boolean | void;
+    on_learn(me: CHARACTER): boolean | void { return; }
+    /** 练习技能回调 — 触发时机：lianxi 命令执行时检查；返回 false 阻止练习 */
+    on_practice?(me: CHARACTER): boolean | void;
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
-    query_enable_prop(lv: number, me?: CHARACTER): Record<string, Record<string, any>> | undefined { return undefined; }
+    query_enable_prop(lv: number, me?: CHARACTER): EnablePropMap | undefined { return undefined; }
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
     query_prop(lv: number, me?: CHARACTER): Record<string, any> | undefined { return undefined; }
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
@@ -116,15 +261,15 @@ export class SKILL extends BASE {
     /** 攻击前回调（每轮） */
     on_before_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => void;
     /** 攻击回调（返回额外伤害） */
-    on_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
+    on_attack(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number { return 0; }
     /** 攻击结束回调（一轮后） */
-    on_attack_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void { }
     /** 一轮攻击完全结束回调 */
     on_end_attack?: (me: CHARACTER, target: CHARACTER) => void;
     /** 内功攻击回调（返回内功伤害） */
-    do_force_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
+    do_force_attack(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number { return 0; }
     /** 内功招架回调（返回减免伤害） */
-    on_force_parry?: (target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>) => number;
+    on_force_parry(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number { return 0; }
     /** 内功攻击结束回调 */
     on_force_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
     /** 受到伤害回调（返回减免后伤害） */
@@ -132,11 +277,11 @@ export class SKILL extends BASE {
     /** 闪避回调 */
     on_dodge?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 闪避结束回调 */
-    on_dodge_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_dodge_over(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void { }
     /** 招架回调 */
     on_parry?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 招架结束回调 */
-    on_parry_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_parry_over(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void { }
     /** 绝招招架回调（返回是否招架成功） */
     on_parry_pfm?: (target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number) => boolean;
     /** 重算闪避回调（由资源文件动态注入） */
@@ -145,6 +290,8 @@ export class SKILL extends BASE {
     on_recount_parry?: (me: CHARACTER) => number;
     /** 内功加成比例 */
     force_rad?: number;
+    /** 复活回调（由 biwu 等系统动态注入） */
+    on_relive?: (me: CHARACTER) => void;
 
     constructor() {
         super();
@@ -256,7 +403,7 @@ export class SKILL extends BASE {
         if (enable_prop) {
             for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
-                    me.change_prop(enable_prop[item], false);
+                    me.change_prop(enable_prop[item]!, false);
                 }
             }
         }
@@ -283,7 +430,7 @@ export class SKILL extends BASE {
         if (enable_prop) {
             for (let item in enable_prop) {
                 if (me.is_enable_skill(this.id, item)) {
-                    me.change_prop(enable_prop[item], true);
+                    me.change_prop(enable_prop[item]!, true);
                 }
             }
         }
@@ -379,7 +526,7 @@ export class SKILL extends BASE {
      * @param me
      * @param type - 基本技能类型
      */
-    enable(me: CHARACTER, type: string): boolean {
+    enable(me: CHARACTER, type: string, _lv?: number): boolean {
         if (!this.can_enables || !this.can_enables.contain(type)) return false;
         if (this.on_enable && this.on_enable(me, type) === false) return false;
         const lv = me.query_skill(this.id);
@@ -405,7 +552,7 @@ export class SKILL extends BASE {
      * @param type
      */
     disenable(me: CHARACTER, type: string): boolean {
-        this.on_disenable && this.on_disenable(me, type);
+        this.on_disenable(me, type);
         const lv = me.query_skill(this.id);
         const enable_prop = this.query_enable_prop(lv, me);
         if (enable_prop) {
@@ -431,7 +578,7 @@ export class SKILL extends BASE {
      * @param me
      */
     do_learn(me: CHARACTER): boolean | undefined {
-        if (this.on_learn && this.on_learn(me) === false) return false;
+        if (this.on_learn(me) === false) return false;
         if (this.learn_condition) {
             for (let key in this.learn_condition) {
                 const val = this.learn_condition[key];
@@ -676,8 +823,12 @@ export class SKILL extends BASE {
      */
     get_pfm(name: string): PERFORM | undefined {
         if (this.pfm) {
-            return this.pfm[name];
+            const entry = this.pfm[name];
+            if (!entry) return undefined;
+            if (entry instanceof PERFORM) return entry;
+            return PERFORM.fromPlain(entry);
         }
+        return undefined;
     }
 
     /**
@@ -943,111 +1094,91 @@ export class SKILL extends BASE {
 // PERFORM 绝招类
 // ============================================================
 
-export class PERFORM extends BASE {
-
-    // ============ 核心属性 ============
+export class PERFORM {
+    // ============ 核心属性（由资源文件部分设置，update() 补全） ============
 
     /** 绝招名称 */
-    name: string = "";
+    name?: string;
     /** 内力消耗 */
-    mp: number = 0;
+    mp?: number;
     /** 出招时间(毫秒) */
-    release_time: number = 0;
+    release_time?: number;
     /** 冷却时间(毫秒) */
-    distime: number = 0;
+    distime?: number;
     /** 出招时间最大值 */
-    release_time_max: number = 0;
+    release_time_max?: number;
     /** 冷却时间最小值 */
-    distime_min: number = 0;
+    distime_min?: number;
     /** 出招时间最小值 */
-    releasetime_min: number = 0;
+    releasetime_min?: number;
 
     // ============ 消耗减免Key ============
 
     /** 冷却时间减免key(针对特定属性) */
-    distime_key: string = "";
+    distime_key?: string;
     /** 冷却时间百分比减免key */
-    distime_per_key: string = "";
+    distime_per_key?: string;
     /** 出招时间减免key */
-    releasetime_key: string = "";
+    releasetime_key?: string;
     /** 出招时间百分比减免key */
-    releasetime_per_key: string = "";
+    releasetime_per_key?: string;
     /** 内力消耗百分比减免key */
-    expend_mp_per_key: string = "";
+    expend_mp_per_key?: string;
 
     // ============ 绝招配置 ============
 
     /** 所属基本技能类型(如'sword', 'blade') */
-    enable_skill: string = "";
+    enable_skill?: string;
     /** 使用类型 */
-    use_type: string = "";
+    use_type?: string | number;
+    /** 武器类型（资源文件使用） */
+    weapon_type?: string;
     /** 使用条件检查函数 */
     check?: (me: CHARACTER, lv: number, base_type?: string) => boolean | string;
     /** 使用条件描述(不满足时显示) */
-    use_condition: string = "";
+    use_condition?: string;
     /** 是否禁止自动释放 */
-    no_auto: boolean = false;
+    no_auto?: boolean;
     /** 允许忙碌时使用 */
-    allow_busy: boolean = false;
+    allow_busy?: boolean;
 
-    // ============ 绝招ID标识 ============
+    // ============ 绝招ID标识（由 update() 设置） ============
 
     /** 完整绝招ID (格式: skillId/pfmName) */
-    id: string = "";
+    id?: string;
     /** 绝招名(在技能内的key) */
-    pid: string = "";
+    pid?: string;
     /** 是否为武器绝招 */
-    is_weapon: boolean = false;
+    is_weapon?: boolean;
+    /** 是否为武器buff绝招 */
+    is_weapon_buff?: boolean;
+    /** 缓存计数(用于部分绝招逻辑) */
+    suc_count?: number;
 
     // ============ 显示 ============
 
+    /** 攻击消息数组(用于多段攻击) */
+    attack_msgs?: string[];
+
     /** 伤害消息 */
-    damage_msg: string = "";
+    damage_msg?: string;
 
     // ============ 回调（由资源文件设置） ============
-
-    /** 使用绝招回调 — 触发时机：玩家/NPC 释放绝招时 */
-    on_use?: (me: CHARACTER, target: CHARACTER, lv: number) => void;
+    /** 使用绝招回调(资源文件使用 — runtime调用pfm.use) */
+    use?: (this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number, sktype?: string) => void;
     /** 绝招伤害回调 — 触发时机：绝招每次造成伤害时（do_attack 中伤害计算后） */
     on_attack?: (me: CHARACTER, target: CHARACTER, lv: number, damage: number) => void;
     /** 查询绝招描述回调 — 触发时机：cha 命令查看技能详情时（query_pfm_desc 调用） */
     query_desc?: (me: CHARACTER, lv: number) => string;
 
-    constructor() {
-        super();
-    }
+    // ============ 冷却/消耗计算（支持热补丁覆盖） ============
 
-    /**
-     * 从普通对象创建PERFORM实例
-     * 替代原JS中 pfm.__proto__ = PERFORM.prototype 的模式
-     * @param obj - 资源文件中的绝招定义对象
-     */
-    static fromPlain(obj: PERFORM): PERFORM {
-        const pfm = new PERFORM();
-        // 复制所有可枚举属性(包含函数)
-        for (const key of Object.keys(obj)) {
-            pfm[key] = obj[key];
-        }
-        return pfm;
-    }
-
-    /**
-     * 查询绝招名称
-     * @param me
-     * @param base_type - 基本技能类型
-     */
+    /** 查询绝招名称 */
     query_name(me?: CHARACTER, base_type?: string): string {
-        return this.name;
+        return this.name || "";
     }
 
-    // ============ 冷却管理 ============
-
-    /**
-     * 改变绝招冷却时间
-     * @param me
-     * @param id - 绝招ID
-     * @param add_time - 增加冷却时间(毫秒), 不传则清除
-     */
+    /** 改变绝招冷却时间 */
     change_distime(me: CHARACTER, id: string, add_time?: number): void {
         if (me.is_player) {
             const dis_time = me.temp ? me.temp["pfm/" + id] : undefined;
@@ -1055,7 +1186,7 @@ export class PERFORM extends BASE {
                 if (add_time)
                     dis_time.e += add_time;
                 else {
-                    add_time = -dis_time.time;
+                    add_time = -(dis_time.time || 0);
                     dis_time.e = 1;
                 }
                 me.notify('{type:"changepfm",id:"' + id + '",time:' + add_time + '}');
@@ -1073,15 +1204,9 @@ export class PERFORM extends BASE {
         }
     }
 
-    // ============ 属性计算 ============
-
-    /**
-     * 查询出招时间
-     * @param me
-     * @param lv
-     */
+    /** 查询出招时间 */
     query_releasetime(me: CHARACTER, lv: number): number {
-        var rtime = this.release_time;
+        var rtime = this.release_time ?? 0;
         if (!(rtime >= 0)) rtime = me.gjsd;
 
         if (this.releasetime_key) {
@@ -1099,14 +1224,9 @@ export class PERFORM extends BASE {
         return Math.floor(rtime);
     }
 
-    /**
-     * 查询冷却时间
-     * @param me
-     * @param lv
-     * @param isref - 是否为引用技能
-     */
+    /** 查询冷却时间 */
     query_distime(me: CHARACTER, lv?: number, isref?: boolean): number {
-        var dis = this.distime;
+        var dis = this.distime ?? 0;
         if (!dis) dis = me.gjsd;
         if (isref) dis = dis * 2;
         if (this.distime_key) {
@@ -1124,11 +1244,7 @@ export class PERFORM extends BASE {
         return Math.floor(dis);
     }
 
-    /**
-     * 查询内力消耗
-     * @param me
-     * @param lv
-     */
+    /** 查询内力消耗 */
     query_mp(me: CHARACTER, lv: number): number {
         var mp = this.mp || 0;
 
@@ -1142,4 +1258,19 @@ export class PERFORM extends BASE {
         if (mp < 0) mp = 0;
         return Math.floor(mp);
     }
+
+    /**
+     * 从普通对象创建PERFORM实例
+     * 替代原JS中 pfm.__proto__ = PERFORM.prototype 的模式
+     * @param obj - 资源文件中的绝招定义对象
+     */
+    static fromPlain(obj: Partial<PERFORM>): PERFORM {
+        const pfm = new PERFORM();
+        // 复制所有可枚举属性(包含函数)
+        for (const key of Object.keys(obj)) {
+            pfm[key] = obj[key];
+        }
+        return pfm;
+    }
+
 }

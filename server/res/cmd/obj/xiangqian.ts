@@ -36,7 +36,7 @@ export default class extends COMMAND {
         }
         return;
     }
-    var items = [];
+    var items: import("../../../core/item.js").ITEM[] = [];
     for (var i = 0; i < player.items.length; i++) {
         if (player.items[i].is_stone) {
             items.push(player.items[i]);

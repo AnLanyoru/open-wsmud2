@@ -1,7 +1,8 @@
 import { ROOM } from "../../../core/room/room.js";
 import { FOLLOWER } from "../../../core/char/follower.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
-export default class extends ROOM {
+export default class MapRoom extends ROOM {
     name = "卧室";
     desc = "这是你的卧室，房间不大陈设也不多，但是收拾的干净整洁，房间里面除了一张楠木大床，一张书桌，一个箱子就没别的东西了。";
     exits = { "out": "yz/home" };
@@ -9,10 +10,10 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("store", "打开仓库");
-        this.add_action("xiulian", "修炼", null);
-        this.add_action("fenpei", "分配属性", null);
-        this.add_action("sleep", "睡觉", function (me) {
+        this.add_action("store", "打开仓库", function (this: MapRoom) { });
+        this.add_action("xiulian", "修炼", function (this: MapRoom) { });
+        this.add_action("fenpei", "分配属性", function (this: MapRoom) { });
+        this.add_action("sleep", "睡觉", function (this: MapRoom, me: CHARACTER) {
 
             me.notify("你躺到床上被子一盖，不一会就呼呼的睡着了。");
         });

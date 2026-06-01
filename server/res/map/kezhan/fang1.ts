@@ -25,9 +25,9 @@ export default class extends ROOM {
     on_leave(me) {
     me.remove_status("room");
 }
-    on_heart_beat() {
+    on_heart_beat(dt: number) {
     for (let item of this.items) {
-        if (item.hp > 0) {
+        if ('hp' in item && item.hp > 0) {
             return check_moveout(item);
         }
     }

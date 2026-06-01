@@ -79,9 +79,9 @@ export default class extends SKILL {
             me.end_attack(target);
         },
         query_desc: function (me, lv) {
-            var lv = 30 - lv / 100;
-            if (lv < 10) lv = 10;
-            return "对敌人进行快速攻击3次，对方的气血每降低" + lv + "%，你的攻击次数增加1次";
+            var calcLv = 30 - lv / 100;
+            if (calcLv < 10) calcLv = 10;
+            return "对敌人进行快速攻击3次，对方的气血每降低" + calcLv + "%，你的攻击次数增加1次";
         }
     }
 };

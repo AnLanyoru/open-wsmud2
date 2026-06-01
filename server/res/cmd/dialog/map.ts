@@ -26,7 +26,7 @@ export default class extends COMMAND {
     }
     var path = area + "/"
     if (this.buffer[area]) return me.send(this.buffer[area]);
-    var area_obj = null;
+    var area_obj: import("../../../core/room/area.js").AREA | null = null;
     for (var i = 0; i < WORLD.AREAS.length; i++) {
         if (path == WORLD.AREAS[i].room_path) {
             area_obj = WORLD.AREAS[i];
@@ -44,9 +44,9 @@ export default class extends COMMAND {
     update_map(id, rm, pos) {
     this.buffer[id] = null;
     if (!rm) {
-        var area_obj;
+        var area_obj: import("../../../core/room/area.js").AREA | null = null;
         for (var i = 0; i < WORLD.AREAS.length; i++) {
-            if (path == WORLD.AREAS[i].room_path) {
+            if (id == WORLD.AREAS[i].room_path) {
                 area_obj = WORLD.AREAS[i];
                 break;
             }
@@ -64,10 +64,11 @@ export default class extends COMMAND {
 }
     createMapJson(area_obj, area) {
     if (!area_obj) return '{type:"map",maps:[]}';
-    var obj = {};
-    obj.type = "map";
-    obj.path = area;
-    obj.map = area_obj.map;
+    var obj: { type: string; path: string; map: any[] } = {
+        type: "map",
+        path: area,
+        map: area_obj.map,
+    };
     return JSON.stringify(obj);
 }
 }

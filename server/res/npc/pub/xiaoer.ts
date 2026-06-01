@@ -1,6 +1,7 @@
 import { NPC } from "../../../core/char/npc.js";
 import { WORLD } from "../../../core/world.js";
 import { UTIL } from "../../../core/util/util.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "店小二";
@@ -16,22 +17,22 @@ export default class extends NPC {
     constructor() {
         super();
         this.add_action("zhudian", "住店", zhudian);
-        this.add_action("xufei", null, function (me) {
-            var kd = me.temp['kezhan'];
-            if (!kd) return zhudian(me);
+        this.add_action("xufei", null, function (this: NPC, me: CHARACTER, par: string) {
+            var kd = me.temp!['kezhan'];
+            if (!kd) return zhudian.call(this, me, par);
             let money = [0, 1000, 3000, 10000][kd.v];
             if (!(money > 0)) return me.send('你还没有住店。');
             if (me.money < money) return me.send('你身上的钱不够。');
             me.money -= money;
             kd.e += 3600000 * 24;
-            let time = new Date(me.temp['kezhan'].e);
+            let time = new Date(me.temp!['kezhan'].e);
             let str = time.getFullYear() + "年" + (time.getMonth() + 1) + "月" + time.getDate() + "日" + time.getHours() + "时";
             me.send("小二一哈腰，说道：多谢您老，收您" + UTIL.moneyToStr(money) + "，续房一天。<cyn>(持续到" +
                 str + ")</cyn>");
         });
     }
 
-    on_enter(me) {
+    on_enter(me: CHARACTER): void {
     let kz = me.query_temp("kezhan");
     if (kz) {
         me.notify("小二一哈腰：这位客官请上楼歇息。");
@@ -51,7 +52,7 @@ export default class extends NPC {
     }
     me.notify(str);
 }
-    on_accept(me, obj, count) {
+    on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
     if (obj !== "money") return;
     if (me.money < 1000) {
         return me.notify("小二面无表情的说道：住店每天10两白银，不二价。");
@@ -75,13 +76,13 @@ export default class extends NPC {
 }
 }
 
-function zhudian(me, par) {
+function zhudian(this: NPC, me: CHARACTER, par: string): void {
     var kd = me.query_temp("kezhan");
     if (kd) {
         me.moveto("kezhan/fang" + kd, me.name + "向客店二楼走去。");
     } else {
         me.notify("小二对你说道：这位" + me.call() + "，本店有多种房间提供：\n1. 人字号房每天10两白银，学习，打坐，练功效果增加10%\n2. 地字号房每天30两白银，学习，打坐，练功效果增加20%\n3. 天字号房间每天1两黄金，学习，打坐，练功效果增加50%");
-        return me.send_commands("give " + this.id + " 1000 money", "人字号客房",
+        me.send_commands("give " + this.id + " 1000 money", "人字号客房",
             "give " + this.id + " 3000 money", "<hic>地字号客房</hic>",
             "give " + this.id + " 10000 money", "<hiy>天字号客房</hiy>");
 

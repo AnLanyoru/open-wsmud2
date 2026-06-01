@@ -52,8 +52,8 @@ export default class extends SKILL {
             me.end_attack(target);
         },
         query_desc: function (me, lv) {
-            var lv = 3000 + lv * 4;
-            return "命中敌人后，使敌人忙乱"+(lv/1000)+"秒，无法攻击，招架";
+            var time = 3000 + lv * 4;
+            return "命中敌人后，使敌人忙乱"+(time/1000)+"秒，无法攻击，招架";
         }
     }
 };

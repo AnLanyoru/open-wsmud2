@@ -4,7 +4,8 @@ import { OBJ } from "../../core/item/obj.js";
 import type { OddsEntry } from "../../core/item/obj.js";
 import { UTIL } from "../../core/util/util.js";
 import { NPC } from "../../core/char/npc.js";
-import type { CHARACTER } from "../../core/char/character.js";
+import type { USER } from "../../core/char/user.js";
+import type { CORPSE } from "../../core/item/corpse.js";
 import { AREA } from "../../core/room/area.js";
 import { ROOM } from "../../core/room/room.js";
 import { EVENTS } from "../../core/task/events.js";
@@ -87,12 +88,13 @@ export default class extends TASK {
     for (let room of area.rooms) {
         for (let i = 0; i < room.items.length; i++) {
             let item = room.items[i];
+            if (!('moveto' in item)) continue;
             if (!item.is_player) continue;
-            if ((item as CHARACTER).query_temp('xy_bm'))
+            if (item.query_temp('xy_bm'))
                 continue;
             // moveto 可能返回字符串 'false'
-    if ((item as CHARACTER).moveto('yz/beimen') as unknown !== 'false') {
-                (item as CHARACTER).send('<yel>你离开襄阳一路赶到扬州。</yel>');
+    if (String(item.moveto('yz/beimen')) !== 'false') {
+                item.send('<yel>你离开襄阳一路赶到扬州。</yel>');
                 i--;
             }
         }
@@ -118,7 +120,7 @@ export default class extends TASK {
     this.call_out(this.create_enemy, 10000);
 }
     create_guards() {
-    this.guard = ROOM.Get("xiangyang/guangchang")!.find_obj_bypath("xiangyang/guo") as NPC | null;
+    this.guard = ROOM.Get("xiangyang/guangchang")!.find_obj_bypath("xiangyang/guo") as unknown as NPC | null;
     if (!this.guard) {
         this.guard = NPC.CLONE("xiangyang/guo");
         ROOM.Get("xiangyang/guangchang")!.item_changed(this.guard, true);
@@ -170,7 +172,7 @@ export default class extends TASK {
         }
         if (!gate.enter_room) continue;
         this.create_index = i;
-        var func = this["create_enemy" + this.step];
+        var func = this["create_enemy" + this.step] as ((par: GateState) => void);
         func && func.call(this, gate);
         if (gate.step > 1) {
 
@@ -206,49 +208,49 @@ export default class extends TASK {
     }
 
 }
-    create_enemy0(par, ..._args: any[]) {
+    create_enemy0(par: GateState) {
     for (var i = par.bing.length; i < 5; i++) {
-        par.bing.push(this.create_one(5, par.enter_room));
+        par.bing.push(this.create_one(5, par.enter_room!));
     }
 }
-    create_enemy1(par, ..._args: any[]) {
+    create_enemy1(par: GateState) {
     if (!par.boss) {
-        par.boss = this.create_one(4, par.enter_room);
+        par.boss = this.create_one(4, par.enter_room!);
     }
     for (var i = par.bing.length; i < 4; i++) {
-        par.bing.push(this.create_one(5, par.enter_room));
+        par.bing.push(this.create_one(5, par.enter_room!));
     }
 }
-    create_enemy2(par, ..._args: any[]) {
+    create_enemy2(par: GateState) {
     if (!par.boss) {
-        par.boss = this.create_one(3, par.enter_room);
+        par.boss = this.create_one(3, par.enter_room!);
     }
     for (var i = par.bing.length; i < 4; i++) {
-        par.bing.push(this.create_one(i == 3 ? 4 : 5, par.enter_room));
+        par.bing.push(this.create_one(i == 3 ? 4 : 5, par.enter_room!));
     }
 }
-    create_enemy3(par, ..._args: any[]) {
+    create_enemy3(par: GateState) {
     if (!par.boss) {
-        par.boss = this.create_one(2, par.enter_room);
+        par.boss = this.create_one(2, par.enter_room!);
     }
     for (var i = par.bing.length; i < 4; i++) {
-        par.bing.push(this.create_one(i == 3 ? 3 : 4, par.enter_room));
+        par.bing.push(this.create_one(i == 3 ? 3 : 4, par.enter_room!));
     }
 }
-    create_enemy4(par, ..._args: any[]) {
+    create_enemy4(par: GateState) {
     if (!par.boss) {
-        par.boss = this.create_one(1, par.enter_room);
+        par.boss = this.create_one(1, par.enter_room!);
     }
     for (var i = par.bing.length; i < 4; i++) {
-        par.bing.push(this.create_one(i == 0 ? 2 : 4, par.enter_room));
+        par.bing.push(this.create_one(i == 0 ? 2 : 4, par.enter_room!));
     }
 }
-    create_enemy5(par, ..._args: any[]) {
+    create_enemy5(par: GateState) {
     if (!par.boss) {
-        par.boss = this.create_one(1, par.enter_room);
+        par.boss = this.create_one(1, par.enter_room!);
     }
     for (var i = par.bing.length; i < 4; i++) {
-        par.bing.push(this.create_one(i < 2 ? 2 : 3, par.enter_room));
+        par.bing.push(this.create_one(i < 2 ? 2 : 3, par.enter_room!));
     }
 }
     create_one(index: number, rm: ROOM, iswall?: boolean): NPC {
@@ -269,16 +271,16 @@ export default class extends TASK {
     npc.is_menggubing = true;
     rm.item_changed(npc, true, "一个" + npc.title + "冲了过来。");
     var item = rm.items.random();
-    if (item && item.is_player) {
-        npc.do_kill(item as CHARACTER);
+    if (item && ('moveto' in item) && item.is_player) {
+        npc.do_kill(item);
     }
     return npc;
 }
     create_mgname() {
     var str = ["完颜", "纥石烈", "兀颜", "纳兰", "阿迭"].random();
-    str += UTIL.name2[parseInt(Math.random() * UTIL.name2.length)];
+    str += UTIL.name2[parseInt(String(Math.random() * UTIL.name2.length))];
     if (this.random(4) == 1) {
-        str += UTIL.name2[parseInt(Math.random() * UTIL.name2.length)];
+        str += UTIL.name2[parseInt(String(Math.random() * UTIL.name2.length))];
     }
     return str;
 }
@@ -294,7 +296,7 @@ export default class extends TASK {
         this.do_kill(me);
     }
 }
-    on_guard_die(npc, killer, corpse) {
+    on_guard_die(npc: NPC, killer: USER, corpse: unknown) {
     if (killer.is_player) {
         // var count = [1, 2, 3, 4, 5, 5][5 - parseInt(npc.path.replace('xiangyang/shouwei', ''))];
         // if (count > 0) {
@@ -311,10 +313,10 @@ export default class extends TASK {
     }
     this.guards.remove(npc);
     var rm = npc.environment;
+    if (!rm) return;
     for (var i = 0; i < rm.items.length; i++) {
         if (rm.items[i] != npc && rm.items[i].path == npc.path) return;
     }
-    var isover = true;
     for (var i = 0; i < this.gate_states.length; i++) {
         var gate = this.gate_states[i];
         if (rm.path.indexOf(gate.dir) > -1) {
@@ -373,7 +375,7 @@ export default class extends TASK {
     }
     return sum;
 }
-    on_bing_die(npc, killer) {
+    on_bing_die(npc: NPC, killer: USER) {
     if (!this.is_start) return;
     if (npc == this.boss) {
         this.finish(1);
@@ -382,7 +384,7 @@ export default class extends TASK {
     if (this.boss) {
         this.boss.remove_status("boss");
     }
-    var gate = this.gate_states[npc.gate_index];
+    var gate = this.gate_states[npc.gate_index!];
     if (npc.iswall) {
         gate.wall_count--;
         return;
@@ -395,10 +397,11 @@ export default class extends TASK {
     }
 
 }
-    check_move(npc) {
-    if (npc.environment.is("xiangyang/guangchang")) return;
-    for (var i = 0; i < npc.environment.items.length; i++) {
-        if (npc.environment.items[i].is_dasong) return;
+    check_move(npc: NPC) {
+    if (npc.environment!.is("xiangyang/guangchang")) return;
+    for (var i = 0; i < npc.environment!.items.length; i++) {
+        const elem = npc.environment!.items[i];
+        if (('is_dasong' in elem) && elem.is_dasong) return;
     }
     switch (npc.gate_index) {
         case 0:
@@ -415,7 +418,7 @@ export default class extends TASK {
             break;
     }
 }
-    finish(issuc) {
+    finish(issuc: number) {
     if (!this.is_start) return;
     if (this.check_handler) clearTimeout(this.check_handler);
     for (var i = 0; i < this.gate_states.length; i++) {
@@ -436,7 +439,7 @@ export default class extends TASK {
     }
     this.guards.length = 0;
     this.is_start = false;
-    var index = (WORLD.DATA.query_temp("xiangyang") as number) + 20;
+    var index = Number(WORLD.DATA.query_temp("xiangyang")) + 20;
     if (issuc == 1) {
         this.send_message("武神历" + UTIL.to_c(index) + "年蒙古可汗蒙哥被击杀于襄阳城下，襄阳城大获全胜！", true);
         this.send_message("郭大侠犒赏全军，前往襄阳城领取！", true);
@@ -472,7 +475,7 @@ export default class extends TASK {
     send_message(str: string, _sendall?: boolean) {
     COMMAND.DO("sys", str);
 }
-    create_event(issuc) {
+    create_event(issuc: number) {
     let desc: string | null = null, command: string | null = null;
     if (issuc === 1) {
         desc = "襄阳守城活动结束，襄阳城大获全胜，可直接领取犒赏军功！";
@@ -504,13 +507,13 @@ export default class extends TASK {
     reset() {
     this.xy_area?.notify_update();
 }
-    jg_limit(me) {
+    jg_limit(me: Record<string, any>) {
     return JUNGONG_LIMITS[me.level];
 }
-    is_jgmax(me) {
+    is_jgmax(me: Record<string, any>) {
     return me.query_temp('jg_week', 0) >= JUNGONG_LIMITS[me.level];
 }
-    reward(me, msg = "") {
+    reward(me: Record<string, any>, msg = "") {
     var status = WORLD.DATA.query_temp("xy_status", 0);
     if (!status) {
         return me.notify(msg + "最近没什么战事，你可以使用你累积的军功兑换物资！");
@@ -522,7 +525,7 @@ export default class extends TASK {
     if (reward > 1) {
         return me.notify(msg + "你本周内的奖励军功已经领取过了！");
     }
-    var count = WORLD.DATA.query_temp("xy_sc", 0) as number;
+    var count = Number(WORLD.DATA.query_temp("xy_sc", 0));
     if (!(count > 0 && count < 5))
         return me.notify(msg + "最近并没有军功奖励可领取。");
     let limit = REWARDS_LIMIT[me.level];
@@ -540,7 +543,7 @@ export default class extends TASK {
     return me.notify("<hiy>你领取了" + added + "点军功，目前" + max + "。</hiy>");
 
 }
-    bm(me, msg = "") {
+    bm(me: USER, msg = "") {
     if (me.query_temp("xy_bm")) {
         return me.notify_fail(msg + "你已经报名守城了。");
     }
@@ -560,7 +563,7 @@ export default class extends TASK {
     if (me.query_temp('xy_bm2')) {
         return me.notify_fail(msg + "你最近刚刚战斗过，休息一天再来报名吧。");
     }
-    const user_count = WORLD.DATA.query_temp("xy_users", 0) as number;
+    const user_count = Number(WORLD.DATA.query_temp("xy_users", 0));
     if (user_count >= 40) return me.notify(msg + "参与守城的人已经够了，你就不要去添乱了。");
 
     me.set_temp('xy_bm', 1, 3600000);
@@ -570,14 +573,15 @@ export default class extends TASK {
     me.notify("<hic>你已经报名参与守城，一周内所获军功未到上限前可重复报名。</hic>");
     return true;
 }
-    on_bing_died(this: any, killer, corpse) {
+    on_bing_died(this: NPC, killer: USER, corpse: CORPSE) {
     if (!killer) return;
     corpse.no_alloc = true;
     corpse.clear_items = clear_items.bind(this, corpse);
     corpse.query_items = query_items.bind(this);
     this.drops_count = 0;
-    if (this.diff_level < 2) {
+    if (this.diff_level! < 2) {
         let room = this.die_room;
+        if (!room) return;
 
         let min_damage = this.max_hp * 0.03;
         for (let key in this.damages) {
@@ -596,9 +600,10 @@ export default class extends TASK {
 
 const REWARDS_LIMIT = [0, 10, 20, 30, 40, 50, 60];
 const JUNGONG_LIMITS = [10, 50, 100, 200, 300, 400, 500];
-function add_jungong(me, count) {
-    let max = JUNGONG_LIMITS[me.level];
-    if (me.query_temp('jg_week', 0) >= max) return false;
+function add_jungong(me: USER, count: number) {
+    if (!me) return;
+    let max = JUNGONG_LIMITS[me.level] ?? 0;
+    if ((me.query_temp('jg_week', 0) ?? 0) >= max) return false;
     let value = me.add_temp('jg_week', count, UTIL.diff_week_time());
     if (value > max) {
         me.add_temp('jg_week', max - value, UTIL.diff_week_time());
@@ -613,27 +618,28 @@ function add_jungong(me, count) {
 }
 const JUNGONGS = [1, 5, 10, 15, 20, 25, 30];
 const EQ_ODDS = [1500, 2500, 3100, 4050, 5001, 5005];
-function is_bm(user) {
+function is_bm(user: USER) {
+    if (!user) return false;
     var bm = user.query_temp('xy_bm');
     if (!bm) return false;
-    if (user.query_temp('jg_week', 0)
-        >= JUNGONG_LIMITS[user.level]) return false;
+    if ((user.query_temp('jg_week', 0) ?? 0)
+        >= (JUNGONG_LIMITS[user.level] ?? 0)) return false;
     return true;
 }
-function query_items(this: any, me) {
+function query_items(this: NPC, me: USER) {
     if (!this.damages) return;
     var sh = this.damages[me.id];
     if (!(sh > 0)) return;
     if (!this.user_items) this.user_items = {};
     if (this.user_items[me.id]) return this.user_items[me.id];
     if (!is_bm(me)) return;
-    sh = parseInt(sh * 100 / this.max_hp);
+    sh = parseInt(String(sh * 100 / this.max_hp));
     if (sh < 3) {
         this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(3))];
         return this.user_items[me.id];
     }
     if (sh > 100) sh = 80;
-    const diff_level = this.diff_level;
+    const diff_level = this.diff_level!;
     const drops: OddsEntry[] = [
         {
             obj: "money/silver",
@@ -660,16 +666,16 @@ function query_items(this: any, me) {
     if (diff_level < 1) {
         add_jungong(me, 1);
     } else {
-        add_jungong(me, parseInt(JUNGONGS[diff_level]
-            * Math.max(sh, 50) / 50));
+        add_jungong(me, parseInt(String(JUNGONGS[diff_level]
+            * Math.max(sh, 50) / 50)));
     }
 
     return items;
 }
-function clear_items(this: any, corpse, me) {
+function clear_items(this: NPC, corpse: CORPSE, me: USER) {
     if (this.user_items && this.user_items[me.id]) {
         this.user_items[me.id].length = 0;
-        if (this.drops_count > 0) {
+        if (this.drops_count && this.drops_count > 0) {
             this.drops_count--;
             if (this.drops_count <= 0) {
                 corpse.disappear();

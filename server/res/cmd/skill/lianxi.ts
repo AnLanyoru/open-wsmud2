@@ -81,7 +81,13 @@ export default class extends COMMAND {
 }
 }
 
-function on_check(me) {
+interface LianxiState {
+    max_level: number;
+    skill_base: import("../../../core/skill/skill.js").SKILL;
+    queues: { skid: string; max_level: number }[];
+    sum_pot: number;
+}
+function on_check(this: LianxiState, me: CHARACTER) {
     let max_level = this.max_level;
     let speed = count_speed(me);
 
@@ -92,6 +98,7 @@ function on_check(me) {
     let str = ['你正在练习', skill.query_color_name(me), '到', max_level, '级，当前练习速度', speed];
     for (let item of this.queues) {
         skill = SKILL.get(item.skid);
+        if (!skill) continue;
         str.push('\n准备练习', skill.query_color_name(me), '到', item.max_level, '级');
         pot += (skill.query_needexp(item.max_level, me) -
             skill.query_needexp(me.query_skill(skill.id, 0), me));
@@ -169,7 +176,7 @@ function check_skill(me, skill, limit = true) {
     }
     return true;
 }
-function do_learn(me) {
+function do_learn(this: LianxiState, me: CHARACTER) {
     if (me.pot > 0) {
 
         if (!check_skill(me, this.skill_base)) return false;

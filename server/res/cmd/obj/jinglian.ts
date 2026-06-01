@@ -1,6 +1,7 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
+import { ITEM } from "../../../core/item.js";
 
 export default class extends COMMAND {
     command = "jinglian";
@@ -18,13 +19,14 @@ export default class extends COMMAND {
     if (!obj.grade) return player.notify(obj.color_name + "品质太低了，承受不住再多的力量。");
     if (obj.level >= 12) return player.notify(obj.color_name + "已经到了极限，无法再承受更多的力量。");
 
-    var item = {
+    var fallbackItem = {
         path: obj.grade == 6 ? "st/yuanjing" : "st/xuanjing",
         color_name: obj.grade == 6 ? "<hio>元晶</hio>" : "<hiw>玄晶</hiw>", count: 0
     };
+    var item: { path: string; color_name: string; count: number } | ITEM = fallbackItem;
 
     for (var i = 0; i < player.items.length; i++) {
-        if (player.items[i].is(item.path)) {
+        if (player.items[i].is(fallbackItem.path)) {
             item = player.items[i];
             break;
         }

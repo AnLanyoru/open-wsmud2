@@ -116,7 +116,13 @@ const BAN_SKILLS = {
     linshuijing: true,
     guanshanjue: true
 };
-function on_check(me) {
+interface LearnState {
+    skill_base: import("../../../core/skill/skill.js").SKILL;
+    target: import("../../../core/char/character.js").CHARACTER;
+    max_level?: number;
+    queues: { skid: string; max_level?: number }[];
+}
+function on_check(this: LearnState, me: CHARACTER) {
 
 
     let speed = count_speed(me);
@@ -132,6 +138,7 @@ function on_check(me) {
 
     for (let item of this.queues) {
         skill = SKILL.get(item.skid);
+        if (!skill) continue;
         let maxlv = item.max_level || target_lv;
         str.push('\n准备学习', skill.query_color_name(me), '到', maxlv, '级');
         pot += (skill.query_needexp(maxlv, me) -
@@ -221,7 +228,7 @@ function check_skill(me, skill, master, limit = true) {
     // }
     return true;
 }
-function do_learn(me) {
+function do_learn(this: LearnState, me: CHARACTER) {
     var master = this.target;
     if (!me.is_here(master) || !master.is_living()) {
         return false;
@@ -230,7 +237,7 @@ function do_learn(me) {
         me.notify("你的潜能不够，无法继续学习下去了。");
         return false;
     }
-    var skill = me.skills[this.skill_base.id];
+    var skill = me.skills?.[this.skill_base.id];
     var lv = 0;
     if (skill) {
         lv = skill.level;

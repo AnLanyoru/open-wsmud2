@@ -1,5 +1,6 @@
 import { USERTASK } from "../../core/task/playertask.js";
 import { OBJ } from "../../core/item/obj.js";
+import type { OddsEntry } from "../../core/item/obj.js";
 
 export default class extends USERTASK {
     id = "wudao";
@@ -92,7 +93,7 @@ export default class extends USERTASK {
 
 }
     reward(me, lv) {
-    let items: any = [];
+    let items: OddsEntry[] = [];
     let exp = 10000;
     if (lv <= 29) {
         exp += lv * 10000;
@@ -112,11 +113,11 @@ export default class extends USERTASK {
         me.add_temp('wds', wd_count);
     }
 
-    items = OBJ.create_by_odds(items);
-    for (var i = 0; i < items.length; i++) {
-        var item = me.add_obj(items[i]);
+    const created = OBJ.create_by_odds(items);
+    for (var i = 0; i < created.length; i++) {
+        var item = me.add_obj(created[i]);
         if (item) {
-            me.send("你获得了" + (items[i] as any).unit_name() + "。");
+            me.send("你获得了" + item.unit_name() + "。");
         }
     }
 

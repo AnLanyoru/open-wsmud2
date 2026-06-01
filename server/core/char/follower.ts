@@ -62,7 +62,7 @@ interface FOLLOWER_DATA {
 /** 客户端命令条目 */
 interface CommandEntry {
   cmd: string;
-  name: string;
+  name: string | null;
 }
 
 /** 发送给客户端的物件命令 JSON */

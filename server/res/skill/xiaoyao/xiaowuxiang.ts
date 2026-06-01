@@ -52,7 +52,7 @@ export default class extends SKILL {
             }
             if (sp_skill.grade > 4)
                 return me.notify_fail("对方使用的武功太高深，你无法模仿。");
-            pfm = sp_skill.get_pfm(str[1]);
+            var pfm = sp_skill.get_pfm(str[1]);
             if (!pfm) {
                 return me.notify_fail(sp_skill.name + "没有这个绝招。");
             }
@@ -85,8 +85,8 @@ export default class extends SKILL {
             if (up > 100) up = 100;
             me.use_pfm(target, pfm, parseInt(up * lv / 100));
 
-            this.distime = pfm.query_distime(me, lv);
-            this.release_time = pfm.query_releasetime(me, lv);
+            this.distime = pfm.query_distime?.(me, lv) ?? 0;
+            this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
 
             if (sp_skill.grade <= 4 && isEnable && !me.is_in("yz/leitai/leitai") &&
                 sp_skill.family !== FAMILIES.MONSTER) {
@@ -134,7 +134,7 @@ export default class extends SKILL {
             }
             if (sp_skill.family === FAMILIES.MONSTER) return me.notify_fail("怪物专属技能无法模仿。");
             if (sp_skill.grade > 4) return me.notify_fail("对方使用的武功太高深，你无法模仿。");
-            pfm = sp_skill.get_pfm(str[1]);
+            var pfm = sp_skill.get_pfm(str[1]);
             if (!pfm) {
                 return me.notify_fail(sp_skill.name + "没有这个绝招。");
             }
@@ -152,8 +152,8 @@ export default class extends SKILL {
             var up = 70 + parseInt(lv / 100);
             if (up > 100) up = 100;
             me.use_pfm(target, pfm, parseInt(up * lv / 100));
-            this.distime = pfm.query_distime(me, lv);
-            this.release_time = pfm.query_releasetime(me, lv);
+            this.distime = pfm.query_distime?.(me, lv) ?? 0;
+            this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
         },
         query_desc: function (me, lv) {
             lv = 70 + parseInt(lv / 100);

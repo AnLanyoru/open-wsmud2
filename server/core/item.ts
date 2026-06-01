@@ -77,9 +77,9 @@ export class ITEM extends BASE {
     /** 是否为 NPC */
     is_npc: boolean = false;
     /** 当前所在环境（房间） */
-    environment: ROOM | null = null;
+    environment?: ROOM;
     /** 掉落列表 */
-    drop_list: any[] | null = null;
+    drop_list?: any[];
 
     // ============ 子类共享属性（OBJ / EQUIPMENT 等） ============
 
@@ -87,10 +87,14 @@ export class ITEM extends BASE {
     is_equipment: boolean = false;
     /** 单位名称 */
     unit: string = '个';
+    /** 冷却类型标识（用于区分同类物品共享冷却） */
+    distype?: string;
     /** 品级 */
     grade: number = 0;
     /** 物件类型标识 */
     otype: number = 0;
+    /** 经书索引（四十二章经专用） */
+    jing_index?: number;
 
     // ============ 消息发送（桩方法，由 CHARACTER 覆写） ============
 
@@ -218,8 +222,8 @@ export class ITEM extends BASE {
      */
     add_action(
         cmd: string,
-        name: string,
-        func: (this: this, ...args: unknown[]) => unknown,
+        name: string | null,
+        func: (...args: any[]) => unknown,
     ): ActionDef<this> | undefined {
         if (!cmd) return;
         if (!this.actions) this.actions = {};
@@ -479,14 +483,14 @@ export class ITEM extends BASE {
      * @param items - 物品数组
      * @param oid - 物品 ID
      */
-    find_obj_byid(items: ITEM[], oid: string): ITEM | undefined {
-        if (!items) return;
+    find_obj_byid(items: ITEM[], oid: string): ITEM | null {
+        if (!items) return null;
         for (let i = 0; i < items.length; i++) {
             if (items[i].id === oid) {
                 return items[i];
             }
         }
-        return;
+        return null;
     }
 
     // ============ 显示名称 ============

@@ -21,7 +21,7 @@ export default class extends SKILL {
     "$p往$N的手腕轻轻一按，结果$w偏向一边。"
 ];
     desc = "招架类技能的基础功法，坚持锻炼会提高你的招架能力";
-    query_prop = lv => ({ zj: lv });
+    query_prop(lv: number): Record<string, any> { return { zj: lv }; }
 
     constructor() {
         super();

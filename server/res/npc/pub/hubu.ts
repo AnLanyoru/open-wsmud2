@@ -1,6 +1,7 @@
 import { NPC } from "../../../core/char/npc.js";
 import { WORLD } from "../../../core/world.js";
 import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "赵铁笔";
@@ -20,7 +21,7 @@ export default class extends NPC {
         this.set_objects([
         "eq/lv1/guanfu", 1, 1
         ]);
-        this.add_action("no_marry", "离婚", function (me, par) {
+        this.add_action("no_marry", "离婚", function (me: CHARACTER, par: string) {
             var user = this.check_player(me);
             if (!user) return;
             this.send_room("$N说道：离婚这个事情可不能草率，我得问问" + me.name + "愿不愿意。注意了，双方同意离婚后将解除婚姻关系。", user);
@@ -28,7 +29,7 @@ export default class extends NPC {
             user.send_commands("no_marry_no " + this.id, "不愿意", "no_marry_yes " + this.id, "愿意");
             user.set_temp("request_no_marry", 1, 100000);
         });
-        this.add_action("no_marry_no", null, function (me, par) {
+        this.add_action("no_marry_no", null, function (me: CHARACTER, par: string) {
             if (!me.query_temp("request_no_marry")) return me.notify("没人问你。");
             var user = this.check_player(me);
             if (!user) return;
@@ -36,7 +37,7 @@ export default class extends NPC {
             me.remove_temp("request_no_marry");
             me.send_room("赵铁笔呵呵笑道：这个我就没办法了，咱总不能强人所难对吧。");
         });
-        this.add_action("no_marry_yes", null, function (me, par) {
+        this.add_action("no_marry_yes", null, function (me: CHARACTER, par: string) {
             if (!me.query_temp("request_no_marry")) return me.notify("没人问你。");
             var user = this.check_player(me);
             if (!user) return;
@@ -55,19 +56,19 @@ export default class extends NPC {
                 user.remove_temp("wife");
                 user.remove_temp("wife_n");
             }
-                me.add_title("", "mar");
-                user.add_title("", "mar");
+                me.add_title?.("", "mar");
+                user?.add_title?.("", "mar");
                 me.set_temp("marry_leave", 1, 7 * 24 * 3600000);
                 user.set_temp("marry_leave", 1, 7* 24 * 3600000);
         });
-        this.add_action("no_shitu", "解除师徒", function (me, par) {
+        this.add_action("no_shitu", "解除师徒", function (me: CHARACTER, par: string) {
             var user = this.check_player2(me);
             if (!user) return;
             this.send_room("<yel>$N对著$n问道：你愿意和" + me.name + "解除师徒关系吗？</yel>", user);
             user.send_commands("no_shitu_no " + this.id, "不愿意", "no_shitu_yes " + this.id, "愿意");
             user.set_temp("request_no_shitu", 1, 100000);
         });
-        this.add_action("no_shitu_no", null, function (me, par) {
+        this.add_action("no_shitu_no", null, function (me: CHARACTER, par: string) {
             if (!me.query_temp("request_no_shitu")) return me.notify("没人问你。");
             var user = this.check_player2(me);
             if (!user) return;
@@ -75,7 +76,7 @@ export default class extends NPC {
             me.remove_temp("request_no_shitu");
             me.send_room("赵铁笔呵呵笑道：这个我就没办法了，咱总不能强人所难对吧。");
         });
-        this.add_action("no_shitu_yes", null, function (me, par) {
+        this.add_action("no_shitu_yes", null, function (me: CHARACTER, par: string) {
             if (!me.query_temp("request_no_shitu")) return me.notify("没人问你。");
             var user = this.check_player2(me);
             if (!user) return;
@@ -97,14 +98,13 @@ export default class extends NPC {
             me.set_temp("st_leave", 1, 3600000 * 24 * 7);
             user.set_temp("st_leave", 1, 3600000 * 24 * 7);
         });
-        this.add_action("no_marry2", null, function (me, par) {
+        this.add_action("no_marry2", null, function (me: CHARACTER, par: string) {
             var wife = me.query_temp("wife") || me.query_temp("husband");
             if (!wife) return me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！");
-            var name = me.query_temp("wife") ? "妻子" : "丈夫";
             me.notify("赵铁笔说道：单方面解除婚姻关系需要缴纳800两黄金的手续费。");
             me.send_commands("give " + this.id + " 8000000 money", "确认解除");
         });
-        this.add_action("no_shitu2", null, function (me, par) {
+        this.add_action("no_shitu2", null, function (me: CHARACTER, par: string) {
             var wife = me.query_temp("shifu") || me.query_temp("tudi");
             if (!wife) return me.notify_fail("赵铁笔说道：你还没拜师，也没收徒！");
             if (me.query_temp("tudi")) {
@@ -114,54 +114,51 @@ export default class extends NPC {
                 me.notify("赵铁笔说道：单方面解除师徒关系需要缴纳500两黄金的手续费，并且解除后7天内不允许再次拜师！");
                 me.send_commands("give " + this.id + " 5000000 money", "确认解除");
             }
-   
+
         });
     }
 
-    check_player(me) {
+    check_player(me: CHARACTER): false | CHARACTER {
     var wife = me.query_temp("wife") || me.query_temp("husband");
-    if (!wife) return me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！");
-    var name = me.query_temp("wife") ? "妻子" : "丈夫";
-    var user = WORLD.getUser(wife);
+    if (!wife) { me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！"); return false; }
+    var user = WORLD.getUser(String(wife));
     if (!user) {
-
-        me.notify_fail("赵铁笔说道：你的" + name + "目前不在线，我不能给你办理离婚！");
+        me.notify_fail("赵铁笔说道：你的妻子/丈夫目前不在线，我不能给你办理离婚！");
         me.send_commands("no_marry2 " + this.id, "强制解除");
         return false;
     }
     if (!this.is_here(user)) {
-         me.notify_fail("赵铁笔说道：你的" + name + "不在这里，我不能给你办理离婚！");
+         me.notify_fail("赵铁笔说道：你的妻子/丈夫不在这里，我不能给你办理离婚！");
          me.send_commands("no_marry2 " + this.id, "强制解除");
          return false;
     }
 
     return user;
 }
-    check_player2(me) {
+    check_player2(me: CHARACTER): false | CHARACTER {
     var tudi = me.query_temp("tudi") || me.query_temp("shifu");
-    if (!tudi) return me.notify_fail("赵铁笔说道：你没有拜师，也没有收徒！");
-    var name = me.query_temp("tudi") ? "徒弟" : "师父";
-    var user = WORLD.getUser(tudi);
+    if (!tudi) { me.notify_fail("赵铁笔说道：你没有拜师，也没有收徒！"); return false; }
+    var user = WORLD.getUser(String(tudi));
     if (!user) {
-         me.notify_fail("赵铁笔说道：你的" + name + "目前不在线，我不能给你办理解除关系手续！");
+         me.notify_fail("赵铁笔说道：你的徒弟/师父目前不在线，我不能给你办理解除关系手续！");
          me.send_commands("no_shitu2 " + this.id, "强制解除");
          return false;
     }
     if (!this.is_here(user)) {
-         me.notify_fail("赵铁笔说道：你的" + name + "不在这里，我不能给你办理解除关系手续！");
+         me.notify_fail("赵铁笔说道：你的徒弟/师父不在这里，我不能给你办理解除关系手续！");
          me.send_commands("no_shitu2 " + this.id, "强制解除");
         return false;
     }
 
     return user;
 }
-    on_accept(me, obj, count) {
-    
+    on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
+
     if (obj == "money") {
         if (count == 8000000) {
             var wife = me.query_temp("wife") || me.query_temp("husband");
             if (!wife) return me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！");
-            var user = WORLD.getUser(wife);
+            var user = WORLD.getUser(String(wife));
             if (me.query_temp("wife")) {
                 me.remove_temp("wife");
                 me.remove_temp("wife_n");
@@ -174,8 +171,8 @@ export default class extends NPC {
                 user && user.remove_temp("wife");
                 user && user.remove_temp("wife_n");
             }
-            me.add_title("", "mar");
-            user && user.add_title("", "mar");
+            me.add_title?.("", "mar");
+            user?.add_title?.("", "mar");
             user && user.notify("<yel>你和" + me.name + "的夫妻关系解除了。</yel>");
             var attach = user ? null : [{
                 obj: "sp/tool/fuqi#" + me.id,
@@ -193,7 +190,7 @@ export default class extends NPC {
         if (count == 10000000) {
             var tudi = me.query_temp("tudi");
             if (!tudi) return me.notify_fail("赵铁笔说道：你没有徒弟！");
-            var user = WORLD.getUser(tudi);
+            var user = WORLD.getUser(String(tudi));
             me.remove_temp("tudi");
             me.remove_temp("tudi_n");
             me.set_temp("st_leave", 1, 3600000 * 24 * 7);
@@ -203,7 +200,7 @@ export default class extends NPC {
                 user.set_temp("st_leave", 1, 3600000 * 24 * 7);
                 user.notify("<yel>你和" + me.name + "的师徒关系解除了。</yel>");
             }
-      
+
             COMMAND.DO("send", tudi, {
                 content: "你的师父主动和你解除师徒关系",
                 attach: [{
@@ -211,7 +208,7 @@ export default class extends NPC {
                     count: 1
                 }]
             });
-         
+
             me.notify("赵铁笔说道：你的师徒关系已经解除了。");
             return true;
         }
@@ -219,7 +216,7 @@ export default class extends NPC {
         if (count == 5000000) {
             var shifu = me.query_temp("shifu");
             if (!shifu) return me.notify_fail("赵铁笔说道：你没有徒弟！");
-            var user = WORLD.getUser(shifu);
+            var user = WORLD.getUser(String(shifu));
             me.remove_temp("shifu");
             me.remove_temp("shifu_n");
             me.set_temp("st_leave", 1, 3600000 * 24 * 7);
@@ -229,7 +226,7 @@ export default class extends NPC {
                 user.set_temp("st_leave", 1, 3600000 * 24 * 7);
                user.notify("<yel>你和" + me.name + "的师徒关系解除了。</yel>");
             }
-       
+
             COMMAND.DO("send", shifu, {
                 content: "你的徒弟主动和你解除师徒关系",
                 attach: [{
@@ -243,4 +240,3 @@ export default class extends NPC {
     }
 }
 }
-

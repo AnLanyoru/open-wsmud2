@@ -7,7 +7,7 @@ export default class extends SKILL {
     grade = 0;
     desc = "使用药草制作各种丹药的技能，提高你的炼药成功率";
     type = SKILL_TYPES.KNOWLEDGE;
-    query_prop = lv => ({ lianyao1: Math.floor(lv / 200) });
+    query_prop(lv: number): Record<string, any> { return { lianyao1: Math.floor(lv / 200) }; }
     slots = [
     {
         prop: "ly_wd",

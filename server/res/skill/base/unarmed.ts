@@ -11,7 +11,7 @@ export default class extends SKILL {
 "$N挥拳攻击$n的$l", "$N往$n的$l一抓", "$N往$n的$l狠狠地踢了一脚",
 "$N提起拳头往$n的$l捶去", "$N对准$n的$l用力挥出一拳"
 ];
-    query_prop = lv => ({ str: parseInt(lv / 10) });
+    query_prop(lv: number): Record<string, any> { return { str: Math.floor(lv / 10) }; }
 
     constructor() {
         super();

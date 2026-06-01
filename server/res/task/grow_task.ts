@@ -1,27 +1,32 @@
 import { USERTASK } from "../../core/task/playertask.js";
 import { WORLD } from "../../core/world.js";
+import type { CHARACTER } from "../../core/char/character.js";
 
 export default class extends USERTASK {
     id = "growup";
     sort = 1;
 
-    query_title(player?): any {
-    var stas = player.query_temp("grow_lv", 0);
+    query_title(player?: CHARACTER): string {
+    if (!player) return '';
+    var stas = player.query_temp("grow_lv", 0) ?? 0;
     return "<hic>" + temps[stas].title + "</hic>";
 }
-    query_desc(player?): any {
-    var stas = player.query_temp("grow_lv", 0);
+    query_desc(player?: CHARACTER): string {
+    if (!player) return '';
+    var stas = player.query_temp("grow_lv", 0) ?? 0;
     return temps[stas].desc;
 }
-    query_state(player?): any {
+    query_state(player?: CHARACTER): number {
+    if (!player) return 0;
     if (!WORLD.is_server(player)) return 0;
-    var stas = player.query_temp("grow_lv", 0);
+    var stas = player.query_temp("grow_lv", 0) ?? 0;
     if (stas >= temps.length) return 0;
     return temps[stas].check(player);
 }
-    on_finish(player?): any {
+    on_finish(player?: CHARACTER): void | boolean {
+    if (!player) return;
     if (!WORLD.is_server(player)) return player.notify("你无法完成。");
-    var stas = player.query_temp("grow_lv", 0);
+    var stas = player.query_temp("grow_lv", 0) ?? 0;
     if (stas >= temps.length) return;
     var st = temps[stas].check(player);
     if (st == 1) return player.notify("你还没完成这个任务。");
@@ -38,7 +43,7 @@ const temps = [
         check: function (player) {
             if (!player.skills) return 1;
             for (var item in player.skills) {
-                if ((item as any) != "force" || (item as any) != "unarmed") {
+                if (item != "force" && item != "unarmed") {
                     return 2;
                 }
 

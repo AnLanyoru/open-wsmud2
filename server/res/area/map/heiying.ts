@@ -1,5 +1,6 @@
 import { AREA } from "../../../core/room/area.js";
 import { ROOM } from "../../../core/room/room.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends AREA {
     name = "黑鹰校场";
@@ -10,39 +11,37 @@ export default class extends AREA {
     is_copy = true;
     not_fb = true;
     map = [
-    { n: "地下甬道", id: "yz/hy/tongdao", p: [0, 0] },
-    { n: "校场", id: "yz/hy/jiaochang1", p: [0, -1], exits: ["s", 'nw', 'ne'] },
-    { n: "校场", id: "yz/hy/jiaochang2", p: [-1, -2] },
-    { n: "校场", id: "yz/hy/jiaochang3", p: [0, -2], exits: ["s", 'n', 'w', 'e'] },
-    { n: "校场", id: "yz/hy/jiaochang4", p: [1, -2] },
-    { n: "校场", id: "yz/hy/jiaochang5", p: [0, -3], exits: ["sw", 'se', 'n'] },
-    { n: "黑鹰厅", id: "yz/hy/yishiting", p: [0, -4] },
-
-];
+        { n: "地下甬道", id: "yz/hy/tongdao", p: [0, 0] },
+        { n: "校场", id: "yz/hy/jiaochang1", p: [0, -1], exits: ["s", "nw", "ne"] },
+        { n: "校场", id: "yz/hy/jiaochang2", p: [-1, -2] },
+        { n: "校场", id: "yz/hy/jiaochang3", p: [0, -2], exits: ["s", "n", "w", "e"] },
+        { n: "校场", id: "yz/hy/jiaochang4", p: [1, -2] },
+        { n: "校场", id: "yz/hy/jiaochang5", p: [0, -3], exits: ["sw", "se", "n"] },
+        { n: "黑鹰厅", id: "yz/hy/yishiting", p: [0, -4] },
+    ];
     drops = [
-    'st/xuanjing',
-    'money/pot',
-    'book/ts#heilongxinfa',
-    'eq/lv1/xk_cloth',
-    'eq/lv1/xk_head',
-    'eq/lv1/xk_shoes',
-    'eq/lv1/qingmu'];
+        "st/xuanjing",
+        "money/pot",
+        "book/ts#heilongxinfa",
+        "eq/lv1/xk_cloth",
+        "eq/lv1/xk_head",
+        "eq/lv1/xk_shoes",
+        "eq/lv1/qingmu",
+    ];
 
-    on_enter(me) {
+    on_enter(me: CHARACTER) {
+        const next_room = ROOM.Get("yz/hy/tongdao");
+        if (!next_room) return;
+        let copy_room = next_room.query_copy2(me);
+        if (!copy_room) {
+            copy_room = next_room.create_copy2(me);
+        }
+    }
 
-
-    var next_room = ROOM.Get('yz/hy/tongdao');
-    var copy_room = next_room.query_copy2(me);
-    if (!copy_room) {
-        copy_room = next_room.create_copy2(me);
+    on_leave(me: CHARACTER) {
+        const copy_room = this.rooms[0]?.query_copy2(me);
+        if (copy_room) {
+            copy_room.clear_copy(me);
+        }
     }
 }
-    on_leave(me) {
-
-    var copy_room = this.rooms[0].query_copy2(me);
-    if (copy_room) {
-        copy_room.clear_copy(me);
-    }
-}
-}
-

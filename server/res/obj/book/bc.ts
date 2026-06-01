@@ -29,4 +29,5 @@ export default class extends OBJ {
 }
 }
 
-const COMBINED = [10, 10, 30, 50, 100, 200, 500];
+export const COMBINED = [10, 10, 30, 50, 100, 200, 500];
+

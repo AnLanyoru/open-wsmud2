@@ -124,6 +124,8 @@ export class OBJ extends ITEM {
     on_enter?(obj: Record<string, any>): void;
     /** 有角色离开房间回调 — 触发时机：有 HP 的角色从本物品所在房间离开时；返回 false 阻止离开 */
     on_leave?(obj: Record<string, any>, dir: string): boolean | void;
+    /** 拾取附件回调 — 触发时机：领取消息附件时（receive 命令调用） */
+    on_receive?(me: CHARACTER, from?: CHARACTER): boolean | void;
 
     /**
      * 初始化钩子

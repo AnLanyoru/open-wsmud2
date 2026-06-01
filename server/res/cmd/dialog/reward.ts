@@ -16,11 +16,11 @@ export default class extends COMMAND {
     exp: "定时更新，无奖励",
     money: "定时更新，无奖励",
 };
-    top = [
+    top: string[] = [
 ];
-    weapon = [
+    weapon: string[] = [
 ];
-    score = [
+    score: string[] = [
 ];
 
     constructor() {

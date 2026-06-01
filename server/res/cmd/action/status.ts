@@ -23,19 +23,13 @@ export default class extends COMMAND {
 
         if (!target.status) return me.send("没有这个状态。");
 
-        var status = null;
-        for (var i = 0; i < target.status.length; i++) {
-            if (target.status[i].id == type) {
-                status = target.status[i];
-                break;
-            }
-        }
+        const status = target.status.find(s => s.id == type);
         if (!status) return me.send("没有这个状态。");
-        var str = [];
+        const str: string[] = [];
         str.push(status.downside ? "<red>" : "<hig>");
         str.push(status.name);
         if (status.override == 1) {
-            str.push(UTIL.to_c(status.count));
+            str.push(UTIL.to_c(status.count ?? 0));
             str.push("层");
         }
 
@@ -45,7 +39,7 @@ export default class extends COMMAND {
             str.push("\n");
         }
         str.push(status.downside ? "<red>" : "<hig>");
-        str.push(UTIL.prop_toString(status.prop, "\n", status.count));
+        str.push(UTIL.prop_toString(status.prop ?? null, "\n", status.count));
         str.push(status.downside ? "</red>\n" : "</hig>\n");
         me.send(str.join(""));
     }

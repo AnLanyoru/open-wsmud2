@@ -1,5 +1,6 @@
 import { OBJ } from "../../../core/item/obj.js";
 import { SKILL } from "../../../core/skill/skill.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends OBJ {
     unit = "颗";
@@ -8,14 +9,14 @@ export default class extends OBJ {
     grade = 5;
     value = 0;
 
-    on_use(me) {
+    on_use(me: CHARACTER): boolean | void {
 
     if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
     var gender = me.gender == 1 ? 2 : 1;
-    var list = [];
+    var list: SKILL[] = [];
     for (var key in me.skills) {
         var skill = SKILL.get(key);
-        if (skill.learn_condition) {
+        if (skill && skill.learn_condition) {
             if (skill.learn_condition.gender &&
                 skill.learn_condition.gender != gender) {
                 if (me.skills[key].ref)
@@ -31,7 +32,7 @@ export default class extends OBJ {
     if (me.query_temp("bianxing")) {
         var sum = 0;
         for (var i = 0; i < list.length; i++) {
-            var needpot = list[i].query_needexp(me.skills[list[i].id].level, me);
+            var needpot = list[i].query_needexp(me.skills![list[i].id].level, me);
             if (me.remove_skill(list[i].id)) {
                 if (needpot)
                     sum += needpot;
@@ -72,4 +73,3 @@ export default class extends OBJ {
 
 }
 }
-

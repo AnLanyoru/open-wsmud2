@@ -2,15 +2,13 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { OBJ } from "../../../core/item/obj.js";
+import { EQUIPMENT } from "../../../core/item/equipment.js";
 
 export default class extends COMMAND {
     command = "fenjie";
     regex = /^(\w+)(?:\s(\w+))?$/;
 
-    /**
-     * @param {CHARACTER} player - 执行命令的角色
-     */
-    enter(player, objid, isok) {
+    enter(player: CHARACTER, objid: string, isok: string): void {
     var obj = player.find_obj(objid);
     if (!obj) {
         return player.notify("你要分解什么装备？");
@@ -26,6 +24,7 @@ export default class extends COMMAND {
         return player.notify("你确定要分解" + obj.color_name + "吗？");
     }
     if (obj.grade >= 5) {
+        if (!(obj instanceof EQUIPMENT)) return player.notify("这个东西不能分解。");
         return this.fenjie2(player, obj, isok);
     }
 
@@ -36,12 +35,12 @@ export default class extends COMMAND {
     if (!isok && obj.st_prop && obj.st_prop.length > 0) {
         return player.notify(obj.color_name + "已经镶嵌宝石，清理宝石后才可以分解。");
     }
-    obj = player.remove_obj(obj);
+    obj = player.remove_obj(obj)!;
     if (!obj) return player.notify("你要分解什么装备?");
     let attach = player.query_prop('fenjie');
     let sum_count = count + attach;
     var item = player.add_obj("st/xuanjing", sum_count);
-    if (!item) return player.notify("分解失败。");
+    if (!item) return player.notify("分解失败。")!;
 
     player.send("你将" + obj.color_name + "分解为" + item.unit_name(sum_count) + "。");
 
@@ -49,35 +48,31 @@ export default class extends COMMAND {
     WORLD.add_recover_obj(player, obj, 2, sum_count);
 
 }
-    fenjie2(player, obj, isok) {
-
-    // if (obj.path.startsWith('eq/cp')
-    //     || obj.path.startsWith('eq/zb'))
-    //     return player.notify('自制装备暂时不能分解。');
-    let count = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 6][obj.level];
+    fenjie2(player: CHARACTER, obj: EQUIPMENT, isok: string): void {
+    let count: number = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 6][obj.level];
     let props = obj.prop;
-    if (!props) return player.send('无法拆解。');
-    let sts = [];
-    let st_names = [];
+    if (!props) { player.send('无法拆解。'); return; }
+    let sts: OBJ[] = [];
+    let st_names: string[] = [];
+    const duanzao = WORLD.COMMANDS.duanzao;
     if (obj.path.startsWith('eq/cp')
         || obj.path.startsWith('eq/zb')) {
-        const duanzao = WORLD.COMMANDS.duanzao;
         for (var key in obj.temp) {
-            let level = obj.temp[key];
+            let level = obj.temp![key] as number;
             if (!level) continue;
-            let prop = duanzao.PROPS[key];
+            let prop = duanzao.PROPS![key];
             if (!prop) continue;
-            let st = OBJ.CREATE('st/p#' + key, duanzao.sum_needs(prop, level));
+            let st = OBJ.CREATE('st/p#' + key, duanzao.sum_needs!(prop, level));
             sts.push(st);
             st_names.push(st.unit_name());
         }
         count += 8;
-        count += obj.query_temp('sc', 0);
+        count += obj.query_temp('sc', 0) ?? 0;
     } else {
-        let active_props = WORLD.COMMANDS.duanzao.PROPS;
-        const def_prop = WORLD.COMMANDS.duanzao.DEFAULT_PROPS[obj.eq_type];
+        let active_props = duanzao.PROPS!;
+        const def_prop = duanzao.DEFAULT_PROPS![obj.eq_type];
         for (let prop in props) {
-            if (!active_props[prop]) continue;
+            if (!(prop in active_props)) continue;
             if (def_prop && def_prop === prop) continue;
             let st = OBJ.CREATE('st/p#' + prop, obj.query_temp(prop, 1));
             sts.push(st);
@@ -94,8 +89,9 @@ export default class extends COMMAND {
     if (obj.st_prop && obj.st_prop.length > 0) {
         return player.notify(obj.color_name + "已经镶嵌宝石，清理宝石后才可以分解。");
     }
-    obj = player.remove_obj(obj);
-    if (!obj) return player.notify("你要分解什么装备?");
+    var removedObj = player.remove_obj(obj);
+    if (!removedObj || !(removedObj instanceof EQUIPMENT)) return player.notify("你要分解什么装备?");
+    obj = removedObj;
 
     let item = player.add_obj("st/yuanjing", count);
     if (!item) return player.notify("分解失败。");
@@ -103,7 +99,7 @@ export default class extends COMMAND {
 
     player.send("你将" + obj.color_name + "分解为" + item.unit_name(count) + "。");
 
-    let rec_items = ['st/yuanjing', count];
+    let rec_items: (string | number)[] = ['st/yuanjing', count];
     for (let st of sts) {
         player.add_obj(st);
         player.send("你获得" + st.unit_name() + "。");
@@ -113,6 +109,3 @@ export default class extends COMMAND {
     return WORLD.add_recover_obj(player, obj, 2, rec_items);
 }
 }
-
-const default_prop = ["gj", 'fy', 'fy', 'fy', 'fy', null, null, null,
-    'fy', 'fy', 'gj'];

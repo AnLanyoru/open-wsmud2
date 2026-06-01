@@ -4,6 +4,28 @@ import { WORLD } from "../../../core/world.js";
 import { OBJ } from "../../../core/item/obj.js";
 import { UTIL } from "../../../core/util/util.js";
 
+interface ShopItem {
+    name?: string;
+    unit?: string;
+    path: string;
+    grade?: number;
+    desc: string;
+    value: number;
+    discount?: number;
+    query_discount?: (me: CHARACTER) => number;
+    limit?: number;
+    limit_time?: number;
+    limit_key?: string;
+    max?: number;
+    max_key?: string;
+    is_show?: (me: CHARACTER) => boolean;
+    on_buy?: (me: CHARACTER, count: number) => boolean | undefined;
+    on_full?: (me: CHARACTER) => void;
+    rcash?: boolean;
+    mtype?: number;
+    id?: string;
+}
+
 export default class extends COMMAND {
     command = "shop";
     allow_busy = true;
@@ -11,10 +33,10 @@ export default class extends COMMAND {
     allow_die = true;
     allow_faint = true;
     regex = /(?:(\w+)\s+(\d+))/;
-    list = null;
-    list_keys = null;
-    idx = null;
-    groups = [
+    list: Map<string, ShopItem> | null = null;
+    list_keys: ShopItem[] | null = null;
+    idx: string | null = null;
+    groups: ShopItem[][] = [
     [
         {
             name: "<hic>扫荡符</hic>", unit: "张", path: "cash/saodang", grade: 2,
@@ -102,14 +124,14 @@ export default class extends COMMAND {
             name: "房契", unit: "颗", grade: 3,
             path: "cash/fang", desc: "使用后获得扬州城豪华型住宅，拥有自己的练功房，钓鱼采药的小花园，和管家黄金购买的房子无区别。",
             value: 998, max_key: "shpm1", max: 1,
-            is_show: function (me) {
-                if (me.query_temp('home', 0) === 2) return false;
-                if (me.query_bool('gift', 1)) return false;
+            is_show: function (this: void, me: CHARACTER) {
+                if (me.query_temp('home', Number(0)) === 2) return false;
+                if (me.query_bool!('gift', 1)) return false;
                 return true;
             },
-            on_full: function (me) {
+            on_full: function (this: void, me: CHARACTER) {
                 me.remove_temp('shpm1');
-                me.set_bool('gift', 1, true);//gift标志0随从包 1房契 2程灵素
+                me.set_bool!('gift', 1, true);//gift标志0随从包 1房契 2程灵素
             }
         }
     ]
@@ -117,86 +139,85 @@ export default class extends COMMAND {
 ];
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, par, count) {
+    enter(me: CHARACTER, par?: string, count?: string): void {
     if (me.query_temp("new")) return me.notify("你先完成新手指导再说。");
     if (!me.is_player) return me.notify("你不能购买。");
 
     if (!this.list)
         this.load_selllist();
 
-    if (count != undefined) {
-        var item = this.list.get(par);
+    if (count !== undefined) {
+        const item = this.list!.get(par!);
         if (!item) return me.notify("商店不出售这个东西。");
         if (item.is_show && item.is_show(me) === false) return me.notify("商店不出售这个东西。");
 
-        count = parseInt(count);
-        if (!(count > 0)) return;
-        if (item.limit > 0 && me.query_temp(item.limit_key, 0) + count > item.limit) {
+        const buyCount = parseInt(count);
+        if (!(buyCount > 0)) return;
+        if (item.limit! > 0 && (me.query_temp(item.limit_key!, 0) ?? 0) + buyCount > item.limit!) {
 
-            return me.notify(item.name + "到达" + (item.limit_time < 3 ?
-                ["本日", '本周', '本月'][item.limit_time] : "") + "购买上限。");
+            return me.notify(item.name + "到达" + (item.limit_time! < 3 ?
+                ["本日", '本周', '本月'][item.limit_time!] : "") + "购买上限。");
         }
 
-        if (item.max > 0 && me.query_temp(item.max_key, 0) + count > item.max) {
+        if (item.max! > 0 && (me.query_temp(item.max_key!, 0) ?? 0) + buyCount > item.max!) {
             return me.notify("没有这么多的" + item.name + "出售了。");
         }
-        if (item.on_buy && item.on_buy(me, count) === false) return;
+        if (item.on_buy && item.on_buy(me, buyCount) === false) return;
         let discount = 1;
         if (item.query_discount) discount = item.query_discount(me);
         else discount = item.discount ?? 1;
         let need_money = 0;
         if (item.mtype === 0) {
-            need_money = item.value * count * 10000;
+            need_money = item.value * buyCount * 10000;
             if (discount < 1) need_money = need_money * discount;
-            need_money = parseInt(need_money);
+            need_money = parseInt(String(need_money));
             if (!(me.money >= need_money)) {
                 return me.notify("你没有那么多的银两。");
             }
-            me.add_money(-need_money, "购买" + item.name + "");
+            me.add_money(-need_money);
         } else if (item.mtype === 1) {
-            need_money = item.value * count;
+            need_money = item.value * buyCount;
 
             if (discount < 1) need_money = need_money * discount;
-            need_money = parseInt(need_money);
-            if (!(me.cash_money >= need_money)) {
+            need_money = parseInt(String(need_money));
+            if (!(me.cash_money! >= need_money)) {
                 return me.notify("你没有那么多的元宝。");
             }
-            me.add_cash(-need_money, "购买" + item.name + "");
+            me.add_cash!(-need_money);
         } else {
-            need_money = item.value * count;
+            need_money = item.value * buyCount;
             if (discount < 1) need_money = need_money * discount;
-            need_money = parseInt(need_money);
-            if (!(me.query_temp('my', 0) >= need_money))
+            need_money = parseInt(String(need_money));
+            if (!((me.query_temp('my', 0) ?? 0) >= need_money))
                 return me.notify("你没有那么多的古币。");
             me.add_temp('my', -need_money);
         }
-        var obj = me.add_obj(item.path, count);
-        me.notify("你从商店里购买了" + obj.unit_name(count) + "。");
-        if (item.limit > 0) {
+        const obj = me.add_obj(item.path, buyCount);
+        me.notify("你从商店里购买了" + obj.unit_name(buyCount) + "。");
+        if (item.limit! > 0) {
             let val = 0;
             if (item.limit_time === 0) {
-                val = me.add_temp(item.limit_key, count, UTIL.diff_time());
+                val = me.add_temp(item.limit_key!, buyCount, UTIL.diff_time());
             } else if (item.limit_time === 1) {
-                val = me.add_temp(item.limit_key, count, UTIL.diff_week_time());
+                val = me.add_temp(item.limit_key!, buyCount, UTIL.diff_week_time());
             } else if (item.limit_time === 2) {
-                val = me.add_temp(item.limit_key, count, UTIL.diff_month_time());
-            } else if (item.limit_time > 10000) {
-                val = me.add_temp(item.limit_key, count, item.limit_time);
+                val = me.add_temp(item.limit_key!, buyCount, UTIL.diff_month_time());
+            } else if (item.limit_time! > 10000) {
+                val = me.add_temp(item.limit_key!, buyCount, item.limit_time!);
             }
-            // me.send(`{"type":"dialog","dialog":"shop",item:["${item.id}",${val}],money:[${me.money},${me.cash_money}]}`);
-            for (let x of this.list_keys) {
+            for (const x of this.list_keys!) {
                 if (x.limit_key === item.limit_key) {
-                    me.send(`{"type":"dialog","dialog":"shop",item:["${x.id}",${Math.min(val, x.limit)}],${format_moneys(me)}}`);
+                    me.send(`{"type":"dialog","dialog":"shop",item:["${x.id}",${Math.min(val, x.limit!)},${format_moneys(me)}]}`);
                 }
             }
         } else {
             me.send(`{"type":"dialog","dialog":"shop",${format_moneys(me)}}`);
         }
-        if (item.max > 0) {
-            let val = me.add_temp(item.max_key, count);
-            if (val >= item.max) {
+        if (item.max! > 0) {
+            const val = me.add_temp(item.max_key!, buyCount);
+            if (val >= item.max!) {
                 me.send(`{"type":"dialog","dialog":"shop",remove:"${item.id}"}`);
                 item.on_full && item.on_full(me);
             }
@@ -209,59 +230,59 @@ export default class extends COMMAND {
 
         }
         WORLD.add_recover_obj(me, {
-            name: obj.unit_name(count),
-            count: count,
+            name: obj.unit_name(buyCount),
+            count: buyCount,
             value: need_money,
-            limit_key: item.limit > 0 ? item.limit_key : null,
+            limit_key: item.limit! > 0 ? item.limit_key : null,
             max_key: item.max_key,
             id: obj.id,
             rcash: item.rcash,
             path: obj.path
-        }, 12, item.mtype);
+        } as Record<string, unknown>, 12, item.mtype);
         return;
     }
     if (par && par === this.idx)
         return me.send(`{"type":"dialog","dialog":"shop",${format_moneys(me)}}`);
 
-    var str = ['{"type":"dialog","dialog":"shop","selllist":['];
+    const str: string[] = ['{"type":"dialog","dialog":"shop","selllist":['];
     for (let i = 0; i < this.groups.length; i++) {
         if (i > 0) str.push(',[');
         else str.push('[');
-        for (let item of this.groups[i]) {
+        for (const item of this.groups[i]) {
             if (item.is_show && item.is_show(me) === false) continue;
             str.push('[', JSON.stringify(item.id ?? ""), ',', JSON.stringify(item.name ?? ""), ',', JSON.stringify(item.desc ?? ""));
-            str.push(',', item.value, ',', item.grade, ',');
-            if (item.query_discount) str.push(item.query_discount(me));
-            else str.push(item.discount ?? 1);
-            if (item.limit > 0)
-                str.push(',', item.limit, ',', me.query_temp(item.limit_key, 0), '');
-            else if (item.max > 0)
-                str.push(',', item.max, ',', me.query_temp(item.max_key, 0), '');
+            str.push(',', String(item.value), ',', String(item.grade ?? 0), ',');
+            if (item.query_discount) str.push(String(item.query_discount(me)));
+            else str.push(String(item.discount ?? 1));
+            if (item.limit! > 0)
+                str.push(',', String(item.limit!), ',', String(me.query_temp(item.limit_key!, 0) ?? 0), '');
+            else if (item.max! > 0)
+                str.push(',', String(item.max!), ',', String(me.query_temp(item.max_key!, 0) ?? 0), '');
             str.push('],');
         }
         str.push('0]');
     }
     str.push('],', format_moneys(me));
-    str.push(`,idx:"`, this.idx, `"}`);
+    str.push(`,idx:"`, this.idx ?? '', `"}`);
 
 
     me.send(str.join(""));
 }
-    load_selllist() {
+    load_selllist(): void {
     this.list = new Map();
     this.list_keys = [];
     this.idx = UTIL.create_id();
     for (let i = 0; i < this.groups.length; i++) {
-        for (let item of this.groups[i]) {
+        for (const item of this.groups[i]) {
             item.mtype = i;
-            let obj = OBJ.CREATE(item.path);
+            const obj = OBJ.CREATE(item.path);
             if (!obj) continue;
             item.name = obj.name;
             item.unit = obj.unit;
             item.grade = obj.grade;
-            item.id = Object.getPrototypeOf(obj).id + i.toString();
+            item.id = (Object.getPrototypeOf(obj) as Record<string, string>).id + String(i);
 
-            this.list.set(item.id, item);
+            this.list.set(item.id!, item);
             if (item.limit_key) {
                 this.list_keys.push(item);
             }

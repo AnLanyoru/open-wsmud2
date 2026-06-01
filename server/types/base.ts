@@ -55,8 +55,20 @@ export interface JSONCache {
 
 /** 动作定义 (用于 ITEM.add_action) */
 export interface ActionDef<TThis = unknown> {
-  name: string;
+  name: string | null;
   action: (this: TThis, ...args: any[]) => unknown;
+  /** 允许战斗中使用的命令 */
+  allow_fight?: boolean;
+  /** 允许死亡状态使用的命令 */
+  allow_die?: boolean;
+  /** 允许昏迷状态使用的命令 */
+  allow_faint?: boolean;
+  /** 允许忙乱状态使用的命令 */
+  allow_busy?: boolean;
+  /** 允许特殊状态使用的命令 */
+  allow_state?: boolean;
+  /** 允许执行的用户等级 */
+  allow_level?: number;
 }
 
 /** 动作映射 */

@@ -9,6 +9,7 @@ import type { AREA } from "./area.js";
 import type { CHARACTER } from "../char/character.js";
 import type { NPC } from "../char/npc.js";
 import type { USER } from "../char/user.js";
+import type { CORPSE } from "../item/corpse.js";
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -118,6 +119,10 @@ export class ROOM extends ITEM {
     score?: number;
     /** 是否可钓鱼 */
     can_diaoyu: boolean = false;
+    /** 比武擂台：计时步数 */
+    biwu_step?: number;
+    /** 是否禁止战斗 */
+    no_fight?: boolean;
 
     // ============ 公共房间缓存(静态) ============
 
@@ -133,13 +138,19 @@ export class ROOM extends ITEM {
     /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
     on_enter(obj: Record<string, any>): void { return; }
     /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
-    on_heart_beat?: (dt: number) => void;
+    on_heart_beat(dt: number): void { return; }
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
     on_login?: (user: Record<string, any>) => void;
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
     /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
     on_set_difficulty?: (type: number) => void;
+    /** 是否为白天（资源文件注入，用于狼王等 NPC 行为） */
+    is_time(): boolean { return false; }
+    /** 创建狼王变身（资源文件注入，lw 任务用） */
+    create_lw(me: CHARACTER, npc: CHARACTER, zone: number, msg: string): void { return; }
+    /** 可移动出口列表（资源文件注入，巡逻 NPC 用） */
+    move_exits?: string[];
 
     // ============ 核心方法 ============
 
@@ -182,7 +193,7 @@ export class ROOM extends ITEM {
      * @param changed_msg - 变更消息(广播给房间内玩家)
      * @param dir - 移动方向
      */
-    item_changed(obj: OBJ | CHARACTER | NPC | USER, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
+    item_changed(obj: OBJ | CHARACTER | NPC | USER | CORPSE, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
         if (!obj) return;
         let msg: string | undefined;
         let obj_index = -1, isshow = !obj.query_temp('hidden');
@@ -394,7 +405,7 @@ export class ROOM extends ITEM {
      * 根据路径查找物件
      * @param path
      */
-    find_by_path(path: string): Record<string, any> | undefined {
+    find_by_path(path: string): CHARACTER | OBJ | NPC | undefined {
         const items = this.items;
         if (!items) return;
         for (let i = 0; i < items.length; i++) {
@@ -729,7 +740,7 @@ export class ROOM extends ITEM {
             if (!this.items[i].is_player)
                 this.items[i].heart_beat(dt);
         }
-        this.on_heart_beat && this.on_heart_beat(dt);
+        this.on_heart_beat(dt);
     }
 
     /**
@@ -778,7 +789,7 @@ export class ROOM extends ITEM {
      * 根据用户查找对应副本
      * @param user
      */
-    query_copy2(user: USER): ROOM | undefined {
+    query_copy2(user: CHARACTER): ROOM | undefined {
         const id = this.parent?.query_owner(user);
         if (!id) return this;
         return this.query_copy(id);
@@ -788,7 +799,7 @@ export class ROOM extends ITEM {
      * 清除副本区域
      * @param me
      */
-    clear_copy(me: USER): void {
+    clear_copy(me: CHARACTER): void {
         if (!this.owner) return;
         const id = this.parent?.query_owner(me);
         if (id !== this.owner) return;
@@ -815,7 +826,7 @@ export class ROOM extends ITEM {
      * @param me
      * @param diff_type - 难度
      */
-    create_copy2(me: USER, diff_type?: number): ROOM | undefined {
+    create_copy2(me: CHARACTER, diff_type?: number): ROOM | undefined {
         const id = this.parent?.query_owner(me);
         if (!id) return;
         return this.create_copy(id, diff_type || 0);

@@ -3,9 +3,10 @@ import { TASK } from "../../core/task/task.js";
 import { WORLD } from "../../core/world.js";
 import { COMMAND } from "../../core/command.js";
 
+declare var __PATH: Record<string, string>;
+
 export default class extends TASK {
     id = "msg";
-    handler: any = null;
     msgs = [
     "欢迎登录，感谢你的支持，如有任何问题或建议",
     "如有BUG请提交管理员，谢谢配合"
@@ -33,8 +34,8 @@ export default class extends TASK {
     }
 }
     clearyz() {
-    (WORLD.COMMANDS['checkorg'] as any).cmd_clearmail();
-    (WORLD.COMMANDS['checkorg'] as any).cmd_clearstore();
+    WORLD.COMMANDS['checkorg']?.cmd_clearmail?.();
+    WORLD.COMMANDS['checkorg']?.cmd_clearstore?.();
 }
     check_file() {
 
@@ -47,21 +48,21 @@ export default class extends TASK {
     this.check_temp_files("log", (dir) => {
         dir = dir.replace("log", "").replace(".txt", "");
         let pars = dir.split('-');
-        let dt = new Date(pars[0], pars[1] - 1, pars[2]);
+        let dt = new Date(parseInt(pars[0]), parseInt(pars[1]) - 1, parseInt(pars[2]));
         return dt < min4;
     });
 
     this.check_temp_files("req", (dir) => {
         dir = dir.replace("request", "").replace(".txt", "");
         let pars = dir.split('-');
-        let dt = new Date(pars[0], pars[1] - 1, pars[2]);
+        let dt = new Date(parseInt(pars[0]), parseInt(pars[1]) - 1, parseInt(pars[2]));
         return dt < min4;
     });
     this.check_temp_files("bak", (dir) => {
         dir = dir.replace("data", "").replace(".js", "");
         let pars = dir.split('-');
         if (pars.length < 3) return false;
-        let dt = new Date(pars[0], pars[1] - 1, pars[2], pars[3]);
+        let dt = new Date(parseInt(pars[0]), parseInt(pars[1]) - 1, parseInt(pars[2]), parseInt(pars[3]));
         if (dt > min1) return false;
         if (dt > min2) {
 
@@ -79,7 +80,7 @@ export default class extends TASK {
     this.check_temp_files("temp", (dir) => {
         let pars = dir.split('-');
         if (pars.length < 5) return false;
-        let dt = new Date(pars[1], pars[2] - 1, pars[3], pars[4]);
+        let dt = new Date(parseInt(pars[1]), parseInt(pars[2]) - 1, parseInt(pars[3]), parseInt(pars[4]));
         if (dt > min2) {
             if (dt.getHours() === 5) return false;
             return true;
@@ -87,7 +88,7 @@ export default class extends TASK {
         return true;
     });
 }
-    async check_temp_files(path, func) {
+    async check_temp_files(path: string, func: (dir: string) => boolean) {
     const dir = __PATH.DATA + path + "/";
     const paths = await fs.readdir(dir);
     for (var i = 0; i < paths.length; i++) {
@@ -97,5 +98,3 @@ export default class extends TASK {
     }
 }
 }
-
-const __PATH: any = (globalThis as any).__PATH;

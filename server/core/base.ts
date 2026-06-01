@@ -8,10 +8,13 @@ import { pathToFileURL } from 'url';
 // 内部类型
 // ============================================================
 
+/** 资源对象最小契约 — BASE.NEW 实际需要的就是 path + create */
+type ResourceObj = { path?: string; create?(fname: string, ctor?: string): void };
+
 /** 工厂函数（旧式 JS 风格，this 即为新对象） */
-type FactoryFunc = (this: BASE, par?: string) => void;
+type FactoryFunc = (this: ResourceObj, par?: string) => void;
 /** 构造函数（ES class） */
-type CtorFunc = new (par?: string) => BASE;
+type CtorFunc = new (par?: string) => ResourceObj;
 
 /**
  * 判断 function 是否为 class constructor。
@@ -250,7 +253,7 @@ export class BASE {
      * @param fname - 文件名（可能带 #参数）
      * @returns 新创建的对象
      */
-    static CREATE(path: string, fname: string): BASE | undefined {
+    static CREATE(path: string, fname: string): ResourceObj | undefined {
         const ary = BASE.PATH_REG.exec(fname);
         if (!ary) {
             console.error('path %s is incorrect:', path + fname);
@@ -285,11 +288,11 @@ export class BASE {
      * @param par - 构造参数
      * @returns 新创建的对象
      */
-    static NEW(fname: string, func: CtorFunc | FactoryFunc, par?: string): BASE {
-        const obj: BASE = isConstructor(func)
+    static NEW(fname: string, func: CtorFunc | FactoryFunc, par?: string): ResourceObj {
+        const obj: ResourceObj = isConstructor(func)
             ? new func(par)
             : (() => {
-                  const o = new BASE();
+                  const o: ResourceObj = new BASE();
                   func.apply(o);
                   return o;
               })();

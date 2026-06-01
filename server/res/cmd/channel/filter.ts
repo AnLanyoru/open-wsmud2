@@ -424,6 +424,5 @@ var workds = [
     '习近平', '毛泽东'];
 UTIL.workds_regex = [];
 for (var i = 0; i < workds.length; i++) {
-    workds[i] = new RegExp(workds[i]);
+    UTIL.workds_regex.push(new RegExp(workds[i]));
 }
-UTIL.workds_regex = workds;

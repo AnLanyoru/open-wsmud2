@@ -65,7 +65,7 @@ export default class extends COMMAND {
             str.push("{cmd:\"unxiangqian " + obj.id + " ");
 
             str.push(obj.st_prop[i].id);
-            str.push("\",name:\"", MONEYS_DESC[obj.st_prop[i].grade], "拆掉");
+            str.push("\",name:\"", MONEYS_DESC[obj.st_prop[i].grade] ?? "", "拆掉");
             str.push(obj.st_prop[i].name);
             sum += MONEYS[obj.st_prop[i].grade];
             str.push("\"},");
@@ -79,7 +79,7 @@ export default class extends COMMAND {
         player.send('铁匠：取消镶嵌后恢复装备的孔洞数量，宝石等级越高需要的手艺更精细。');
         return player.notify(str.join(""));
     } else {
-        let st = null, index = 0;
+        let st: { id: string; grade: number; path: string; name: string } | null = null, index = 0;
         for (index = 0; index < obj.st_prop.length; index++) {
             let item = obj.st_prop[index];
             if (item.id === par) {

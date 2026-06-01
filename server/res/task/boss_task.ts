@@ -6,15 +6,16 @@ import { FAMILIES } from "../../core/skill/family.js";
 import { NPC } from "../../core/char/npc.js";
 import { ROOM } from "../../core/room/room.js";
 import { EVENTS } from "../../core/task/events.js";
+import type { USER } from "../../core/char/user.js";
+import type { CORPSE } from "../../core/item/corpse.js";
 
 export default class extends TASK {
     id = "boss";
-    quickly: any = false;
-    boss: any = null;
+    quickly: boolean = false;
+    boss: NPC[] | null = null;
     boss_count = 1;
-    time_handler: any = null;
-    next_time: any = null;
-    user_items: Record<string, any[]> | null = null;
+    next_time: Date | null = null;
+    user_items: Record<string, OBJ[]> | null = null;
     levels = [
     3, 5, 10, 12, 20, 40
 ];
@@ -77,7 +78,7 @@ export default class extends TASK {
     run() {
     this.stop();
     this.check_time();
-    const list: any = this.check_users();
+    const list = this.check_users();
     this.boss = [];
     for (var i = 0; i < list.length; i++) {
         if (!list[i]) continue;
@@ -85,18 +86,20 @@ export default class extends TASK {
         let bs = this.create_boss(level);
         if (!bs) return console.log("boss 创建失败");
         this.boss.push(bs);
-        (bs as any).event_id = 'boss' + level;
+        bs.event_id = 'boss' + level;
         var rm = ROOM.RANDOM()!; //ROOM.Get("yz/nanmen");
         rm.item_changed(bs, true);
-        let desc = '听说' + bs.name + '出现在' + (rm as any).long_name() + '一带';
+        let desc = '听说' + bs.name + '出现在' + rm.long_name() + '一带';
         let msg = '{"type":"msg","ch":"rumor","content":"' + desc + '。"}';
-        for (var j = 0; j < list[i].length; j++) {
-            list[i][j].send(msg);
+        var users = list[i];
+        if (!users) continue;
+        for (var j = 0; j < users.length; j++) {
+            users[j].send(msg);
         }
-        EVENTS.add(this.create_event((bs as any).event_id, level, desc, rm));
+        EVENTS.add(this.create_event(bs.event_id!, level, desc, rm));
     }
 }
-    create_event(evtid, level, desc, rm): any {
+    create_event(evtid: string, level: number, desc: string, rm: ROOM) {
     return {
         id: evtid,
         name: BOSS_LEVELS[level] + "BOSS挑战",
@@ -104,56 +107,55 @@ export default class extends TASK {
         time: 0,
         grade: level,
         command: "前往挑战",
-        check: (me) => me.level === level,
-        on_command: function (me) {
+        check: (me: USER) => me.level === level,
+        on_command: function (me: USER) {
             if (me.state) return me.send('你正在' + me.state.title + "。");
-            if (me.query_temp("bcc", 0) >= 5)
+            if ((me.query_temp("bcc", 0) ?? 0) >= 5)
                 return me.send('你今日的BOSS挑战次数已满。');
             if (!me.can_trans()) return;
-            if ((rm as any).is_full(1))
+            if (rm.is_full(1))
                 return me.send('那里人太多了，你过不去。');
-            me.moveto((rm as any).path, me.name + "离开了。", me.name + "走了过来。");
+            me.moveto(rm.path, me.name + "离开了。", me.name + "走了过来。");
             return true;
         }
     }
 }
     check_users() {
-    var list: any = [];
+    var list: (USER[] | undefined)[] = [];
     for (var i = 0; i < WORLD.USERS.length; i++) {
         var user = WORLD.USERS[i];
         if (!user.level) continue;
-        if (user.level > 5 && (this as any).create_boss2(user)) continue;
+        if (user.level > 5 && this.create_boss2?.(user)) continue;
         if (!user.socket) continue;
-        if ((user as any).query_temp("bcc", 0) >= 5) continue;
+        if ((user.query_temp("bcc", 0) ?? 0) >= 5) continue;
         var lv = user.level - 1;
         if (lv > 4) {
             lv = 4;
         }
         if (!list[lv]) list[lv] = [];
-        list[lv].push(user);
+        list[lv]!.push(user);
 
     }
     return list;
 }
-    create_boss(player_level) {
-    var max_level = this.boss_levels[WORLD.DATA.query_temp("fb_index", 0) as number];
+    create_boss(player_level?: number) {
+    var max_level = this.boss_levels[Number(WORLD.DATA.query_temp("fb_index", 0))];
+    var boss_max = 0;
+    var boss_min = 0;
     if (player_level) {
-        var boss_max = this.level_max[player_level][1];
-        var boss_min = this.level_max[player_level][0];
+        boss_max = this.level_max[player_level][1];
+        boss_min = this.level_max[player_level][0];
         if (max_level > boss_max) max_level = boss_max;
-    } else {
-        boss_max = 0;
-        boss_min = 0;
     }
 
     var level = this.random(max_level - boss_min) + boss_min;
 
     if (!this.paths[level]) return console.log(level, max_level, " boss 创建失败");
     var diff_level = this.levels[level];
-    var boss: any = NPC.CLONE(this.paths[level]);
+    var boss = NPC.CLONE(this.paths[level]);
     if (!boss) return;
-    (boss as any).boss_index = level;
-    (boss as any).min_fbindex = this.boss_min_fb[level];
+    boss.boss_index = level;
+    boss.min_fbindex = this.boss_min_fb[level];
     var sk_level = (level + 1) * 100;
     if (diff_level > 300) {
         sk_level = (level + 1) * 130;
@@ -174,15 +176,15 @@ export default class extends TASK {
     boss.recount();
     boss.record_damage = true;
     boss.on_died = this.on_died;
-    boss.on_enter = null;
-    (boss as any).on_kill = this.on_kill;
+    boss.on_enter = undefined;
+    boss.on_kill = this.on_kill;
     boss.no_fight = true;
     boss.no_refresh = true;
-    boss.on_die = null;
+    boss.on_die = undefined;
 
     return boss;
 }
-    on_kill(this: any, me) {
+    on_kill(this: NPC, me: USER) {
     if (me.level > this.level) {
         if (this.family == FAMILIES.MONSTER) {
             return me.notify_fail(this.name + "目露凶光狠狠的瞪着你。");
@@ -190,43 +192,43 @@ export default class extends TASK {
         return me.notify_fail(this.name + "对你拱手说道：这位" + me.call() + "，不知" + this.callme() + "有何得罪之处？");
     }
 }
-    on_died(this: any, me, corpse) {
+    on_died(this: NPC, me: USER, corpse: CORPSE) {
     if (!this.is_party_boss)
         EVENTS.add(create_finish_event(this));
     if (!this.damages) return;
-    (corpse as any).no_alloc = true;
-    (corpse as any).clear_items = clear_items.bind(this);
-    (corpse as any).query_items = query_items.bind(this);
-    (corpse as any).query_damage = query_damage.bind(this);
+    corpse.no_alloc = true;
+    corpse.clear_items = clear_items.bind(this);
+    corpse.query_items = query_items.bind(this);
+    corpse.query_damage = query_damage.bind(this);
 }
 }
 
-const BOSSTASK: any = undefined as any;
+const BOSSTASK = TASK.GET('boss');
 const BOSS_LEVELS = ["", "武士", "武师", "宗师", "武圣", "武帝", "武神"];
-function create_finish_event(boss) {
+function create_finish_event(boss: NPC) {
     return {
-        id: boss.event_id,
+        id: boss.event_id ?? '',
         name: BOSS_LEVELS[boss.level] + "BOSS挑战",
         desc: boss.name + "被击败了，解锁快速领取可直接领取基础掉落，并增加一次参与次数",
-        time: (BOSSTASK as any).next_time.getTime(),
+        time: BOSSTASK?.next_time?.getTime() ?? 0,
         grade: boss.level,
         command: "领取",
-        check: (me) => me.level === boss.level,
-        on_command: function (me, par) {
-            (BOSSTASK as any).boss_auto_drops(me, boss, par);
+        check: (me: USER) => me.level === boss.level,
+        on_command: (me: USER) => {
+            BOSSTASK?.boss_auto_drops?.(me, boss, '');
         }
-    } as any;
+    };
 }
-function query_damage(this: any) {
-    var str: any = [];
+function query_damage(this: NPC) {
+    var str: string[] = [];
     for (var key in this.damages) {
         var user = WORLD.getUser(key);
         if (user) {
             str.push(user.name);
             str.push("：");
-            str.push(this.damages[key]);
+            str.push(String(this.damages![key]));
             str.push("==");
-            str.push(parseInt(this.damages[key] * 100 / this.max_hp));
+            str.push(String(parseInt(String(this.damages![key] * 100 / this.max_hp))));
             str.push("%\n");
         }
     }
@@ -237,24 +239,24 @@ const BOSS_DROPS = {
         "st/st_red#0", "st/st_gre#0", "st/st_blu#0", "st/st_yel#0"],
 
 };
-function query_items(this: any, me) {
-    if (!this.damages) return;
+function query_items(this: NPC, me: USER) {
+    if (!me || !this.damages) return;
 
     var sh = this.damages[me.id];
     if (!(sh > 1)) return;
     if (!this.user_items) this.user_items = {};
     if (this.user_items[me.id]) return this.user_items[me.id];
-    if (me.query_temp("bcc", 0) >= 5) return;
+    if ((me.query_temp("bcc", 0) ?? 0) >= 5) return;
 
 
 
-    sh = parseInt(sh * 100 / this.max_hp);
+    sh = parseInt(String(sh * 100 / this.max_hp));
     if (sh < 1) {
         this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(10))];
         return this.user_items[me.id];
     }
     if (sh > 100) sh = 80;
-    var lv = this.diff_level - 20;
+    var lv = this.diff_level! - 20;
     if (lv < 0) lv = 0;
 
     var drops = [
@@ -273,8 +275,9 @@ function query_items(this: any, me) {
     this.user_items[me.id] = items;
     return items;
 }
-function clear_items(this: any, me) {
+function clear_items(this: NPC, me: USER) {
     if (this.user_items) {
-        this.user_items[me.id].length = 0;
+        var items = this.user_items[me.id];
+        if (items) items.length = 0;
     }
 }

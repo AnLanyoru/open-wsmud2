@@ -46,7 +46,7 @@ export default class extends COMMAND {
     return -1;
 }
     save_eqgroup(me, index) {
-    let eqs = [];
+    let eqs: string[] = [];
     for (let sk of SK_TYPES) {
         let skill = me.skills[sk];
         if (skill && skill.enable_skill) {

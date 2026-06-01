@@ -5,6 +5,10 @@
  */
 import { BASE } from "../base.js";
 import { WORLD } from "../world.js";
+import type { CHARACTER } from "../char/character.js";
+import type { OBJ } from "../item/obj.js";
+import type { USER } from "../char/user.js";
+import type { NPC } from "../char/npc.js";
 
 export class TASK extends BASE {
 
@@ -71,12 +75,25 @@ export class TASK extends BASE {
      * 查询玩家货物列表 — 子类覆写（如押镖任务的货物）
      * @param me - 玩家角色
      */
-    query_goods(me: Record<string, any>): any[] | undefined { return undefined; }
+    query_goods(me: CHARACTER): OBJ[] | undefined { return undefined; }
 
     /**
      * 设置/清除玩家货物缓存 — 子类覆写
      * @param me - 玩家角色
      * @param list - 物品列表，传 null 清除缓存
      */
-    set_goods(me: Record<string, any>, list: any[] | null): void { return undefined; }
+    set_goods(me: CHARACTER, list: OBJ[] | null): void { return undefined; }
+
+    /** 执行定时任务（由 time 等任务子类实现） */
+    run2?(): void;
+    /** BOSS任务：创建二级BOSS */
+    create_boss2?(user: USER): boolean;
+    /** BOSS任务：自动掉落分配 */
+    boss_auto_drops?(me: USER, boss: NPC, par: string): void;
+    /** BOSS任务：下次运行时间 */
+    next_time?: Date | null;
+    /** 货物缓存（由 goods 任务设置） */
+    customer?: Record<string, OBJ[] | null>;
+    /** 比武结束回调（由 fight 任务实现） */
+    battle_over?(p1: CHARACTER, p2: CHARACTER): void;
 }

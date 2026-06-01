@@ -1,5 +1,6 @@
 import { NPC } from "../../../core/char/npc.js";
 import { WORLD } from "../../../core/world.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "管家";
@@ -20,7 +21,7 @@ export default class extends NPC {
             "管家说道：这里不但有适合住家的小别院，也有富丽堂皇的大宅，客官您要不要来看看。",
             "管家说道：这里之前据说是位财主的家，方圆几里都是他家的产业！"
         ]);
-        this.add_action("qianyue", "签约", function (me, par) {
+        this.add_action("qianyue", "签约", function (this: NPC, me: CHARACTER, par: string) {
             if (!WORLD.is_server(me)) {
                 return me.notify("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
             }
@@ -40,14 +41,14 @@ export default class extends NPC {
         });
     }
 
-    on_enter(me) {
+    on_enter(me: CHARACTER): void {
     if (me.query_temp("home")) {
         me.notify("管家对你热情的说道：您来啦，快请进。");
     } else {
         me.notify("管家招呼道：这位" + me.call() + "，需要房子吗，练功，学习都会提高效率哦。");
     }
 }
-    on_accept(me, obj, count) {
+    on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
     if (obj !== 'money') return false;
     let home = me.query_temp('home', 0);
     if (home === 2) return me.notify_fail("管家的说道：你已经购买住宅了。");
@@ -57,7 +58,7 @@ export default class extends NPC {
         me.set_temp("home", 2);
         me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
 
-        me.clear_home(false);
+        me.clear_home!(false);
     } else {
         if (count === 1000000) {
             me.set_temp("home", 1);
@@ -73,7 +74,7 @@ export default class extends NPC {
     }
     return true;
 }
-    on_leave(me, dir) {
+    on_leave(me: CHARACTER, dir: string): boolean | void {
     if (dir == "enter") {
         if (!WORLD.is_server(me)) {
             return me.notify_fail("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
@@ -83,11 +84,10 @@ export default class extends NPC {
             me.notify("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
             return false;
         } else {
-            me.go_home();
+            me.go_home!();
             return false;
         }
 
     }
 }
 }
-

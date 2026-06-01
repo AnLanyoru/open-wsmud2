@@ -8,7 +8,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, arg, cmd, par) {
+    enter(player: CHARACTER, arg: string, cmd: string, par: string) {
     if (!arg || !cmd) return;
     var target = player.find_obj(arg, player.environment);
     if (!target) return player.send("没有这个人。");

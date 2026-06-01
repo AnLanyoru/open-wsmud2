@@ -49,7 +49,7 @@ export default class extends SKILL {
         release_time: 0,
         use_type: 2,
         use: function (me, target, lv) {
-            let par = {
+            const par: { fy_per: number; diff_sh_per?: number } = {
                 fy_per: 100
             };
             let fy = me.query_prop('pssg_fy');

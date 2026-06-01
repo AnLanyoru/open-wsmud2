@@ -1,6 +1,7 @@
 import { NPC } from "../../../../core/char/npc.js";
 import { ROOM } from "../../../../core/room/room.js";
 import { CORPSE } from "../../../../core/item/corpse.js";
+import { CHARACTER } from "../../../../core/char/character.js";
 
 export default class extends NPC {
     name = "黑鹰教徒";
@@ -35,26 +36,26 @@ export default class extends NPC {
         });
     }
 
-    on_heart_beat() {
-    let exits = this.environment.move_exits;
+    on_heart_beat(dt: number): void {
+    let exits = this.environment!.move_exits;
     if (!exits || !exits.length) return;
     this.do_command('go', exits.random());
-    for (let item of this.environment.items) {
-        if (item.is_player) {
+    for (let item of this.environment!.items) {
+        if (item instanceof CHARACTER && item.is_player) {
             this.send_room("$N喊道：这里有个小毛贼！");
             return this.do_kill(item);
         }
     }
 }
-    on_enter(me) {
+    on_enter(me: CHARACTER): void {
     if (me.is_player && !this.fight_type) {
         this.send_room("$N喝道：" + me.call(true) + "，哪里来的小毛贼！");
         this.do_kill(me);
     }
 }
-    die(killer) {
+    die(killer?: CHARACTER): boolean | undefined {
     if (!this.environment) return;
-    if (this.on_die && this.on_die(killer) == false) {
+    if (this.on_die && killer && this.on_die(killer) == false) {
         this.hp = 1;
         return false;
     }
@@ -66,16 +67,17 @@ export default class extends NPC {
     var isinfb = this.environment.is_fb();
     corpse.init(this, isinfb);
     this.die_room = this.environment;
-    this.environment.item_changed(corpse, true);
-    this.environment.item_changed(this, false);
+    var env = this.environment;
+    env.item_changed(corpse, true);
+    env.item_changed(this, false);
     // this.call_out(this.relive, 120000);
     this.on_died && this.on_died(killer, corpse);
 
 }
-    on_died(me, corpse) {
-    let eny = this.enemy[0];
+    on_died(me: CHARACTER | undefined, corpse: any): void {
+    let eny = this.enemy![0];
     if (eny && eny.hp > 0 && eny.environment === this.die_room) {
-        let count = eny.query_temp('hy_ct', 0);
+        let count = eny.query_temp('hy_ct', 0) ?? 0;
         if (count > 0) {
             eny.add_exp(0, 10000);
             eny.add_temp('hy_ct', -1);
@@ -88,11 +90,11 @@ export default class extends NPC {
     }
     corpse.items = null;
 }
-    relive() {
+    relive(): void {
     if (!this.die_room) return;
     var room = ROOM.Get(rooms.random());
-
-    obj = NPC.CLONE(this.path);
+    if (!room) return;
+    let obj = NPC.CLONE(this.path);
     room.item_changed(obj, true);
     this.die_room = null;
     this.equipment = null;

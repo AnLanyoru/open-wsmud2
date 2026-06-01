@@ -39,14 +39,15 @@ export default class extends COMMAND {
             }
         }
     }
-    var obj = {};
-    obj.type = "dialog";
-    obj.dialog = "skills";
+    var obj: { type: string; dialog: string; is_custom?: number; id: string; desc: string } = {
+        type: "dialog",
+        dialog: "skills",
+        id: skid,
+        desc: skill_base.query_desc(target, target.query_skill(skid, 1000)),
+    };
     if (skill_base.is_custom)
         obj.is_custom = 1;
-    obj.id = skid;
     if (!target.skills) target.skills = {};
-    obj.desc = skill_base.query_desc(target, target.query_skill(skid, 1000));
     return player.send(JSON.stringify(obj));
 }
 }

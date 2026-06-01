@@ -546,4 +546,11 @@ export const UTIL = {
 
   /** 敏感词替换（由 world/cmd/channel/filter.js 注入实现） */
   replace_word(str: string): string { return str; },
+
+  /** 敏感词过滤检查（由 world/cmd/channel/filter.js 注入实现） */
+  check_word(str: string): boolean { return true; },
+  /** 添加敏感词（由 world/cmd/channel/filter.js 注入实现） */
+  add_world(str: string): void {},
+  /** 敏感词正则列表（由 world/cmd/channel/filter.js 注入实现） */
+  workds_regex: new Array<RegExp>(),
 };

@@ -1,6 +1,7 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { UTIL } from "../../../core/util/util.js";
+import { ITEM } from "../../../core/item.js";
 
 export default class extends COMMAND {
     command = "qu";
@@ -15,9 +16,10 @@ export default class extends COMMAND {
     if (!arg) return me.notify("你要取什么东西？");
 
     me.items = me.items || [];
-    var obj = {};
-    obj.remove_item_byid = me.remove_item_byid;
-    obj.items = me.stores || [];
+    var obj: { remove_item_byid: (id: string, count?: number) => ITEM | null | undefined; items: ITEM[] } = {
+        remove_item_byid: me.remove_item_byid.bind(me),
+        items: me.stores || [],
+    };
     var move_count = 1;
     if (count) move_count = parseInt(count);
     var moved_obj = obj.remove_item_byid(arg, move_count);

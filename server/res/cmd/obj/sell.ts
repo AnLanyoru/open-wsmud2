@@ -38,7 +38,7 @@ export default class extends COMMAND {
     //     }
     // }
     if (objid === "all") {
-        var str = [];
+        var str: string[] = [];
         let sum_money = 0;
         for (var i = 0; i < me.items.length; i++) {
             var item = me.items[i];

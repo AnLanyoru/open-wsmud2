@@ -35,7 +35,7 @@ export class MONSTER extends CHARACTER {
   // ============ 功能属性 ============
 
   /** 死亡后重生房间 */
-  die_room: ROOM | null = null;
+  die_room?: ROOM;
   /** 击杀奖励积分 */
   score: number = 0;
 

@@ -129,7 +129,11 @@ function check_skill(me, book, skill) {
     // }
     return true;
 }
-function do_learn(me) {
+interface StudyState {
+    target: { color_name: string; max_level: number };
+    skill_base: import("../../../core/skill/skill.js").SKILL;
+}
+function do_learn(this: StudyState, me: CHARACTER) {
 
     if (check_skill(me, this.target, this.skill_base) == false) return false;
 

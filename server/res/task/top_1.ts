@@ -1,12 +1,13 @@
 import { TASK } from "../../core/task/task.js";
 import { WORLD } from "../../core/world.js";
+import type { USER } from "../../core/char/user.js";
 import { FAMILIES } from "../../core/skill/family.js";
+import type { FAMILY } from "../../core/skill/family.js";
 import { COMMAND } from "../../core/command.js";
 
 export default class extends TASK {
     id = "top";
     prev_time = 0;
-    time_handler: any = null;
 
     startup() {
     var dt = new Date();
@@ -18,7 +19,7 @@ export default class extends TASK {
     this.time_handler = this.call_out(this.run.bind(this), diff_time);
 }
     stop() {
-    clearTimeout(this.time_handler);
+    clearTimeout(this.time_handler!);
 }
     run() {
     this.startup();
@@ -41,15 +42,15 @@ export default class extends TASK {
             var user = stats[i];
             if (i > 19) break;
             if (!user.id) continue;
-            (COMMAND.DO as any)("send", user.id, {
+            COMMAND.DO("send", user.id, JSON.stringify({
                 from: "score",
                 from_name: "综合榜奖励",
                 content: "你目前在" + topname + "单排名第" +
                     (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                 attach: [
-                    (WORLD.COMMANDS.reward as any).score_reward(i)
+                    WORLD.COMMANDS.reward?.score_reward?.(i)
                 ]
-            });
+            }));
         }
     }
 }
@@ -61,19 +62,19 @@ export default class extends TASK {
         for (let i = 0; i < tops.length; i++) {
             let user = tops[i];
             if (!user.userid) continue;
-            (COMMAND.DO as any)("send", user.userid, {
+            COMMAND.DO("send", user.userid, JSON.stringify({
                 from: "top",
                 from_name: "高手榜奖励",
                 content: "你目前在" + topname + "排名第" + (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                 attach: [
-                    (WORLD.COMMANDS.reward as any).top_reward(i)
+                    WORLD.COMMANDS.reward?.top_reward?.(i)
                 ]
-            });
+            }));
         }
     }
 }
     send_weapons() {
-    const map = {};
+    const map: Record<string, number> = {};
     let eqs = WORLD.STATS.EQ_STATS ?? [];
     for (let stats of eqs) {
         for (let i = 0; i < stats.length; i++) {
@@ -90,7 +91,7 @@ export default class extends TASK {
             }
             map[item.user] = max_count;
 
-            (COMMAND.DO as any)("send", item.user, {
+            COMMAND.DO("send", item.user, JSON.stringify({
                 from: "weapon",
                 from_name: "兵器谱奖励",
                 content: "你的" + item.wname + "在兵器谱排名第" + (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
@@ -100,7 +101,7 @@ export default class extends TASK {
                         count: count
                     }
                 ]
-            });
+            }));
         }
     }
 }
@@ -111,9 +112,9 @@ export default class extends TASK {
         this.sort_family(fam);
     }
 }
-    sort_family(fam) {
-    var list: any = [];
-    var user: any = null;
+    sort_family(fam: FAMILY) {
+    var list: { name: string; id: string }[] = [];
+    var user: { name: string; id: string } | null = null;
     if (fam.tops) {
         var max = 0;
         for (var key in fam.tops) {
@@ -132,8 +133,8 @@ export default class extends TASK {
         else {
             var last_time = Number.MAX_VALUE;
             for (var i = 0; i < list.length; i++) {
-                var item: any = WORLD.getUser(list[i].id);
-                var time = item ? item.query_temp('last_sm', 1) : Date.now();
+                var u: USER | undefined = WORLD.getUser(list[i].id);
+                var time = u ? (u.query_temp('last_sm', 1) ?? Date.now()) : Date.now();
 
                 if (time < last_time) {
                     user = list[i];
@@ -143,21 +144,22 @@ export default class extends TASK {
         }
     } else {
         if (fam !== FAMILIES.NONE) return;
-        for (let user of WORLD.USERS) {
-            if (user.family === FAMILIES.NONE && user.query_temp('wg_sr', 0)
-                && user.query_temp('sr', 0)) {
-                list.push(user);
+        for (let u of WORLD.USERS) {
+            if (u.family === FAMILIES.NONE && u.query_temp('wg_sr', 0)
+                && u.query_temp('sr', 0)) {
+                list.push({ name: u.name, id: u.id });
             }
         }
         if (!list.length) return;
         user = list.random();
     }
 
+    if (!user) return;
 
     fam.set_dadizi(user.id, user.name);
 
 
-    (COMMAND.DO as any)("send", user.id, {
+    COMMAND.DO("send", user.id, JSON.stringify({
         from: "fam",
         from_name: "门派奖励",
         content: "恭喜你成为" + fam.name + "的" + fam.top_name + "。",
@@ -167,10 +169,10 @@ export default class extends TASK {
                 count: 1
             }
         ]
-    });
-    user = WORLD.getUser(user.id);
-    if (user) {
-        user.set_temp('last_sm', Date.now());
+    }));
+    const lastUser = WORLD.getUser(user.id);
+    if (lastUser) {
+        lastUser.set_temp('last_sm', Date.now());
     }
 }
 }

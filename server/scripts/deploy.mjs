@@ -35,7 +35,7 @@ const files = walkDir(SRC);
 let count = 0;
 
 for (const src of files) {
-  if (!src.endsWith('.js') && !src.endsWith('.js.map')) continue;
+  if (!src.endsWith('.js')) continue;
 
   const rel = relative(SRC, src);
   const dest = join(DEST, rel);
@@ -68,7 +68,7 @@ if (existsSync(RES_SRC)) {
   let resCount = 0;
 
   for (const src of resFiles) {
-    if (!src.endsWith('.js') && !src.endsWith('.js.map')) continue;
+    if (!src.endsWith('.js')) continue;
 
     const rel = relative(RES_SRC, src);
     const dest = join(RES_DEST, rel);
@@ -78,14 +78,10 @@ if (existsSync(RES_SRC)) {
       mkdirSync(destDir, { recursive: true });
     }
 
-    if (src.endsWith('.js')) {
-      // 重写 import 路径: core/ → os/
-      let content = readFileSync(src, 'utf-8');
-      content = content.replace(/(from\s+["'](?:\.\.\/)+)core\//g, '$1os/');
-      writeFileSync(dest, content, 'utf-8');
-    } else {
-      copyFileSync(src, dest);
-    }
+    // 重写 import 路径: core/ → os/
+    let content = readFileSync(src, 'utf-8');
+    content = content.replace(/(from\s+["'](?:\.\.\/)+)core\//g, '$1os/');
+    writeFileSync(dest, content, 'utf-8');
     resCount++;
   }
 

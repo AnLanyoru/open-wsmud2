@@ -70,9 +70,8 @@ export default class extends SKILL {
             "<hiw>$N施出「拨狗朝天」，$w由下往上向$n撩去</hiw>"
         ],
         use: function (me, target, lv) {
-            var count = 3 + parseInt(lv / 100);
-            if (count > 10) count = 10;
-            this.suc_count = 0;
+                var count = 3 + parseInt(lv / 100);
+                if (count > 10) count = 10;
             me.send_room("<hiw>$N手中青光一闪，响起阵阵风声，手中$W犹若千百根相似，层层叠叠将$n笼罩。</hiw>\n", target);
             for (var i = 0; i < count; i++) {
                 me.do_attack({

@@ -112,12 +112,12 @@ export default class extends COMMAND {
     str.push(limit_mp);
     if (target.query_jingli) {
 
-        str.push(',jingli:"', target.query_temp('ad_jl', 0), '/', target.query_jclimit(), "<hig>(+", 200 - target.query_temp('ex_jl', 0), ')</hig>"');
+        str.push(',jingli:"', String(target.query_temp('ad_jl', 0) ?? 0), '/', String(target.query_jclimit?.() ?? 0), "<hig>(+", String(200 - (target.query_temp('ex_jl', 0) ?? 0)), ')</hig>"');
     } else {
         str.push(',jingli:0');
     }
     str.push(',gjsd:');
-    str.push(target.gjsd / 1000);
+    str.push(String(target.gjsd / 1000));
     str.push(',bj:"');
     str.push(target.bj);
     str.push('%",');

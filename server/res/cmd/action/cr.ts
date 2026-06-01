@@ -60,7 +60,7 @@ function fb_saodang(me, path, isdiff, count) {
     if (!fb) {
         return me.notify("没有这个副本!");
     }
-    let next_room = ROOM.Get(fb.first);
+    let next_room = ROOM.Get(fb.first ?? '');
     if (!next_room) {
         return me.notify("没有这个房间");
     }
@@ -71,6 +71,7 @@ function fb_saodang(me, path, isdiff, count) {
 
     if (me.is_full(-10)) return me.notify("你身上东西太多了!");
     var area = next_room.parent;
+    if (!area) return me.notify("区域错误");
     var unlock_name = isdiff ? "fb_sao1" : "fb_sao0";
     if (area.unlock_index) {
         if (me.query_temp('fb_sao' + area.fb_index, 0) !== (isdiff ? 2 : 1))
@@ -104,7 +105,7 @@ function fb_quick(me, area, isdiff) {
     }
     if (me.items.length > 204) return me.notify_fail("你背包的东西太多了。");
 
-    if (area.on_quick && !area.on_quick(me)) return false;
+    if (area.on_quick?.(me) === false) return false;
 
     if (me.expend_jingli(area.expend) == false) { return me.notify_fail("你的精力不够，不能开启副本。"); }
 
@@ -192,7 +193,7 @@ function fb_start(me, path) {
     if (!fb) {
         return me.notify("没有这个副本!");
     }
-    var next_room = ROOM.Get(fb.first);
+    var next_room = ROOM.Get(fb.first ?? '');
     if (!next_room) {
         return me.notify("没有这个副本!");
     }
@@ -261,7 +262,7 @@ function fb_start(me, path) {
         }
 
         if (!me.team || me.team[0] === me) {
-            WORLD.COMMANDS['ex'].on_enter_fb(me, next_room);
+            WORLD.COMMANDS['ex']?.on_enter_fb?.(me, next_room);
         }
     }
     me.send('{type:"dialog",dialog:"jh",close:true}');
@@ -280,8 +281,8 @@ function fb_start(me, path) {
 
 }
 function fb_over(me) {
-    var area = me.environment.parent;
     if (!me.environment || !me.environment.is_fb()) return;
+    var area = me.environment.parent;
     var score = me.query_fbscore();
     var max_score = area.score || 100;
     var max_exp = area.query_exp();
@@ -404,7 +405,7 @@ function fb_first_check(me, fb, area, diff) {
     if (diff === 2) fb_fam_key = fb_key;
     if (WORLD.DATA.query_temp(fb_fam_key)) return;//这个门派已经拿过了
     var fb_key2 = "fb_first_" + fblock;
-    var ss_users = WORLD.DATA.query_temp(fb_key2);
+    var ss_users = String(WORLD.DATA.query_temp(fb_key2) ?? '');
     var teams = me.team || [me];
     if (ss_users) {
         for (var i = 0; i < teams.length; i++) {
@@ -433,10 +434,10 @@ function fb_first_check(me, fb, area, diff) {
             me.send("<hig>你获得了称号【" + area.ss_title + "】。</hig>");
         }
     }
-    if (area.is_show && WORLD.DATA.query_temp("fb_index", 0) < fb.parent.fb_index) {
+    if (area.is_show && Number(WORLD.DATA.query_temp("fb_index", 0) ?? 0) < fb.parent.fb_index) {
         WORLD.DATA.set_temp("fb_index", fb.parent.fb_index);
     }
-    let ss_userids = WORLD.DATA.query_temp(fb_key2, "");
+    let ss_userids = String(WORLD.DATA.query_temp(fb_key2, "") ?? "");
     let msg = "<hio>恭喜你完成副本" + fb_name + "的首杀！</hio>";
     if (diff < 2) msg = "<hio>恭喜你做为" + me.family.name + "弟子首次通过了副本" + fb_name + "！</hio>";
     for (var i = 0; i < teams.length; i++) {
@@ -448,14 +449,16 @@ function fb_first_check(me, fb, area, diff) {
     fb.parent.notify_update();
 }
 function team_name(tms) {
-    var str = [];
+    const str: string[] = [];
     for (var i = 0; i < tms.length; i++) {
         str.push(tms[i].name);
     }
     return str.join("，");
 }
 function fb_confirm_over(me) {
+    if (!me.environment) return;
     var area = me.environment.parent;
+    if (!area) return;
     var score = me.query_fbscore();
     var max_score = area.score || 100;
     var p = parseInt(score * 100 / max_score);
@@ -463,34 +466,34 @@ function fb_confirm_over(me) {
     if (p > 100) p = 100;
 
     var exp = 1200;
-    var str = ["当前副本："];
+    var str: string[] = ["当前副本："];
     str.push(area.name);
     if (exp > 0) {
         str.push("\n将获得经验：");
-        str.push(exp);
+        str.push(String(exp));
         str.push("，潜能：");
-        str.push(exp);
+        str.push(String(exp));
     }
     str.push("\n完成度：");
     if (p < 30) {
-        str.push(p);
+        str.push(String(p));
         str.push("%\n");
     } else if (p < 60) {
         str.push("<hig>");
-        str.push(p);
+        str.push(String(p));
         str.push("%</hig>\n");
     } else if (p < 80) {
         str.push("<hic>");
-        str.push(p);
+        str.push(String(p));
         str.push("%</hic>\n");
     } else if (p < 100) {
         str.push("<hiy>");
-        str.push(p);
+        str.push(String(p));
         str.push("%</hiy>\n");
     } else {
         p = 100;
         str.push("<hiz>");
-        str.push(p);
+        str.push(String(p));
         str.push("%</hiz>\n");
     }
     me.notify(str.join(""));

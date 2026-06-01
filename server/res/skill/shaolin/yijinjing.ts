@@ -60,7 +60,7 @@ export default class extends SKILL {
 
             me.send_room("<hiy>$N深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼。</hiy>");
             if (!me.enemy) return false;
-            var list = [];
+            var list: any[] = [];
             var time = lv * 10 + 2000;
             if (time > 7000) time = 7000;
             for (let x of me.enemy) {
@@ -100,7 +100,7 @@ export default class extends SKILL {
         use_type: 2,
         release_time: 0,
         use: function (me, target, lv) {
-            var lv = 30 + parseInt(lv / 100);
+            var zhaoLv = 30 + parseInt(lv / 100);
             me.send_room("<hiy>$N高呼佛号，全身真气鼓动，犹如金铸之钟，坚不可摧。</hiy>");
             me.add_status({
                 id: "force",
@@ -108,14 +108,14 @@ export default class extends SKILL {
                 desc: "大幅减少你受到的伤害",
                 duration: 10000,
                 prop: {
-                    diff_sh_per2: lv
+                    diff_sh_per2: zhaoLv
                 }
             });
 
         },
         query_desc: function (me, lv) {
-            var lv = 30 + parseInt(lv / 100);
-            return "减少你受到的伤害，10秒内增加" + lv + "%伤害减免。";
+            var calcLv2 = 30 + parseInt(lv / 100);
+            return "减少你受到的伤害，10秒内增加" + calcLv2 + "%伤害减免。";
         }
     }
 };

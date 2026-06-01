@@ -17,6 +17,7 @@ import { WORLD } from '../world.js';
 import { BASE } from '../base.js';
 // @ts-ignore - Legacy JS module
 import { CORPSE } from '../item/corpse.js';
+import type { EQUIPMENT } from '../item/equipment.js';
 import type { ActionMap } from '../../types/base.js';
 
 declare var __PATH: Record<string, string>;
@@ -44,23 +45,23 @@ export class NPC extends CHARACTER {
   // ============ 功能属性 ============
 
   /** 闲聊消息列表 */
-  chat_msg: string[] | null = null;
+  chat_msg?: string[];
   /** 闲聊触发概率（百分比） */
   chat_chance: number = 0;
   /** 出售物品列表 */
-  sell_list: OBJ[] | null = null;
+  sell_list?: OBJ[];
   /** 死亡后重生房间 */
-  die_room: ROOM | null = null;
+  die_room?: ROOM;
   /** 是否禁止刷新（不重生） */
   no_refresh: boolean = false;
   /** 击杀奖励积分 */
   score: number = 0;
   /** 任务主人 ID */
-  master: string | null = null;
+  master?: string;
   /** 关联玩家 ID（首席弟子 NPC 绑定） */
   userid?: string;
   /** 对话问题 */
-  question: Record<string, (me: CHARACTER) => void> | null = null;
+  question?: Record<string, (me: CHARACTER) => void>;
 
   /** 禁止战斗标识 */
   no_fight: boolean = false;
@@ -91,6 +92,18 @@ export class NPC extends CHARACTER {
   /** 掉落分配：是否禁止队伍分配 */
   no_alloc?: boolean;
   /** 追杀任务：玩家查询（npc.query_temp("player")）复用 CHARACTER 的 query_temp */
+  /** BOSS/襄阳：掉落计数 */
+  drops_count?: number;
+  /** BOSS/襄阳：玩家物品缓存 */
+  user_items?: Record<string, any[]>;
+  /** BOSS：是否队伍BOSS */
+  is_party_boss?: boolean;
+  /** 高手榜排名索引（biwu 系统动态设置） */
+  top_index?: number;
+  /** 自动使用装备列表（biwu 系统动态设置） */
+  auto_eqs?: EQUIPMENT[];
+  /** 连击次数（biwu 系统动态设置） */
+  attack_count?: number;
 
   // ============ 运行时方法（由资源文件注入） ============
 
@@ -111,6 +124,8 @@ export class NPC extends CHARACTER {
   on_master_enter?: (me: Record<string, any>) => void;
   /** 击杀回调 — 触发时机：BOSS/任务 NPC 被击杀时（由 world/ 资源文件设置） */
   on_kill?(killer: Record<string, any>): void;
+  /** 接受物品回调 — 触发时机：玩家 give 物品给 NPC 时 */
+  on_accept?(me: CHARACTER, obj: string, count: number): boolean | void;
   constructor() {
     super();
   }

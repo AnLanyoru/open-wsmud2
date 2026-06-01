@@ -99,6 +99,10 @@ export interface StatsTopEntry {
   skills?: Record<string, number>;
   equipment?: EQUIPMENT[];
   temp?: Record<string, unknown>;
+  /** 显示名称（由 extends 注入的 CHARACTER.long_name） */
+  long_name?(): string;
+  /** 外观描述（由 extends 注入的 CHARACTER.query_desc） */
+  query_desc?(me: CHARACTER, cmd?: string): string;
 }
 
 /** 武器排行条目 */
@@ -150,7 +154,7 @@ export interface GameSocket {
 export interface MessageSystem {
   stores: Map<UID, Map<UID, MessageStoreEntry>>;
   NOTICES: MessageEntry[];
-  pushUserMessage(toid: UID, from: CHARACTER, msg: MessageEntry): void;
+  pushUserMessage(toid: UID, from: { id: UID; name: string }, msg: MessageEntry): void;
   getUserMessages(me: CHARACTER): { id: UID; name: string; content: string; time: number }[];
   getMessageFromID(me: CHARACTER, from: UID, count?: number): MessageEntry[];
   getMessageByIndex(me: CHARACTER, from: UID, index: number): MessageEntry | undefined;
@@ -167,6 +171,7 @@ export interface StatsSystem {
   WEAPON: WeaponRankEntry[];
   EQ_STATS: WeaponRankEntry[][];
   SC_STATS: Record<string, ScoreRankEntry[]>;
+  [key: string]: StatsTopEntry[] | ScoreRankEntry[] | WeaponRankEntry[] | WeaponRankEntry[][] | Record<string, ScoreRankEntry[]> | ((...args: unknown[]) => unknown) | undefined;
   load_tops(tops?: StatsTopEntry[], defname?: string, key?: string): StatsTopEntry[];
   loadTopUser(data: any, npc: NPC): void;
   checkStats(player: USER): void;

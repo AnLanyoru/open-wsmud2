@@ -1,4 +1,5 @@
 import { NPC } from "../../../../core/char/npc.js";
+import { CHARACTER } from "../../../../core/char/character.js";
 
 export default class extends NPC {
     name = "丫鬟";
@@ -17,7 +18,7 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.add_action("ok", "救出丫鬟", function (me) {
+        this.add_action("ok", "救出丫鬟", function (this: NPC, me: CHARACTER, par: string) {
 
             var type = me.query_temp("fb/cuifu/yahuan");
             if (!type) {
@@ -28,25 +29,25 @@ export default class extends NPC {
             } else {
                 if (type == 2 || type == 4) {
                     ///me.notify("<hic>你刚想要答应丫鬟，想起来自己还没房子，也是无家可归的人，就没想法了。</hic>");
-                    if (me.add_follower(this)) {
+                    if (me.add_follower!(this)) {
                         me.notify("你想了一下觉得这个小丫头也怪可怜的，便对她说道：好吧，你就先跟着我吧！");
                         me.notify("<him>你获得了丫鬟的追随，你可以去你的住所找她。</him>");
                         this.do_follow(null);
                         this.destroy();
                     }
-         
+
                 } else {
                     me.notify("你已经答应她了。");
                 }
-    
+
             }
- 
+
         });
     }
 
-    on_enter(me) {
+    on_enter(me: CHARACTER): void {
     if (!this.follow_target && !me.query_temp("fb/cuifu/yahuan")) {
-        me.notify("丫鬟看到你进来，吓了一跳，待看清来人，扑到你前面泣声喊道：大人，救救我！", this);
+        me.notify("丫鬟看到你进来，吓了一跳，待看清来人，扑到你前面泣声喊道：大人，救救我！");
         me.send_commands("ok " + this.id, "答应她");
     }
 }

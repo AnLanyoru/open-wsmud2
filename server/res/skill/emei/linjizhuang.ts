@@ -30,7 +30,7 @@ export default class extends SKILL {
                 name: "鹤翔",
                 on_interval: function (me) {
                     if (me.hp > 0) {
-                        hp = me.do_recover(me.max_hp * gj / 100);
+                        var hp = me.do_recover(me.max_hp * gj / 100);
                         if (hp > 0) me.notify("<hig>你恢复了" + hp + "点气血。</hig>");
                     }
 

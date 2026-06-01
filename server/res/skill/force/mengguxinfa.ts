@@ -43,7 +43,7 @@ export default class extends SKILL {
             var time = (10000 + lv * 10);
             var gj = 10 + (lv / 100);
             me.send_room("<HIy>$N大喝一声，全身真气鼓动，看似坚不可摧。</HIy>");
-            const prop = {
+            const prop: { fy_per: number; gj_per: number; zj_per?: number } = {
                 fy_per: gj,
                 gj_per: gj
             };
