@@ -121,7 +121,7 @@ export class FOLLOWER extends CHARACTER {
   /** 主人名称 */
   master_name: string | null = null;
   /** 消息监听者(主人) */
-  listener: USER | null = null;
+  listener?: USER;
   /** 主人可见命令JSON缓存 */
   master_json: string | null = null;
 
@@ -201,7 +201,7 @@ export class FOLLOWER extends CHARACTER {
   /**
    * 设置消息监听者
    */
-  set_listener(me: CHARACTER, target: USER): void {
+  set_listener(me: CHARACTER, target?: USER): void {
     if (me.id == this.master) this.listener = target;
   }
 

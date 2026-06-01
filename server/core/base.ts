@@ -18,10 +18,11 @@ type CtorFunc = new (par?: string) => ResourceObj;
 
 /**
  * 判断 function 是否为 class constructor。
- * isClass 被用于 class/factory 分支选择，其在 Module 阶段固定，通过 toString 判断即可。
+ * ES class 的 prototype 属性为 non-writable，普通 function 为 writable。
  */
 function isConstructor(fn: Function): fn is CtorFunc {
-    return fn.toString().trim().startsWith('class');
+    const desc = Object.getOwnPropertyDescriptor(fn, 'prototype');
+    return desc !== undefined && desc.writable === false;
 }
 
 /** 事件处理记录 */
@@ -56,14 +57,11 @@ export class BASE {
     // ============ 批量属性设置 ============
 
     /**
-     * 批量设置属性 — 将键值对中的属性复制到当前对象
+     * 批量设置属性 — 将键值对中的可枚举自有属性复制到当前对象
      * @param pars - 键值对（可选）
      */
-    set(pars?: Partial<this> & Record<string, any>): void {
-        if (!pars) return;
-        for (const item in pars) {
-            this[item] = pars[item];
-        }
+    set(pars?: Partial<this>): void {
+        if (pars) Object.assign(this, pars);
     }
 
     // ============ 生命周期 ============
@@ -116,7 +114,7 @@ export class BASE {
 
         if (!evts.length) {
             delete this._events[name];
-            this[name] = null;
+            delete this[name];
         }
     }
 
@@ -140,7 +138,7 @@ export class BASE {
         }
         if (!evts.length) {
             delete this._events[name];
-            this[name] = null;
+            delete this[name];
         }
     }
 
