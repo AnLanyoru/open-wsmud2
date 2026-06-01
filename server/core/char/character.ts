@@ -69,7 +69,7 @@ export interface SkillData {
   /** 融合技能引用路径（格式：skill_id/action_name） */
   ref?: string;
   /** 技能进阶槽位 ID 列表（影响技能 grade 和附加属性） */
-  addin?: string[];
+  addin?: number[];
 }
 
 interface AttackPart {
@@ -599,7 +599,7 @@ export class CHARACTER extends ITEM {
   /**
    * 发送战斗消息（支持多视角）
    */
-  send_combat(text: string, target: CHARACTER): void {
+  send_combat(text: string, target?: CHARACTER): void {
     if (!this.environment || !text) return;
     const list = this.environment.items;
     let th_vision: string | undefined;
