@@ -23,7 +23,7 @@ export default class extends SKILL {
         sword: 50
     }
 };
-    pfm = {
+    pfm_set = {
     jiang:
     {
         name: "剑掌五连环",

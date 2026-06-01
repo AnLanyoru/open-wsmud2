@@ -15,7 +15,7 @@ export default class extends SKILL {
 ];
     query_prop(lv: number): Record<string, any> { return { gj: lv * 2, mz: lv * 2, fy: lv * 2, zj: lv * 2, ds: lv * 2 }; }
     can_enables = ["bite"];
-    pfm = {
+    pfm_set = {
     puyao:
     {
         name: "撕咬",

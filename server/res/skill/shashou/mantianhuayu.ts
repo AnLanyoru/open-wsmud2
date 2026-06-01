@@ -22,7 +22,7 @@ export default class extends SKILL {
         throwing: 300
     }
 };
-    pfm = {
+    pfm_set = {
     luo:
     {
         name: "落花",

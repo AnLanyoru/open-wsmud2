@@ -23,7 +23,7 @@ export default class extends SKILL {
         dodge:50
     }
 };
-    pfm = {
+    pfm_set = {
     lingbo:
     {
         name: "一苇渡江",

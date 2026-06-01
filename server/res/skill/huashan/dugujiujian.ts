@@ -64,7 +64,7 @@ export default class extends SKILL {
     "<hir>$n见招式被破，一时慌乱被$N趁虚欺上随手一剑刺向$p</hir>",
     "<hir>$N以攻为守，以进为退，挺剑一招象是「白云出岫」回刺$p的$l</hir>"
 ];
-    pfm = {
+    pfm_set = {
     wu:
     {
         name: "无招",

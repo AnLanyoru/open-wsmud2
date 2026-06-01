@@ -22,7 +22,7 @@ export default class extends SKILL {
         club: 50
     }
 };
-    pfm = {
+    pfm_set = {
     wu:
     {
         name: "绊字决",

@@ -20,7 +20,7 @@ export default class extends SKILL {
         dodge: 200
     }
 };
-    pfm = {
+    pfm_set = {
     power:
         {
             name: "无痕",

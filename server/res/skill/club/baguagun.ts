@@ -48,7 +48,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     wu:
     {
         name: "八卦八打",

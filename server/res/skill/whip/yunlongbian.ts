@@ -38,7 +38,7 @@ export default class extends SKILL {
         },
     }
 ];
-    pfm = {
+    pfm_set = {
     chan:
     {
         name: "缠字诀",

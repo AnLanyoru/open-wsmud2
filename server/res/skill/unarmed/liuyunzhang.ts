@@ -39,7 +39,7 @@ export default class extends SKILL {
         }
     },
 ];
-    pfm = {
+    pfm_set = {
     chan:
     {
         name: "排山倒海",

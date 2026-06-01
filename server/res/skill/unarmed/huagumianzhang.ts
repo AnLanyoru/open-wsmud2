@@ -38,7 +38,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     hua:
     {
         name: "化骨",

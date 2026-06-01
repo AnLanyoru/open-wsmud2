@@ -25,7 +25,7 @@ export default class extends SKILL {
         club: 50
     }
 };
-    pfm = {
+    pfm_set = {
     wu:
     {
         name: "韦陀伏魔",

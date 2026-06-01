@@ -21,7 +21,7 @@ export default class extends SKILL {
         club: 300
     }
 };
-    pfm = {
+    pfm_set = {
     chan:
     {
         name: "绊字决",

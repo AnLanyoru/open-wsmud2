@@ -14,7 +14,7 @@ export default class extends SKILL {
         force: 250
     }
 };
-    pfm = {
+    pfm_set = {
     power:
     {
         name: "混元天罡",

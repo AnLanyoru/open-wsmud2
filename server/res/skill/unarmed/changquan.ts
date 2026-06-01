@@ -61,7 +61,7 @@ export default class extends SKILL {
         }
     }
 ];
-    pfm = {
+    pfm_set = {
     zhen:
     {
         name: "太祖八式",

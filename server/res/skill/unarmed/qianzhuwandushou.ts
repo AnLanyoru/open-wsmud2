@@ -40,7 +40,7 @@ export default class extends SKILL {
         }
     },
 ];
-    pfm = {
+    pfm_set = {
     qian:
     {
         name: "千蛛万毒",

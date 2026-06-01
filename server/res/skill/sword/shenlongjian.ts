@@ -39,7 +39,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     jiang:
     {
         name: "神龙天降",

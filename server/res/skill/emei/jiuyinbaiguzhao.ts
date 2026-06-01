@@ -23,7 +23,7 @@ export default class extends SKILL {
         unarmed: 300
     }
 };
-    pfm = {
+    pfm_set = {
     duo:
     {
         name: "夺命",

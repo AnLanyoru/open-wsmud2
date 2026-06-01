@@ -39,7 +39,7 @@ export default class extends SKILL {
         },
     }
 ];
-    pfm = {
+    pfm_set = {
     zhen:
     {
         name: "震字诀",

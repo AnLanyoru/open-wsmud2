@@ -44,7 +44,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     wu:
     {
         name: "绝棍闷打",

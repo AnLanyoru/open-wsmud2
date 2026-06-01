@@ -22,7 +22,7 @@ export default class extends SKILL {
     }
 };
     can_enables = ["staff"];
-    pfm = {
+    pfm_set = {
     fumo:
     {
         name: "罗汉伏魔",

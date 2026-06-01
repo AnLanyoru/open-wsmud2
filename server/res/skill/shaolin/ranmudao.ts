@@ -23,7 +23,7 @@ export default class extends SKILL {
         blade: 300
     }
 };
-    pfm = {
+    pfm_set = {
     hu:
     {
         name: "护体真焰",

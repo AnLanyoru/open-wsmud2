@@ -13,7 +13,7 @@ export default class extends SKILL {
         force: 200
     }
 };
-    pfm = {
+    pfm_set = {
     xi:
     {
         name: "鹤翔庄",

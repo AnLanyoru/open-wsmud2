@@ -56,7 +56,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     suo:
     {
         name: "锁龙",

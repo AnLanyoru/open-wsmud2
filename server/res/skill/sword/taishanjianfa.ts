@@ -38,7 +38,7 @@ export default class extends SKILL {
         }
     }
 ];
-    pfm = {
+    pfm_set = {
     jiang:
     {
         name: "七星落长空",

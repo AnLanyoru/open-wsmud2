@@ -58,7 +58,7 @@ export default class extends SKILL {
         taijishengong: 100
     }
 };
-    pfm = {
+    pfm_set = {
     zhen:
     {
         name: "震字决",

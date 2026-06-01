@@ -23,7 +23,7 @@ export default class extends SKILL {
         unarmed: 50
     }
 };
-    pfm = {
+    pfm_set = {
     bao:
     {
         name: "虎抱头",

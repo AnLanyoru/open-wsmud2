@@ -23,7 +23,7 @@ export default class extends SKILL {
         parry: 300
     }
 };
-    pfm = {
+    pfm_set = {
     duo:
     {
         name: "无相",

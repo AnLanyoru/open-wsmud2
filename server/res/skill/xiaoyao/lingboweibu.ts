@@ -22,7 +22,7 @@ export default class extends SKILL {
         dodge: 400
     }
 };
-    pfm = {
+    pfm_set = {
     lingbo:
     {
         name: "凌波",

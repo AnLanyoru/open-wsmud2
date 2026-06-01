@@ -14,7 +14,7 @@ export default class extends SKILL {
         throwing: 100
     }
 };
-    pfm = {
+    pfm_set = {
     jiang:
     {
         name: "又见飞刀",

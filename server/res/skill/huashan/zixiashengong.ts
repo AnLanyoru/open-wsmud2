@@ -15,7 +15,7 @@ export default class extends SKILL {
         force: 300
     }
 };
-    pfm = {
+    pfm_set = {
     xi:
     {
         name: "紫气东来",

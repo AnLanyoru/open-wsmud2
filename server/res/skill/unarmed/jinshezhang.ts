@@ -43,7 +43,7 @@ export default class extends SKILL {
         }
     },
 ];
-    pfm = {
+    pfm_set = {
     qian:
     {
         name: "金龙升天",

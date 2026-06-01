@@ -36,7 +36,7 @@ export default class extends SKILL {
         },
     }
 ];
-    pfm = {
+    pfm_set = {
     chang:
     {
         name: "无常五化",

@@ -31,7 +31,7 @@ export default class extends SKILL {
         parry: 100
     }
 };
-    pfm = {
+    pfm_set = {
     duo:
     {
         name: "空手入白刃",

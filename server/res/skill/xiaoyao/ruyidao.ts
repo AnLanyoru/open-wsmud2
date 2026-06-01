@@ -28,7 +28,7 @@ export default class extends SKILL {
         blade: 50
     }
 };
-    pfm = {
+    pfm_set = {
     suifeng:
     {
         name: "随风起舞式",

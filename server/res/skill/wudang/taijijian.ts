@@ -52,7 +52,7 @@ export default class extends SKILL {
     }
 };
     can_enables = ["sword"];
-    pfm = {
+    pfm_set = {
     chan:
     {
         name: "缠字诀",

@@ -34,7 +34,7 @@ export default class extends SKILL {
         }
     }
 ];
-    pfm = {
+    pfm_set = {
     snake:
     {
         name: "金蛇游身",

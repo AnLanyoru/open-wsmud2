@@ -28,7 +28,7 @@ export default class extends SKILL {
         beimingshengong:300
     }
 };
-    pfm = {
+    pfm_set = {
     zhong:
     {
         name: "生死符",

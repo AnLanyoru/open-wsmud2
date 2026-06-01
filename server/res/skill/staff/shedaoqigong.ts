@@ -43,7 +43,7 @@ export default class extends SKILL {
         },
     },
 ];
-    pfm = {
+    pfm_set = {
     chang:
     {
         name: "唱仙法",

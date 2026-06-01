@@ -25,7 +25,7 @@ export default class extends SKILL {
     }
 };
     can_enables = ["sword"];
-    pfm = {
+    pfm_set = {
     mie:
     {
         name: "灭剑",

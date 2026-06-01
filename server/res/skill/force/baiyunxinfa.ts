@@ -46,7 +46,7 @@ export default class extends SKILL {
         }
     }
 ];
-    pfm = {
+    pfm_set = {
     power:
     {
         name: "白云",

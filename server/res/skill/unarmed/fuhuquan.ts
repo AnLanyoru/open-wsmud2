@@ -25,7 +25,7 @@ export default class extends SKILL {
         unarmed: 50
     }
 };
-    pfm = {
+    pfm_set = {
     zhen:
     {
         name: "罗汉伏虎",

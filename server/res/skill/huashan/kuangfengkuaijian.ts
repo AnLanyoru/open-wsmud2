@@ -32,7 +32,7 @@ export default class extends SKILL {
         sword: 300
     }
 };
-    pfm = {
+    pfm_set = {
     duoming:
     {
         name: "夺命连环",

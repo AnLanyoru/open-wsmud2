@@ -25,7 +25,7 @@ export default class extends SKILL {
         sword: 50
     }
 };
-    pfm = {
+    pfm_set = {
     san:
     {
         name: "三环套月",

@@ -22,7 +22,7 @@ export default class extends SKILL {
         unarmed: 100
     }
 };
-    pfm = {
+    pfm_set = {
     chuan:
     {
         name: "掌心雷",

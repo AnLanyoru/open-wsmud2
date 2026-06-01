@@ -26,7 +26,7 @@ export default class extends SKILL {
         sword: 500
     }
 };
-    pfm = {
+    pfm_set = {
     yi:
     {
         name: "倚天剑决",

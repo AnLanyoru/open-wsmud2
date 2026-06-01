@@ -27,7 +27,7 @@ export default class extends SKILL {
             unarmed: 50
         }
     };
-    pfm = {
+    pfm_set = {
         po: {
             name: "破玉",
             distime: 16000,

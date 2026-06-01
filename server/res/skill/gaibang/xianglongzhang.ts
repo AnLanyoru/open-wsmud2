@@ -35,7 +35,7 @@ export default class extends SKILL {
         unarmed: 500
     }
 };
-    pfm = {
+    pfm_set = {
     qi:
     {
         name: "降龙",

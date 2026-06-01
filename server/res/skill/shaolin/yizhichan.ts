@@ -21,7 +21,7 @@ export default class extends SKILL {
         unarmed: 300
     }
 };
-    pfm = {
+    pfm_set = {
     zhen:
     {
         name: "惊魔一指",

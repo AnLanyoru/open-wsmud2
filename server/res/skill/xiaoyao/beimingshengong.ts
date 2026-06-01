@@ -14,7 +14,7 @@ export default class extends SKILL {
         force: 300
     }
 };
-    pfm = {
+    pfm_set = {
     //xi:
     //{
     //    name: "<hir>冥字诀</hir>",

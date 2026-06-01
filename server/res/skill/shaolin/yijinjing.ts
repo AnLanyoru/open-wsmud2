@@ -15,7 +15,7 @@ export default class extends SKILL {
         force: 500
     }
 };
-    pfm = {
+    pfm_set = {
     foguang:
     {
         name: "佛光守护",

@@ -211,8 +211,10 @@ export class SKILL extends BASE {
 
     // ============ 绝招与技能槽 ============
 
-    /** 绝招字典(由资源文件设置) */
-    pfm?: Record<string, PERFORM>;
+    /** 绝招字典(由资源文件设置-原始数据) */
+    pfm_set?: Record<string, Partial<PERFORM>>;
+    /** 绝招字典(运行时-处理后的PERFORM实例) */
+    pfm: Record<string, PERFORM> = {};
     /** 进阶属性槽位(由资源文件设置) */
     slots: any[] | null = null;
 
@@ -822,13 +824,10 @@ export class SKILL extends BASE {
      * @param name - 绝招名
      */
     get_pfm(name: string): PERFORM | undefined {
-        if (this.pfm) {
-            const entry = this.pfm[name];
-            if (!entry) return undefined;
-            if (entry instanceof PERFORM) return entry;
-            return PERFORM.fromPlain(entry);
-        }
-        return undefined;
+        const entry = this.pfm[name];
+        if (!entry) return undefined;
+        if (entry instanceof PERFORM) return entry;
+        return PERFORM.fromPlain(entry);
     }
 
     /**
@@ -837,9 +836,6 @@ export class SKILL extends BASE {
      * @param obj
      */
     set_pfm(name: string, obj: PERFORM): void {
-        if (!this.pfm) {
-            this.pfm = {};
-        }
         this.pfm[name] = obj;
     }
 
@@ -908,9 +904,9 @@ export class SKILL extends BASE {
 
         const desc = level_color[this.grade] || "wht";
         this.color_name = "<" + desc + ">" + this.name + "</" + desc + ">";
-        if (this.pfm) {
-            for (let key in this.pfm) {
-                const raw = this.pfm[key];
+        if (this.pfm_set) {
+            for (let key in this.pfm_set) {
+                const raw = this.pfm_set[key];
                 // 将普通对象转换为PERFORM实例(替代原JS的__proto__赋值)
                 const pfm = PERFORM.fromPlain(raw);
                 if (pfm.enable_skill === 'sword' || pfm.enable_skill === 'blade' || pfm.enable_skill === 'whip'
@@ -921,6 +917,7 @@ export class SKILL extends BASE {
                 pfm.pid = key;
                 this.pfm[key] = pfm;
             }
+            delete this.pfm_set;
         }
     }
 
