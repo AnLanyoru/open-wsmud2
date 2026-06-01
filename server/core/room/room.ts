@@ -138,7 +138,7 @@ export class ROOM extends ITEM {
     /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
     on_enter(obj: Record<string, any>): void { return; }
     /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
-    on_heart_beat(dt: number): void { return; }
+    on_heart_beat?(dt: number): void { return; }
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
     on_login?: (user: Record<string, any>) => void;
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
@@ -740,7 +740,7 @@ export class ROOM extends ITEM {
             if (!this.items[i].is_player)
                 this.items[i].heart_beat(dt);
         }
-        this.on_heart_beat(dt);
+        this.on_heart_beat?.(dt);
     }
 
     /**

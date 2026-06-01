@@ -1,5 +1,4 @@
 import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -19,7 +18,7 @@ export default class extends COMMAND {
         for (let i = 0; i < events.length; i++) {
             let evt = events[i];
             if (evt.id === type) {
-                if (this.check_command(evt, me)) {
+                if (this.check_command(me, evt as Partial<Pick<COMMAND, 'allow_die' | 'allow_faint' | 'allow_state' | 'allow_fight' | 'allow_busy'>>)) {
                     if (evt.on_command?.(me, paras)) {
                         me.send('{type:"dialog",dialog:"events",close:true}');
                     }
@@ -48,27 +47,5 @@ export default class extends COMMAND {
         me.send(str.join(""));
     }
 
-}
-    check_command(event, me) {
-
-    if (me.hp <= 0 && !event.allow_die) {
-        return me.notify_fail("你现在是灵魂状态，不能那么做。");
-    }
-    if (!event.allow_faint && me.is_faint) {
-
-        me.send("你正在昏迷中！");
-        return false;
-    }
-    if (!event.allow_state && me.state) {
-        return me.notify_fail("你正在" + me.state.title + "，没时间这么做。");
-    }
-    if (!event.allow_fight && me.fight_type > 0) {
-        return me.notify_fail("你正在战斗，待会再说。");
-    }
-    if (!event.allow_busy && me.is_busy) {
-        return me.notify_fail("你现在正忙。");
-    }
-    return true;
-}
-}
+}}
 

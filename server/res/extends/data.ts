@@ -20,4 +20,3 @@
  *
  * @see os/data.js
  */
-export default function() {}

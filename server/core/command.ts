@@ -39,55 +39,79 @@ export class COMMAND extends BASE {
         super();
     }
 
-    // ============ Core method (overridden by subclasses) ============
+    // ============ 核心方法（由子类重写） ============
 
     /**
-     * Command entry method — defined by subclass logic.
-     * @param me - executing character (may be null)
-     * @param arg - command argument
-     * @param _par2 - extra param (COMMAND.DO usage)
-     * @param _par3 - extra param (COMMAND.DO usage)
-     * @returns false indicates command failure
+     * 命令入口方法，由子类实现具体逻辑
+     * @param me - 执行角色（可为 null）
+     * @param arg - 命令参数
+     * @param _par2 - 额外参数（供 COMMAND.DO 使用）
+     * @param _par3 - 额外参数（供 COMMAND.DO 使用）
+     * @returns 返回 false 表示命令执行失败
      */
     enter(me: CHARACTER | null, arg?: unknown, _par2?: unknown, _par3?: unknown): boolean | void {
         return undefined;
     }
 
-    // ============ Command identity ============
+    // ============ 命令标识 ============
 
-    /** Command name (comma-separated aliases) */
+    /** 命令名（逗号分隔别名） */
     command!: string;
-    /** Parameter regex pattern */
+    /** 参数正则匹配模式 */
     regex: RegExp | null = null;
-    /** Bound exec function (on target prototype) — subclasses define exec() as method */
+    /** 绑定到目标原型上的执行函数，由子类定义 exec() 方法提供 */
     exec?(...args: unknown[]): unknown;
-    /** Map JSON cache (set by subclasses e.g. jh, dialog/map) */
+    /** 地图 JSON 缓存（由 jh、dialog/map 等子类设置） */
     map_json?: any;
-    /** JSON cache (used by emote_data etc.) */
+    /** JSON 缓存（供 emote_data 等使用） */
     json?: string;
 
-    // ============ Permission control ============
+    // ============ 权限控制 ============
 
-    /** Allow execution during combat */
+    /** 允许在战斗时执行 */
     allow_fight: boolean = true;
-    /** Allow execution while dead */
+    /** 允许在死亡时执行 */
     allow_die: boolean = false;
-    /** Allow execution while unconscious */
+    /** 允许在昏迷时执行 */
     allow_faint: boolean = false;
-    /** Allow execution while in special state */
+    /** 允许在特殊状态时执行 */
     allow_state: boolean = false;
-    /** Allow execution while busy */
+    /** 允许在忙碌时执行 */
     allow_busy: boolean = false;
-    /** Required privilege level (0=all, 6=admin) */
+    /** 所需权限等级（0=所有玩家, 6=管理员） */
     allow_level: number = 0;
-    /** Allow execution before login */
+    /** 允许在登录前执行 */
     allow_login: boolean = false;
 
     /**
-     * Bind command to target class prototypes.
-     * Usage: obj.do_commandname()
-     * @param item - target class constructor
-     * @param name - command name (defaults to this.command)
+     * 命令状态检查，可由子类通过 overrides 覆写允许标志
+     */
+    check_command(me: CHARACTER, overrides?: Partial<Pick<COMMAND, 'allow_die' | 'allow_faint' | 'allow_state' | 'allow_fight' | 'allow_busy'>>): boolean {
+        const allow_die = overrides?.allow_die ?? this.allow_die;
+        const allow_faint = overrides?.allow_faint ?? this.allow_faint;
+        const allow_state = overrides?.allow_state ?? this.allow_state;
+        const allow_fight = overrides?.allow_fight ?? this.allow_fight;
+        const allow_busy = overrides?.allow_busy ?? this.allow_busy;
+
+        if (me.hp <= 0 && !allow_die)
+            return me.notify_fail("你现在是灵魂状态，不能那么做。");
+        if (!allow_faint && me.is_faint) {
+            me.send("你正在昏迷中！");
+            return false;
+        }
+        if (!allow_state && me.state)
+            return me.notify_fail("你正在" + me.state.title + "，没时间这么做。");
+        if (!allow_fight && me.fight_type > 0)
+            return me.notify_fail("你正在战斗，待会再说。");
+        if (!allow_busy && me.is_busy)
+            return me.notify_fail("你现在正忙。");
+        return true;
+    }
+
+    /**
+     * 将命令绑定到目标类的原型上，之后可通过 obj.do_commandname() 调用
+     * @param item - 目标类构造函数
+     * @param name - 命令名（默认使用 this.command）
      */
     for_item(item: Function, name?: string): void {
         if (this.exec) {
@@ -97,8 +121,8 @@ export class COMMAND extends BASE {
     }
 
     /**
-     * Command creation callback — registers to WORLD.COMMANDS.
-     * @param fname - command file name
+     * 命令创建回调，向 WORLD.COMMANDS 注册命令
+     * @param fname - 命令文件名
      */
     create(fname: string): void {
         if (this.command) {
@@ -113,7 +137,7 @@ export class COMMAND extends BASE {
     }
 
     /**
-     * Command update callback
+     * 命令更新回调，重新注册到 WORLD.COMMANDS
      */
     update(): void {
         if (this.command) {
@@ -127,11 +151,11 @@ export class COMMAND extends BASE {
     }
 
     /**
-     * Execute a named command.
-     * @param cmd - command name
-     * @param par1 - arg
-     * @param par2 - extra
-     * @param par3 - extra
+     * 执行指定名称的命令
+     * @param cmd - 命令名
+     * @param par1 - 参数1
+     * @param par2 - 额外参数
+     * @param par3 - 额外参数
      */
     static DO(cmd: string, par1?: unknown, par2?: unknown, par3?: unknown): void {
         const cmdObj = WORLD.COMMANDS[cmd];

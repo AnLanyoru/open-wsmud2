@@ -23,4 +23,3 @@
  * @see os/char/user.js
  * @see os/char/follower.js
  */
-export default function() {}

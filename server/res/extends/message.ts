@@ -19,4 +19,3 @@
  *
  * @see os/world.js (MESSAGE object)
  */
-export default function() {}

@@ -13,4 +13,3 @@
  *
  * @see os/room/fam_area.js
  */
-export default function() {}

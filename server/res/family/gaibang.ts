@@ -1,3 +1,4 @@
+import type { CHARACTER } from "../../core/char/character.js";
 import { FAMILY } from "../../core/skill/family.js";
 
 export default class extends FAMILY {
@@ -18,7 +19,7 @@ export default class extends FAMILY {
     eqs = [
 
 ];
-    npc_skills = [
+    npc_skills: [string, number, (string | string[])?][] = [
     ["dodge", 800],
     ["parry", 800],
     ["force", 800],
@@ -54,7 +55,7 @@ export default class extends FAMILY {
         this.set_titles("丐帮帮主", "丐帮副帮主", "丐帮九袋长老", "丐帮八袋弟子", "丐帮七袋弟子", "丐帮六袋弟子");
     }
 
-    call(player, isbad) {
+    call(player: CHARACTER, isbad: boolean) {
     var age = player.query_age();
     if (player.gender == 2) {
         if (age < 18) return isbad ? "小贱人" : "小姑娘";
@@ -66,7 +67,7 @@ export default class extends FAMILY {
         else return isbad ? "老匹夫" : "老爷子";
     }
 }
-    call_me(player, isbad) {
+    call_me(player: CHARACTER, isbad: boolean) {
     var age = player.query_age();
     if (player.gender == 2) {
         if (age < 30) return isbad ? "本姑娘" : "小女子";
@@ -76,13 +77,13 @@ export default class extends FAMILY {
         else return isbad ? "老子" : "老头子";
     }
 }
-    on_kill(npc, me) {
-    if (this.boss) {
+    on_kill(npc: CHARACTER, me: CHARACTER) {
+    if (this.boss && me.family) {
         this.boss.do_command("chat", me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，丐帮众弟子听令，对" + me.family.name + "弟子格杀勿论！");
     }
 }
-    on_battle(fam) {
-    if (this.boss) {
+    on_battle(fam: FAMILY) {
+    if (this.boss && fam.boss) {
         this.boss.do_command("chat", "哈哈，" + fam.boss.call() + "且慢！");
     }
 }

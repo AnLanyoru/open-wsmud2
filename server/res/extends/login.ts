@@ -19,4 +19,3 @@
  *
  * @see os/login.js
  */
-export default function() {}

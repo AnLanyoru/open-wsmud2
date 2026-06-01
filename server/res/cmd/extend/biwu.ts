@@ -23,7 +23,7 @@ export default class extends COMMAND {
 
     enter(me: CHARACTER, fam?: string, type?: string, par?: string) {
         if (!me.can_trans?.()) return;
-        if (!WORLD.COMMANDS["events"]?.check_command?.(this.biwu_state, me)) return;
+        if (!this.check_command(me, this.biwu_state)) return;
         const index = parseInt(type!);
         if (!(index > 0 && index < 11)) return me.notify("错误的对手编号。");
 

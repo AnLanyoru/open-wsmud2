@@ -8,22 +8,14 @@ import { pathToFileURL } from 'url';
 // 内部类型
 // ============================================================
 
-/** 资源对象最小契约 — BASE.NEW 实际需要的就是 path + create */
-type ResourceObj = { path?: string; create?(fname: string, ctor?: string): void };
-
-/** 工厂函数（旧式 JS 风格，this 即为新对象） */
-type FactoryFunc = (this: ResourceObj, par?: string) => void;
-/** 构造函数（ES class） */
-type CtorFunc = new (par?: string) => ResourceObj;
-
-/**
- * 判断 function 是否为 class constructor。
- * ES class 的 prototype 属性为 non-writable，普通 function 为 writable。
- */
-function isConstructor(fn: Function): fn is CtorFunc {
-    const desc = Object.getOwnPropertyDescriptor(fn, 'prototype');
-    return desc !== undefined && desc.writable === false;
+/** 资源对象最小契约 — NEW 实例化后设置 path 并调用 create */
+interface ResourceObj {
+    path?: string;
+    create?(fname: string, ctor?: string): void;
 }
+
+/** 资源类构造函数（ES class） */
+type CtorFunc = new (par?: string) => ResourceObj;
 
 /** 事件处理记录 */
 interface EventRecord {
@@ -219,11 +211,19 @@ export class BASE {
     // 静态成员 — 资源加载和对象工厂
     // ============================================================
 
-    /** 已加载资源缓存: 路径 -> 构造函数或工厂函数 */
-    static ITEMS: Record<string, CtorFunc | FactoryFunc> = {};
+    /** 已加载资源缓存: 路径 -> 构造函数 */
+    static ITEMS: Record<string, CtorFunc> = {};
 
     /** 文件路径解析正则: 路径/#参数 */
     static PATH_REG: RegExp = /^(\w+(?:\/\w+)*)(#\w+)?$/;
+
+    /**
+     * 加载 extends 补丁文件 — 仅执行其副作用，不产生对象实例。
+     * extends 文件通过顶层代码直接覆盖原型方法，无需存入 ITEMS。
+     */
+    static async RUN_EXTENDS(filepath: string): Promise<void> {
+        await import(pathToFileURL(filepath).href);
+    }
 
     /**
      * 预加载一个资源文件（async），存入缓存供后续同步 CREATE 使用
@@ -235,10 +235,10 @@ export class BASE {
             const mod = await import(pathToFileURL(filepath).href);
             const func = mod.default;
             if (typeof func === 'function') {
-                BASE.ITEMS[fkey] = func as CtorFunc | FactoryFunc;
+                BASE.ITEMS[fkey] = func as CtorFunc;
             } else {
-                // extends/ files: side-effects ran on import
-                BASE.ITEMS[fkey] = function (this: BASE) { /* stub */ } as FactoryFunc;
+                // extends/ files: side-effects ran on import, stub for CREATE compatibility
+                BASE.ITEMS[fkey] = class {} as CtorFunc;
             }
         } catch (e) {
             console.error('preload %s error:', filepath, e, (e as Error).stack);
@@ -286,16 +286,10 @@ export class BASE {
      * @param par - 构造参数
      * @returns 新创建的对象
      */
-    static NEW(fname: string, func: CtorFunc | FactoryFunc, par?: string): ResourceObj {
-        const obj: ResourceObj = isConstructor(func)
-            ? new func(par)
-            : (() => {
-                  const o: ResourceObj = new BASE();
-                  func.apply(o);
-                  return o;
-              })();
+    static NEW(fname: string, func: CtorFunc, par?: string): ResourceObj {
+        const obj = new func(par);
         obj.path = fname;
-        if (obj.create) obj.create(fname, par);
+        obj.create?.(fname, par);
         return obj;
     }
 
@@ -326,9 +320,9 @@ export class BASE {
             );
             const func = (mod as { default?: Function }).default;
             if (typeof func === 'function') {
-                BASE.ITEMS[fkey] = func as CtorFunc | FactoryFunc;
+                BASE.ITEMS[fkey] = func as CtorFunc;
             } else {
-                BASE.ITEMS[fkey] = function (this: BASE) { /* stub */ } as FactoryFunc;
+                BASE.ITEMS[fkey] = class {} as CtorFunc;
             }
         } catch (e) {
             console.error('update %s error:', filepath, e, (e as Error).stack);

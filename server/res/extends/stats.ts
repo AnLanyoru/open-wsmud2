@@ -62,4 +62,3 @@ STATS.loadTopUser = function (data, npc) {
     npc.recount();
 };
 
-export default function() {}

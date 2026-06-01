@@ -8,6 +8,10 @@ import { FAMILIES } from "./family.js";
 import type { FAMILY } from './family.js';
 import type { CHARACTER } from '../char/character.js';
 
+
+export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
+
+
 /**
  * query_enable_prop 内层返回值：属性名→加成数值
  * 这些属性通过 change_prop → add_prop 写入角色 prop 字典，由 recount() 读取计算六大战斗属性
@@ -161,7 +165,6 @@ const level_desc = ["基本技能", "普通技能", "高级技能", "稀有武�
 // ============================================================
 // SKILL 技能类
 // ============================================================
-
 export class SKILL extends BASE {
 
     // ============ 核心属性 ============

@@ -13,4 +13,3 @@
  *
  * @see os/room/area.js
  */
-export default function() {}

@@ -13,4 +13,3 @@
  *
  * @see os/item/obj.js
  */
-export default function() {}

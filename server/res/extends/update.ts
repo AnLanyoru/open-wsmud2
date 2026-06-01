@@ -19,4 +19,3 @@
  *
  * 适合放一些不方便归类的零散修补。
  */
-export default function() {}

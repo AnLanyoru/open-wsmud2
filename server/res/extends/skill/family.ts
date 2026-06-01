@@ -25,4 +25,3 @@
  *
  * @see os/skill/family.js
  */
-export default function() {}

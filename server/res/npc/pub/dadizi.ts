@@ -1,6 +1,6 @@
 import { NPC } from "../../../core/char/npc.js";
 import { WORLD } from "../../../core/world.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import { FAMILIES, FAMILY } from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "大师兄";
@@ -37,7 +37,7 @@ export default class extends NPC {
     on_kill(me) {
     return me.notify_fail(this.name + '说道：' + this.callme() + "只接受比试。");
 }
-    init_from(fam) {
+    init_from(fam: FAMILY) {
 
     this.set_objects(["eq/lv0/cloth", 1, 1], ["eq/lv0/jian", 1, 1]);
 

@@ -13,4 +13,3 @@
  *
  * @see os/item/equipment.js
  */
-export default function() {}

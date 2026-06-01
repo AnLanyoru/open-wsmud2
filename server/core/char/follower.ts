@@ -97,6 +97,7 @@ interface FollowerState {
 // FOLLOWER 类
 // ============================================================
 
+/** 随从 */
 // @ts-ignore: static CREATE override incompatible with base
 export class FOLLOWER extends CHARACTER {
   // ============ 核心属性 ============

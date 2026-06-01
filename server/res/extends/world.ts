@@ -42,4 +42,3 @@ WORLD.loadLocalData = function () {
     db.deleteLocalRoles();
 };
 
-export default function() {}

@@ -18,4 +18,3 @@
  *
  * @see os/char/character.js
  */
-export default function() {}

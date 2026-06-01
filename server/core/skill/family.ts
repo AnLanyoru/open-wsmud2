@@ -10,7 +10,7 @@ import { EVENTS } from "../task/events.js";
 import { COMMAND } from "../command.js";
 import type { NPC } from '../char/npc.js';
 import type { USER } from '../char/user.js';
-import type { SKILL } from './skill.js';
+import type { SKILL, SkillSet } from './skill.js';
 import type { AREA } from '../room/area.js';
 import type { TempValue } from '../../types/base.js';
 
@@ -68,6 +68,9 @@ export class FAMILY extends BASE {
     skills4: SKILL[] = [];
     /** 门派隐藏/知识类技能列表（type=KNOWLEDGE 或 is_hidden） */
     skills0: SKILL[] = [];
+    
+    /** 门派npc武功配置列表 */
+    npc_skills: SkillSet = [];
     /** 默认NPC定义 */
     def_npcs?: string[][];
     /** 掌门NPC路径 */

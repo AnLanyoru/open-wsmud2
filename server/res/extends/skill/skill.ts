@@ -13,4 +13,3 @@
  *
  * @see os/skill/skill.js (PERFORM class)
  */
-export default function() {}
