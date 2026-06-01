@@ -12,48 +12,36 @@ export default class MapRoom extends ROOM {
     constructor() {
         super();
         var act: ReturnType<ROOM['add_action']>;
-        act = this.add_action("fight", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("你正在擂台比试。");
-            return true;
-        });
+        act = this.add_action("fight", "", this.action_fight);
         if (act) act.allow_fight = true;
-        act = this.add_action("kill", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("你正在擂台比试。");
-            return true;
-        });
+        act = this.add_action("kill", "", this.action_kill);
         if (act) act.allow_fight = true;
-        act = this.add_action("dazuo", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("你正在擂台比试。");
-            return true;
-        });
+        act = this.add_action("dazuo", "", this.action_dazuo);
         if (act) act.allow_fight = true;
-        act = this.add_action("liaoshang", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("你正在擂台比试。");
-            return true;
-        });
+        act = this.add_action("liaoshang", "", this.action_liaoshang);
         if (act) act.allow_fight = true;
-        act = this.add_action("perform", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("擂台上自动出招。");
-            return true;
-        });
+        act = this.add_action("perform", "", this.action_perform);
         if (act) act.allow_fight = true;
-        act = this.add_action("unequip", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("擂台上自动出招，不允许卸下装备。");
-            return true;
-        });
+        act = this.add_action("unequip", "", this.action_unequip);
         if (act) act.allow_fight = true;
-        act = this.add_action("enable", "", function (this: MapRoom, me: CHARACTER) {
-            me.notify("擂台上自动出招，不能更改武功。");
-            return true;
-        });
+        act = this.add_action("enable", "", this.action_enable);
         if (act) act.allow_fight = true;
-        act = this.add_action("surrender", '投降', function (this: MapRoom, me: CHARACTER) {
-            if (WORLD.COMMANDS.biwu && typeof WORLD.COMMANDS.biwu === 'object' && 'surrender' in WORLD.COMMANDS.biwu) {
-                (WORLD.COMMANDS.biwu as Record<string, any>).surrender(me);
-            }
-            return true;
-        });
+        act = this.add_action("surrender", '投降', this.surrender);
         if (act) act.allow_fight = true;
+    }
+
+    action_fight(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
+    action_kill(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
+    action_dazuo(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
+    action_liaoshang(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
+    action_perform(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招。"); return true; }
+    action_unequip(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招，不允许卸下装备。"); return true; }
+    action_enable(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招，不能更改武功。"); return true; }
+    surrender(this: MapRoom, me: CHARACTER) {
+        if (WORLD.COMMANDS.biwu && typeof WORLD.COMMANDS.biwu === 'object' && 'surrender' in WORLD.COMMANDS.biwu) {
+            (WORLD.COMMANDS.biwu as Record<string, any>).surrender(me);
+        }
+        return true;
     }
 
     on_leave(me: CHARACTER, dir: string) {

@@ -9,21 +9,22 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action('lkfb', null, function (me, par) {
-            let npc = this.items[0];
-            if (npc && npc.is('penglai/wulang/jiangjiu')) {
-                if (par) {
-                    WORLD.COMMANDS['cr'].enter(me, 'over');
+        this.add_action('lkfb', null, this.lkfb);
+    }
 
-                    me.moveto('penglai/matou');
-                    me.send('你和' + npc.name + '乘坐大船，来到一个偏远神秘的小岛。');
-                    me.enable_area();
-                } else {
-                    me.send('你即将离开这个副本进入公共区域，是否确认？');
-                    me.send_commands('lkfb ok', '确认进入');
-                }
+    lkfb(me, par) {
+        let npc = this.items[0];
+        if (npc && npc.is('penglai/wulang/jiangjiu')) {
+            if (par) {
+                WORLD.COMMANDS['cr'].enter(me, 'over');
+                me.moveto('penglai/matou');
+                me.send('你和' + npc.name + '乘坐大船，来到一个偏远神秘的小岛。');
+                me.enable_area();
+            } else {
+                me.send('你即将离开这个副本进入公共区域，是否确认？');
+                me.send_commands('lkfb ok', '确认进入');
             }
-        });
+        }
     }
 
     on_before_enter(me) {

@@ -8,21 +8,18 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action('lkfb', null, function (me, par) {
-  
-            if (par) {
-      
-                WORLD.COMMANDS['cr'].enter(me, 'over');
-      
-                me.moveto(ROOM.Get('bj/hg/nanmen'));
+        this.add_action('lkfb', null, this.lkfb);
+    }
 
-                me.send('你顺着小路进入京城，来到奉天城门。');
-            } else {
-                me.send('你即将离开这个副本进入公共区域，是否确认？');
-                me.send_commands('lkfb ok', '确认进入');
-            }
-
-        });
+    lkfb(me, par) {
+        if (par) {
+            WORLD.COMMANDS['cr'].enter(me, 'over');
+            me.moveto(ROOM.Get('bj/hg/nanmen'));
+            me.send('你顺着小路进入京城，来到奉天城门。');
+        } else {
+            me.send('你即将离开这个副本进入公共区域，是否确认？');
+            me.send_commands('lkfb ok', '确认进入');
+        }
     }
 
     on_before_enter(me) {

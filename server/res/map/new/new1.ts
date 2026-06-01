@@ -11,38 +11,8 @@ export default class MapRoom extends ROOM {
     constructor() {
         super();
         this.set_npc("new/daoshi");
-        this.add_action("guid_start", null, function (this: MapRoom, me: CHARACTER) {
-            var lv = me.query_temp("new");
-            if (lv != 1) return;
-            me.set_temp("new", 2);
-            me.notify("指引者愉快的笑了。\n指引者对你说道：点击房间里人物或物品名称，会显示他们的简介和可用指令，你可以选择你想要要的操作。");
-
-            on_guide(me);
-
-        });
-        this.add_action("guide_over", null, function (this: MapRoom, me: CHARACTER) {
-            var lv = me.query_temp("new");
-            if (lv != 1) return;
-            me.notify("指引者对你说：好吧，祝你游戏愉快！");
-            me.remove_temp("new");
-            me.notify("指引者对你挥了挥手。");
-            var fb = me.environment;
-
-            const room = this;
-            me.call_out(function (this: CHARACTER) {
-                if (this.moveto("yz/kedian", undefined, me.name + "风尘仆仆的走了进来.") != false) {
-                    if (fb) {
-                        const fbRoom: any = fb;
-                        fbRoom.clear_copy(me);
-                    }
-                    var obj = me.add_obj("cash/new_box");
-                    if (obj) {
-                        me.notify("指引者给你一个" + obj.color_name + "。");
-                    }
-                    me.add_exp(10000, 10000, 10000);
-                }
-            }, 1000);
-        });
+        this.add_action("guid_start", null, this.guid_start);
+        this.add_action("guide_over", null, this.guide_over);
         this.set_item("yizi", "椅子", "这是一张椅子，可以坐。", [[
             "zuo2", "坐下去", function (this: MapRoom, me: CHARACTER) {
                 me.notify("你拉开一张椅子坐了上去。");
@@ -53,15 +23,48 @@ export default class MapRoom extends ROOM {
                 }
             }
         ]]);
-        this.add_action("zuo", "坐下来", function (this: MapRoom, me: CHARACTER) {
-            var lv = me.query_temp("new");
-            if (lv == 2) {
-                me.notify("你一屁股坐在地上。");
-                this.call_out(next_guide, 1000, me);
-            } else {
-                me.notify("好好听课，别乱坐。");
+        this.add_action("zuo", "坐下来", this.zuo);
+    }
+
+    guid_start(this: MapRoom, me: CHARACTER) {
+        var lv = me.query_temp("new");
+        if (lv != 1) return;
+        me.set_temp("new", 2);
+        me.notify("指引者愉快的笑了。\n指引者对你说道：点击房间里人物或物品名称，会显示他们的简介和可用指令，你可以选择你想要要的操作。");
+        on_guide(me);
+    }
+
+    guide_over(this: MapRoom, me: CHARACTER) {
+        var lv = me.query_temp("new");
+        if (lv != 1) return;
+        me.notify("指引者对你说：好吧，祝你游戏愉快！");
+        me.remove_temp("new");
+        me.notify("指引者对你挥了挥手。");
+        var fb = me.environment;
+        const room = this;
+        me.call_out(function (this: CHARACTER) {
+            if (this.moveto("yz/kedian", undefined, me.name + "风尘仆仆的走了进来.") != false) {
+                if (fb) {
+                    const fbRoom: any = fb;
+                    fbRoom.clear_copy(me);
+                }
+                var obj = me.add_obj("cash/new_box");
+                if (obj) {
+                    me.notify("指引者给你一个" + obj.color_name + "。");
+                }
+                me.add_exp(10000, 10000, 10000);
             }
-        });
+        }, 1000);
+    }
+
+    zuo(this: MapRoom, me: CHARACTER) {
+        var lv = me.query_temp("new");
+        if (lv == 2) {
+            me.notify("你一屁股坐在地上。");
+            this.call_out(next_guide, 1000, me);
+        } else {
+            me.notify("好好听课，别乱坐。");
+        }
     }
 
     on_enter(me: CHARACTER) {

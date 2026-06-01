@@ -127,9 +127,9 @@ export class USER extends CHARACTER {
   // ============ 网络连接 ============
 
   /** 网络套接字 */
-  socket: GameSocket | null = null;
+  socket?: GameSocket;
   /** IP地址 */
-  ip_address: string | null = null;
+  ip_address: string;
   /** 登录密码 */
   password: string = '';
   /** 登录时间戳 */
@@ -178,7 +178,7 @@ export class USER extends CHARACTER {
   // ============ 技能 ============
 
   /** 技能组定义 */
-  sk_groups: (string[] | null)[] | null = null;
+  sk_groups?: (string[] | null)[];
   /** 秘籍列表 */
   books: string[] = [];
 
@@ -312,8 +312,8 @@ export class USER extends CHARACTER {
     if (!newUser.socket) return;
     (newUser.socket as { user: USER | null }).user = null;
     this.socket = newUser.socket;
-    newUser.socket = null;
-    (this.socket as { user: USER | null }).user = this;
+    newUser.socket = undefined;
+    this.socket.user = this;
     this.send_loginmessage();
 
     if (!this.environment) {
@@ -361,16 +361,16 @@ export class USER extends CHARACTER {
       (this.environment as ROOM).clear_copy(this);
       (this.environment as ROOM).parent?.on_leaved?.(this);
     }
-    this.environment = null;
+    this.environment = undefined;
     this.clear_status();
     this.environment = rm;
     WORLD.login_out(this);
-    this.environment = null;
+    this.environment = undefined;
 
     this.clear_home();
     if (this.socket) {
       (this.socket as { user: USER | null }).user = null;
-      this.socket = null;
+      this.socket = undefined;
     }
   }
 
@@ -393,7 +393,7 @@ export class USER extends CHARACTER {
     this.disconnect_time = Date.now();
     if (this.socket) {
       const socket = this.socket;
-      this.socket = null;
+      this.socket = undefined;
       (socket as { user: USER | null }).user = null;
       socket.end();
     }

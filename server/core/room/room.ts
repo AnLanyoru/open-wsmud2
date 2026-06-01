@@ -235,7 +235,7 @@ export class ROOM extends ITEM {
             }
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
-            obj.environment = null;
+            obj.environment = undefined;
         }
     }
 

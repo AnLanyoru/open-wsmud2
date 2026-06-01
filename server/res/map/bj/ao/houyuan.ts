@@ -8,19 +8,19 @@ export default class extends ROOM {
     constructor() {
         super();
         this.set_item("men", "铁门", "这是一扇很结实的铁门。", [
-            ["unlock", "打开", function (me) {
-                if (this.query_exits("enter"))
-                    return me.notify("这扇门已经是打开的。");
-                var obj = me.find_obj_bypath("sp/bj/laofangkey");
-                if (!obj)
-                    return me.notify("你不会撬锁。");
-
-                this.add_exit("south", "bj/ao/laofang");
-                me.remove_obj(obj,1);
-                me.send_room("$N用一把钥匙打开了牢房门，可是钥匙却断了。");
-    
-            }]
+            ["unlock", "打开", this.unlock_men]
         ]);
         this.set_npc("bj/ao/guanjia", ["bj/ao/jiading", 2]);
+    }
+
+    unlock_men(me) {
+        if (this.query_exits("enter"))
+            return me.notify("这扇门已经是打开的。");
+        var obj = me.find_obj_bypath("sp/bj/laofangkey");
+        if (!obj)
+            return me.notify("你不会撬锁。");
+        this.add_exit("south", "bj/ao/laofang");
+        me.remove_obj(obj, 1);
+        me.send_room("$N用一把钥匙打开了牢房门，可是钥匙却断了。");
     }
 }

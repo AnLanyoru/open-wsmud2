@@ -117,7 +117,7 @@ export class FOLLOWER extends CHARACTER {
   // ============ 主人相关 ============
 
   /** 主人ID */
-  master: string | null = null;
+  master?: string;
   /** 主人名称 */
   master_name: string | null = null;
   /** 消息监听者(主人) */
@@ -482,7 +482,7 @@ export class FOLLOWER extends CHARACTER {
     corpse.init(this, false);
     this.environment.item_changed(corpse, true);
     this.environment.item_changed(this, false);
-    this.environment = null;
+    this.environment = undefined;
   }
 
   // ============ 心跳 ============
