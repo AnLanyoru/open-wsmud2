@@ -2597,7 +2597,7 @@ export class CHARACTER extends ITEM {
     }
     if (par.is_dodged) {
       sh = 0;
-      this.send_combat((par.miss_msg || target.dodge_skill!.query_dodge_action()) + '\n', target);
+      this.send_combat((par.miss_msg || target.dodge_skill.query_dodge_action()) + '\n', target);
     } else {
       if (target.parry_skill.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
         target.parry_skill.on_parry(target, this, par);
@@ -2615,8 +2615,8 @@ export class CHARACTER extends ITEM {
           !par.is_throwing) {
           sh += weapon.do_attack(this, target, par);
         }
-        if ((attackskill as Record<string, any>).on_attack && !par.is_throwing) {
-          sh += (attackskill as Record<string, any>).on_attack(this, target, par);
+        if (attackskill.on_attack && !par.is_throwing) {
+          sh += attackskill.on_attack(this, target, par);
         }
         sh = sh * (this.attack_part ? this.attack_part.hert : 1);
         if (!par.no_power) {
@@ -2629,8 +2629,8 @@ export class CHARACTER extends ITEM {
         }
       }
       let power_gj = par.power_gj ?? 0;
-      if ((this.force_skill as Record<string, any>)?.do_force_attack) {
-        power_gj += (this.force_skill as Record<string, any>).do_force_attack(this, target, par);
+      if (this.force_skill.do_force_attack) {
+        power_gj += this.force_skill.do_force_attack(this, target, par);
       }
       if (power_gj > 0 && (!weapon || weapon.weapon_type === WEAPON_TYPE.NONE)) {
         power_gj = power_gj + power_gj * this.query_prop('add_sh_per') / 100;
@@ -2638,9 +2638,9 @@ export class CHARACTER extends ITEM {
           power_gj = power_gj * (150 + (par.add_bjsh_per ?? this.query_prop('add_bjsh_per'))) / 100;
       }
       if (power_gj > 0) sh += power_gj;
-      if ((target.force_skill as Record<string, any>)?.on_force_parry) {
+      if (target.force_skill.on_force_parry) {
         par.power_gj = power_gj;
-        sh -= (target.force_skill as Record<string, any>).on_force_parry(target, this, sh, par);
+        sh -= target.force_skill.on_force_parry(target, this, sh, par);
         if (this.hp <= 0 || !target.fight_type) {
           return;
         }
@@ -2649,7 +2649,7 @@ export class CHARACTER extends ITEM {
         sh = target.damage(sh, this, par.diff_fy);
 
       if (par.is_parried) {
-        this.send_combat((par.parry_msg || target.parry_skill!.query_parry_action(target, this, weapon_type)) + '\n', target);
+        this.send_combat((par.parry_msg || target.parry_skill.query_parry_action(target, this, weapon_type)) + '\n', target);
         if (sh > 0) {
           target.send_combat(query_status_msg(target.hp, target.max_hp));
           if (target.on_damage) target.on_damage(this, sh);
@@ -2666,15 +2666,15 @@ export class CHARACTER extends ITEM {
     }
     if (this.fight_type) {
       if (!par.no_append_target && target.fight_type) {
-        if ((target.dodge_skill as Record<string, any>)?.on_dodge_over)
-          (target.dodge_skill as Record<string, any>).on_dodge_over(target, this, par);
-        if (!par.is_dodged && (target.parry_skill as Record<string, any>)?.on_parry_over)
-          (target.parry_skill as Record<string, any>).on_parry_over(target, this, par);
+        if (target.dodge_skill.on_dodge_over)
+          target.dodge_skill.on_dodge_over(target, this, par);
+        if (!par.is_dodged && target.parry_skill.on_parry_over)
+          target.parry_skill.on_parry_over(target, this, par);
       }
       if (!par.no_append) {
-        if ((attackskill as Record<string, any>).on_attack_over) (attackskill as Record<string, any>).on_attack_over(this, target, par, sh);
-        if ((this.force_skill as Record<string, any>)?.on_force_over)
-          (this.force_skill as Record<string, any>).on_force_over(this, target, par, sh);
+        if (attackskill.on_attack_over) attackskill.on_attack_over(this, target, par, sh);
+        if (this.force_skill.on_force_over)
+          this.force_skill.on_force_over(this, target, par, sh);
       }
     }
     return sh;
@@ -2687,7 +2687,7 @@ export class CHARACTER extends ITEM {
     if (gjmsg) this.send_room(gjmsg);
     const is_dodged = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
     if (is_dodged) {
-      this.send_room((dsmsg || this.dodge_skill!.query_dodge_action()), this);
+      this.send_room((dsmsg || this.dodge_skill.query_dodge_action()), this);
     } else {
       this.send_room(shmsg);
       this.damage(sh);

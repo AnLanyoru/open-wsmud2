@@ -44,7 +44,7 @@ export class FAMILY_AREA extends AREA {
      * 通知客户端门派区域数据更新
      */
     notify_update(): void {
-        this.json = null;
+        this.json = undefined;
         WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
     }
 }

@@ -8,6 +8,7 @@ import type { ROOM } from "./room.js";
 import type { USER } from "../char/user.js";
 import type { CHARACTER } from "../char/character.js";
 import type { SKILL } from "../skill/skill.js";
+import type { ActionMap } from "../../types/base.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
@@ -37,11 +38,11 @@ export class AREA {
     /** 区域内的房间列表 */
     rooms: ROOM[] = [];
     /** 子区域列表(由extends设置) */
-    areas: AREA[] | null = null;
+    areas?: AREA[];
     /** 小地图数据 */
     map: any[] = [];
     /** 默认入口房间路径 */
-    first: string | null = null;
+    first?: string;
 
     // ============ 副本相关 ============
 
@@ -60,41 +61,41 @@ export class AREA {
     /** 是否非副本(普通区域标识) */
     not_fb: boolean = false;
     /** 重生房间路径 */
-    recover_room: string | null = null;
+    recover_room?: string;
 
     // ============ 掉落相关 ============
 
     /** 掉落列表缓存 */
-    drop_list: any[] | null = null;
+    drop_list?: any[];
     /** 困难模式掉落列表缓存 */
-    diff_drop_list: any[] | null = null;
+    diff_drop_list?: any[];
     /** 普通模式NPC掉落配置(NPC路径列表) */
-    drop_npcs0: string[] | null = null;
+    drop_npcs0?: string[];
     /** 困难模式NPC掉落配置(NPC路径列表) */
-    drop_npcs1: string[] | null = null;
+    drop_npcs1?: string[];
 
     // ============ 门派与社交 ============
 
     /** 所属门派标识 */
-    family: string | null = null;
+    family?: string;
     /** 是否为公共区域 */
     is_public: boolean = false;
 
     // ============ 缓存 ============
 
     /** JSON缓存 */
-    json: string | null = null;
+    json?: string;
     /** 所属区域路径(用于快速查找) */
-    room_path: string | null = null;
+    room_path?: string;
     /** 副本难度系数 */
     fb_index: number = 1;
 
     // ============ 交互属性 ============
 
     /** 区域级命令映射 */
-    actions: Record<string, any> | null = null;
+    actions?: ActionMap<this>;
     /** 区域掉落物品列表 */
-    drop_items: any[] | null = null;
+    drop_items?: any[];
     /** 区域掉落列表（资源文件直接定义） */
     drops?: string[];
 
@@ -212,16 +213,16 @@ export class AREA {
      * 清除缓存(重置json和掉落列表)
      */
     clear(): void {
-        this.json = null;
-        this.drop_list = null;
-        this.diff_drop_list = null;
+        this.json = undefined;
+        this.drop_list = undefined;
+        this.diff_drop_list = undefined;
     }
 
     /**
      * 查询普通掉落列表
      * @param isdiff
      */
-    query_drops(isdiff?: boolean): any[] | null {
+    query_drops(isdiff?: boolean): any[] | undefined {
         if (isdiff) return this.query_diff_drops();
         if (this.drop_list) return this.drop_list;
         const items: any[] = [];
@@ -243,7 +244,7 @@ export class AREA {
      * @param npcs
      * @param items
      */
-    query_npc_drops(npcs: string[] | null, items: any[]): void {
+    query_npc_drops(npcs: string[] | undefined, items: any[]): void {
         if (!npcs || !npcs.length) return;
         for (let i = 0; i < npcs.length; i++) {
             const npc = NPC.GET(npcs[i] as string);
@@ -255,7 +256,7 @@ export class AREA {
     /**
      * 查询困难模式掉落
      */
-    query_diff_drops(): any[] | null {
+    query_diff_drops(): any[] | undefined {
         if (this.diff_drop_list) return this.diff_drop_list;
         const items: any[] = [];
         for (let i = 0; i < this.rooms.length; i++) {
@@ -300,7 +301,7 @@ export class AREA {
     /**
      * 查询掉落物品列表
      */
-    query_drop_items(): any[] | null {
+    query_drop_items(): any[] | undefined {
         return this.drop_items;
     }
 
@@ -315,7 +316,7 @@ export class AREA {
 
     /** 通知区域更新 */
     notify_update(): void {
-        this.json = null;
+        this.json = undefined;
         if (this.is_area)
             WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
         else

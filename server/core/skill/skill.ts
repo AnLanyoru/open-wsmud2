@@ -266,15 +266,15 @@ export class SKILL extends BASE {
     /** 攻击前回调（每轮） */
     on_before_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => void;
     /** 攻击回调（返回额外伤害） */
-    on_attack(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number { return 0; }
+    on_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
     /** 攻击结束回调（一轮后） */
-    on_attack_over(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void { }
+    on_attack_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
     /** 一轮攻击完全结束回调 */
     on_end_attack?: (me: CHARACTER, target: CHARACTER) => void;
     /** 内功攻击回调（返回内功伤害） */
-    do_force_attack(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number { return 0; }
+    do_force_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
     /** 内功招架回调（返回减免伤害） */
-    on_force_parry(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number { return 0; }
+    on_force_parry?: (target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>) => number;
     /** 内功攻击结束回调 */
     on_force_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
     /** 受到伤害回调（返回减免后伤害） */
@@ -282,11 +282,11 @@ export class SKILL extends BASE {
     /** 闪避回调 */
     on_dodge?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 闪避结束回调 */
-    on_dodge_over(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void { }
+    on_dodge_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 招架回调 */
     on_parry?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 招架结束回调 */
-    on_parry_over(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void { }
+    on_parry_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
     /** 绝招招架回调（返回是否招架成功） */
     on_parry_pfm?: (target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number) => boolean;
     /** 重算闪避回调（由资源文件动态注入） */

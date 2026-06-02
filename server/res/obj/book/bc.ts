@@ -10,9 +10,9 @@ export default class extends OBJ {
     transable = true;
     otype = 1;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
     if (!par) return;
-    par = par.substr(1);
+    par = par.slice(1);
     var skill = SKILL.get(par);
     if (!skill || !skill.grade) {
         this.value = 1000;
