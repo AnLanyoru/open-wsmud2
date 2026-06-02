@@ -182,7 +182,7 @@ export default class extends SKILL {
     };
 }
     on_parry_over(me, target, par) {
-    if (par.is_parry) {
+    if (par.is_parried) {
         if (!me.query_temp("sk_dugu_parry")) {
             me.do_attack({
                 target: target,

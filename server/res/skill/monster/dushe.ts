@@ -24,7 +24,7 @@ export default class extends SKILL {
     };
 }
     on_attack_over(me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
+    if (!par.is_dodged && !par.is_parried) {
         var lv = me.query_skill("dushegongji", 0);
         var sh = parseInt((lv / 10) + 10);
         if (this.random(lv) > 100) {

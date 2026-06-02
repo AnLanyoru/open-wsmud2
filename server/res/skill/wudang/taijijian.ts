@@ -169,7 +169,7 @@ export default class extends SKILL {
     };
 }
     on_attack_over(me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
+    if (!par.is_dodged && !par.is_parried) {
         if (!me.query_temp("sk/taijijian/sword")) {
             me.send_room("<cyn>$n一招失势被$N的剑招所乱！</cyn>", target);
             target.add_status({

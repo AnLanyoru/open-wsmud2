@@ -141,15 +141,15 @@ export interface DoAttackPar {
 
   // === 输入：回调（this 绑定为 par 自身） ===
   /** 目标招架时回调 */
-  on_parry?: (target: CHARACTER, is_parry: boolean) => void;
+  on_parry?: (target: CHARACTER, is_parried: boolean) => void;
   /** 目标闪避时回调 */
   on_dodge?: (target: CHARACTER) => void;
 
   // === 输出字段（do_attack 内部写入，调用方读取） ===
   /** 本次攻击是否被闪避 */
-  is_dodge?: boolean;
+  is_dodged?: boolean;
   /** 本次攻击是否被招架 */
-  is_parry?: boolean;
+  is_parried?: boolean;
   /** 本次攻击是否暴击 */
   iscirt?: boolean;
 }
@@ -239,14 +239,14 @@ declare var __PATH: Record<string, string>;
  * Team array type — CHARACTER array with extra properties set by team commands at runtime.
  */
 export type TeamData = CHARACTER[] & {
-    /** 是否允许自由拾取 */
-    free_get?: boolean;
-    /** 队伍唯一 ID */
-    id?: string;
-    /** 战利品分配函数 */
-    alloc?: (obj: any) => void;
-    /** 战利品分配列表（dice 命令用） */
-    objs?: { id: string; color_name: string; unit: string; dice: { users: string[]; num: number; user: string } }[];
+  /** 是否允许自由拾取 */
+  free_get?: boolean;
+  /** 队伍唯一 ID */
+  id?: string;
+  /** 战利品分配函数 */
+  alloc?: (obj: any) => void;
+  /** 战利品分配列表（dice 命令用） */
+  objs?: { id: string; color_name: string; unit: string; dice: { users: string[]; num: number; user: string } }[];
 };
 
 /** 角色类 */
@@ -369,15 +369,15 @@ export class CHARACTER extends ITEM {
   /** 敌人列表 */
   enemy: CHARACTER[] | null = null;
   /** 当前攻击技能 */
-  attack_skill: SKILL | null = null;
+  attack_skill: SKILL;
   /** 空手技能 */
-  noweapon_skill: SKILL | null = null;
+  noweapon_skill: SKILL;
   /** 闪避技能 */
-  dodge_skill: SKILL | null = null;
+  dodge_skill: SKILL;
   /** 招架技能 */
-  parry_skill: SKILL | null = null;
+  parry_skill: SKILL;
   /** 内功技能 */
-  force_skill: SKILL | null = null;
+  force_skill: SKILL;
   /** 自动技能缓存 */
   auto_skills: AutoSkillEntry[] | null = null;
   /** 当前攻击部位 */
@@ -529,12 +529,12 @@ export class CHARACTER extends ITEM {
   /**
    * 发送消息给自身（不考虑状态）
    */
-  send(_msg: string): void {}
+  send(_msg: string): void { }
 
   /**
    * 发送命令列表（客户端交互菜单）
    */
-  send_commands(...args: string[]): void {}
+  send_commands(...args: string[]): void { }
 
   /**
    * 操作失败通知
@@ -554,7 +554,7 @@ export class CHARACTER extends ITEM {
   /**
    * 角色死亡处理
    */
-  die(_killer?: CHARACTER): boolean | void {}
+  die(_killer?: CHARACTER): boolean | void { }
 
   /**
    * 是否在指定路径的房间
@@ -1007,7 +1007,7 @@ export class CHARACTER extends ITEM {
   /**
    * 增加积分（仅 USER 覆写）
    */
-  add_score(_val: number): void {}
+  add_score(_val: number): void { }
 
   // ================================================================
   // 战斗临时属性
@@ -1229,7 +1229,7 @@ export class CHARACTER extends ITEM {
   /**
    * 查询当前使用的技能（含装备选择）
    */
-  query_used_skill(skname: string): any {
+  query_used_skill(skname: string): SKILL {
     if (!this.skills) {
       return WORLD.DEFAULT_SKILLS[skname];
     }
@@ -2569,44 +2569,44 @@ export class CHARACTER extends ITEM {
 
     let sh = par.gj ?? this.gj;
     const mz = par.mz ?? this.mz;
-    par.is_dodge = false;
-    par.is_parry = false;
+    par.is_dodged = false;
+    par.is_parried = false;
     if (target.is_faint || this.is_shadow) {
-      par.is_dodge = false;
-      par.is_parry = false;
+      par.is_dodged = false;
+      par.is_parried = false;
     } else if (target.is_rash) {
-      par.is_dodge = false;
-      par.is_parry = (target.is_busy || par.no_parry) ? false : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
+      par.is_dodged = false;
+      par.is_parried = (target.is_busy || par.no_parry) ? false : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
     } else if (this.is_miss && !par.no_dodge) {
-      par.is_dodge = true;
-      par.is_parry = (target.is_busy || par.no_parry) ? false : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
+      par.is_dodged = true;
+      par.is_parried = (target.is_busy || par.no_parry) ? false : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
     } else if (target.is_miss || par.no_dodge) {
-      par.is_dodge = false;
-      par.is_parry = (target.is_busy || par.no_parry) ? false : (Math.random() * (target.zj / 2) + target.zj / 2 > mz);
+      par.is_dodged = false;
+      par.is_parried = (target.is_busy || par.no_parry) ? false : (Math.random() * (target.zj / 2) + target.zj / 2 > mz);
     } else if (target.is_busy || par.no_parry) {
-      par.is_dodge = Math.random() * (target.ds / 2) + target.ds / 2 > mz;
-      par.is_parry = false;
+      par.is_dodged = Math.random() * (target.ds / 2) + target.ds / 2 > mz;
+      par.is_parried = false;
     } else {
-      par.is_dodge = Math.random() * (target.ds / 2) + target.ds / 2 > mz;
-      par.is_parry = Math.random() * (target.zj / 2) + target.zj / 2 > mz;
+      par.is_dodged = Math.random() * (target.ds / 2) + target.ds / 2 > mz;
+      par.is_parried = Math.random() * (target.zj / 2) + target.zj / 2 > mz;
     }
-    if (par.is_dodge) {
+    if (par.is_dodged) {
       if (par.on_dodge) par.on_dodge(target);
-    } else if ((target.dodge_skill as Record<string, any>)?.on_dodge) {
-      (target.dodge_skill as Record<string, any>).on_dodge(target, this, par);
+    } else if (target.dodge_skill.on_dodge) {
+      target.dodge_skill.on_dodge(target, this, par);
     }
-    if (par.is_dodge) {
+    if (par.is_dodged) {
       sh = 0;
       this.send_combat((par.miss_msg || target.dodge_skill!.query_dodge_action()) + '\n', target);
     } else {
-      if ((target.parry_skill as Record<string, any>)?.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
-        (target.parry_skill as Record<string, any>).on_parry(target, this, par);
+      if (target.parry_skill.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
+        target.parry_skill.on_parry(target, this, par);
       }
       if (par.on_parry) {
-        par.on_parry(target, par.is_parry);
+        par.on_parry(target, par.is_parried);
       }
       par.bj = par.bj ?? this.bj;
-      if (par.is_parry) {
+      if (par.is_parried) {
         sh = 0;
       } else {
         if (weapon && weapon.do_attack &&
@@ -2648,7 +2648,7 @@ export class CHARACTER extends ITEM {
       if (sh > 0)
         sh = target.damage(sh, this, par.diff_fy);
 
-      if (par.is_parry) {
+      if (par.is_parried) {
         this.send_combat((par.parry_msg || target.parry_skill!.query_parry_action(target, this, weapon_type)) + '\n', target);
         if (sh > 0) {
           target.send_combat(query_status_msg(target.hp, target.max_hp));
@@ -2668,7 +2668,7 @@ export class CHARACTER extends ITEM {
       if (!par.no_append_target && target.fight_type) {
         if ((target.dodge_skill as Record<string, any>)?.on_dodge_over)
           (target.dodge_skill as Record<string, any>).on_dodge_over(target, this, par);
-        if (!par.is_dodge && (target.parry_skill as Record<string, any>)?.on_parry_over)
+        if (!par.is_dodged && (target.parry_skill as Record<string, any>)?.on_parry_over)
           (target.parry_skill as Record<string, any>).on_parry_over(target, this, par);
       }
       if (!par.no_append) {
@@ -2685,8 +2685,8 @@ export class CHARACTER extends ITEM {
    */
   from_attack(sh: number, mz: number, gjmsg: string, shmsg: string, dsmsg: string, parrymsg: string): boolean {
     if (gjmsg) this.send_room(gjmsg);
-    const is_dodge = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
-    if (is_dodge) {
+    const is_dodged = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
+    if (is_dodged) {
       this.send_room((dsmsg || this.dodge_skill!.query_dodge_action()), this);
     } else {
       this.send_room(shmsg);
@@ -2699,7 +2699,7 @@ export class CHARACTER extends ITEM {
         this.end_fight();
       }
     }
-    return is_dodge;
+    return is_dodged;
   }
 
   /**

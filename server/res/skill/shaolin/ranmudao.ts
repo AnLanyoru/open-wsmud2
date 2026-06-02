@@ -102,7 +102,7 @@ export default class extends SKILL {
     on_parry_over(me, target, par) {
     let sh = me.query_temp("sk_ranmu");
     if (sh) {
-        if (par.is_parry) sh = sh * 2;
+        if (par.is_parried) sh = sh * 2;
         target.send_combat("<HIR>$n的护体真气灼伤了$N的真元！！</HIR>", me);
         target.damage2(sh, me);
         me.end_attack(target);

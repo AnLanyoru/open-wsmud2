@@ -3,7 +3,6 @@
  */
 
 import crypto from 'crypto';
-import type { WsSocket } from './net-ws.js';
 import { WORLD } from './world.js';
 
 // Global __CONFIG is set by the bootstrap script
@@ -134,73 +133,83 @@ const USERLOGIN: UserLoginModule = {
     if (user.userid) {
       return this.login_error(user, '参数错误');
     }
-    const parts = str.split(' ');
-
-    if (parts.length < 2) {
-      return this.login_error(user, '参数错误');
+    // 防止同一 socket 并发鉴权导致会话数据被覆盖（串号）
+    if ((user as any)._authing) {
+      return this.login_error(user, '登录验证进行中，请稍后重试。', false);
     }
-
-    const cookieUser = this.encryptUser(parts[0], parts[1]);
-    if (!cookieUser || cookieUser.id === 0) {
-      return this.login_error(
-        user,
-        `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`
-      );
-    }
+    (user as any)._authing = true;
 
     try {
-      const dbUser = await WORLD.DB.getUserByID(cookieUser.id);
-      if (!dbUser || dbUser.pwd !== cookieUser.pwd) {
+      const parts = str.split(' ');
+
+      if (parts.length < 2) {
+        return this.login_error(user, '参数错误');
+      }
+
+      const cookieUser = this.encryptUser(parts[0], parts[1]);
+      if (!cookieUser || cookieUser.id === 0) {
         return this.login_error(
           user,
-          `密码已修改，请<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
-          true
+          `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`
         );
       }
-    } catch (e) {
-      return this.login_error(user, '登录验证失败，请稍后再试。');
+
+      try {
+        const dbUser = await WORLD.DB.getUserByID(cookieUser.id);
+        if (!dbUser || dbUser.pwd !== cookieUser.pwd) {
+          return this.login_error(
+            user,
+            `密码已修改，请<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
+            true
+          );
+        }
+      } catch (e) {
+        return this.login_error(user, '登录验证失败，请稍后再试。');
+      }
+
+      user.user_level = cookieUser.level ?? 0;
+      user.userid = cookieUser.id;
+      user.password = cookieUser.pwd;
+      user.loginTime = cookieUser.loginTime;
+      user.ip_address = user.socket?.remoteAddress ?? '';
+
+      if (cookieUser.id !== WORLD.admin_user) {
+        if (WORLD.CONNECT_COUNT > WORLD.max_connect_count) {
+          return this.login_error(user, '服务器人数过多，请稍后再试。');
+        }
+        if (parts.length === 2 && WORLD.USERS.length > WORLD.max_user_count) {
+          return this.login_error(user, '服务器人数过多，请稍后再试。');
+        }
+        if (!WORLD.before_login(user)) {
+          return this.login_error(user, '服务器正在关闭或开启，请稍后再试。');
+        }
+      }
+
+      if (parts.length === 4) {
+        if (parseInt(parts[3]) !== WORLD.SERVERID) {
+          return this.login_error(user, '参数错误。');
+        }
+        const data = (WORLD as { can_cross(id: string): boolean }).can_cross(parts[2]);
+        if (!data) {
+          return this.login_error(user, '不允许登录');
+        }
+        WORLD.on_user_cross_login(user, data);
+        return;
+      } else {
+        user.serverid = WORLD.SERVERID;
+      }
+
+      user.wait_input = null;
+
+      if (parts[2]) {
+        this.wait_login(user, 'login ' + parts[2]);
+        return;
+      }
+      await this.load_roles(user);
+      user.wait_input = this.wait_login;
+    } finally {
+      (user as any)._authing = false;
     }
-
-    user.user_level = cookieUser.level ?? 0;
-
-    user.wait_input = null;
-    user.userid = cookieUser.id;
-    user.password = cookieUser.pwd;
-    user.loginTime = cookieUser.loginTime;
-    user.ip_address = user.socket?.remoteAddress ?? '';
-
-    if (cookieUser.id !== WORLD.admin_user) {
-      if (WORLD.CONNECT_COUNT > WORLD.max_connect_count) {
-        return this.login_error(user, '服务器人数过多，请稍后再试。');
-      }
-      if (parts.length === 2 && WORLD.USERS.length > WORLD.max_user_count) {
-        return this.login_error(user, '服务器人数过多，请稍后再试。');
-      }
-      if (!WORLD.before_login(user)) {
-        return this.login_error(user, '服务器正在关闭或开启，请稍后再试。');
-      }
-    }
-
-    if (str.length === 4) {
-      if (parseInt(parts[3]) !== WORLD.SERVERID) {
-        return this.login_error(user, '参数错误。');
-      }
-      const data = (WORLD as { can_cross(id: string): boolean }).can_cross(parts[2]);
-      if (!data) {
-        return this.login_error(user, '不允许登录');
-      }
-      WORLD.on_user_cross_login(user, data);
-      return;
-    } else {
-      user.serverid = WORLD.SERVERID;
-    }
-
-    if (parts[2]) {
-      this.wait_login(user, 'login ' + parts[2]);
-      return;
-    }
-    await this.load_roles(user);
-    user.wait_input = this.wait_login;
   },
 
   /**

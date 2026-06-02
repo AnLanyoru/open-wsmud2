@@ -110,7 +110,7 @@ export default class extends SKILL {
         } else {
             me.set_temp("kuangfeng", kf_count + 1, 5000);
         }
-        if (par.is_dodge || par.is_parry) me.end_attack(target);
+        if (par.is_dodged || par.is_parried) me.end_attack(target);
     }
 }
 }

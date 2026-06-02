@@ -69,7 +69,7 @@ export default class extends SKILL {
     };
 }
     on_attack_over(me, target, par) {
-    if (!par.is_dodge && !par.is_parry) {
+    if (!par.is_dodged && !par.is_parried) {
         var lv = me.query_skill("fumozhang", 0);
         lv = 5 + parseInt(lv / 100);
         target.add_status({

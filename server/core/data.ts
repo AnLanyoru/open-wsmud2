@@ -5,6 +5,7 @@
 // NOTE: 这些依赖通过 TypeScript 编译到 server/dist/ 后路径等价
 import { WORLD } from './world.js';
 import { FAMILIES } from './skill/family.js';
+import { StatsTopEntry } from '../types/index.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -219,19 +220,19 @@ const DATA: DataObject = {
     reset_famtops(me: { id: string; remove_temp(name: string): void }, fam: { id: string; name: string }): void {
         me.remove_temp('top_fam_sc');
         me.remove_temp('top_fam');
-        const tops = WORLD.STATS['tops_' + fam.id];
+        const tops = WORLD.STATS['tops_' + fam.id] as StatsTopEntry[] | undefined;
         if (tops) {
             for (let i = 0; i < tops.length; i++) {
                 const user = tops[i];
                 if (user.userid === me.id) {
-                    user.userid = null;
+                    user.userid = undefined;
                     user.name = fam.name + '弟子';
-                    user.title = null;
+                    user.title = undefined;
                     break;
                 }
             }
         }
-        const scTops = WORLD.STATS.SC_STATS?.[fam.id];
+        const scTops = WORLD.STATS.SC_STATS[fam.id];
         if (scTops) {
             for (let i = 0; i < scTops.length; i++) {
                 if (scTops[i].id === me.id) {

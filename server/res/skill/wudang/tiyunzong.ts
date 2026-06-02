@@ -34,7 +34,7 @@ export default class extends SKILL {
     };
 }
     on_dodge_over(me, target, par) {
-    if (par.is_dodge && !me.query_temp("tiyunzong")) {
+    if (par.is_dodged && !me.query_temp("tiyunzong")) {
         var lv = me.query_skill("tiyunzong", 0);
         me.add_status({
             id: "dodge",

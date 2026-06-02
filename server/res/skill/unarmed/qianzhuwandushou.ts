@@ -132,7 +132,7 @@ export default class extends SKILL {
     if (me.query_temp("wangu")) {
         var lv = me.query_skill("wudushengong", 0) + me.query_skill("qianzhuwandushou", 0);
         var gj = 200 + parseInt(lv * (lv / 1000 + 1));
-        if (par.is_parry) {
+        if (par.is_parried) {
             let val = me.query_prop('qzwds_sh');
             if (val > 0) {
                 gj = gj * val / 100;

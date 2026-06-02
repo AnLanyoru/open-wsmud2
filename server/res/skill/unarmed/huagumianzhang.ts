@@ -88,7 +88,7 @@ export default class extends SKILL {
     };
 }
     on_attack_over(me, target, par) {
-    if (!par.is_dodge && !par.is_parry && par.iscirt) {
+    if (!par.is_dodged && !par.is_parried && par.iscirt) {
         me.send_room("<hib>一股阴寒的掌力顺着$N的手掌侵入$n，$p不由得打了个冷颤。</hib>", target);
         var lv = me.query_skill("huagumianzhang", 0) + 10;
         lv += me.gj * me.query_prop('hgmz_ds') / 100;

@@ -46,7 +46,7 @@ export default class extends SKILL {
         use: function (me, target, lv) {
             var time = 2000 + lv * 5;
             if (time > 8000) time = 8000;
-            var is_parry = false;
+            var is_parried = false;
             var sh = me.do_attack({
                 target: target,
                 gj: me.gj,
@@ -54,14 +54,14 @@ export default class extends SKILL {
                 attack_msg: "<hiy>$N大喝一声，双掌齐出，如怒潮般汹涌般向$p当胸猛击过去。</hiy>",
                 damage_msg: "<hir>只听砰的一声，$N已经重重打中$p胸口，跟着喀喇喇几声，肋骨好像断了几根！</hir>",
                 on_parry: function (t, ispa) {
-                    is_parry = ispa;
+                    is_parried = ispa;
                     if (ispa)
                         this.damage_msg = "<hir>$n慌乱中匆忙招架，后续掌力却如怒潮狂涌而至，$p心口一甜，喷出一口鲜血。</hir>";
                     return false;
                 },
                 miss_msg: "<hic>$n大惊之下，$i连划三个半圆护住身前，同时足尖着力，飘身后退，避开了$N的一掌。</hic>"
             });
-            if (sh && !is_parry) {
+            if (sh && !is_parried) {
                 target.add_status({
                     id: "unarmed",
                     duration: time,

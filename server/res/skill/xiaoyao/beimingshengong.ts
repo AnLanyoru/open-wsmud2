@@ -132,7 +132,7 @@ export default class extends SKILL {
     };
 }
     on_parry_over(me, target, par) {
-    if (par.is_parry) {
+    if (par.is_parried) {
         target.add_mp(-me.query_skill("beimingshengong", 0) - 10);
         //me.send_room("<hib>$n顿觉全身内力如水银般循孔飞泄而出！</hib>\n", target);
     }

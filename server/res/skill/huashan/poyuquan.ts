@@ -67,7 +67,7 @@ export default class extends SKILL {
                     no_weapon: true
                 };
                 me.do_attack(par);
-                if (!par.is_dodge) {
+                if (!par.is_dodged) {
                     let time = 5000 + parseInt(lv / 2);
                     if (time > 15000) time = 15000;
                     let fy = lv * 2 + 600;
