@@ -7,6 +7,7 @@ import { UTIL } from "../util.js";
 import { FAMILIES } from "./family.js";
 import type { FAMILY } from './family.js';
 import type { CHARACTER } from '../char/character.js';
+import { PROPERTIES, SKILL_TYPES } from "../const.js";
 
 
 export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
@@ -152,11 +153,6 @@ export interface LearnCondition {
     /** 其他角色属性阈值(如门派贡献、等级等) 自己写新的，别乱用any */
 }
 
-// 从 os/const.js 导入常量
-// 注意: 这些常量应被迁移到 server/core/const.ts
-const SKILL_TYPES = { BASE: 0, SKILL: 1, KNOWLEDGE: 2 } as const;
-const PROPERTIES: Record<string, string> = {};
-
 /** 品级颜色 */
 const level_color = ["wht", "hig", "hic", "hiy", "hiz", "hio", "ord"];
 /** 品级描述 */
@@ -274,7 +270,7 @@ export class SKILL extends BASE {
     /** 内功攻击回调（返回内功伤害） */
     do_force_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
     /** 内功招架回调（返回减免伤害） */
-    on_force_parry?: (target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>) => number;
+    on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number;
     /** 内功攻击结束回调 */
     on_force_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
     /** 受到伤害回调（返回减免后伤害） */
@@ -827,10 +823,9 @@ export class SKILL extends BASE {
      * @param name - 绝招名
      */
     get_pfm(name: string): PERFORM | undefined {
-        const entry = this.pfm[name];
-        if (!entry) return undefined;
-        if (entry instanceof PERFORM) return entry;
-        return PERFORM.fromPlain(entry);
+        if (this.pfm) {
+            return this.pfm[name];
+        }
     }
 
     /**

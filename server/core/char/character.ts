@@ -345,7 +345,7 @@ export class CHARACTER extends ITEM {
   /** 当前活动状态 */
   state: any = null;
   /** 等待用户输入的回调 */
-  wait_input: ((me: CHARACTER, req: string) => void) | null = null;
+  wait_input?: ((me: CHARACTER, req: string) => void);
 
   // ============ 技能与装备 ============
 

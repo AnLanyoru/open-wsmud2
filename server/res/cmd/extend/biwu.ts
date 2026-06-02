@@ -202,24 +202,24 @@ export default class extends COMMAND {
     }
 
     recount(this: CHARACTER) {
-        this.max_hp = Math.floor(this.con * 5 + (this.max_mp * this.query_force_rad() + this.query_prop("max_hp") + this.query_prop("con") * this.con) * (100 + this.query_prop("hp_per")) / 100);
+        this.max_hp = parseInt(this.con * 5 + (this.max_mp * this.query_force_rad() + this.query_prop("max_hp") + this.query_prop("con") * this.con) * (100 + this.query_prop("hp_per")) / 100);
 
         if (this.max_hp < 1) this.max_hp = 1;
         if (this.hp > this.max_hp) this.hp = this.max_hp;
 
         this.gjsd = 4000 - this.query_prop("gjsd");
         if (this.gjsd > 500) {
-            this.gjsd = Math.floor(this.gjsd - (this.gjsd * this.query_prop("gjsd_per") / 100));
+            this.gjsd = parseInt(this.gjsd - (this.gjsd * this.query_prop("gjsd_per") / 100));
         }
         if (this.gjsd < 500) this.gjsd = 500;
 
-        this.gj = Math.floor(this.str + (this.query_prop("gj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("gj_per")) / 100);
-        this.fy = Math.floor(((this.str + this.con) / 10 + this.query_prop("fy") + this.query_prop("con") * this.con / 10) * (100 + this.query_prop("fy_per")) / 100);
-        this.mz = Math.floor((this.dex / 2 + this.query_prop("mz")) * (100 + this.query_prop("mz_per")) / 100);
-        this.ds = Math.floor((this.dex / 2 + this.query_prop("ds") + this.query_prop("dex") * this.dex / 10) * (100 + this.query_prop("ds_per")) / 100);
-        this.zj = Math.floor((this.str / 2 + this.query_prop("zj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("zj_per")) / 100);
-        this.bj = Math.floor(this.dex / 10 + this.query_prop("bj_per"));
-        if (this.parry_skill?.on_recount_parry) {
+        this.gj = parseInt(this.str + (this.query_prop("gj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("gj_per")) / 100);
+        this.fy = parseInt(((this.str + this.con) / 10 + this.query_prop("fy") + this.query_prop("con") * this.con / 10) * (100 + this.query_prop("fy_per")) / 100);
+        this.mz = parseInt((this.dex / 2 + this.query_prop("mz")) * (100 + this.query_prop("mz_per")) / 100);
+        this.ds = parseInt((this.dex / 2 + this.query_prop("ds") + this.query_prop("dex") * this.dex / 10) * (100 + this.query_prop("ds_per")) / 100);
+        this.zj = parseInt((this.str / 2 + this.query_prop("zj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("zj_per")) / 100);
+        this.bj = parseInt(this.dex / 10 + this.query_prop("bj_per"));
+        if (this.parry_skill.on_recount_parry) {
             this.zj += this.parry_skill.on_recount_parry(this);
         }
         if (this.dodge_skill?.on_recount_dodge) {

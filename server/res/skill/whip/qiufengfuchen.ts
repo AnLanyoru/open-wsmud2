@@ -1,3 +1,4 @@
+import type { CHARACTER } from "../../../core/char/character.js";
 import { SKILL } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
@@ -44,7 +45,7 @@ export default class extends SKILL {
         distime: 30000,
         enable_skill: "whip",
         mp: 20,
-        use: function (me, target, lv) {
+        use: function (me: CHARACTER, target: CHARACTER, lv: number) {
             var time = Math.round(lv * 100 / 5);
             if (time < 2000) time == 2000;
             else if (time > 10000) time = 10000;

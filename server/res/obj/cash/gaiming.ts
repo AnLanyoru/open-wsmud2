@@ -90,7 +90,7 @@ async function update_name(me, name, obj) {
         return me.send('你的名字已经改为：' + name + "。");
 
 
-    } catch (err) {
+    } catch (err: any) {
         if (err.errno == 1062) {
             return me.send('这个名字已经有人使用了。');
         } else {

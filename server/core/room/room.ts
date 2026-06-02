@@ -257,7 +257,8 @@ export class ROOM extends ITEM {
             if (item.is_player) {
                 str.push(",p:1");
             }
-            if (item.is_character) {
+            // @ts-ignore 前面已经判断了类型
+            if (item.is_character && item.hp) {
                 const ch = item as CHARACTER;
                 str.push(",mp:");
                 str.push(String(ch.mp));
@@ -393,7 +394,7 @@ export class ROOM extends ITEM {
     find_obj(oid: string): any {
         const items = this.items;
         if (!items) return;
-        const item = ITEM.prototype.find_obj_byid.call(this, items, oid);
+        const item = this.find_obj_byid.call(this, items, oid);
         if (item) return item;
         if (!this.hidden_items) return;
         for (let i = 0; i < this.hidden_items.length; i++) {

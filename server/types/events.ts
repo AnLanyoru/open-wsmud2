@@ -4,13 +4,11 @@
 
 import type { CHARACTER } from '../core/char/character.js';
 import type { USER } from '../core/char/user.js';
-import type { NPC } from '../core/char/npc.js';
-import type { FOLLOWER } from '../core/char/follower.js';
 import type { OBJ } from '../core/item/obj.js';
 import type { EQUIPMENT } from '../core/item/equipment.js';
 import type { ROOM } from '../core/room/room.js';
 import type { CORPSE } from '../core/item/corpse.js';
-import type { SKILL, PERFORM } from '../core/skill/skill.js';
+import type { SKILL } from '../core/skill/skill.js';
 
 // ============================================================
 // CHARACTER 回调
