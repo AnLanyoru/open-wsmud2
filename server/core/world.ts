@@ -29,18 +29,8 @@ import LISTENER_MODULE from './ws.js';
 // Type-only imports from our type definitions
 // NOTE: IWorld and related types transitively import USER, CHARACTER, etc. from other agents' files.
 // Once all core/ type files exist, this import resolves fully.
-import type {
-  IWorld,
-  MessageSystem,
-  StatsSystem,
-  GameSocket,
-  ReceivedLog,
-  LogEntry,
-  MessageEntry,
-  MessageStoreEntry,
-  ServerConfig,
-} from '../types/world.js';
-import type { UID } from '../types/base.js';
+
+import type { Timestamp, UID } from '../types/base.js';
 import type { USER } from './char/user.js';
 import type { CHARACTER } from './char/character.js';
 import type { COMMAND } from './command.js';
@@ -68,16 +58,242 @@ import type { EventItem } from './task/events.js';
 // ============================================================
 
 /** 排行榜保存时需复制的玩家属性列表 */
-const COPY_PROPS = [
+export const COPY_PROPS = [
   'str', 'con', 'dex', 'int', 'gender', 'max_mp', 'exp', 'pot',
   'kar', 'per', 'hp', 'max_hp', 'mp', 'age', 'score',
 ] as const;
 
 // ============================================================
+// 类型定义
+// ============================================================
+
+/** 运行时路径配置 */
+export interface PathConfig {
+  BASE: string;
+  WORLD: string;
+  COMMAND: string;
+  SKILL: string;
+  MAP: string;
+  NPC: string;
+  OBJ: string;
+  TASK: string;
+  AREA: string;
+  FAMILY: string;
+  EXTENDS: string;
+  DATA: string;
+  DEF_DATA: string;
+  BASE_DATA: string;
+  [key: string]: string;
+}
+
+/** 服务器配置 */
+export interface ServerConfig {
+  ip: string;
+  port: number;
+  id: number;
+  name: string;
+  istest: boolean;
+  isdef: boolean;
+}
+
+/** 全局配置 */
+export interface AppConfig {
+  DB: any;
+  init(): Promise<void>;
+  WEB_PORT: number;
+  CONNECT_LEVEL: number;
+  MD5: string;
+  SESSION_SECRET: string;
+  HEARTBEAT: number;
+  DESIV: Buffer | null;
+  def_server: ServerConfig;
+  [key: string]: any;
+}
+
+/** 消息条目 */
+export interface MessageEntry {
+  content: string;
+  time: number;
+  attach?: { name: string; obj: string; count: number }[];
+  rec?: boolean;
+  index?: number;
+}
+
+/** 消息存储条目 */
+export interface MessageStoreEntry {
+  name: string;
+  items: MessageEntry[];
+}
+
+/** 统计排行条目 */
+export interface StatsTopEntry {
+  userid?: UID;
+  name?: string;
+  title?: string;
+  path?: string;
+  str?: number;
+  con?: number;
+  dex?: number;
+  int?: number;
+  gender?: number;
+  max_mp?: number;
+  exp?: number;
+  pot?: number;
+  kar?: number;
+  per?: number;
+  hp?: number;
+  max_hp?: number;
+  mp?: number;
+  age?: number;
+  score?: number;
+  skills?: Record<string, number>;
+  equipment?: EQUIPMENT[];
+  temp?: Record<string, unknown>;
+  long_name?(): string;
+  query_desc?(me: CHARACTER, cmd?: string): string;
+}
+
+/** 武器排行条目 */
+export interface WeaponRankEntry {
+  id: UID;
+  user: UID;
+  score: number;
+  name: string;
+  desc: string;
+  wname: string;
+}
+
+/** 分数排行条目 */
+export interface ScoreRankEntry {
+  id: UID;
+  score: number;
+  name: string;
+}
+
+/** 接收请求日志 */
+export interface ReceivedLog {
+  time: Timestamp;
+  cmd: string;
+  user: UID;
+}
+
+/** 日志条目 */
+export interface LogEntry {
+  time: Timestamp;
+  cmd: string;
+  user: string;
+  msg: string;
+}
+
+/** Socket 接口 (最小化) */
+export interface GameSocket {
+  user?: USER | null;
+  oserver?: any;
+  end(data?: string): void;
+  send?(data: string): void;
+  destroy(): void;
+  destroyed?: boolean;
+  setTimeout(ms: number): void;
+  remoteAddress?: string;
+  [key: string]: any;
+}
+
+/** WORLD 的 MESSAGE 子系统 */
+export interface MessageSystem {
+  stores: Map<UID, Map<UID, MessageStoreEntry>>;
+  NOTICES: MessageEntry[];
+  pushUserMessage(toid: UID, from: { id: UID; name: string }, msg: MessageEntry): void;
+  getUserMessages(me: CHARACTER): { id: UID; name: string; content: string; time: number }[];
+  getMessageFromID(me: CHARACTER, from: UID, count?: number): MessageEntry[];
+  getMessageByIndex(me: CHARACTER, from: UID, index: number): MessageEntry | undefined;
+  save(): string;
+  saveNotice(): string;
+  load(data: { notices?: MessageEntry[]; messages?: any[] }): void;
+}
+
+
+/** WORLD 主接口 */
+export interface IWorld {
+  // 核心状态
+  USERS: USER[];
+  COMMANDS: Record<string, COMMAND>;
+  SKILLS: Record<string, SKILL>;
+  ROOMS: Record<string, ROOM>;
+  RUN_ROOMS: ROOM[];
+  DEFAULT_SKILLS: Record<string, SKILL>;
+  AREAS: AREA[];
+  TASKS: USERTASK[];
+  SYSTEMTASKS: TASK[];
+  USER_EVENTS: any[];
+  OBJ_STROE: Map<string, OBJ>;
+  NPC_STROE: Map<string, NPC>;
+  HEARTBEATCOUNT: number;
+
+  // 服务器状态
+  RECEIVED: ReceivedLog[];
+  LOGS: LogEntry[];
+  SERVERID: number;
+  SERVERS: ServerConfig[];
+  CONNECT_COUNT: number;
+  max_connect_count: number;
+  max_user_count: number;
+  SocketCount: number;
+
+  // 子系统
+  DATA: any;
+  USERLOGIN: any;
+  DB: any;
+  LISTENER: any;
+  MESSAGE: MessageSystem;
+
+  // 配置
+  status: number;
+  heart_beat_service: ReturnType<typeof setInterval> | null;
+  heartbeat_interval: number;
+  SERVER: ServerConfig | null;
+  DEFAULT_COMMAND: COMMAND | null;
+
+  // 方法
+  SocketIn(): void;
+  connect(socket: GameSocket): void;
+  check_connect(socket: GameSocket): boolean;
+  before_login(user: USER): boolean;
+  disconnect(socket: GameSocket): void;
+  request(request: string, socket: GameSocket): void;
+  saveRequest(): void;
+  startup(sid?: number): Promise<void>;
+  sendAll(msg: string): void;
+  getUser(id: UID | number): USER | undefined;
+  find_user(name: string): USER | undefined;
+  on_user_login(user: USER): void;
+  on_user_cross_login(user: any, data?: any): void;
+  on_user_relogin(user: USER): void;
+  heart_beat(): void;
+  login_out(user: USER): void;
+  send(text: string): void;
+  log(user: USER | null, cmd: string, msg: string): void;
+  saveLog(): void;
+  is_server(user: USER): boolean;
+  save(): Promise<boolean>;
+  writeHeapSnapshot(): void;
+  loadLocalData(): void;
+  on_cross_response(id: UID, sid: string): void;
+  can_cross(id: UID): boolean;
+  on_user_die(me: CHARACTER, killer: CHARACTER, corpse: CORPSE): void;
+  on_resource_loaded(): void;
+  on_startup(): void;
+  on_user_quit(user: USER): void;
+  on_user_save(user: USER): void;
+  on_heart_beat(now: number): void;
+  on_cross_chat?(msg: any): void;
+  close(): Promise<boolean>;
+}
+
+// ============================================================
 // World 类
 // ============================================================
 
-class World implements IWorld {
+class World {
   // ========== 核心状态 ==========
 
   /** 在线用户列表 */
@@ -140,7 +356,7 @@ class World implements IWorld {
   /**
    * 消息子系统 — 管理用户私信和系统公告
    */
-  MESSAGE: MessageSystem = {
+  MESSAGE = {
     /** 用户消息存储: toUserId → Map<fromUserId, MessageStoreEntry> */
     stores: new Map<UID, Map<UID, MessageStoreEntry>>(),
     /** 系统公告列表 */
@@ -350,19 +566,19 @@ class World implements IWorld {
   /**
    * 排行榜/统计子系统 — 管理玩家属性排行、装备评分、分数排行
    */
-  STATS: StatsSystem = {
+  STATS = {
     /** 玩家属性排行榜（按门派分组） */
-    TOPS: [],
+    TOPS: [] as NPC[],
     /** 经验排行（预留） */
     EXP: [],
     /** 总积分排行 */
     SCORE: [],
     /** 武器排行 */
-    WEAPON: [],
+    WEAPON: [] as {score: number }[],
     /** 各部位装备评分排行（11 个部位） */
-    EQ_STATS: [],
+    EQ_STATS: [] as {  score: number }[][],
     /** 各门派积分排行 */
-    SC_STATS: {} as Record<string, any[]>,
+    SC_STATS: {} as Record<string, { id?: string, name: string, score: number }[]>,
 
     /**
      * 加载排行榜数据（由 world/extends/stats.js 覆盖实现）
@@ -370,7 +586,7 @@ class World implements IWorld {
      * @param defname - 默认名称
      * @param key - 门派标识
      */
-    load_tops(tops?: any[], defname?: string, key?: string): any[] {
+    load_tops(tops?: any[], defname?: string, key?: string): NPC[] {
       return [];
     },
     /**

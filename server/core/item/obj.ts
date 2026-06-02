@@ -16,7 +16,7 @@ import type { CHARACTER } from '../char/character.js';
 import type { SKILL } from '../skill/skill.js';
 
 // Lazy import WORLD to avoid circular deps: obj.ts -> world.ts -> ... -> obj.ts
-import type { IWorld } from '../../types/world.js';
+import type { IWorld } from '../world.js';
 let _WORLD: IWorld | null = null;
 import('../world.js').then(m => {
     _WORLD = (m as { WORLD: IWorld }).WORLD;

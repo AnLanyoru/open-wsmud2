@@ -17,7 +17,7 @@ import type { ROOM as RoomClass } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { OddsEntry } from '../item/obj.js';
 import type { NPC } from './npc.js';
-import type { GameSocket } from '../../types/world.js';
+import type { GameSocket } from '../world.js';
 import { StdioNull } from 'node:child_process';
 
 // Array.prototype 扩展方法（由 util.js 注入）

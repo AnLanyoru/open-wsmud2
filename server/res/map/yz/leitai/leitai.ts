@@ -39,7 +39,8 @@ export default class MapRoom extends ROOM {
     action_enable(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招，不能更改武功。"); return true; }
     surrender(this: MapRoom, me: CHARACTER) {
         if (WORLD.COMMANDS.biwu && typeof WORLD.COMMANDS.biwu === 'object' && 'surrender' in WORLD.COMMANDS.biwu) {
-            (WORLD.COMMANDS.biwu as Record<string, any>).surrender(me);
+            // @ts-ignore 动态借用比武命令的投降处理函数
+            WORLD.COMMANDS.biwu.surrender(me);
         }
         return true;
     }

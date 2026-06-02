@@ -2,7 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { EQUIP_TYPE } from "../../../core/const.js";
-import type { StatsTopEntry, ScoreRankEntry, WeaponRankEntry } from "../../../types/world.js";
+import type { StatsTopEntry, ScoreRankEntry, WeaponRankEntry } from "../../../core/world.js";
 import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {

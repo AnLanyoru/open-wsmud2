@@ -13,7 +13,7 @@ import { FOLLOWER } from './follower.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
 import { WEAPON_TYPE } from '../const.js';
-import type { GameSocket } from '../../types/world.js';
+import type { GameSocket } from '../world.js';
 import type { NPC } from './npc.js';
 import { FAMILIES } from '../skill/family.js';
 

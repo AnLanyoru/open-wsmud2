@@ -2,7 +2,7 @@
 // 数据持久化模块 - 数据库操作 / 文件备份
 // ============================================================
 
-import type { ServerConfig } from '../types/world.js';
+import type { ServerConfig } from './world.js';
 
 import fs_sync from 'fs';
 import { WORLD } from './world.js';

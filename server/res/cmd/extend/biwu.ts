@@ -6,7 +6,7 @@ import { ROOM } from "../../../core/room/room.js";
 import { WORLD } from "../../../core/world.js";
 import { UTIL } from "../../../core/util/util.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
-import type { StatsTopEntry } from "../../../types/world.js";
+import type { StatsTopEntry } from "../../../core/world.js";
 
 export default class extends COMMAND {
     command = "biwu";
@@ -59,7 +59,7 @@ export default class extends COMMAND {
 
     start_biwu(me: CHARACTER, fam: string | undefined, index: number) {
         let tops = WORLD.STATS.TOPS;
-        if (fam) tops = WORLD.STATS["tops_" + fam.toUpperCase()] as StatsTopEntry[] | undefined || [];
+        if (fam) tops = WORLD.STATS["tops_" + fam.toUpperCase()] || [];
         if (!tops) return me.send("错误的对手，无法挑战。");
 
         const topEntry = tops[index];
@@ -103,9 +103,9 @@ export default class extends COMMAND {
 
     surrender(me: CHARACTER) {
         const room = me.environment!;
-        let npc: CHARACTER = room.items![1] as unknown as CHARACTER;
+        let npc = room.items[1] as NPC;
         if (npc.is_player) {
-            npc = room.items![0] as unknown as CHARACTER;
+            npc = room.items[0] as NPC;
         }
         me.end_fight();
         npc.end_fight();
@@ -116,14 +116,14 @@ export default class extends COMMAND {
     on_heart_beat(this: ROOM, _dt: number) {
         this.biwu_step = (this.biwu_step || 0) + 1;
         if (this.biwu_step! < 60) return;
-        if (!this.items!.length) {
+        if (!this.items.length) {
             return;
         }
-        let me: CHARACTER = this.items![0] as unknown as CHARACTER;
-        let npc: CHARACTER | undefined = this.items![1] as unknown as CHARACTER;
+        let me: CHARACTER = this.items[0] as unknown as CHARACTER;
+        let npc: CHARACTER | undefined = this.items[1] as unknown as CHARACTER;
         if (npc && npc.is_player) {
             me = npc;
-            npc = this.items![0] as unknown as CHARACTER;
+            npc = this.items[0] as unknown as CHARACTER;
         }
         me.end_fight();
         npc?.end_fight();
@@ -132,13 +132,13 @@ export default class extends COMMAND {
         me.notify("<yel>挑战超时，自动离开擂台。</yel>");
     }
 
-    create_npc(player: CHARACTER | StatsTopEntry, fam?: string): NPC {
+    create_npc(player: CHARACTER, fam?: string): NPC {
         const npc = NPC.CLONE("pub/gaoshou1");
         for (let i = 0; i < COPY_PROPS.length; i++) {
-            const key = COPY_PROPS[i] as keyof StatsTopEntry;
+            const key = COPY_PROPS[i];
             const val = player[key];
             if (val !== undefined) {
-                (npc as unknown as Record<string, unknown>)[key] = val;
+                npc[key] = val;
             }
         }
         npc.equipment = [];
@@ -146,7 +146,7 @@ export default class extends COMMAND {
             const eqs = player.equipment;
             for (let i = 0; i < eqs.length; i++) {
                 if (!eqs[i]) continue;
-                const obj = eqs[i]!.clone(player as unknown as CHARACTER);
+                const obj = eqs[i]!.clone(player);
                 npc.equipment[obj.eq_type] = obj;
                 if (obj.on_eq) obj.on_eq(npc);
             }
@@ -161,15 +161,22 @@ export default class extends COMMAND {
             }
         }
         npc.attack_count = 3;
-        npc.title = player.title || "";
-        npc.age = player.age || 20;
-        npc.score = player.score || 0;
-        npc.top_index = 0;
+        if (player.is_player) {
 
-        const playerUserid = "userid" in player ? (player as StatsTopEntry).userid : undefined;
-        if (playerUserid) {
-            npc.userid = playerUserid;
-            npc.id = "top_" + (fam ? fam.toUpperCase() : "") + "_" + (npc.top_index - 1);
+            npc.title = player.query_title("family");
+            npc.age = player.query_age();
+            npc.userid = player.id;
+            npc.score = player.query_temp(fam ? 'top_fam_sc' : "top_sc", 0) as number;
+            npc.top_index = player.query_temp(fam ? 'top_fam' : "top", 0);
+
+            npc.id = "top_" + (fam ? fam.toUpperCase() : "") + "_" + (npc.top_index! - 1);
+        } else {
+            let top_npc = player as NPC;
+            npc.title = top_npc.title;
+            npc.age = top_npc.age;
+            npc.userid = top_npc.userid;
+            npc.score = top_npc.score;
+            npc.top_index = top_npc.top_index;
         }
 
         for (const key of COPY_TEMPS) {
@@ -282,17 +289,17 @@ export default class extends COMMAND {
         }
         top = player.query_temp("top_fam");
         if (top) {
-            this.check_fams_stats(player, WORLD.STATS["tops_" + player.family!.id] as StatsTopEntry[] | undefined || [], top, player.family!.id);
+            this.check_fams_stats(player, WORLD.STATS["tops_" + player.family!.id] || [], top, player.family!.id);
         }
     }
 
-    check_fams_stats(player: CHARACTER, tops: StatsTopEntry[], top: number, fam?: string) {
-        const npc = tops[top - 1];
+    check_fams_stats(player: CHARACTER, tops: CHARACTER[], top: number, fam?: string) {
+        const npc = tops[top - 1] as NPC;
         if (!npc) return;
         const top_key = fam ? "top_fam" : "top";
         if (npc.userid !== player.id) {
             for (let i = 0; i < tops.length; i++) {
-                if (tops[i]!.userid === player.id) {
+                if ((tops[i] as NPC).userid === player.id) {
                     player.set_temp(top_key, i + 1);
                     return this.setStatsTitle(player, i, fam);
                 }
@@ -302,18 +309,18 @@ export default class extends COMMAND {
         }
     }
 
-    updateTopStats(top: StatsTopEntry, index: number, fam?: string) {
+    updateTopStats(top: NPC, index: number, fam?: string) {
         const top_user = top.userid ? WORLD.getUser(top.userid) : null;
         const top_key = fam ? "top_fam" : "top";
         if (index > 0) {
-            (top as Record<string, unknown>).top_index = index + 1;
+            top.top_index = index + 1;
             top.userid = top.userid;
             if (top_user) {
                 top_user.set_temp(top_key, index + 1);
                 this.setStatsTitle(top_user, index, fam);
             }
         } else {
-            (top as Record<string, unknown>).top_index = -1;
+            top.top_index = -1;
             if (top_user) {
                 top_user.remove_temp(top_key);
                 this.setStatsTitle(top_user, 10, fam);
@@ -321,7 +328,7 @@ export default class extends COMMAND {
         }
     }
 
-    checkTopindex(sc: number, tops: StatsTopEntry[]): number {
+    checkTopindex(sc: number, tops: NPC[]): number {
         let index = -1;
         for (let i = tops.length - 1; i >= 0; i--) {
             const item = tops[i]!;
@@ -335,7 +342,7 @@ export default class extends COMMAND {
         let tops = WORLD.STATS.TOPS;
         let top_key = "top";
         if (fam) {
-            tops = (WORLD.STATS as Record<string, StatsTopEntry[]>)["tops_" + fam.toUpperCase()] || [];
+            tops = WORLD.STATS["tops_" + fam.toUpperCase()] || [];
             top_key = "top_fam";
         }
         if (!tops) return;
@@ -351,7 +358,7 @@ export default class extends COMMAND {
         }
         player.set_temp(top_key, index + 1);
         const newNpc = this.create_npc(player, fam);
-        tops.splice(index, 0, newNpc as unknown as StatsTopEntry);
+        tops.splice(index, 0, newNpc);
         if (tops.length > 10) {
             const removed = tops.splice(tops.length - 1)[0];
             if (removed) this.updateTopStats(removed, -1, fam);
@@ -367,7 +374,7 @@ export default class extends COMMAND {
         }
     }
 
-    biwu_watch(_me: CHARACTER) {}
+    biwu_watch(_me: CHARACTER) { }
 }
 
 function challenge_end(this: CHARACTER & { on_die?: (killer: CHARACTER) => boolean | void }, killer: CHARACTER): boolean | undefined {

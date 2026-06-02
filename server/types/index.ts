@@ -5,4 +5,3 @@
 export * from './base.js';
 export * from './props.js';
 export * from './events.js';
-export * from './world.js';

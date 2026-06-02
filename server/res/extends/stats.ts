@@ -11,19 +11,21 @@
  *   const STATS = WORLD.STATS;
  *   STATS.load_tops = function (tops, defname, key) { /* ... * / };
  */
-import { WORLD } from "../../core/world.js";
+import { COPY_PROPS, WORLD } from "../../core/world.js";
 import { NPC } from "../../core/char/npc.js";
 import { OBJ } from "../../core/item/obj.js";
+import type { CHARACTER } from "../../core/char/character.js";
+import type { StatsTopEntry } from "../../core/world.js";
+import type { EQUIPMENT } from "../../core/item/equipment.js";
 
 const STATS = WORLD.STATS;
 
-STATS.load_tops = function (tops, defname = '武林高手', key = "") {
+STATS.load_tops = function (tops: StatsTopEntry[], defname: string = '武林高手', key: string = ""): CHARACTER[] {
     tops = tops ?? new Array(10).fill({ path: "pub/gaoshou1" });
-    const ary = [];
+    const ary: CHARACTER[] = [];
     for (let i = 0; i < tops.length; i++) {
         let item = tops[i];
-        let npc;
-        npc = NPC.CLONE("pub/gaoshou1");
+        let npc = NPC.CLONE("pub/gaoshou1");
         npc.name = defname;
         if (item.userid) {
             this.loadTopUser(item, npc);
@@ -49,7 +51,7 @@ STATS.loadTopUser = function (data, npc) {
         for (let i = 0; i < data.eq.length; i++) {
             let item = data.eq[i];
             if (!item) continue;
-            let obj = OBJ.CREATE(item[0]);
+            let obj = OBJ.CREATE(item[0]) as EQUIPMENT;
             if (!obj) continue;
             obj.load_db(item);
             npc.equipment[i] = obj;

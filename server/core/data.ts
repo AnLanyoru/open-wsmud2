@@ -5,7 +5,7 @@
 // NOTE: 这些依赖通过 TypeScript 编译到 server/dist/ 后路径等价
 import { WORLD } from './world.js';
 import { FAMILIES } from './skill/family.js';
-import { StatsTopEntry } from '../types/index.js';
+import type { StatsTopEntry } from './world.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -186,7 +186,7 @@ const DATA: DataObject = {
         for (const key of FAMS_TATAS) {
             WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
                 undefined,
-                (FAMILIES as Record<string, { name: string }>)[key].name + '弟子',
+                FAMILIES[key].name + '弟子',
             );
         }
     },
