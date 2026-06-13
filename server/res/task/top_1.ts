@@ -48,7 +48,7 @@ export default class extends TASK {
                 content: "你目前在" + topname + "单排名第" +
                     (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                 attach: [
-                    WORLD.COMMANDS.reward?.score_reward?.(i)
+                    WORLD.COMMANDS.reward.score_reward(i)
                 ]
             }));
         }
@@ -74,8 +74,8 @@ export default class extends TASK {
     }
 }
     send_weapons() {
-    const map: Record<string, number> = {};
-    let eqs = WORLD.STATS.EQ_STATS ?? [];
+    const map = {};
+    let eqs = WORLD.STATS.EQ_STATS ?? [];  // todo 这个类型没写好
     for (let stats of eqs) {
         for (let i = 0; i < stats.length; i++) {
             let item = stats[i];
@@ -113,8 +113,8 @@ export default class extends TASK {
     }
 }
     sort_family(fam: FAMILY) {
-    var list: { name: string; id: string }[] = [];
-    var user: { name: string; id: string } | null = null;
+    var list: any[] = [];  // todo 牛魔的黄牛混用
+    var user: USER | null = null;
     if (fam.tops) {
         var max = 0;
         for (var key in fam.tops) {
@@ -134,7 +134,7 @@ export default class extends TASK {
             var last_time = Number.MAX_VALUE;
             for (var i = 0; i < list.length; i++) {
                 var u: USER | undefined = WORLD.getUser(list[i].id);
-                var time = u ? (u.query_temp('last_sm', 1) ?? Date.now()) : Date.now();
+                var time = u ? u.query_temp('last_sm', 1) : Date.now();
 
                 if (time < last_time) {
                     user = list[i];
@@ -144,10 +144,10 @@ export default class extends TASK {
         }
     } else {
         if (fam !== FAMILIES.NONE) return;
-        for (let u of WORLD.USERS) {
-            if (u.family === FAMILIES.NONE && u.query_temp('wg_sr', 0)
-                && u.query_temp('sr', 0)) {
-                list.push({ name: u.name, id: u.id });
+        for (let user of WORLD.USERS) {
+            if (user.family === FAMILIES.NONE && user.query_temp('wg_sr', 0)
+                && user.query_temp('sr', 0)) {
+                list.push(user);
             }
         }
         if (!list.length) return;

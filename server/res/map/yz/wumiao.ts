@@ -33,16 +33,16 @@ export default class MapRoom extends ROOM {
                     let count = WORLD.DATA.add_temp('qmhd1', 1, 3600000 * 24 * 5) as number;
                     if (me.random(count) > 100) {
                         WORLD.DATA.remove_temp('qmhd1');
-                        if (fh_user.add_title) fh_user.add_title("再来一次的", "qmhd");
-                        if ('send' in fh_user) fh_user.send("<hig>你获得了称号【再来一次的】。</hig>");
+                        fh_user.add_title("再来一次的", "qmhd");
+                        fh_user.send("<hig>你获得了称号【再来一次的】。</hig>");
                     }
 
                 } else if (type === 2) {
                     let count = WORLD.DATA.add_temp('qmhd2', 1, 3600000 * 24 * 5) as number;
                     if (me.random(count) > 100) {
                         WORLD.DATA.remove_temp('qmhd2');
-                        if (fh_user.add_title) fh_user.add_title("武庙常客", "qmhd");
-                        if ('send' in fh_user) fh_user.send("<hig>你获得了称号【武庙常客】。</hig>");
+                        fh_user.add_title("武庙常客", "qmhd");
+                        fh_user.send("<hig>你获得了称号【武庙常客】。</hig>");
                     }
                 }
             }

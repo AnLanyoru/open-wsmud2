@@ -3,6 +3,7 @@ import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { SKILL } from "../../../core/skill/skill.js";
 import { SKILL_TYPES } from "../../../core/const.js";
+import type {LianxiState} from "./lianxi";
 
 export default class extends COMMAND {
     command = "study";
@@ -130,8 +131,8 @@ function check_skill(me, book, skill) {
     return true;
 }
 interface StudyState {
-    target: { color_name: string; max_level: number };
-    skill_base: import("../../../core/skill/skill.js").SKILL;
+    target: LianxiState;
+    skill_base: SKILL;
 }
 function do_learn(this: StudyState, me: CHARACTER) {
 

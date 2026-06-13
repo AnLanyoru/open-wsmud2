@@ -13,7 +13,7 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, arg) {
-    var obj: { type: string; dialog: string; items: { id: string; title: string; desc: string; state: any }[] } = {
+    var obj = {
         type: "dialog",
         dialog: "tasks",
         items: [],

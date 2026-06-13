@@ -44,8 +44,7 @@ export default class extends COMMAND {
             if (me.check_command({
                 allow_busy: false, allow_state: false,
                 allow_die: false, allow_faint: false,
-                allow_fight: false,
-                enter: () => true
+                allow_fight: false
             }) == false) return;
 
             if (type == "fb") {
@@ -81,7 +80,7 @@ export default class extends COMMAND {
                         can_sd = me.query_temp('fb_sao' + index, Number(0)) === 1;
                     } else {
                         const sdVal = me.query_temp('fb_sao0', Number(0));
-                        can_sd = sdVal !== undefined && sdVal >= index;
+                        can_sd = sdVal && sdVal >= index;
                     }
                     if (can_sd) {
                         return me.send_commands('cr ' + fb.id, "进入副本", "cr " + fb.id + " 0 1", "扫荡一次",
@@ -401,4 +400,10 @@ const FBS: Record<string, number | AREA> = {
 };
 const JDS: Record<string, number> = {
     heiying: 0,
+
+    // gmp: 4,
+    // gumen: 5,
+    // gzc: 6,
+    // gysd: 7,
+    // yzjd: 8
 };

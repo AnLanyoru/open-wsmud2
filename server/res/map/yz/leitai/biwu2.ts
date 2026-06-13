@@ -22,24 +22,7 @@ export default class MapRoom extends ROOM {
     on_enter(me: CHARACTER) {
         if (!me.is_player) return;
         const room = this;
-        me.die = function (this: CHARACTER, killer?: CHARACTER) {
-            if (this.environment && this.environment.items.length != 2) {
-                return this.send("比武出现问题，请练习管理解决。");
-            }
-            if (!this.environment) return;
-            var p1 = this.environment.items[0];
-            var p2 = this.environment.items[1];
-            if (!p1.is_player || !p2.is_player) {
-                return this.send("比武出现问题，请练习管理解决。");
-            }
-
-            this.die = USER.prototype.die;
-            if (killer) killer.die = USER.prototype.die;
-            this.send_room("<hic>比武结束," + (killer ? killer.name : "") + "获得胜利，5秒钟后将离开擂台。</hic>");
-            if (killer) killer.send("<hig>恭喜你获得胜利，积分+1，目前积分</hig>");
-
-            this.call_out(move_out, 5000);
-        };
+        me.die = challenge_over;
         this.start_time = Date.now();
         me.call_interval(
             function (x: number) {
@@ -101,7 +84,24 @@ export default class MapRoom extends ROOM {
         return me.notify_fail("你比试完才可以下擂台。");
     }
 }
+function challenge_over(this: CHARACTER, killer: CHARACTER) {
+    if (!this.environment) return this.send("比武出现问题，请联系管理解决。");
+    if (this.environment.items.length != 2) {
+        return this.send("比武出现问题，请联系管理解决。");
+    }
+    const p1 = this.environment.items[0];
+    const p2 = this.environment.items[1];
+    if (!p1.is_player || !p2.is_player) {
+        return this.send("比武出现问题，请联系管理解决。");
+    }
 
+    this.die = USER.prototype.die;
+    killer.die = USER.prototype.die;
+    this.send_room("<hic>比武结束," + killer.name + "获得胜利，5秒钟后将离开擂台。</hic>");
+    killer.send("<hig>恭喜你获得胜利，积分+1，目前积分</hig>");
+
+    this.call_out(move_out, 5000);
+};
 function move_out() {
 
 }

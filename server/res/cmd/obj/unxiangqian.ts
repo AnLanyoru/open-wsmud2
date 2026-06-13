@@ -2,6 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { UTIL } from "../../../core/util/util.js";
+import {ITEM} from "../../../core/item";
 
 export default class extends COMMAND {
     command = "unxiangqian";
@@ -79,7 +80,7 @@ export default class extends COMMAND {
         player.send('铁匠：取消镶嵌后恢复装备的孔洞数量，宝石等级越高需要的手艺更精细。');
         return player.notify(str.join(""));
     } else {
-        let st: { id: string; grade: number; path: string; name: string } | null = null, index = 0;
+        let st: ITEM | null = null, index = 0;
         for (index = 0; index < obj.st_prop.length; index++) {
             let item = obj.st_prop[index];
             if (item.id === par) {

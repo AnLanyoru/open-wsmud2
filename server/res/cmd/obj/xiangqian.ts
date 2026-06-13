@@ -1,6 +1,7 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
+import type {ITEM} from "../../../core/item";
 
 export default class extends COMMAND {
     command = "xiangqian";
@@ -36,16 +37,16 @@ export default class extends COMMAND {
         }
         return;
     }
-    var items: import("../../../core/item.js").ITEM[] = [];
-    for (var i = 0; i < player.items.length; i++) {
+        const items: ITEM[] = [];
+        for (let i = 0; i < player.items.length; i++) {
         if (player.items[i].is_stone) {
             items.push(player.items[i]);
         }
     }
     if (!items.length) return player.notify("你身上没有可以镶嵌的宝石。");
-    var str = ['{type:"dialog",dialog:"pack",xqdesc:\"',
-        obj.color_name, "\",id:\"", obj.id, "\",stones:["];
-    for (var i = 0; i < items.length; i++) {
+        const str = ['{type:"dialog",dialog:"pack",xqdesc:\"',
+            obj.color_name, "\",id:\"", obj.id, "\",stones:["];
+        for (let i = 0; i < items.length; i++) {
         if (i > 0) str.push(",");
         str.push("{name:\"");
         str.push(items[i].name);

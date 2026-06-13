@@ -24,7 +24,7 @@ function climb_tree(me: CHARACTER, par?: string) {
     if (me.gender == 1) {
         leave_msg = me.name + "战战兢兢的抓住树干往上爬去。";
     } else {
-        leave_msg = me.per > 40 ? me.name + "轻轻一跳，衣裙飘飘，象仙子般飞上大榕树。" : me.name + "战战兢兢地拉着大榕树的盘根，屁股一扭一扭地往上爬。";
+        leave_msg = me.per > 40 ? me.name + "轻轻一跳，衣裙飘飘，犹如仙子般飞上大榕树。" : me.name + "战战兢兢地拉着大榕树的盘根，缓慢地往上爬去。";
     }
     var in_msg: string | null = null;
 

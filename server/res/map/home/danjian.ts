@@ -52,7 +52,9 @@ export default class MapRoom extends ROOM {
 }
     on_npc_create(me, npc) {
     if (!npc) return;
-    if (npc.environment && npc.environment.parent.id == "home") return;
+    if (npc.environment && npc.environment.parent.id == "home") {
+        if (!npc.team || npc.team != me.team) return;
+    }
     if (!npc.hp) npc.hp = 1;
     if (npc.state) npc.set_state(null);
     npc.moveto(this, npc.name + "离开了。", npc.name + "走了过来。");

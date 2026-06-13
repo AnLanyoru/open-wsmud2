@@ -10,6 +10,7 @@ import type { CHARACTER } from '../char/character.js';
 import { PROPERTIES, SKILL_TYPES } from "../const.js";
 
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
 
 
@@ -289,7 +290,7 @@ export class SKILL extends BASE {
     on_recount_dodge?: (me: CHARACTER) => number;
     /** 重算招架回调（由资源文件动态注入） */
     on_recount_parry?: (me: CHARACTER) => number;
-    /** 内功加成比例 */
+    /** 内功转血比例 */
     force_rad?: number;
     /** 复活回调（由 biwu 等系统动态注入） */
     on_relive?: (me: CHARACTER) => void;

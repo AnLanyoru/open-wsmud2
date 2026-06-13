@@ -3,6 +3,7 @@ import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { SKILL } from "../../../core/skill/skill.js";
 
+//查看不在同一房间的
 export default class extends COMMAND {
     command = "look3";
     allow_busy = true;

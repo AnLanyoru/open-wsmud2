@@ -11,7 +11,9 @@ export default class extends COMMAND {
     regex = /^(\w+)(?:\s(\w+))?$/;
 
     /**
-     * @param {CHARACTER} player - 执行命令的角色
+     * @param  player - 执行命令的角色
+     * @param skid
+     * @param from
      */
     enter(player, skid, from) {
     var skill_base = SKILL.get(skid);
@@ -39,7 +41,7 @@ export default class extends COMMAND {
             }
         }
     }
-    var obj: { type: string; dialog: string; is_custom?: number; id: string; desc: string } = {
+    var obj  = {
         type: "dialog",
         dialog: "skills",
         id: skid,

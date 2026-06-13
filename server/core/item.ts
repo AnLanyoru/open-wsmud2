@@ -13,6 +13,7 @@ import type { ActionDef, ActionMap } from '../types/base.js';
 // ITEM 类
 // ============================================================
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export class ITEM extends BASE {
 
     constructor() {
@@ -331,7 +332,7 @@ export class ITEM extends BASE {
      * @param func - 回调，返回 false 停止遍历
      * @param parent - 父容器，默认 this
      */
-    each_item(func: (item: ITEM) => boolean | void, parent?: ITEM): void {
+    each_item(func: (item: ITEM) => boolean | void, parent?: ITEM | ROOM): void {
         if (!func) return;
         parent = parent || this;
         if (!parent.items) return;

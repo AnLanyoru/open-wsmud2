@@ -1,7 +1,7 @@
 import { ROOM } from "../../../core/room/room.js";
 import { WORLD } from "../../../core/world.js";
 import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util/util.js";
+import { UTIL } from "../../../core/util";
 import { NPC } from "../../../core/char/npc.js";
 import { USER } from "../../../core/char/user.js";
 import { USERTASK } from "../../../core/task/playertask.js";
@@ -9,6 +9,7 @@ import { COMMAND } from "../../../core/command.js";
 import type { CHARACTER } from "../../../core/char/character.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 
+// todo 太多了审核不完，记得review
 export default class MapRoom extends ROOM {
     name = "第一层";
     desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
@@ -67,11 +68,11 @@ export default class MapRoom extends ROOM {
                 this.hp = 1;
                 return false;
             }
-            var level = (me.query_temp("wd_level", 0) as number) + 1;
+            let level = (me.query_temp("wd_level", 0) as number) + 1;
             if (level >= 90) {
                 me.hp = me.max_hp;
                 me.mp = me.max_mp;
-                var rmNpc = room.environment?.find_by_path("pub/wudao");
+                let rmNpc = room.environment?.find_by_path("pub/wudao");
                 if (rmNpc && 'destroy' in rmNpc) {
                     (rmNpc as unknown as { destroy: () => void }).destroy();
                 }
@@ -80,7 +81,7 @@ export default class MapRoom extends ROOM {
             } else {
                 me.hp = 1;
                 me.notify("<hir>你的挑战失败了。</hir>");
-                var rmNpc = room.environment?.find_by_path("pub/wudao");
+                let rmNpc = room.environment?.find_by_path("pub/wudao");
                 if (rmNpc && 'do_kill' in rmNpc) {
                     (rmNpc as unknown as { end_fight: () => false; full: () => void }).end_fight();
                     (rmNpc as unknown as { end_fight: () => false; full: () => void }).full();
@@ -115,10 +116,10 @@ export default class MapRoom extends ROOM {
     }
     reward3(me: CHARACTER, count: number) {
 
-        var items: { obj: string[]; count?: number }[] = [];
+        let items: { obj: string[]; count?: number }[] = [];
         if (count > 100) count = 100;
 
-        var lv = 10000 + count * 1000;
+        let lv = 10000 + count * 1000;
         me.add_exp(lv, lv);
 
         items.push({
@@ -129,21 +130,21 @@ export default class MapRoom extends ROOM {
             obj: ["st/st_gre#2", "st/st_red#2", "st/st_yel#2", "st/st_blu#2"]
         });
 
-        var created: any[] = OBJ.create_by_odds(items);
-        for (var i = 0; i < created.length; i++) {
-            var item = me.add_obj(created[i]);
-            var cnt = created[i].count || 1;
+        let created = OBJ.create_by_odds(items);
+        for (let i = 0; i < created.length; i++) {
+            let item = me.add_obj(created[i]);
+            let count = created[i].count || 1;
             if (item) {
-                me.send("你获得了" + UTIL.to_c(cnt) + item.unit + item.color_name + "。");
+                me.send("你获得了" + UTIL.to_c(count) + item.unit + item.color_name + "。");
             }
         }
     }
     on_leave(me: CHARACTER, dir: string) {
-        var level = (me.query_temp("wd_level", 0) as number) + 1;
+        let level = (me.query_temp("wd_level", 0) as number) + 1;
         if (me.query_temp('wudao_o')) level = 100;
-        var roomNpc: CHARACTER | OBJ | NPC | undefined = this.find_by_path(level == 100 ? "pub/wudao_boss" : "pub/wudao");
+        let roomNpc: CHARACTER | OBJ | NPC | undefined = this.find_by_path(level == 100 ? "pub/wudao_boss" : "pub/wudao");
         if (dir == "up") {
-            if (roomNpc && 'name' in roomNpc) {
+            if (roomNpc) {
                 return me.notify_fail(roomNpc.name + "对你说道：打败我，你就可以上去。");
             }
             if (this.items.length > 1) {
@@ -154,9 +155,7 @@ export default class MapRoom extends ROOM {
                     }
                 }
                 for (let item of npcs) {
-                    if ('do_kill' in item) {
-                        item.destroy();
-                    }
+                    item.destroy();
                 }
             }
             if (level >= 100) {

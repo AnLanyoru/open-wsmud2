@@ -25,7 +25,7 @@ USER.prototype.send_question = function (npc, list, callbacks) {
     let str = ['<div class="sel">'];
     for (let i = 0; i < list.length; i++) {
         if (str.length > 1) str.push('\n');
-        str.push(i + 1, '、', '<cmd cmd="answer ', npc.id, ' ', i + 1, '">', list[i], '</cmd>');
+        str.push((i + 1).toString(), '、', '<cmd cmd="answer ', npc.id, ' ', (i + 1).toString(), '">', list[i], '</cmd>');
     }
     str.push('</div>');
     this.send(str.join(''));

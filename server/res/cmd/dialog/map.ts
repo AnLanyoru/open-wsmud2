@@ -1,6 +1,7 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
+import {AREA} from "../../../core/room/area";
 
 export default class extends COMMAND {
     command = "map";
@@ -26,7 +27,7 @@ export default class extends COMMAND {
     }
     var path = area + "/"
     if (this.buffer[area]) return me.send(this.buffer[area]);
-    var area_obj: import("../../../core/room/area.js").AREA | null = null;
+    var area_obj: AREA | null = null;
     for (var i = 0; i < WORLD.AREAS.length; i++) {
         if (path == WORLD.AREAS[i].room_path) {
             area_obj = WORLD.AREAS[i];
@@ -44,7 +45,7 @@ export default class extends COMMAND {
     update_map(id, rm, pos) {
     this.buffer[id] = null;
     if (!rm) {
-        var area_obj: import("../../../core/room/area.js").AREA | null = null;
+        var area_obj: AREA | null = null;
         for (var i = 0; i < WORLD.AREAS.length; i++) {
             if (id == WORLD.AREAS[i].room_path) {
                 area_obj = WORLD.AREAS[i];

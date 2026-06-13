@@ -52,7 +52,7 @@ export default class extends COMMAND {
 
 
         if (key == "no_message") {
-            me.no_message = (value == 1) ? true : false;
+            me.no_message = (value == 1);
         }
         me.set_setting(key, value);
 

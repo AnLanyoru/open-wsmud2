@@ -2,6 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { FOLLOWER } from "../../../core/char/follower.js";
+import {USER} from "../../../core/char/user";
 
 export default class extends COMMAND {
     command = "relation";
@@ -63,7 +64,7 @@ export default class extends COMMAND {
         str.push("分后才可以另行收徒或拜师\"");
     }
     if (me.query_temp("husband")) {
-        var husband: { color_name?: string } | null = null;// WORLD.getUser(me.query_temp("husband"));
+        var husband: USER | null = null;// WORLD.getUser(me.query_temp("husband"));
         str.push(",husband:\"");
         if (husband) {
             str.push(husband.color_name ?? "");
@@ -72,7 +73,7 @@ export default class extends COMMAND {
         }
         str.push("\"");
     } else if (me.query_temp("wife")) {
-        var wife: { color_name?: string } | null = null;// WORLD.getUser(me.query_temp("wife"));
+        var wife: USER | null = null;// WORLD.getUser(me.query_temp("wife"));
         str.push(",wife:\"");
         if (wife) {
             str.push(wife.color_name ?? "");

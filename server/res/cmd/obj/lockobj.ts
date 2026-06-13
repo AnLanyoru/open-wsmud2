@@ -8,9 +8,7 @@ export default class extends COMMAND {
     allow_die = true;
     allow_faint = true;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
+
     enter(me, objid) {
     var obj = me.find_obj(objid);
     if (!obj) {

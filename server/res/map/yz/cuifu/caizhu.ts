@@ -1,4 +1,6 @@
 import { ROOM } from "../../../../core/room/room.js";
+import type {NPC} from "../../../../core/char/npc";
+import type {USER} from "../../../../core/char/user";
 
 export default class extends ROOM {
     name = "大门";
@@ -12,11 +14,11 @@ export default class extends ROOM {
         ]);
     }
 
-    on_enter(me) {
+    on_enter(me: NPC) {
     if (me.is("yz/cuifu/yahuan")) {
-        var player = me.follow_target;
+        var player = me.follow_target as USER;
         if (!player || !player.is_here(me)) return;
-        if ( player.can_follow("yz/cuifu/yahuan")) {
+        if ( player.can_follow(me)) {
             me.do_follow(null);
             player.notify("眼看就要走到门外，丫鬟却站在原地不动了。");
             player.notify("丫鬟垂首说道：这位大人，小女子已无家可归，还望大人收留！");

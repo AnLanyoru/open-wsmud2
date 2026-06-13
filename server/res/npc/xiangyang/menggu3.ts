@@ -16,7 +16,6 @@ export default class extends NPC {
         gj: 7000,
         fy: 7000,
         mz: 7000,
-        zj: 7000,
         zj: 1500,
         ds: 4000
     };

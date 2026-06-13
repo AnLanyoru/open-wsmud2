@@ -8,7 +8,6 @@ export default class extends COMMAND {
     allow_busy = true;
     allow_state = true;
     allow_die = true;
-    allow_level = 6;
     regex = /^(\w+)\s(.+)$/;
 
     /**

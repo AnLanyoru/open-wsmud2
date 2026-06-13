@@ -57,6 +57,7 @@ import type { EventItem } from './task/events.js';
 // 常量
 // ============================================================
 
+// todo 需要检查一下和第一次提交的js文件的不同
 /** 排行榜保存时需复制的玩家属性列表 */
 export const COPY_PROPS = [
   'str', 'con', 'dex', 'int', 'gender', 'max_mp', 'exp', 'pot',

@@ -4,6 +4,7 @@ import { WORLD } from "../../../core/world.js";
 import { OBJ } from "../../../core/item/obj.js";
 import { UTIL } from "../../../core/util/util.js";
 
+// todo 不能完全确定是好的
 interface ShopItem {
     name?: string;
     unit?: string;

@@ -44,7 +44,7 @@ export default class extends COMMAND {
         }
 
     }
-    if (me.environment?.no_fight && !pfm.allow_safe) return me.notify("这里不允许战斗。");
+    if (me.environment.no_fight && !pfm.allow_safe) return me.notify("这里不允许战斗。");
 
 
     var name = "【" + pfm.name + "】";
@@ -61,10 +61,10 @@ export default class extends COMMAND {
     if (me.mp < pfm.query_mp(me, lv)) {
         return me.notify("你的内力不够，无法使用" + name);
     }
-    if (pfm.check?.(me, lv, sk) === false) return;
-
+    if (pfm.check && !pfm.check(me,
+        lv, sk)) return;
     if (pfm.enable_skill && pfm.enable_skill != sk) {
-        return me.notify(name + "需要装备为" + (SKILL.get(pfm.enable_skill)?.name ?? pfm.enable_skill) + "才可以使用。");
+        return me.notify(name + "需要装备为" + SKILL.get(pfm.enable_skill).name + "才可以使用。");
     }
     if (sk === "throwing" && !me.can_throwing()) {
         return me.notify("你没有装备暗器，无法使用" + name);
@@ -84,7 +84,7 @@ export default class extends COMMAND {
         //     }
         // }
     }
-    if (!pfm.no_check && pfm.check?.(me, lv) === false) {
+    if (pfm.check && !pfm.no_check && !pfm.check(me, lv)) {
         return;
     }
     var key = "pfm/" + sk + "/" + pfmid;
@@ -119,26 +119,26 @@ export default class extends COMMAND {
             //me.attack_skill = sp_skill;
             me.remove_status('weapon', true);
         }
-        isrelease = pfm.use?.(me, target, lv, sk) !== false;
+        isrelease = pfm.use(me, target, lv, sk) != false;
     }
 
 
 
 
     if (isrelease) {
-        me.add_mp(-(pfm.query_mp?.(me, lv) ?? 0));
+        me.add_mp(-pfm.query_mp(me, lv) || 0);
         //释放成功才算释放时间
         // if (!pfm.use_type) {
         //     //保存目标被释放的技能
         //     me.set_temp("used_pfm", pfm.id, 20000);
         // }
         me.set_temp("used_pfm", pfm.id, 20000);
-        var time = pfm.query_releasetime?.(me, lv) ?? 0;
+        var time = pfm.query_releasetime(me, lv) ?? 0;
         if (time) me.release_time = time + now;
         else me.release_time = 0;
 
-        var distime = pfm.query_distime?.(me, lv, is_ref) ?? 0;
-        var rtime = isrelease ? (pfm.query_releasetime?.(me, lv) ?? 0) : 0;
+        var distime = pfm.query_distime(me, lv, is_ref);
+        var rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
         me.set_temp(key, 1, distime + rtime);
         me.notify('{type:"dispfm",id:"' + sk + "." + pfmid + '",rtime:'
@@ -158,6 +158,7 @@ const NOWEAPON = {
     "unarmed": true, "dodge": true,
     "parry": true, throwing: true
 };
+
 const WEAPON = {
     sword: "sword",
     blade: "blade",
@@ -165,3 +166,13 @@ const WEAPON = {
     club: "club",
     whip: "whip"
 };
+
+// WEAPON_TYPE = {
+//     NONE: "unarmed",
+//     SWORD: "sword",
+//     BLADE: "blade",
+//     STAFF: "staff",
+//     CLUB: "club",
+//     WHIP: "whip",
+//     THROWING: "throwing"
+// }

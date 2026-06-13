@@ -14,10 +14,10 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.set_objects([
-            "eq/lv0/cloth", 1, 1,
-            "eq/lv0/dao", 1, 1
-        ]);
+        this.set_objects(
+            ["eq/lv0/cloth", 1, 1],
+            ["eq/lv0/dao", 1, 1]
+        );
         this.skill_map(
             ["dodge", 200],
             ["parry", 200],
@@ -47,7 +47,7 @@ export default class extends NPC {
         if (item.path == this.path) {
             item.do_kill(me);
         }
-    }, this.environment);
+    }, this.environment); // todo  运行时环境似乎必定存在，需要查验
 }
     on_die(killer) {
     var ishas = false;

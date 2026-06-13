@@ -17,6 +17,7 @@ import type { ROOM } from '../room/room.js';
 // MONSTER 类
 // ============================================================
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export class MONSTER extends CHARACTER {
 
   // ============ 核心属性 ============

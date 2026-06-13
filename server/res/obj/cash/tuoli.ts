@@ -46,9 +46,9 @@ export default class extends OBJ {
         }
         me.send_room("<hiy>$N义无反顾的拿出叛师符，嘴里念念有词...\n\n</hiy>");
         if (sum) {
-            me.notify("<hig>你遗忘的武功转化为" + parseInt(String(sum)) + "点潜能。</hig>");
+            me.notify("<hig>你遗忘的武功转化为" + parseInt(sum) + "点潜能。</hig>");
 
-            me.pot += parseInt(String(sum));
+            me.pot += parseInt(sum);
         }
         if (up_count > 0) {
             let obj = me.add_obj('book/up', up_count);
@@ -65,7 +65,7 @@ export default class extends OBJ {
         });
         let fam = me.family;
         me.family = FAMILIES.NONE;
-        me.add_title?.("普通百姓", "family");
+        me.add_title("普通百姓", "family");
         me.remove_temp("master");
 
         //me.remove_temp("master");

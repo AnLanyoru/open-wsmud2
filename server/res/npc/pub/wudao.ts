@@ -1,5 +1,5 @@
 import { NPC } from "../../../core/char/npc.js";
-import { UTIL } from "../../../core/util/util.js";
+import { UTIL } from "../../../core/util";
 
 export default class extends NPC {
     name = "";

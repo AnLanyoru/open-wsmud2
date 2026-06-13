@@ -31,6 +31,7 @@ export interface StoneEntry {
     grade: number;
 }
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export class EQUIPMENT extends OBJ {
 
     constructor() {
@@ -94,7 +95,7 @@ export class EQUIPMENT extends OBJ {
     // ============ 回调函数（由资源文件覆写） ============
 
     /** 套装属性计算 — 触发时机：get_desc()/check_group() 查询套装效果时；传入已装备同套装件数 */
-    group_prop?: (count: number) => Record<string, number> | undefined | void;
+    group_prop?(count: number): Record<string, number>;
     /** 装备时回调 — 触发时机：eq() 开头，条件检查通过后、属性加成应用前；返回 false 阻止装备 */
     on_eq?: ((me: CHARACTER) => boolean | void);
     /** 卸下时回调 — 触发时机：uneq() 开头，属性移除之前 */

@@ -2,6 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 
+//只能看排行榜的物品
 export default class extends COMMAND {
     command = "look1";
     allow_busy = true;

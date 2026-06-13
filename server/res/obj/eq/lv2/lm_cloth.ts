@@ -15,7 +15,7 @@ export default class extends EQUIPMENT {
     };
     group_name = "lm2";
 
-    group_prop(count) {
+    group_prop(count: number) {
     if (count == 3) {
         return {
             int: 10

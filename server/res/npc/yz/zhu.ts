@@ -59,7 +59,7 @@ export default class extends NPC {
     if (obj != "money") return false;
 
     me.add_temp("learn/zhu", count);
-    me.notify("朱熹点了点头，说道：哦，向你这麽有心的学生还真是不多见，好好努力。");
+    me.notify("朱熹点了点头，说道：哦，像你这么有心的学生还真是不多见，好好努力。");
 
     return true;
 }

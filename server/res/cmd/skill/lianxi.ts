@@ -81,9 +81,9 @@ export default class extends COMMAND {
 }
 }
 
-interface LianxiState {
+export interface LianxiState {
     max_level: number;
-    skill_base: import("../../../core/skill/skill.js").SKILL;
+    skill_base: SKILL;
     queues: { skid: string; max_level: number }[];
     sum_pot: number;
 }

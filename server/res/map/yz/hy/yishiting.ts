@@ -31,10 +31,10 @@ export default class MapRoom extends ROOM {
 
     on_enter(me: CHARACTER) {
     if (me.is_player) {
-        let npc = this.find_by_path('yz/hy/tiehu');
-        if (npc && 'fight_type' in npc) {
-            if ('on_kill' in npc && typeof npc.on_kill === 'function') npc.on_kill(me);
-            if ('do_kill' in npc && typeof npc.do_kill === 'function') npc.do_kill(me);
+        let npc = this.find_by_path('yz/hy/tiehu') as NPC;
+        if (npc && !npc.fight_type) {
+          npc.on_kill(me);
+          npc.do_kill(me);
         }
     }
 }

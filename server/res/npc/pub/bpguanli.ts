@@ -31,7 +31,7 @@ export default class extends NPC {
                 str.push(String((pt.level + 3) * 200));
             }
             me.send(str.join(""));
-            if ((me.query_temp('pt_lv', 0) ?? 0) < 5) {
+            if (me.query_temp('pt_lv', 0) < 5) {
                 me.send_commands("party fam", "开启帮派战",
                     "party boss", "发送英雄帖",
                     "party xiangyang", "守卫襄阳",
@@ -57,7 +57,7 @@ export default class extends NPC {
         this.add_action("levelup2", "设施升级", function (me: CHARACTER, par: string) {
             var pt = me.query_party?.();
             if (!pt) return me.notify("你还没有加入帮派。");
-            if ((me.query_temp('pt_lv', 0) ?? 0) > 1) {
+            if (me.query_temp('pt_lv', 0) > 1) {
                 return me.notify("你没有权限升级设施。");
             }
             var exp = pt.query_exp();

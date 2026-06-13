@@ -1,6 +1,7 @@
 /**
  * WebSocket/TCP 网络层实现
  * 支持多种WebSocket协议版本及原始TCP
+ * todo 不知道ai改了个啥，记得review
  */
 
 import { createRequire } from 'module';

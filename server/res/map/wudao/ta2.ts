@@ -1,6 +1,6 @@
 import { ROOM } from "../../../core/room/room.js";
 import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
+import { UTIL } from "../../../core/util";
 import { NPC } from "../../../core/char/npc.js";
 import { USER } from "../../../core/char/user.js";
 import { COMMAND } from "../../../core/command.js";
@@ -59,21 +59,15 @@ export default class extends ROOM {
             }
             this.hp = this.max_hp;
             this.mp = this.max_mp;
-            var rm_npc = this.environment?.find_by_path("pub/wudao");
-            if (rm_npc && 'destroy' in rm_npc) {
-                (rm_npc as unknown as { destroy: () => void }).destroy();
-            }
+            let rm_npc = this.environment.find_by_path("pub/wudao");
+            rm_npc && rm_npc.destroy();
             this.moveto('wudao/ding');
             this.notify("<hir>你的挑战失败了。</hir>");
         };
-        let npc = this.items[0];
+        let npc = this.items[0] as NPC;
         if (npc && !npc.is_player) {
-            if ('do_kill' in npc) {
-                me.do_kill(npc);
-            }
-            if ('on_kill' in npc && typeof npc.on_kill === 'function') {
-                npc.on_kill(me);
-            }
+            me.do_kill(npc);
+            npc.on_kill(me);
         }
     }
     on_reward(me: CHARACTER, lv: number) {

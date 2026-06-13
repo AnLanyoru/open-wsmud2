@@ -16,6 +16,7 @@ let _ROOM: {
 } | null = null;
 import("./room.js").then((m: Record<string, any>) => { _ROOM = m.ROOM as any; });
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export class AREA {
 
     // ============ 核心属性 ============
@@ -200,6 +201,14 @@ export class AREA {
     query_exp(): number {
         const lv = this.fb_index || 0;
         return 1000 + lv * 100;
+    }
+
+    /**
+     * 查询区域潜能奖励
+     */
+    query_pot(): number {
+        if (this.pot >= 0 && this.pot != 1000) return this.pot;
+        return this.query_exp();
     }
 
     /**

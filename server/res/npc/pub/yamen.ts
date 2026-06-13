@@ -1,6 +1,6 @@
 import { NPC } from "../../../core/char/npc.js";
 import { UTIL } from "../../../core/util/util.js";
-
+// todo 逃犯没做
 export default class extends NPC {
     name = "逃犯";
     desc = "他是衙门正在追捕的逃犯";

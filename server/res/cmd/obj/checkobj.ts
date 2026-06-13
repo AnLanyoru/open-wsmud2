@@ -57,7 +57,7 @@ export default class extends COMMAND {
 }
 
 function query_obj_desc(player,obj, type) {
-    var json: { type: string; dialog: string; from: string; id: string; desc: string; commands?: { cmd: string; name: string }[] } = {
+    var json = {
         type: "dialog",
         dialog: "pack",
         from: type,

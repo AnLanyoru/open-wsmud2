@@ -11,11 +11,11 @@ import type { CHARACTER } from "../char/character.js";
 export class USERTASK extends BASE {
 
     /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
-    on_create(player?: CHARACTER): any { return undefined; }
+    on_create?(player?: CHARACTER): any;
     /** 任务启动回调（由资源文件动态注入） */
-    on_start(player?: CHARACTER): any { return undefined; }
+    on_start?(player?: CHARACTER): any;
     /** 任务完成回调（由资源文件动态注入） */
-    on_finish(player?: CHARACTER, par?: string): any { return undefined; }
+    on_finish?(player?: CHARACTER, par?: string): any;
     /** 放弃任务回调（由资源文件动态注入） */
     giveup?(player?: CHARACTER): any;
 

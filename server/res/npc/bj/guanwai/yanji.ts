@@ -47,5 +47,9 @@ export default class extends NPC {
                 obj: ["book/bc#hujiadaofa", "sp/bj/yanji"],
                 odds: 3000
         });
+        this.set_chat_msg([
+            "阎基摸了摸怀里的刀谱残页，阴恻恻地冷笑一声。",
+            "阎基说道：胡家的人还想找我报仇？哼，先保住自己的命吧。"
+        ]);
     }
 }

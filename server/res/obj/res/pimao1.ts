@@ -7,5 +7,5 @@ export default class extends OBJ {
     value = 10;
     combined = true;
     transable = true;
-    otype = 3;
+    otype = 3;  // todo 问下ai这玩意是啥
 }

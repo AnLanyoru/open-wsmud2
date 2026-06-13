@@ -27,6 +27,7 @@ const FAMS_TATAS: string[] = [
 // DATA 单例
 // ============================================================
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export interface DataObject {
     /** 队伍数据 */
     parties: Map<string, any>;

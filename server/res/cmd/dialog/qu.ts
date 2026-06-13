@@ -2,6 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { UTIL } from "../../../core/util/util.js";
 import { ITEM } from "../../../core/item.js";
+import {OBJ} from "../../../core/item/obj";
 
 export default class extends COMMAND {
     command = "qu";
@@ -16,13 +17,13 @@ export default class extends COMMAND {
     if (!arg) return me.notify("你要取什么东西？");
 
     me.items = me.items || [];
-    var obj: { remove_item_byid: (id: string, count?: number) => ITEM | null | undefined; items: ITEM[] } = {
+    let obj = {
         remove_item_byid: me.remove_item_byid.bind(me),
         items: me.stores || [],
     };
-    var move_count = 1;
+    let move_count = 1;
     if (count) move_count = parseInt(count);
-    var moved_obj = obj.remove_item_byid(arg, move_count);
+    let moved_obj = obj.remove_item_byid(arg, move_count);
     if (!moved_obj) return me.notify("你的仓库里没有这样东西。");
 
     moved_obj = me.push_item(moved_obj);

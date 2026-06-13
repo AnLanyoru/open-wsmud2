@@ -8,6 +8,7 @@ import { UTIL } from "../../../core/util/util.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
 import type { StatsTopEntry } from "../../../core/world.js";
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
     command = "biwu";
     allow_busy = true;
@@ -76,10 +77,7 @@ export default class extends COMMAND {
         room.on_heart_beat = this.on_heart_beat;
         room.biwu_step = 0;
         me.auto_pfm = true;
-        const checkPfm = this.check_pfms;
-        me.check_pfms = function (this: CHARACTER, target: CHARACTER): boolean | undefined {
-            return checkPfm.call(this, target);
-        };
+        me.check_pfms = this.check_pfms;
         me.init_pfms = this.init_pfms;
 
         npc.fight_type = 0;
@@ -114,16 +112,16 @@ export default class extends COMMAND {
     }
 
     on_heart_beat(this: ROOM, _dt: number) {
-        this.biwu_step = (this.biwu_step || 0) + 1;
-        if (this.biwu_step! < 60) return;
+        this.biwu_step++;
+        if (this.biwu_step < 60) return;
         if (!this.items.length) {
             return;
         }
-        let me: CHARACTER = this.items[0] as unknown as CHARACTER;
-        let npc: CHARACTER | undefined = this.items[1] as unknown as CHARACTER;
+        let me: CHARACTER = this.items[0] as CHARACTER;
+        let npc: CHARACTER | undefined = this.items[1] as CHARACTER;
         if (npc && npc.is_player) {
             me = npc;
-            npc = this.items[0] as unknown as CHARACTER;
+            npc = this.items[0] as CHARACTER;
         }
         me.end_fight();
         npc?.end_fight();
@@ -179,9 +177,9 @@ export default class extends COMMAND {
             npc.top_index = top_npc.top_index;
         }
 
-        for (const key of COPY_TEMPS) {
-            const value = player.temp ? player.temp[key] : undefined;
-            if (value != null) {
+        for (let key of COPY_TEMPS) {
+            let value = player.query_temp(key);
+            if (value) {
                 npc.set_temp(key, value);
             }
         }
@@ -192,7 +190,7 @@ export default class extends COMMAND {
         npc.check_pfms = this.check_pfms;
         npc.init_pfms = this.init_pfms;
 
-        if (npc.force_skill?.on_relive) {
+        if (npc.force_skill.on_relive) {
             npc.force_skill.on_relive(npc);
         }
 
@@ -219,7 +217,7 @@ export default class extends COMMAND {
         this.ds = parseInt((this.dex / 2 + this.query_prop("ds") + this.query_prop("dex") * this.dex / 10) * (100 + this.query_prop("ds_per")) / 100);
         this.zj = parseInt((this.str / 2 + this.query_prop("zj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("zj_per")) / 100);
         this.bj = parseInt(this.dex / 10 + this.query_prop("bj_per"));
-        if (this.parry_skill.on_recount_parry) {
+        if (this.parry_skill?.on_recount_parry) {
             this.zj += this.parry_skill.on_recount_parry(this);
         }
         if (this.dodge_skill?.on_recount_dodge) {
@@ -239,10 +237,10 @@ export default class extends COMMAND {
             return this.equip(this.items![0]);
         }
         if ((this.auto_eqs?.length || 0) > 0 && this.random(3) === 1) {
-            const eqs: EQUIPMENT[] = [];
+            let eqs: EQUIPMENT[] = [];
             for (let i = 0; i < this.auto_eqs!.length; i++) {
-                const obj = this.auto_eqs![i];
-                const key = "disobj_" + (obj.distype || obj.id);
+                let obj = this.auto_eqs![i];
+                let key = "disobj_" + (obj.distype || obj.id);
                 if (obj.distime && this.query_temp(key)) {
                     continue;
                 }
@@ -265,9 +263,9 @@ export default class extends COMMAND {
     init_pfms(this: CHARACTER & { auto_eqs?: EQUIPMENT[] }) {
         CHARACTER.prototype.init_pfms.call(this);
         this.auto_eqs = [];
-        for (let i = 1; i < (this.equipment?.length || 0); i++) {
-            if (this.equipment![i]?.on_use) {
-                this.auto_eqs.push(this.equipment![i]!);
+        for (let i = 1; i < (this.equipment.length || 0); i++) {
+            if (this.equipment[i].on_use) {
+                this.auto_eqs.push(this.equipment[i]);
             }
         }
     }
@@ -279,7 +277,7 @@ export default class extends COMMAND {
             const title = "天下第" + TOPS[index];
             player.add_title?.(title, "top");
             player.notify("<hiy>你的高手榜称号变动为【" + title + "】。</hiy>");
-        } else player.add_title?.(null, "top");
+        } else player.add_title(null, "top");
     }
 
     checkStats(player: CHARACTER) {
@@ -314,7 +312,7 @@ export default class extends COMMAND {
         const top_key = fam ? "top_fam" : "top";
         if (index > 0) {
             top.top_index = index + 1;
-            top.userid = top.userid;
+            top.id = "top_" + (fam ? fam.toUpperCase() : "") + "_" + index;
             if (top_user) {
                 top_user.set_temp(top_key, index + 1);
                 this.setStatsTitle(top_user, index, fam);

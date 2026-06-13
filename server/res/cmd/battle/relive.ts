@@ -9,9 +9,7 @@ export default class extends COMMAND {
     command = "relive";
     allow_die = true;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
+
     enter(me, arg) {
     if (!WORLD.is_server(me)) {
         return WORLD.on_cross_user_relive(me);

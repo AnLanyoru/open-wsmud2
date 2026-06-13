@@ -31,6 +31,7 @@ declare global {
 // 本地类型定义
 // ============================================================
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export interface SkillData {
   /** 技能等级 */
   level: number;
@@ -158,7 +159,7 @@ interface CommandDef {
   /** 参数正则匹配 */
   regex?: RegExp;
   /** 命令执行函数 */
-  enter: (me: CHARACTER, ...args: string[]) => boolean | void;
+  enter?: (me: CHARACTER, ...args: string[]) => boolean | void;
   /** 所需最低权限等级 */
   allow_level?: number;
   /** 是否允许死亡状态执行 */
@@ -192,6 +193,10 @@ interface AutoSkillEntry {
 
 /** 角色状态 — StatusDef 的运行时扩展 */
 interface CharacterStatus extends StatusDef {
+  /** 标识符 */
+  id?: string;
+  /** 状态名字 */
+  name?: string;
   /** 最大叠加层数 */
   max_count?: number;
   /** 是否不受减免影响 */
@@ -216,6 +221,8 @@ interface CharacterStatus extends StatusDef {
   is_shadow?: boolean;
   /** 是否免疫控制 */
   ig_control?: boolean;
+  /** 是否是昏迷类型状态，无知觉 */
+  is_faint?: boolean;
   /** 间隔触发次数上限 */
   duration_count?: number;
   /** 已触发的间隔次数 */
@@ -226,6 +233,8 @@ interface CharacterStatus extends StatusDef {
   start_time?: number;
   /** 当前叠加层数 */
   count?: number;
+  /** 持续时间 */
+  duration?: number;
 }
 
 // Declaration for global runtime constants
@@ -1681,7 +1690,7 @@ export class CHARACTER extends ITEM {
         if (!this.equipment) this.equipment = [];
         this.equipment[obj.eq_type] = obj as EQUIPMENT;
       } else {
-        this.items!.push(obj as ITEM);
+        this.items.push(obj as ITEM);
       }
     }
   }

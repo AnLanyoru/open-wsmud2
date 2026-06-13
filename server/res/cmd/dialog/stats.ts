@@ -5,6 +5,7 @@ import { EQUIP_TYPE } from "../../../core/const.js";
 import type { StatsTopEntry, ScoreRankEntry, WeaponRankEntry } from "../../../core/world.js";
 import type { USER } from "../../../core/char/user.js";
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
     command = "stats";
     allow_busy = true;

@@ -18,7 +18,7 @@ export default class extends COMMAND {
         for (let i = 0; i < events.length; i++) {
             let evt = events[i];
             if (evt.id === type) {
-                if (this.check_command(me, evt as Partial<Pick<COMMAND, 'allow_die' | 'allow_faint' | 'allow_state' | 'allow_fight' | 'allow_busy'>>)) {
+                if (this.check_command(me, evt)) {  // todo 旧代码是 check_command(evt, me)
                     if (evt.on_command?.(me, paras)) {
                         me.send('{type:"dialog",dialog:"events",close:true}');
                     }

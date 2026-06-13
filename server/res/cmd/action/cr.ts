@@ -2,7 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util/util.js";
+import { UTIL } from "../../../core/util";
 import { FAMILIES } from "../../../core/skill/family.js";
 import { AREA } from "../../../core/room/area.js";
 import { ROOM } from "../../../core/room/room.js";
@@ -105,14 +105,15 @@ function fb_quick(me, area, isdiff) {
     }
     if (me.items.length > 204) return me.notify_fail("你背包的东西太多了。");
 
-    if (area.on_quick?.(me) === false) return false;
+    if (area.on_quick && !area.on_quick(me)) return false;
 
     if (me.expend_jingli(area.expend) == false) { return me.notify_fail("你的精力不够，不能开启副本。"); }
 
 
     me.remove_obj(fu, 1);
-    var max_score = area.query_exp();
-    me.add_exp(max_score, max_score);
+    var max_exp = area.query_exp();
+    var max_pot = area.query_pot ? area.query_pot() : max_exp;
+    me.add_exp(max_exp, max_pot);
     me.add_temp("fb_count", 1);
     me.add_temp("fb_count_day", 1, UTIL.diff_time());
 
@@ -228,12 +229,12 @@ function fb_start(me, path) {
     if (copy_room) {
         next_room = copy_room;
         if (me.team) {
-            if (copy_room.query_temp(me.id, undefined, me) == 1) {
+            if (copy_room.query_temp(me.id, me) == 1) {
                 return me.notify("你已经完成副本，必须等其他队员也完成后才可以重新进入。");
             }
             if (me.expend_jingli(fb.expend) == false) { return me.notify("你的精力不够，无法副本。"); }
             //记录这个玩家进入副本的标志，防止重复进入
-            copy_room.set_temp(me.id, 1, undefined, me);
+            copy_room.set_temp(me.id, 1, me);
         } else {
             if (diff_type == 2)
                 return me.notify("你需要组队才可以进入副本。");
@@ -248,9 +249,9 @@ function fb_start(me, path) {
         if (!next_room) {
             return me.notify("副本创建失败。");
         }
-        next_room.set_temp("diff", diff_type, undefined, me);
+        next_room.set_temp("diff", diff_type, me);
         if (me.team) {
-            next_room.set_temp(me.id, 1, undefined, me);
+            next_room.set_temp(me.id, 1, me);
             for (var i = 0; i < me.team.length; i++) {
                 var tm = me.team[i];
                 if (tm != me && tm.is_player) {

@@ -20,6 +20,7 @@ let _NPC: {
 } | null = null;
 import("../char/npc.js").then((m: Record<string, any>) => { _NPC = m.NPC as any; });
 
+// todo 需要检查一下和第一次提交的js文件的不同
 /**
  * 隐藏物品被look时的描述
  * @param this - 隐藏物品对象
@@ -933,8 +934,9 @@ export class ROOM extends ITEM {
      * @param def
      * @param me
      */
-    query_temp<T = unknown>(name: string, def?: T, me?: Record<string, any>): T | undefined {
-        const first = this.query_fb_first(me!.query_teamid());
+    // @ts-ignore
+    query_temp<T = unknown>(name: string, me: USER, def?: T): T | undefined {
+        const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
         if (!first.temp) return;
         const item = first.temp[name];
@@ -955,8 +957,9 @@ export class ROOM extends ITEM {
      * @param time
      * @param me
      */
-    set_temp(name: string, value: unknown, time?: number, me?: Record<string, any>): void {
-        const first = this.query_fb_first(me!.query_teamid());
+    // @ts-ignore
+    override set_temp(name: string, value: unknown, me: USER, time?: number): void {
+        const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
         if (!first.temp) first.temp = {};
         if (time) {
@@ -976,9 +979,10 @@ export class ROOM extends ITEM {
      * @param time
      * @param me
      */
-    add_temp(name: string, value: number, time?: number, me?: Record<string, any>): number {
-        const val = (this.query_temp(name, 0, me) as number) + value;
-        this.set_temp(name, val, time, me);
+    // @ts-ignore
+    add_temp(name: string, value: number, me: USER, time?: number): number {
+        const val = (this.query_temp(name, me, 0) as number) + value;
+        this.set_temp(name, val, me, time);
         return val;
     }
 

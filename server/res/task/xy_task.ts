@@ -2,7 +2,7 @@ import { TASK } from "../../core/task/task.js";
 import { WORLD } from "../../core/world.js";
 import { OBJ } from "../../core/item/obj.js";
 import type { OddsEntry } from "../../core/item/obj.js";
-import { UTIL } from "../../core/util/util.js";
+import { UTIL } from "../../core/util";
 import { NPC } from "../../core/char/npc.js";
 import type { USER } from "../../core/char/user.js";
 import type { CORPSE } from "../../core/item/corpse.js";
@@ -10,7 +10,7 @@ import { AREA } from "../../core/room/area.js";
 import { ROOM } from "../../core/room/room.js";
 import { EVENTS } from "../../core/task/events.js";
 import { COMMAND } from "../../core/command.js";
-
+// todo 襄阳没做
 // 城门状态
 interface GateState {
     step: number;

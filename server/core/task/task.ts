@@ -10,6 +10,7 @@ import type { OBJ } from "../item/obj.js";
 import type { USER } from "../char/user.js";
 import type { NPC } from "../char/npc.js";
 
+// todo 需要检查一下和第一次提交的js文件的不同
 export class TASK extends BASE {
 
     /** 定时器句柄（子类用于存放 setTimeout/setInterval 返回值） */

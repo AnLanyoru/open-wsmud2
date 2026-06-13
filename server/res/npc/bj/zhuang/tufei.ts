@@ -2,7 +2,7 @@ import { NPC } from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "土匪";
-    desc = "这家伙满脸横肉一付凶神恶煞的模样，令人望而生畏。";
+    desc = "这家伙满脸横肉一副凶神恶煞的模样，令人望而生畏。";
     gender = 1;
     age = 25;
     per = 26;

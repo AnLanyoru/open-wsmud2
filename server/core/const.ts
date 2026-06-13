@@ -6,18 +6,9 @@
  * 技能类型映射
  */
 export const SKILL_TYPES: Record<string, number> = {
-    SKILL: 0,       // 普通技能
-    FORCE: 1,       // 内功
-    DODGE: 2,       // 轻功
-    UNARMED: 3,     // 拳脚
-    PARRY: 4,       // 招架
-    SWORD: 5,       // 剑法
-    BLADE: 6,       // 刀法
-    STAFF: 7,       // 杖法
-    CLUB: 8,        // 棍法
-    THROWING: 9,    // 暗器
-    WHIP: 10,       // 鞭法
-    COMMON: 11,     // 通用技能（读书写字等）
+    BASE: 0,  // 基础技能
+    SKILL: 1,  // 特殊技能
+    KNOWLEDGE: 2  // 知识类技能
 };
 
 /**

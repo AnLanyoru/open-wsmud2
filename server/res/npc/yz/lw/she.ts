@@ -24,9 +24,6 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    this.do_kill(me);
-}
-    on_enter(me) {
     if (me.is_player && !me.query_temp('langpi')) {
         this.do_kill(me);
     } else {

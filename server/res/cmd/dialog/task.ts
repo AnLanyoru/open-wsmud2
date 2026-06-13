@@ -8,9 +8,7 @@ export default class extends COMMAND {
     regex = /(\w+)\s+(\w+)(?:\s(\w+))?(?:\s(\w+))?/;
     allow_state = true;
 
-    /**
-     * @param me - 执行命令的角色
-     */
+
     enter(me: CHARACTER, tid?: string, cmd?: string, oid?: string): void {
     if (!tid || !cmd) return;
     if (!me.is_player || !WORLD.is_server(me)) return;
@@ -34,7 +32,7 @@ export default class extends COMMAND {
             task.start(me, target);
             break;
         case "giveup":
-            task.giveup!(me);
+            task.giveup(me);
             break;
         case "fin2":
             this.task_fin(me, task, 'ok');
@@ -44,7 +42,7 @@ export default class extends COMMAND {
 }
     task_fin(me: CHARACTER, task: USERTASK, par?: string): void {
     if (task.on_finish(me, par)) {
-        const obj: Record<string, unknown> = {
+        const obj: Record<string, any> = {
             type: "dialog",
             dialog: "tasks",
             id: task.id,

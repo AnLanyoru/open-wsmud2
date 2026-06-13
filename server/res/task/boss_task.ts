@@ -226,9 +226,9 @@ function query_damage(this: NPC) {
         if (user) {
             str.push(user.name);
             str.push("：");
-            str.push(String(this.damages![key]));
+            str.push(this.damages![key]);
             str.push("==");
-            str.push(String(parseInt(String(this.damages![key] * 100 / this.max_hp))));
+            str.push(parseInt(this.damages![key] * 100 / this.max_hp).toString());
             str.push("%\n");
         }
     }
@@ -240,17 +240,17 @@ const BOSS_DROPS = {
 
 };
 function query_items(this: NPC, me: USER) {
-    if (!me || !this.damages) return;
+    if (!this.damages) return;
 
     var sh = this.damages[me.id];
     if (!(sh > 1)) return;
     if (!this.user_items) this.user_items = {};
     if (this.user_items[me.id]) return this.user_items[me.id];
-    if ((me.query_temp("bcc", 0) ?? 0) >= 5) return;
+    if (me.query_temp("bcc", 0) >= 5) return;
 
 
 
-    sh = parseInt(String(sh * 100 / this.max_hp));
+    sh = parseInt(sh * 100 / this.max_hp);
     if (sh < 1) {
         this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(10))];
         return this.user_items[me.id];
@@ -281,3 +281,4 @@ function clear_items(this: NPC, me: USER) {
         if (items) items.length = 0;
     }
 }
+

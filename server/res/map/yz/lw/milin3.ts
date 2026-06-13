@@ -5,6 +5,16 @@ import { COMMAND } from "../../../../core/command.js";
 import type { CHARACTER } from "../../../../core/char/character.js";
 import type { NPC } from "../../../../core/char/npc.js";
 
+/*
+1.脱光变身
+2.披着着狼皮吞下一块月饼
+3.丢狼皮变身
+4.喊话变异
+5.使用狼皮变身
+6.丢月饼变异
+7.杀小狼变身
+8.吃蛇变异
+*/
 export default class MapRoom extends ROOM {
     name = "密林深处";
     desc = "这里是密林的深处，楠木参天，浓阴蔽日，再往里就没有路走了，一只大狼懒洋洋的趴着，四周散落着不少乱七八糟的物件。";

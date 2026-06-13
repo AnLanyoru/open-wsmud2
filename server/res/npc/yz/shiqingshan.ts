@@ -76,11 +76,8 @@ function check_bing(this: NPC, me: CHARACTER): void {
     this.send_message("史青山喝道：给我拿下！");
 
     this.each_item(item => {
-
         if (item.is("pub/wujiang") || item.is("yz/shiqingshan")) {
-            if (item instanceof CHARACTER) {
-                item.do_kill(me);
-            }
+            (item as CHARACTER).do_kill(me);
         }
     }, this.environment!);
 }

@@ -117,8 +117,8 @@ const BAN_SKILLS = {
     guanshanjue: true
 };
 interface LearnState {
-    skill_base: import("../../../core/skill/skill.js").SKILL;
-    target: import("../../../core/char/character.js").CHARACTER;
+    skill_base: SKILL;
+    target: CHARACTER;
     max_level?: number;
     queues: { skid: string; max_level?: number }[];
 }
