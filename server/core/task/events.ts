@@ -1,9 +1,9 @@
 /**
  * EVENTS 活动事件管理
  */
+import type { USER } from "../char/user.js";
 import {WORLD} from "../world.js";
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /**
  * 活动项接口 — 活动面板中的单个活动/事件条目
  */
@@ -21,15 +21,22 @@ export interface EventItem {
     /** 活动操作按钮文本 */
     command?: string;
     /** 检查玩家是否可参与 — 返回 true 表示该玩家可见此活动 */
-    check?: (user: Record<string, any>) => boolean;
+    check?: (user: USER) => boolean;
     /** 活动按钮点击回调 — 触发时机：玩家在活动面板中点击该活动按钮时 */
-    on_command?: (me: Record<string, any>) => void;
+    on_command?: (me: USER) => void;
 
     /** 查询活动描述（由 EVENTS.add 通过 EVENT_BASE 原型注入默认实现） */
-    query_desc?(): string;
+    query_desc?(me?: USER): string;
 
     /** 查询活动品级（由 EVENTS.add 通过 EVENT_BASE 原型注入默认实现） */
-    query_grade?(): number;
+    query_grade?(me?: USER): number;
+
+    /** 覆写命令状态检查 */
+    allow_die?: boolean;
+    allow_faint?: boolean;
+    allow_state?: boolean;
+    allow_fight?: boolean;
+    allow_busy?: boolean;
 }
 
 /**
@@ -67,14 +74,14 @@ export class EVENTS {
      * @param item - 活动
      * @param act - 操作索引(0添加 1更新 2完成)
      */
-    static notify(item: { id: string; check?: (user: Record<string, any>) => boolean }, act: number): void {
+    static notify(item: { id: string; check?: (user: USER) => boolean }, act: number): void {
         const users = WORLD.USERS;
         const msg = `{type: "dialog", dialog: "events",${EVENTS.ACTIONS[act]}:1}`;
         for (const user of users) {
-            if (!(user as Record<string, any>).socket) continue;
+            if (!user.socket) continue;
             if (item.check && !item.check(user))
                 continue;
-            (user as Record<string, any>).send(msg);
+            user.send(msg);
         }
     }
 
@@ -99,10 +106,10 @@ export class EVENTS {
  * 提供 query_desc / query_grade 默认实现
  */
 const EVENT_BASE = {
-    query_desc(this: any): string {
+    query_desc(this: any, _me?: USER): string {
         return this.desc;
     },
-    query_grade(this: any): number {
+    query_grade(this: any, _me?: USER): number {
         return this.grade;
     }
 };

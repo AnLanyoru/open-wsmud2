@@ -26,7 +26,6 @@ declare var __PATH: Record<string, string>;
 // NPC 类
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 // @ts-ignore: static CREATE override incompatible with base
 export class NPC extends CHARACTER {
 

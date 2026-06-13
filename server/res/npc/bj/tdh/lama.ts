@@ -1,4 +1,6 @@
+import type { CHARACTER } from "../../../../core/char/character.js";
 import {NPC} from "../../../../core/char/npc.js";
+import type { ITEM } from "../../../../core/item.js";
 
 export default class extends NPC {
     name = "喇嘛";
@@ -45,14 +47,14 @@ export default class extends NPC {
         me.notify("喇嘛说道：你是谁，居然敢破坏大爷的好事，不想活了是不是？！");
         this.each_item(item => {
             if (item.path == this.path) {
-                item.do_kill(me);
+                item.is_character && (item as CHARACTER).do_kill(me);
             }
-        }, this.environment); // todo  运行时环境似乎必定存在，需要查验
+        }, this.environment);
     }
 
     on_die(killer) {
-        var ishas = false;
-        var dubi = null;
+        let ishas = false;
+        let dubi: ITEM | null = null;
         this.each_item(item => {
             if (item != this && item.path == this.path) {
                 ishas = true;
@@ -61,7 +63,7 @@ export default class extends NPC {
             }
         }, this.environment);
         if (!ishas && dubi && killer) {
-            var rd = this.random(killer.kar / 2) + killer.kar / 2 > 20;
+            let rd = this.random(killer.kar / 2) + killer.kar / 2 > 20;
             if (rd) {
 
                 killer.notify("白衣女尼对你说道：“多谢这位" + killer.call() + "拔刀相助，贫尼感激不尽，无以为报。这里有一套神行百变身法，你若愿学，贫尼定倾囊以授。");

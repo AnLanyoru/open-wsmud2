@@ -1,5 +1,6 @@
 import {TASK} from "../../core/task/task.js";
 import {WORLD} from "../../core/world.js";
+import type {WeaponRankEntry} from "../../core/world.js";
 import type {USER} from "../../core/char/user.js";
 import {FAMILIES} from "../../core/skill/family.js";
 import type {FAMILY} from "../../core/skill/family.js";
@@ -10,12 +11,12 @@ export default class extends TASK {
     prev_time = 0;
 
     startup() {
-        var dt = new Date();
-        var hour = dt.getHours();
-        var day = dt.getDate();
+        let dt = new Date();
+        let hour = dt.getHours();
+        let day = dt.getDate();
         if (hour >= 20) day = day + 1;
         dt = new Date(dt.getFullYear(), dt.getMonth(), day, 20);
-        var diff_time = +dt - Date.now();
+        let diff_time = +dt - Date.now();
         this.time_handler = this.call_out(this.run.bind(this), diff_time);
     }
 
@@ -25,7 +26,7 @@ export default class extends TASK {
 
     run() {
         this.startup();
-        var diff = Date.now() - this.prev_time;
+        let diff = Date.now() - this.prev_time;
         if (diff < 600000) return;
         this.send_score();
         this.send_tops();
@@ -41,8 +42,8 @@ export default class extends TASK {
             let stats = data[key];
             if (!stats) continue;
             let topname = FAMILIES[key].name + "综合榜";
-            for (var i = 0; i < stats.length; i++) {
-                var user = stats[i];
+            for (let i = 0; i < stats.length; i++) {
+                let user = stats[i];
                 if (i > 19) break;
                 if (!user.id) continue;
                 COMMAND.DO("send", user.id, JSON.stringify({
@@ -51,7 +52,7 @@ export default class extends TASK {
                     content: "你目前在" + topname + "单排名第" +
                         (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                     attach: [
-                        WORLD.COMMANDS.reward.score_reward(i)
+                        WORLD.COMMANDS.reward.score_reward!(i)
                     ]
                 }));
             }
@@ -79,8 +80,8 @@ export default class extends TASK {
     }
 
     send_weapons() {
-        const map = {};
-        let eqs = WORLD.STATS.EQ_STATS ?? [];  // todo 这个类型没写好
+        const map: Record<string, number> = {};
+        const eqs: WeaponRankEntry[][] = WORLD.STATS.EQ_STATS;
         for (let stats of eqs) {
             for (let i = 0; i < stats.length; i++) {
                 let item = stats[i];
@@ -113,19 +114,19 @@ export default class extends TASK {
 
     send_family() {
 
-        for (var name in FAMILIES) {
-            var fam = FAMILIES[name];
+        for (let name in FAMILIES) {
+            let fam = FAMILIES[name];
             this.sort_family(fam);
         }
     }
 
     sort_family(fam: FAMILY) {
-        var list: any[] = [];  // todo 牛魔的黄牛混用
-        var user: USER | null = null;
+        const list: any[] = [];
+        let user: USER | null = null;
         if (fam.tops) {
-            var max = 0;
-            for (var key in fam.tops) {
-                var item = fam.tops[key];
+            let max = 0;
+            for (let key in fam.tops) {
+                let item = fam.tops[key];
                 if (item.score > max) {
                     max = item.score;
                     list.length = 0;
@@ -138,10 +139,10 @@ export default class extends TASK {
             if (!list.length) return;
             if (list.length == 1) user = list[0];
             else {
-                var last_time = Number.MAX_VALUE;
-                for (var i = 0; i < list.length; i++) {
-                    var u: USER | undefined = WORLD.getUser(list[i].id);
-                    var time = u ? u.query_temp('last_sm', 1) : Date.now();
+                let last_time = Number.MAX_VALUE;
+                for (let i = 0; i < list.length; i++) {
+                    let u: USER | undefined = WORLD.getUser(list[i].id);
+                    let time = u ? u.query_temp('last_sm', 1) ?? 1 : Date.now();
 
                     if (time < last_time) {
                         user = list[i];

@@ -15,10 +15,9 @@ import type {StatusDef} from '../../types/events.js';
 import type {ActionMap} from '../../types/base.js';
 import type {ROOM as RoomClass} from '../room/room.js';
 import type {FAMILY} from '../skill/family.js';
-import type {OddsEntry} from '../item/obj.js';
 import type {NPC} from './npc.js';
 import type {GameSocket} from '../world.js';
-import {StdioNull} from 'node:child_process';
+import type { COMMAND } from '../command.js';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -31,7 +30,6 @@ declare global {
 // 本地类型定义
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export interface SkillData {
     /** 技能等级 */
     level: number;
@@ -155,24 +153,6 @@ export interface DoAttackPar {
     iscirt?: boolean;
 }
 
-interface CommandDef {
-    /** 参数正则匹配 */
-    regex?: RegExp;
-    /** 命令执行函数 */
-    enter?: (me: CHARACTER, ...args: string[]) => boolean | void;
-    /** 所需最低权限等级 */
-    allow_level?: number;
-    /** 是否允许死亡状态执行 */
-    allow_die?: boolean;
-    /** 是否允许昏迷状态执行 */
-    allow_faint?: boolean;
-    /** 是否允许活动中执行 */
-    allow_state?: boolean;
-    /** 是否允许战斗中执行 */
-    allow_fight?: boolean;
-    /** 是否允许忙乱中执行 */
-    allow_busy?: boolean;
-}
 
 interface AutoSkillEntry {
     /** 绝招对象 */
@@ -193,10 +173,6 @@ interface AutoSkillEntry {
 
 /** 角色状态 — StatusDef 的运行时扩展 */
 interface CharacterStatus extends StatusDef {
-    /** 标识符 */
-    id?: string;
-    /** 状态名字 */
-    name?: string;
     /** 最大叠加层数 */
     max_count?: number;
     /** 是否不受减免影响 */
@@ -233,8 +209,6 @@ interface CharacterStatus extends StatusDef {
     start_time?: number;
     /** 当前叠加层数 */
     count?: number;
-    /** 持续时间 */
-    duration?: number;
 }
 
 // Declaration for global runtime constants
@@ -350,7 +324,7 @@ export class CHARACTER extends ITEM {
     // ============ 环境与交互 ============
 
     /** 当前所在房间 */
-    environment?: RoomClass;
+    environment: RoomClass;
     /** 当前活动状态 */
     state: any = null;
     /** 等待用户输入的回调 */
@@ -723,7 +697,7 @@ export class CHARACTER extends ITEM {
      */
     do_command(cmdName: string, str?: string): void {
         str = str || '';
-        let cmd: CommandDef | undefined = WORLD.COMMANDS[cmdName] as CommandDef | undefined;
+        let cmd: COMMAND | undefined = WORLD.COMMANDS[cmdName] as COMMAND | undefined;
         let pars: [CHARACTER, ...string[]];
         if (cmd && cmd.regex && str) {
             const match = cmd.regex.exec(str);
@@ -734,7 +708,7 @@ export class CHARACTER extends ITEM {
         if (this.do_item_action(this.environment, cmdName, pars)) {
             return;
         }
-        cmd = cmd || (WORLD.DEFAULT_COMMAND as CommandDef | undefined);
+        cmd = cmd || (WORLD.DEFAULT_COMMAND as COMMAND | undefined);
         if (cmd) {
             if (!this.check_command(cmd)) return;
             if (cmd.enter.apply(cmd, pars) !== false) {
@@ -764,7 +738,7 @@ export class CHARACTER extends ITEM {
     /**
      * 检查命令是否允许执行
      */
-    check_command(cmd: CommandDef): boolean {
+    check_command(cmd: COMMAND): boolean {
         if ((cmd.allow_level ?? 0) > this.user_level) {
             this.send('什么？');
             return false;

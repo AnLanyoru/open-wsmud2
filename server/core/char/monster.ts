@@ -17,7 +17,6 @@ import type {ROOM} from '../room/room.js';
 // MONSTER 类
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export class MONSTER extends CHARACTER {
 
     // ============ 核心属性 ============
@@ -32,7 +31,8 @@ export class MONSTER extends CHARACTER {
     level: number = 0;
     /** 怪物描述 */
     desc!: string;
-
+    /** 怪兽门派 */
+    family = FAMILIES.MONSTER;
     // ============ 功能属性 ============
 
     /** 死亡后重生房间 */

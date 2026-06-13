@@ -10,7 +10,6 @@ import type {CHARACTER} from '../char/character.js';
 import {PROPERTIES, SKILL_TYPES} from "../const.js";
 
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
 
 

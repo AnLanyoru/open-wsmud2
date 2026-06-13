@@ -18,7 +18,6 @@ import type {AREA} from '../room/area.js';
 // 模块级常量
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /** 需保存的数值属性 */
 const SAVE_NUMPROP = [
     'str', 'con', 'dex', 'int', 'gender', 'max_mp', 'limit_mp', 'exp', 'pot',

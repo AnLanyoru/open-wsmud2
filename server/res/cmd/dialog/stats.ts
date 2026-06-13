@@ -4,8 +4,8 @@ import {WORLD} from "../../../core/world.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
 import type {StatsTopEntry, ScoreRankEntry, WeaponRankEntry} from "../../../core/world.js";
 import type {USER} from "../../../core/char/user.js";
+import { NPC } from "../../../core/char/npc.js";
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
     command = "stats";
     allow_busy = true;
@@ -177,9 +177,9 @@ export default class extends COMMAND {
 const STATS = WORLD.STATS;
 
 function render_top_item(me: CHARACTER, fam: string | undefined, index: string | undefined): void {
-    const tops: StatsTopEntry[] = STATS.TOPS;
-    let items: StatsTopEntry[];
-    if (fam) items = (STATS['tops_' + fam.toUpperCase()] ?? []) as unknown as StatsTopEntry[];
+    const tops: NPC[] = STATS.TOPS;
+    let items: NPC[];
+    if (fam) items = (STATS['tops_' + fam.toUpperCase()] ?? []);
     else items = tops;
     const item = items[Number(index) - 1];
     if (!item) return me.send('你要看什么？');
@@ -189,7 +189,7 @@ function render_top_item(me: CHARACTER, fam: string | undefined, index: string |
 function render_score_item(me: CHARACTER, fam: string | undefined, index: string | undefined): void {
     const tops: ScoreRankEntry[] = STATS.SCORE;
     let items: ScoreRankEntry[];
-    if (fam) items = (STATS.SC_STATS[fam.toUpperCase()] ?? []) as unknown as ScoreRankEntry[];
+    if (fam) items = (STATS.SC_STATS[fam.toUpperCase()] ?? []);
     else items = tops;
     const item = items[Number(index) - 1];
     if (!item) return me.send('你要看什么？');
@@ -200,7 +200,7 @@ function render_score_item(me: CHARACTER, fam: string | undefined, index: string
 
 function renderScore(me: CHARACTER, fam?: string): void {
     const tops: ScoreRankEntry[] = STATS.SCORE;
-    const items: ScoreRankEntry[] = fam ? (STATS.SC_STATS[fam.toUpperCase()] ?? []) as unknown as ScoreRankEntry[] : tops;
+    const items: ScoreRankEntry[] = fam ? (STATS.SC_STATS[fam.toUpperCase()] ?? []) : tops;
 
     const str: string[] = ['{"type":"dialog","dialog":"stats","scores":['];
     for (let i = 0; i < items.length; i++) {
@@ -220,14 +220,14 @@ function renderScore(me: CHARACTER, fam?: string): void {
 }
 
 function renderTops(me: CHARACTER, stype?: string): void {
-    const tops: StatsTopEntry[] = STATS.TOPS;
+    const tops: NPC[] = STATS.TOPS;
     let famid: string | null = null;
-    let items: StatsTopEntry[];
+    let items: NPC[];
     if (stype) {
         famid = stype.toUpperCase();
         const found = STATS["tops_" + famid];
         if (!found) return me.send('没有这个榜单。');
-        items = found as unknown as StatsTopEntry[];
+        items = found;
     } else {
         items = tops;
     }

@@ -45,7 +45,6 @@ export interface OddsEntry {
     max?: number;
 }
 
-// todo 需要检查一下和第一次提交的js文件的不同
 // @ts-ignore: static CREATE override incompatible with base
 export class OBJ extends ITEM {
 
@@ -110,7 +109,7 @@ export class OBJ extends ITEM {
     /** 合成的物品路径 */
     combine_to?: string;
     /** 合成所需数量 */
-    combine_count: number = 999;
+    combine_count?: number;
 
     // ============ 回调函数（由资源文件或子类设置） ============
 
@@ -173,7 +172,7 @@ export class OBJ extends ITEM {
      * 物品 JSON 序列化
      */
     item_to_json(): string {
-        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${parseInt(String(this.value / 10), 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0}]`;
+        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${parseInt(String(this.value / 10), 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0}]`;
     }
 
     /**
@@ -465,6 +464,6 @@ export class OBJ extends ITEM {
     }
 
     format_to_pack(): string {
-        return `[${JSON.stringify(this.color_name ?? "")},${JSON.stringify(this.id ?? "")},${this.count},${this.grade},${JSON.stringify(this.unit ?? "")},${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
+        return `[${JSON.stringify(this.color_name ?? "")},${JSON.stringify(this.id ?? "")},${this.count},${this.grade},${JSON.stringify(this.unit ?? "")},${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
     }
 }

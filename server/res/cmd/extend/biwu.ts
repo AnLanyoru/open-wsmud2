@@ -1,14 +1,13 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {USER} from "../../../core/char/user.js";
-import {NPC} from "../../../core/char/npc.js";
-import {ROOM} from "../../../core/room/room.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
-import {EQUIPMENT} from "../../../core/item/equipment.js";
-import type {StatsTopEntry} from "../../../core/world.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { USER } from "../../../core/char/user.js";
+import { NPC } from "../../../core/char/npc.js";
+import { ROOM } from "../../../core/room/room.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
+import { EQUIPMENT } from "../../../core/item/equipment.js";
+import type { StatsTopEntry } from "../../../core/world.js";
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
     command = "biwu";
     allow_busy = true;
@@ -112,8 +111,8 @@ export default class extends COMMAND {
     }
 
     on_heart_beat(this: ROOM, _dt: number) {
-        this.biwu_step++;
-        if (this.biwu_step < 60) return;
+        this.biwu_step!++;
+        if (this.biwu_step! < 60) return;
         if (!this.items.length) {
             return;
         }
@@ -154,7 +153,7 @@ export default class extends COMMAND {
             for (const sk in player.skills) {
                 const item = player.skills[sk];
                 if (typeof item === "number") {
-                    npc.skills[sk] = {level: item, exp: 0, enable_skill: null};
+                    npc.skills[sk] = { level: item, exp: 0, enable_skill: null };
                 }
             }
         }
@@ -263,14 +262,16 @@ export default class extends COMMAND {
     init_pfms(this: CHARACTER & { auto_eqs?: EQUIPMENT[] }) {
         CHARACTER.prototype.init_pfms.call(this);
         this.auto_eqs = [];
-        for (let i = 1; i < (this.equipment.length || 0); i++) {
-            if (this.equipment[i].on_use) {
-                this.auto_eqs.push(this.equipment[i]);
+        if (this.equipment) {
+            for (let i = 1; i < (this.equipment.length || 0); i++) {
+                if (this.equipment[i]?.on_use) {
+                    this.auto_eqs.push(this.equipment[i]!);
+                }
             }
         }
     }
 
-    setStatsTitle(player: CHARACTER, index: number, fam?: string) {
+    setStatsTitle(player: USER, index: number, fam?: string) {
         if (fam) return;
 
         if (index < 10) {
@@ -280,7 +281,7 @@ export default class extends COMMAND {
         } else player.add_title(null, "top");
     }
 
-    checkStats(player: CHARACTER) {
+    checkStats(player: USER) {
         let top: number | undefined = player.query_temp("top");
         if (top) {
             this.check_fams_stats(player, WORLD.STATS.TOPS, top);
@@ -291,7 +292,7 @@ export default class extends COMMAND {
         }
     }
 
-    check_fams_stats(player: CHARACTER, tops: CHARACTER[], top: number, fam?: string) {
+    check_fams_stats(player: USER, tops: CHARACTER[], top: number, fam?: string) {
         const npc = tops[top - 1] as NPC;
         if (!npc) return;
         const top_key = fam ? "top_fam" : "top";
@@ -336,7 +337,7 @@ export default class extends COMMAND {
         return 0;
     }
 
-    updatePlayerStats(player: CHARACTER, sc: number, fam?: string) {
+    updatePlayerStats(player: USER, sc: number, fam?: string) {
         let tops = WORLD.STATS.TOPS;
         let top_key = "top";
         if (fam) {

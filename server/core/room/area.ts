@@ -9,6 +9,7 @@ import type {USER} from "../char/user.js";
 import type {CHARACTER} from "../char/character.js";
 import type {SKILL} from "../skill/skill.js";
 import type {ActionMap} from "../../types/base.js";
+import { BASE } from "../base.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
@@ -18,8 +19,7 @@ import("./room.js").then((m: Record<string, any>) => {
     _ROOM = m.ROOM as any;
 });
 
-// todo 需要检查一下和第一次提交的js文件的不同
-export class AREA {
+export class AREA extends BASE {
 
     // ============ 核心属性 ============
 

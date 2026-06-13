@@ -31,7 +31,6 @@ export interface StoneEntry {
     grade: number;
 }
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export class EQUIPMENT extends OBJ {
 
     constructor() {

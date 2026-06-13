@@ -8,7 +8,6 @@ import {pathToFileURL} from 'url';
 // 内部类型
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /** 资源对象最小契约 — NEW 实例化后设置 path 并调用 create */
 interface ResourceObj {
     path?: string;

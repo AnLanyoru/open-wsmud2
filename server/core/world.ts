@@ -58,7 +58,6 @@ import type {EventItem} from './task/events.js';
 // 常量
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /** 排行榜保存时需复制的玩家属性列表 */
 export const COPY_PROPS = [
     'str', 'con', 'dex', 'int', 'gender', 'max_mp', 'exp', 'pot',
@@ -628,11 +627,11 @@ class World {
         /** 总积分排行 */
         SCORE: [],
         /** 武器排行 */
-        WEAPON: [] as { score: number }[],
+        WEAPON: [] as WeaponRankEntry[],
         /** 各部位装备评分排行（11 个部位） */
-        EQ_STATS: [] as { score: number }[][],
+        EQ_STATS: [] as WeaponRankEntry[][],
         /** 各门派积分排行 */
-        SC_STATS: {} as Record<string, { id?: string, name: string, score: number }[]>,
+        SC_STATS: {} as Record<string, ScoreRankEntry[]>,
 
         /**
          * 加载排行榜数据（由 world/extends/stats.js 覆盖实现）
@@ -655,7 +654,7 @@ class World {
          */
         checkStats(player: any): void {
             this.updateScore(player);
-            (WORLD.COMMANDS.biwu as Record<string, any>).checkStats(player);
+            WORLD.COMMANDS.biwu.checkStats!(player);
         },
 
         /**

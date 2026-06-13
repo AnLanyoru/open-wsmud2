@@ -58,11 +58,9 @@ export class COMMAND extends BASE {
      * 命令入口方法，由子类实现具体逻辑
      * @param me - 执行角色（可为 null）
      * @param arg - 命令参数
-     * @param _par2 - 额外参数（供 COMMAND.DO 使用）
-     * @param _par3 - 额外参数（供 COMMAND.DO 使用）
      * @returns 返回 false 表示命令执行失败
      */
-    enter(me: CHARACTER | null, arg?: unknown, _par2?: unknown, _par3?: unknown): boolean | void {
+    enter(me: CHARACTER | null, ...arg: string[]): boolean | void {
         return undefined;
     }
 
@@ -172,14 +170,12 @@ export class COMMAND extends BASE {
     /**
      * 执行指定名称的命令
      * @param cmd - 命令名
-     * @param par1 - 参数1
-     * @param par2 - 额外参数
-     * @param par3 - 额外参数
+     * @param args - 参数列表
      */
-    static DO(cmd: string, par1?: unknown, par2?: unknown, par3?: unknown): void {
+    static DO(cmd: string, ...args: string[]): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
-            cmdObj.enter(null, par1, par2, par3);
+            cmdObj.enter(null, ...args);
         }
     }
 }

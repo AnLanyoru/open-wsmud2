@@ -16,7 +16,6 @@ export interface LoginUser {
     [key: string]: any;
 }
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /** 最小化用户参数类型（用于各方法签名） */
 interface LoginUserParam {
     userid?: number;

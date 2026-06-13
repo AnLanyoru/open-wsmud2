@@ -22,7 +22,6 @@ import("../char/npc.js").then((m: Record<string, any>) => {
     _NPC = m.NPC as any;
 });
 
-// todo 需要检查一下和第一次提交的js文件的不同
 /**
  * 隐藏物品被look时的描述
  * @param this - 隐藏物品对象

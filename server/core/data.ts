@@ -5,7 +5,7 @@
 // NOTE: 这些依赖通过 TypeScript 编译到 server/dist/ 后路径等价
 import {WORLD} from './world.js';
 import {FAMILIES} from './skill/family.js';
-import type {StatsTopEntry} from './world.js';
+import type {StatsTopEntry, WeaponRankEntry} from './world.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -27,7 +27,6 @@ const FAMS_TATAS: string[] = [
 // DATA 单例
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export interface DataObject {
     /** 队伍数据 */
     parties: Map<string, any>;
@@ -155,7 +154,7 @@ const DATA: DataObject = {
         WORLD.STATS.EQ_STATS = new Array(11);
         data.eq_stats = data.eq_stats ?? [];
         for (let i = 0; i < 11; i++) {
-            WORLD.STATS.EQ_STATS[i] = data.eq_stats[i] ?? new Array(10).fill({score: 0});
+            WORLD.STATS.EQ_STATS[i] = data.eq_stats[i] ?? new Array(10).fill({score: 0} as WeaponRankEntry);
         }
         for (const key of FAMS_TATAS) {
             const tops = data['tops_' + key];
@@ -216,7 +215,7 @@ const DATA: DataObject = {
     create_def_eqs(): void {
         WORLD.STATS.EQ_STATS = new Array(11);
         for (let i = 0; i < 11; i++) {
-            WORLD.STATS.EQ_STATS[i] = new Array(10).fill({score: 0});
+            WORLD.STATS.EQ_STATS[i] = new Array(10).fill({score: 0} as WeaponRankEntry);
         }
         WORLD.STATS.EQ_STATS[0] = WORLD.STATS.WEAPON;
     },

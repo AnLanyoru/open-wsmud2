@@ -1,4 +1,5 @@
 import {SKILL} from "../../../core/skill/skill.js";
+import { PropMap } from "../../../types/index.js";
 
 export default class extends SKILL {
     name = "蒙古心法";
@@ -43,7 +44,7 @@ export default class extends SKILL {
                     var time = (10000 + lv * 10);
                     var gj = 10 + (lv / 100);
                     me.send_room("<HIy>$N大喝一声，全身真气鼓动，看似坚不可摧。</HIy>");
-                    const prop = {  // todo 这里要变成键集合类型
+                    const prop: PropMap = {
                         fy_per: gj,
                         gj_per: gj
                     };

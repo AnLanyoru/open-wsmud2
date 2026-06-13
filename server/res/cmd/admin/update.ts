@@ -5,7 +5,6 @@ import {NPC} from "../../../core/char/npc.js";
 import {BASE} from "../../../core/base.js";
 import {TASK} from "../../../core/task/task.js";
 
-// todo ai改过得review一下
 export default class extends COMMAND {
     command = "update";
     allow_busy = true;

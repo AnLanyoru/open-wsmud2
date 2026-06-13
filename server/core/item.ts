@@ -13,7 +13,6 @@ import type {ActionDef, ActionMap} from '../types/base.js';
 // ITEM 类
 // ============================================================
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export class ITEM extends BASE {
 
     constructor() {
@@ -36,7 +35,7 @@ export class ITEM extends BASE {
     /** 最大携带物品数 */
     max_item_count: number = 10;
     /** 金钱数量 */
-    money: number = 0;
+    money?: number;
     /** 子物品列表 */
     items: ITEM[] | null = null;
     /** 是否为货币 */

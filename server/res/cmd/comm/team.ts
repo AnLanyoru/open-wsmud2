@@ -1,9 +1,8 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER, TeamData} from "../../../core/char/character.js";
+import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 
-// todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
     command = "team";
     allow_busy = true;
@@ -63,7 +62,7 @@ export default class extends COMMAND {
 
     team_with(me: CHARACTER, user?: string) {
         if (!user) return me.notify("需要指定玩家名字。");
-        var player = me.find_obj(user, me.environment);
+        var player = me.find_obj(user, me.environment) as CHARACTER;
         if (!player) return me.notify("没有这个玩家，或者不在线");
         if (player.master != me.id) return me.notify(player.name + "拒绝了你的组队邀请。");
         if (player.team) return me.notify(player.name + "已加入组队，无法接受你的请求。");
@@ -92,7 +91,7 @@ export default class extends COMMAND {
         if (player.team) return me.notify(player.name + "已加入组队，无法接受你的请求。");
         if (me.environment && me.environment.is_fb()) return me.notify("你正在副本，无法邀请别人。");
         if (me.environment && me.environment.parent && me.environment.parent.no_team) return me.notify("你正在副本，无法邀请别人。");
-        var teamId = me.query_temp<string>('team');
+        var teamId = player.query_temp('team');
         if (teamId && teamId == me.id) return me.notify("你已经邀请过" + player.name + "了，正在等待回应。");
 
         if (me.team) {
