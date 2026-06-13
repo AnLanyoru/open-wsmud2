@@ -1,8 +1,6 @@
-
-
 export default {
     footer: [["属性", null],
-    ["详细", null], ["称号", null]],
+        ["详细", null], ["称号", null]],
 
     selectIndex: 0,
     onData: function (data) {
@@ -77,8 +75,7 @@ export default {
                 SendCommand("score2 " + this.uid);
             else
                 SendCommand("score2");
-        }
-        else if (item == 2) {
+        } else if (item == 2) {
             if (!this.titles)
                 SendCommand("score title");
             panel.on("click", ".btn-noused", function (e) {

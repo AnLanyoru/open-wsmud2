@@ -1,5 +1,3 @@
-
-
 let tools = null;
 let hideTool = null;
 let bottom_tools = null;

@@ -4,7 +4,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 import * as acorn from 'acorn';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -13,25 +13,25 @@ const OS_DIR = path.join(__dirname, '..', 'os');
 const DRY_RUN = process.argv.includes('--dry-run');
 
 const CLASS_FILE = {
-    ROOM:'room/room.js', NPC:'char/npc.js', MONSTER:'char/monster.js',
-    CHARACTER:'char/character.js', OBJ:'item/obj.js', EQUIPMENT:'item/equipment.js',
-    CONTAINER:'item/container.js', CORPSE:'item/corpse.js', COMMAND:'command.js',
-    SKILL:'skill/skill.js', PERFORM:'skill/skill.js', FAMILY:'skill/family.js',
-    AREA:'room/area.js', FAMILY_AREA:'room/fam_area.js',
-    USERTASK:'task/playertask.js', TASK:'task/task.js',
-    MONEY:'item/money.js', BASE:'base.js',
+    ROOM: 'room/room.js', NPC: 'char/npc.js', MONSTER: 'char/monster.js',
+    CHARACTER: 'char/character.js', OBJ: 'item/obj.js', EQUIPMENT: 'item/equipment.js',
+    CONTAINER: 'item/container.js', CORPSE: 'item/corpse.js', COMMAND: 'command.js',
+    SKILL: 'skill/skill.js', PERFORM: 'skill/skill.js', FAMILY: 'skill/family.js',
+    AREA: 'room/area.js', FAMILY_AREA: 'room/fam_area.js',
+    USERTASK: 'task/playertask.js', TASK: 'task/task.js',
+    MONEY: 'item/money.js', BASE: 'base.js',
 };
 
 const KNOWN_GLOBALS = [
-    'WORLD','OBJ','UTIL','FAMILIES','SKILL','PERFORM','SKILL_TYPES',
-    'BASE_SKILLS','EQUIP_TYPE','WEAPON_TYPE','PROPERTIES',
-    'CHARACTER','MONSTER','NPC','AREA','ROOM','USER','FOLLOWER',
-    'CORPSE','MONEY','EQUIPMENT','CONTAINER','ITEM','BASE',
-    'FAMILY','FAMILY_AREA','TASK','USERTASK','EVENTS','COMMAND',
-    '__CONFIG','__PATH',
+    'WORLD', 'OBJ', 'UTIL', 'FAMILIES', 'SKILL', 'PERFORM', 'SKILL_TYPES',
+    'BASE_SKILLS', 'EQUIP_TYPE', 'WEAPON_TYPE', 'PROPERTIES',
+    'CHARACTER', 'MONSTER', 'NPC', 'AREA', 'ROOM', 'USER', 'FOLLOWER',
+    'CORPSE', 'MONEY', 'EQUIPMENT', 'CONTAINER', 'ITEM', 'BASE',
+    'FAMILY', 'FAMILY_AREA', 'TASK', 'USERTASK', 'EVENTS', 'COMMAND',
+    '__CONFIG', '__PATH',
 ];
 
-let stats = { ok: 0, skip: 0, extends: 0, errors: [] };
+let stats = {ok: 0, skip: 0, extends: 0, errors: []};
 
 function walk(dir) {
     const files = [];
@@ -61,8 +61,12 @@ function findGlobals(src, baseClass) {
 function convert(filePath) {
     const rel = path.relative(WORLD_DIR, filePath);
     let src;
-    try { src = fs.readFileSync(filePath, 'utf8'); }
-    catch (e) { stats.errors.push(`${rel}: read - ${e.message}`); return; }
+    try {
+        src = fs.readFileSync(filePath, 'utf8');
+    } catch (e) {
+        stats.errors.push(`${rel}: read - ${e.message}`);
+        return;
+    }
 
     // Skip extends/
     if (filePath.replace(/\\/g, '/').includes('world/extends/')) {
@@ -269,7 +273,7 @@ function convert(filePath) {
 
         // For / while loops at top-level using this → constructor
         if ((stmt.type === 'ForStatement' || stmt.type === 'ForInStatement' ||
-            stmt.type === 'ForOfStatement' || stmt.type === 'WhileStatement') &&
+                stmt.type === 'ForOfStatement' || stmt.type === 'WhileStatement') &&
             stmtSrc.includes('this.')) {
             constructorBody.push(stmtSrc.trim());
             needConstructor = true;

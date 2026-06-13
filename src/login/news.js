@@ -1,9 +1,9 @@
-import { Page } from '../base/page.js';
+import {Page} from '../base/page.js';
 
 class NewsPage extends Page {
-  constructor() {
-    super();
-    this.template = `
+    constructor() {
+        super();
+        this.template = `
         <div id="new_panel" class="mypanel" style="display:none">
             <ul>
                 <li class="content" style="height:20rem;">
@@ -14,7 +14,7 @@ class NewsPage extends Page {
             </ul>
         </div>
 `;
-  }
+    }
 }
 
 export default NewsPage;

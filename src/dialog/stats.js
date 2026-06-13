@@ -1,20 +1,18 @@
-
-
 const STATS_SILDER1 = [["总榜", ''], ["武当派", 'wudang'], ["少林派", 'shaolin'], ["华山派", 'huashan'],
-["峨眉派", 'emei'], ["逍遥派", 'xiaoyao'], ["丐帮", 'gaibang'], ["杀手楼", 'shashou'],
-["无门无派", 'none']];
+    ["峨眉派", 'emei'], ["逍遥派", 'xiaoyao'], ["丐帮", 'gaibang'], ["杀手楼", 'shashou'],
+    ["无门无派", 'none']];
 const STATS_SILDER2 = [
     ["武器", ""], ["衣服", "cloth"], ["鞋", "shoes"], ["头部", "head"],
     ["披风", "cape"], ["戒指", "ring"], ["项链", "necklace"], ["饰品", "jewels"],
     ["护腕", "wrist"], ["腰带", "waist"], ["暗器", "throwing"]
 ];
 export default {
-    footers: [{ cmd: "score", name: "综合榜", selected_silder: "", silder: STATS_SILDER1 },
-    { cmd: "top", name: "高手榜", selected_silder: "", silder: STATS_SILDER1 },
-    { cmd: "weapon", name: "兵器谱", selected_silder: "", silder: STATS_SILDER2 },
-    { cmd: "exp", name: "经验榜", selected_silder: "", silder: STATS_SILDER1 },
-    { cmd: "mp", name: "内力榜", selected_silder: "", silder: STATS_SILDER1 },
-    { cmd: "money", name: "富豪榜", selected_silder: "", silder: STATS_SILDER1 }
+    footers: [{cmd: "score", name: "综合榜", selected_silder: "", silder: STATS_SILDER1},
+        {cmd: "top", name: "高手榜", selected_silder: "", silder: STATS_SILDER1},
+        {cmd: "weapon", name: "兵器谱", selected_silder: "", silder: STATS_SILDER2},
+        {cmd: "exp", name: "经验榜", selected_silder: "", silder: STATS_SILDER1},
+        {cmd: "mp", name: "内力榜", selected_silder: "", silder: STATS_SILDER1},
+        {cmd: "money", name: "富豪榜", selected_silder: "", silder: STATS_SILDER1}
     ],
     selectedItem: 0,
     init: function () {

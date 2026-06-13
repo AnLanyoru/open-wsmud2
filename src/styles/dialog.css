@@ -8,7 +8,7 @@
     text-align: center;
 }
 
-.signinfo>a {
+.signinfo > a {
     color: #333;
 }
 
@@ -17,7 +17,7 @@
     z-index: 10;
 }
 
-.dialog>.dialog-header {
+.dialog > .dialog-header {
     height: 2.5em;
     line-height: 2.5em;
     background-color: #222;
@@ -26,17 +26,17 @@
     flex-direction: row;
 }
 
-.dialog>.dialog-content {
+.dialog > .dialog-content {
     overflow: auto;
     width: 100%;
 }
 
-.dialog>.dialog-content .item-commands {
+.dialog > .dialog-content .item-commands {
     text-align: center;
 }
 
 
-.dialog>.dialog-header>.dialog-title {
+.dialog > .dialog-header > .dialog-title {
     color: #808000;
     font-weight: bold;
     overflow-x: hidden;
@@ -45,13 +45,13 @@
     flex: 1;
 }
 
-.dialog>.dialog-header>.dialog-icon {
+.dialog > .dialog-header > .dialog-icon {
     color: #808000;
     margin-top: 0.65em;
     margin-right: 0.25em;
 }
 
-.dialog>.dialog-header>.dialog-close {
+.dialog > .dialog-header > .dialog-close {
     line-height: 2em;
     color: gray;
     cursor: pointer;
@@ -59,7 +59,7 @@
     margin-right: 4px;
 }
 
-.dialog>.dialog-footer>.trade_btn {
+.dialog > .dialog-footer > .trade_btn {
     float: right;
     border-left: solid 1px gray;
     display: inline-block;
@@ -69,12 +69,12 @@
     line-height: 1.875em;
 }
 
-.dialog>.dialog-footer>.ok {
+.dialog > .dialog-footer > .ok {
     color: #00FFFF;
 }
 
 
-.dialog>.dialog-footer {
+.dialog > .dialog-footer {
     background-color: #222;
     white-space: nowrap;
     height: 2.5em;
@@ -82,13 +82,13 @@
     line-height: 2.5em;
 }
 
-.dialog>.dialog-footer>.item-commands {
+.dialog > .dialog-footer > .item-commands {
     float: right;
     margin-right: 2px;
     padding-bottom: 0px;
 }
 
-.dialog>.dialog-footer>.item-commands>span {
+.dialog > .dialog-footer > .item-commands > span {
     height: 2em;
     line-height: 2em;
     padding: 0 0.5em 0 0.5em;
@@ -96,7 +96,7 @@
     margin-left: 1em;
 }
 
-.dialog>.dialog-footer>.footer-item {
+.dialog > .dialog-footer > .footer-item {
     color: #bdc3c7;
     display: inline-block;
     width: 5em;
@@ -106,7 +106,7 @@
 }
 
 
-.dialog>.dialog-footer>.eq-group {
+.dialog > .dialog-footer > .eq-group {
     width: 2em;
     height: 2em;
     border-radius: 2em;
@@ -116,20 +116,19 @@
     margin-top: 0.25em;
 }
 
-.dialog>.dialog-footer>.channel-item {
+.dialog > .dialog-footer > .channel-item {
 
     width: 4em;
 }
 
 
-
-.dialog>.dialog-footer>.select {
+.dialog > .dialog-footer > .select {
     background-color: #555;
     color: #bdc3c7;
 }
 
 
-.dialog>.dialog-footer>.sk-group {
+.dialog > .dialog-footer > .sk-group {
     width: 2em;
     height: 2em;
     border-radius: 2em;
@@ -149,7 +148,7 @@
     padding-top: 0.5em;
 }
 
-.dialog-score>.score-section {
+.dialog-score > .score-section {
     line-height: 1em;
     padding-left: 0.5em;
     border-radius: 4px;
@@ -219,7 +218,7 @@
     padding-top: 0.5em;
 }
 
-.dialog-titles>.title-item {
+.dialog-titles > .title-item {
     line-height: 2em;
     padding-left: 1.5em;
     border-radius: 4px;
@@ -232,11 +231,11 @@
     background-color: #111;
 }
 
-.dialog-titles>.selected {
+.dialog-titles > .selected {
     border-left-color: #00FF00;
 }
 
-.dialog-titles>.title-item>.btn-noused {
+.dialog-titles > .title-item > .btn-noused {
     float: right;
     display: inline-block;
     color: #00ff00;
@@ -247,18 +246,18 @@
     cursor: pointer;
 }
 
-.dialog-titles>.empty {
+.dialog-titles > .empty {
     color: gray;
     padding-left: 1.4em;
     line-height: 2em;
 }
 
 @media (max-width: 480px) {
-    .dialog>.dialog-footer>.footer-item {
+    .dialog > .dialog-footer > .footer-item {
         width: 4em;
     }
 
-    .dialog>.dialog-footer>.eq-group {
+    .dialog > .dialog-footer > .eq-group {
         margin-left: 0.5em;
         width: 1.5em;
         height: 1.5em;

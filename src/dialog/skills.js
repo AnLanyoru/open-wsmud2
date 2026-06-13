@@ -144,8 +144,7 @@ export default {
             if (data.exp >= 0) item.exp = data.exp;
             if (data.can_enables) item.can_enables = data.can_enables;
             this.updateSkillItem(item);
-        }
-        else if (data.enable == false) {
+        } else if (data.enable == false) {
             if (item.enable_skill) {
                 var old_skill = item.enable_skill;
                 this.skills[old_skill][data.id] = false;
@@ -188,7 +187,7 @@ export default {
     onData: function (data) {
         if (data.book) {
             if (!this.books) return;
-            this.books.push({ name: data.book[0], grade: data.book[1], id: data.book[2] });
+            this.books.push({name: data.book[0], grade: data.book[1], id: data.book[2]});
             if (this.isShow && this.selected_item == 2) {
                 return this.showBooks();
             }
@@ -431,10 +430,12 @@ export default {
     }
 };
 const level_desc = ["wht", "hig", "hic", "hiy", "him", "hio", 'ord'];
+
 function wrap_name(obj) {
     let tag = level_desc[obj.grade];
     return `<${tag}>${obj.name}</${tag}>`;
 }
+
 const skills_css = `
 .dialog-skills {
     overflow-y: auto;

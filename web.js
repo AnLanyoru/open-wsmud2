@@ -11,15 +11,14 @@ const app = express();
 const HOST = __CONFIG.WEB_HOST;
 const PORT = __CONFIG.WEB_PORT;
 const API_PATHS = ['./api/user', './api/game'];
-const APIS = {
-};
+const APIS = {};
 
 for (let api of API_PATHS) {
     APIS[api.replace('./api/', "")] = require(api);
 }
 
 
-app.use(express.static(path.join(__dirname, 'www'), { fallthrough: true }));
+app.use(express.static(path.join(__dirname, 'www'), {fallthrough: true}));
 
 
 app.disable('x-powered-by');
@@ -37,7 +36,7 @@ app.use(session({
     }
 }));
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(pinoHttp({
     level: 'info',
@@ -53,40 +52,40 @@ app.use(pinoHttp({
 }));
 
 app.all('/api/:className/:methodName', async (req, res) => {
-    const { className, methodName } = req.params;
+    const {className, methodName} = req.params;
     try {
         const ClassModule = APIS[className];
         if (!ClassModule)
-            return res.status(404).json({ error: 'Method not found' });
+            return res.status(404).json({error: 'Method not found'});
         const instance = new ClassModule(req, res);
         if (typeof instance[methodName] !== 'function') {
-            return res.status(404).json({ error: 'Method not found' });
+            return res.status(404).json({error: 'Method not found'});
         }
-        const params = { ...req.query, ...req.body };
+        const params = {...req.query, ...req.body};
 
         const result = await instance[methodName](params);
 
         res.json(result);
     } catch (error) {
         console.error('API Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({error: 'Internal server error'});
     }
 });
 app.all('/sse/:className/:methodName', async (req, res) => {
-    const { className, methodName } = req.params;
+    const {className, methodName} = req.params;
     try {
         const ClassModule = APIS[className];
         if (!ClassModule)
-            return res.status(404).json({ error: 'Method not found' });
+            return res.status(404).json({error: 'Method not found'});
         const instance = new ClassModule(req, res);
         if (typeof instance[methodName] !== 'function') {
-            return res.status(404).json({ error: 'Method not found' });
+            return res.status(404).json({error: 'Method not found'});
         }
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         res.flushHeaders();
-        const handler = await instance[methodName]({ ...req.query, ...req.body });
+        const handler = await instance[methodName]({...req.query, ...req.body});
         if (!res.writableEnded) {
             if (handler && handler.end) {
                 const closeHandler = () => {
@@ -100,7 +99,7 @@ app.all('/sse/:className/:methodName', async (req, res) => {
     } catch (error) {
         console.error('API Error:', error);
         if (!res.headersSent) {
-            res.status(500).json({ error: 'Internal server error' });
+            res.status(500).json({error: 'Internal server error'});
         }
     }
 });
@@ -115,17 +114,17 @@ function reload_api(req, res) {
             }
             APIS[modulePath.replace('./api/', "")] = require(resolvedPath);
         }
-        res.json({ msg: 'api reload' });
+        res.json({msg: 'api reload'});
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({error: 'Internal server error'});
     }
 }
+
 app.use("/reload", reload_api);
 
 const http = require('http');
 const server = http.createServer(app);
-
 
 
 // 启动服务器

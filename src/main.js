@@ -1,4 +1,4 @@
-import { Page } from './base/page.js';
+import {Page} from './base/page.js';
 import LoginPage from './login/index.js';
 import GameMainPage from './game/main.js';
 

@@ -1,12 +1,11 @@
-
-import { Page } from '../base/page.js';
+import {Page} from '../base/page.js';
 import API from '../api.js';
 import * as Client from '../client.js';
 
 class ChangePwdPage extends Page {
-  constructor() {
-    super();
-    this.template = `
+    constructor() {
+        super();
+        this.template = `
       <div id="pwd_panel" class="mypanel" style="display:none;">
             <ul>
                 <li class="panel_item active"><span>修改密码</span></li>
@@ -35,48 +34,48 @@ class ChangePwdPage extends Page {
         </div>
 `;
 
-  }
-
-  open() {
-    Client.hide2show("#pwd_panel");
-    API.GetPhone(function (x) {
-      if (x.code !== 1) return Client.showInputError("#update_pwd1", "获取绑定的手机号失败");
-
-      if (x.result) {
-        $("#pwd_phone").prop("disabled", true).val(x.result);
-        $("#pwd_bind").show();
-      } else {
-        $("#pwd_phone").prop("disabled", false).val("");
-        $("#pwd_bind").hide();
-      }
-    });
-  }
-
-  update() {
-    $('#pwd_panel').find('.input-error').remove();
-    var pwd1 = $("#update_pwd1").val();
-    var pwd2 = $("#update_pwd2").val();
-    var pwd3 = $("#update_pwd3").val();
-    if (pwd1.length < 6 || pwd1.length > 20) return Client.showInputError("#update_pwd1", "密码长度在6到20之间");
-    if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#update_pwd2", "密码长度在6到20之间");
-    if (pwd3 != pwd2) return Client.showInputError("#update_pwd3", "两次密码输入不一致");
-    var valid_no;
-    if ($("#pwd_bind").is(":visible")) {
-      valid_no = $("#pwd_no").val();
-      if (!valid_no) return Client.showInputError($("#pwd_no").parent(), "请输入你绑定的手机尾号");
-      if (!/^\d{4}$/.test(valid_no)) return Client.showInputError($("#pwd_no").parent(), "请输入你绑定的手机尾号");
     }
 
-    Client.showLoader("正在修改密码", "#pwd_panel");
-    API.ChangePassword(pwd1, pwd2, valid_no, function (x) {
-      if (x.code) {
-        Client.hide2show($("#slist_panel"));
-      } else {
-        Client.showInputError("#update_pwd1", x.result || '修改失败');
+    open() {
         Client.hide2show("#pwd_panel");
-      }
-    });
-  }
+        API.GetPhone(function (x) {
+            if (x.code !== 1) return Client.showInputError("#update_pwd1", "获取绑定的手机号失败");
+
+            if (x.result) {
+                $("#pwd_phone").prop("disabled", true).val(x.result);
+                $("#pwd_bind").show();
+            } else {
+                $("#pwd_phone").prop("disabled", false).val("");
+                $("#pwd_bind").hide();
+            }
+        });
+    }
+
+    update() {
+        $('#pwd_panel').find('.input-error').remove();
+        var pwd1 = $("#update_pwd1").val();
+        var pwd2 = $("#update_pwd2").val();
+        var pwd3 = $("#update_pwd3").val();
+        if (pwd1.length < 6 || pwd1.length > 20) return Client.showInputError("#update_pwd1", "密码长度在6到20之间");
+        if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#update_pwd2", "密码长度在6到20之间");
+        if (pwd3 != pwd2) return Client.showInputError("#update_pwd3", "两次密码输入不一致");
+        var valid_no;
+        if ($("#pwd_bind").is(":visible")) {
+            valid_no = $("#pwd_no").val();
+            if (!valid_no) return Client.showInputError($("#pwd_no").parent(), "请输入你绑定的手机尾号");
+            if (!/^\d{4}$/.test(valid_no)) return Client.showInputError($("#pwd_no").parent(), "请输入你绑定的手机尾号");
+        }
+
+        Client.showLoader("正在修改密码", "#pwd_panel");
+        API.ChangePassword(pwd1, pwd2, valid_no, function (x) {
+            if (x.code) {
+                Client.hide2show($("#slist_panel"));
+            } else {
+                Client.showInputError("#update_pwd1", x.result || '修改失败');
+                Client.hide2show("#pwd_panel");
+            }
+        });
+    }
 }
 
 export default ChangePwdPage;

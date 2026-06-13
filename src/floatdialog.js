@@ -1,5 +1,5 @@
 import Dialog from './dialog/base.js';
-import { SendCommand } from './client.js';
+import {SendCommand} from './client.js';
 
 const float_css = `
 .float-dialog {
@@ -243,7 +243,7 @@ const FloatDialog = {
         if (this.currentFloat) {
             this.hideCurrent();
         }
-        this.createFloatWindow({ text, cmds: cmdsData.items || [] });
+        this.createFloatWindow({text, cmds: cmdsData.items || []});
         this.updateWarn();
     },
 

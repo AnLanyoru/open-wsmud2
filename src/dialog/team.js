@@ -1,7 +1,6 @@
-
-
 export default {
-    init: function () { },
+    init: function () {
+    },
     createElement: function () {
         return $('<div class="dialog-team"></div>');
     },

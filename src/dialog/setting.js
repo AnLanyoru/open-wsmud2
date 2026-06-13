@@ -1,7 +1,6 @@
-
 import Util from '../utils/util.js';
 import Setting from '../setting.js';
-import { GameClient, hide2show, ReceiveMessage } from '../client.js';
+import {GameClient, hide2show, ReceiveMessage} from '../client.js';
 
 export default {
     footer: [["显示", "setting"], ["<yel>高级</yel>", "custom"]

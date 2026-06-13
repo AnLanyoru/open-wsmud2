@@ -1,12 +1,11 @@
-
-import { Page } from '../base/page.js';
+import {Page} from '../base/page.js';
 import API from '../api.js';
 import * as Client from '../client.js';
 
 class ResetPwdPage extends Page {
-  constructor() {
-    super();
-    this.template = `
+    constructor() {
+        super();
+        this.template = `
      <div id="reset_panel" class="mypanel" style="display:none;">
             <ul>
                 <li class="panel_item active"><span>重置你的密码</span></li>
@@ -33,35 +32,35 @@ class ResetPwdPage extends Page {
         </div>
 `;
 
-  }
+    }
 
-  on_mount() {
-  }
+    on_mount() {
+    }
 
-  reset() {
-    var name = $("#reset_name").val();
-    if (!name) return Client.showInputError("#reset_name", "请输入用户名");
-    if (!/^[a-z0-9]{5,15}$/.test(name)) return Client.showInputError("#reset_name", "用户名格式错误,需要5-15位字母开头的字母，数字或下划线，不区分大小写");
-    var phone = $("#reset_phone").val();
-    if (!phone) return Client.showInputError("#reset_phone", "请输入你的帐号绑定的手机号码");
-    if (!/^1\d{10}$/.test(phone)) return Client.showInputError("#reset_phone", "手机号码格式错误");
-    var valid_no = "";
-    var pwd1 = $("#reset_pwd1").val();
-    if (!pwd1) return Client.showInputError("#reset_pwd1", "请输入你的新密码");
-    var pwd2 = $("#reset_pwd2").val();
-    if (!pwd2) return Client.showInputError("#reset_pwd2", "请重复输入你的新密码");
-    if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#update_pwd2", "密码长度在6到20之间");
-    if (pwd2 != pwd1) return Client.showInputError("#reset_pwd2", "两次密码输入不一致");
-    Client.showLoader("正在修改密码", "#reset_panel");
-    API.ResetPasswordByPhone(name, phone, valid_no, pwd1, function (x) {
-      if (x.code) {
-        Client.hide2show("#login_panel");
-      } else {
-        Client.showInputError("#reset_pwd2", x.result ?? "重置失败");
-        Client.hide2show("#reset_panel");
-      }
-    });
-  }
+    reset() {
+        var name = $("#reset_name").val();
+        if (!name) return Client.showInputError("#reset_name", "请输入用户名");
+        if (!/^[a-z0-9]{5,15}$/.test(name)) return Client.showInputError("#reset_name", "用户名格式错误,需要5-15位字母开头的字母，数字或下划线，不区分大小写");
+        var phone = $("#reset_phone").val();
+        if (!phone) return Client.showInputError("#reset_phone", "请输入你的帐号绑定的手机号码");
+        if (!/^1\d{10}$/.test(phone)) return Client.showInputError("#reset_phone", "手机号码格式错误");
+        var valid_no = "";
+        var pwd1 = $("#reset_pwd1").val();
+        if (!pwd1) return Client.showInputError("#reset_pwd1", "请输入你的新密码");
+        var pwd2 = $("#reset_pwd2").val();
+        if (!pwd2) return Client.showInputError("#reset_pwd2", "请重复输入你的新密码");
+        if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#update_pwd2", "密码长度在6到20之间");
+        if (pwd2 != pwd1) return Client.showInputError("#reset_pwd2", "两次密码输入不一致");
+        Client.showLoader("正在修改密码", "#reset_panel");
+        API.ResetPasswordByPhone(name, phone, valid_no, pwd1, function (x) {
+            if (x.code) {
+                Client.hide2show("#login_panel");
+            } else {
+                Client.showInputError("#reset_pwd2", x.result ?? "重置失败");
+                Client.hide2show("#reset_panel");
+            }
+        });
+    }
 }
 
 export default ResetPwdPage;

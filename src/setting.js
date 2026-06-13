@@ -1,5 +1,3 @@
-
-
 const Setting = {
     keep_msg: 0,
     show_hpnum: 0,
@@ -112,16 +110,14 @@ const Setting = {
             case "combat_wrap":
                 if (value) {
                     $(".combat-commands").addClass('combat-wrap');
-                }
-                else {
+                } else {
                     $(".combat-commands").removeClass('combat-wrap');
                 }
                 break;
             case "action_wrap":
                 if (value) {
                     $(".room-commands").addClass('combat-wrap');
-                }
-                else {
+                } else {
                     $(".room-commands").removeClass('combat-wrap');
                 }
                 break;

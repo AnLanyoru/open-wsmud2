@@ -1,5 +1,3 @@
-
-
 export const ProxyHost = "/";
 export const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -136,8 +134,7 @@ export function Str2XML(s) {
         xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
         xmlDoc.async = "false";
         xmlDoc.loadXML(s);
-    }
-    else {
+    } else {
         var parser = new DOMParser();
         xmlDoc = parser.parseFromString(s, "text/xml");
     }

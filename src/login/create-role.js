@@ -1,8 +1,7 @@
-
-import { Page } from '../base/page.js';
+import {Page} from '../base/page.js';
 import API from '../api.js';
 import * as Client from '../client.js';
-import { RefreshInput } from './roles.js';
+import {RefreshInput} from './roles.js';
 
 window.RefreshInput = RefreshInput;
 

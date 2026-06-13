@@ -1,11 +1,10 @@
-
-import { Page } from '../base/page.js';
+import {Page} from '../base/page.js';
 import Combat from '../combat.js';
 import MAP from '../map.js';
 import * as ToolAction from './tool.js';
 import Dialog from '../dialog/base.js';
-import { Confirm } from '../confirm.js';
-import { Warn } from '../confirm.js';
+import {Confirm} from '../confirm.js';
+import {Warn} from '../confirm.js';
 import Process from '../process.js';
 import Setting from '../setting.js';
 import SCRIPT from '../script.js';
@@ -121,6 +120,7 @@ class GameMainPage extends Page {
 }
 
 let last_click = 0;
+
 function open_map() {
     last_click = last_click || 0;
     if (Date.now() - last_click > 500) {
@@ -129,6 +129,7 @@ function open_map() {
     }
     Dialog.show("map");
 }
+
 function MenuClick(item) {
     var cmd = $(this).attr("command");
     if (!cmd) {
@@ -138,6 +139,7 @@ function MenuClick(item) {
     }
     return HandlerMenuCommand(cmd);
 }
+
 function HandlerMenuCommand(cmd) {
     switch (cmd) {
         case "showtool":
@@ -162,6 +164,7 @@ function HandlerMenuCommand(cmd) {
     }
     return false;
 }
+
 function ShowChat() {
     var elem = $(".chat-panel").toggleClass("hide");
     if (!elem.is(".hide")) {
@@ -172,11 +175,13 @@ function ShowChat() {
     }
     return false;
 }
+
 function OnSendBoxKeyDown(e) {
     if (e.keyCode == 13) {
         SendChatMessage();
     }
 }
+
 function SendChatMessage() {
     var value = $(".sender-box").val();
     if (!value) return;
@@ -206,6 +211,7 @@ function ChannelChanged() {
     $(".sender-box").focus();
     return false;
 }
+
 function ShowEmotePanel() {
     var panel = $(".channel-emotes");
     if (panel.is(".hide")) {
@@ -224,6 +230,7 @@ function ShowEmotePanel() {
         $(".channel-emotes").addClass("hide");
     }
 }
+
 function ContainerCommand(e) {
     var elem = $(e.target);
     var cmd = elem.attr("cmd");
@@ -256,8 +263,7 @@ function ContainerCommand(e) {
             }
         } else if (char === '#') {
             SCRIPT.run(cmd);
-        }
-        else {
+        } else {
             SendCommand(cmd);
             if (!elem.closest('.dialog-fb').length &&
                 elem.closest(".dialog-content").length > 0) {

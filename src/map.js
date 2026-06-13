@@ -1,5 +1,3 @@
-
-
 export default {
     DIRS: ["west", "north", "south", "east", "northwest", "southwest", "northeast", "southeast",
         "down", "up", "westdown", "northdown", "southdown", "eastdown", "westup", "northup", "southup", "eastup", "enter", "out"],
@@ -256,10 +254,12 @@ export default {
             var y = map[i].p[1];
             if (x < pos.minX) {
                 pos.minX = x;
-            } if (x > pos.maxX) pos.maxX = x;
+            }
+            if (x > pos.maxX) pos.maxX = x;
             if (y < pos.minY) {
                 pos.minY = y;
-            } if (y > pos.maxY) pos.maxY = y;
+            }
+            if (y > pos.maxY) pos.maxY = y;
         }
         return pos;
     },

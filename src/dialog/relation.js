@@ -1,5 +1,3 @@
-
-
 function format_time_span(time) {
     let diff = Math.floor(time / 1000);
     if (diff < 0) diff = 0;
@@ -15,7 +13,8 @@ function format_time_span(time) {
 }
 
 export default {
-    init: function () { },
+    init: function () {
+    },
     createElement: function () {
         return $('<div class="dialog-relation"></div>');
     },

@@ -1,5 +1,3 @@
-
-
 const task_css = `
 
 .dialog-tasks {

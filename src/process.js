@@ -1,16 +1,15 @@
-
 import MessageQueue from './message.js';
-import { connectServer, hide2show, isConnected, onLogin, SendCommand, showLoader, GameClient } from './client.js';
+import {connectServer, hide2show, isConnected, onLogin, SendCommand, showLoader, GameClient} from './client.js';
 import Combat from './combat.js';
 import Setting from './setting.js';
 import MAP from './map.js';
 import SCRIPT from './script.js';
-import { roles } from './login/index.js';
-import { SERVERS } from "./login/server.js";
+import {roles} from './login/index.js';
+import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
 
 const MessageContent = () => $(".content-message");
-const MessagePage = { append: (div) => $(".content-message").append(div) };
+const MessagePage = {append: (div) => $(".content-message").append(div)};
 
 const Process = {
     itemsElement: null,
@@ -109,7 +108,7 @@ const Process = {
             Dialog.skills.isShow = false;
         }
         console.log("重新连接到", serv.Name);
-        if (!data.pid) Process.die({ relive: true });
+        if (!data.pid) Process.die({relive: true});
         connectServer(serv, data.pid);
     }
     ,
@@ -168,14 +167,14 @@ const Process = {
             if (id == Process.player) {
                 var name = $(this).find(".item-name").html();
 
-                var cmds = [{ cmd: "look " + id, name: "查看" },
-                { cmd: "dazuo", name: "打坐" },
-                { cmd: "liaoshang", name: "疗伤" }];
+                var cmds = [{cmd: "look " + id, name: "查看"},
+                    {cmd: "dazuo", name: "打坐"},
+                    {cmd: "liaoshang", name: "疗伤"}];
                 if (Dialog.team.items && Dialog.team.items.length) {
-                    cmds.push({ cmd: "team out", name: "退出队伍" });
+                    cmds.push({cmd: "team out", name: "退出队伍"});
                     if (Dialog.team.isCap) {
-                        cmds.push({ cmd: "team dismiss", name: "解散队伍" });
-                        cmds.push({ cmd: "team set", name: "更改分配方式" });
+                        cmds.push({cmd: "team dismiss", name: "解散队伍"});
+                        cmds.push({cmd: "team set", name: "更改分配方式"});
                     }
                 }
                 Process.item({
@@ -539,9 +538,10 @@ const Process = {
     }, addAction: function (data) {
         Combat.AddObj(data.id, data.name, data.distime);
     }, removeAction: function (data) {
-        Combat.DisObj({ id: data.id, remove: true });
+        Combat.DisObj({id: data.id, remove: true});
     }
 };
+
 function ReceiveMessage(x) {
     Process.message.push(x);
     Process.message.scroll2end();

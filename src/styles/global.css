@@ -76,7 +76,7 @@ pre {
     font-size: 0.875rem;
 }
 
-.loader>img {
+.loader > img {
     vertical-align: middle;
     border: 0;
     width: 20px;
@@ -242,7 +242,8 @@ ORD {
     color: #FF4500;
 }
 
-FLA {}
+FLA {
+}
 
 BBLK {
     background-color: #FFFFFF;
@@ -398,7 +399,7 @@ line::after {
     margin: 0px auto;
 }
 
-.mypanel>ul {
+.mypanel > ul {
     padding-left: 0;
     display: block;
     margin: 0px;
@@ -410,7 +411,7 @@ line::after {
     -webkit-padding-start: 0px;
 }
 
-.mypanel>ul>.active {
+.mypanel > ul > .active {
     color: #fff;
     background-color: #337ab7;
     border-color: #337ab7;
@@ -436,7 +437,7 @@ line::after {
     padding-left: 0.6rem;
 }
 
-.new-list>li {
+.new-list > li {
     list-style-type: disc;
     font-size: 1rem;
     line-height: 1.2em;
@@ -445,7 +446,7 @@ line::after {
     cursor: pointer;
 }
 
-.new-list>li:hover {
+.new-list > li:hover {
     text-decoration: underline;
 }
 
@@ -464,9 +465,10 @@ line::after {
 
 }
 
-.role-list {}
+.role-list {
+}
 
-.role-list>.role-item {
+.role-list > .role-item {
     font-size: 1rem;
     cursor: pointer;
     padding-top: 0.4rem;
@@ -474,7 +476,7 @@ line::after {
     list-style-type: none;
 }
 
-.role-list>.select {
+.role-list > .select {
 
     list-style-type: disc;
 }
@@ -515,7 +517,7 @@ line::after {
     position: relative;
 }
 
-.validnum-box>.validnum-btn {
+.validnum-box > .validnum-btn {
     margin: 0px;
     position: absolute;
     right: 20%;
@@ -528,7 +530,7 @@ line::after {
     background-color: transparent;
 }
 
-.validnum-box>.validnum-img {
+.validnum-box > .validnum-img {
     margin: 0px;
     position: absolute;
     right: 20%;

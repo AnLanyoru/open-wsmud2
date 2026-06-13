@@ -1,6 +1,5 @@
-
 import Util from './utils/util.js';
-import { Confirm } from './confirm.js';
+import {Confirm} from './confirm.js';
 
 const MAP_DIR_EXITS = {
     left: ["west", "westup", "westdown"],
@@ -189,7 +188,7 @@ const SCRIPT = {
             return result;
         },
         input: function () {
-            const par = { btn_text: "确定", min: 0, max: 0 };
+            const par = {btn_text: "确定", min: 0, max: 0};
             for (let i = 0; i < arguments.length; i++) {
                 let val = arguments[i];
                 if (typeof val === 'string') par.btn_text = val;
@@ -243,4 +242,4 @@ const SCRIPT = {
 
 };
 export default SCRIPT;
-export { MAP_DIR_EXITS };
+export {MAP_DIR_EXITS};
