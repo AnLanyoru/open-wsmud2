@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "崔莺莺";

@@ -1,10 +1,10 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends ROOM {
     name = "药铺";
     desc = "这是一家药铺，一股浓浓的药味让你几欲窒息，那是从药柜上的几百个小抽屉里散发出来的。神医平一指坐在茶几旁，独自喝着茶，看也不看你一眼。一名小伙计站在柜台后招呼着顾客。柜台上贴着一张发黄的<cmd cmd='look guanggao'>广告(guanggao)</cmd>。";
-    exits = { "south": "yz/dongdajie2", "north": "yz/neishi" };
+    exits = {"south": "yz/dongdajie2", "north": "yz/neishi"};
     no_fight = true;
 
     constructor() {
@@ -32,6 +32,7 @@ function start_work(me) {
     });
     return true;
 }
+
 function do_work(me) {
 
     var exp = WORLD.DATA.get_exp(me);

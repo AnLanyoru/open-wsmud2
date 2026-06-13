@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "守卫";
@@ -37,12 +37,13 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    return false;
-}
-    on_die(me) {
-    if (me.is_player) {
-        me.add_temp('jg', -200);
-        me.notify('<red>你击杀了襄阳守军，军功减少200。</red>');
+        return false;
     }
-}
+
+    on_die(me) {
+        if (me.is_player) {
+            me.add_temp('jg', -200);
+            me.notify('<red>你击杀了襄阳守军，军功减少200。</red>');
+        }
+    }
 }

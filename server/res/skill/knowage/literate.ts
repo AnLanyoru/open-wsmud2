@@ -1,5 +1,5 @@
-import { SKILL } from "../../../core/skill/skill.js";
-import { SKILL_TYPES } from "../../../core/const.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
 
 export default class extends SKILL {
     id = "literate";
@@ -122,7 +122,7 @@ export default class extends SKILL {
             grade = this.query_grade(me);
         }
 
-        return { int: parseInt(lv / (10 - grade)) }
+        return {int: parseInt(lv / (10 - grade))}
     }
 }
 

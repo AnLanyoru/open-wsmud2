@@ -1,4 +1,4 @@
-import { FAMILY } from "../../core/skill/family.js";
+import {FAMILY} from "../../core/skill/family.js";
 
 export default class extends FAMILY {
     id = "XIAOYAO";
@@ -7,47 +7,47 @@ export default class extends FAMILY {
     top_family = "逍遥宗";
     can_battle = true;
     def_npcs = [["pub/mpguanli#XIAOYAO", "xiaoyao/linjian"],
-["pub/dadizi#XIAOYAO", "xiaoyao/linjian3"],
-["xiaoyao/xuemuhua", "xiaoyao/muwu2"],
-["xiaoyao/suxinghe", "xiaoyao/qingcaop"],
-["xiaoyao/xiaoyaozi", "xiaoyao/shishi2"]];
+        ["pub/dadizi#XIAOYAO", "xiaoyao/linjian3"],
+        ["xiaoyao/xuemuhua", "xiaoyao/muwu2"],
+        ["xiaoyao/suxinghe", "xiaoyao/qingcaop"],
+        ["xiaoyao/xiaoyaozi", "xiaoyao/shishi2"]];
     boss_guard = ["xiaoyao/shishi2", "xiaoyao/shishi", "xiaoyao/linjian3"];
     guard_rooms = ['xiaoyao/muwu1', 'xiaoyao/muwu2', 'xiaoyao/muwu3', "xiaoyao/liangong"];
     npc_skills = [
-    ["dodge", 800],
-    ["parry", 800],
-    ["force", 800],
-    ["unarmed", 800],
-    ["blade", 800],
-    ["sword", 800],
-    ["literate", 800],
-    ["xiaoyaoxinfa", 800],
-    ["beimingshengong", 800, "force"],
-    ["lingboweibu", 800, "dodge"],
-    ["ruyidao", 800, "blade"],
-    ["zhemeishou", 800, "parry"],
-    ["liuyangzhang", 800, "unarmed"]];
+        ["dodge", 800],
+        ["parry", 800],
+        ["force", 800],
+        ["unarmed", 800],
+        ["blade", 800],
+        ["sword", 800],
+        ["literate", 800],
+        ["xiaoyaoxinfa", 800],
+        ["beimingshengong", 800, "force"],
+        ["lingboweibu", 800, "dodge"],
+        ["ruyidao", 800, "blade"],
+        ["zhemeishou", 800, "parry"],
+        ["liuyangzhang", 800, "unarmed"]];
     boss_skills = [
-    ["dodge", 800],
-    ["parry", 800],
-    ["force", 800],
-    ["unarmed", 800],
-    ["blade", 800],
-    ["sword", 800],
-    ["xiaowuxiang2", 800, "force"],
-    ["lingboweibu2", 800, "dodge"],
-    ["ruyidao", 800, "blade"],
-    ["zhemeishou", 800, "parry"],
-    ["liuyangzhang2", 800, "unarmed"]];
+        ["dodge", 800],
+        ["parry", 800],
+        ["force", 800],
+        ["unarmed", 800],
+        ["blade", 800],
+        ["sword", 800],
+        ["xiaowuxiang2", 800, "force"],
+        ["lingboweibu2", 800, "dodge"],
+        ["ruyidao", 800, "blade"],
+        ["zhemeishou", 800, "parry"],
+        ["liuyangzhang2", 800, "unarmed"]];
     boss_skills2 = [
-    ["dodge", 5000],
-    ["parry", 5000],
-    ["force", 5000],
-    ["unarmed", 5000],
-    ["beimingshengong3", 5000, "force"],
-    ["lingboweibu2", 5000, "dodge"],
-    ["zhemeishou", 5000, "parry"],
-    ["liuyangzhang3", 5000, "unarmed"]];
+        ["dodge", 5000],
+        ["parry", 5000],
+        ["force", 5000],
+        ["unarmed", 5000],
+        ["beimingshengong3", 5000, "force"],
+        ["lingboweibu2", 5000, "dodge"],
+        ["zhemeishou", 5000, "parry"],
+        ["liuyangzhang3", 5000, "unarmed"]];
     boss_path = "xiaoyao/xiaoyaozi";
 
     constructor() {
@@ -56,35 +56,38 @@ export default class extends FAMILY {
     }
 
     call(player, isbad) {
-    var age = player.query_age();
-    if (player.gender == 2) {
-        if (age < 18) return isbad ? "小贱人" : "小姑娘";
-        else if (age < 50) return isbad ? "贱人" : "姑娘";
-        else return isbad ? "死老太婆" : "婆婆";
-    } else {
-        if (age < 20) return isbad ? "小王八蛋" : "小兄弟";
-        else if (age < 50) return isbad ? "臭贼" : "壮士";
-        else return isbad ? "老匹夫" : "老爷子";
+        var age = player.query_age();
+        if (player.gender == 2) {
+            if (age < 18) return isbad ? "小贱人" : "小姑娘";
+            else if (age < 50) return isbad ? "贱人" : "姑娘";
+            else return isbad ? "死老太婆" : "婆婆";
+        } else {
+            if (age < 20) return isbad ? "小王八蛋" : "小兄弟";
+            else if (age < 50) return isbad ? "臭贼" : "壮士";
+            else return isbad ? "老匹夫" : "老爷子";
+        }
     }
-}
+
     call_me(player, isbad) {
-    var age = player.query_age();
-    if (player.gender == 2) {
-        if (age < 30) return isbad ? "本姑娘" : "小女子";
-        else return isbad ? "老娘" : "妾身";
-    } else {
-        if (age < 50) return isbad ? "大爷我" : "在下";
-        else return isbad ? "老子" : "老头子";
+        var age = player.query_age();
+        if (player.gender == 2) {
+            if (age < 30) return isbad ? "本姑娘" : "小女子";
+            else return isbad ? "老娘" : "妾身";
+        } else {
+            if (age < 50) return isbad ? "大爷我" : "在下";
+            else return isbad ? "老子" : "老头子";
+        }
     }
-}
+
     on_kill(npc, me) {
-    if (this.boss) {
-        this.boss.do_command("chat", me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，逍遥派众弟子听令，对" + me.family.name + "弟子格杀勿论！");
+        if (this.boss) {
+            this.boss.do_command("chat", me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，逍遥派众弟子听令，对" + me.family.name + "弟子格杀勿论！");
+        }
     }
-}
+
     on_battle(fam) {
-    if (this.boss) {
-        this.boss.do_command("chat", "...");
+        if (this.boss) {
+            this.boss.do_command("chat", "...");
+        }
     }
-}
 }

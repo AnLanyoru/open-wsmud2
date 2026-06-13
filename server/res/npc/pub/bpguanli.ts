@@ -1,6 +1,6 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "帮会管理员";
@@ -75,6 +75,6 @@ export default class extends NPC {
     }
 
     on_kill(me: CHARACTER) {
-    return false;
-}
+        return false;
+    }
 }

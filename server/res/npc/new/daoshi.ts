@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "<hic>指引者</hic>";
@@ -21,25 +21,25 @@ export default class extends NPC {
 
     query_commands_json(player, isyb) {
 
-    var json = {};
-    json.type = "item";
-    json.desc = this.desc;
-    json.id = this.id;
-    json.commands = [];
-    json.commands.push({
-        cmd: "look " + this.id,
-        name: "查看"
-    });
+        var json = {};
+        json.type = "item";
+        json.desc = this.desc;
+        json.id = this.id;
+        json.commands = [];
+        json.commands.push({
+            cmd: "look " + this.id,
+            name: "查看"
+        });
 
-    if (this.actions) {
-        for (var cmd in this.actions) {
-            if (!this.actions[cmd].name) continue;
-            json.commands.push({
-                cmd: cmd + " " + this.id,
-                name: this.actions[cmd].name
-            });
+        if (this.actions) {
+            for (var cmd in this.actions) {
+                if (!this.actions[cmd].name) continue;
+                json.commands.push({
+                    cmd: cmd + " " + this.id,
+                    name: this.actions[cmd].name
+                });
+            }
         }
+        return JSON.stringify(json);
     }
-    return JSON.stringify(json);
-}
 }

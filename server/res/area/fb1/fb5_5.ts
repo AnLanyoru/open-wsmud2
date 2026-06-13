@@ -1,4 +1,4 @@
-import { AREA } from "../../../core/room/area.js";
+import {AREA} from "../../../core/room/area.js";
 
 export default class extends AREA {
     id = "zhuang";
@@ -15,40 +15,40 @@ export default class extends AREA {
     room_path = "bj/zhuang/";
     ss_title = "天下无双";
     map = [
-     { n: "小路", id: "bj/zhuang/xiaolu", p: [0, 3] },
-                    { n: "小路", id: "bj/zhuang/xiaolu2", p: [0, 2], exits: ["s", "n"] },
-                    { n: "大门", id: "bj/zhuang/damen", p: [0, 1] },
-                    { n: "大院", id: "bj/zhuang/dayuan", p: [0, 0] },
-                    { n: "大厅", id: "bj/zhuang/dating", p: [0, -1], exits: ["w", "s", "n", "e"] },
-                    { n: "西厅", id: "bj/zhuang/dating1", p: [-1, -1] },
-                    { n: "东厅", id: "bj/zhuang/dating2", p: [1, -1] },
-                    { n: "走廊", id: "bj/zhuang/changlang", p: [0, -2] },
-                    { n: "小屋", id: "bj/zhuang/xiaowu", p: [0, -3], exits: ["s"] }
-];
+        {n: "小路", id: "bj/zhuang/xiaolu", p: [0, 3]},
+        {n: "小路", id: "bj/zhuang/xiaolu2", p: [0, 2], exits: ["s", "n"]},
+        {n: "大门", id: "bj/zhuang/damen", p: [0, 1]},
+        {n: "大院", id: "bj/zhuang/dayuan", p: [0, 0]},
+        {n: "大厅", id: "bj/zhuang/dating", p: [0, -1], exits: ["w", "s", "n", "e"]},
+        {n: "西厅", id: "bj/zhuang/dating1", p: [-1, -1]},
+        {n: "东厅", id: "bj/zhuang/dating2", p: [1, -1]},
+        {n: "走廊", id: "bj/zhuang/changlang", p: [0, -2]},
+        {n: "小屋", id: "bj/zhuang/xiaowu", p: [0, -3], exits: ["s"]}
+    ];
     drops = [
-    "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"
-];
+        "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"
+    ];
     quick_drops = [
-    {
-        obj: "money/silver",
-        min: 1,
-        max: 10
-    }, {
-        obj: [
-            "eq/lv0/cloth",
-            "eq/lv0/dao",
-            "eq/lv0/ring",
-            "eq/lv0/tiegun",
-            "eq/lv0/jian",
-            "eq/lv0/jin",
-            "eq/lv0/shoes",
-            "eq/lv0/duanyi",
-        ]
-    },
-    {
-        obj: ["book/bc#shenxingbaibian", "book/bc#huashanjianfa", "book/bc#shenlongjian",
-            "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"],
-        odds: 5000
-    }
-];
+        {
+            obj: "money/silver",
+            min: 1,
+            max: 10
+        }, {
+            obj: [
+                "eq/lv0/cloth",
+                "eq/lv0/dao",
+                "eq/lv0/ring",
+                "eq/lv0/tiegun",
+                "eq/lv0/jian",
+                "eq/lv0/jin",
+                "eq/lv0/shoes",
+                "eq/lv0/duanyi",
+            ]
+        },
+        {
+            obj: ["book/bc#shenxingbaibian", "book/bc#huashanjianfa", "book/bc#shenlongjian",
+                "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"],
+            odds: 5000
+        }
+    ];
 }

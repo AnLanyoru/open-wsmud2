@@ -1,6 +1,6 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "管家";
@@ -42,52 +42,54 @@ export default class extends NPC {
     }
 
     on_enter(me: CHARACTER): void {
-    if (me.query_temp("home")) {
-        me.notify("管家对你热情的说道：您来啦，快请进。");
-    } else {
-        me.notify("管家招呼道：这位" + me.call() + "，需要房子吗，练功，学习都会提高效率哦。");
+        if (me.query_temp("home")) {
+            me.notify("管家对你热情的说道：您来啦，快请进。");
+        } else {
+            me.notify("管家招呼道：这位" + me.call() + "，需要房子吗，练功，学习都会提高效率哦。");
+        }
     }
-}
+
     on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
-    if (obj !== 'money') return false;
-    let home = me.query_temp('home', 0);
-    if (home === 2) return me.notify_fail("管家的说道：你已经购买住宅了。");
-    if (home) {
-        if (count !== 18000000)
-            return me.notify("管家的说道：豪华型住宅需要1800两黄金。");
-        me.set_temp("home", 2);
-        me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
-
-        me.clear_home!(false);
-    } else {
-        if (count === 1000000) {
-            me.set_temp("home", 1);
-            me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
-
-        } else if (count === 18880000) {
-            me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
-
+        if (obj !== 'money') return false;
+        let home = me.query_temp('home', 0);
+        if (home === 2) return me.notify_fail("管家的说道：你已经购买住宅了。");
+        if (home) {
+            if (count !== 18000000)
+                return me.notify("管家的说道：豪华型住宅需要1800两黄金。");
             me.set_temp("home", 2);
-        } else {
-            return me.notify("管家的说道：" + me.call() + "，你是要购买100两黄金的房子吗?");
-        }
-    }
-    return true;
-}
-    on_leave(me: CHARACTER, dir: string): boolean | void {
-    if (dir == "enter") {
-        if (!WORLD.is_server(me)) {
-            return me.notify_fail("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
-        }
-        var home = me.query_temp("home");
-        if (!home) {
-            me.notify("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
-            return false;
-        } else {
-            me.go_home!();
-            return false;
-        }
+            me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
 
+            me.clear_home!(false);
+        } else {
+            if (count === 1000000) {
+                me.set_temp("home", 1);
+                me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
+
+            } else if (count === 18880000) {
+                me.send_room("$n拿出一纸契约，给$N看了官府颁印的契尾，麻利的按好指印：多谢您老，以后这栋房子就是您的啦。", this);
+
+                me.set_temp("home", 2);
+            } else {
+                return me.notify("管家的说道：" + me.call() + "，你是要购买100两黄金的房子吗?");
+            }
+        }
+        return true;
     }
-}
+
+    on_leave(me: CHARACTER, dir: string): boolean | void {
+        if (dir == "enter") {
+            if (!WORLD.is_server(me)) {
+                return me.notify_fail("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
+            }
+            var home = me.query_temp("home");
+            if (!home) {
+                me.notify("管家拦住你：这位" + me.call() + "，这里是私人住宅区，你不能进去。");
+                return false;
+            } else {
+                me.go_home!();
+                return false;
+            }
+
+        }
+    }
 }

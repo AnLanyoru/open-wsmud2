@@ -1,12 +1,12 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { USER } from "../../../core/char/user.js";
-import { NPC } from "../../../core/char/npc.js";
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
-import { EQUIPMENT } from "../../../core/item/equipment.js";
-import type { StatsTopEntry } from "../../../core/world.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {USER} from "../../../core/char/user.js";
+import {NPC} from "../../../core/char/npc.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
+import {EQUIPMENT} from "../../../core/item/equipment.js";
+import type {StatsTopEntry} from "../../../core/world.js";
 
 // todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
@@ -154,7 +154,7 @@ export default class extends COMMAND {
             for (const sk in player.skills) {
                 const item = player.skills[sk];
                 if (typeof item === "number") {
-                    npc.skills[sk] = { level: item, exp: 0, enable_skill: null };
+                    npc.skills[sk] = {level: item, exp: 0, enable_skill: null};
                 }
             }
         }
@@ -372,10 +372,13 @@ export default class extends COMMAND {
         }
     }
 
-    biwu_watch(_me: CHARACTER) { }
+    biwu_watch(_me: CHARACTER) {
+    }
 }
 
-function challenge_end(this: CHARACTER & { on_die?: (killer: CHARACTER) => boolean | void }, killer: CHARACTER): boolean | undefined {
+function challenge_end(this: CHARACTER & {
+    on_die?: (killer: CHARACTER) => boolean | void
+}, killer: CHARACTER): boolean | undefined {
     if (this.on_die && this.on_die(killer) === false) {
         this.hp = 1;
         return false;

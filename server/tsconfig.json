@@ -16,13 +16,25 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": ".",
-    "lib": ["ES2020"],
-    "types": ["node"],
+    "lib": [
+      "ES2020"
+    ],
+    "types": [
+      "node"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["core/**/*.ts", "types/**/*.ts", "res/**/*.ts", "globals.d.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "core/**/*.ts",
+    "types/**/*.ts",
+    "res/**/*.ts",
+    "globals.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

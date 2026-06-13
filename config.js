@@ -1,6 +1,3 @@
-
-
-
 module.exports = {
     DB: require('./data/sql'),
     init: async function () {

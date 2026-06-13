@@ -1,11 +1,11 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class MapRoom extends ROOM {
     name = "武庙";
     desc = '这里是岳王庙的正殿，内有岳飞像，像上方悬挂岳飞手书"还我河山"的横匾。殿两侧壁上嵌着"精忠报国"四个大字。武人到此，都放下武器，毕恭毕敬地上香礼拜。旁边似乎有一道侧门。';
-    exits = { "east": "yz/beidajie2" };
+    exits = {"east": "yz/beidajie2"};
     no_fight = true;
     is_heartbeat = true;
 
@@ -25,9 +25,9 @@ export default class MapRoom extends ROOM {
             var name = fh_user.name;
 
             var cmds = ["<mag>今天风很大，阳光正好，" + name + "走的很安详，嘴角含笑。$N深深的鞠了一躬。</mag>",
-            "<blu>$N走上前去感叹道：" + name + "生前也是个体面人，还是上一炷香再走吧。</blu>",
-            "<yel>有人的活着他已经死了，而" + name + "虽然不在了，却仍然活在武庙中。</yel>",
-            "<CYN>一个人的生命应当如" + name + "这样度过：当他回首往事的时候不会因副本中断而感到悔恨,也不会因回到武庙而感到羞愧!</CYN>"].random();
+                "<blu>$N走上前去感叹道：" + name + "生前也是个体面人，还是上一炷香再走吧。</blu>",
+                "<yel>有人的活着他已经死了，而" + name + "虽然不在了，却仍然活在武庙中。</yel>",
+                "<CYN>一个人的生命应当如" + name + "这样度过：当他回首往事的时候不会因副本中断而感到悔恨,也不会因回到武庙而感到羞愧!</CYN>"].random();
             if (me.level >= 1) {
                 if (type === 1) {
                     let count = WORLD.DATA.add_temp('qmhd1', 1, 3600000 * 24 * 5) as number;

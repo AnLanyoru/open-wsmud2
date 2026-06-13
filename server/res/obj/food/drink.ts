@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "壶";
@@ -12,33 +12,34 @@ export default class extends OBJ {
     transable = true;
 
     on_use(me) {
-    me.send_room("$N仰头灌下一" + this.unit + this.name + "。");
-    me.add_status({
-        id: "drink",
-        name: this.name,
-        desc: this.desc,
-        recover_mp: this.recover_mp,
-        on_interval: function (me) {
-            if (me.mp < me.max_mp) {
-                me.add_mp(this.recover_mp);
-                me.send('<blu>你恢复了' + this.recover_mp + '内力。</blu>');
-            }
-        },
-        duration_count: 10,
-        duration: 5000
-    });
+        me.send_room("$N仰头灌下一" + this.unit + this.name + "。");
+        me.add_status({
+            id: "drink",
+            name: this.name,
+            desc: this.desc,
+            recover_mp: this.recover_mp,
+            on_interval: function (me) {
+                if (me.mp < me.max_mp) {
+                    me.add_mp(this.recover_mp);
+                    me.send('<blu>你恢复了' + this.recover_mp + '内力。</blu>');
+                }
+            },
+            duration_count: 10,
+            duration: 5000
+        });
 
-}
-    on_create(path, par) {
-    if (!par) {
-        this.path = path + "#0";
-        return;
     }
-    par = par.substr(1);
-    var lv = parseInt(par);
-    if (!(lv > 0 && lv < 5)) return;
-    this.set(OBJS[lv]);
-}
+
+    on_create(path, par) {
+        if (!par) {
+            this.path = path + "#0";
+            return;
+        }
+        par = par.substr(1);
+        var lv = parseInt(par);
+        if (!(lv > 0 && lv < 5)) return;
+        this.set(OBJS[lv]);
+    }
 }
 
 const OBJS = [{

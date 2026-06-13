@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "小昭";
@@ -31,11 +31,11 @@ export default class extends NPC {
     }
 
     on_master_enter(me) {
-    if (this.random(3) == 1) {
-        if(me.gender==1)
-            me.notify("小昭嘻嘻一笑，对你说道：" + me.name + "哥哥，你来啦。");
-        else
-            me.notify("小昭嘻嘻一笑，对你说道：" + me.name + "姐姐，你来啦。");
+        if (this.random(3) == 1) {
+            if (me.gender == 1)
+                me.notify("小昭嘻嘻一笑，对你说道：" + me.name + "哥哥，你来啦。");
+            else
+                me.notify("小昭嘻嘻一笑，对你说道：" + me.name + "姐姐，你来啦。");
+        }
     }
-}
 }

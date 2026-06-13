@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { WORLD } from "../../../core/world.js";
-import { EQUIP_TYPE } from "../../../core/const.js";
+import {COMMAND} from "../../../core/command.js";
+import {WORLD} from "../../../core/world.js";
+import {EQUIP_TYPE} from "../../../core/const.js";
 
 /**
  * 属性每级所需材料数（1级=1, 2级=+2, ...）
@@ -14,11 +14,11 @@ export default class extends COMMAND {
      * 可锻造的属性定义
      */
     PROPS = {
-        gj: { needs: NEEDS, name: "攻击" },
-        fy: { needs: NEEDS, name: "防御" },
-        mz: { needs: NEEDS, name: "命中" },
-        ds: { needs: NEEDS, name: "躲闪" },
-        zj: { needs: NEEDS, name: "招架" },
+        gj: {needs: NEEDS, name: "攻击"},
+        fy: {needs: NEEDS, name: "防御"},
+        mz: {needs: NEEDS, name: "命中"},
+        ds: {needs: NEEDS, name: "躲闪"},
+        zj: {needs: NEEDS, name: "招架"},
     };
 
     /**

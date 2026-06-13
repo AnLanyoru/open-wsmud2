@@ -1,10 +1,10 @@
-import { ROOM } from "../../../../core/room/room.js";
-import { SKILL } from "../../../../core/skill/skill.js";
+import {ROOM} from "../../../../core/room/room.js";
+import {SKILL} from "../../../../core/skill/skill.js";
 
 export default class extends ROOM {
     name = "巷子深处";
     desc = "这里是流氓巷的最里面，这里的小流氓反而变少了，四周看上去也有些整洁，有块空地上放着一个<cmd cmd='look shinian'>石撵</cmd>，四周地面磨得的光亮，看上去像是经常被拖动的样子。北面好像有个仓库，有个大铁门锁着。";
-    exits = { "west": "yz/lmw/xiangzi2",  "east": "yz/lmw/fang", };
+    exits = {"west": "yz/lmw/xiangzi2", "east": "yz/lmw/fang",};
 
     constructor() {
         super();
@@ -34,19 +34,19 @@ export default class extends ROOM {
     }
 
     on_leave(me, dir) {
-    if (dir == "east") {
-        var obj = this.find_obj_bypath("yz/lm/liumang");
-        if (obj) {
-            if (me.gender == 1) {
-                me.notify("流氓吊儿郎当的拦住你。");
-            } else {
-                me.notify("流氓轻佻的朝你吹了个口哨，嬉皮笑脸的说道：妹妹要到哪里去？");
-            }
+        if (dir == "east") {
+            var obj = this.find_obj_bypath("yz/lm/liumang");
+            if (obj) {
+                if (me.gender == 1) {
+                    me.notify("流氓吊儿郎当的拦住你。");
+                } else {
+                    me.notify("流氓轻佻的朝你吹了个口哨，嬉皮笑脸的说道：妹妹要到哪里去？");
+                }
 
-            return false;
+                return false;
+            }
         }
     }
-}
 }
 
 function do_work(me) {

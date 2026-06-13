@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "流氓";
@@ -28,17 +28,17 @@ export default class extends NPC {
             min: 20,
             max: 240
         }, {
-                obj: ["eq/lv0/cloth", "eq/lv0/jian", "eq/lv0/mugun"],
-                odds: 3000
-            });
+            obj: ["eq/lv0/cloth", "eq/lv0/jian", "eq/lv0/mugun"],
+            odds: 3000
+        });
     }
 
     on_kill(me) {
-    me.each_item(item => {
-        if (item != this && item.path == this.path) {
-            this.send_room("$N喊道：兄弟们有人搞事，并肩子上！");
-            item.do_kill(me);
-        }
-    }, me.environment);
-}
+        me.each_item(item => {
+            if (item != this && item.path == this.path) {
+                this.send_room("$N喊道：兄弟们有人搞事，并肩子上！");
+                item.do_kill(me);
+            }
+        }, me.environment);
+    }
 }

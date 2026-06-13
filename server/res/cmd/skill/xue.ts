@@ -1,8 +1,8 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { SKILL } from "../../../core/skill/skill.js";
-import { SKILL_TYPES } from "../../../core/const.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
 
 export default class extends COMMAND {
     command = "xue";
@@ -14,114 +14,115 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, par, sk, target) {
-    if (!sk) return me.notify("你要学习什么技能？");
-    target = me.find_obj(target, me.environment);
-    if (!target) return me.notify("你要跟谁学习技能？");
+        if (!sk) return me.notify("你要学习什么技能？");
+        target = me.find_obj(target, me.environment);
+        if (!target) return me.notify("你要跟谁学习技能？");
 
-    if (!me.skills) me.skills = {};
-    var skill_base = SKILL.get(sk);
-    if (!skill_base) return me.notify("没有这个技能。");
-    if (skill_base.grade !== skill_base.query_grade(me)
-        && skill_base.type !== SKILL_TYPES.KNOWLEDGE)
-        return me.notify('你的' + skill_base.query_color_name(me) + "已经进阶，不能再通过学习提升等级了。");
-    if (target.is_player) {
-        if (!me.master ||
-            me.master !== target.id
-            || skill_base.type !== SKILL_TYPES.BASE) {
-            return me.notify(me.name + "不能向" + target.name + "请教" + skill_base.color_name + "！");
-        }
-    } else {
-        if (target.on_teach) {
-            if (target.on_teach(me, sk) === false) return;
+        if (!me.skills) me.skills = {};
+        var skill_base = SKILL.get(sk);
+        if (!skill_base) return me.notify("没有这个技能。");
+        if (skill_base.grade !== skill_base.query_grade(me)
+            && skill_base.type !== SKILL_TYPES.KNOWLEDGE)
+            return me.notify('你的' + skill_base.query_color_name(me) + "已经进阶，不能再通过学习提升等级了。");
+        if (target.is_player) {
+            if (!me.master ||
+                me.master !== target.id
+                || skill_base.type !== SKILL_TYPES.BASE) {
+                return me.notify(me.name + "不能向" + target.name + "请教" + skill_base.color_name + "！");
+            }
         } else {
-            if (target.master == me.id) {
-                if (target.on_master_learn && target.on_master_learn(me, sk) == false) return;
-
+            if (target.on_teach) {
+                if (target.on_teach(me, sk) === false) return;
             } else {
-                if (!target.is(me.query_temp("master")))
-                    return me.notify(target.name + "对你说道：请教？这怎么敢当！");
+                if (target.master == me.id) {
+                    if (target.on_master_learn && target.on_master_learn(me, sk) == false) return;
+
+                } else {
+                    if (!target.is(me.query_temp("master")))
+                        return me.notify(target.name + "对你说道：请教？这怎么敢当！");
+                }
             }
         }
-    }
-    if (BAN_SKILLS[sk]) return me.send(skill_base.color_name + '不能通过学习升级。');
+        if (BAN_SKILLS[sk]) return me.send(skill_base.color_name + '不能通过学习升级。');
 
-    if (!target.skills[sk]) return me.notify(target.name + "不会这个技能。");
+        if (!target.skills[sk]) return me.notify(target.name + "不会这个技能。");
 
-    if (target.skills[sk].disable) return me.notify("这个技能暂时不能学习，请联系管理员处理。");
-
+        if (target.skills[sk].disable) return me.notify("这个技能暂时不能学习，请联系管理员处理。");
 
 
-    if (me.skills[sk + "2"]) return me.notify("你已经学会了的" + skill_base.color_name + "的进阶武功，不用再学习了。");
-    const skill_level = me.query_skill(sk, 0);
-    if (skill_level === 0 && skill_base.do_learn(me) == false) return;
+        if (me.skills[sk + "2"]) return me.notify("你已经学会了的" + skill_base.color_name + "的进阶武功，不用再学习了。");
+        const skill_level = me.query_skill(sk, 0);
+        if (skill_level === 0 && skill_base.do_learn(me) == false) return;
 
-    if (check_skill(me, skill_base, target, false) == false) {
-        return;
-    }
-    if (target.is(me.query_temp("master"))) {
-        if (skill_base.grade > 3 && skill_level === 0) {
-            if (me.query_temp('sm_level', 0) < 2 && me.query_temp("gongji", 0) < 5000) {
-                return me.notify(target.name + "对你说道：你对本门的贡献还不够，还需要多加努力。");
+        if (check_skill(me, skill_base, target, false) == false) {
+            return;
+        }
+        if (target.is(me.query_temp("master"))) {
+            if (skill_base.grade > 3 && skill_level === 0) {
+                if (me.query_temp('sm_level', 0) < 2 && me.query_temp("gongji", 0) < 5000) {
+                    return me.notify(target.name + "对你说道：你对本门的贡献还不够，还需要多加努力。");
+                }
             }
         }
-    }
-    if (!checkSkillCount(me, sk)) return;
-    var max = skill_base.type === SKILL_TYPES.KNOWLEDGE ? 0 : me.skill_limit();
-    if (par) {
-        max = parseInt(par);
-        if (!(max > 0)) return me.send('错误的等级设置');
-        if (max <= skill_level)
-            return me.notify("你的" + skill_base.query_color_name(me) + "已经学习到" + max + "级了。");
-    }
-    if (me.state) {
-        if (me.state.id !== 'learn')
-            return me.notify('你正在' + me.state.title + "。");
-        if (me.state.skill_base.id === sk)
-            return me.send('你正在学习' + skill_base.query_color_name(me) + "。");
-        for (let i = 0; i < me.state.queues.length; i++) {
-            if (me.state.queues[i].skid == sk) {
-                me.state.queues.splice(i, 1);
-                break;
-            }
+        if (!checkSkillCount(me, sk)) return;
+        var max = skill_base.type === SKILL_TYPES.KNOWLEDGE ? 0 : me.skill_limit();
+        if (par) {
+            max = parseInt(par);
+            if (!(max > 0)) return me.send('错误的等级设置');
+            if (max <= skill_level)
+                return me.notify("你的" + skill_base.query_color_name(me) + "已经学习到" + max + "级了。");
         }
-        me.state.queues.push({
-            skid: sk,
-            max_level: max
+        if (me.state) {
+            if (me.state.id !== 'learn')
+                return me.notify('你正在' + me.state.title + "。");
+            if (me.state.skill_base.id === sk)
+                return me.send('你正在学习' + skill_base.query_color_name(me) + "。");
+            for (let i = 0; i < me.state.queues.length; i++) {
+                if (me.state.queues[i].skid == sk) {
+                    me.state.queues.splice(i, 1);
+                    break;
+                }
+            }
+            me.state.queues.push({
+                skid: sk,
+                max_level: max
+            });
+            return me.send('已将' + skill_base.query_color_name(me) + "加入学习队列。");
+        }
+        me.notify("<hic>你开始向" + target.name + "请教有关「" + skill_base.name + "」的疑问。</hic>");
+        me.set_state({
+            id: "learn",
+            title: "学习" + skill_base.name,
+            target: target,
+            max_level: max,
+            skill_base: skill_base,
+            queues: [],
+            on_enter: do_learn,
+            no_move: "你在听师父讲解，还是不要乱走的好。",
+            desc: "[\"你听了" + target.name + "的指导，似乎有些心得。\"]",
+            on_stop: function (me, isauto) {
+                if (isauto) {
+                    return to_next(me);
+                }
+            },
+            on_check: on_check
         });
-        return me.send('已将' + skill_base.query_color_name(me) + "加入学习队列。");
-    }
-    me.notify("<hic>你开始向" + target.name + "请教有关「" + skill_base.name + "」的疑问。</hic>");
-    me.set_state({
-        id: "learn",
-        title: "学习" + skill_base.name,
-        target: target,
-        max_level: max,
-        skill_base: skill_base,
-        queues: [],
-        on_enter: do_learn,
-        no_move: "你在听师父讲解，还是不要乱走的好。",
-        desc: "[\"你听了" + target.name + "的指导，似乎有些心得。\"]",
-        on_stop: function (me, isauto) {
-            if (isauto) {
-                return to_next(me);
-            }
-        },
-        on_check: on_check
-    });
 
-}
+    }
 }
 
 const BAN_SKILLS = {
     linshuijing: true,
     guanshanjue: true
 };
+
 interface LearnState {
     skill_base: SKILL;
     target: CHARACTER;
     max_level?: number;
     queues: { skid: string; max_level?: number }[];
 }
+
 function on_check(this: LearnState, me: CHARACTER) {
 
 
@@ -155,6 +156,7 @@ function on_check(this: LearnState, me: CHARACTER) {
     str.push('</hic>\n点击学习其他武功可添加到学习队列。');
     me.send(str.join(""));
 }
+
 function format_timespan(time, str) {
     if (time < 60) return str.push('少于1分钟');
     if (time > 86400) {
@@ -167,6 +169,7 @@ function format_timespan(time, str) {
     }
     str.push(Math.floor(time / 60), '分钟');
 }
+
 function to_next(me) {
     let state = me.state;
     if (state.queues.length > 0) {
@@ -184,6 +187,7 @@ function to_next(me) {
         return WORLD.check_user_next(me);
     }
 }
+
 function checkSkillCount(me, sk) {
     var count = 0;
     for (var skid in me.skills) {
@@ -197,6 +201,7 @@ function checkSkillCount(me, sk) {
     if (count >= 50) return me.notify_fail('你的技能数量已经达到上限(基础武功和知识类武功外的其他技能不能超过50个)。');
     return true;
 }
+
 function check_skill(me, skill, master, limit = true) {
 
     var lv = me.query_skill(skill.id, 0);
@@ -228,6 +233,7 @@ function check_skill(me, skill, master, limit = true) {
     // }
     return true;
 }
+
 function do_learn(this: LearnState, me: CHARACTER) {
     var master = this.target;
     if (!me.is_here(master) || !master.is_living()) {
@@ -281,6 +287,7 @@ function do_learn(this: LearnState, me: CHARACTER) {
     this.skill_base.add_exp(me, exp);
 
 }
+
 function count_speed(me) {
     let pot = parseInt((me.int + me.query_prop("int")) *
         (100 + me.query_prop("study_per") + me.family.query_temp('study_per', 0)

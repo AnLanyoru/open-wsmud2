@@ -3,9 +3,9 @@
 // ============================================================
 
 // NOTE: 这些依赖通过 TypeScript 编译到 server/dist/ 后路径等价
-import { WORLD } from './world.js';
-import { FAMILIES } from './skill/family.js';
-import type { StatsTopEntry } from './world.js';
+import {WORLD} from './world.js';
+import {FAMILIES} from './skill/family.js';
+import type {StatsTopEntry} from './world.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -52,40 +52,58 @@ export interface DataObject {
 
     /** 根据玩家等级获取随机经验 */
     get_exp(me: { random(n: number): number; level: number }): number;
+
     /** 加载全局数据时的回调 */
     on_load(data: Record<string, any>): void;
+
     /** 保存全局数据时的回调 */
     on_save(str: string[]): void;
+
     /** 创建默认排行榜 */
     create_def_tops(): void;
+
     /** 创建默认装备统计 */
     create_def_eqs(): void;
+
     /** 创建默认分数统计 */
     create_def_scs(): void;
+
     /** 重置家族排行 */
     reset_famtops(me: { id: string; remove_temp(name: string): void }, fam: { id: string; name: string }): void;
+
     /** 保存全局数据到数据库 */
     save(): Promise<void>;
+
     /** JSON.stringify 替换函数 */
     temp_replacer(_key: string, value: unknown): unknown;
+
     /** 保存临时数据到字符串数组 */
     save_temp(str: string[]): void;
+
     /** 从数据库加载全局数据 */
     load(): Promise<void>;
+
     /** 查询临时数据 */
     query_temp(name: string, def?: unknown, _me?: unknown): unknown;
+
     /** 设置临时数据 */
     set_temp(name: string, value: unknown, time?: number, _me?: unknown): void;
+
     /** 移除临时数据 */
     remove_temp(name: string): void;
+
     /** 累加临时数据 */
     add_temp(name: string, value: number, time?: number, _me?: unknown): number;
+
     /** 清除统计数据 */
     clear_data(): void;
+
     /** 添加统计数据 */
     add_data(key: string, user: { id: string; name: string }, val: number): void;
+
     /** 查询最大值 */
     query_max_data(key: string): { name: string; value: number } | undefined;
+
     /** 查询最小值 */
     query_min_data(key: string): { name: string; value: number } | undefined;
 }
@@ -133,11 +151,11 @@ const DATA: DataObject = {
         this.remove_temp('xy_users');
         this.remove_temp('xy_party');
         WORLD.STATS.TOPS = WORLD.STATS.load_tops(data.tops);
-        WORLD.STATS.SCORE = data.score ?? new Array(20).fill({ name: '无', score: 0 });
+        WORLD.STATS.SCORE = data.score ?? new Array(20).fill({name: '无', score: 0});
         WORLD.STATS.EQ_STATS = new Array(11);
         data.eq_stats = data.eq_stats ?? [];
         for (let i = 0; i < 11; i++) {
-            WORLD.STATS.EQ_STATS[i] = data.eq_stats[i] ?? new Array(10).fill({ score: 0 });
+            WORLD.STATS.EQ_STATS[i] = data.eq_stats[i] ?? new Array(10).fill({score: 0});
         }
         for (const key of FAMS_TATAS) {
             const tops = data['tops_' + key];
@@ -151,7 +169,7 @@ const DATA: DataObject = {
         WORLD.STATS.SC_STATS = {};
         for (const key of FAMS_TATAS) {
             WORLD.STATS.SC_STATS[key] =
-                sc_stats[key] ?? new Array(20).fill({ name: '无', score: 0 });
+                sc_stats[key] ?? new Array(20).fill({name: '无', score: 0});
         }
 
         console.log('全局数据已加载');
@@ -198,7 +216,7 @@ const DATA: DataObject = {
     create_def_eqs(): void {
         WORLD.STATS.EQ_STATS = new Array(11);
         for (let i = 0; i < 11; i++) {
-            WORLD.STATS.EQ_STATS[i] = new Array(10).fill({ score: 0 });
+            WORLD.STATS.EQ_STATS[i] = new Array(10).fill({score: 0});
         }
         WORLD.STATS.EQ_STATS[0] = WORLD.STATS.WEAPON;
     },
@@ -209,7 +227,7 @@ const DATA: DataObject = {
     create_def_scs(): void {
         WORLD.STATS.SC_STATS = {};
         for (const key of FAMS_TATAS) {
-            WORLD.STATS.SC_STATS[key] = new Array(20).fill({ score: 0 });
+            WORLD.STATS.SC_STATS[key] = new Array(20).fill({score: 0});
         }
     },
 
@@ -384,7 +402,7 @@ const DATA: DataObject = {
         let data = this.temp_data[key];
         if (!data) data = this.temp_data[key] = {};
         let userData = data[user.id];
-        if (!userData) userData = data[user.id] = { name: user.name, value: 0 };
+        if (!userData) userData = data[user.id] = {name: user.name, value: 0};
         userData.value += val;
     },
 

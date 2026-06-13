@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "东北虎";
@@ -14,7 +14,7 @@ export default class extends MONSTER {
         super();
         this.skill_map(
             ["bite", 270],
-            ["bite2", 270,"bite"]);
+            ["bite2", 270, "bite"]);
         this.set_drop({
             obj: "res/pimao2",
             min: 1,
@@ -23,7 +23,7 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    me.notify("一只凶猛的东北虎朝你扑了过来。");
-    this.do_kill(me);
-}
+        me.notify("一只凶猛的东北虎朝你扑了过来。");
+        this.do_kill(me);
+    }
 }

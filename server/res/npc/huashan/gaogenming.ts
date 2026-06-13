@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "高根明";
@@ -19,7 +19,7 @@ export default class extends NPC {
     prop = {
         gj: 500,
         mz: 500,
-        ds:500
+        ds: 500
     };
 
     constructor() {
@@ -38,7 +38,7 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    return true;
-}
+        return true;
+    }
 }
 

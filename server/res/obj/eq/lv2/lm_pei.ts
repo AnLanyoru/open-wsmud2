@@ -1,5 +1,5 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
+import {EQUIPMENT} from "../../../../core/item/equipment.js";
+import {EQUIP_TYPE} from "../../../../core/const.js";
 
 export default class extends EQUIPMENT {
     name = "龙纹玉佩";
@@ -15,16 +15,16 @@ export default class extends EQUIPMENT {
     group_name = "lm2";
 
     group_prop(count) {
-    if (count == 3) {
-        return {
-            int: 10
-        };
-    } else if (count == 5) {
-        return {
-            lianxi_per: 15,
-            dazuo_per: 15
-        };
+        if (count == 3) {
+            return {
+                int: 10
+            };
+        } else if (count == 5) {
+            return {
+                lianxi_per: 15,
+                dazuo_per: 15
+            };
+        }
     }
-}
 }
 

@@ -11,8 +11,8 @@
  *   WORLD.on_startup = function () { /* ... * / };
  *   WORLD.check_connect = function (socket) { return true; };
  */
-import { WORLD } from "../../core/world.js";
-import { USER } from "../../core/char/user.js";
+import {WORLD} from "../../core/world.js";
+import {USER} from "../../core/char/user.js";
 import db from "../../core/util/data.js";
 
 // 覆盖 os/world.js 中的空壳实现

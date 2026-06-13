@@ -1,9 +1,9 @@
-import { ROOM } from "../../../../core/room/room.js";
+import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "内室";
     desc = "这里是一个空荡荡的房间，除了<cmd cmd='look floor'>地板(floor)</cmd>，什么也没有。";
-    exits = { "east": "bj/tdh/hct" };
+    exits = {"east": "bj/tdh/hct"};
 
     constructor() {
         super();
@@ -28,11 +28,11 @@ export default class extends ROOM {
                 return;
             }
             me.send_room("$N在木板上咚地敲了一下。");
-           var count= me.add_temp("fb/tdh/knock", 1, 1000);
-           if (count == 3) {
-               me.send_room("从地板里边伸出一双手把地板掀开了。");
-               this.add_exit("down","bj/tdh/andao1");
-           }
+            var count = me.add_temp("fb/tdh/knock", 1, 1000);
+            if (count == 3) {
+                me.send_room("从地板里边伸出一双手把地板掀开了。");
+                this.add_exit("down", "bj/tdh/andao1");
+            }
         });
     }
 }

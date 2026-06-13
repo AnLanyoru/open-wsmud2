@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "土匪";
@@ -40,7 +40,7 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    me.notify("土匪一声大喊: 此山是我开，此树是我栽，若要从此过，留下买路财 !");
-    this.do_kill(me);
-}
+        me.notify("土匪一声大喊: 此山是我开，此树是我栽，若要从此过，留下买路财 !");
+        this.do_kill(me);
+    }
 }

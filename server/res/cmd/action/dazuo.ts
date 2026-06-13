@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
     command = "dazuo";
@@ -9,32 +9,32 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me) {
-    if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
-    if (me.state) return me.notify("你正在" + me.state.title + "，没有时间打坐。");
-    if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会打坐。");
-    me.notify("<hir>你坐下来运气用功，一股<HIW>内息</HIW>开始在体内流动。</hir>");
-    me.send_message(me.name + "盘膝坐下，开始修炼内力。");
-    me.set_state({
-        id: "dazuo",
-        cmd: "dazuo",
-        title: "打坐运功",
-        rate: 2,
-        on_enter: do_dazuo,
-        no_move: "打坐时要专心，小心走火入魔。",
-        desc: '[]',
-        stime: Date.now(),
-        //"你只觉丹田处一股热流，慢慢涌向全身经脉。","你只觉你的内息游遍了你全身，全身上下舒畅无比。","你感觉冥冥之中有股力量被引入体内，化为内力。"
-        on_stop: function (me, isauto) {
-            me.notify("<hiy>你运功完毕，深深吸了口气，站了起来。</hiy>");
-            me.send_message(me.name + "运功完毕，站了起来。");
-            if (isauto && me.query_setting('auto_work')) {
-                return WORLD.check_user_next(me);
-            }
-        },
-        on_check: on_check
-    });
-    return true;
-}
+        if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
+        if (me.state) return me.notify("你正在" + me.state.title + "，没有时间打坐。");
+        if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会打坐。");
+        me.notify("<hir>你坐下来运气用功，一股<HIW>内息</HIW>开始在体内流动。</hir>");
+        me.send_message(me.name + "盘膝坐下，开始修炼内力。");
+        me.set_state({
+            id: "dazuo",
+            cmd: "dazuo",
+            title: "打坐运功",
+            rate: 2,
+            on_enter: do_dazuo,
+            no_move: "打坐时要专心，小心走火入魔。",
+            desc: '[]',
+            stime: Date.now(),
+            //"你只觉丹田处一股热流，慢慢涌向全身经脉。","你只觉你的内息游遍了你全身，全身上下舒畅无比。","你感觉冥冥之中有股力量被引入体内，化为内力。"
+            on_stop: function (me, isauto) {
+                me.notify("<hiy>你运功完毕，深深吸了口气，站了起来。</hiy>");
+                me.send_message(me.name + "运功完毕，站了起来。");
+                if (isauto && me.query_setting('auto_work')) {
+                    return WORLD.check_user_next(me);
+                }
+            },
+            on_check: on_check
+        });
+        return true;
+    }
 }
 
 function on_check(me) {
@@ -59,6 +59,7 @@ function on_check(me) {
     str.push('达到内力上限', max, '</hic>。');
     me.send(str.join(""));
 }
+
 function do_dazuo(me) {
     var max = me.limit_mp + me.query_prop("limit_mp");
 
@@ -86,11 +87,12 @@ function do_dazuo(me) {
 
     }
 }
+
 function count_speed(me) {
 
     let exp = parseInt((me.query_skill("force") / 100 + me.query_prop("dazuo")
         + 1 + me.con / 10) * (100 + me.family.query_temp('dazuo_per', 0)
-            + WORLD.DATA.query_temp("dazuo_per", 0) + me.query_prop("dazuo_per")) / 100);
+        + WORLD.DATA.query_temp("dazuo_per", 0) + me.query_prop("dazuo_per")) / 100);
     let prop = me.query_prop('shaolin');
     if (prop > 0) {
         let time = Math.floor((Date.now() - me.state.stime) / 60000);

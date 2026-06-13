@@ -1,6 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { UTIL } from "../../../core/util/util.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {UTIL} from "../../../core/util/util.js";
+
 export default class extends COMMAND {
     command = "ask";
     regex = /^(\w+)\s+about\s+(.+)$/;
@@ -9,15 +10,15 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, objid, par) {
-    var obj = me.find_obj(objid, me.environment);
-    if (!obj || !obj.on_ask) return me.notify("你要问谁什么？");
-    if (!par || par.length>10) return me.notify("你要问什么？");
-    par = UTIL.htmlEncode(UTIL.replace_word(par));
-  
-    me.send_room("$N向$n打听有关「" + par + "」的问题。", obj);
-    if (obj.on_ask(me, par) != false) return;
-    me.send_room(ask_dunno.random(), obj);
-}
+        var obj = me.find_obj(objid, me.environment);
+        if (!obj || !obj.on_ask) return me.notify("你要问谁什么？");
+        if (!par || par.length > 10) return me.notify("你要问什么？");
+        par = UTIL.htmlEncode(UTIL.replace_word(par));
+
+        me.send_room("$N向$n打听有关「" + par + "」的问题。", obj);
+        if (obj.on_ask(me, par) != false) return;
+        me.send_room(ask_dunno.random(), obj);
+    }
 }
 
 var ask_dunno = ["$n摇摇头，说道：没听说过。",

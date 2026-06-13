@@ -1,4 +1,4 @@
-import { MONEY } from "../../../core/item/money.js";
+import {MONEY} from "../../../core/item/money.js";
 
 export default class extends MONEY {
     name = "黄金";

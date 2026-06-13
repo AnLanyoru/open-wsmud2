@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "程玉环";
@@ -15,13 +15,13 @@ export default class extends NPC {
     constructor() {
         super();
         this.skill_map(
-                ["dodge", 100],
-                ["parry", 100],
-                ["force", 100],
-                ["unarmed", 100],
-                ["sword", 100],
-                ["literate", 100],
-                ["taijijian", 100],
-                ["taijiquan", 100]);
+            ["dodge", 100],
+            ["parry", 100],
+            ["force", 100],
+            ["unarmed", 100],
+            ["sword", 100],
+            ["literate", 100],
+            ["taijijian", 100],
+            ["taijiquan", 100]);
     }
 }

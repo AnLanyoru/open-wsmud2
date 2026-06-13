@@ -1,9 +1,9 @@
 /**
  * FAMILY_AREA 门派区域类 - 继承自AREA
  */
-import { AREA } from "./area.js";
-import { WORLD } from "../world.js";
-import { FAMILIES } from "../skill/family.js";
+import {AREA} from "./area.js";
+import {WORLD} from "../world.js";
+import {FAMILIES} from "../skill/family.js";
 
 export class FAMILY_AREA extends AREA {
 

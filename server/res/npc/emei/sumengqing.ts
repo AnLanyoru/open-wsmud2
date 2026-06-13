@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "苏梦清";
@@ -32,12 +32,12 @@ export default class extends NPC {
             ["literate", 100],
             ["emeixinfa", 100, "force"],
             ["zhutianbu", 100, "dodge"],
-            ["jindingzhang", 100,"unarmed"]);
+            ["jindingzhang", 100, "unarmed"]);
     }
 
     on_master(me) {
-    if (me.gender != 2) return me.notify_fail("苏梦清对你说道：这位"+me.call()+"，我们峨眉派不收男弟子的。");
-    return true;
-}
+        if (me.gender != 2) return me.notify_fail("苏梦清对你说道：这位" + me.call() + "，我们峨眉派不收男弟子的。");
+        return true;
+    }
 }
 

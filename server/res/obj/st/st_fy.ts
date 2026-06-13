@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     name = "玄武之魂";
@@ -11,38 +11,38 @@ export default class extends OBJ {
     otype = 2;
 
     on_create(path, par) {
-    var lv = 5;
-    if (!par) {
-        lv = 5 - parseInt(Math.log(this.random(400) + 1));
-    } else {
-        lv = parseInt(par.substr(1));
+        var lv = 5;
+        if (!par) {
+            lv = 5 - parseInt(Math.log(this.random(400) + 1));
+        } else {
+            lv = parseInt(par.substr(1));
+        }
+        this.path = path + "#" + lv;
+        switch (lv) {
+            case 1:
+                this.prop = {fy: 1000};
+                this.desc += "\n防御：+1000";
+                break;
+            case 2:
+                this.prop = {fy: 500, hp_per: 1};
+                this.desc += "\n防御：+500\n气血：+1%";
+                break;
+            case 3:
+                this.prop = {fy_per: 1, hp_per: 1};
+                this.desc += "\n防御：+1%\n气血：+1%";
+                break;
+            case 4:
+                this.prop = {fy_per: 2};
+                this.desc += "\n防御：+2%";
+                break;
+            case 5:
+                this.prop = {hp_per: 2};
+                this.desc += "\n气血：+2%";
+                break;
+            default:
+                this.prop = {fy: 500, max_hp: 5000};
+                this.desc += "\n防御：+500\n气血：+5000";
+                break;
+        }
     }
-    this.path = path + "#" + lv;
-    switch (lv) {
-        case 1:
-            this.prop = { fy: 1000 };
-            this.desc += "\n防御：+1000";
-            break;
-        case 2:
-            this.prop = { fy: 500, hp_per: 1 };
-            this.desc += "\n防御：+500\n气血：+1%";
-            break;
-        case 3:
-            this.prop = { fy_per: 1, hp_per: 1 };
-            this.desc += "\n防御：+1%\n气血：+1%";
-            break;
-        case 4:
-            this.prop = { fy_per: 2 };
-            this.desc += "\n防御：+2%";
-            break;
-        case 5:
-            this.prop = { hp_per: 2 };
-            this.desc += "\n气血：+2%";
-            break;
-        default:
-            this.prop = { fy: 500, max_hp: 5000 };
-            this.desc += "\n防御：+500\n气血：+5000";
-            break;
-    }
-}
 }

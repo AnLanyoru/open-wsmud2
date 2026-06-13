@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "张三丰";
@@ -43,14 +43,14 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.query_skill("taijiquan", 0) >= 500 || me.query_skill("taijiquan2", 0) >= 500) {
-        if (me.query_skill("taijishengong", 0) >= 500 || me.query_skill("taijishengong2", 0) >= 500) {
-            return true;
+        if (me.query_skill("taijiquan", 0) >= 500 || me.query_skill("taijiquan2", 0) >= 500) {
+            if (me.query_skill("taijishengong", 0) >= 500 || me.query_skill("taijishengong2", 0) >= 500) {
+                return true;
+            }
         }
+        if (me.query_skill("taijiquan", 0) < 500 && me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极拳掌握程度还不够，需要多加练习。");
+        if (me.query_skill("taijishengong", 0) < 500 && me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极神功掌握程度还不够，还需多加努力。");
+        return false;
     }
-    if (me.query_skill("taijiquan", 0) < 500 &&  me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极拳掌握程度还不够，需要多加练习。");
-    if (me.query_skill("taijishengong", 0) < 500 &&  me.query_skill("taijiquan2", 0) < 500) return me.notify_fail("张三丰说道：你的太极神功掌握程度还不够，还需多加努力。");
-    return false;
-}
 }
 

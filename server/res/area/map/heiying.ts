@@ -1,6 +1,6 @@
-import { AREA } from "../../../core/room/area.js";
-import { ROOM } from "../../../core/room/room.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {AREA} from "../../../core/room/area.js";
+import {ROOM} from "../../../core/room/room.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends AREA {
     name = "黑鹰校场";
@@ -11,13 +11,13 @@ export default class extends AREA {
     is_copy = true;
     not_fb = true;
     map = [
-        { n: "地下甬道", id: "yz/hy/tongdao", p: [0, 0] },
-        { n: "校场", id: "yz/hy/jiaochang1", p: [0, -1], exits: ["s", "nw", "ne"] },
-        { n: "校场", id: "yz/hy/jiaochang2", p: [-1, -2] },
-        { n: "校场", id: "yz/hy/jiaochang3", p: [0, -2], exits: ["s", "n", "w", "e"] },
-        { n: "校场", id: "yz/hy/jiaochang4", p: [1, -2] },
-        { n: "校场", id: "yz/hy/jiaochang5", p: [0, -3], exits: ["sw", "se", "n"] },
-        { n: "黑鹰厅", id: "yz/hy/yishiting", p: [0, -4] },
+        {n: "地下甬道", id: "yz/hy/tongdao", p: [0, 0]},
+        {n: "校场", id: "yz/hy/jiaochang1", p: [0, -1], exits: ["s", "nw", "ne"]},
+        {n: "校场", id: "yz/hy/jiaochang2", p: [-1, -2]},
+        {n: "校场", id: "yz/hy/jiaochang3", p: [0, -2], exits: ["s", "n", "w", "e"]},
+        {n: "校场", id: "yz/hy/jiaochang4", p: [1, -2]},
+        {n: "校场", id: "yz/hy/jiaochang5", p: [0, -3], exits: ["sw", "se", "n"]},
+        {n: "黑鹰厅", id: "yz/hy/yishiting", p: [0, -4]},
     ];
     drops = [
         "st/xuanjing",

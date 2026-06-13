@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "吴六奇";
@@ -27,13 +27,13 @@ export default class extends NPC {
             ["yunlongshenfa", 200, "dodge"],
             ["yunlongxinfa", 200, "force"]);
         this.set_drop({
-            obj: "money/silver",
-            min: 10,
-            max: 20
-        }, {
-            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-            odds: 8000
-        },
+                obj: "money/silver",
+                min: 10,
+                max: 20
+            }, {
+                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+                odds: 8000
+            },
             {
                 obj: ["book/bc#houquan"],
                 odds: 5000
@@ -41,7 +41,7 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    me.notify("吴六奇对你喝到：你不是我天地会的人，来这里做什么？");
-    this.do_kill(me);
-}
+        me.notify("吴六奇对你喝到：你不是我天地会的人，来这里做什么？");
+        this.do_kill(me);
+    }
 }

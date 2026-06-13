@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "recobj";
@@ -9,7 +9,7 @@ export default class extends COMMAND {
      */
     enter(me, objid) {
 
-    return me.send('你没有可供恢复的道具和操作');
+        return me.send('你没有可供恢复的道具和操作');
 
-}
+    }
 }

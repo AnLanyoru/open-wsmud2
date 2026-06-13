@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
     command = "auto";
@@ -15,7 +15,7 @@ export default class extends COMMAND {
      */
     enter(me, type) {
 
-}
+    }
 }
 
 WORLD.check_user_next = function (me) {

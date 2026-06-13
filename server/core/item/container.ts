@@ -1,9 +1,9 @@
 /**
  * CONTAINER 容器类 — 可装入物品的物件
  */
-import { OBJ } from './obj.js';
-import { UTIL } from '../util.js';
-import type { USER } from '../char/user.js';
+import {OBJ} from './obj.js';
+import {UTIL} from '../util.js';
+import type {USER} from '../char/user.js';
 
 /** 物品/容器描述 JSON 结构 */
 export interface ItemDescJson {

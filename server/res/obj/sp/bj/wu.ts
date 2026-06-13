@@ -1,4 +1,4 @@
-import { OBJ } from "../../../../core/item/obj.js";
+import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends OBJ {
     name = "吴之荣的头颅";

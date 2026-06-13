@@ -1,10 +1,10 @@
-import { ROOM } from "../../../../core/room/room.js";
-import { WORLD } from "../../../../core/world.js";
+import {ROOM} from "../../../../core/room/room.js";
+import {WORLD} from "../../../../core/world.js";
 
 export default class extends ROOM {
     name = "小路";
     desc = "你走在一条小路上。前面道路崎岖，行人很少。往南有条小路通往城内。";
-    exits = { "north": "bj/zhuang/xiaolu2"};
+    exits = {"north": "bj/zhuang/xiaolu2"};
 
     constructor() {
         super();
@@ -23,16 +23,17 @@ export default class extends ROOM {
     }
 
     on_before_enter(me) {
-    if (me.query_temp('fb', 0) > 10) {
-        this.add_exit('south', "bj/zhuang/dalu" );
+        if (me.query_temp('fb', 0) > 10) {
+            this.add_exit('south', "bj/zhuang/dalu");
+        }
     }
-}
-    on_leave(me, dir) {
-    if (dir === 'south') {
 
-        this.actions['lkfb'].action(me);
-        return false;
+    on_leave(me, dir) {
+        if (dir === 'south') {
+
+            this.actions['lkfb'].action(me);
+            return false;
+        }
     }
-}
 }
 

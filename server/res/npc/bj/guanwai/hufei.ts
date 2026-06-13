@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "胡斐";
@@ -76,12 +76,12 @@ export default class extends NPC {
     }
 
     on_accept(me, obj, count) {
-    if (!obj || !obj.path) return;
-    if (obj.is("sp/bj/yanji")) {
-        me.notify("\n<HIC>胡斐大喜道：狗贼！想不到你也有今天！！手起刀落，将阎基的头颅剁为两段。</hic>");
-        me.notify("<HIC>胡斐说道：这位" + me.call() + "，如此大恩大德，在下实不知何以为报。</hic>");
-        me.set_temp("fb/guanwai/hu", 1);
-        return true;
+        if (!obj || !obj.path) return;
+        if (obj.is("sp/bj/yanji")) {
+            me.notify("\n<HIC>胡斐大喜道：狗贼！想不到你也有今天！！手起刀落，将阎基的头颅剁为两段。</hic>");
+            me.notify("<HIC>胡斐说道：这位" + me.call() + "，如此大恩大德，在下实不知何以为报。</hic>");
+            me.set_temp("fb/guanwai/hu", 1);
+            return true;
+        }
     }
-}
 }

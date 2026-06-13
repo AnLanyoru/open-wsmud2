@@ -1,12 +1,12 @@
-import { ROOM } from "../../../core/room/room.js";
-import { UTIL } from "../../../core/util/util.js";
-import type { CHARACTER } from "../../../core/char/character.js";
-import type { NPC } from "../../../core/char/npc.js";
+import {ROOM} from "../../../core/room/room.js";
+import {UTIL} from "../../../core/util/util.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import type {NPC} from "../../../core/char/npc.js";
 
 export default class MapRoom extends ROOM {
     name = "训练室";
     desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识，就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。";
-    exits = { "west": "new/new1", "south": "new/new3" };
+    exits = {"west": "new/new1", "south": "new/new3"};
     no_fight = true;
 
     on_enter(me: CHARACTER) {
@@ -35,6 +35,7 @@ export default class MapRoom extends ROOM {
             });
         }
     }
+
     on_leave(me: CHARACTER, dir: string) {
 
         var lv = me.query_temp("new", 0) as number;
@@ -60,11 +61,15 @@ function next_guide(me: CHARACTER) {
         me.notify("<hig>指引者对你说道：打开背包，点击拳脚快速入门，下面会显示物品可用操作，然后点击学习，等你学练会了这个技能再来找我。</hig>");
     }
 }
+
 function next_guide2(me: CHARACTER, npc: CHARACTER, _room: ROOM) {
     me.set_temp("new", 5);
     me.notify("<hig>指引者对你说道：接下来你用刚学会的技能去南面的训练室杀掉一个木头人，带点战利品回来。</hig>");
-    npc.add_action("next", "交战利品", function (this: CHARACTER, ch: CHARACTER) { next_guide3(ch, npc); });
+    npc.add_action("next", "交战利品", function (this: CHARACTER, ch: CHARACTER) {
+        next_guide3(ch, npc);
+    });
 }
+
 function next_guide3(me: CHARACTER, npc: CHARACTER) {
     if (me.query_temp("new") != 5) return false;
     var obj = me.find_obj_bypath("sp/new/mutou");
@@ -80,8 +85,11 @@ function next_guide3(me: CHARACTER, npc: CHARACTER) {
     if (obj2) {
         me.notify("指引者给了你一本" + obj2.color_name + "。");
     }
-    npc.add_action("next", "疗伤完毕", function (ch: CHARACTER) { guide_over(ch, npc); });
+    npc.add_action("next", "疗伤完毕", function (ch: CHARACTER) {
+        guide_over(ch, npc);
+    });
 }
+
 function guide_over(me: CHARACTER, npc: CHARACTER) {
     var lv = me.query_temp("new");
     if (lv != 6) return me.notify_fail("好好听课不要乱点.");
@@ -97,12 +105,18 @@ function guide_over(me: CHARACTER, npc: CHARACTER) {
     npc.remove_action("guid");
 
     npc.remove_action("next");
-    npc.add_action("ask1", "如何开始", function (ch: CHARACTER) { ask1(ch); });
-    npc.add_action("ask6", "<hig>开始闯荡江湖</hig>", function (ch: CHARACTER) { ask6(ch); });
+    npc.add_action("ask1", "如何开始", function (ch: CHARACTER) {
+        ask1(ch);
+    });
+    npc.add_action("ask6", "<hig>开始闯荡江湖</hig>", function (ch: CHARACTER) {
+        ask6(ch);
+    });
 }
+
 function ask1(me: CHARACTER) {
     me.notify("指引者对你说：踏入江湖后最好是先拜入一个门派学习武功，提升你的实力，再通过挑战副本进一步提升自己。");
 }
+
 function ask6(me: CHARACTER) {
     if (!me.query_temp("new")) return;
     me.notify("指引者对你说：祝你游戏愉快，这是你完成新手训练的奖励。");

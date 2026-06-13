@@ -1,6 +1,6 @@
-import { ROOM } from "../../../../core/room/room.js";
-import { WORLD } from "../../../../core/world.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
+import {ROOM} from "../../../../core/room/room.js";
+import {WORLD} from "../../../../core/world.js";
+import type {CHARACTER} from "../../../../core/char/character.js";
 
 export default class MapRoom extends ROOM {
     name = "擂台";
@@ -30,13 +30,41 @@ export default class MapRoom extends ROOM {
         if (act) act.allow_fight = true;
     }
 
-    action_fight(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
-    action_kill(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
-    action_dazuo(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
-    action_liaoshang(this: MapRoom, me: CHARACTER) { me.notify("你正在擂台比试。"); return true; }
-    action_perform(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招。"); return true; }
-    action_unequip(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招，不允许卸下装备。"); return true; }
-    action_enable(this: MapRoom, me: CHARACTER) { me.notify("擂台上自动出招，不能更改武功。"); return true; }
+    action_fight(this: MapRoom, me: CHARACTER) {
+        me.notify("你正在擂台比试。");
+        return true;
+    }
+
+    action_kill(this: MapRoom, me: CHARACTER) {
+        me.notify("你正在擂台比试。");
+        return true;
+    }
+
+    action_dazuo(this: MapRoom, me: CHARACTER) {
+        me.notify("你正在擂台比试。");
+        return true;
+    }
+
+    action_liaoshang(this: MapRoom, me: CHARACTER) {
+        me.notify("你正在擂台比试。");
+        return true;
+    }
+
+    action_perform(this: MapRoom, me: CHARACTER) {
+        me.notify("擂台上自动出招。");
+        return true;
+    }
+
+    action_unequip(this: MapRoom, me: CHARACTER) {
+        me.notify("擂台上自动出招，不允许卸下装备。");
+        return true;
+    }
+
+    action_enable(this: MapRoom, me: CHARACTER) {
+        me.notify("擂台上自动出招，不能更改武功。");
+        return true;
+    }
+
     surrender(this: MapRoom, me: CHARACTER) {
         if (WORLD.COMMANDS.biwu && typeof WORLD.COMMANDS.biwu === 'object' && 'surrender' in WORLD.COMMANDS.biwu) {
             // @ts-ignore 动态借用比武命令的投降处理函数

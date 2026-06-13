@@ -1,13 +1,13 @@
 /**
  * SKILL 技能基类 & PERFORM 绝招类
  */
-import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
-import { UTIL } from "../util.js";
-import { FAMILIES } from "./family.js";
-import type { FAMILY } from './family.js';
-import type { CHARACTER } from '../char/character.js';
-import { PROPERTIES, SKILL_TYPES } from "../const.js";
+import {BASE} from "../base.js";
+import {WORLD} from "../world.js";
+import {UTIL} from "../util.js";
+import {FAMILIES} from "./family.js";
+import type {FAMILY} from './family.js';
+import type {CHARACTER} from '../char/character.js';
+import {PROPERTIES, SKILL_TYPES} from "../const.js";
 
 
 // todo 需要检查一下和第一次提交的js文件的不同
@@ -93,6 +93,7 @@ export interface EnablePropMap {
     throwing?: EnablePropValues;
     /** 噬咬技能(怪物专用) */
     bite?: EnablePropValues;
+
     /** 允许 for...in 动态遍历时的字符串索引 */
     [key: string]: EnablePropValues | undefined;
 }
@@ -121,6 +122,7 @@ export interface SkillAndLevel {
     throwing?: number;
     /** 噬咬技能(怪物专用) */
     bite?: number;
+
     /** 允许 for...in 动态遍历时的字符串索引 */
     [key: string]: number | undefined;
 }
@@ -243,16 +245,29 @@ export class SKILL extends BASE {
 
     /** 激活技能回调 — 触发时机：enable() 开头，技能装备到基本技能类型时；返回 false 阻止激活 */
     on_enable?: (me: CHARACTER, type: string) => boolean | void;
+
     /** 取消激活回调 — 触发时机：disenable() 开头，技能从基本技能类型卸下时 */
-    on_disenable(me: CHARACTER, type: string): void { }
+    on_disenable(me: CHARACTER, type: string): void {
+    }
+
     /** 学习技能回调 — 触发时机：玩家执行学习命令时（do_learn() 开头）；返回 false 阻止学习 */
-    on_learn(me: CHARACTER): boolean | void { return; }
+    on_learn(me: CHARACTER): boolean | void {
+        return;
+    }
+
     /** 练习技能回调 — 触发时机：lianxi 命令执行时检查；返回 false 阻止练习 */
     on_practice?(me: CHARACTER): boolean | void;
+
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
-    query_enable_prop(lv: number, me?: CHARACTER): EnablePropMap | undefined { return undefined; }
+    query_enable_prop(lv: number, me?: CHARACTER): EnablePropMap | undefined {
+        return undefined;
+    }
+
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
-    query_prop(lv: number, me?: CHARACTER): Record<string, any> | undefined { return undefined; }
+    query_prop(lv: number, me?: CHARACTER): Record<string, any> | undefined {
+        return undefined;
+    }
+
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
     on_enemy_die?: (me: CHARACTER, target: CHARACTER) => void;
 
@@ -270,8 +285,10 @@ export class SKILL extends BASE {
     on_end_attack?: (me: CHARACTER, target: CHARACTER) => void;
     /** 内功攻击回调（返回内功伤害） */
     do_force_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
+
     /** 内功招架回调（返回减免伤害） */
     on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number;
+
     /** 内功攻击结束回调 */
     on_force_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
     /** 受到伤害回调（返回减免后伤害） */

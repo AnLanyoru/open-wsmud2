@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER, TeamData } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER, TeamData} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
 
 // todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
@@ -18,13 +18,20 @@ export default class extends COMMAND {
     enter(me: CHARACTER, act?: string, user?: string) {
         if (act) {
             switch (act) {
-                case "add": return this.team_add(me, user);
-                case "with": return this.team_with(me, user);
-                case "remove": return this.team_remove(me, user);
-                case "out": return this.team_out(me);
-                case "reply": return this.team_reply(me, user);
-                case "dismiss": return this.team_dismiss(me);
-                case "set": return this.team_set(me, user);
+                case "add":
+                    return this.team_add(me, user);
+                case "with":
+                    return this.team_with(me, user);
+                case "remove":
+                    return this.team_remove(me, user);
+                case "out":
+                    return this.team_out(me);
+                case "reply":
+                    return this.team_reply(me, user);
+                case "dismiss":
+                    return this.team_dismiss(me);
+                case "set":
+                    return this.team_set(me, user);
             }
         } else {
             me.send(teamToString(me));

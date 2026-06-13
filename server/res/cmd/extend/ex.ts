@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "ex";
@@ -12,12 +12,14 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, type) {
-    return false;
-}
+        return false;
+    }
+
     append_sklf(env) {
 
-}
+    }
+
     on_enter_fb(me, env) {
 
-}
+    }
 }

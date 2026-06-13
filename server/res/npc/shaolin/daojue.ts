@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "道觉禅师";
@@ -27,8 +27,8 @@ export default class extends NPC {
         this.set_objects([
             "eq/lv0/cloth", 1, 1
         ], [
-                "eq/lv0/mugun", 1, 1
-            ]);
+            "eq/lv0/mugun", 1, 1
+        ]);
         this.skill_map(
             ["dodge", 300],
             ["parry", 300],
@@ -45,9 +45,9 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender == 2) return me.notify_fail("道觉禅师说道：阿弥陀佛，少林寺不收女弟子。");
-    if (me.query_skill("hunyuanyiqi", 0) < 100) return me.notify_fail("道觉禅师说道：你的混元一气掌握程度还不够，需要多加练习。");
-    return true;
-}
+        if (me.gender == 2) return me.notify_fail("道觉禅师说道：阿弥陀佛，少林寺不收女弟子。");
+        if (me.query_skill("hunyuanyiqi", 0) < 100) return me.notify_fail("道觉禅师说道：你的混元一气掌握程度还不够，需要多加练习。");
+        return true;
+    }
 }
 

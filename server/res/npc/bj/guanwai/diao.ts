@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "金雕";
@@ -23,7 +23,7 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    me.notify("一只迅猛的金雕朝你俯冲过来。");
-    this.do_kill(me);
-}
+        me.notify("一只迅猛的金雕朝你俯冲过来。");
+        this.do_kill(me);
+    }
 }

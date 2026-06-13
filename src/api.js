@@ -2,7 +2,7 @@ import Util from './utils/util.js';
 
 export default {
     Login: function (code, pwd, cb) {
-        return Util.Post('api/user/login', { code: code, pwd: pwd }, cb);
+        return Util.Post('api/user/login', {code: code, pwd: pwd}, cb);
     },
     IsRegistValidation: function (cb) {
         return Util.Get('UserAPI/IsRegistValidation', cb);
@@ -17,7 +17,7 @@ export default {
         return Util.Get('e', [guider], cb);
     },
     ChangePassword: function (oldpwd, pwd, no, cb) {
-        return Util.Post('api/user/changepassword', { oldpwd: oldpwd, pwd: pwd, no: no }, cb);
+        return Util.Post('api/user/changepassword', {oldpwd: oldpwd, pwd: pwd, no: no}, cb);
     },
     LoginOut: function (cb) {
         return Util.Get('UserAPI/LoginOut', cb);
@@ -26,7 +26,7 @@ export default {
         return Util.Get('UserAPI/GetRoles', [userid], cb);
     },
     AddRole: function (player, cb) {
-        return Util.Post('UserAPI/AddRole', { player: player }, cb);
+        return Util.Post('UserAPI/AddRole', {player: player}, cb);
     },
     GetUser: function (cb) {
         return Util.Get('UserAPI/GetUser', cb);
@@ -47,13 +47,13 @@ export default {
         return Util.Get('api/user/getphone', cb);
     },
     BindPhone: function (code, no, pwd, cb) {
-        return Util.Post('api/user/bindphone', { code: code, no: no, pwd: pwd }, cb);
+        return Util.Post('api/user/bindphone', {code: code, no: no, pwd: pwd}, cb);
     },
     SendValidateCode: function (no, cb) {
         return Util.Get('UserAPI/SendValidateCode', [no], cb);
     },
     ResetPasswordByPhone: function (name, phone, vcode, pwd, cb) {
-        return Util.Post('api/user/resetpwd', { name: name, phone: phone, vcode: vcode, pwd: pwd }, cb);
+        return Util.Post('api/user/resetpwd', {name: name, phone: phone, vcode: vcode, pwd: pwd}, cb);
     },
     NewServer: function (cb) {
         return Util.Get('UserAPI/NewServer', cb);

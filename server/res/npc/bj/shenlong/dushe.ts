@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "毒蛇";
@@ -14,7 +14,7 @@ export default class extends MONSTER {
         super();
         this.skill_map(
             ["bite", 200],
-            ["dushegongji", 200,"bite"]);
+            ["dushegongji", 200, "bite"]);
         this.set_drop({
             obj: "res/pimao1",
             min: 1,
@@ -23,6 +23,6 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    this.do_kill(me);
-}
+        this.do_kill(me);
+    }
 }

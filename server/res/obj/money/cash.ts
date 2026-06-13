@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     name = "元宝";
@@ -8,7 +8,7 @@ export default class extends OBJ {
     grade = 5;
 
     on_receive(me) {
-    if (!this.count) return false;
-    me.add_cash(this.count, "排行榜收取");
-}
+        if (!this.count) return false;
+        me.add_cash(this.count, "排行榜收取");
+    }
 }

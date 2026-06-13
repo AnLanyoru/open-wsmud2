@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends NPC {
     name = "拍卖师";

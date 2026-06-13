@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 const PROP_NAMES = {
     gj: "攻击之魂",

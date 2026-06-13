@@ -1,6 +1,6 @@
-import { OBJ } from "../../../../core/item/obj.js";
-import { WORLD } from "../../../../core/world.js";
-import { NPC } from "../../../../core/char/npc.js";
+import {OBJ} from "../../../../core/item/obj.js";
+import {WORLD} from "../../../../core/world.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends OBJ {
     unit = "个";
@@ -10,22 +10,23 @@ export default class extends OBJ {
     value = 10000;
 
     on_use(me) {
-    if (!me.is_player) return me.notify("你不能用追杀令。");
-    me.notify("请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：");
+        if (!me.is_player) return me.notify("你不能用追杀令。");
+        me.notify("请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：");
 
-    me.wait_input = readname.bind(this);
-    return false;
-}
-    on_create(path, par) {
-    if (!par) {
-        this.path = path + "#1";
-        return;
+        me.wait_input = readname.bind(this);
+        return false;
     }
-    par = par.substr(1);
-    var lv = parseInt(par);
-    if (!(lv > 0 && lv <= 5)) return;
-    this.grade = lv;
-}
+
+    on_create(path, par) {
+        if (!par) {
+            this.path = path + "#1";
+            return;
+        }
+        par = par.substr(1);
+        var lv = parseInt(par);
+        if (!(lv > 0 && lv <= 5)) return;
+        this.grade = lv;
+    }
 }
 
 function readname(me, cmd) {
@@ -50,7 +51,7 @@ function readname(me, cmd) {
     if (!me.remove_obj(obj, 1)) return;
     user.notify("<hir>" + fam.name + "对你发出追杀令，听天由命吧。</hir>");
     me.notify("<hir>追杀令已发出，一分钟内对方将被你的门派弟子追杀。</hir>");
-    var npc = fam.create_npc(obj.grade-1);
+    var npc = fam.create_npc(obj.grade - 1);
     if (fam.boss) {
         fam.boss.do_command("chat", npc.name + "听令，即刻起追杀" + name + "，不得有误。");
     }

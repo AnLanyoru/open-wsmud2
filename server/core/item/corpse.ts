@@ -1,11 +1,11 @@
 /**
  * CORPSE 尸体类 — 继承自CONTAINER
  */
-import type { OBJ } from './obj.js';
-import { CONTAINER } from './container.js';
-import type { ItemDescJson } from './container.js';
-import type { CHARACTER } from '../char/character.js';
-import type { USER } from '../char/user.js';
+import type {OBJ} from './obj.js';
+import {CONTAINER} from './container.js';
+import type {ItemDescJson} from './container.js';
+import type {CHARACTER} from '../char/character.js';
+import type {USER} from '../char/user.js';
 
 export class CORPSE extends CONTAINER {
 

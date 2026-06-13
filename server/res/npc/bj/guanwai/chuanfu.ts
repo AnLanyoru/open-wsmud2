@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "船夫";
@@ -18,11 +18,11 @@ export default class extends NPC {
         ]);
         this.set_drop({
             obj: "sp/tool/diao#1",
-            odds:500    
+            odds: 500
         }, {
-                obj: "sp/tool/diao#2",
-                odds: 50
-            });
+            obj: "sp/tool/diao#2",
+            odds: 50
+        });
         this.set_chat_msg([
             "船夫搓着手说道：江上风急，要过江就交一两黄金。",
             "船夫抬头望了望天色，说道：再晚些风雪更大，船就不好走了。",
@@ -38,20 +38,21 @@ export default class extends NPC {
     }
 
     on_leave(me, dir) {
-    if (dir == "east" || dir == "west") {
-        me.notify("船夫对你说道：江面化冻了，没船可不行。");
-        me.send_commands("ask " + this.id + " about 过江", "询问过江",
-            "ask " + this.id + " about 船厂", "询问船厂");
-        me.set_temp("fb/guanwai/jiang", dir);
-        return false;
-    } 
-}
-    on_accept(me, obj, count) {
-    if (obj == "money" && count == 10000) {
-        if (me.moveto("bj/guanwai/jiang") != false) {
-            me.send_room("船夫带着$N上了船，船夫辨着水势掌舵，一声「起锚」船就张帆离岸了......");
-            return true;
+        if (dir == "east" || dir == "west") {
+            me.notify("船夫对你说道：江面化冻了，没船可不行。");
+            me.send_commands("ask " + this.id + " about 过江", "询问过江",
+                "ask " + this.id + " about 船厂", "询问船厂");
+            me.set_temp("fb/guanwai/jiang", dir);
+            return false;
         }
     }
-}
+
+    on_accept(me, obj, count) {
+        if (obj == "money" && count == 10000) {
+            if (me.moveto("bj/guanwai/jiang") != false) {
+                me.send_room("船夫带着$N上了船，船夫辨着水势掌舵，一声「起锚」船就张帆离岸了......");
+                return true;
+            }
+        }
+    }
 }

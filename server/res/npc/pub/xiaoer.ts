@@ -1,7 +1,7 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "店小二";
@@ -35,47 +35,48 @@ export default class extends NPC {
     }
 
     on_enter(me: CHARACTER): void {
-    let kz = me.query_temp("kezhan");
-    if (kz) {
-        me.notify("小二一哈腰：这位客官请上楼歇息。");
+        let kz = me.query_temp("kezhan");
+        if (kz) {
+            me.notify("小二一哈腰：这位客官请上楼歇息。");
 
-        return me.send_commands('zhudian ' + this.id, '上楼', 'xufei ' + this.id, '续房',);
+            return me.send_commands('zhudian ' + this.id, '上楼', 'xufei ' + this.id, '续房',);
+        }
+        var str = "";
+        switch (this.random(2)) {
+            case 0:
+                str = "店小二笑咪咪地说道：这位" + me.call()
+                    + "，要住店吗？请进请进。";
+                break;
+            case 1:
+                str = "店小二用脖子上的毛巾抹了抹手，说道：这位" + me.call()
+                    + "，请进请进。小店还有几间上好的房间。";
+                break;
+        }
+        me.notify(str);
     }
-    var str = "";
-    switch (this.random(2)) {
-        case 0:
-            str = "店小二笑咪咪地说道：这位" + me.call()
-                + "，要住店吗？请进请进。";
-            break;
-        case 1:
-            str = "店小二用脖子上的毛巾抹了抹手，说道：这位" + me.call()
-                + "，请进请进。小店还有几间上好的房间。";
-            break;
-    }
-    me.notify(str);
-}
+
     on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
-    if (obj !== "money") return;
-    if (me.money < 1000) {
-        return me.notify("小二面无表情的说道：住店每天10两白银，不二价。");
-    } else if (count === 1000) {
-        me.set_temp("kezhan", 1, 1000 * 3600 * 24);
-        me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
-        me.moveto("kezhan/fang1", me.name + "向客店二楼走去。");
-        return true;
-    } else if (count === 3000) {
-        me.set_temp("kezhan", 2, 1000 * 3600 * 24);
-        me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
-        me.moveto("kezhan/fang2", me.name + "向客店二楼走去。");
-        return true;
-    } else if (count === 10000) {
-        me.set_temp("kezhan", 3, 1000 * 3600 * 24);
-        me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
-        me.moveto("kezhan/fang3", me.name + "向客店二楼走去。");
-        return true;
+        if (obj !== "money") return;
+        if (me.money < 1000) {
+            return me.notify("小二面无表情的说道：住店每天10两白银，不二价。");
+        } else if (count === 1000) {
+            me.set_temp("kezhan", 1, 1000 * 3600 * 24);
+            me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
+            me.moveto("kezhan/fang1", me.name + "向客店二楼走去。");
+            return true;
+        } else if (count === 3000) {
+            me.set_temp("kezhan", 2, 1000 * 3600 * 24);
+            me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
+            me.moveto("kezhan/fang2", me.name + "向客店二楼走去。");
+            return true;
+        } else if (count === 10000) {
+            me.set_temp("kezhan", 3, 1000 * 3600 * 24);
+            me.send_message("小二一哈腰，说道：多谢您老，客官请楼上歇息。");
+            me.moveto("kezhan/fang3", me.name + "向客店二楼走去。");
+            return true;
+        }
+        return false;
     }
-    return false;
-}
 }
 
 function zhudian(this: NPC, me: CHARACTER, par: string): void {

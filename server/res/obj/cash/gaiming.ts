@@ -1,7 +1,7 @@
-import { OBJ } from "../../../core/item/obj.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
-import { SKILL } from "../../../core/skill/skill.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
+import {SKILL} from "../../../core/skill/skill.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -11,13 +11,13 @@ export default class extends OBJ {
     value = 0;
 
     on_use(me) {
-    if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
+        if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
 
-    me.notify("请说出你的名字(打开聊天框任意频道输入)：");
-    me.send_commands("clearwait", "取消使用");
-    me.wait_input = readname;
-    return false;
-}
+        me.notify("请说出你的名字(打开聊天框任意频道输入)：");
+        me.send_commands("clearwait", "取消使用");
+        me.wait_input = readname;
+        return false;
+    }
 }
 
 function readname(me, cmd) {
@@ -45,6 +45,7 @@ function readname(me, cmd) {
     update_name(me, name, obj);
     return false;
 }
+
 async function update_name(me, name, obj) {
     try {
         let result = await WORLD.DB.change_name(me.id, me.userid, name);

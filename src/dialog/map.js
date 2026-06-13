@@ -1,4 +1,3 @@
-
 import MAP from '../map.js';
 
 export default {

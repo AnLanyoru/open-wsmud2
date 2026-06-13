@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "苏星河";
@@ -42,8 +42,8 @@ export default class extends NPC {
 
     on_master(me) {
 
-    if (me.query_skill("xiaoyaoxinfa", 0) < 100) return me.notify_fail("苏星河说道：你的逍遥心法掌握程度还不够，需要多加练习。");
-    return true;
-}
+        if (me.query_skill("xiaoyaoxinfa", 0) < 100) return me.notify_fail("苏星河说道：你的逍遥心法掌握程度还不够，需要多加练习。");
+        return true;
+    }
 }
 

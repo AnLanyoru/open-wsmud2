@@ -1,12 +1,11 @@
-#  MUD 游戏客户端+服务器
+# MUD 游戏客户端+服务器
+
 项目包含简化版的web服务器，使用sqlite作为数据存储，和游戏服务器共享数据，不支持分开部署。
 完整版的web客户端，包含最新版本的所有前端代码
 基础版的mud服务端，不支持多服务器，包含所有公共地图，几个副本和禁地，可参考开发。
 默认管理账号密码为：administrator/123456，没有账号管理功能。
 尽量不要管os/目录下的文件，年代久远代码混乱，能用就行
 新增的改动放到world/extends目录下，可直接热更新。
-
-
 
 ## 项目结构
 
@@ -26,7 +25,7 @@
 
 ## 环境要求
 
-- Node.js >= 24.10.0 
+- Node.js >= 24.10.0
 
 ## 快速开始
 
@@ -41,6 +40,7 @@ npm start
 ```
 
 启动后：
+
 - Web 服务器运行在 **http://localhost:8088**
 - 游戏服务器（WebSocket）运行在 **localhost:31300**
 
@@ -48,13 +48,13 @@ npm start
 
 `.env` 文件中的配置项：
 
-| 变量 | 说明 | 默认值 |
-|------|------|--------|
-| `WEB_PORT` | Web 服务器端口 | `8088` |
-| `WS_PORT` | 游戏 WebSocket 端口 | `31300` |
-| `MD5_PREFIX` | MD5 加密前缀 | `12345` |
-| `SESSION_SECRET` | Session 密钥 | `123` |
-| `DESIV` | DES 加密向量 | `1234123412341234` |
+| 变量               | 说明              | 默认值                |
+|------------------|-----------------|--------------------|
+| `WEB_PORT`       | Web 服务器端口       | `8088`             |
+| `WS_PORT`        | 游戏 WebSocket 端口 | `31300`            |
+| `MD5_PREFIX`     | MD5 加密前缀        | `12345`            |
+| `SESSION_SECRET` | Session 密钥      | `123`              |
+| `DESIV`          | DES 加密向量        | `1234123412341234` |
 
 ## 开发
 
@@ -100,19 +100,21 @@ npm run os-debug
 
 ## 可用脚本汇总
 
-| 命令 | 说明 |
-|------|------|
-| `npm start` | 同时启动 Web 和游戏服务器 |
-| `npm run web` | 启动 Web 服务器 |
-| `npm run os` | 启动游戏服务器 |
-| `npm run dev` | 启动前端开发服务器 |
-| `npm run build` | 构建前端 |
-| `npm run preview` | 预览前端构建结果 |
-| `npm run web-debug` | Web 服务器调试模式 |
-| `npm run os-debug` | 游戏服务器调试模式 |
+| 命令                  | 说明              |
+|---------------------|-----------------|
+| `npm start`         | 同时启动 Web 和游戏服务器 |
+| `npm run web`       | 启动 Web 服务器      |
+| `npm run os`        | 启动游戏服务器         |
+| `npm run dev`       | 启动前端开发服务器       |
+| `npm run build`     | 构建前端            |
+| `npm run preview`   | 预览前端构建结果        |
+| `npm run web-debug` | Web 服务器调试模式     |
+| `npm run os-debug`  | 游戏服务器调试模式       |
 
 ## 游戏管理
+
 没有管理工具，自己用命令或扩展cmd/admin/目录
+
 ``` javascript
 //执行命令
 SendCommand("call this.hp=1000000");

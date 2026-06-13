@@ -1,5 +1,3 @@
-
-
 export default {
     footer: [["全部", ""], ["世界", "chat"], ["队伍", "tm"], ["门派", "fam"], ["全区", "es"], ["帮派", "pty"], ["系统", "sys"]],
     isScroll: true,

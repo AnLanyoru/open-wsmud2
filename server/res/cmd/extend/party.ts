@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "party";
@@ -14,5 +14,5 @@ export default class extends COMMAND {
      */
     enter(me, cmd, par, par2) {
 
-}
+    }
 }

@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { NPC } from "../../../core/char/npc.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends COMMAND {
     command = "setting";
@@ -14,89 +14,88 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, key, value) {
-    if (!me.is_player) return;
-    if (!key) {
-        var str = ['{type:"setting",items:{'];
+        if (!me.is_player) return;
+        if (!key) {
+            var str = ['{type:"setting",items:{'];
 
-        if (me.setting) {
-            str.push(JSON.stringify(me.setting));
-        }
-        str.push("}}");
-        me.notify(str.join(""));
-    } else {
-        if (key === 'psxk' || key === 'fullscreen') return;
-
-        let setting_item = setting_keys[key];
-        if (!setting_item) return me.notify("无效设定项。");
-
-
-
-        if (setting_item.type === 'String') {
-            if (value && setting_item.length && value.length > setting_item.length) {
-                return me.notify("设定值太长。");
+            if (me.setting) {
+                str.push(JSON.stringify(me.setting));
             }
-            if (value === 'none') value = "";
-            else if (setting_item.def && setting_item.def === value)
-                value = "";
+            str.push("}}");
+            me.notify(str.join(""));
+        } else {
+            if (key === 'psxk' || key === 'fullscreen') return;
 
-        } else if (setting_item.type === 'Boolean') {
-            value = value || 0;
-            value = parseInt(value);
-            if (value !== 0 && value !== 1) return me.notify("无效设定值。");
-
-        }
-        if (setting_item.on_setting) {
-            if (setting_item.on_setting(me, value) === false) return;
-        }
+            let setting_item = setting_keys[key];
+            if (!setting_item) return me.notify("无效设定项。");
 
 
-
-        if (key == "no_message") {
-            me.no_message = (value == 1);
-        }
-        me.set_setting(key, value);
-
-        if (setting_item.desc) {
             if (setting_item.type === 'String') {
-                if (value && value !== '0') {
-                    me.notify("<hic>已设置" + setting_item.desc + "</hic>");
-                } else {
-                    me.notify("<cyn>已取消" + setting_item.desc + "</cyn>");
+                if (value && setting_item.length && value.length > setting_item.length) {
+                    return me.notify("设定值太长。");
                 }
+                if (value === 'none') value = "";
+                else if (setting_item.def && setting_item.def === value)
+                    value = "";
+
             } else if (setting_item.type === 'Boolean') {
-                if (value) {
-                    me.notify("<hic>已开启" + setting_item.desc + "</hic>");
-                } else {
-                    me.notify("<cyn>已关闭" + setting_item.desc + "</cyn>");
+                value = value || 0;
+                value = parseInt(value);
+                if (value !== 0 && value !== 1) return me.notify("无效设定值。");
+
+            }
+            if (setting_item.on_setting) {
+                if (setting_item.on_setting(me, value) === false) return;
+            }
+
+
+            if (key == "no_message") {
+                me.no_message = (value == 1);
+            }
+            me.set_setting(key, value);
+
+            if (setting_item.desc) {
+                if (setting_item.type === 'String') {
+                    if (value && value !== '0') {
+                        me.notify("<hic>已设置" + setting_item.desc + "</hic>");
+                    } else {
+                        me.notify("<cyn>已取消" + setting_item.desc + "</cyn>");
+                    }
+                } else if (setting_item.type === 'Boolean') {
+                    if (value) {
+                        me.notify("<hic>已开启" + setting_item.desc + "</hic>");
+                    } else {
+                        me.notify("<cyn>已关闭" + setting_item.desc + "</cyn>");
+                    }
+
                 }
 
             }
 
+
+            //var parent = me.environment;
+            //if (!parent) return;
+            //switch (key) {
+            //    case "exits_map":
+            //        parent.send_exits(me);
+            //        break;
+            //}
         }
-
-
-        //var parent = me.environment;
-        //if (!parent) return;
-        //switch (key) {
-        //    case "exits_map":
-        //        parent.send_exits(me);
-        //        break;
-        //}
     }
-}
+
     clear(me) {
-    let str = [];
-    for (let user of WORLD.USERS) {
-        if (!user.settings) continue;
-        for (let key in user.settings) {
-            if (!setting_keys[key]) {
-                str.push(user.name, key, '\n');
-                delete user.settings[key];
+        let str = [];
+        for (let user of WORLD.USERS) {
+            if (!user.settings) continue;
+            for (let key in user.settings) {
+                if (!setting_keys[key]) {
+                    str.push(user.name, key, '\n');
+                    delete user.settings[key];
+                }
             }
         }
+        if (me) me.send(str.join(''));
     }
-    if (me) me.send(str.join(''));
-}
 }
 
 const setting_keys = {
@@ -122,7 +121,7 @@ const setting_keys = {
 
     },
     'keep_msg': {
-        type: "Boolean", 
+        type: "Boolean",
         desc: "切换房间时不清空上房间信息"
 
     }, 'off_move': {
@@ -237,7 +236,7 @@ const setting_keys = {
     }, 'hide_equip': {
         type: "Boolean",
         desc: "隐藏自己的装备"
-    }, 
+    },
     'show_send': {
         type: "Boolean",
         desc: "显示发送的指令"

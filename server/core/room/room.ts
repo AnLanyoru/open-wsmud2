@@ -1,15 +1,15 @@
 /**
  * ROOM 房间类
  */
-import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
-import { ITEM } from "../item.js";
-import { OBJ } from "../item/obj.js";
-import type { AREA } from "./area.js";
-import type { CHARACTER } from "../char/character.js";
-import type { NPC } from "../char/npc.js";
-import type { USER } from "../char/user.js";
-import type { CORPSE } from "../item/corpse.js";
+import {BASE} from "../base.js";
+import {WORLD} from "../world.js";
+import {ITEM} from "../item.js";
+import {OBJ} from "../item/obj.js";
+import type {AREA} from "./area.js";
+import type {CHARACTER} from "../char/character.js";
+import type {NPC} from "../char/npc.js";
+import type {USER} from "../char/user.js";
+import type {CORPSE} from "../item/corpse.js";
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -18,7 +18,9 @@ declare const __PATH: Record<string, string>;
 let _NPC: {
     CLONE: (path: string, ...args: any[]) => any;
 } | null = null;
-import("../char/npc.js").then((m: Record<string, any>) => { _NPC = m.NPC as any; });
+import("../char/npc.js").then((m: Record<string, any>) => {
+    _NPC = m.NPC as any;
+});
 
 // todo 需要检查一下和第一次提交的js文件的不同
 /**
@@ -70,7 +72,9 @@ export class ROOM extends ITEM {
     /**
      * 房间完整显示名称 — 覆写ITEM同名方法
      */
-    long_name(): string { return this._room_name; }
+    long_name(): string {
+        return this._room_name;
+    }
 
     /** 房间描述 */
     desc: string = "";
@@ -133,23 +137,42 @@ export class ROOM extends ITEM {
     // ============ 回调（由资源文件设置） ============
 
     /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
-    on_leave(obj: Record<string, any>, dir: string): boolean | void { return; }
+    on_leave(obj: Record<string, any>, dir: string): boolean | void {
+        return;
+    }
+
     /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
-    on_before_enter(obj: Record<string, any>): void { return; }
+    on_before_enter(obj: Record<string, any>): void {
+        return;
+    }
+
     /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
-    on_enter(obj: Record<string, any>): void { return; }
+    on_enter(obj: Record<string, any>): void {
+        return;
+    }
+
     /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
-    on_heart_beat?(dt: number): void { return; }
+    on_heart_beat?(dt: number): void {
+        return;
+    }
+
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
     on_login?: (user: Record<string, any>) => void;
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
     /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
     on_set_difficulty?: (type: number) => void;
+
     /** 是否为白天（资源文件注入，用于狼王等 NPC 行为） */
-    is_time(): boolean { return false; }
+    is_time(): boolean {
+        return false;
+    }
+
     /** 创建狼王变身（资源文件注入，lw 任务用） */
-    create_lw(me: CHARACTER, npc: CHARACTER, zone: number, msg: string): void { return; }
+    create_lw(me: CHARACTER, npc: CHARACTER, zone: number, msg: string): void {
+        return;
+    }
+
     /** 可移动出口列表（资源文件注入，巡逻 NPC 用） */
     move_exits?: string[];
 
@@ -924,7 +947,10 @@ export class ROOM extends ITEM {
      */
     static Get(path: string): ROOM | undefined {
         const rm = WORLD.ROOMS[path];
-        if (!rm) { console.log("room %s is not exist", path); return undefined; }
+        if (!rm) {
+            console.log("room %s is not exist", path);
+            return undefined;
+        }
         return rm;
     }
 

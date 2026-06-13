@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import type { CHARACTER } from "../../../core/char/character.js";
-import type { FOLLOWER } from "../../../core/char/follower.js";
-import type { USER } from "../../../core/char/user.js";
+import {COMMAND} from "../../../core/command.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import type {FOLLOWER} from "../../../core/char/follower.js";
+import type {USER} from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "dc";

@@ -1,11 +1,11 @@
-import { ROOM } from "../../../core/room/room.js";
-import type { CHARACTER } from "../../../core/char/character.js";
-import type { OBJ } from "../../../core/item/obj.js";
+import {ROOM} from "../../../core/room/room.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import type {OBJ} from "../../../core/item/obj.js";
 
 export default class MapRoom extends ROOM {
     name = "训练室";
     desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识， 就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。房子中间有个桌子，几张<cmd cmd='look yizi'><hig>椅子</hig></cmd>。";
-    exits = { "east": "new/new2" };
+    exits = {"east": "new/new2"};
     no_fight = true;
 
     constructor() {
@@ -78,11 +78,14 @@ export default class MapRoom extends ROOM {
             if (this.items.length > 0 && this.items[0]) {
                 const npcItem = this.items[0];
                 if ('add_action' in npcItem && 'do_command' in npcItem) {
-                    npcItem.add_action("guid", "我需要指引", function (me: CHARACTER) { on_guide(me); });
+                    npcItem.add_action("guid", "我需要指引", function (me: CHARACTER) {
+                        on_guide(me);
+                    });
                 }
             }
         }
     }
+
     on_leave(me: CHARACTER, dir: string) {
         if (!me.is_player) return true;
         var lv = me.query_temp("new");
@@ -99,8 +102,7 @@ function on_guide(me: CHARACTER) {
             + "请了，接下来我来告诉你一些这个世界的基本知识。");
         me.send_commands('guide_over', '<blk>直接闯荡江湖</blk>', 'guid_start', '<hig>我需要指引</hig>');
 
-    }
-    else if (lv == 2) {
+    } else if (lv == 2) {
         me.notify("<hig>指引者对你说道：打开底部动作按钮，然后点击坐下来。</hig>");
     } else if (lv == 3) {
         me.notify("<hig>指引者说到：在房间描述里点击【椅子】，然后坐下去");
@@ -112,10 +114,12 @@ function on_guide(me: CHARACTER) {
         me.notify("<hig>指引者对你说道：学会基本内功，然后打开动作栏点击疗伤。</hig>");
     }
 }
+
 function next_guide3(me: CHARACTER) {
     me.notify("<hig>指引者对你说道：接下来，点击动作按钮，你将会看到一些操作，那是你所在房间或自己的可用命令。嗯，站着听课也累了，坐下来试试。</hig>");
 
 }
+
 function next_guide(me: CHARACTER) {
     me.set_temp("new", 3);
     me.notify("指引者说道：如果你对当前的显示效果不满意可以通过设置更改效果。");
@@ -125,6 +129,7 @@ function next_guide(me: CHARACTER) {
         me.notify("指引者微笑着说：有时候房间里有些隐藏物品可以操作，比如这里有个椅子，你可以坐在椅子上面。<hig>（在房间描述里点击【椅子】如果物品可用会显示描述及可用操作）</hig>");
     }, 1000);
 }
+
 function next_guide4(this: ROOM, me: CHARACTER) {
     me.notify("指引者点了点头：不错，学的挺快。想要获得高级道具和技能，观察和利用周围环境是必不可少的。");
     me.notify("<hig>指引者说道：接下来教你怎么移动到别的房间：点击房间的出口方向就可以走出这个房间，来东面的训练室找我。</hig>");

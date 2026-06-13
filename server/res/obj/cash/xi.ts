@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "颗";
@@ -8,14 +8,14 @@ export default class extends OBJ {
     value = 0;
 
     on_use(me) {
-    if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
-    var count = me.str + me.con + me.dex + me.int;
-    var max = 30 + count - 80;
-    me.notify("请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20");
-    me.wait_input = readnumber;
-    me.send_commands("quxiao", "取消使用");
-    return false;
-}
+        if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
+        var count = me.str + me.con + me.dex + me.int;
+        var max = 30 + count - 80;
+        me.notify("请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20");
+        me.wait_input = readnumber;
+        me.send_commands("quxiao", "取消使用");
+        return false;
+    }
 }
 
 function readnumber(me, cmd) {
@@ -54,6 +54,7 @@ function readnumber(me, cmd) {
     me.send_commands("ok", "确认", "cancle", "重新设置");
     me.wait_input = checkResult;
 }
+
 function checkResult(me, str) {
     if (str == "ok") {
         var obj = me.find_obj_bypath('cash/xi');

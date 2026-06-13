@@ -1,7 +1,7 @@
-import { AREA } from "../../../core/room/area.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {AREA} from "../../../core/room/area.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends AREA {
     id = "wudao";
@@ -14,13 +14,13 @@ export default class extends AREA {
     is_public = true;
     sp = "从第一层开始挑战，可获取秘籍残页，技能强化书，根据最高挑战层数每日领取奖励";
     map = [
-        { n: "入口", id: "wudao/men", p: [0, 0], exits: ["e"] },
-        { n: "武道塔", id: "wudao/ta", p: [1, 0] },
-        { n: "塔顶", id: "wudao/ding", p: [1, -5], exits: ["e", "s", "w", "n"] },
-        { n: "朱雀台", id: "wudao/south", p: [1, -4] },
-        { n: "白虎台", id: "wudao/west", p: [0, -5] },
-        { n: "玄武台", id: "wudao/north", p: [1, -6] },
-        { n: "青龙台", id: "wudao/east", p: [2, -5] },
+        {n: "入口", id: "wudao/men", p: [0, 0], exits: ["e"]},
+        {n: "武道塔", id: "wudao/ta", p: [1, 0]},
+        {n: "塔顶", id: "wudao/ding", p: [1, -5], exits: ["e", "s", "w", "n"]},
+        {n: "朱雀台", id: "wudao/south", p: [1, -4]},
+        {n: "白虎台", id: "wudao/west", p: [0, -5]},
+        {n: "玄武台", id: "wudao/north", p: [1, -6]},
+        {n: "青龙台", id: "wudao/east", p: [2, -5]},
     ];
 
     query_actions(_me: CHARACTER) {

@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "野狗";
@@ -22,6 +22,6 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    this.do_kill(me);
-}
+        this.do_kill(me);
+    }
 }

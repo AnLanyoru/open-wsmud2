@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "龟公";
@@ -37,10 +37,10 @@ export default class extends NPC {
     }
 
     on_leave(me, dir) {
-    if (dir == "east" || dir == "west") {
-        me.notify("龟公拦住你：这位" + me.call() + "，别着急，先来后到嘛，要不兄弟我另外给你物色个？");
-        return false;
-    }
+        if (dir == "east" || dir == "west") {
+            me.notify("龟公拦住你：这位" + me.call() + "，别着急，先来后到嘛，要不兄弟我另外给你物色个？");
+            return false;
+        }
 
-}
+    }
 }

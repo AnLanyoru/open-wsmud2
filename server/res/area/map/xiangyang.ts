@@ -1,7 +1,7 @@
-import { AREA } from "../../../core/room/area.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {AREA} from "../../../core/room/area.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends AREA {
     name = "襄阳";

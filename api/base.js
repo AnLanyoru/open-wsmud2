@@ -1,6 +1,4 @@
-﻿
-
-const crypto = require('crypto');
+﻿const crypto = require('crypto');
 const desvi = __CONFIG.DESIV;
 const md5add = __CONFIG.MD5;
 const SessionKey = 'u';
@@ -13,9 +11,11 @@ class Apibase {
         this.req = req;
         this.res = res;
     }
+
     error(code = 500, message) {
-        return this.res.status(code).json({ error: message });
+        return this.res.status(code).json({error: message});
     }
+
     signIn(id, uname, pwd, level) {
         if (!(id > 0)) return null;
         let key = this.req.cookies[SessionKey];
@@ -32,6 +32,7 @@ class Apibase {
         });
         return cert;
     }
+
     sessionKey() {
         return this.req.session.id;
     }
@@ -50,6 +51,7 @@ class Apibase {
         this.loginUser = this.deEncryptUser(key, str);
         return this.loginUser;
     }
+
     deEncryptUser(key, cert) {
         let txt = this.deEncrypt(key, cert);
         let str = txt.split("%");
@@ -65,6 +67,7 @@ class Apibase {
             };
         return null;
     }
+
     deEncrypt(key, str) {
 
         if (!key || !str) return;
@@ -79,12 +82,12 @@ class Apibase {
     }
 
 
-
     MD5(str) {
         let md5 = crypto.createHash('md5');
         let result = md5.update(str + md5add).digest('hex');
         return result.toUpperCase();
     }
+
     encrypt(str, key) {
         if (!key || !str) return;
         if (key.length > 16) key = key.substr(0, 16);
@@ -98,6 +101,7 @@ class Apibase {
         txt += decipher.final('base64');
         return txt;
     }
+
     encryptUser(id, uname, pwd, key, level) {
         return this.encrypt([id, uname, pwd,
             Date.now(), level].join('%'), key);
@@ -106,9 +110,11 @@ class Apibase {
     setSession(key, value) {
         this.req.session[key] = value;
     }
+
     getSession(key) {
         return this.req.session[key];
     }
+
     deleteSession(key) {
         delete this.req.session[key];
     }
@@ -123,12 +129,15 @@ class Apibase {
         this.res.setHeader('Connection', 'keep-alive');
         this.res.flushHeaders(); // 发送响应头
     }
+
     sse(data) {
         this.res.write(`data: ${JSON.stringify(data)}\n\n`); // 发送数据
     }
+
     end_sse() {
         this.res.end();
     }
+
     guid() {
         var str = [];
         str.push(parseInt((Date.now() - 1598376101624) / 1000).toString(16));

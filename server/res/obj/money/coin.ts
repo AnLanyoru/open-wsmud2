@@ -1,5 +1,5 @@
-import { MONEY } from "../../../core/item/money.js";
-import { UTIL } from "../../../core/util/util.js";
+import {MONEY} from "../../../core/item/money.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends MONEY {
     name = "铜板";
@@ -8,7 +8,7 @@ export default class extends MONEY {
     value = 1;
 
     unit_name() {
-    return UTIL.moneyToStr(this.count);
-}
+        return UTIL.moneyToStr(this.count);
+    }
 }
 

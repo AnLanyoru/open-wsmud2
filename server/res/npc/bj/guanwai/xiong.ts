@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "<blk>黑熊</blk>";
@@ -29,12 +29,12 @@ export default class extends MONSTER {
             obj: "st/xuanjing"
         }, {
             obj: "drug/xiongdan",
-            odds:1000
+            odds: 1000
         });
     }
 
     on_enter(me) {
-    me.notify("一只凶猛的黑熊朝你扑了过来。");
-    this.do_kill(me);
-}
+        me.notify("一只凶猛的黑熊朝你扑了过来。");
+        this.do_kill(me);
+    }
 }

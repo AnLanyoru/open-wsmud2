@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 import type {USER} from "../../../../core/char/user";
 
 export default class extends NPC {
@@ -53,6 +53,7 @@ export default class extends NPC {
             me.notify("平四咬牙说道：阎基躲在关外一带，你若能拿到他的头颅，少爷必有重谢。");
         });
     }
+
     on_leave(me: USER, dir: string) {
         if (dir == "north" && !me.query_temp("fb/guanwai/pingsi")) {
             me.notify("平四拦住你恭敬地说道：" + me.call() + "，我家少爷正在屋中，不知你有什么事情？");

@@ -1,9 +1,9 @@
-import { ROOM } from "../../../core/room/room.js";
+import {ROOM} from "../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "思过崖";
     desc = "这里便是华山派弟子受罚思过的地方。位于玉女峰顶，正好有一小快平地，一面是深不可测的山谷、一面是陡峭的<cmd cmd='look bi'>悬壁</cmd>，零零落落的有几快山石。";
-    exits = { "northdown": "huashan/xiaojing" };
+    exits = {"northdown": "huashan/xiaojing"};
 
     constructor() {
         super();

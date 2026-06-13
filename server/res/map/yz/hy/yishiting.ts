@@ -1,11 +1,11 @@
-import { ROOM } from "../../../../core/room/room.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
-import type { NPC } from "../../../../core/char/npc.js";
+import {ROOM} from "../../../../core/room/room.js";
+import type {CHARACTER} from "../../../../core/char/character.js";
+import type {NPC} from "../../../../core/char/npc.js";
 
 export default class MapRoom extends ROOM {
     name = "黑鹰厅";
     desc = "高约三丈的穹顶下，黑檀木横梁上悬着一块鎏金 “奉旨缉拿” 匾额，边缘镶着铜质云纹，匾额下方垂着三盏羊角宫灯，灯影在青砖地面投下晃动的光斑。西侧墙根处有一扇半尺厚的<cmd cmd='look men'>铁门</cmd>，门框与石壁严丝合缝。";
-    exits = { "south": "yz/hy/jiaochang5" };
+    exits = {"south": "yz/hy/jiaochang5"};
 
     constructor() {
         super();
@@ -30,20 +30,21 @@ export default class MapRoom extends ROOM {
     }
 
     on_enter(me: CHARACTER) {
-    if (me.is_player) {
-        let npc = this.find_by_path('yz/hy/tiehu') as NPC;
-        if (npc && !npc.fight_type) {
-          npc.on_kill(me);
-          npc.do_kill(me);
+        if (me.is_player) {
+            let npc = this.find_by_path('yz/hy/tiehu') as NPC;
+            if (npc && !npc.fight_type) {
+                npc.on_kill(me);
+                npc.do_kill(me);
+            }
         }
     }
-}
+
     close_men() {
-    if (this.query_exits("down")) {
-        this.remove_exit("down");
-        this.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
-        const dilao = ROOM.Get('yz/hy/dilao');
-        if (dilao) dilao.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
+        if (this.query_exits("down")) {
+            this.remove_exit("down");
+            this.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
+            const dilao = ROOM.Get('yz/hy/dilao');
+            if (dilao) dilao.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
+        }
     }
-}
 }

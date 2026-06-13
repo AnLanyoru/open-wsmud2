@@ -1,4 +1,4 @@
-import { OBJ } from "../../../../core/item/obj.js";
+import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -11,11 +11,12 @@ export default class extends OBJ {
     no_drop = true;
 
     on_study(me, skill_base) {
-  
-    return true;
-}
+
+        return true;
+    }
+
     do_study(me, skill_base) {
 
-    skill_base.add_exp(me, 10);
-}
+        skill_base.add_exp(me, 10);
+    }
 }

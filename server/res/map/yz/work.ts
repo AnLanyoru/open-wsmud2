@@ -1,11 +1,11 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends ROOM {
     name = "谷物加工厂";
     no_fight = true;
     desc = "这是一间谷物加工厂，这里是谷子脱壳成米的地方。米厂老板是一个一看就知道是十分精明的干瘦的中年人，老是带着一脸奸笑。你可以看到许多人正在忙忙碌碌的工作着，门口挂著一块<CMD cmd='look sign'>牌子(sign)</cmd>。";
-    exits = { "east": "yz/nanmen" };
+    exits = {"east": "yz/nanmen"};
 
     constructor() {
         super();
@@ -33,10 +33,12 @@ function start_work(me) {
     });
     return true;
 }
+
 function on_check(me) {
     var exp = WORLD.DATA.exps[me.level];
     return me.send('你正在打工，每10秒增加' + exp + "点经验和潜能，1两<wht>白银</wht>。")
 }
+
 function do_work(me) {
 
     var exp = WORLD.DATA.get_exp(me);

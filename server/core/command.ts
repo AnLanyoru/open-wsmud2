@@ -2,37 +2,49 @@
  * 所有命令的基类，
  * 自动加载所有定义在 __COMMAND 文件夹下的命令文件
  */
-import { BASE } from './base.js';
-import { WORLD } from './world.js';
-import type { CHARACTER } from './char/character.js';
-import type { OBJ } from './item/obj.js';
+import {BASE} from './base.js';
+import {WORLD} from './world.js';
+import type {CHARACTER} from './char/character.js';
+import type {OBJ} from './item/obj.js';
 
 export class COMMAND extends BASE {
 
     /** 比武记录（由 world/cmd/extend/biwu.js 注入） */
     biwu_record?: Record<string, any>;
+
     /** 进入副本回调（由 world/cmd/extend/ex.js 注入） */
     on_enter_fb?(me: CHARACTER | null, env: any): void;
+
     /** 清理邮件（由 checkorg 命令注入） */
     cmd_clearmail?(): void;
+
     /** 清理商店（由 checkorg 命令注入） */
     cmd_clearstore?(): void;
+
     /** 积分奖励（由 reward 命令注入） */
     score_reward?(i: number): Record<string, unknown>;
+
     /** 排行榜奖励（由 reward 命令注入） */
     top_reward?(i: number): Record<string, unknown>;
+
     /** 更新玩家排行榜（由 biwu 命令注入） */
     updatePlayerStats?(player: Record<string, any>, sc: number, fam?: string): void;
+
     /** 检查排行（由 biwu 命令注入） */
     checkStats?(player: Record<string, any>): void;
+
     /** 获取当前技能组索引（由 sk_group 命令注入） */
     cur_eqs?(me: CHARACTER): number;
+
     /** 清除延迟更新（由 update 命令注入） */
     clear_update?(): void;
+
     /** 锻造命令属性（由 duanzao 命令注入） */
     PROPS?: Record<string, unknown>;
+
     /** 锻造材料需求计算（由 duanzao 命令注入） */
     sum_needs?(prop: unknown, level: number): number;
+
     /** 默认锻造属性（由 duanzao 命令注入） */
     DEFAULT_PROPS?: Record<string | number, string | null>;
 
@@ -60,8 +72,10 @@ export class COMMAND extends BASE {
     command!: string;
     /** 参数正则匹配模式 */
     regex: RegExp | null = null;
+
     /** 绑定到目标原型上的执行函数，由子类定义 exec() 方法提供 */
     exec?(...args: unknown[]): unknown;
+
     /** 地图 JSON 缓存（由 jh、dialog/map 等子类设置） */
     map_json?: any;
     /** JSON 缓存（供 emote_data 等使用） */
@@ -83,8 +97,10 @@ export class COMMAND extends BASE {
     allow_level: number = 0;
     /** 允许在登录前执行 */
     allow_login: boolean = false;
+
     /** 拆分动作 */
-    split_book(player: CHARACTER, book: OBJ): void {}
+    split_book(player: CHARACTER, book: OBJ): void {
+    }
 
     /**
      * 命令状态检查，可由子类通过 overrides 覆写允许标志

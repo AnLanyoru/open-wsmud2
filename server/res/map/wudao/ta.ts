@@ -1,19 +1,19 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util";
-import { NPC } from "../../../core/char/npc.js";
-import { USER } from "../../../core/char/user.js";
-import { USERTASK } from "../../../core/task/playertask.js";
-import { COMMAND } from "../../../core/command.js";
-import type { CHARACTER } from "../../../core/char/character.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {UTIL} from "../../../core/util";
+import {NPC} from "../../../core/char/npc.js";
+import {USER} from "../../../core/char/user.js";
+import {USERTASK} from "../../../core/task/playertask.js";
+import {COMMAND} from "../../../core/command.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 // todo 太多了审核不完，记得review
 export default class MapRoom extends ROOM {
     name = "第一层";
     desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
-    exits = { "up": "wudao/up", "out": "wudao/men" };
+    exits = {"up": "wudao/up", "out": "wudao/men"};
     max_item_count = 1;
 
     on_before_enter(me: CHARACTER) {
@@ -61,6 +61,7 @@ export default class MapRoom extends ROOM {
         this.items.push(npc);
         this.refresh();
     }
+
     on_enter(me: CHARACTER) {
         const room = this;
         me.die = function (this: CHARACTER, killer?: CHARACTER) {
@@ -94,6 +95,7 @@ export default class MapRoom extends ROOM {
             roomNpc.do_kill(me);
         }
     }
+
     reward(me: CHARACTER, count: number) {
         if (count > 100) count = 100;
         var lv = 1000 + count * 100;
@@ -114,6 +116,7 @@ export default class MapRoom extends ROOM {
             }
         }
     }
+
     reward3(me: CHARACTER, count: number) {
 
         let items: { obj: string[]; count?: number }[] = [];
@@ -139,6 +142,7 @@ export default class MapRoom extends ROOM {
             }
         }
     }
+
     on_leave(me: CHARACTER, dir: string) {
         let level = (me.query_temp("wd_level", 0) as number) + 1;
         if (me.query_temp('wudao_o')) level = 100;

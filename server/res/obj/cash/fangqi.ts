@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -8,9 +8,9 @@ export default class extends OBJ {
     value = 0;
 
     on_use(me) {
-    if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
+        if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
 
-    me.send('请从技能列表选择遗忘技能，然后选择使用重置卡，将会重置你的某项技能。');
-    return false;
-}
+        me.send('请从技能列表选择遗忘技能，然后选择使用重置卡，将会重置你的某项技能。');
+        return false;
+    }
 }

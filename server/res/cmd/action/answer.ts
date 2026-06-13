@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { USER } from "../../../core/char/user.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {USER} from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "answer";
@@ -11,12 +11,12 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, objid, par) {
-    var obj = me.find_obj(objid, me.environment);
+        var obj = me.find_obj(objid, me.environment);
 
-    if (!obj || !obj.on_answer) return me.notify("你要回答什么？");
+        if (!obj || !obj.on_answer) return me.notify("你要回答什么？");
 
-    obj.on_answer(me, par);
-}
+        obj.on_answer(me, par);
+    }
 }
 
 USER.prototype.send_question = function (npc, list, callbacks) {

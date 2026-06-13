@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "崔员外";
@@ -19,17 +19,17 @@ export default class extends NPC {
             ["eq/lv0/cloth", 1, 1]
         );
         this.skill_map(
-                ["unarmed",30],
-                ["dodge", 30],
-                ["sword", 30],
-                ["blade", 30],
-                ["parry", 30]);
+            ["unarmed", 30],
+            ["dodge", 30],
+            ["sword", 30],
+            ["blade", 30],
+            ["parry", 30]);
         this.set_drop({
             obj: "money/silver",
             min: 10,
             max: 20
         }, {
-           obj: ["eq/lv0/cloth", "eq/lv0/jian"],
+            obj: ["eq/lv0/cloth", "eq/lv0/jian"],
             odds: 5000
         }, {
             obj: "eq/lv1/gold_ring",
@@ -38,13 +38,13 @@ export default class extends NPC {
     }
 
     on_enter(target) {
-    if (target.is("yz/cuifu/yahuan")) {
-        this.send_room("<hir>崔员外对丫鬟叫道：小娘皮，竟然想跑？</hir>");
-        this.do_kill(target);
+        if (target.is("yz/cuifu/yahuan")) {
+            this.send_room("<hir>崔员外对丫鬟叫道：小娘皮，竟然想跑？</hir>");
+            this.do_kill(target);
 
-    } else {
-        target.notify("崔员外扯着嗓子喊道：管家，管家，有人闯进来了。");
+        } else {
+            target.notify("崔员外扯着嗓子喊道：管家，管家，有人闯进来了。");
+        }
+
     }
-
-}
 }

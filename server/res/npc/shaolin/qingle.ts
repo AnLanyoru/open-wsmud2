@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "清乐比丘";
@@ -22,8 +22,8 @@ export default class extends NPC {
         this.set_objects([
             "eq/lv0/cloth", 1, 1
         ], [
-                "eq/lv0/mugun", 1, 1
-            ]);
+            "eq/lv0/mugun", 1, 1
+        ]);
         this.skill_map(
             ["dodge", 100],
             ["parry", 100],
@@ -39,8 +39,8 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender == 2) return me.notify_fail("清乐比丘说道：阿弥陀佛，少林寺不收女弟子。");
-    return true;
-}
+        if (me.gender == 2) return me.notify_fail("清乐比丘说道：阿弥陀佛，少林寺不收女弟子。");
+        return true;
+    }
 }
 

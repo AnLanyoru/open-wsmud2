@@ -1,5 +1,5 @@
-import { NPC } from "../../../../core/char/npc.js";
-import { OBJ } from "../../../../core/item/obj.js";
+import {NPC} from "../../../../core/char/npc.js";
+import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends NPC {
     name = "庄允城";

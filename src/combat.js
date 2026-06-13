@@ -1,4 +1,3 @@
-
 import Setting from './setting.js';
 
 const Combat = {
@@ -49,8 +48,8 @@ const Combat = {
         // if (!Combat.IsShow) return;
         // this.append_items(cmds, panel);
     },
-    def_actions: [{ cmd: "dazuo", name: "打坐" },
-    { cmd: "liaoshang", name: "疗伤" }],
+    def_actions: [{cmd: "dazuo", name: "打坐"},
+        {cmd: "liaoshang", name: "疗伤"}],
 
     refActions: function () {
         let actions = [...this.def_actions];
@@ -95,8 +94,7 @@ const Combat = {
                 if (data.remove) {
                     this.object_actions.splice(i, 1);
                     return item.elem.remove();
-                }
-                else {
+                } else {
                     this.ANI_OBJ(item, data.time, data.time);
                 }
             }
@@ -298,7 +296,7 @@ const Combat = {
     },
     STATUS: {},
     AppendStatusItem: function (id, elem, status) {
-        var stitem = { elem: elem, items: {} };
+        var stitem = {elem: elem, items: {}};
         if (status) {
             for (var i = 0; i < status.length; i++) {
                 this.StatusItem_add(stitem, status[i]);

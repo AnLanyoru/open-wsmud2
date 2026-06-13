@@ -42,7 +42,9 @@ export class Page {
         if (this.$el) this.$el.remove();
         this.$el = null;
         if (this.on_unmount) this.on_unmount();
-        if (this.$children) this.$children.forEach(com => { if (com.on_unmount) com.on_unmount(); });
+        if (this.$children) this.$children.forEach(com => {
+            if (com.on_unmount) com.on_unmount();
+        });
         if (this.$parent && this.$parent.$children) {
             this.$parent.$children = this.$parent.$children.filter(com => com !== this);
         }
@@ -57,7 +59,7 @@ export class Page {
 
     insert(options) {
         if (!options) throw new Error('选项不能为空');
-        if (typeof options === 'string') options = { url: options };
+        if (typeof options === 'string') options = {url: options};
         const ComClass = options.Class;
         if (!ComClass) throw new Error(`组件类不存在`);
         const com = new ComClass();
@@ -90,10 +92,10 @@ export function EventsMixin(target) {
             return this;
         }
         if (!this.handlers[type]) {
-            this.handlers[type] = { listeners: [], cache: [] };
+            this.handlers[type] = {listeners: [], cache: []};
         }
         const handler = this.handlers[type];
-        handler.listeners.push({ fn: func, ctx, once });
+        handler.listeners.push({fn: func, ctx, once});
         if (handler.cache.length) {
             handler.cache.forEach(data => this._runListeners(handler, data));
             handler.cache = [];
@@ -103,7 +105,7 @@ export function EventsMixin(target) {
     target.prototype.emit = function (type, data, delay = true, clear = false) {
         const handler = this.handlers[type];
         if (!handler) {
-            if (delay) this.handlers[type] = { listeners: [], cache: [data] };
+            if (delay) this.handlers[type] = {listeners: [], cache: [data]};
             return this;
         }
         if (!handler.listeners.length) {
@@ -116,7 +118,7 @@ export function EventsMixin(target) {
     };
     target.prototype._runListeners = function (handler, data) {
         for (let i = handler.listeners.length - 1; i >= 0; i--) {
-            const { fn, ctx, once } = handler.listeners[i];
+            const {fn, ctx, once} = handler.listeners[i];
             if (fn.call(ctx, data) === false || once) handler.listeners.splice(i, 1);
         }
     };

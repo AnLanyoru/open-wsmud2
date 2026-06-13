@@ -1,9 +1,9 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { EQUIP_TYPE } from "../../../core/const.js";
-import type { StatsTopEntry, ScoreRankEntry, WeaponRankEntry } from "../../../core/world.js";
-import type { USER } from "../../../core/char/user.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {EQUIP_TYPE} from "../../../core/const.js";
+import type {StatsTopEntry, ScoreRankEntry, WeaponRankEntry} from "../../../core/world.js";
+import type {USER} from "../../../core/char/user.js";
 
 // todo 需要检查一下和第一次提交的js文件的不同
 export default class extends COMMAND {
@@ -18,153 +18,164 @@ export default class extends COMMAND {
      * @param me - 执行命令的角色
      */
     enter(me: CHARACTER, par?: string, fam?: string, index?: string): void {
-  
-    if (!par) {
-        return;
-    }
-    if (par === "top") {
-        if (index) {
 
-            return render_top_item(me, fam, index);
+        if (!par) {
+            return;
         }
-        return renderTops(me, fam);
-    }
-    if (par === "weapon") {
-        if (index) {
+        if (par === "top") {
+            if (index) {
 
-            return render_eq(me,fam,index);
+                return render_top_item(me, fam, index);
+            }
+            return renderTops(me, fam);
         }
-        return renderWeapons(me, fam);
-    }
-    if (par === "score") {
+        if (par === "weapon") {
+            if (index) {
 
-        if (index)
-            return render_score_item(me,fam, index);
-        return renderScore(me, fam);
-    }
+                return render_eq(me, fam, index);
+            }
+            return renderWeapons(me, fam);
+        }
+        if (par === "score") {
+
+            if (index)
+                return render_score_item(me, fam, index);
+            return renderScore(me, fam);
+        }
 
 
-    if (par === "exp") {
-        if (index)
-            return this.render_item(me,EXP_STATS, fam, index);
+        if (par === "exp") {
+            if (index)
+                return this.render_item(me, EXP_STATS, fam, index);
 
-        this.renderExp(me, fam);
+            this.renderExp(me, fam);
+        }
+        if (par === "mp") {
+            if (index)
+                return this.render_item(me, MP_STATS, fam, index);
+            this.renderMP(me, fam);
+        }
+        if (par === "money") {
+            if (index)
+                return this.render_item(me, MONEY_STATS, fam, index);
+            this.renderMoney(me, fam);
+        }
+
     }
-    if (par === "mp") {
-        if (index)
-            return this.render_item(me,MP_STATS,fam, index);
-        this.renderMP(me, fam);
-    }
-    if (par === "money") {
-        if (index)
-            return this.render_item(me, MONEY_STATS, fam, index);
-        this.renderMoney(me, fam);
-    }
-  
-}
+
     render_item(me: CHARACTER, cache: Record<string, UserStatsInst | undefined>, fam?: string, index?: string): void {
-    if (!fam) fam = "all";
-    const stats = cache[fam];
+        if (!fam) fam = "all";
+        const stats = cache[fam];
 
-    if (!stats || !stats.result) return me.send('你要看什么？');
-    const idx = Number(index) - 1;
-    if (!(idx >= 0 && idx < stats.result.length))
-        return  me.send('你要看什么？');
-    const item = stats.result[idx];
-    if (!item) return me.send('没有这个人。');
-    const user = WORLD.getUser(item.id);
-    if (!user) return me.send(item.name + "现在不在线。");
-    if (user.query_desc) {
-        me.notify(user.query_desc(me, "look1"));
+        if (!stats || !stats.result) return me.send('你要看什么？');
+        const idx = Number(index) - 1;
+        if (!(idx >= 0 && idx < stats.result.length))
+            return me.send('你要看什么？');
+        const item = stats.result[idx];
+        if (!item) return me.send('没有这个人。');
+        const user = WORLD.getUser(item.id);
+        if (!user) return me.send(item.name + "现在不在线。");
+        if (user.query_desc) {
+            me.notify(user.query_desc(me, "look1"));
+        }
     }
-}
+
     renderExp(me: CHARACTER, fam?: string): void {
-    let stype = fam;
-    if (!stype) stype = "all";
-    let stats: UserStatsInst | undefined = EXP_STATS[stype];
+        let stype = fam;
+        if (!stype) stype = "all";
+        let stats: UserStatsInst | undefined = EXP_STATS[stype];
 
-    if (!stats) {
-        stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
-            (me: CHARACTER, item: { value: number }) => { return me.exp < item.value },
-            (me: CHARACTER) => {
-                return {
-                    id: me.id,
-                    value: me.exp,
-                    name: me.color_name
-                };
-            });
-        stats.type = "exp";
-        stats.fam = fam;
-        EXP_STATS[stype] = stats;
+        if (!stats) {
+            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+                (me: CHARACTER, item: { value: number }) => {
+                    return me.exp < item.value
+                },
+                (me: CHARACTER) => {
+                    return {
+                        id: me.id,
+                        value: me.exp,
+                        name: me.color_name
+                    };
+                });
+            stats.type = "exp";
+            stats.fam = fam;
+            EXP_STATS[stype] = stats;
+        }
+        if (stats!.isExpire()) {
+            stats!.order();
+        }
+        me.send(stats!.cache!);
     }
-    if (stats!.isExpire()) {
-        stats!.order();
-    }
-    me.send(stats!.cache!);
-}
+
     renderMoney(me: CHARACTER, fam?: string): void {
-    let stype = fam;
-    if (!stype) stype = "all";
-    let stats: UserStatsInst | undefined = MONEY_STATS[stype];
+        let stype = fam;
+        if (!stype) stype = "all";
+        let stats: UserStatsInst | undefined = MONEY_STATS[stype];
 
-    if (!stats) {
-        stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
-            (me: CHARACTER, item: { value: number }) => { return me.money < item.value },
-            (me: CHARACTER) => {
-                return {
-                    id: me.id,
-                    value: me.money,
-                    name: me.color_name
-                };
-            });
-        stats.type = "money";
-        stats.formatter = function (this: void, value: number): string {
-            if (value >= 10000) {
-                return '"' + Math.floor(value / 10000) + "两黄金" + '"';
-            }
-            if (value > 100) {
-                return '"' + Math.floor(value / 100) + "两白银" + '"';
-            }
-            if (value > 0) {
-                return '"' + Math.floor(value / 100) + "个铜板" + '"';
-            }
-            return '""';
-        };
-        stats.fam = fam;
-        MONEY_STATS[stype] = stats;
+        if (!stats) {
+            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+                (me: CHARACTER, item: { value: number }) => {
+                    return me.money < item.value
+                },
+                (me: CHARACTER) => {
+                    return {
+                        id: me.id,
+                        value: me.money,
+                        name: me.color_name
+                    };
+                });
+            stats.type = "money";
+            stats.formatter = function (this: void, value: number): string {
+                if (value >= 10000) {
+                    return '"' + Math.floor(value / 10000) + "两黄金" + '"';
+                }
+                if (value > 100) {
+                    return '"' + Math.floor(value / 100) + "两白银" + '"';
+                }
+                if (value > 0) {
+                    return '"' + Math.floor(value / 100) + "个铜板" + '"';
+                }
+                return '""';
+            };
+            stats.fam = fam;
+            MONEY_STATS[stype] = stats;
+        }
+        if (stats!.isExpire()) {
+            stats!.order();
+        }
+        me.send(stats!.cache!);
     }
-    if (stats!.isExpire()) {
-        stats!.order();
-    }
-    me.send(stats!.cache!);
-}
+
     renderMP(me: CHARACTER, fam?: string): void {
-    let stype = fam;
-    if (!stype) stype = "all";
-    let stats: UserStatsInst | undefined = MP_STATS[stype];
+        let stype = fam;
+        if (!stype) stype = "all";
+        let stats: UserStatsInst | undefined = MP_STATS[stype];
 
-    if (!stats) {
-        stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
-            (me: CHARACTER, item: { value: number }) => { return me.max_mp < item.value },
-            (me: CHARACTER) => {
-                return {
-                    id: me.id,
-                    value: me.max_mp,
-                    name: me.color_name
-                };
-            });
-        stats.type = "mp";
-        stats.fam = fam;
-        MP_STATS[stype] = stats;
+        if (!stats) {
+            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+                (me: CHARACTER, item: { value: number }) => {
+                    return me.max_mp < item.value
+                },
+                (me: CHARACTER) => {
+                    return {
+                        id: me.id,
+                        value: me.max_mp,
+                        name: me.color_name
+                    };
+                });
+            stats.type = "mp";
+            stats.fam = fam;
+            MP_STATS[stype] = stats;
+        }
+        if (stats!.isExpire()) {
+            stats!.order();
+        }
+        me.send(stats!.cache!);
     }
-    if (stats!.isExpire()) {
-        stats!.order();
-    }
-    me.send(stats!.cache!);
-}
 }
 
 const STATS = WORLD.STATS;
+
 function render_top_item(me: CHARACTER, fam: string | undefined, index: string | undefined): void {
     const tops: StatsTopEntry[] = STATS.TOPS;
     let items: StatsTopEntry[];
@@ -174,6 +185,7 @@ function render_top_item(me: CHARACTER, fam: string | undefined, index: string |
     if (!item) return me.send('你要看什么？');
     return me.notify(item.query_desc!(item as unknown as CHARACTER, 'look1'));
 }
+
 function render_score_item(me: CHARACTER, fam: string | undefined, index: string | undefined): void {
     const tops: ScoreRankEntry[] = STATS.SCORE;
     let items: ScoreRankEntry[];
@@ -185,6 +197,7 @@ function render_score_item(me: CHARACTER, fam: string | undefined, index: string
     if (!user) return me.send('对方不在线。');
     return me.notify(user.query_desc(me));
 }
+
 function renderScore(me: CHARACTER, fam?: string): void {
     const tops: ScoreRankEntry[] = STATS.SCORE;
     const items: ScoreRankEntry[] = fam ? (STATS.SC_STATS[fam.toUpperCase()] ?? []) as unknown as ScoreRankEntry[] : tops;
@@ -205,6 +218,7 @@ function renderScore(me: CHARACTER, fam?: string): void {
     str.push("}");
     me.send(str.join(""));
 }
+
 function renderTops(me: CHARACTER, stype?: string): void {
     const tops: StatsTopEntry[] = STATS.TOPS;
     let famid: string | null = null;
@@ -222,7 +236,7 @@ function renderTops(me: CHARACTER, stype?: string): void {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (i > 0) str.push(",");
-        str.push('["', item.long_name!(),'",',String(item.score),']');
+        str.push('["', item.long_name!(), '",', String(item.score), ']');
     }
     if (!stype || famid === me.family!.id) {
         str.push('],top:', String(me.query_temp(stype ? "top_fam" : "top", 0) ?? 0));
@@ -232,10 +246,11 @@ function renderTops(me: CHARACTER, stype?: string): void {
         str.push(',sc:0');
     }
 
-    str.push(',fam:"', stype ?? '','"');
+    str.push(',fam:"', stype ?? '', '"');
     str.push("}");
     me.send(str.join(""));
 }
+
 function render_eq(me: CHARACTER, type: string | undefined, index: string | undefined): void {
 
     if (!type) type = 'weapon';
@@ -243,6 +258,7 @@ function render_eq(me: CHARACTER, type: string | undefined, index: string | unde
     const wea = eqs[Number(index) - 1];
     if (wea) me.send(wea.desc);
 }
+
 function renderWeapons(me: CHARACTER, type?: string): void {
     const str: string[] = ['{"type":"dialog","dialog":"stats","weapons":['];
     if (!type) type = 'weapon';
@@ -261,7 +277,7 @@ function renderWeapons(me: CHARACTER, type?: string): void {
         } else {
             str.push('无');
         }
-        str.push('",',String(item.score),']');
+        str.push('",', String(item.score), ']');
     }
     str.push(']');
     str.push("}");
@@ -292,6 +308,7 @@ interface UserStatsInst {
 const EXP_STATS: Record<string, UserStatsInst | undefined> = {};
 const MONEY_STATS: Record<string, UserStatsInst | undefined> = {};
 const MP_STATS: Record<string, UserStatsInst | undefined> = {};
+
 function UserStats(this: UserStatsInst, order: (me: CHARACTER, item: UserStatsResult) => boolean, added: (me: CHARACTER) => UserStatsResult): void {
     this.result = null;
     this.cache = null;
@@ -301,6 +318,7 @@ function UserStats(this: UserStatsInst, order: (me: CHARACTER, item: UserStatsRe
     this.maxCount = 20;
     this.type = null;
 }
+
 UserStats.prototype.formatter = function (this: UserStatsInst, val: number): string {
     return String(val);
 };
@@ -323,12 +341,12 @@ UserStats.prototype.order = function (this: UserStatsInst, append?: string): voi
     for (let i = 0; i < this.result!.length; i++) {
         const u = this.result![i];
         if (i > 0) str.push(",");
-        str.push('["', u.name, '",', this.formatter(u.value),']');
+        str.push('["', u.name, '",', this.formatter(u.value), ']');
     }
     str.push(']');
     str.push(',"time":', String(Date.now()), '');
     str.push(',"st":"', this.type ?? '', '"', append ?? "");
-    str.push(',"fam":"', this.fam ?? '','"');
+    str.push(',"fam":"', this.fam ?? '', '"');
 
     str.push("}");
     this.cache = str.join("");

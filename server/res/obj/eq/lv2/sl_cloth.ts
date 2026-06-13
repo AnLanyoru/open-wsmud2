@@ -1,5 +1,5 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
+import {EQUIPMENT} from "../../../../core/item/equipment.js";
+import {EQUIP_TYPE} from "../../../../core/const.js";
 
 export default class extends EQUIPMENT {
     name = "神龙袍";
@@ -12,7 +12,7 @@ export default class extends EQUIPMENT {
     prop = {
         fy: 50,
         max_hp: 250,
-        con:10
+        con: 10
     };
 }
 

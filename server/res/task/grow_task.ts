@@ -1,39 +1,42 @@
-import { USERTASK } from "../../core/task/playertask.js";
-import { WORLD } from "../../core/world.js";
-import type { CHARACTER } from "../../core/char/character.js";
+import {USERTASK} from "../../core/task/playertask.js";
+import {WORLD} from "../../core/world.js";
+import type {CHARACTER} from "../../core/char/character.js";
 
 export default class extends USERTASK {
     id = "growup";
     sort = 1;
 
     query_title(player?: CHARACTER): string {
-    if (!player) return '';
-    var stas = player.query_temp("grow_lv", 0) ?? 0;
-    return "<hic>" + temps[stas].title + "</hic>";
-}
+        if (!player) return '';
+        var stas = player.query_temp("grow_lv", 0) ?? 0;
+        return "<hic>" + temps[stas].title + "</hic>";
+    }
+
     query_desc(player?: CHARACTER): string {
-    if (!player) return '';
-    var stas = player.query_temp("grow_lv", 0) ?? 0;
-    return temps[stas].desc;
-}
+        if (!player) return '';
+        var stas = player.query_temp("grow_lv", 0) ?? 0;
+        return temps[stas].desc;
+    }
+
     query_state(player?: CHARACTER): number {
-    if (!player) return 0;
-    if (!WORLD.is_server(player)) return 0;
-    var stas = player.query_temp("grow_lv", 0) ?? 0;
-    if (stas >= temps.length) return 0;
-    return temps[stas].check(player);
-}
+        if (!player) return 0;
+        if (!WORLD.is_server(player)) return 0;
+        var stas = player.query_temp("grow_lv", 0) ?? 0;
+        if (stas >= temps.length) return 0;
+        return temps[stas].check(player);
+    }
+
     on_finish(player?: CHARACTER): void | boolean {
-    if (!player) return;
-    if (!WORLD.is_server(player)) return player.notify("你无法完成。");
-    var stas = player.query_temp("grow_lv", 0) ?? 0;
-    if (stas >= temps.length) return;
-    var st = temps[stas].check(player);
-    if (st == 1) return player.notify("你还没完成这个任务。");
-    temps[stas].finish(player);
-    player.set_temp("grow_lv", stas + 1);
-    return true;
-}
+        if (!player) return;
+        if (!WORLD.is_server(player)) return player.notify("你无法完成。");
+        var stas = player.query_temp("grow_lv", 0) ?? 0;
+        if (stas >= temps.length) return;
+        var st = temps[stas].check(player);
+        if (st == 1) return player.notify("你还没完成这个任务。");
+        temps[stas].finish(player);
+        player.set_temp("grow_lv", stas + 1);
+        return true;
+    }
 }
 
 const temps = [

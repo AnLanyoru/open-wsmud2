@@ -1,4 +1,3 @@
-
 import * as Util from './utils/util.js';
 import Setting from './setting.js';
 
@@ -71,7 +70,7 @@ export function SendCommand(cmd) {
     if (Setting.show_send) {
         var d = new Date();
         var time = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
-        ReceiveMessage("<hio>" + time + "</hio> " + "<HIW>" + cmd+ "</HIW>");
+        ReceiveMessage("<hio>" + time + "</hio> " + "<HIW>" + cmd + "</HIW>");
     }
     if (!GameClient || !GameClient.Connected()) {
         LastCommand = cmd;
@@ -121,11 +120,12 @@ export function hide2show(elem2, callback) {
     var p = $(".login-content").children();
     for (var i = 0; i < p.length; i++) {
         if ($(p[i]).css("display") != "none") {
-            elem1 = $(p[i]); break;
+            elem1 = $(p[i]);
+            break;
         }
     }
     if (!elem1) elem1 = $("#login_panel");
-    elem1.animate({ opacity: 0 }, "fast", function () {
+    elem1.animate({opacity: 0}, "fast", function () {
         elem1.hide();
         if (elem2 == ".container") $(".login-content").hide();
         else $(".login-content").show();
@@ -133,7 +133,7 @@ export function hide2show(elem2, callback) {
             elem2 = $(elem2);
             elem2.show();
             elem2.css("opacity", "0");
-            elem2.animate({ opacity: 1 }, "slow", callback);
+            elem2.animate({opacity: 1}, "slow", callback);
         }
     });
 }
@@ -151,6 +151,7 @@ export function showLoader(msg, elem) {
 }
 
 let wsindex = 0;
+
 export class WSClient {
     constructor(ip, port) {
         if (ip === '127.0.0.1' || ip === '0.0.0.0') {
@@ -159,6 +160,7 @@ export class WSClient {
         this.IP = ip;
         this.Port = port;
     }
+
     Connect(callback) {
         try {
             var pol = location.protocol == "http:" ? "ws" : "wss";
@@ -172,6 +174,7 @@ export class WSClient {
             this.OnError && this.OnError(e);
         }
     }
+
     OnReceived(evt) {
         if (!evt || !evt.data) return;
         var data = evt.data;
@@ -192,6 +195,7 @@ export class WSClient {
             this.OnMessage(data);
         }
     }
+
     Send(text) {
         try {
             this.ws.send(text);
@@ -199,13 +203,16 @@ export class WSClient {
             ReceiveMessage(e);
         }
     }
+
     Destroy() {
         this.ws.onclose = null;
         this.ws.close();
     }
+
     Close() {
         this.ws.close();
     }
+
     Connected() {
         return this.ws && this.ws.readyState == 1;
     }

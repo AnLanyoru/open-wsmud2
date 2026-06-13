@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "灭绝";
@@ -40,10 +40,10 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender != 2) return me.notify_fail("灭绝对你哼了道：再不走小心杀了你！");
-    if (me.query_skill("linjizhuang", 0) < 500 && me.query_skill("linjizhuang2", 0) < 500) return me.notify_fail("灭绝说道：你的临济十二庄掌握程度还不够，需要多加练习。");
-    if (me.query_skill("huifengjian", 0) < 300) return me.notify_fail("灭绝说道：你的回风拂柳剑掌握程度还不够，需要多加练习。");
-    return true;
-}
+        if (me.gender != 2) return me.notify_fail("灭绝对你哼了道：再不走小心杀了你！");
+        if (me.query_skill("linjizhuang", 0) < 500 && me.query_skill("linjizhuang2", 0) < 500) return me.notify_fail("灭绝说道：你的临济十二庄掌握程度还不够，需要多加练习。");
+        if (me.query_skill("huifengjian", 0) < 300) return me.notify_fail("灭绝说道：你的回风拂柳剑掌握程度还不够，需要多加练习。");
+        return true;
+    }
 }
 

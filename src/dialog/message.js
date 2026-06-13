@@ -1,6 +1,5 @@
+import {showFlag} from '../game/tool.js';
 
-
-import { showFlag } from '../game/tool.js';
 export default {
     init: function () {
 

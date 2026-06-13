@@ -1,9 +1,9 @@
-import { ROOM } from "../../../../core/room/room.js";
-import { WORLD } from "../../../../core/world.js";
-import { UTIL } from "../../../../core/util/util.js";
-import { COMMAND } from "../../../../core/command.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
-import type { NPC } from "../../../../core/char/npc.js";
+import {ROOM} from "../../../../core/room/room.js";
+import {WORLD} from "../../../../core/world.js";
+import {UTIL} from "../../../../core/util/util.js";
+import {COMMAND} from "../../../../core/command.js";
+import type {CHARACTER} from "../../../../core/char/character.js";
+import type {NPC} from "../../../../core/char/npc.js";
 
 /*
 1.脱光变身
@@ -18,7 +18,7 @@ import type { NPC } from "../../../../core/char/npc.js";
 export default class MapRoom extends ROOM {
     name = "密林深处";
     desc = "这里是密林的深处，楠木参天，浓阴蔽日，再往里就没有路走了，一只大狼懒洋洋的趴着，四周散落着不少乱七八糟的物件。";
-    exits = { "east": "yz/lw/milin2" };
+    exits = {"east": "yz/lw/milin2"};
 
     constructor() {
         super();
@@ -127,6 +127,7 @@ export default class MapRoom extends ROOM {
         return dt.getFullYear() === 2024 && dt.getMonth() === 8 && (dt.getDate() >= 15 && dt.getDate() <= 17)
             && hour >= 21 && hour <= 24;
     }
+
     is_killlang(me: CHARACTER) {
         var rm = ROOM.Get('yz/lw/milin2');
         if (!rm) {
@@ -144,6 +145,7 @@ export default class MapRoom extends ROOM {
         }
         return lang;
     }
+
     create_lw(me: CHARACTER, npc: any, type: number, msg: string): void {
 
         if (!WORLD.is_server(me)) return;
@@ -168,7 +170,7 @@ export default class MapRoom extends ROOM {
         npc.mp = npc.max_mp = me.max_mp;
         npc.on_die = this.on_lwdie.bind(this, me, type);
         if (me.level >= 4) {
-            npc.prop = { gj: me.gj, mz: me.mz, fy: me.fy };
+            npc.prop = {gj: me.gj, mz: me.mz, fy: me.fy};
         }
         npc.init();
         npc.recount();
@@ -176,6 +178,7 @@ export default class MapRoom extends ROOM {
         this.item_changed(npc, true);
         npc.do_kill(me);
     };
+
     on_lwdie(this: MapRoom, me: CHARACTER, t: number) {
         var type = "zq" + t;
         if (WORLD.DATA.query_temp(type)) return;

@@ -1,5 +1,5 @@
-import { NPC } from "../../../../core/char/npc.js";
-import { CHARACTER } from "../../../../core/char/character.js";
+import {NPC} from "../../../../core/char/npc.js";
+import {CHARACTER} from "../../../../core/char/character.js";
 
 export default class extends NPC {
     name = "丫鬟";
@@ -22,7 +22,7 @@ export default class extends NPC {
 
             var type = me.query_temp("fb/cuifu/yahuan");
             if (!type) {
-                me.send_room("$N看了看$n，把旁边的衣服丢给$n，道：穿好衣服，我带你出去。\n$n穿上她的衣服。",this);
+                me.send_room("$N看了看$n，把旁边的衣服丢给$n，道：穿好衣服，我带你出去。\n$n穿上她的衣服。", this);
                 this.do_follow(me);
                 me.set_temp("fb/cuifu/yahuan", 1);
                 me.add_fbscore(10);
@@ -46,9 +46,9 @@ export default class extends NPC {
     }
 
     on_enter(me: CHARACTER): void {
-    if (!this.follow_target && !me.query_temp("fb/cuifu/yahuan")) {
-        me.notify("丫鬟看到你进来，吓了一跳，待看清来人，扑到你前面泣声喊道：大人，救救我！");
-        me.send_commands("ok " + this.id, "答应她");
+        if (!this.follow_target && !me.query_temp("fb/cuifu/yahuan")) {
+            me.notify("丫鬟看到你进来，吓了一跳，待看清来人，扑到你前面泣声喊道：大人，救救我！");
+            me.send_commands("ok " + this.id, "答应她");
+        }
     }
-}
 }

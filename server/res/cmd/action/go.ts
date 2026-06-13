@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { EQUIP_TYPE } from "../../../core/const.js";
-import { ROOM } from "../../../core/room/room.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {EQUIP_TYPE} from "../../../core/const.js";
+import {ROOM} from "../../../core/room/room.js";
 
 export default class extends COMMAND {
     command = "go";
@@ -10,51 +10,50 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, dir) {
-    if (me.hp <= 0) return;
-    if (!dir) return me.notify("你要往哪里走？");
-    dir = OUTER_DOORS[dir];
-    if (!dir) return me.notify("你要往哪里走？");
-    var cur_room = me.environment;
-    if (!cur_room) {
-        return me.notify("这里不知道怎么走。");
-    }
-    var rm = cur_room.exits && cur_room.exits[dir];
-    if (!rm) return me.notify("这个方向没有出路。");
-    // if (rm === " ") {
-    //     console.log(me.name, cur_room.path);
-    // }
+        if (me.hp <= 0) return;
+        if (!dir) return me.notify("你要往哪里走？");
+        dir = OUTER_DOORS[dir];
+        if (!dir) return me.notify("你要往哪里走？");
+        var cur_room = me.environment;
+        if (!cur_room) {
+            return me.notify("这里不知道怎么走。");
+        }
+        var rm = cur_room.exits && cur_room.exits[dir];
+        if (!rm) return me.notify("这个方向没有出路。");
+        // if (rm === " ") {
+        //     console.log(me.name, cur_room.path);
+        // }
 
-    var next_room = ROOM.Get(rm);
-    if (!next_room) {
-        return me.notify(rm + "还没开放!");
-    }
-    if (me.fight_type > 0 && !me.do_escape()) {
-        return;
-    }
-    if (me.is_rash) return me.notify("你现在没办法移动。");
-    if (cur_room.owner) {
-        //当前房间在副本区域
-        var copyroom = next_room.query_copy(cur_room.owner);
-        if (copyroom) {
-            next_room = copyroom;
-        } else {
-            if (cur_room.is_fb()) {
-                //不能从副本直接出去
-                return me.notify("这里不能过去。");
+        var next_room = ROOM.Get(rm);
+        if (!next_room) {
+            return me.notify(rm + "还没开放!");
+        }
+        if (me.fight_type > 0 && !me.do_escape()) {
+            return;
+        }
+        if (me.is_rash) return me.notify("你现在没办法移动。");
+        if (cur_room.owner) {
+            //当前房间在副本区域
+            var copyroom = next_room.query_copy(cur_room.owner);
+            if (copyroom) {
+                next_room = copyroom;
+            } else {
+                if (cur_room.is_fb()) {
+                    //不能从副本直接出去
+                    return me.notify("这里不能过去。");
+                }
             }
         }
-    }
 
-    if (me.query_temp("killer")) {
-        if (next_room.is_copy() || next_room.no_fight)
-            return me.notify("你现在正在被追杀，不能进入安全区和副本区域。");
+        if (me.query_temp("killer")) {
+            if (next_room.is_copy() || next_room.no_fight)
+                return me.notify("你现在正在被追杀，不能进入安全区和副本区域。");
+        }
+        me.moveto(next_room, sendOutMessage(me, dir), sendInMessage(me), dir);
     }
-    me.moveto(next_room, sendOutMessage(me, dir), sendInMessage(me), dir);
-}
 }
 
-var OUTER_DOORS = {
-};
+var OUTER_DOORS = {};
 var doors = ["west", "north", "south", "east", "northwest", "southwest", "northeast", "southeast",
     "down", "up", "westdown", "northdown", "southdown", "eastdown", "westup", "northup", "southup", "eastup", "enter", "out"];
 var doors_short = ["s", "n", "w", "e", "se", "sw", "nw", "ne", "d", "u", "sd", "ed", "nd", "wd", "su", "eu", "wu", "nu"];
@@ -64,6 +63,7 @@ for (var i = 0; i < doors.length; i++) {
     }
     OUTER_DOORS[doors[i]] = doors[i];
 }
+
 function sendOutMessage(player, dir) {
     dir = dirs[dir] || "";
     if (player.is_fighting()) {
@@ -81,6 +81,7 @@ function sendOutMessage(player, dir) {
     }
     return player.name + "往" + dir + "离开。";
 }
+
 function sendInMessage(player, dir) {
     if (player.fight_type) {
         return player.name + "跌跌撞撞地跑了过来，模样有些狼狈。";
@@ -104,6 +105,7 @@ function sendInMessage(player, dir) {
     }
     return face + "走了过来。";
 }
+
 var dirs = {
     "north": "北方",
     "south": "南方",
@@ -130,6 +132,7 @@ var face1 = ["眉歪眼斜", "贼眉鼠眼", "尖嘴猴腮", "相貌平平", "�
     "仪表堂堂", "丰神如玉", "气宇不凡", "玉树临风般"];
 var face2 = ["奇丑无比", "獐头鼠目", "身材干瘦", "相貌平平", "体态轻盈", "亭亭玉立",
     "面目姣好", "容色秀丽", "风情万种", "清丽绝俗", "美若天仙"];
+
 function getFace(player) {
     var v = parseInt((player.per || 20) / 4);
     if (player.gender == 1) {

@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     name = "师门补给包";
@@ -8,14 +8,14 @@ export default class extends OBJ {
     grade = 5;
 
     on_open(me) {
-    var result = [
+        var result = [
 
 
-        {
-            obj: ["cash/jing#3"], count: 1,
-        }
-    ];
+            {
+                obj: ["cash/jing#3"], count: 1,
+            }
+        ];
 
-    return OBJ.create_by_odds(result);
-}
+        return OBJ.create_by_odds(result);
+    }
 }

@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "庄夫人";
@@ -48,21 +48,21 @@ export default class extends NPC {
     }
 
     on_accept(me, obj, count) {
-    if (!obj || !obj.path || me.query_temp("fb/zhuang/shuang")) return;
-    if (obj.is("sp/bj/wu")) {
-        me.notify("庄夫人看着吴之荣的头颅，或许是想到了已经阴阳两隔的家人，清丽的脸上有几分愤怒，更多的是悲伤。\n半晌后庄夫人擦了擦眼角对你说道：这位" +
-            me.call() + "，如此大恩大德,妾身实不知何以为报。");
-        if (me.per + me.query_prop("per") > 36) {
-            me.notify("庄夫人拉着双儿对你说道：这小丫头跟随妾身多年,做事也还妥当，就送与恩公代为照料。");
-            me.set_temp("fb/zhuang/shuang", 1);
-        } else {
-            me.notify("庄夫人看了你一会，对你说道：这本书是救妾身这群人的恩公给我的，今日就送与恩公。");
-            var obj = me.add_obj("book/bc#huashanjianfa");
-            if (obj) {
-                me.notify("庄夫人给了你" + obj.unit_name(1) + "。");
+        if (!obj || !obj.path || me.query_temp("fb/zhuang/shuang")) return;
+        if (obj.is("sp/bj/wu")) {
+            me.notify("庄夫人看着吴之荣的头颅，或许是想到了已经阴阳两隔的家人，清丽的脸上有几分愤怒，更多的是悲伤。\n半晌后庄夫人擦了擦眼角对你说道：这位" +
+                me.call() + "，如此大恩大德,妾身实不知何以为报。");
+            if (me.per + me.query_prop("per") > 36) {
+                me.notify("庄夫人拉着双儿对你说道：这小丫头跟随妾身多年,做事也还妥当，就送与恩公代为照料。");
+                me.set_temp("fb/zhuang/shuang", 1);
+            } else {
+                me.notify("庄夫人看了你一会，对你说道：这本书是救妾身这群人的恩公给我的，今日就送与恩公。");
+                var obj = me.add_obj("book/bc#huashanjianfa");
+                if (obj) {
+                    me.notify("庄夫人给了你" + obj.unit_name(1) + "。");
+                }
             }
+            return true;
         }
-        return true;
     }
-}
 }

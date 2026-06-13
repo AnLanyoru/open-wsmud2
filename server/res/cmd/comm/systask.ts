@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { TASK } from "../../../core/task/task.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {TASK} from "../../../core/task/task.js";
 
 export default class extends COMMAND {
     command = "systask";

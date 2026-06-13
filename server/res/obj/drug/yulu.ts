@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "颗";
@@ -11,10 +11,10 @@ export default class extends OBJ {
     transable = true;
 
     on_use(me) {
-    if (me.hp == me.max_hp) {
-        return me.notify_fail("你现在不需要九花玉露丸。");
+        if (me.hp == me.max_hp) {
+            return me.notify_fail("你现在不需要九花玉露丸。");
+        }
+        me.add_hp(me.max_hp);
+        me.send_room("$N吃下一颗" + this.color_name + "，气色恢复如初。");
     }
-    me.add_hp(me.max_hp);
-    me.send_room("$N吃下一颗" + this.color_name + "，气色恢复如初。");
-}
 }

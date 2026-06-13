@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "茅十八";
@@ -56,24 +56,25 @@ export default class extends NPC {
     }
 
     on_accept(me, obj, count) {
-    if (!obj.is("eq/lv2/hl_bian")) return false;
-    me.notify("茅十八哈哈大笑道：史松这个狗贼，也有这般下场！", true);
-    var obj = me.add_obj("book/book#wuhuduanmendao");
-    if (obj) {
-        me.notify("茅十八对你抱拳道：这位" + me.call() + "，多谢， 兄弟我命案在身就不多耽搁了，后会有期。");
-        me.notify("茅十八给了你一本" + obj.color_name + "。");
-        me.notify("茅十八急匆匆的走了。");
-        this.destroy();
+        if (!obj.is("eq/lv2/hl_bian")) return false;
+        me.notify("茅十八哈哈大笑道：史松这个狗贼，也有这般下场！", true);
+        var obj = me.add_obj("book/book#wuhuduanmendao");
+        if (obj) {
+            me.notify("茅十八对你抱拳道：这位" + me.call() + "，多谢， 兄弟我命案在身就不多耽搁了，后会有期。");
+            me.notify("茅十八给了你一本" + obj.color_name + "。");
+            me.notify("茅十八急匆匆的走了。");
+            this.destroy();
+        }
+        me.add_fbscore(50);
+        return true;
     }
-    me.add_fbscore(50);
-    return true;
-}
+
     on_die(me) {
-    var item = this.environment.find_by_path("yz/lcy/shisong");
-    if (item) {
-        this.call_out(getAllFromMe, 100, item, this.environment.items);
+        var item = this.environment.find_by_path("yz/lcy/shisong");
+        if (item) {
+            this.call_out(getAllFromMe, 100, item, this.environment.items);
+        }
     }
-}
 }
 
 function getAllFromMe(shi, items) {

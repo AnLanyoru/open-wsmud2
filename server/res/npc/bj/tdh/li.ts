@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "李力世";
@@ -29,13 +29,13 @@ export default class extends NPC {
             ["yunlongxinfa", 200, "force"],
             ["wuhuduanmendao", 200, "blade"]);
         this.set_drop({
-            obj: "money/silver",
-            min: 10,
-            max: 14
-        }, {
-            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-            odds: 8000
-        },
+                obj: "money/silver",
+                min: 10,
+                max: 14
+            }, {
+                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+                odds: 8000
+            },
             {
                 obj: ["book/bc#wuhuduanmendao"],
                 odds: 5000

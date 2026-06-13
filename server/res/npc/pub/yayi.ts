@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "衙役";
@@ -15,7 +15,7 @@ export default class extends NPC {
     constructor() {
         super();
         this.skill_map(["dodge", 5500],
-                ["parry", 5500],
+            ["parry", 5500],
             ["force", 5500],
             ["unarmed", 5500],
             ["sword", 5500],

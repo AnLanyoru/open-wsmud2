@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "fenpei";
@@ -9,24 +9,24 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me) {
-    var fen = me.query_temp("fenpei");
-    if (!fen) return me.notify("你目前没有可以分配的先天属性。");
-    if (fen <= 0) return me.notify("你目前的可分配属性是"+fen+"，无法分配。");
-    me.notify("请说出你的先天属性，每项15-30，总计" + fen + "，比如:10 0 0 10");
-    me.wait_input = readnumber;
-}
+        var fen = me.query_temp("fenpei");
+        if (!fen) return me.notify("你目前没有可以分配的先天属性。");
+        if (fen <= 0) return me.notify("你目前的可分配属性是" + fen + "，无法分配。");
+        me.notify("请说出你的先天属性，每项15-30，总计" + fen + "，比如:10 0 0 10");
+        me.wait_input = readnumber;
+    }
 }
 
 function readnumber(me, cmd) {
     var fen = me.query_temp("fenpei");
-    if (!cmd) return me.notify("请说出你要增加的先天属性，总计" + fen +"，比如:10 0 0 10");
+    if (!cmd) return me.notify("请说出你要增加的先天属性，总计" + fen + "，比如:10 0 0 10");
     var ss = cmd.split(' ');
-    if (ss.length != 5) return me.notify("请说出你要增加的先天属性，总计" + fen +"，比如:10 0 0 10");
+    if (ss.length != 5) return me.notify("请说出你要增加的先天属性，总计" + fen + "，比如:10 0 0 10");
     var str = parseInt(ss[1]);
     var con = parseInt(ss[2]);
     var dex = parseInt(ss[3]);
     var int = parseInt(ss[4]);
-    if (str + con + dex + int != fen) return me.notify("四项总计需要是" + fen+"，请重新调整");
+    if (str + con + dex + int != fen) return me.notify("四项总计需要是" + fen + "，请重新调整");
     if (str < 0 || con < 0 || dex < 0 || int < 0) return me.notify("单项的值需要大于0");
     me.set_temp("re_str", str);
     me.set_temp("re_con", con);
@@ -37,9 +37,10 @@ function readnumber(me, cmd) {
     me.send_commands("ok", "确认", "cancle", "重新设置");
     me.wait_input = checkResult;
 }
+
 function checkResult(me, str) {
     if (str == "ok") {
-        me.str +=( me.query_temp("re_str") || 0);
+        me.str += (me.query_temp("re_str") || 0);
         me.con += (me.query_temp("re_con") || 0);
         me.int += (me.query_temp("re_int") || 0);
         me.dex += (me.query_temp("re_dex") || 0);
@@ -55,6 +56,6 @@ function checkResult(me, str) {
         var fen = me.query_temp("fenpei");
         if (!fen) return;
         me.wait_input = readnumber;
-        me.notify("请说出你要增加的先天属性(臂力 根骨 身法 悟性)，总计" + fen +"，比如:10 0 0 10");
+        me.notify("请说出你要增加的先天属性(臂力 根骨 身法 悟性)，总计" + fen + "，比如:10 0 0 10");
     }
 }

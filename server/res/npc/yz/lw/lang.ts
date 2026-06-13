@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "狼";
@@ -24,10 +24,10 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    if (!me.query_temp('langpi')) {
-        this.do_kill(me);
-    } else {
-        me.notify(this.name + "凑到你身边蹭了蹭。");
+        if (!me.query_temp('langpi')) {
+            this.do_kill(me);
+        } else {
+            me.notify(this.name + "凑到你身边蹭了蹭。");
+        }
     }
-}
 }

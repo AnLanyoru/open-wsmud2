@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "宋远桥";
@@ -42,9 +42,9 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.query_skill("wudangxinfa", 0) < 100) return me.notify_fail("宋远桥说道：你的武当心法掌握程度还不够，需要多加练习。");
-    if (me.query_skill("wudangjianfa", 0) < 100) return me.notify_fail("宋远桥说道：你的武当剑法掌握程度还不够，还需多加努力。");
-    return true;
-}
+        if (me.query_skill("wudangxinfa", 0) < 100) return me.notify_fail("宋远桥说道：你的武当心法掌握程度还不够，需要多加练习。");
+        if (me.query_skill("wudangjianfa", 0) < 100) return me.notify_fail("宋远桥说道：你的武当剑法掌握程度还不够，还需多加努力。");
+        return true;
+    }
 }
 

@@ -14,7 +14,7 @@ export const SKILL_TYPES: Record<string, number> = {
 /**
  * 基本技能 ID 常量
  */
-export const BASE_SKILLS: Record<string, string>  = {
+export const BASE_SKILLS: Record<string, string> = {
     FORCE: "force",   // 基本内功
     DODGE: "dodge",   // 基本轻功
     PARRY: "parry",   // 基本招架

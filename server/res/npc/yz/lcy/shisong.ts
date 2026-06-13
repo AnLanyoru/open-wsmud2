@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "史松";
@@ -49,14 +49,15 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    me.notify("史松怒道：哪里来的反贼敢打扰大爷的好事！");
-}
-    on_die() {
-    var item = this.environment.find_by_path("yz/lcy/maoshiba");
-    if (item) {
-        this.call_out(getAllFromMe, 100, item, this.environment.items);
+        me.notify("史松怒道：哪里来的反贼敢打扰大爷的好事！");
     }
-}
+
+    on_die() {
+        var item = this.environment.find_by_path("yz/lcy/maoshiba");
+        if (item) {
+            this.call_out(getAllFromMe, 100, item, this.environment.items);
+        }
+    }
 }
 
 function getAllFromMe(mao, items) {

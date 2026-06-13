@@ -1,4 +1,3 @@
-
 import Util from '../utils/util.js';
 import SCRIPT from '../script.js';
 
@@ -6,31 +5,31 @@ const Keys = {
     groups: [{
         name: "移动",
         items: [
-            { name: "左", key: null, cmd: "#go @dir(left)" },
-            { name: "右", key: null, cmd: "#go @dir(right)" },
-            { name: "上", key: null, cmd: "#go @dir(up)" },
-            { name: "下", key: null, cmd: "#go @dir(down)" },
-            { name: "左上", key: null, cmd: "#go @dir(leftup)" },
-            { name: "左下", key: null, cmd: "#go @dir(leftdown)" },
-            { name: "右上", key: null, cmd: "#go @dir(rightup)" },
-            { name: "右下", key: null, cmd: "#go @dir(rightdown)" }
+            {name: "左", key: null, cmd: "#go @dir(left)"},
+            {name: "右", key: null, cmd: "#go @dir(right)"},
+            {name: "上", key: null, cmd: "#go @dir(up)"},
+            {name: "下", key: null, cmd: "#go @dir(down)"},
+            {name: "左上", key: null, cmd: "#go @dir(leftup)"},
+            {name: "左下", key: null, cmd: "#go @dir(leftdown)"},
+            {name: "右上", key: null, cmd: "#go @dir(rightup)"},
+            {name: "右下", key: null, cmd: "#go @dir(rightdown)"}
         ]
     }, {
         name: "菜单",
         items: [
-            { name: "属性", key: null, cmd: "#menu score" },
-            { name: "背包", key: null, cmd: "#menu pack" },
-            { name: "技能", key: null, cmd: "#menu skills" },
-            { name: "任务", key: null, cmd: "#menu tasks" },
-            { name: "商城", key: null, cmd: "#menu shop" },
-            { name: "社交", key: null, cmd: "#menu message" },
-            { name: "排行", key: null, cmd: "#menu stats" },
-            { name: "设置", key: null, cmd: "#menu setting" },
-            { name: "动作", key: null, cmd: "#menu showcombat" },
-            { name: "活动", key: null, cmd: "#menu events" },
-            { name: "聊天", key: null, cmd: "#menu showchat" },
-            { name: "停止", key: null, cmd: "#menu stopstate" },
-            { name: "江湖", key: null, cmd: "#menu jh" }
+            {name: "属性", key: null, cmd: "#menu score"},
+            {name: "背包", key: null, cmd: "#menu pack"},
+            {name: "技能", key: null, cmd: "#menu skills"},
+            {name: "任务", key: null, cmd: "#menu tasks"},
+            {name: "商城", key: null, cmd: "#menu shop"},
+            {name: "社交", key: null, cmd: "#menu message"},
+            {name: "排行", key: null, cmd: "#menu stats"},
+            {name: "设置", key: null, cmd: "#menu setting"},
+            {name: "动作", key: null, cmd: "#menu showcombat"},
+            {name: "活动", key: null, cmd: "#menu events"},
+            {name: "聊天", key: null, cmd: "#menu showchat"},
+            {name: "停止", key: null, cmd: "#menu stopstate"},
+            {name: "江湖", key: null, cmd: "#menu jh"}
         ]
     }
     ],
@@ -83,8 +82,7 @@ const Keys = {
             key = this.id2keys[item.id];
             if (key) delete this.setting[key];
             delete this.id2keys[item.id];
-        }
-        else if (key) {
+        } else if (key) {
             if (this.setting[key]) {
                 if (this.setting[key] === item.id) {
                     return;
@@ -150,9 +148,10 @@ const Keys = {
                 id = j + "_" + i;
                 group.items[i].id = id;
                 group.items[i].key = setting[id];
-            } j++;
+            }
+            j++;
         }
-        let group = { name: "动作栏", items: [] };
+        let group = {name: "动作栏", items: []};
         for (let i = 0; i < 12; i++) {
 
             id = "2_" + i;
@@ -162,7 +161,7 @@ const Keys = {
             });
         }
         this.groups.push(group);
-        group = { name: "技能栏", items: [] };
+        group = {name: "技能栏", items: []};
         for (let i = 0; i < 12; i++) {
             id = "3_" + i;
             group.items.push({

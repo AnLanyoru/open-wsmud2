@@ -1,8 +1,8 @@
-import { SKILL } from "../../../core/skill/skill.js";
-import type { EnablePropMap, LearnCondition, PERFORM } from "../../../core/skill/skill.js";
-import { FAMILIES } from "../../../core/skill/family.js";
-import { WEAPON_TYPE } from "../../../core/const.js";
-import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import type {EnablePropMap, LearnCondition, PERFORM} from "../../../core/skill/skill.js";
+import {FAMILIES} from "../../../core/skill/family.js";
+import {WEAPON_TYPE} from "../../../core/const.js";
+import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "劈石破玉拳";

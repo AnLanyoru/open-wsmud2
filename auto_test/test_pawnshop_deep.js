@@ -15,8 +15,13 @@ const WS_PORT = 31300;
 
 // ======================== 网络延迟模拟 ========================
 
-function jitter() { return 80 + Math.random() * 520; }
-function spike() { return Math.random() < 0.08 ? (1000 + Math.random() * 2000) : 0; }
+function jitter() {
+    return 80 + Math.random() * 520;
+}
+
+function spike() {
+    return Math.random() < 0.08 ? (1000 + Math.random() * 2000) : 0;
+}
 
 async function lag() {
     const d = jitter() + spike();
@@ -55,7 +60,8 @@ function parseSellList(msg) {
                 value: row[5] || 0,
             }));
         }
-    } catch {}
+    } catch {
+    }
     return [];
 }
 
@@ -99,14 +105,20 @@ function parseSingleQuoteJson(msg) {
         if (msg[i] === '[') depth++;
         else if (msg[i] === ']') {
             depth--;
-            if (depth === 0) { rolesEnd = i + 1; break; }
+            if (depth === 0) {
+                rolesEnd = i + 1;
+                break;
+            }
         }
     }
     if (rolesEnd < 0) return null;
     // 转为标准JSON: '→", 属性名加引号
     let json = msg.substring(rolesStart + 6, rolesEnd);
     json = json.replace(/'/g, '"').replace(/([{,]\s*)(\w+)\s*:/g, '$1"$2":');
-    try { return JSON.parse(json); } catch {}
+    try {
+        return JSON.parse(json);
+    } catch {
+    }
     return null;
 }
 
@@ -114,14 +126,20 @@ function parseSingleQuoteJson(msg) {
 
 function httpLogin() {
     return new Promise((resolve, reject) => {
-        const p = JSON.stringify({ code: 'administrator', pwd: '123456' });
+        const p = JSON.stringify({code: 'administrator', pwd: '123456'});
         const req = http.request({
             hostname: '127.0.0.1', port: WEB_PORT, path: '/api/user/login', method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(p) }
+            headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(p)}
         }, (res) => {
             let b = '';
             res.on('data', c => b += c);
-            res.on('end', () => { try { resolve(JSON.parse(b)); } catch (e) { reject(e); } });
+            res.on('end', () => {
+                try {
+                    resolve(JSON.parse(b));
+                } catch (e) {
+                    reject(e);
+                }
+            });
         });
         req.on('error', reject);
         req.write(p);
@@ -137,8 +155,14 @@ class WSClient {
         this.buf = [];
         ws.on('message', d => this.buf.push(d.toString()));
     }
-    clear() { this.buf.length = 0; }
-    send(cmd) { this.ws.send(cmd); }
+
+    clear() {
+        this.buf.length = 0;
+    }
+
+    send(cmd) {
+        this.ws.send(cmd);
+    }
 
     async sendAndCollect(cmd, waitMs = 2500) {
         this.clear();
@@ -165,7 +189,12 @@ async function main() {
     ws.on('error', e => console.error('  WS error:', e.message));
 
     // 认证(不指定角色, 获取角色列表)
-    await new Promise(r => { ws.on('open', () => { ws.send(login.u + ' ' + login.p); setTimeout(r, 5000); }); });
+    await new Promise(r => {
+        ws.on('open', () => {
+            ws.send(login.u + ' ' + login.p);
+            setTimeout(r, 5000);
+        });
+    });
 
     // 解析角色列表
     let roles = [];
@@ -251,7 +280,11 @@ async function main() {
     await new Promise(r => setTimeout(r, 1500));
 
     const tangId = extractTangId(c.buf);
-    if (!tangId) { console.log('  找不到唐楠!'); ws.close(); return; }
+    if (!tangId) {
+        console.log('  找不到唐楠!');
+        ws.close();
+        return;
+    }
     console.log('  唐楠ID:', tangId);
     c.clear();
 
@@ -285,7 +318,10 @@ async function main() {
         for (const m of c.buf) console.log('    ', trim(m));
         console.log(ok ? '    ✓ 初始刷新成功' : '    ? 初始刷新失败');
         c.clear();
-        if (ok) { refCount++; if (refCount >= 5) canRefresh = false; }
+        if (ok) {
+            refCount++;
+            if (refCount >= 5) canRefresh = false;
+        }
     }
 
     // ============================================================
@@ -368,7 +404,8 @@ async function main() {
                     for (const m of c.buf) console.log('      ', trim(m));
                     console.log(ok ? '      ✓ 穿插刷新成功!' : '      ? 被拒');
                     if (ok) {
-                        totalRefreshes++; refCount++;
+                        totalRefreshes++;
+                        refCount++;
                         if (refCount >= 5) canRefresh = false;
                         // 刷新后重新列货物
                         c.clear();
@@ -379,7 +416,8 @@ async function main() {
                             if (items.length > 0) selllist = items;
                         }
                         if (selllist.length > 0) {
-                            i = -1; roundBought = 0;
+                            i = -1;
+                            roundBought = 0;
                             console.log('      → 新货物 ' + selllist.length + ' 件, 重新购买');
                         }
                         c.clear();
@@ -413,7 +451,10 @@ async function main() {
                 const hasErr = c.buf.some(m => m.includes('没有') || m.includes('不能') || m.includes('不出售'));
                 console.log(hasErr ? '    ✗ 购买失败' : '    ✓ (静默)');
             }
-            if (buyOk) { roundBought++; totalBought++; }
+            if (buyOk) {
+                roundBought++;
+                totalBought++;
+            }
             c.clear();
             await tinyLag();
         }
@@ -463,7 +504,12 @@ async function main() {
             for (const m of c.buf) {
                 if (m.includes('加急上货需要') || m.includes('本店近日')) console.log('    ', trim(m));
             }
-            if (maxed) { console.log('    ⛔ 已达上限'); canRefresh = false; c.clear(); continue; }
+            if (maxed) {
+                console.log('    ⛔ 已达上限');
+                canRefresh = false;
+                c.clear();
+                continue;
+            }
 
             const payCost = cost > 0 ? cost : ((refCount + 1) % 6) * 10 + 10;
             console.log('    费用: ' + payCost + '两黄金');
@@ -475,8 +521,12 @@ async function main() {
 
             const ok = isRefreshOk(c.buf);
             for (const m of c.buf) console.log('    ', trim(m));
-            if (ok) { console.log('    ✓ 刷新成功'); totalRefreshes++; refCount++; if (refCount >= 5) canRefresh = false; }
-            else console.log('    ✗ 刷新被拒');
+            if (ok) {
+                console.log('    ✓ 刷新成功');
+                totalRefreshes++;
+                refCount++;
+                if (refCount >= 5) canRefresh = false;
+            } else console.log('    ✗ 刷新被拒');
             c.clear();
         }
     }
@@ -496,4 +546,7 @@ async function main() {
     process.exit(0);
 }
 
-main().catch(err => { console.error('错误:', err); process.exit(1); });
+main().catch(err => {
+    console.error('错误:', err);
+    process.exit(1);
+});

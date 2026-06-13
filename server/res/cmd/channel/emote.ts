@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
     command = "emote";
@@ -13,37 +13,39 @@ export default class extends COMMAND {
      */
     enter(me, str) {
 
-    if (!str) return me.send(this.emote_data());
-    let paras = str.split(WT_REG);
-    let target: typeof me | undefined, emts: string[] | undefined;
-    if (paras.length > 1) {
-        emts = emote[paras[0]];
-        target = WORLD.find_user(paras[1]);
-    } else {
-        emts = emote[str];
-    }
-    if (!emts) return;
-    var emt = target ? emts[1] : emts[0];
-    var msg = splitmessage(me, emt, 3, target);
+        if (!str) return me.send(this.emote_data());
+        let paras = str.split(WT_REG);
+        let target: typeof me | undefined, emts: string[] | undefined;
+        if (paras.length > 1) {
+            emts = emote[paras[0]];
+            target = WORLD.find_user(paras[1]);
+        } else {
+            emts = emote[str];
+        }
+        if (!emts) return;
+        var emt = target ? emts[1] : emts[0];
+        var msg = splitmessage(me, emt, 3, target);
 
-    return msg;
-}
-    emote_data(me?: CHARACTER) {
-    if (this.json) return this.json;
-    var str = ["{type:'emote',items:["];
-    for (var key in emote) {
-        if (str.length > 1) str.push(",");
-        str.push("\"");
-        str.push(key);
-        str.push("\"");
+        return msg;
     }
-    str.push("]}");
-    this.json = str.join("");
-    return this.json;
-}
+
+    emote_data(me?: CHARACTER) {
+        if (this.json) return this.json;
+        var str = ["{type:'emote',items:["];
+        for (var key in emote) {
+            if (str.length > 1) str.push(",");
+            str.push("\"");
+            str.push(key);
+            str.push("\"");
+        }
+        str.push("]}");
+        this.json = str.join("");
+        return this.json;
+    }
 }
 
 const WT_REG = /\s+/;
+
 function splitmessage(me, text, type, target) {
     if (text.length < 3) return text;
     const str: string[] = [];
@@ -96,6 +98,7 @@ function splitmessage(me, text, type, target) {
     start < i && str.push(text.substring(start, i));
     return str.join("");
 }
+
 var emote = {
     哈欠: ["$N打了个哈欠，觉得无聊极了。", "$N白了$n一眼，说：$n无聊不无聊啊 ?", "$N打了个哈欠，觉得自己真是无聊透顶。"],
     睡着: ["$N睡着了，呼噜打得震天响。", "$N睡梦中幸福地笑着，口水流了一枕头。", "$N在$n的身边睡着了，呼噜打得震天响。"],

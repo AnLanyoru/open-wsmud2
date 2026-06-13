@@ -1,7 +1,7 @@
 /**
  * MONEY 货币类 — 继承自OBJ
  */
-import { OBJ } from './obj.js';
+import {OBJ} from './obj.js';
 
 export class MONEY extends OBJ {
 

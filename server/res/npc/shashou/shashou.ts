@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "守卫";
@@ -30,14 +30,14 @@ export default class extends NPC {
     }
 
     on_leave(me, dir) {
-    if (dir == "north") {
-        if (me.family != FAMILIES.NONE && me.family != FAMILIES.SHASHOU) {
-            me.notify("守卫拦住你：这位" + me.call() + "，请留步。");
-            return false;
-        }
-       
-    }
+        if (dir == "north") {
+            if (me.family != FAMILIES.NONE && me.family != FAMILIES.SHASHOU) {
+                me.notify("守卫拦住你：这位" + me.call() + "，请留步。");
+                return false;
+            }
 
-}
+        }
+
+    }
 }
 

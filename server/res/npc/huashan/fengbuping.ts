@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "封不平";
@@ -29,15 +29,15 @@ export default class extends NPC {
             ["huashanxinfa", 500, "force"],
             ["huashanjianfa", 500],
             ["feiyanhuixiang", 500, "dodge"],
-            ["kuangfengkuaijian", 500,"sword"],
+            ["kuangfengkuaijian", 500, "sword"],
             ["huashanquanfa", 500, "unarmed"]);
     }
 
     on_master(me) {
 
-    if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("封不平说道：你的华山心法掌握程度还不够，需要多加练习。");
-    if (me.query_skill("huashanjianfa", 0) < 200) return me.notify_fail("封不平说道：你的华山剑法掌握程度还不够，需要多加练习。");
-    return true;
-}
+        if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("封不平说道：你的华山心法掌握程度还不够，需要多加练习。");
+        if (me.query_skill("huashanjianfa", 0) < 200) return me.notify_fail("封不平说道：你的华山剑法掌握程度还不够，需要多加练习。");
+        return true;
+    }
 }
 

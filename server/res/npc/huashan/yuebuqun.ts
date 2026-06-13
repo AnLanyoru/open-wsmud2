@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "岳不群";
@@ -41,15 +41,16 @@ export default class extends NPC {
     }
 
     on_teach(me, sk) {
-    if (!this.is(me.query_temp("master")))
-        return me.notify_fail(this.name + "对你说道：请教？这怎么敢当！");
+        if (!this.is(me.query_temp("master")))
+            return me.notify_fail(this.name + "对你说道：请教？这怎么敢当！");
 
-}
+    }
+
     on_master(me) {
 
-    if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山心法掌握程度还不够，需要多加练习。");
-    if (me.query_skill("huashanjianfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山剑法掌握程度还不够，还需多加努力。");
-    return true;
-}
+        if (me.query_skill("huashanxinfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山心法掌握程度还不够，需要多加练习。");
+        if (me.query_skill("huashanjianfa", 0) < 100) return me.notify_fail("岳不群说道：你的华山剑法掌握程度还不够，还需多加努力。");
+        return true;
+    }
 }
 

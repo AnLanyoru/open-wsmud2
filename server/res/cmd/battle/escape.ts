@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "escape";
@@ -9,9 +9,9 @@ export default class extends COMMAND {
      */
     enter(me) {
 
-    if (!me.fight_type) {
-        return me.notify("你现在没有在战斗，逃跑干嘛？");
+        if (!me.fight_type) {
+            return me.notify("你现在没有在战斗，逃跑干嘛？");
+        }
+        me.do_escape();
     }
-    me.do_escape();
-}
 }

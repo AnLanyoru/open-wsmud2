@@ -1,5 +1,5 @@
-
 import Util from '../utils/util.js';
+
 export default {
     init: function () {
         Dialog.pack.init();
@@ -14,19 +14,21 @@ export default {
     updateitem: function (data) {
         if (data.store) {
             if (!this.stores || !this.isShow)
-                return Dialog.pack.onData({ remove: data.store, id: data.id });
+                return Dialog.pack.onData({remove: data.store, id: data.id});
             var item = this.find_item(1, data.id);
             var store_item = this.find_item(3, data.storeid);
             if (!item) {
                 item = Object.assign({}, store_item);
-                item.id = data.id; item.count = (-data.store);
+                item.id = data.id;
+                item.count = (-data.store);
                 Dialog.pack.items.push(item);
             } else {
                 item.count -= data.store;
             }
             if (!store_item) {
                 store_item = Object.assign({}, item);
-                store_item.id = data.storeid; store_item.count = data.store;
+                store_item.id = data.storeid;
+                store_item.count = data.store;
                 this.stores.push(store_item);
             } else {
                 store_item.count += data.store;
@@ -55,7 +57,9 @@ export default {
         if (otype == 2) items = this.selllist;
         else if (otype == 3) items = this.stores;
         for (var i = 0; i < items.length; i++) {
-            if (items[i].id == id) { return items[i]; }
+            if (items[i].id == id) {
+                return items[i];
+            }
         }
     }, formatItems: function (data) {
         let items = [];
@@ -96,8 +100,7 @@ export default {
             if (data.sum > 0) {
                 this.typeElement.show();
                 this.store_count = data.sum;
-            }
-            else {
+            } else {
                 this.typeElement.hide();
                 this.store_count = data.stores.length;
             }

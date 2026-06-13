@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "程灵素";
@@ -27,8 +27,8 @@ export default class extends NPC {
     }
 
     on_master_enter(me) {
-    if (this.random(3) == 1) {
-        me.notify("程灵素看你进来，对你羞赧一笑，苍白的小脸上笑容如春花初绽，竟似越看越美。");
+        if (this.random(3) == 1) {
+            me.notify("程灵素看你进来，对你羞赧一笑，苍白的小脸上笑容如春花初绽，竟似越看越美。");
+        }
     }
-}
 }

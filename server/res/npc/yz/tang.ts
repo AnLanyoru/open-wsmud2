@@ -1,6 +1,6 @@
-import { NPC } from "../../../core/char/npc.js";
-import { UTIL } from "../../../core/util/util.js";
-import { TASK } from "../../../core/task/task.js";
+import {NPC} from "../../../core/char/npc.js";
+import {UTIL} from "../../../core/util/util.js";
+import {TASK} from "../../../core/task/task.js";
 
 export default class extends NPC {
     name = "唐楠";
@@ -42,27 +42,28 @@ export default class extends NPC {
     }
 
     on_sell(me) {
-    var task = TASK.GET('goods');
-    if (task) return task.query_goods(me);
-    return this.sell_list;
-}
-    on_accept(me, obj, count) {
-    if (obj !== 'money') return;
-    var ref_count = me.query_temp("ref_count", 0);
-    if (ref_count > 5) return me.notify("唐楠对你说道：这位" + me.call() + "，本店近日就这么多货物了。");
-    var task = TASK.GET('goods');
-    if (!task) return me.notify("唐楠对你说道：这位" + me.call() + "，本店近日就这么多货物了。");
-    var cash = [100000, 200000, 300000, 400000, 500000, 600000][ref_count];
-    if (cash === count) {
-        me.notify("唐楠对你说道：这位" + me.call() + "，本店的货物都在这里了，请过目。");
-        task.set_goods(me, null);
-        me.do_command("list", this.id);
-        me.add_temp("ref_count", 1, UTIL.diff_time());
-        return true;
-    } else {
-        me.notify("唐楠对你说道：这位" + me.call() + "，这次需要" + (cash / 10000) + "两黄金才能刷新了。");
-        return false;
+        var task = TASK.GET('goods');
+        if (task) return task.query_goods(me);
+        return this.sell_list;
     }
-}
+
+    on_accept(me, obj, count) {
+        if (obj !== 'money') return;
+        var ref_count = me.query_temp("ref_count", 0);
+        if (ref_count > 5) return me.notify("唐楠对你说道：这位" + me.call() + "，本店近日就这么多货物了。");
+        var task = TASK.GET('goods');
+        if (!task) return me.notify("唐楠对你说道：这位" + me.call() + "，本店近日就这么多货物了。");
+        var cash = [100000, 200000, 300000, 400000, 500000, 600000][ref_count];
+        if (cash === count) {
+            me.notify("唐楠对你说道：这位" + me.call() + "，本店的货物都在这里了，请过目。");
+            task.set_goods(me, null);
+            me.do_command("list", this.id);
+            me.add_temp("ref_count", 1, UTIL.diff_time());
+            return true;
+        } else {
+            me.notify("唐楠对你说道：这位" + me.call() + "，这次需要" + (cash / 10000) + "两黄金才能刷新了。");
+            return false;
+        }
+    }
 }
 

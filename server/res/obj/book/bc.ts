@@ -1,6 +1,6 @@
-import { OBJ } from "../../../core/item/obj.js";
-import { WORLD } from "../../../core/world.js";
-import { SKILL } from "../../../core/skill/skill.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {WORLD} from "../../../core/world.js";
+import {SKILL} from "../../../core/skill/skill.js";
 
 export default class extends OBJ {
     unit = "份";
@@ -11,22 +11,22 @@ export default class extends OBJ {
     otype = 1;
 
     on_create(path: string, par: string) {
-    if (!par) return;
-    par = par.slice(1);
-    var skill = SKILL.get(par);
-    if (!skill || !skill.grade) {
-        this.value = 1000;
-        return;
-    }
-    this.skill = skill.id;
-    this.grade = skill.grade;
-    this.name = skill.name + "残页";
-    this.desc = "一本武功秘籍碎片，需要" + ["十", "三十", "五十", "一百", "二百", "五百"][this.grade - 1] + "份这样的残页就可以合成一本完整的" + skill.color_name + "秘籍。";
-    this.combine_count = COMBINED[this.grade];
-    this.combine_to = "book/book#" + skill.id;
-    this.value = WORLD.DATA.book_values[this.grade];
+        if (!par) return;
+        par = par.slice(1);
+        var skill = SKILL.get(par);
+        if (!skill || !skill.grade) {
+            this.value = 1000;
+            return;
+        }
+        this.skill = skill.id;
+        this.grade = skill.grade;
+        this.name = skill.name + "残页";
+        this.desc = "一本武功秘籍碎片，需要" + ["十", "三十", "五十", "一百", "二百", "五百"][this.grade - 1] + "份这样的残页就可以合成一本完整的" + skill.color_name + "秘籍。";
+        this.combine_count = COMBINED[this.grade];
+        this.combine_to = "book/book#" + skill.id;
+        this.value = WORLD.DATA.book_values[this.grade];
 
-}
+    }
 }
 
 export const COMBINED = [10, 10, 30, 50, 100, 200, 500];

@@ -1,5 +1,3 @@
-
-
 const paimai_css = `
 .dialog-pms {
     max-height: 32em;

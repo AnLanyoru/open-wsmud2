@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "静心";
@@ -37,10 +37,10 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender != 2) return me.notify_fail("静心对你说道：这位" + me.call() + "，我们峨眉派不收男弟子的。");
-    if (me.query_skill("emeixinfa", 0) < 100) return me.notify_fail("静心说道：你的峨眉心法掌握程度还不够，需要多加练习。");
-    if (me.query_skill("jindingzhang", 0) < 100) return me.notify_fail("静心说道：你的金顶绵掌掌握程度还不够，需要多加练习。");
-    return true;
-}
+        if (me.gender != 2) return me.notify_fail("静心对你说道：这位" + me.call() + "，我们峨眉派不收男弟子的。");
+        if (me.query_skill("emeixinfa", 0) < 100) return me.notify_fail("静心说道：你的峨眉心法掌握程度还不够，需要多加练习。");
+        if (me.query_skill("jindingzhang", 0) < 100) return me.notify_fail("静心说道：你的金顶绵掌掌握程度还不够，需要多加练习。");
+        return true;
+    }
 }
 

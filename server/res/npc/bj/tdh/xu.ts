@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "徐天川";
@@ -27,13 +27,13 @@ export default class extends NPC {
             ["yunlongshenfa", 200, "dodge"],
             ["yunlongxinfa", 200, "force"]);
         this.set_drop({
-            obj: "money/silver",
-            min: 10,
-            max: 20
-        }, {
-            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-            odds: 8000
-        },
+                obj: "money/silver",
+                min: 10,
+                max: 20
+            }, {
+                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+                odds: 8000
+            },
             {
                 obj: ["book/bc#houquan"],
                 odds: 5000

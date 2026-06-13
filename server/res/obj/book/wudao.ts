@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -9,6 +9,6 @@ export default class extends OBJ {
     otype = 1;
 
     lingwu(me, p) {
-    me.do_command("lingwu");
-}
+        me.do_command("lingwu");
+    }
 }

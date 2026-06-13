@@ -1,11 +1,11 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util";
-import { FAMILIES } from "../../../core/skill/family.js";
-import { AREA } from "../../../core/room/area.js";
-import { ROOM } from "../../../core/room/room.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {UTIL} from "../../../core/util";
+import {FAMILIES} from "../../../core/skill/family.js";
+import {AREA} from "../../../core/room/area.js";
+import {ROOM} from "../../../core/room/room.js";
 
 export default class extends COMMAND {
     command = "cr";
@@ -15,17 +15,16 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, arg) {
-    if (!me.environment) return;
+        if (!me.environment) return;
 
-    if (!arg) {
-        fb_confirm_over(me);
-    } else if (arg == "over") {
-        fb_over(me);
+        if (!arg) {
+            fb_confirm_over(me);
+        } else if (arg == "over") {
+            fb_over(me);
+        } else {
+            fb_start(me, arg);
+        }
     }
-    else {
-        fb_start(me, arg);
-    }
-}
 }
 
 function fb_ok(me) {
@@ -45,6 +44,7 @@ function fb_ok(me) {
     }
     return me.notify("没有人邀请你进入副本。");
 }
+
 function fb_reject(me) {
     var r = me.query_temp("teamcr");
     if (r == 1) {
@@ -55,6 +55,7 @@ function fb_reject(me) {
     }
     return me.notify("没有人邀请你进入副本。");
 }
+
 function fb_saodang(me, path, isdiff, count) {
     var fb = AREA.Get_FB(path);
     if (!fb) {
@@ -91,6 +92,7 @@ function fb_saodang(me, path, isdiff, count) {
         me.notify(area.name + "扫荡完成。");
     });
 }
+
 function fb_quick(me, area, isdiff) {
 
     var drops = area.query_drops(isdiff, me);
@@ -107,7 +109,9 @@ function fb_quick(me, area, isdiff) {
 
     if (area.on_quick && !area.on_quick(me)) return false;
 
-    if (me.expend_jingli(area.expend) == false) { return me.notify_fail("你的精力不够，不能开启副本。"); }
+    if (me.expend_jingli(area.expend) == false) {
+        return me.notify_fail("你的精力不够，不能开启副本。");
+    }
 
 
     me.remove_obj(fu, 1);
@@ -141,6 +145,7 @@ function fb_quick(me, area, isdiff) {
 
     area.on_quick_over && area.on_quick_over(me);
 }
+
 function get_mincount(drops, obj) {
     for (var i = 0; i < drops.length; i++) {
         if (typeof drops[i].obj == "string") {
@@ -154,6 +159,7 @@ function get_mincount(drops, obj) {
     }
     return 1;
 }
+
 function get_odds(drops, obj) {
     for (var i = 0; i < drops.length; i++) {
         if (typeof drops[i].obj == "string") {
@@ -167,6 +173,7 @@ function get_odds(drops, obj) {
     }
     return 1;
 }
+
 function fb_start(me, path) {
     if (!path) return me.notify("你要开始哪个副本？");
     if (!me.environment) return me.notify("你不知道在哪。");
@@ -220,9 +227,6 @@ function fb_start(me, path) {
         return me.notify("副本" + fb.name + "还没解锁!");
 
 
-
-
-
     if (fb.on_enter && fb.on_enter(me) === false) return;
     var team = me.query_teamid();
     var copy_room = next_room.query_copy(team);
@@ -232,7 +236,9 @@ function fb_start(me, path) {
             if (copy_room.query_temp(me.id, me) == 1) {
                 return me.notify("你已经完成副本，必须等其他队员也完成后才可以重新进入。");
             }
-            if (me.expend_jingli(fb.expend) == false) { return me.notify("你的精力不够，无法副本。"); }
+            if (me.expend_jingli(fb.expend) == false) {
+                return me.notify("你的精力不够，无法副本。");
+            }
             //记录这个玩家进入副本的标志，防止重复进入
             copy_room.set_temp(me.id, 1, me);
         } else {
@@ -243,7 +249,9 @@ function fb_start(me, path) {
         if (me.query_jingli() < fb.expend) {
             return me.notify("你的精力不够，不能开启副本。");
         }
-        if (me.expend_jingli(fb.expend) == false) { return me.notify("你的精力不够，不能开启副本。"); }
+        if (me.expend_jingli(fb.expend) == false) {
+            return me.notify("你的精力不够，不能开启副本。");
+        }
         next_room = next_room.create_copy(team, diff_type);
 
         if (!next_room) {
@@ -281,6 +289,7 @@ function fb_start(me, path) {
 
 
 }
+
 function fb_over(me) {
     if (!me.environment || !me.environment.is_fb()) return;
     var area = me.environment.parent;
@@ -393,6 +402,7 @@ function fb_over(me) {
         me.notify("你现在还不能离开副本。");
     }
 }
+
 function fb_first_check(me, fb, area, diff) {
     if (me.family === FAMILIES.NONE && !me.query_temp('sr')) {
         return;//无门无派的非长期散人不参与
@@ -449,6 +459,7 @@ function fb_first_check(me, fb, area, diff) {
     WORLD.DATA.set_temp(fb_key2, ss_userids);
     fb.parent.notify_update();
 }
+
 function team_name(tms) {
     const str: string[] = [];
     for (var i = 0; i < tms.length; i++) {
@@ -456,6 +467,7 @@ function team_name(tms) {
     }
     return str.join("，");
 }
+
 function fb_confirm_over(me) {
     if (!me.environment) return;
     var area = me.environment.parent;

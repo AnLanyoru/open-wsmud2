@@ -13,7 +13,8 @@ export default {
         this.skill_element_id = null;
         this.element.removeClass("hide-item");
     },
-    hide: function () { },
+    hide: function () {
+    },
     init: function () {
         if (!this.created) {
             Dialog.injectStyle(packet_css);
@@ -30,8 +31,7 @@ export default {
         if (data.eq_group !== undefined) {
             this.eq_group = data.eq_group;
             this.show_moeny();
-        }
-        else if (data.eq != undefined && this.items) {
+        } else if (data.eq != undefined && this.items) {
             for (var i = 0; i < this.items.length; i++) {
                 if (this.items[i].id == data.id) {
                     this.eqs[data.eq] = this.items[i];
@@ -50,8 +50,7 @@ export default {
 
             this.show_items();
 
-        }
-        else if (data.locked >= 0) {
+        } else if (data.locked >= 0) {
             let item = this.get_item(data.id);
             if (item) {
                 item.is_lock = data.locked;
@@ -77,8 +76,7 @@ export default {
             }
             str.push("</span>");
             this.show_sub(str.join(""));
-        }
-        else if (data.desc) {
+        } else if (data.desc) {
             var str = [];
             str.push(data.desc);
             str.push("<span class='item-commands'>");
@@ -95,8 +93,7 @@ export default {
                 str.push('<span cmd="_confirm qu ' + data.id + '">取出</span>');
             } else if (from == "sj") {
                 str.push('<span cmd="_confirm qu ' + data.id + '">取出</span>');
-            }
-            else {
+            } else {
                 str.push('<span cmd="_confirm buy 1 ' + data.id + ' from ' + Dialog.list.seller + '">购买</span>');
             }
             str.push("</span>");
@@ -151,10 +148,10 @@ export default {
         }
         this.objelement = $("<pre class='obj-desc'>" + str + "</pre>").appendTo(
             parent.parent()).on("click", function () {
-                this.objelement.remove();
-                this.objelement = null;
-                parent.show();
-            }.bind(this));
+            this.objelement.remove();
+            this.objelement = null;
+            parent.show();
+        }.bind(this));
         parent.hide();
     }, onData: function (data) {
         if (data.items) {
@@ -234,7 +231,7 @@ export default {
 
         Dialog.footer(str.join(""));
 
-    }, cleanup_cmds: { cleanup: true, cancle: true, store: true, sell: true },
+    }, cleanup_cmds: {cleanup: true, cancle: true, store: true, sell: true},
     footerChanged: function (cmd, elem) {
         if (this.cleanup_cmds[cmd])
             return this.cleanup(cmd, elem);
@@ -247,8 +244,7 @@ export default {
         elem.removeClass('select');
         if (pack.packElement.is('.cleanup')) {
             if (cmd == 'cleanup') {
-                pack.packElement.find('.obj-item>.selected').
-                    each(this.cleanup_item);
+                pack.packElement.find('.obj-item>.selected').each(this.cleanup_item);
             } else if (cmd == 'store') {
                 SendCommand((this.command_before ?? "") + 'store all');
             } else if (cmd == 'sell') {
@@ -256,8 +252,7 @@ export default {
             }
             pack.packElement.removeClass("cleanup");
             this.show_moeny();
-        }
-        else {
+        } else {
             pack.packElement.find(".item-commands").remove();
             pack.packElement.addClass("cleanup");
             pack.show_items();
@@ -477,7 +472,6 @@ export default {
         return false;
     }
 };
-
 
 
 const packet_css = `

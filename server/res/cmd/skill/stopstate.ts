@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "stopstate";
@@ -10,9 +10,9 @@ export default class extends COMMAND {
      * @param {CHARACTER} player - 执行命令的角色
      */
     enter(player) {
-    if (player.state) {
-        if (player.state.no_stop) return player.notify(player.state.no_stop);
+        if (player.state) {
+            if (player.state.no_stop) return player.notify(player.state.no_stop);
+        }
+        player.set_state(null);
     }
-    player.set_state(null);
-}
 }

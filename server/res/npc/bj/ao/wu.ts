@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "吴之荣";
@@ -36,6 +36,6 @@ export default class extends NPC {
     }
 
     on_die(killer) {
-    killer.set_temp("fb/ao/wu", 1);
-}
+        killer.set_temp("fb/ao/wu", 1);
+    }
 }

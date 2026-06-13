@@ -1,5 +1,3 @@
-
-
 const party_css = `
 .dialog-party>wht {
     display: inline-block;

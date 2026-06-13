@@ -1,5 +1,5 @@
-import { OBJ } from "../../../core/item/obj.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends OBJ {
     name = "工具包";
@@ -9,31 +9,31 @@ export default class extends OBJ {
     grade = 5;
 
     on_open(me: CHARACTER): OBJ[] | false | void {
-    let index = me.add_temp('gjx1', 1);
-    let result: OBJ[] = [];
-    if (index === 1) {
-        result.push(
-            OBJ.CREATE("sp/tool/yao#4"),
-            OBJ.CREATE("sp/tool/chu#3"),
-            OBJ.CREATE("sp/tool/diao#3"));
+        let index = me.add_temp('gjx1', 1);
+        let result: OBJ[] = [];
+        if (index === 1) {
+            result.push(
+                OBJ.CREATE("sp/tool/yao#4"),
+                OBJ.CREATE("sp/tool/chu#3"),
+                OBJ.CREATE("sp/tool/diao#3"));
 
-    } else if (index === 2) {
-        result.push(
-            OBJ.CREATE("sp/tool/chu#4"),
-            OBJ.CREATE("sp/tool/yao#3"),
-            OBJ.CREATE("sp/tool/diao#3"));
+        } else if (index === 2) {
+            result.push(
+                OBJ.CREATE("sp/tool/chu#4"),
+                OBJ.CREATE("sp/tool/yao#3"),
+                OBJ.CREATE("sp/tool/diao#3"));
 
-    } else if (index === 3) {
+        } else if (index === 3) {
+            result.push(
+                OBJ.CREATE("sp/tool/diao#4"),
+                OBJ.CREATE("sp/tool/chu#3"),
+                OBJ.CREATE("sp/tool/yao#3"));
+            me.remove_temp('gjx1');
+        }
         result.push(
-            OBJ.CREATE("sp/tool/diao#4"),
-            OBJ.CREATE("sp/tool/chu#3"),
-            OBJ.CREATE("sp/tool/yao#3"));
-        me.remove_temp('gjx1');
+            OBJ.CREATE("sp/tool/er#5"),
+            OBJ.CREATE("sp/tool/exp#5"));
+
+        return result;
     }
-    result.push(
-        OBJ.CREATE("sp/tool/er#5"),
-        OBJ.CREATE("sp/tool/exp#5"));
-
-    return result;
-}
 }

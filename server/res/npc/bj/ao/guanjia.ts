@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "女管家";
@@ -25,15 +25,16 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    this.send_room("$N喊道：还愣着干嘛，快给我上！", me);
-    this.each_item(item => {
-        if ( item.path == "bj/ao/jiading") {
-            item.do_kill(me);
-        }
-    }, this.environment);
-}
+        this.send_room("$N喊道：还愣着干嘛，快给我上！", me);
+        this.each_item(item => {
+            if (item.path == "bj/ao/jiading") {
+                item.do_kill(me);
+            }
+        }, this.environment);
+    }
+
     on_leave(me, dir) {
-    if (dir == "south" || dir == "north")
-        return me.notify_fail("女官家挡住了你。");
-}
+        if (dir == "south" || dir == "north")
+            return me.notify_fail("女官家挡住了你。");
+    }
 }

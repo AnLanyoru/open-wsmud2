@@ -1,5 +1,5 @@
-import { CONTAINER } from "../../../core/item/container.js";
-import { OBJ } from "../../../core/item/obj.js";
+import {CONTAINER} from "../../../core/item/container.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends CONTAINER {
     name = "餐桌";
@@ -12,12 +12,13 @@ export default class extends CONTAINER {
     no_alloc = true;
 
     query_items(me) {
-    if (me.query_temp("get_dest") ) return;
-    var items = [OBJ.CREATE(me.gender == 1 ? "cash/jing#4" : "food/hua", 3)];
-    return items;
-}
+        if (me.query_temp("get_dest")) return;
+        var items = [OBJ.CREATE(me.gender == 1 ? "cash/jing#4" : "food/hua", 3)];
+        return items;
+    }
+
     clear_items(me) {
-    me.set_temp("get_dest", 1, 3600000 * 48);
-}
+        me.set_temp("get_dest", 1, 3600000 * 48);
+    }
 }
 

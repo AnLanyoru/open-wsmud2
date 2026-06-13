@@ -1,4 +1,4 @@
-import { OBJ } from "../../../../core/item/obj.js";
+import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "块";

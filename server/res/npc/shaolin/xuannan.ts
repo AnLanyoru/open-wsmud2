@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "玄难";
@@ -25,7 +25,7 @@ export default class extends NPC {
         super();
         this.set_objects([
             "eq/lv0/cloth", 1, 1
-        ],[
+        ], [
             "eq/lv0/dao", 1, 1
         ]);
         this.skill_map(
@@ -48,12 +48,12 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender == 2) return me.notify_fail("玄难说道：阿弥陀佛，少林寺不收女弟子。");
-    if (me.query_skill("yijinjing", 0) >= 500 || me.query_skill("yijinjing2", 0) >= 500) {
-        return true;
+        if (me.gender == 2) return me.notify_fail("玄难说道：阿弥陀佛，少林寺不收女弟子。");
+        if (me.query_skill("yijinjing", 0) >= 500 || me.query_skill("yijinjing2", 0) >= 500) {
+            return true;
+        }
+        if (me.query_skill("yijinjing", 0) < 500 && me.query_skill("yijinjing2", 0) < 500) return me.notify_fail("玄难说道：你的易筋经掌握程度还不够，需要多加练习。");
+        return false;
     }
-    if (me.query_skill("yijinjing", 0) < 500 &&  me.query_skill("yijinjing2", 0) < 500) return me.notify_fail("玄难说道：你的易筋经掌握程度还不够，需要多加练习。");
-    return false;
-}
 }
 

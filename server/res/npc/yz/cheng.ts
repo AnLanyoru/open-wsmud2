@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { USERTASK } from "../../../core/task/playertask.js";
+import {NPC} from "../../../core/char/npc.js";
+import {USERTASK} from "../../../core/task/playertask.js";
 
 export default class extends NPC {
     name = "程药发";
@@ -15,7 +15,7 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.set_objects(["eq/lv0/cloth",1,1]);
+        this.set_objects(["eq/lv0/cloth", 1, 1]);
         this.add_action("ask1", "追捕", function (me) {
 
             USERTASK.RUN("yamen2", me);

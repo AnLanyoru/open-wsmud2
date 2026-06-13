@@ -1,11 +1,10 @@
-
-
 import Util from './utils/util.js';
 
 export const Confirm = {
     DEFAULT: {
 
-        onOK: function () { },
+        onOK: function () {
+        },
         footer: true,
 
         btn_text: "确认"
@@ -270,7 +269,6 @@ export const Confirm = {
         SendCommand('pay 0 ' + (/mobile/i.test(navigator.userAgent) ? "m" : "c"));
     }
 };
-
 
 
 export const Warn = {

@@ -4,18 +4,21 @@
  * 生命周期: create() → [玩家 start()] → 任务进行 → [完成/放弃]
  * 热更新: update() 替换 WORLD.TASKS 中的旧实例
  */
-import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
-import type { CHARACTER } from "../char/character.js";
+import {BASE} from "../base.js";
+import {WORLD} from "../world.js";
+import type {CHARACTER} from "../char/character.js";
 
 export class USERTASK extends BASE {
 
     /** 任务创建回调 — 触发时机：任务资源文件加载/更新时调用（create/update 方法末尾） */
     on_create?(player?: CHARACTER): any;
+
     /** 任务启动回调（由资源文件动态注入） */
     on_start?(player?: CHARACTER): any;
+
     /** 任务完成回调（由资源文件动态注入） */
     on_finish?(player?: CHARACTER, par?: string): any;
+
     /** 放弃任务回调（由资源文件动态注入） */
     giveup?(player?: CHARACTER): any;
 
@@ -50,25 +53,33 @@ export class USERTASK extends BASE {
     /**
      * 查询任务标题 — 子类覆写
      */
-    query_title(player?: CHARACTER): string | undefined { return undefined; }
+    query_title(player?: CHARACTER): string | undefined {
+        return undefined;
+    }
 
     /**
      * 玩家开始任务 — 子类覆写
      * @param player - 玩家角色
      * @param target - 可选目标
      */
-    start(player?: CHARACTER, target?: CHARACTER | null): any { return undefined; }
+    start(player?: CHARACTER, target?: CHARACTER | null): any {
+        return undefined;
+    }
 
     /**
      * 查询任务描述 — 子类覆写
      */
-    query_desc(player?: CHARACTER): string | undefined { return undefined; }
+    query_desc(player?: CHARACTER): string | undefined {
+        return undefined;
+    }
 
     /**
      * 查询任务状态 — 子类覆写
      * @returns 0=不显示 1=进行中 2=可领取 3=已完成
      */
-    query_state(player?: CHARACTER): number | undefined { return undefined; }
+    query_state(player?: CHARACTER): number | undefined {
+        return undefined;
+    }
 
     /**
      * 运行指定 ID 的任务（对玩家触发）

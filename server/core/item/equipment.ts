@@ -6,12 +6,12 @@
  * - on_eq(me)                    装备时回调，返回false阻止装备
  * - on_uneq(me)                  卸下时回调
  */
-import { OBJ } from './obj.js';
-import { UTIL } from '../util.js';
-import { EQUIP_TYPE, PROPERTIES } from '../const.js';
-import { SKILL } from '../skill/skill.js';
-import type { CHARACTER } from '../char/character.js';
-import type { USER } from '../char/user.js';
+import {OBJ} from './obj.js';
+import {UTIL} from '../util.js';
+import {EQUIP_TYPE, PROPERTIES} from '../const.js';
+import {SKILL} from '../skill/skill.js';
+import type {CHARACTER} from '../char/character.js';
+import type {USER} from '../char/user.js';
 
 /** Enhancement level icon strings */
 const level_desc: string[] = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
@@ -96,6 +96,7 @@ export class EQUIPMENT extends OBJ {
 
     /** 套装属性计算 — 触发时机：get_desc()/check_group() 查询套装效果时；传入已装备同套装件数 */
     group_prop?(count: number): Record<string, number>;
+
     /** 装备时回调 — 触发时机：eq() 开头，条件检查通过后、属性加成应用前；返回 false 阻止装备 */
     on_eq?: ((me: CHARACTER) => boolean | void);
     /** 卸下时回调 — 触发时机：uneq() 开头，属性移除之前 */

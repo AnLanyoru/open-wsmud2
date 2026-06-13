@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "武林高手";
@@ -13,7 +13,7 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.set_objects(["eq/lv0/cloth",1,1]);
+        this.set_objects(["eq/lv0/cloth", 1, 1]);
         this.skill_map(
             ["force", 100],
             ["dodge", 100],

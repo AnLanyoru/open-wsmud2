@@ -13,11 +13,11 @@ const DESIV = Buffer.from('2333115543435321', 'utf8');
 
 function httpLogin() {
     return new Promise((resolve, reject) => {
-        const postData = JSON.stringify({ code: USERNAME, pwd: PASSWORD });
+        const postData = JSON.stringify({code: USERNAME, pwd: PASSWORD});
         const options = {
             hostname: '127.0.0.1', port: WEB_PORT,
             path: '/api/user/login', method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(postData) }
+            headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(postData)}
         };
         const req = http.request(options, (res) => {
             let body = '';
@@ -27,7 +27,9 @@ function httpLogin() {
                     const data = JSON.parse(body);
                     console.log('Login response:', JSON.stringify(data));
                     resolve(data);
-                } catch(e) { reject(e); }
+                } catch (e) {
+                    reject(e);
+                }
             });
         });
         req.on('error', reject);
@@ -86,7 +88,10 @@ async function main() {
         process.exit(0);
     });
 
-    setTimeout(() => { console.log('Timeout'); process.exit(1); }, 10000);
+    setTimeout(() => {
+        console.log('Timeout');
+        process.exit(1);
+    }, 10000);
 }
 
 main();

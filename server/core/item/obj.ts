@@ -9,14 +9,15 @@
  * - on_create(path?, par?)  创建后回调
  * - on_reload(me)         热重载回调
  */
-import { BASE } from '../base.js';
-import { ITEM } from '../item.js';
-import { UTIL } from '../util.js';
-import type { CHARACTER } from '../char/character.js';
-import type { SKILL } from '../skill/skill.js';
+import {BASE} from '../base.js';
+import {ITEM} from '../item.js';
+import {UTIL} from '../util.js';
+import type {CHARACTER} from '../char/character.js';
+import type {SKILL} from '../skill/skill.js';
 
 // Lazy import WORLD to avoid circular deps: obj.ts -> world.ts -> ... -> obj.ts
-import type { IWorld } from '../world.js';
+import type {IWorld} from '../world.js';
+
 let _WORLD: IWorld | null = null;
 import('../world.js').then(m => {
     _WORLD = (m as { WORLD: IWorld }).WORLD;
@@ -115,22 +116,31 @@ export class OBJ extends ITEM {
 
     /** 使用回调，par 为可选参数 */
     on_use?(me: CHARACTER, par?: string): boolean | void;
+
     /** 学习回调，skill 为技能对象，lv 为技能等级 */
     on_study?(me: CHARACTER, skill: SKILL, lv: number): boolean | void;
+
     /** 打开回调，返回 false 阻止打开，返回数组表示打开后显示物品 */
     on_open?(me: CHARACTER): OBJ[] | false | void;
+
     /** 初始化回调 */
     on_init?(me: CHARACTER): void;
+
     /** 创建后回调 */
     on_create?(path?: string, par?: string): void;
+
     /** 热重载回调 */
     on_reload?(me: CHARACTER): void;
+
     /** 拾取回调，返回 false 阻止拾取 */
     on_get?(player: CHARACTER): boolean | void;
+
     /** 有角色进入房间回调 — 触发时机：有 HP 的角色进入本物品所在房间时 */
     on_enter?(obj: Record<string, any>): void;
+
     /** 有角色离开房间回调 — 触发时机：有 HP 的角色从本物品所在房间离开时；返回 false 阻止离开 */
     on_leave?(obj: Record<string, any>, dir: string): boolean | void;
+
     /** 拾取附件回调 — 触发时机：领取消息附件时（receive 命令调用） */
     on_receive?(me: CHARACTER, from?: CHARACTER): boolean | void;
 

@@ -1,5 +1,5 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
+import {EQUIPMENT} from "../../../../core/item/equipment.js";
+import {EQUIP_TYPE} from "../../../../core/const.js";
 
 export default class extends EQUIPMENT {
     unit = "把";
@@ -8,7 +8,7 @@ export default class extends EQUIPMENT {
     value = 2500;
     eq_type = EQUIP_TYPE.THROWING;
     prop = {
-    gj: 3
-};
+        gj: 3
+    };
 }
 

@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "澄净";
@@ -45,15 +45,15 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.gender == 2) return me.notify_fail("澄净说道：阿弥陀佛，少林寺不收女弟子。");
-    if (me.query_skill("ranmudao", 0) >= 500 || me.query_skill("ranmudao2", 0) >= 500) {
-        if (me.query_skill("yizhichan", 0) >= 500 || me.query_skill("yizhichan2", 0) >= 500) {
-            return true;
+        if (me.gender == 2) return me.notify_fail("澄净说道：阿弥陀佛，少林寺不收女弟子。");
+        if (me.query_skill("ranmudao", 0) >= 500 || me.query_skill("ranmudao2", 0) >= 500) {
+            if (me.query_skill("yizhichan", 0) >= 500 || me.query_skill("yizhichan2", 0) >= 500) {
+                return true;
+            }
         }
+        if (me.query_skill("ranmudao", 0) < 500 && me.query_skill("ranmudao2", 0) < 500) return me.notify_fail("澄净说道：你的燃木刀掌握程度还不够，需要多加练习。");
+        if (me.query_skill("yizhichan", 0) < 500 && me.query_skill("yizhichan2", 0) < 500) return me.notify_fail("澄净说道：你的一指禅掌握程度还不够，需要多加练习。");
+        return false;
     }
-    if (me.query_skill("ranmudao", 0) < 500 && me.query_skill("ranmudao2", 0) < 500) return me.notify_fail("澄净说道：你的燃木刀掌握程度还不够，需要多加练习。");
-    if (me.query_skill("yizhichan", 0) < 500 && me.query_skill("yizhichan2", 0) < 500) return me.notify_fail("澄净说道：你的一指禅掌握程度还不够，需要多加练习。");
-    return false;
-}
 }
 

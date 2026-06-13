@@ -1,5 +1,5 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
+import {EQUIPMENT} from "../../../../core/item/equipment.js";
+import {EQUIP_TYPE} from "../../../../core/const.js";
 
 export default class extends EQUIPMENT {
     unit = "个";
@@ -8,8 +8,8 @@ export default class extends EQUIPMENT {
     value = 1000;
     eq_type = EQUIP_TYPE.CLOTH;
     prop = {
-    fy: 550,
-    desc:"这件衣服的材料非常轻盈，却韧性十足，坚逾精钢"
-};
+        fy: 550,
+        desc: "这件衣服的材料非常轻盈，却韧性十足，坚逾精钢"
+    };
 }
 

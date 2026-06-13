@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "官兵";
@@ -38,11 +38,11 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    this.each_item(item => {
-        if (item != this && item.path == this.path) {
-            this.send_room("$N喊道：兄弟们并肩子上！");
-            item.do_kill(me);
-        }
-    }, this.environment);
-}
+        this.each_item(item => {
+            if (item != this && item.path == this.path) {
+                this.send_room("$N喊道：兄弟们并肩子上！");
+                item.do_kill(me);
+            }
+        }, this.environment);
+    }
 }

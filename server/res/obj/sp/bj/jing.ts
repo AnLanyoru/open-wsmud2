@@ -1,6 +1,6 @@
-import { OBJ } from "../../../../core/item/obj.js";
-import { ITEM } from "../../../../core/item.js";
-import { CHARACTER } from "../../../../core/char/character.js";
+import {OBJ} from "../../../../core/item/obj.js";
+import {ITEM} from "../../../../core/item.js";
+import {CHARACTER} from "../../../../core/char/character.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -66,44 +66,44 @@ export default class extends OBJ {
     }
 
     on_create(path: string, par?: string): void {
-    if (!par) return;
-    var lv = parseInt(par.substr(1));
-    this.jing_index = lv;
-    switch (lv) {
-        case 1:
-            this.name = "四十二章经一";
-            this.desc = "一本镶黄旗的经书,封皮很精致。";
-            break;
-        case 2:
-            this.name = "四十二章经二";
-            this.desc = "一本正黄旗的经书,封皮很精致。";
-            break;
-        case 3:
-            this.name = "四十二章经三";
-            this.desc = "一本正蓝旗的经书,封皮很精致。";
-            break;
-        case 4:
-            this.name = "四十二章经四";
-            this.desc = "一本镶蓝旗的经书,封皮很精致。";
-            break;
-        case 5:
-            this.name = "四十二章经五";
-            this.desc = "一本镶红旗的经书,封皮很精致。";
-            break;
-        case 6:
-            this.name = "四十二章经六";
-            this.desc = "一本正红旗的经书,封皮很精致。";
-            break;
-        case 7:
-            this.name = "四十二章经七";
-            this.desc = "一本镶白旗的经书,封皮很精致。";
-            break;
-        case 8:
-            this.name = "四十二章经八";
-            this.desc = "一本正白旗的经书,封皮很精致。";
-            break;
+        if (!par) return;
+        var lv = parseInt(par.substr(1));
+        this.jing_index = lv;
+        switch (lv) {
+            case 1:
+                this.name = "四十二章经一";
+                this.desc = "一本镶黄旗的经书,封皮很精致。";
+                break;
+            case 2:
+                this.name = "四十二章经二";
+                this.desc = "一本正黄旗的经书,封皮很精致。";
+                break;
+            case 3:
+                this.name = "四十二章经三";
+                this.desc = "一本正蓝旗的经书,封皮很精致。";
+                break;
+            case 4:
+                this.name = "四十二章经四";
+                this.desc = "一本镶蓝旗的经书,封皮很精致。";
+                break;
+            case 5:
+                this.name = "四十二章经五";
+                this.desc = "一本镶红旗的经书,封皮很精致。";
+                break;
+            case 6:
+                this.name = "四十二章经六";
+                this.desc = "一本正红旗的经书,封皮很精致。";
+                break;
+            case 7:
+                this.name = "四十二章经七";
+                this.desc = "一本镶白旗的经书,封皮很精致。";
+                break;
+            case 8:
+                this.name = "四十二章经八";
+                this.desc = "一本正白旗的经书,封皮很精致。";
+                break;
+
+        }
 
     }
-
-}
 }

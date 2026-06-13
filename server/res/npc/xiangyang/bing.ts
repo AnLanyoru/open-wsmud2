@@ -1,6 +1,6 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
-import { TASK } from "../../../core/task/task.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
+import {TASK} from "../../../core/task/task.js";
 
 export default class extends NPC {
     name = "蒙古密探";
@@ -29,31 +29,32 @@ export default class extends NPC {
     on_die(killer) {
 
 
-    if (WORLD.DATA.query_temp("xy_status")) {
-        return this.call_out(this.relive, 600000);
+        if (WORLD.DATA.query_temp("xy_status")) {
+            return this.call_out(this.relive, 600000);
+        }
+        var task = TASK.GET("xiangyang");
+        if (!task || task.is_start)
+            return this.call_out(this.relive, 600000);
+        task.on_mihan(killer);
+        this.call_out(this.relive, 3600000);
     }
-    var task = TASK.GET("xiangyang");
-    if (!task || task.is_start)
-        return this.call_out(this.relive, 600000);
-    task.on_mihan(killer);
-    this.call_out(this.relive, 3600000);
-}
+
     relive() {
 
-    var task = TASK.GET("xiangyang");
-    if (!task || task.is_start) {
-        this.call_out(this.relive, 60000);
-        return;
-    }
+        var task = TASK.GET("xiangyang");
+        if (!task || task.is_start) {
+            this.call_out(this.relive, 60000);
+            return;
+        }
 
-    var obj = NPC.CLONE(this.path);
-    var rm = task.xy_area.rooms.random();
-    obj.moveto(rm);
-    // this.do_command('chat', rm.name);
-    this.die_room = null;
-    this.equipment = null;
-    this.items = null;
-    this.skills = null;
-}
+        var obj = NPC.CLONE(this.path);
+        var rm = task.xy_area.rooms.random();
+        obj.moveto(rm);
+        // this.do_command('chat', rm.name);
+        this.die_room = null;
+        this.equipment = null;
+        this.items = null;
+        this.skills = null;
+    }
 }
 

@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "何小二";
@@ -38,8 +38,8 @@ export default class extends NPC {
     }
 
     on_master(me) {
-   
-    return true;
-}
+
+        return true;
+    }
 }
 

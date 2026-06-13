@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "店小二";
@@ -17,20 +17,21 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    var str = "";
-    switch (this.random(2)) {
-        case 0:
-            str = "店小二笑咪咪地说道：这位" + me.call()
-                + "，进来喝杯茶，歇歇腿吧。";
-            break;
-        case 1:
-            str = "店小二用脖子上的毛巾抹了抹手，说道：这位" + me.call()
-                + "，请进请进。";
-            break;
+        var str = "";
+        switch (this.random(2)) {
+            case 0:
+                str = "店小二笑咪咪地说道：这位" + me.call()
+                    + "，进来喝杯茶，歇歇腿吧。";
+                break;
+            case 1:
+                str = "店小二用脖子上的毛巾抹了抹手，说道：这位" + me.call()
+                    + "，请进请进。";
+                break;
+        }
+        me.notify(str);
     }
-    me.notify(str);
-}
+
     on_leave(me, dir) {
 
-}
+    }
 }

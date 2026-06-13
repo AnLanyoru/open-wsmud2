@@ -2,7 +2,7 @@
 // BASE — 所有游戏对象的根基类
 // ============================================================
 
-import { pathToFileURL } from 'url';
+import {pathToFileURL} from 'url';
 
 // ============================================================
 // 内部类型
@@ -12,6 +12,7 @@ import { pathToFileURL } from 'url';
 /** 资源对象最小契约 — NEW 实例化后设置 path 并调用 create */
 interface ResourceObj {
     path?: string;
+
     create?(fname: string, ctor?: string): void;
 }
 
@@ -239,7 +240,8 @@ export class BASE {
                 BASE.ITEMS[fkey] = func as CtorFunc;
             } else {
                 // extends/ files: side-effects ran on import, stub for CREATE compatibility
-                BASE.ITEMS[fkey] = class {} as CtorFunc;
+                BASE.ITEMS[fkey] = class {
+                } as CtorFunc;
             }
         } catch (e) {
             console.error('preload %s error:', filepath, e, (e as Error).stack);
@@ -317,13 +319,14 @@ export class BASE {
         const filepath = fkey + '.js';
         try {
             const mod = await import(
-                pathToFileURL(filepath).href + '?update=' + Date.now()
-            );
+            pathToFileURL(filepath).href + '?update=' + Date.now()
+                );
             const func = (mod as { default?: Function }).default;
             if (typeof func === 'function') {
                 BASE.ITEMS[fkey] = func as CtorFunc;
             } else {
-                BASE.ITEMS[fkey] = class {} as CtorFunc;
+                BASE.ITEMS[fkey] = class {
+                } as CtorFunc;
             }
         } catch (e) {
             console.error('update %s error:', filepath, e, (e as Error).stack);

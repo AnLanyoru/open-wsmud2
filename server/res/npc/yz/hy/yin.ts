@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "尹小龙";
@@ -33,50 +33,53 @@ export default class extends NPC {
                     'eq/lv1/xk_shoes'],
                 odds: 5000
             }, {
-            obj: [
-                'eq/lv1/xk_head',
-                'eq/lv1/qingmu'],
-            odds: 500
-        }
+                obj: [
+                    'eq/lv1/xk_head',
+                    'eq/lv1/qingmu'],
+                odds: 500
+            }
         );
     }
 
     on_enter(me) {
-    if (me.is_player) {
-        this.die();
+        if (me.is_player) {
+            this.die();
+        }
     }
-}
+
     on_died(killer, corpse) {
 
-    if (killer)
-        corpse.items = null;
-    else {
-        corpse.no_alloc = true;
-        corpse.query_items = this.query_items;
-        corpse.clear_items = this.clear_items;
+        if (killer)
+            corpse.items = null;
+        else {
+            corpse.no_alloc = true;
+            corpse.query_items = this.query_items;
+            corpse.clear_items = this.clear_items;
+        }
     }
-}
+
     query_items(eny) {
-    let items = this.items;
-    if (!items || !items.length) return null;
-    if (this.owner) {
-        if (this.owner === eny.id)
+        let items = this.items;
+        if (!items || !items.length) return null;
+        if (this.owner) {
+            if (this.owner === eny.id)
+                return items;
+            return null;
+        }
+        let count = eny.query_temp('hy_ct', 0);
+        if (count > 0) {
+            this.owner = eny.id;
             return items;
+        }
         return null;
     }
-    let count = eny.query_temp('hy_ct', 0);
-    if (count > 0) {
-        this.owner = eny.id;
-        return items;
-    }
-    return null;
-}
+
     clear_items(eny) {
-    this.items = null;
-    if (this.owner && this.owner === eny.id && eny.query_temp('hy_ct', 0) > 0) {
-        eny.add_exp(0, 10000);
-        eny.add_temp('hy_ct', -1);
-        this.owner = null;
+        this.items = null;
+        if (this.owner && this.owner === eny.id && eny.query_temp('hy_ct', 0) > 0) {
+            eny.add_exp(0, 10000);
+            eny.add_temp('hy_ct', -1);
+            this.owner = null;
+        }
     }
-}
 }

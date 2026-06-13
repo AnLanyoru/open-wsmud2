@@ -1,4 +1,3 @@
-
 import Util from '../utils/util.js';
 import SCRIPT from '../script.js';
 
@@ -67,8 +66,7 @@ export default {
                 str.push('<div class="footer-item" for="1">书架</div>');
                 str.push("<span class='obj-money'>", data.target, "目前的技能上限为<HIC>", data.limit, "</HIC>级</span>");
                 Dialog.footer(str.join(""));
-            }
-            else
+            } else
                 Dialog.footer("<span class='obj-money'>你目前的技能上限为<HIC>" + data.limit + "</HIC>级</span>");
         }
     },

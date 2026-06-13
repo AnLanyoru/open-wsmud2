@@ -1,4 +1,4 @@
-import { AREA } from "../../../core/room/area.js";
+import {AREA} from "../../../core/room/area.js";
 
 export default class extends AREA {
     id = "by";
@@ -15,36 +15,36 @@ export default class extends AREA {
     room_path = "yz/by/";
     ss_title = "扬州守备";
     map = [
-        { n: "大门", id: "yz/lcy/dating", p: [0, 0] },
-                    { n: "兵营", id: "yz/lcy/erlou", p: [0, 1], exits: ["n", "s"] },
-                    { n: "兵器库", id: "yz/lcy/fang1", p: [0, 2] }
-];
+        {n: "大门", id: "yz/lcy/dating", p: [0, 0]},
+        {n: "兵营", id: "yz/lcy/erlou", p: [0, 1], exits: ["n", "s"]},
+        {n: "兵器库", id: "yz/lcy/fang1", p: [0, 2]}
+    ];
     drops = ["book/book#blade", "book/book#sword", "eq/lv2/jiangjunjian", "eq/lv1/jundao", "eq/lv1/junfu", "eq/lv1/qimeigun", "eq/lv1/guanfu"];
     quick_drops = [
-    {
-        obj: "money/silver",
-        min: 1,
-        max: 10
-    }, {
-        obj: [
-            "eq/lv0/cloth",
-            "eq/lv0/dao",
-            "eq/lv0/ring",
-            "eq/lv0/tiegun",
-            "eq/lv0/jian",
-            "eq/lv0/jin",
-            "eq/lv0/shoes",
-            "eq/lv0/duanyi",
-        ]
-    }, {
-        obj: [
-            "eq/lv2/jiangjunjian", "eq/lv1/jundao", "eq/lv1/junfu", "eq/lv1/guanfu"
-        ],
-        odds: 1000
-    },
-    {
-        obj: ["book/book#sword",  "book/book#blade"],
-        odds: 1000
-    }
-];
+        {
+            obj: "money/silver",
+            min: 1,
+            max: 10
+        }, {
+            obj: [
+                "eq/lv0/cloth",
+                "eq/lv0/dao",
+                "eq/lv0/ring",
+                "eq/lv0/tiegun",
+                "eq/lv0/jian",
+                "eq/lv0/jin",
+                "eq/lv0/shoes",
+                "eq/lv0/duanyi",
+            ]
+        }, {
+            obj: [
+                "eq/lv2/jiangjunjian", "eq/lv1/jundao", "eq/lv1/junfu", "eq/lv1/guanfu"
+            ],
+            odds: 1000
+        },
+        {
+            obj: ["book/book#sword", "book/book#blade"],
+            odds: 1000
+        }
+    ];
 }

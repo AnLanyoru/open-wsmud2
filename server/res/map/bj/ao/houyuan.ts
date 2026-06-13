@@ -1,9 +1,9 @@
-import { ROOM } from "../../../../core/room/room.js";
+import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "后院";
     desc = "这里是鳌府后院，中心是一个大花园。西边一条长廊走道直通往鳌拜的卧房，有几个官兵把守。北边是书房。南边是鳌拜私设的牢房, <cmd cmd='look men'>牢门(men)</cmd>是锁着的。";
-    exits = { "west": "bj/ao/woshi", east:"bj/ao/dayuan","north":"bj/ao/shufang" };
+    exits = {"west": "bj/ao/woshi", east: "bj/ao/dayuan", "north": "bj/ao/shufang"};
 
     constructor() {
         super();

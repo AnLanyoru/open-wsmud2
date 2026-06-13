@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "阎基";
@@ -24,7 +24,7 @@ export default class extends NPC {
         this.set_objects([
             "eq/lv0/cloth", 1, 1
         ], [
-                "eq/lv0/dao", 1, 1
+            "eq/lv0/dao", 1, 1
         ]);
         this.skill_map(
             ["dodge", 500],
@@ -41,11 +41,11 @@ export default class extends NPC {
             min: 10,
             max: 30
         }, {
-                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-                odds: 8000
-            }, {
-                obj: ["book/bc#hujiadaofa", "sp/bj/yanji"],
-                odds: 3000
+            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+            odds: 8000
+        }, {
+            obj: ["book/bc#hujiadaofa", "sp/bj/yanji"],
+            odds: 3000
         });
         this.set_chat_msg([
             "阎基摸了摸怀里的刀谱残页，阴恻恻地冷笑一声。",

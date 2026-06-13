@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { UTIL } from "../../../core/util/util.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
     command = "give";

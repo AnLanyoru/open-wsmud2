@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "李四";
@@ -32,7 +32,7 @@ export default class extends NPC {
             ["feidao", 500, "throwing"],
             ["chuanxinzhang", 500, "unarmed"]);
         this.set_chat_msg([
-            "李四说道：江湖上的其他门派都防着我们，所以他们战斗的时候你就去浑水摸鱼吧，楼主会奖励你的。", 
+            "李四说道：江湖上的其他门派都防着我们，所以他们战斗的时候你就去浑水摸鱼吧，楼主会奖励你的。",
             "",
             ""
         ]);
@@ -40,9 +40,9 @@ export default class extends NPC {
 
     on_master(me) {
 
-    if (me.query_skill("shashouxinfa", 0) < 100) return me.notify_fail("李四说道：你的杀手心法掌握程度还不够，需要多加练习。");
-    if (me.query_skill("feidao", 0) < 100) return me.notify_fail("李四说道：你的飞刀掌握程度还不够，还需多加努力。");
-    return true;
-}
+        if (me.query_skill("shashouxinfa", 0) < 100) return me.notify_fail("李四说道：你的杀手心法掌握程度还不够，需要多加练习。");
+        if (me.query_skill("feidao", 0) < 100) return me.notify_fail("李四说道：你的飞刀掌握程度还不够，还需多加努力。");
+        return true;
+    }
 }
 

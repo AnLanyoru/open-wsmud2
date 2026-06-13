@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "韦春芳";
@@ -36,24 +36,25 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    if (me.gender == 1) {
-        me.notify("韦春芳招呼道：楼上楼下的姑娘们，客人来了！");
-    } else {
-        me.notify("韦春芳说道：哎呀，这年月大姑娘也逛窑子，成何体统。");
-    }
-}
-    on_accept(me, obj, count) {
-    if (obj != "money" || count != 50000) return me.notify_fail("韦春芳对你笑道：赵爷欠的可是5两黄金。");
-    var tiao = me.find_obj_bypath("sp/yz/qiantiao");
-    if (!tiao) return false;
-    if (me.remove_obj(tiao, 1)) {
-        var quan = me.add_obj("eq/lv1/qianjinquan");
-        if (quan) {
-            me.notify("韦春芳说道：赵爷有空常来玩呀。");
-            me.notify("韦春芳给你" + quan.unit_name() + "。");
-            return true;
+        if (me.gender == 1) {
+            me.notify("韦春芳招呼道：楼上楼下的姑娘们，客人来了！");
+        } else {
+            me.notify("韦春芳说道：哎呀，这年月大姑娘也逛窑子，成何体统。");
         }
     }
-    return false;
-}
+
+    on_accept(me, obj, count) {
+        if (obj != "money" || count != 50000) return me.notify_fail("韦春芳对你笑道：赵爷欠的可是5两黄金。");
+        var tiao = me.find_obj_bypath("sp/yz/qiantiao");
+        if (!tiao) return false;
+        if (me.remove_obj(tiao, 1)) {
+            var quan = me.add_obj("eq/lv1/qianjinquan");
+            if (quan) {
+                me.notify("韦春芳说道：赵爷有空常来玩呀。");
+                me.notify("韦春芳给你" + quan.unit_name() + "。");
+                return true;
+            }
+        }
+        return false;
+    }
 }

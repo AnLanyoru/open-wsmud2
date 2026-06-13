@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "喇嘛";
@@ -27,13 +27,13 @@ export default class extends NPC {
             ["mizongxinfa", 200, "force"],
             ["dashouyin", 200, "unarmed"]);
         this.set_drop({
-            obj: "money/silver",
-            min: 5,
-            max: 12
-        }, {
-            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-            odds: 8000
-        },
+                obj: "money/silver",
+                min: 5,
+                max: 12
+            }, {
+                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+                odds: 8000
+            },
             {
                 obj: ["book/bc#mizongxinfa", "book/bc#dashouyin"],
                 odds: 3000
@@ -41,34 +41,35 @@ export default class extends NPC {
     }
 
     on_enter(me) {
-    if (this.is_fighting()) return;
-    me.notify("喇嘛说道：你是谁，居然敢破坏大爷的好事，不想活了是不是？！");
-    this.each_item(item => {
-        if (item.path == this.path) {
-            item.do_kill(me);
-        }
-    }, this.environment); // todo  运行时环境似乎必定存在，需要查验
-}
-    on_die(killer) {
-    var ishas = false;
-    var dubi = null;
-    this.each_item(item => {
-        if (item != this && item.path == this.path) {
-            ishas = true;
-        } else if (item.path == "bj/tdh/dubi") {
-            dubi = item;
-        }
-    }, this.environment);
-    if (!ishas && dubi && killer) {
-        var rd = this.random(killer.kar / 2) + killer.kar / 2 > 20;
-        if (rd) {
+        if (this.is_fighting()) return;
+        me.notify("喇嘛说道：你是谁，居然敢破坏大爷的好事，不想活了是不是？！");
+        this.each_item(item => {
+            if (item.path == this.path) {
+                item.do_kill(me);
+            }
+        }, this.environment); // todo  运行时环境似乎必定存在，需要查验
+    }
 
-            killer.notify("白衣女尼对你说道：“多谢这位" + killer.call() + "拔刀相助，贫尼感激不尽，无以为报。这里有一套神行百变身法，你若愿学，贫尼定倾囊以授。");
-            killer.set_temp("fb/tdh/dubi", 1);
-        } else {
-            killer.set_temp("fb/tdh/dubi", 2);
-            killer.notify("白衣女尼对你说道：“多谢这位" + killer.call() + "拔刀相助，贫尼感激不尽。");
+    on_die(killer) {
+        var ishas = false;
+        var dubi = null;
+        this.each_item(item => {
+            if (item != this && item.path == this.path) {
+                ishas = true;
+            } else if (item.path == "bj/tdh/dubi") {
+                dubi = item;
+            }
+        }, this.environment);
+        if (!ishas && dubi && killer) {
+            var rd = this.random(killer.kar / 2) + killer.kar / 2 > 20;
+            if (rd) {
+
+                killer.notify("白衣女尼对你说道：“多谢这位" + killer.call() + "拔刀相助，贫尼感激不尽，无以为报。这里有一套神行百变身法，你若愿学，贫尼定倾囊以授。");
+                killer.set_temp("fb/tdh/dubi", 1);
+            } else {
+                killer.set_temp("fb/tdh/dubi", 2);
+                killer.notify("白衣女尼对你说道：“多谢这位" + killer.call() + "拔刀相助，贫尼感激不尽。");
+            }
         }
     }
-}
 }

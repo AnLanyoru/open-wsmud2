@@ -1,5 +1,5 @@
-import { SKILL } from "../../../core/skill/skill.js";
-import { SKILL_TYPES } from "../../../core/const.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
 
 export default class extends SKILL {
     id = "blade";
@@ -8,8 +8,8 @@ export default class extends SKILL {
     grade = 0;
     desc = "刀法类武功的基础功法，坚持锻炼会使你的技巧熟练，增加自身的命中";
     attack_actions = [
-    "$N用$W往$n的$l刺去", "$N用$W往$n的$l砍去", "$N挥动$W,斩向$n的$l"
-];
+        "$N用$W往$n的$l刺去", "$N用$W往$n的$l砍去", "$N挥动$W,斩向$n的$l"
+    ];
 
     constructor() {
         super();
@@ -22,10 +22,10 @@ export default class extends SKILL {
                 var msg = "<hic>$N看$n露出破绽，挥动$W斩向$n的$l</hic>";
                 var gj = 10 + lv;
                 me.do_attack({
-                    target:  target,
-                    gj:me.gj + gj,
+                    target: target,
+                    gj: me.gj + gj,
                     mz: me.mz,
-                    attack_msg:msg
+                    attack_msg: msg
                 });
                 me.end_attack(target);
             },
@@ -37,7 +37,7 @@ export default class extends SKILL {
     }
 
     query_prop(lv, me) {
-    return { mz: lv };
-}
+        return {mz: lv};
+    }
 }
 

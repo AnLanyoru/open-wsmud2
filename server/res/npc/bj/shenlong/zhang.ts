@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "张淡月";
@@ -53,11 +53,11 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    this.send_room("洪安通喝到：来我们神龙教撒野？给我上！");
-    this.each_item(item => {
-        if (!item.is_player && item.hp > 0 && !item.master) {
-            item.do_kill(me);
-        }
-    }, this.environment);
-}
+        this.send_room("洪安通喝到：来我们神龙教撒野？给我上！");
+        this.each_item(item => {
+            if (!item.is_player && item.hp > 0 && !item.master) {
+                item.do_kill(me);
+            }
+        }, this.environment);
+    }
 }

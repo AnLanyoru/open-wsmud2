@@ -1,7 +1,7 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util/util.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
     command = "diaoyu";
@@ -10,28 +10,28 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me) {
-    if (!me.environment || !me.environment.can_diaoyu)
-        return false;
-    var wea = me.query_weapon();
-    if (!wea || !wea.path.startsWith("sp/tool/diao")) return me.notify("你没有装备钓竿不可以钓鱼。");
-    var er = query_er(me);
-    if (!er) return me.notify("你身上没有鱼饵，可以去扬州城的杂货店购买钓竿和鱼饵。");
-    me.send_room("$N坐在岸边，把手中的$W甩到水里。");
+        if (!me.environment || !me.environment.can_diaoyu)
+            return false;
+        var wea = me.query_weapon();
+        if (!wea || !wea.path.startsWith("sp/tool/diao")) return me.notify("你没有装备钓竿不可以钓鱼。");
+        var er = query_er(me);
+        if (!er) return me.notify("你身上没有鱼饵，可以去扬州城的杂货店购买钓竿和鱼饵。");
+        me.send_room("$N坐在岸边，把手中的$W甩到水里。");
 
-    me.set_state({
-        id: "diao",
-        type: "work",
-        title: "钓鱼",
-        player: me,
-        rate: 2,
-        yuer: er,
-        on_enter: do_diaoyu,
-        stime: Date.now(),
-        on_check: on_check,
-        no_move: "你还在钓鱼，专心点比较好！",
-        desc: '["你眼睛一眨也不眨地盯着浮漂，专心致志。","浮漂一上一下的在动，看样子有东西要上钩了！"]',
-    });
-}
+        me.set_state({
+            id: "diao",
+            type: "work",
+            title: "钓鱼",
+            player: me,
+            rate: 2,
+            yuer: er,
+            on_enter: do_diaoyu,
+            stime: Date.now(),
+            on_check: on_check,
+            no_move: "你还在钓鱼，专心点比较好！",
+            desc: '["你眼睛一眨也不眨地盯着浮漂，专心致志。","浮漂一上一下的在动，看样子有东西要上钩了！"]',
+        });
+    }
 }
 
 function on_check(me) {
@@ -54,6 +54,7 @@ function on_check(me) {
     }
     me.send(`你正在钓鱼，当前效率${grade}，每10秒获得${exp}经验，${pot}潜能，${str}。`);
 }
+
 function calculate_lv(grade) {
     // 权重基准(×10取整)
 
@@ -83,6 +84,7 @@ function calculate_lv(grade) {
     const [lo, hi] = UTIL.weightedChoice(ranges_cumulative, rawWeights);
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
+
 function do_diaoyu(me) {
     let r_i = me.random(100);
     if (r_i > 89) {
@@ -110,6 +112,7 @@ function do_diaoyu(me) {
     var pot = exp + me.query_prop('lsj_qn');
     me.add_exp(exp, pot, 0);
 }
+
 function query_er(me) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {

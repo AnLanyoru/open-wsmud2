@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "蒙面大盗";
@@ -20,5 +20,5 @@ export default class extends NPC {
     on_kill(me) {
 
 
-}
+    }
 }

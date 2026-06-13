@@ -1,5 +1,5 @@
-import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util/util.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends OBJ {
     name = "门派功绩";
@@ -9,10 +9,10 @@ export default class extends OBJ {
     grade = 3;
 
     on_receive(me) {
-    if (!this.count) return false;
-    me.add_temp('gongji', this.count);
-    me.notify("你获得了" + UTIL.to_c(this.count) + "点<hiy>门派功绩</hiy>。");
-    me.set_temp('last_sm', Date.now());
-}
+        if (!this.count) return false;
+        me.add_temp('gongji', this.count);
+        me.notify("你获得了" + UTIL.to_c(this.count) + "点<hiy>门派功绩</hiy>。");
+        me.set_temp('last_sm', Date.now());
+    }
 }
 

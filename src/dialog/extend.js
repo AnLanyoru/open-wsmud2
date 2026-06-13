@@ -1,18 +1,17 @@
-
 import Util from '../utils/util.js';
-import { ReceiveMessage } from '../client.js';
+import {ReceiveMessage} from '../client.js';
 import Combat from '../combat.js';
 
 export default {
     types: [
         {
             name: "自定义快捷操作", value: "button", for: [
-                { name: "动作栏", value: "action" },
-                { name: "地图", value: "map" },
-                { name: "背包道具", value: "pack" },
-                { name: "技能", value: "skill" },
-                { name: "师父/随从技能", value: "mskill" },
-                { name: "房间物体", value: "item" },
+                {name: "动作栏", value: "action"},
+                {name: "地图", value: "map"},
+                {name: "背包道具", value: "pack"},
+                {name: "技能", value: "skill"},
+                {name: "师父/随从技能", value: "mskill"},
+                {name: "房间物体", value: "item"},
             ]
         }
         // , {
@@ -158,7 +157,7 @@ export default {
         this.prev_time = 0;
         this.record_cmds = [];
         ReceiveMessage('<hic>开始记录你的操作命令。</hic>');
-        Process.state({ state: "正在记录你的操作命令" });
+        Process.state({state: "正在记录你的操作命令"});
     },
     excluded: {
         score: true, score2: true, pack: true, cha: true, tasks: true,
@@ -311,7 +310,7 @@ export default {
                 window.android.saveJsonFile("武神扩展.json", jsonStr);
                 ReceiveMessage(`<cyn>扩展导出为本地文件【武神扩展.json】。</cyn>`);
             } else {
-                const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+                const blob = new Blob([jsonStr], {type: "application/json;charset=utf-8"});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;

@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "<hic>守城低保CD重置</hic>";
@@ -22,17 +22,17 @@ export default class extends NPC {
     constructor() {
         super();
         this.add_action("xycz", "确定重置CD", function (me) {
-            var t=me.query_temp('xy_cz');
+            var t = me.query_temp('xy_cz');
             if (!t) return me.notify("这里只处理没报名却领军功，然后又后悔要重置CD的问题。");
-            var jg=me.add_temp("jungong", -200);
+            var jg = me.add_temp("jungong", -200);
             me.remove_temp("xy_cz");
             me.remove_temp("xy_hd");
-            var obj=me.add_obj("sp/mihan");
-            me.notify("已扣除掉你领取的低保军功200，重置守城CD，你获得了一个" + obj .color_name+ "。");
+            var obj = me.add_obj("sp/mihan");
+            me.notify("已扣除掉你领取的低保军功200，重置守城CD，你获得了一个" + obj.color_name + "。");
         });
     }
 
     on_kill(me) {
-    return false;
-}
+        return false;
+    }
 }

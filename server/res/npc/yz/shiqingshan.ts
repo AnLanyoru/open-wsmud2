@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "史青山";
@@ -43,24 +43,24 @@ export default class extends NPC {
     }
 
     on_enter(me: CHARACTER): void {
-    if (me.is_player) {
-        me.notify("史青山喝道：各将领听令，擅闯军营者格杀勿论！");
-        if (!me.query_temp("fb/by/bing")) {
-            me.set_temp("fb/by/bing", 1);
-            NPC.CREATE("pub/bing", this.environment!, function (bing: NPC) {
-                bing.do_kill(me);
-                bing.on_die = check_bing.bind(bing, me);
-            }, 3);
-        } else {
-            this.environment!.each_item(item => {
-                if (item.is("pub/bing") && item instanceof CHARACTER) {
-                    item.do_kill(me);
-                }
-            }, this.environment!);
+        if (me.is_player) {
+            me.notify("史青山喝道：各将领听令，擅闯军营者格杀勿论！");
+            if (!me.query_temp("fb/by/bing")) {
+                me.set_temp("fb/by/bing", 1);
+                NPC.CREATE("pub/bing", this.environment!, function (bing: NPC) {
+                    bing.do_kill(me);
+                    bing.on_die = check_bing.bind(bing, me);
+                }, 3);
+            } else {
+                this.environment!.each_item(item => {
+                    if (item.is("pub/bing") && item instanceof CHARACTER) {
+                        item.do_kill(me);
+                    }
+                }, this.environment!);
+            }
         }
-    }
 
-}
+    }
 }
 
 function check_bing(this: NPC, me: CHARACTER): void {

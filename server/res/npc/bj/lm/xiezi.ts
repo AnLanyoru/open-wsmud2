@@ -1,4 +1,4 @@
-import { MONSTER } from "../../../../core/char/monster.js";
+import {MONSTER} from "../../../../core/char/monster.js";
 
 export default class extends MONSTER {
     name = "石甲蝎";
@@ -12,13 +12,13 @@ export default class extends MONSTER {
     max_hp = 14000;
     score = 10;
     prop = {
-    gj: 900,
-    mz: 1100,
-    ds: 900,
-    fy: 900,
-    zj: 900,
-    gjsd: 2000
-};
+        gj: 900,
+        mz: 1100,
+        ds: 900,
+        fy: 900,
+        zj: 900,
+        gjsd: 2000
+    };
 
     constructor() {
         super();
@@ -36,8 +36,8 @@ export default class extends MONSTER {
     }
 
     on_enter(me) {
-    if (me.is_player && !this.fight_type) {
-        this.do_kill(me);
+        if (me.is_player && !this.fight_type) {
+            this.do_kill(me);
+        }
     }
-}
 }

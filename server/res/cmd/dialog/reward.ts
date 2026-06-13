@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "reward";
@@ -9,19 +9,16 @@ export default class extends COMMAND {
     allow_faint = true;
     regex = /^(\w+)(?:\s+(\d+))?$/;
     rules = {
-    score: "根据你所有学会的武学计算的分数，按照门派榜单发放奖励，",
-    top: "每日消耗精力获得挑战次数，只可挑战积分比自己高的玩家，挑战成功自己增加积分，失败双方积分不变，按照门派榜单发放奖励，",
-    weapon: "当武器获得精炼或者自制装备时会计算分数，玩家同一部件多件装备取最高分上榜，所有榜单奖励总计上限200，",
-    mp: "定时更新，无奖励",
-    exp: "定时更新，无奖励",
-    money: "定时更新，无奖励",
-};
-    top: string[] = [
-];
-    weapon: string[] = [
-];
-    score: string[] = [
-];
+        score: "根据你所有学会的武学计算的分数，按照门派榜单发放奖励，",
+        top: "每日消耗精力获得挑战次数，只可挑战积分比自己高的玩家，挑战成功自己增加积分，失败双方积分不变，按照门派榜单发放奖励，",
+        weapon: "当武器获得精炼或者自制装备时会计算分数，玩家同一部件多件装备取最高分上榜，所有榜单奖励总计上限200，",
+        mp: "定时更新，无奖励",
+        exp: "定时更新，无奖励",
+        money: "定时更新，无奖励",
+    };
+    top: string[] = [];
+    weapon: string[] = [];
+    score: string[] = [];
 
     constructor() {
         super();
@@ -40,32 +37,35 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, par, index) {
-    if (!par) {
-        return;
-    }
-    let rule = this.rules[par];
-    if (!rule) return me.notify("你要看什么？");
-    let ary = this[par] ?? [];
-    let reward = ary[index - 1] ?? "";
+        if (!par) {
+            return;
+        }
+        let rule = this.rules[par];
+        if (!rule) return me.notify("你要看什么？");
+        let ary = this[par] ?? [];
+        let reward = ary[index - 1] ?? "";
 
-    me.notify("<hic>" + rule + reward + "</hic>");
-}
+        me.notify("<hic>" + rule + reward + "</hic>");
+    }
+
     score_reward(i) {
-    return {
-        obj: "money/exp",
-        count: (20 - i) * 1000
-    };
-}
+        return {
+            obj: "money/exp",
+            count: (20 - i) * 1000
+        };
+    }
+
     top_reward(i) {
-    return {
-        obj: "money/gold",
-        count: (50 + (10 - i) * 5)
-    };
-}
+        return {
+            obj: "money/gold",
+            count: (50 + (10 - i) * 5)
+        };
+    }
+
     weapon_reward(i) {
-    return {
-        obj: "st/xuanjing",
-        count: (50 + (10 - i) * 5)
-    };
-}
+        return {
+            obj: "st/xuanjing",
+            count: (50 + (10 - i) * 5)
+        };
+    }
 }

@@ -1,11 +1,11 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class MapRoom extends ROOM {
     name = "仓库";
     desc = "这里是你帮派的仓库，一扇厚厚的铁门紧锁着，里面堆满了你们帮会的战利品，仓库管理员可以在这里选择怎么处理这些战利品。";
-    exits = { "south": "banghui/juyitang" };
+    exits = {"south": "banghui/juyitang"};
     no_fight = true;
 
     constructor() {

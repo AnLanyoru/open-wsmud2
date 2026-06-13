@@ -1,7 +1,7 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
-import { USERTASK } from "../../../core/task/playertask.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
+import {USERTASK} from "../../../core/task/playertask.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends NPC {
     name = "门派后勤管理员";
@@ -75,13 +75,13 @@ export default class extends NPC {
     }
 
     on_create(path: string, par?: string): void {
-    if (!par) return;
-    this.family = FAMILIES[par.substr(1)]!;
-    if (!this.family.customer) this.family.customer = {};
-    if (this.family == FAMILIES.NONE) {
-        this.name = "武馆后勤";
+        if (!par) return;
+        this.family = FAMILIES[par.substr(1)]!;
+        if (!this.family.customer) this.family.customer = {};
+        if (this.family == FAMILIES.NONE) {
+            this.name = "武馆后勤";
+        }
     }
-}
 }
 
 const NEEDS_GJ = [500, 5000, 10000, 50000, 100000];

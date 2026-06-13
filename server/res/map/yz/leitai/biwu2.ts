@@ -1,22 +1,32 @@
-import { ROOM } from "../../../../core/room/room.js";
-import { USER } from "../../../../core/char/user.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
+import {ROOM} from "../../../../core/room/room.js";
+import {USER} from "../../../../core/char/user.js";
+import type {CHARACTER} from "../../../../core/char/character.js";
 
 export default class MapRoom extends ROOM {
     name = "擂台";
     desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
-    exits = { "down": "yz/leitai/ltx" };
+    exits = {"down": "yz/leitai/ltx"};
     max_item_count = 1;
     no_save = true;
     start_time = 0;
 
     constructor() {
         super();
-        this.add_action("fight", "", function (this: MapRoom, me: CHARACTER) { return me.notify("你正在比试。") });
-        this.add_action("kill", "", function (this: MapRoom, me: CHARACTER) { return me.notify("你正在比试。") });
-        this.add_action("dazuo", "", function (this: MapRoom, me: CHARACTER) { return me.notify("你正在比试。") });
-        this.add_action("liaoshang", "", function (this: MapRoom, me: CHARACTER) { return me.notify("你正在比试。") });
-        this.add_action("relive", "", function (this: MapRoom, me: CHARACTER) { return me.notify("你正在比试。") });
+        this.add_action("fight", "", function (this: MapRoom, me: CHARACTER) {
+            return me.notify("你正在比试。")
+        });
+        this.add_action("kill", "", function (this: MapRoom, me: CHARACTER) {
+            return me.notify("你正在比试。")
+        });
+        this.add_action("dazuo", "", function (this: MapRoom, me: CHARACTER) {
+            return me.notify("你正在比试。")
+        });
+        this.add_action("liaoshang", "", function (this: MapRoom, me: CHARACTER) {
+            return me.notify("你正在比试。")
+        });
+        this.add_action("relive", "", function (this: MapRoom, me: CHARACTER) {
+            return me.notify("你正在比试。")
+        });
     }
 
     on_enter(me: CHARACTER) {
@@ -44,6 +54,7 @@ export default class MapRoom extends ROOM {
             }
         );
     }
+
     on_heart_beat(dt: number): void {
         if (this.start_time) {
             if (dt - this.start_time >= 300000) {
@@ -80,10 +91,12 @@ export default class MapRoom extends ROOM {
             }
         }
     };
+
     on_leave(me: CHARACTER, dir: string) {
         return me.notify_fail("你比试完才可以下擂台。");
     }
 }
+
 function challenge_over(this: CHARACTER, killer: CHARACTER) {
     if (!this.environment) return this.send("比武出现问题，请联系管理解决。");
     if (this.environment.items.length != 2) {
@@ -102,6 +115,7 @@ function challenge_over(this: CHARACTER, killer: CHARACTER) {
 
     this.call_out(move_out, 5000);
 };
+
 function move_out() {
 
 }

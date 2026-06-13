@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "门派弟子";
@@ -16,5 +16,5 @@ export default class extends NPC {
 
     init_from(fam, level) {
 
-}
+    }
 }

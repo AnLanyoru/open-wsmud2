@@ -1,5 +1,5 @@
-import { OBJ } from "../../../core/item/obj.js";
-import { UTIL } from "../../../core/util/util.js";
+import {OBJ} from "../../../core/item/obj.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends OBJ {
     name = "潜能";
@@ -9,7 +9,7 @@ export default class extends OBJ {
     grade = 1;
 
     on_use(me) {
-    me.add_exp(0, 10000);
-}
+        me.add_exp(0, 10000);
+    }
 }
 

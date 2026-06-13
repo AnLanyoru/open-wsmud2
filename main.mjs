@@ -1,7 +1,7 @@
-import { createRequire } from 'module';
+import {createRequire} from 'module';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import {fileURLToPath, pathToFileURL} from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -52,7 +52,7 @@ for (const item in __PATH) {
 }
 
 await readdir(__PATH.BASE);
-const { WORLD } = await import('./os/world.js');
+const {WORLD} = await import('./os/world.js');
 await __CONFIG.init();
 await WORLD.startup(process.argv[2]);
 

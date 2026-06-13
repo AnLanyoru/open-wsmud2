@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "家将";
@@ -19,7 +19,7 @@ export default class extends NPC {
             ["dodge", 150],
             ["sword", 150],
             ["parry", 150],
-            ["juemengun", 150,["club","dodge"]]);
+            ["juemengun", 150, ["club", "dodge"]]);
         this.set_objects(
             ["eq/lv1/guanfu", 1, 1],
             ["eq/lv0/tiegun", 1, 1]
@@ -29,11 +29,11 @@ export default class extends NPC {
             min: 10,
             max: 30
         }, {
-                obj: ["eq/lv0/cloth", "eq/lv0/tiegun", "eq/lv0/shoes"],
-                odds: 3000
-            }, {
-                obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes", "eq/lv1/guanfu"],
-                odds: 3000
+            obj: ["eq/lv0/cloth", "eq/lv0/tiegun", "eq/lv0/shoes"],
+            odds: 3000
+        }, {
+            obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes", "eq/lv1/guanfu"],
+            odds: 3000
         }, {
             obj: ["book/bc#juemengun"],
             odds: 3000

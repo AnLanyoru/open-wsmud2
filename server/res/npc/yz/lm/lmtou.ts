@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "流氓头";
@@ -36,11 +36,11 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    if (this.call_lm) return;
-    this.call_lm = true;
-    this.send_message("流氓头叫道：哪里来王八蛋来这里撒野");
-    NPC.CREATE("yz/lm/liumang", this.environment, function (bing) {
-        bing.do_kill(me);
-    }, 2);
-}
+        if (this.call_lm) return;
+        this.call_lm = true;
+        this.send_message("流氓头叫道：哪里来王八蛋来这里撒野");
+        NPC.CREATE("yz/lm/liumang", this.environment, function (bing) {
+            bing.do_kill(me);
+        }, 2);
+    }
 }

@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     name = "潜能";
@@ -8,7 +8,7 @@ export default class extends OBJ {
     grade = 1;
 
     on_receive(me) {
-    if (!this.count) return false;
-    me.add_exp(0, this.count);
-}
+        if (!this.count) return false;
+        me.add_exp(0, this.count);
+    }
 }

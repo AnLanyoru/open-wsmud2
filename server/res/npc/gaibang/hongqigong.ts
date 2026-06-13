@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "洪七公";
@@ -43,9 +43,9 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.query_skill("huntianqigong", 0) < 500 && me.query_skill("huntianqigong2", 0) < 500) return me.notify_fail("洪七公说道：你的混天气功掌握程度还不够，需要多加练习。");
-    if (me.query_skill("dagoubang", 0) < 500 && me.query_skill("dagoubang2", 0) < 500) return me.notify_fail("洪七公说道：你的打狗棒掌握程度还不够，还需多加努力。");
-    return true;
-}
+        if (me.query_skill("huntianqigong", 0) < 500 && me.query_skill("huntianqigong2", 0) < 500) return me.notify_fail("洪七公说道：你的混天气功掌握程度还不够，需要多加练习。");
+        if (me.query_skill("dagoubang", 0) < 500 && me.query_skill("dagoubang2", 0) < 500) return me.notify_fail("洪七公说道：你的打狗棒掌握程度还不够，还需多加努力。");
+        return true;
+    }
 }
 

@@ -1,5 +1,5 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "user";
@@ -13,7 +13,7 @@ export default class extends COMMAND {
      */
     enter(me, arg) {
 
-}
+    }
 }
 
 const num_reg = /\d+/;

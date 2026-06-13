@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
 
 //只能看排行榜的物品
 export default class extends COMMAND {
@@ -13,30 +13,30 @@ export default class extends COMMAND {
      * @param {CHARACTER} player - 执行命令的角色
      */
     enter(player, index, from) {
-    index = parseInt(index);
-    if (from) {
-        var paras = from.split('_');
-        let tops = WORLD.STATS.TOPS;
-        if (paras[1]) tops = WORLD.STATS['tops_' + paras[1]] ?? [];
-        let parent = tops[parseInt(paras[2])];
-        if (!parent) {
-            return player.notify("你要看什么？");
-        }
-        if (!(index >= 0 && index < 11)) return player.notify("你要看什么？");
-        var item = parent.equipment[index];
+        index = parseInt(index);
+        if (from) {
+            var paras = from.split('_');
+            let tops = WORLD.STATS.TOPS;
+            if (paras[1]) tops = WORLD.STATS['tops_' + paras[1]] ?? [];
+            let parent = tops[parseInt(paras[2])];
+            if (!parent) {
+                return player.notify("你要看什么？");
+            }
+            if (!(index >= 0 && index < 11)) return player.notify("你要看什么？");
+            var item = parent.equipment[index];
 
-        if (!item) return player.notify(parent.name + "没有装备你要看的东西。");
-        player.notify(item.get_desc(parent));
+            if (!item) return player.notify(parent.name + "没有装备你要看的东西。");
+            player.notify(item.get_desc(parent));
 
-    } else {
-        var obj = WORLD.STATS.TOPS[index - 1];
-        if (!obj) {
-            return player.notify("你要看什么？");
-        }
-        if (obj.query_desc) {
-            player.notify(obj.query_desc(player, "look1"));
+        } else {
+            var obj = WORLD.STATS.TOPS[index - 1];
+            if (!obj) {
+                return player.notify("你要看什么？");
+            }
+            if (obj.query_desc) {
+                player.notify(obj.query_desc(player, "look1"));
+            }
         }
     }
-}
 }
 

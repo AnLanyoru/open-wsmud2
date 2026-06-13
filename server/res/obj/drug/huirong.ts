@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "颗";
@@ -9,8 +9,8 @@ export default class extends OBJ {
     transable = true;
 
     on_use(me) {
-    if (me.per < 2) return me.notify_fail("你已经没有办法继续折腾你的容貌了。");
-    me.per -= 1;
-    me.notify("<hib>你吞下一颗毁容丸，感觉自己的容貌发生了一些变化。</hib>");
-}
+        if (me.per < 2) return me.notify_fail("你已经没有办法继续折腾你的容貌了。");
+        me.per -= 1;
+        me.notify("<hib>你吞下一颗毁容丸，感觉自己的容貌发生了一些变化。</hib>");
+    }
 }

@@ -1,4 +1,4 @@
-import { FAMILY_AREA } from "../../../core/room/fam_area.js";
+import {FAMILY_AREA} from "../../../core/room/fam_area.js";
 
 export default class extends FAMILY_AREA {
     id = "emei";
@@ -11,20 +11,20 @@ export default class extends FAMILY_AREA {
     room_path = "emei/";
     family = "EMEI";
     map = [
-    { n: "广场", id: "emei/guangchang", p: [0, 0], exits: ["w", "e", "s", "n"] },
-    { n: "庙门", id: "emei/miaomen", p: [0, -1] },
-    { n: "睹光台", id: "emei/duguangtai", p: [1, -2] },
-    { n: "华藏庵", id: "emei/huacang", p: [2, -2], exits: ["w"] },
-    { n: "金顶", id: "emei/jinding", p: [1, -1], exits: ["w", "n"] },
-    { n: "大殿", id: "emei/dadian", p: [0, 1] },
-    { n: "走廊", id: "emei/zoulang1", p: [1, 0], exits: ["e", "s"] },
-    { n: "走廊", id: "emei/zoulang2", p: [-1, 0] },
-    { n: "走廊", id: "emei/zoulang3", p: [-1, 1], exits: ["s", "n"] },
-    { n: "走廊", id: "emei/zoulang4", p: [-1, -1], exits: ["s", "n"] },
-    { n: "厨房", id: "emei/chufang", p: [2, 0] },
-    { n: "休息室", id: "emei/xiuxishi", p: [1, 1] },
-    { n: "清修洞", id: "emei/qingxiu", p: [-1, 2] },
-    { n: "小屋", id: "emei/xiaowu", p: [-1, -2] },
-    { n: "练功房", id: "emei/liangong", p: [-2, 0], exits: ["e"] }
-];
+        {n: "广场", id: "emei/guangchang", p: [0, 0], exits: ["w", "e", "s", "n"]},
+        {n: "庙门", id: "emei/miaomen", p: [0, -1]},
+        {n: "睹光台", id: "emei/duguangtai", p: [1, -2]},
+        {n: "华藏庵", id: "emei/huacang", p: [2, -2], exits: ["w"]},
+        {n: "金顶", id: "emei/jinding", p: [1, -1], exits: ["w", "n"]},
+        {n: "大殿", id: "emei/dadian", p: [0, 1]},
+        {n: "走廊", id: "emei/zoulang1", p: [1, 0], exits: ["e", "s"]},
+        {n: "走廊", id: "emei/zoulang2", p: [-1, 0]},
+        {n: "走廊", id: "emei/zoulang3", p: [-1, 1], exits: ["s", "n"]},
+        {n: "走廊", id: "emei/zoulang4", p: [-1, -1], exits: ["s", "n"]},
+        {n: "厨房", id: "emei/chufang", p: [2, 0]},
+        {n: "休息室", id: "emei/xiuxishi", p: [1, 1]},
+        {n: "清修洞", id: "emei/qingxiu", p: [-1, 2]},
+        {n: "小屋", id: "emei/xiaowu", p: [-1, -2]},
+        {n: "练功房", id: "emei/liangong", p: [-2, 0], exits: ["e"]}
+    ];
 }

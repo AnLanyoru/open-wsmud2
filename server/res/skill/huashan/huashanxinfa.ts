@@ -1,5 +1,5 @@
-import { SKILL } from "../../../core/skill/skill.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends SKILL {
     name = "华山心法";
@@ -10,19 +10,19 @@ export default class extends SKILL {
     family = FAMILIES.HUASHAN;
     can_enables = ["force"];
     learn_condition = {
-    skill: {
-        force: 50
-    }
-};
-
-    query_enable_prop(lv) {
-    return {
-        force: {
-            max_hp: lv,
-            limit_mp: lv * 10,
-            desc: "唯一：将你内力的50%转化为气血"
+        skill: {
+            force: 50
         }
     };
-}
+
+    query_enable_prop(lv) {
+        return {
+            force: {
+                max_hp: lv,
+                limit_mp: lv * 10,
+                desc: "唯一：将你内力的50%转化为气血"
+            }
+        };
+    }
 }
 

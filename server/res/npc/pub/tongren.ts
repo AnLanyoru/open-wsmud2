@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "<yel>铜人</yel>";
@@ -22,9 +22,9 @@ export default class extends NPC {
 
     die() {
 
-    this.clear_combat_prop();
-    this.add_hp(this.max_hp);
-    this.send_room('$N身上破损的铜皮剥落，再次神采奕奕，精气十足。\n');
-    return false;
-}
+        this.clear_combat_prop();
+        this.add_hp(this.max_hp);
+        this.send_room('$N身上破损的铜皮剥落，再次神采奕奕，精气十足。\n');
+        return false;
+    }
 }

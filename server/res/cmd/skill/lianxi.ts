@@ -1,8 +1,8 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import { SKILL } from "../../../core/skill/skill.js";
-import { SKILL_TYPES } from "../../../core/const.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
+import {SKILL} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
 
 export default class extends COMMAND {
     command = "lianxi";
@@ -14,71 +14,71 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me, skid, par) {
-    if (!me.skills) return;
-    if (!(me.pot > 0)) return me.send('你的潜能不足。');
-    if (me.state && me.state.id !== 'lianxi')
-        return me.send('你正在' + me.state.title + "。");
-    var skill = me.skills[skid];
-    if (!skill) return me.notify("你不会这个技能。");
+        if (!me.skills) return;
+        if (!(me.pot > 0)) return me.send('你的潜能不足。');
+        if (me.state && me.state.id !== 'lianxi')
+            return me.send('你正在' + me.state.title + "。");
+        var skill = me.skills[skid];
+        if (!skill) return me.notify("你不会这个技能。");
 
-    var skill_base = SKILL.get(skid);
-    if (!skill_base) return me.notify("没有这个技能。");
+        var skill_base = SKILL.get(skid);
+        if (!skill_base) return me.notify("没有这个技能。");
 
-    if (skill_base.on_practice && skill_base.on_practice(me) === false) return;
-    if (skill_base.on_learn && skill_base.on_learn(me) === false) return;
-    if (skill_base.type == SKILL_TYPES.KNOWLEDGE) {
-        return me.notify(skill_base.color_name + "只能通过学习增加熟练度。");
-    }
-    var min_level = (skill_base.lianxi_level || 100);
-    if (skill.level < min_level) {
-        return me.notify("你的" + skill_base.query_color_name(me) + "等级不够" + min_level + "，无法练习。");
-    }
-
-    if (me.query_prop(skid)) return me.notify("你不能装备增加" + skill_base.color_name + "等级的道具练习。");
-
-    var max = me.skill_limit();
-    if (par) {
-        max = Math.min(par, max);
-        if (!(max > 0)) return me.send('错误的等级设置');
-        if (max <= me.query_skill(skid))
-            return me.notify("你的" + skill_base.query_color_name(me) + "已经练习到" + max + "级了。");
-    }
-    if (me.state) {
-        if (me.state.skill_base === skill_base)
-            return me.send('你正在练习' + skill_base.query_color_name(me) + "。");
-        for (let i = 0; i < me.state.queues.length; i++) {
-            if (me.state.queues[i].skid == skid) {
-                me.state.queues.splice(i, 1);
-                break;
-            }
+        if (skill_base.on_practice && skill_base.on_practice(me) === false) return;
+        if (skill_base.on_learn && skill_base.on_learn(me) === false) return;
+        if (skill_base.type == SKILL_TYPES.KNOWLEDGE) {
+            return me.notify(skill_base.color_name + "只能通过学习增加熟练度。");
         }
-        me.state.queues.push({
-            skid: skid,
-            max_level: max
-        });
-        return me.send('已将' + skill_base.query_color_name(me) + "加入练习队列。");
-    }
-    if (!check_skill(me, skill_base, false)) return;
+        var min_level = (skill_base.lianxi_level || 100);
+        if (skill.level < min_level) {
+            return me.notify("你的" + skill_base.query_color_name(me) + "等级不够" + min_level + "，无法练习。");
+        }
 
-    me.notify("<hic>你开始练习" + skill_base.query_color_name(me) + "。</hic>");
-    me.set_state({
-        id: "lianxi",
-        title: "练习技能",
-        max_level: max,
-        skill_base: skill_base,
-        queues: [],
-        sum_pot: 0,
-        stime: Date.now(),
-        on_enter: do_learn,
-        desc: "[\"你对" + skill_base.query_color_name(me) + "似乎有些心得。\"]",
-        on_stop: function (me, isauto) {
-            if (isauto) {
-                return to_next(me);
+        if (me.query_prop(skid)) return me.notify("你不能装备增加" + skill_base.color_name + "等级的道具练习。");
+
+        var max = me.skill_limit();
+        if (par) {
+            max = Math.min(par, max);
+            if (!(max > 0)) return me.send('错误的等级设置');
+            if (max <= me.query_skill(skid))
+                return me.notify("你的" + skill_base.query_color_name(me) + "已经练习到" + max + "级了。");
+        }
+        if (me.state) {
+            if (me.state.skill_base === skill_base)
+                return me.send('你正在练习' + skill_base.query_color_name(me) + "。");
+            for (let i = 0; i < me.state.queues.length; i++) {
+                if (me.state.queues[i].skid == skid) {
+                    me.state.queues.splice(i, 1);
+                    break;
+                }
             }
-        },
-        on_check: on_check
-    });
-}
+            me.state.queues.push({
+                skid: skid,
+                max_level: max
+            });
+            return me.send('已将' + skill_base.query_color_name(me) + "加入练习队列。");
+        }
+        if (!check_skill(me, skill_base, false)) return;
+
+        me.notify("<hic>你开始练习" + skill_base.query_color_name(me) + "。</hic>");
+        me.set_state({
+            id: "lianxi",
+            title: "练习技能",
+            max_level: max,
+            skill_base: skill_base,
+            queues: [],
+            sum_pot: 0,
+            stime: Date.now(),
+            on_enter: do_learn,
+            desc: "[\"你对" + skill_base.query_color_name(me) + "似乎有些心得。\"]",
+            on_stop: function (me, isauto) {
+                if (isauto) {
+                    return to_next(me);
+                }
+            },
+            on_check: on_check
+        });
+    }
 }
 
 export interface LianxiState {
@@ -87,6 +87,7 @@ export interface LianxiState {
     queues: { skid: string; max_level: number }[];
     sum_pot: number;
 }
+
 function on_check(this: LianxiState, me: CHARACTER) {
     let max_level = this.max_level;
     let speed = count_speed(me);
@@ -119,6 +120,7 @@ function on_check(this: LianxiState, me: CHARACTER) {
     str.push('</hic>\n点击练习其他武功可添加到队列。');
     me.send(str.join(""));
 }
+
 function format_timespan(time, str) {
     if (time < 60) return str.push('少于1分钟');
     if (time > 86400) {
@@ -131,6 +133,7 @@ function format_timespan(time, str) {
     }
     str.push(Math.floor(time / 60), '分钟');
 }
+
 function to_next(me) {
     let state = me.state;
     if (state.queues.length > 0) {
@@ -149,6 +152,7 @@ function to_next(me) {
         return WORLD.check_user_next(me);
     }
 }
+
 function check_skill(me, skill, limit = true) {
 
     var lv = me.query_skill(skill.id, 0);
@@ -176,6 +180,7 @@ function check_skill(me, skill, limit = true) {
     }
     return true;
 }
+
 function do_learn(this: LianxiState, me: CHARACTER) {
     if (me.pot > 0) {
 
@@ -189,6 +194,7 @@ function do_learn(this: LianxiState, me: CHARACTER) {
     return me.notify_fail("你的潜能不够，无法继续练习下去了。");
 
 }
+
 function count_speed(me) {
     let pot = parseInt((me.int + me.query_prop("int")) * (100 + me.query_prop("lianxi_per")
         + me.family.query_temp('lianxi_per', 0)

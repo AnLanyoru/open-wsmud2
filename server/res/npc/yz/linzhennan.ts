@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { USERTASK } from "../../../core/task/playertask.js";
+import {NPC} from "../../../core/char/npc.js";
+import {USERTASK} from "../../../core/task/playertask.js";
 
 export default class extends NPC {
     name = "林震南";
@@ -16,9 +16,9 @@ export default class extends NPC {
     constructor() {
         super();
         this.skill_map(
-                ["unarmed", 150],
-                ["dodge", 150],
-                ["parry", 150]);
+            ["unarmed", 150],
+            ["dodge", 150],
+            ["parry", 150]);
         this.add_action("biao", "运镖", function (me) {
 
             USERTASK.GET("yunbiao").on_start(me);

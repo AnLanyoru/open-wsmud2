@@ -1,5 +1,3 @@
-
-
 const jh_fam = {
     name: "门派",
     items: null,
@@ -90,8 +88,7 @@ const jh_fam = {
     },
     append_footer: function () {
         let fb = this.items[this.selected_index];
-        Dialog.footerElement.find('.item-commands').
-            html(`<span cmd="jh fam ${fb.index} start">进入地图</span>`);
+        Dialog.footerElement.find('.item-commands').html(`<span cmd="jh fam ${fb.index} start">进入地图</span>`);
     }
 };
 const jh_fb = {
@@ -283,8 +280,7 @@ const jh_ar = {
     append_footer: function () {
         let fb = this.items[this.selected_index];
         if (fb.unlock)
-            Dialog.footerElement.find('.item-commands').
-                html(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
+            Dialog.footerElement.find('.item-commands').html(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
         else
             Dialog.footerElement.find('.item-commands').empty();
     }
@@ -324,9 +320,15 @@ export default {
             return;
         }
         if (!data.fbs) return;
-        jh_fam.items = data.families.map(function (x) { return { name: x, unlock: false }; });
-        jh_fb.items = data.fbs.map(function (x) { return { name: x }; });
-        jh_ar.items = data.areas.map(function (x) { return { name: x, unlock: false }; });
+        jh_fam.items = data.families.map(function (x) {
+            return {name: x, unlock: false};
+        });
+        jh_fb.items = data.fbs.map(function (x) {
+            return {name: x};
+        });
+        jh_ar.items = data.areas.map(function (x) {
+            return {name: x, unlock: false};
+        });
         this.selected_item.show(this.listElement, this.descElement);
     },
     show: function () {

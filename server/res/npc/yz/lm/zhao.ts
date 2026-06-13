@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "赵三拳";
@@ -29,19 +29,19 @@ export default class extends NPC {
             ["parry", 100],
             ["blade", 100], ["taizuchangquan", 100, "unarmed"]);
         this.set_drop({
-            obj: "money/silver",
-            min: 5,
-            max: 10
-        }, {
-            obj: ["eq/lv0/cloth", "eq/lv0/mugun", "eq/lv0/jian", "sp/yz/qiantiao"],
-            odds: 8000
-        },
+                obj: "money/silver",
+                min: 5,
+                max: 10
+            }, {
+                obj: ["eq/lv0/cloth", "eq/lv0/mugun", "eq/lv0/jian", "sp/yz/qiantiao"],
+                odds: 8000
+            },
             {
                 obj: ["book/book#unarmed", "book/book#parry", "book/book#dodge", "book/book#force"],
                 odds: 8000
             }, {
-            obj: ["eq/lv1/lm_head", "eq/lv1/lm_cloth", "eq/lv1/lm_shoes", "eq/lv1/lm_shou", "eq/lv1/lm_jian", "book/bc#taizuchangquan"],
-            odds: 9000
-        });
+                obj: ["eq/lv1/lm_head", "eq/lv1/lm_cloth", "eq/lv1/lm_shoes", "eq/lv1/lm_shou", "eq/lv1/lm_jian", "book/bc#taizuchangquan"],
+                odds: 9000
+            });
     }
 }

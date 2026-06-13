@@ -1,16 +1,16 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import { UTIL } from "../../../core/util";
-import { NPC } from "../../../core/char/npc.js";
-import { USER } from "../../../core/char/user.js";
-import { COMMAND } from "../../../core/command.js";
-import type { CHARACTER } from "../../../core/char/character.js";
-import type { OBJ } from "../../../core/item/obj.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import {UTIL} from "../../../core/util";
+import {NPC} from "../../../core/char/npc.js";
+import {USER} from "../../../core/char/user.js";
+import {COMMAND} from "../../../core/command.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import type {OBJ} from "../../../core/item/obj.js";
 
 export default class extends ROOM {
     name = "武道塔";
     desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
-    exits = { "up": "wudao/up", "out": "wudao/ding" };
+    exits = {"up": "wudao/up", "out": "wudao/ding"};
     max_item_count = 1;
 
     on_before_enter(me: CHARACTER) {
@@ -50,6 +50,7 @@ export default class extends ROOM {
         this.items.push(npc);
         this.refresh();
     }
+
     on_enter(me: CHARACTER) {
         const room = this;
         me.die = function (this: CHARACTER, killer?: CHARACTER) {
@@ -70,9 +71,11 @@ export default class extends ROOM {
             npc.on_kill(me);
         }
     }
+
     on_reward(me: CHARACTER, lv: number) {
 
     }
+
     on_leave(me: CHARACTER, dir: string) {
 
         var npc: CHARACTER | OBJ | NPC | undefined = this.find_by_path("pub/wudao_boss");

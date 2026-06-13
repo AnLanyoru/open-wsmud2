@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { WORLD } from "../../../core/world.js";
+import {NPC} from "../../../core/char/npc.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends NPC {
     name = "擂台比武报名";
@@ -27,23 +27,23 @@ export default class extends NPC {
     }
 
     query_commands(player) {
-    if (this.json) return this.json;
-    var json = {};
-    json.type = "item";
-    json.desc = this.desc;
-    json.id = this.id;
-    json.commands = [];
+        if (this.json) return this.json;
+        var json = {};
+        json.type = "item";
+        json.desc = this.desc;
+        json.id = this.id;
+        json.commands = [];
 
-    json.commands.push({
-        cmd: "askbiwu " + this.id,
-        name: "挑战"
-    });
-    json.commands.push({
-        cmd: "askbiwu1 " + this.id,
-        name: "更新我的比武状态"
-    });
-    this.json = JSON.stringify(json);
-    return this.json;
-}
+        json.commands.push({
+            cmd: "askbiwu " + this.id,
+            name: "挑战"
+        });
+        json.commands.push({
+            cmd: "askbiwu1 " + this.id,
+            name: "更新我的比武状态"
+        });
+        this.json = JSON.stringify(json);
+        return this.json;
+    }
 }
 

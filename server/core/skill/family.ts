@@ -1,18 +1,18 @@
 /**
  * FAMILY 门派基类
  */
-import { BASE } from "../base.js";
-import { WORLD } from "../world.js";
-import { ITEM } from "../item.js";
-import { UTIL } from "../util.js";
-import { ROOM } from "../room/room.js";
-import { EVENTS } from "../task/events.js";
-import { COMMAND } from "../command.js";
-import type { NPC } from '../char/npc.js';
-import type { USER } from '../char/user.js';
-import type { SKILL, SkillSet } from './skill.js';
-import type { AREA } from '../room/area.js';
-import type { TempValue } from '../../types/base.js';
+import {BASE} from "../base.js";
+import {WORLD} from "../world.js";
+import {ITEM} from "../item.js";
+import {UTIL} from "../util.js";
+import {ROOM} from "../room/room.js";
+import {EVENTS} from "../task/events.js";
+import {COMMAND} from "../command.js";
+import type {NPC} from '../char/npc.js';
+import type {USER} from '../char/user.js';
+import type {SKILL, SkillSet} from './skill.js';
+import type {AREA} from '../room/area.js';
+import type {TempValue} from '../../types/base.js';
 
 // 懒加载 NPC 避免循环依赖: family.ts → npc.ts → character.ts (TDZ)
 let _NPC: {
@@ -20,7 +20,9 @@ let _NPC: {
     CREATE: (path: string, room?: any) => any;
     GET: (path: string) => any;
 } | null = null;
-import("../char/npc.js").then((m: Record<string, any>) => { _NPC = m.NPC as any; });
+import("../char/npc.js").then((m: Record<string, any>) => {
+    _NPC = m.NPC as any;
+});
 
 // todo 需要检查一下和第一次提交的js文件的不同
 export class FAMILY extends BASE {
@@ -52,8 +54,11 @@ export class FAMILY extends BASE {
     skill_levels: SKILL[][] | null = null;
     /** 门派战结算回调 — 触发时机：玩家领取门派战战利品时 */
     battle_settle?: (...args: any[]) => void;
+
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
-    on_kill(killer: Record<string, any>, victim: Record<string, any>): void {}
+    on_kill(killer: Record<string, any>, victim: Record<string, any>): void {
+    }
+
     /** 货物缓存（由 goods 任务设置） */
     customer?: Record<string, any>;
 
@@ -69,7 +74,7 @@ export class FAMILY extends BASE {
     skills4: SKILL[] = [];
     /** 门派隐藏/知识类技能列表（type=KNOWLEDGE 或 is_hidden） */
     skills0: SKILL[] = [];
-    
+
     /** 门派npc武功配置列表 */
     npc_skills: SkillSet = [];
     /** 默认NPC定义 */
@@ -102,9 +107,14 @@ export class FAMILY extends BASE {
     // ============ 回调（由资源文件覆写为方法） ============
 
     /** 门派称谓回调 — 传入角色，返回该角色在门派的称呼 */
-    call(me: Record<string, any>, isbad?: boolean): string { return ''; }
+    call(me: Record<string, any>, isbad?: boolean): string {
+        return '';
+    }
+
     /** 自称回调 — 传入角色，返回该角色在门派的自称 */
-    call_me(me: Record<string, any>, isbad?: boolean): string { return ''; }
+    call_me(me: Record<string, any>, isbad?: boolean): string {
+        return '';
+    }
 
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
@@ -257,7 +267,7 @@ export class FAMILY extends BASE {
         if (count < 0) return;
         if (!this.tops) this.tops = {};
         const old = this.tops[me.id];
-        if (!old) this.tops[me.id] = { name: me.name, score: count };
+        if (!old) this.tops[me.id] = {name: me.name, score: count};
         else {
             old.score += count;
         }
@@ -771,7 +781,7 @@ export class FAMILY extends BASE {
 }
 
 /** 所有门派注册表 — 必须在 FAMILY class 之后定义以避免循环依赖 TDZ */
-export const FAMILIES: Record<string, FAMILY> = { NONE: new FAMILY() };
+export const FAMILIES: Record<string, FAMILY> = {NONE: new FAMILY()};
 
 const TITLES: string[] = ['入门弟子', '弟子', '执事', '护法', '长老', '供奉'];
 

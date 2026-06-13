@@ -50,7 +50,6 @@ module.exports = {
     },
 
 
-
     getServers: function () {
         let sql = "select id,name, ip,port,istest,isdef,create_time,start_time from servers";
 

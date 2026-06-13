@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "谷虚道长";
@@ -29,11 +29,11 @@ export default class extends NPC {
             ["literate", 100],
             ["wudangxinfa", 100, "force"],
             ["wudangjianfa", 100, "sword"],
-            ["wudangchangquan", 100,"unarmed"]);
+            ["wudangchangquan", 100, "unarmed"]);
     }
 
     on_master(me) {
-    return true;
-}
+        return true;
+    }
 }
 

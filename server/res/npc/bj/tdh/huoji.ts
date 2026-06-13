@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "药铺伙计";
@@ -22,14 +22,14 @@ export default class extends NPC {
             ["parry", 100],
             ["force", 100],
             ["unarmed", 100],
-            ["houquan", 100,"unarmed"]);
+            ["houquan", 100, "unarmed"]);
         this.set_drop({
             obj: "money/silver",
             min: 10,
             max: 20
         }, {
-                obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
-                odds: 8000
+            obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
+            odds: 8000
         });
     }
 }

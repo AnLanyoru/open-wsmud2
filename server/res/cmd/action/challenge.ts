@@ -1,6 +1,6 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
+import {COMMAND} from "../../../core/command.js";
+import {CHARACTER} from "../../../core/char/character.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
     command = "challenge";
@@ -11,7 +11,7 @@ export default class extends COMMAND {
      */
     enter(player, index) {
 
-    return WORLD.COMMANDS['biwu'].biwu_record(player);
-}
+        return WORLD.COMMANDS['biwu'].biwu_record(player);
+    }
 }
 

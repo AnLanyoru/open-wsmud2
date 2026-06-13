@@ -1,11 +1,11 @@
-import { ROOM } from "../../../core/room/room.js";
-import { WORLD } from "../../../core/world.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
+import type {CHARACTER} from "../../../core/char/character.js";
 
 export default class MapRoom extends ROOM {
     name = "赌场";
     desc = "赌桌围着黑压压的赌徒，吆喝声、惊叹声、欢呼声、咒骂声、哄笑声和噼哩啪啦的声响使你的耳朵几乎无法忍受，赌桌旁的墙上贴有一张<cmd cmd='look paper'>纸</cmd>。";
-    exits = { "east": "yz/nandajie1", };
+    exits = {"east": "yz/nandajie1",};
     no_fight = true;
     master: CHARACTER | null = null;
     stores = new Map<string, number>();
@@ -116,12 +116,14 @@ export default class MapRoom extends ROOM {
             this.rolle_handler = undefined;
         }
     }
+
     roll_over1() {
         if (this.master) {
             this.master.send_room("$N高声喊道：来吧……赌一赌，闯王变盘古！搏一搏，云龙变成长生决！");
         }
         this.rolle_handler = this.call_out(this.roll_over, 10000);
     }
+
     roll_over() {
         this.rolle_handler = undefined;
         if (!this.master) return;

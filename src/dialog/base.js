@@ -1,4 +1,3 @@
-
 import DialogScore from './score.js';
 import DialogMap from './map.js';
 import DialogKeys from './keys.js';
@@ -21,7 +20,6 @@ import DialogPm from './paimai.js';
 import DialogPack2 from './packet2.js';
 import DialogMaster from './master.js';
 import DialogList from './list.js';
-
 
 
 const Dialog = {

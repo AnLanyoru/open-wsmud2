@@ -1,5 +1,5 @@
-import { NPC } from "../../../core/char/npc.js";
-import { FAMILIES } from "../../../core/skill/family.js";
+import {NPC} from "../../../core/char/npc.js";
+import {FAMILIES} from "../../../core/skill/family.js";
 
 export default class extends NPC {
     name = "鲁有脚";
@@ -40,9 +40,9 @@ export default class extends NPC {
     }
 
     on_master(me) {
-    if (me.query_skill("huntianqigong", 0) < 300 && me.query_skill("huntianqigong2", 0) < 300) return me.notify_fail("鲁有脚说道：你的混天气功掌握程度还不够，需要多加练习。");
+        if (me.query_skill("huntianqigong", 0) < 300 && me.query_skill("huntianqigong2", 0) < 300) return me.notify_fail("鲁有脚说道：你的混天气功掌握程度还不够，需要多加练习。");
 
-    return true;
-}
+        return true;
+    }
 }
 

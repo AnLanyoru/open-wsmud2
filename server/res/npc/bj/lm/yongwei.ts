@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "披甲俑卫";
@@ -12,13 +12,13 @@ export default class extends NPC {
     max_hp = 22000;
     score = 20;
     prop = {
-    gj: 1000,
-    mz: 1500,
-    fy: 2000,
-    ds: 1000,
-    zj: 1000,
-    gjsd: 1500
-};
+        gj: 1000,
+        mz: 1500,
+        fy: 2000,
+        ds: 1000,
+        zj: 1000,
+        gjsd: 1500
+    };
 
     constructor() {
         super();

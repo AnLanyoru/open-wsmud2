@@ -1,20 +1,22 @@
 /**
  * AREA 区域类 - 管理一组房间
  */
-import { WORLD } from "../world.js";
-import { FAMILIES } from "../skill/family.js";
-import { NPC } from "../char/npc.js";
-import type { ROOM } from "./room.js";
-import type { USER } from "../char/user.js";
-import type { CHARACTER } from "../char/character.js";
-import type { SKILL } from "../skill/skill.js";
-import type { ActionMap } from "../../types/base.js";
+import {WORLD} from "../world.js";
+import {FAMILIES} from "../skill/family.js";
+import {NPC} from "../char/npc.js";
+import type {ROOM} from "./room.js";
+import type {USER} from "../char/user.js";
+import type {CHARACTER} from "../char/character.js";
+import type {SKILL} from "../skill/skill.js";
+import type {ActionMap} from "../../types/base.js";
 
 // 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
 let _ROOM: {
     Get: (path: string) => any;
 } | null = null;
-import("./room.js").then((m: Record<string, any>) => { _ROOM = m.ROOM as any; });
+import("./room.js").then((m: Record<string, any>) => {
+    _ROOM = m.ROOM as any;
+});
 
 // todo 需要检查一下和第一次提交的js文件的不同
 export class AREA {
@@ -163,7 +165,9 @@ export class AREA {
      * 人物离开区域回调
      * @param me
      */
-    on_leaved(me: CHARACTER): void { return undefined; }
+    on_leaved(me: CHARACTER): void {
+        return undefined;
+    }
 
     /**
      * 人物离开前回调
@@ -185,7 +189,9 @@ export class AREA {
      * 查找子区域
      * @param path
      */
-    find_area(path: string): AREA | undefined { return undefined; }
+    find_area(path: string): AREA | undefined {
+        return undefined;
+    }
 
     /**
      * 查询指定难度的通关记录 是否通关
@@ -354,13 +360,18 @@ export class AREA {
 
     /** 快速扫荡回调 */
     on_quick?(me: CHARACTER): boolean | void;
+
     /** 快速扫荡结束回调 */
     on_quick_over?(me: CHARACTER): void;
+
     /** 副本分数 */
     score?: number;
 
     /** 按 ID 获取副本区域（由 world/cmd/dialog/jh.js 注入实现） */
-    static Get_FB(_id: string): AREA | undefined { return undefined; }
+    static Get_FB(_id: string): AREA | undefined {
+        return undefined;
+    }
+
     /** 副本区域索引 */
     static FBS: AREA[] | undefined;
 }

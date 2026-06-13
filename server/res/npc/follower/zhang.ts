@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "张无忌";
@@ -31,8 +31,8 @@ export default class extends NPC {
     }
 
     on_master_enter(me) {
-    if (this.random(3) == 1) {
-        me.notify("张无忌对你嘿嘿一笑。");
+        if (this.random(3) == 1) {
+            me.notify("张无忌对你嘿嘿一笑。");
+        }
     }
-}
 }

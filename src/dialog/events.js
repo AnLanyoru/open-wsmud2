@@ -1,5 +1,4 @@
-
-import { showFlag } from '../game/tool.js';
+import {showFlag} from '../game/tool.js';
 
 const events_css = `
 

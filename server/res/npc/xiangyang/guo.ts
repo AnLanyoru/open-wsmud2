@@ -1,4 +1,4 @@
-import { NPC } from "../../../core/char/npc.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "郭靖";
@@ -36,21 +36,22 @@ export default class extends NPC {
     }
 
     on_kill(me) {
-    return false;
-}
+        return false;
+    }
+
     query_commands(player) {
 
-    var json = {};
-    json.type = "item";
-    json.desc = this.desc;
-    json.id = this.id;
-    json.commands = [];
-    json.commands.push({
-        cmd: "look " + this.id,
-        name: "查看"
-    });
+        var json = {};
+        json.type = "item";
+        json.desc = this.desc;
+        json.id = this.id;
+        json.commands = [];
+        json.commands.push({
+            cmd: "look " + this.id,
+            name: "查看"
+        });
 
-    this.json = JSON.stringify(json)
-    return this.json;
-}
+        this.json = JSON.stringify(json)
+        return this.json;
+    }
 }

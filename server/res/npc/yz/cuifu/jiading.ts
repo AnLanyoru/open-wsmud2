@@ -1,4 +1,4 @@
-import { NPC } from "../../../../core/char/npc.js";
+import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
     name = "家丁";
@@ -15,10 +15,10 @@ export default class extends NPC {
     constructor() {
         super();
         this.skill_map(
-                ["club", 15],
-                ["dodge", 15],
-                ["sword", 15],
-                ["parry", 15]);
+            ["club", 15],
+            ["dodge", 15],
+            ["sword", 15],
+            ["parry", 15]);
         this.set_objects(
             ["eq/lv0/cloth", 1, 1],
             ["eq/lv0/mugun", 1, 1]
@@ -28,11 +28,11 @@ export default class extends NPC {
             min: 10,
             max: 30
         }, {
-                obj: ["eq/lv0/cloth", "eq/lv0/mugun"],
-                odds:3000
-            }, {
-                obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes"],
-                odds: 3000
-            });
+            obj: ["eq/lv0/cloth", "eq/lv0/mugun"],
+            odds: 3000
+        }, {
+            obj: ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes"],
+            odds: 3000
+        });
     }
 }

@@ -1,4 +1,4 @@
-import { OBJ } from "../../../core/item/obj.js";
+import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
     unit = "颗";
@@ -8,11 +8,11 @@ export default class extends OBJ {
     value = 0;
 
     on_use(me) {
-    var size = 10;
-    if (me.max_item_count + size > 100) return me.notify_fail("背包最多只能扩充到100格。");
-    me.max_item_count += size;
-    me.send('{"type":"dialog","dialog":"pack",max_item_count:' + me.max_item_count + '}');
-    // me.notify('你的背包容量扩充为' + me.max_item_count + "。");
-    return true;
-}
+        var size = 10;
+        if (me.max_item_count + size > 100) return me.notify_fail("背包最多只能扩充到100格。");
+        me.max_item_count += size;
+        me.send('{"type":"dialog","dialog":"pack",max_item_count:' + me.max_item_count + '}');
+        // me.notify('你的背包容量扩充为' + me.max_item_count + "。");
+        return true;
+    }
 }

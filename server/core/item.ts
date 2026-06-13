@@ -2,12 +2,12 @@
 // ITEM — 所有游戏物件的基类（物品、角色、房间等）
 // ============================================================
 
-import { BASE } from './base.js';
+import {BASE} from './base.js';
 
-import { UTIL } from './util.js';
+import {UTIL} from './util.js';
 
-import type { ROOM } from './room/room.js';
-import type { ActionDef, ActionMap } from '../types/base.js';
+import type {ROOM} from './room/room.js';
+import type {ActionDef, ActionMap} from '../types/base.js';
 
 // ============================================================
 // ITEM 类
@@ -100,9 +100,13 @@ export class ITEM extends BASE {
     // ============ 消息发送（桩方法，由 CHARACTER 覆写） ============
 
     /** 发送消息到客户端（桩方法，玩家/NPC 子类覆写） */
-    send(_msg: string): void {}
+    send(_msg: string): void {
+    }
+
     /** 查询用户设置（桩方法，玩家子类覆写） */
-    query_setting(_name: string): boolean | number { return false; }
+    query_setting(_name: string): boolean | number {
+        return false;
+    }
 
     // ============ 堆叠操作 ============
 
