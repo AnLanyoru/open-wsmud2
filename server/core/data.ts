@@ -45,6 +45,11 @@ const DATA = {
     /** 书籍价值表（按 grade 索引） */
     book_values: [1, 1000, 5000, 10000, 100000, 500000, 2000000],
 
+    /** 活动开始时间 unix timestamp */
+    act_stime: 0,
+    /** 活动结束时间 unix timestamp */
+    act_etime: 0,
+
     /** 静态属性映射 */
     PROPS: {},
 

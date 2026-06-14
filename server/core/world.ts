@@ -44,7 +44,6 @@ import type {OBJ} from './item/obj.js';
 import type {NPC} from './char/npc.js';
 import type {EQUIPMENT} from './item/equipment.js';
 import type {CORPSE} from './item/corpse.js';
-import type {DataObject} from './data.js';
 import type {UserLoginModule} from './login.js';
 import type wsServer from './net-ws.js';
 import type {EventItem} from './task/events.js';
@@ -398,7 +397,7 @@ class World {
     // ========== 子系统 ==========
 
     /** 全局持久化数据 */
-    DATA: DataObject = WORLD_DATA;
+    DATA = WORLD_DATA;
     /** 登录/会话管理模块 */
     USERLOGIN: UserLoginModule = USERLOGIN_MODULE;
     /** 数据库操作模块 */
