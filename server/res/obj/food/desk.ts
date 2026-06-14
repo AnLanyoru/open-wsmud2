@@ -1,6 +1,7 @@
 import {CONTAINER} from "../../../core/item/container.js";
 import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends CONTAINER {
     name = "婚宴礼桌";
@@ -12,18 +13,18 @@ export default class extends CONTAINER {
     no_get = true;
     no_alloc = true;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 0;
         if (par) {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
             if (!(lv > 0 && lv < 6)) lv = 0;
         }
         this.grade = lv;
     }
 
-    query_items(me) {
+    query_items(me: CHARACTER) {
         if (me.query_temp("get_marry") || !WORLD.DATA.query_temp("marry")) return;
-        var items = [];
+        var items: OBJ[] = [];
         var count = 1;
         if (me.id == WORLD.DATA.query_temp("mar1") || me.id == WORLD.DATA.query_temp("mar2")) count = 3;
         for (var i = 0; i < this.grade; i++) {
@@ -33,7 +34,7 @@ export default class extends CONTAINER {
         return items;
     }
 
-    clear_items(me) {
+    clear_items(me: CHARACTER) {
         me.set_temp("get_marry", 1, 60000 * 30);
     }
 }

@@ -22,7 +22,7 @@ export default class extends OBJ {
                     if (me.skills[key].ref)
                         return me.notify_fail('请先取消' + skill.query_color_name(me) + '融合的技能。');
 
-                    if (me.skills[key].addin && me.skills[key].addin.length)
+                    if (me.skills[key].addin?.length)
                         return me.notify_fail('请先取消' + skill.query_color_name(me) + '的技能进阶。');
 
                     list.push(skill);

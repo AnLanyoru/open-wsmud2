@@ -1,3 +1,4 @@
+import type { CHARACTER } from "../../../../core/char/character.js";
 import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -7,16 +8,16 @@ export default class extends OBJ {
     value = 100;
     transable = true;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv < 6)) return;
         this.grade = lv;
         this.value = lv * 10000;
     }
 
-    on_open(me) {
+    on_open(me: CHARACTER) {
 
         var result = [
             {

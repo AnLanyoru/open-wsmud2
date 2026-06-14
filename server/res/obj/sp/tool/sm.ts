@@ -12,7 +12,7 @@ export default class extends OBJ {
             this.path = path + "#1";
             return;
         }
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv < 6)) return;
         this.grade = lv;

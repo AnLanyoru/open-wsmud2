@@ -62,7 +62,7 @@ interface FOLLOWER_DATA {
 /** 客户端命令条目 */
 interface CommandEntry {
     cmd: string;
-    name: string | null;
+    name: string;
 }
 
 /** 发送给客户端的物件命令 JSON */
@@ -125,6 +125,8 @@ export class FOLLOWER extends CHARACTER {
     listener?: USER;
     /** 主人可见命令JSON缓存 */
     master_json: string | null = null;
+    /** 主人可见命令列表 */
+    action_list: CommandEntry[] | null = null;
 
     // ============ 战斗与装备 ============
 
@@ -322,7 +324,7 @@ export class FOLLOWER extends CHARACTER {
         if (!old || !npc) return;
         const copys = ['str', 'con', 'dex', 'int', 'gender', 'kar', 'per', 'name', 'title', 'desc', 'on_master_learn', 'on_master_enter'];
         for (let i = 0; i < copys.length; i++) {
-            (old as Record<string, any>)[copys[i]] = (npc as Record<string, any>)[copys[i]];
+            old[copys[i]] = npc[copys[i]];
         }
         if (!old.skills) old.skills = {};
         if (!old.equipment) old.equipment = [];
@@ -570,9 +572,7 @@ export class FOLLOWER extends CHARACTER {
                         name: '停止' + (this.state as FollowerState).title.replace('中', '')
                     }]
                     : []),
-                ...(this.actions
-                    ? Object.entries(this.actions).map(([cmd, act]) => ({cmd, name: act.name}))
-                    : []),
+                ...(this.action_list || []),
             ],
         };
         this.master_json = JSON.stringify(json);

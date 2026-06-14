@@ -18,6 +18,7 @@ import type {FAMILY} from '../skill/family.js';
 import type {NPC} from './npc.js';
 import type {GameSocket} from '../world.js';
 import type { COMMAND } from '../command.js';
+import type { UserState } from './user.js';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -326,7 +327,7 @@ export class CHARACTER extends ITEM {
     /** 当前所在房间 */
     environment?: RoomClass;
     /** 当前活动状态 */
-    state: any = null;
+    state?: UserState | null = null;
     /** 等待用户输入的回调 */
     wait_input?: ((me: CHARACTER, req: string) => void);
 
@@ -1357,9 +1358,10 @@ export class CHARACTER extends ITEM {
 
     /**
      * 清除指定类型的负面状态
+     * @returns 清除的状态数量
      */
-    clear_downside(type: boolean): number | undefined {
-        if (!this.status) return;
+    clear_downside(type: boolean): number{
+        if (!this.status) return 0;
         let removed = '0';
         let count = 0;
         for (let i = 0; i < this.status.length; i++) {
@@ -1373,7 +1375,7 @@ export class CHARACTER extends ITEM {
                 count++;
             }
         }
-        if (removed.length == 1 || !this.environment) return;
+        if (removed.length == 1 || !this.environment) return 0;
         const items = this.environment.items;
         const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
         for (let i = 0; i < items.length; i++) {
@@ -1414,7 +1416,7 @@ export class CHARACTER extends ITEM {
     /**
      * 按条件批量移除状态
      */
-    remvoe_statuses(func: (item: CharacterStatus) => boolean): void {
+    remove_statuses(func: (item: CharacterStatus) => boolean): void {
         if (!this.status || !this.status.length) return;
         let removed = '0';
         for (let i = this.status.length - 1; i >= 0; i--) {

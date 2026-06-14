@@ -22,7 +22,7 @@ export default class extends COMMAND {
         if (me.query_setting("off_es")) return me.notify("你目前禁止全区频道中。");
         var msg = "", name = me.name;
         if (str[0] == "*") {
-            str = str.substr(1);
+            str = str.slice(1);
             msg = WORLD.COMMANDS["emote"].enter(me, str);
             if (!msg) {
                 msg = UTIL.htmlEncode(str);

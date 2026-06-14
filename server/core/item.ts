@@ -88,7 +88,7 @@ export class ITEM extends BASE {
     is_equipment: boolean = false;
     /** 单位名称 */
     unit: string = '个';
-    /** 冷却类型标识（用于区分同类物品共享冷却） */
+    /** 冷却类型标识（用于区分同类物品共享冷却, 空字符串为使用id区分冷却） */
     distype?: string;
     /** 品级 */
     grade: number = 0;

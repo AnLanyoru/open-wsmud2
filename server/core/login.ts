@@ -100,7 +100,7 @@ const USERLOGIN: UserLoginModule = {
      */
     encryptUser(key: string, session: string): DecryptedSession | null {
         if (!key || !session) return null;
-        if (key.length >= 16) key = key.substr(0, 16);
+        if (key.length >= 16) key = key.slice(0, 16);
         try {
             const keyBuf = Buffer.from(key, 'utf8');
             const decipher = crypto.createDecipheriv('aes-128-cbc', keyBuf, __CONFIG.DESIV);
@@ -230,8 +230,8 @@ const USERLOGIN: UserLoginModule = {
         let cmd = str;
         let pars = '';
         if (i > 0) {
-            cmd = str.substr(0, i);
-            pars = str.substr(i + 1);
+            cmd = str.slice(0, i);
+            pars = str.slice(i + 1);
         }
         const command = WORLD.COMMANDS[cmd];
         if (command && (command as { allow_login?: boolean }).allow_login) {

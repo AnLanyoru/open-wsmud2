@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {OBJ} from "../../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -6,14 +7,15 @@ export default class extends OBJ {
     unit = "封";
     value = 0;
     grade = 3;
+    target: string;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         if (par) {
-            this.target = par.substr(1);
+            this.target = par.slice(1);
         }
     }
 
-    on_receive(me) {
+    on_receive(me: USER) {
         if (!this.target) return;
         if (me.query_temp("wife") == this.target) {
             var name = me.query_temp("wife_n");

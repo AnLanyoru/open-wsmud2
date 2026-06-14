@@ -52,7 +52,7 @@ function on_look_hidden_item(this: Record<string, any>, player: Record<string, a
  */
 function getAreaByPath(path: string): AREA | undefined {
     let index = path.lastIndexOf("/");
-    path = path.substr(0, index + 1);
+    path = path.slice(0, index + 1);
     const items = WORLD.AREAS;
     for (let i = 0; i < items.length; i++) {
         if ((items[i] as AREA).room_path == path) return items[i] as AREA;

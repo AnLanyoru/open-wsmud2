@@ -27,87 +27,8 @@ const FAMS_TATAS: string[] = [
 // DATA 单例
 // ============================================================
 
-export interface DataObject {
-    /** 队伍数据 */
-    parties: Map<string, any>;
-    /** 拍卖数据 */
-    PAIMAI: Map<string, any>;
-    /** 运行时临时数据 */
-    temp: Record<string, any>;
-    /** 活动开始时间戳（世界活动用） */
-    act_stime?: number;
-    /** 活动结束时间戳（世界活动用） */
-    act_etime?: number;
-    /** 经验等级倍率表 */
-    exps: number[];
-    /** 宝石价值表 */
-    stone_values: number[];
-    /** 书籍价值表 */
-    book_values: number[];
-    /** 静态属性映射 */
-    PROPS: Record<string, any>;
-    /** 统计用临时数据存储 */
-    temp_data: Record<string, Record<string, { name: string; value: number }>>;
 
-    /** 根据玩家等级获取随机经验 */
-    get_exp(me: { random(n: number): number; level: number }): number;
-
-    /** 加载全局数据时的回调 */
-    on_load(data: Record<string, any>): void;
-
-    /** 保存全局数据时的回调 */
-    on_save(str: string[]): void;
-
-    /** 创建默认排行榜 */
-    create_def_tops(): void;
-
-    /** 创建默认装备统计 */
-    create_def_eqs(): void;
-
-    /** 创建默认分数统计 */
-    create_def_scs(): void;
-
-    /** 重置家族排行 */
-    reset_famtops(me: { id: string; remove_temp(name: string): void }, fam: { id: string; name: string }): void;
-
-    /** 保存全局数据到数据库 */
-    save(): Promise<void>;
-
-    /** JSON.stringify 替换函数 */
-    temp_replacer(_key: string, value: unknown): unknown;
-
-    /** 保存临时数据到字符串数组 */
-    save_temp(str: string[]): void;
-
-    /** 从数据库加载全局数据 */
-    load(): Promise<void>;
-
-    /** 查询临时数据 */
-    query_temp(name: string, def?: unknown, _me?: unknown): unknown;
-
-    /** 设置临时数据 */
-    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void;
-
-    /** 移除临时数据 */
-    remove_temp(name: string): void;
-
-    /** 累加临时数据 */
-    add_temp(name: string, value: number, time?: number, _me?: unknown): number;
-
-    /** 清除统计数据 */
-    clear_data(): void;
-
-    /** 添加统计数据 */
-    add_data(key: string, user: { id: string; name: string }, val: number): void;
-
-    /** 查询最大值 */
-    query_max_data(key: string): { name: string; value: number } | undefined;
-
-    /** 查询最小值 */
-    query_min_data(key: string): { name: string; value: number } | undefined;
-}
-
-const DATA: DataObject = {
+const DATA = {
     // ============ 字段 ============
 
     /** 队伍数据 */
@@ -305,8 +226,8 @@ const DATA: DataObject = {
      * @param def - 默认值（键不存在时返回）
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
-    query_temp(name: string, def?: unknown, _me?: unknown): unknown {
-        if (!this.temp) return def;
+    query_temp<T>(name: string, def?: T, _me?: unknown): T {
+        if (!def) def = undefined as T;
         const item = this.temp[name];
         if (item && item.e) {
             if (Date.now() <= item.e) {

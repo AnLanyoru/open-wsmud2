@@ -1,6 +1,7 @@
 import {OBJ} from "../../../core/item/obj.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends OBJ {
     unit = "粒";
@@ -10,10 +11,11 @@ export default class extends OBJ {
     value = 1000;
     transable = true;
 
-    on_use(me) {
+    on_use(me: CHARACTER) {
         me.notify("你吞下一粒突破丹。")
         if (!(me.pot > 0)) return me.notify("你的潜能不够，好像没什么效果。");
-        var list = [];
+        if (!me.skills) return me.notify("你还没有学会任何技能。");
+        var list: SKILL[] = [];
         for (var sk in me.skills) {
             var base_skill = SKILL.get(sk);
             if (base_skill && base_skill.type != SKILL_TYPES.KNOWLEDGE && base_skill.grade <= this.grade) {
@@ -40,12 +42,12 @@ export default class extends OBJ {
         me.pot -= needexp;
     }
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         if (!par) {
             this.path = "drug/skill2#1";
             return;
         }
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv <= 5)) {
             lv = 1;

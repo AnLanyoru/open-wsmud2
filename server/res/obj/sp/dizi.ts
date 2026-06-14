@@ -1,5 +1,5 @@
 import {OBJ} from "../../../core/item/obj.js";
-import {FAMILIES} from "../../../core/skill/family.js";
+import {FAMILIES, FAMILY} from "../../../core/skill/family.js";
 
 export default class extends OBJ {
     unit = "个";
@@ -7,10 +7,11 @@ export default class extends OBJ {
     desc = "";
     grade = 1;
     value = 1000;
+    family: FAMILY;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         if (!par) return;
-        this.family = FAMILIES[par.substr(1)];
+        this.family = FAMILIES[par.slice(1)];
     }
 
     on_receive(me) {

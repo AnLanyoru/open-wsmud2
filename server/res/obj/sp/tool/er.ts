@@ -8,9 +8,9 @@ export default class extends OBJ {
     consume = 5000;
     transable = true;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv < 6)) return;
         this.grade = lv;

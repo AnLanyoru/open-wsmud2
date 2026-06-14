@@ -35,7 +35,7 @@ export default class extends COMMAND {
         }
         var msg = "", name = me.name;
         if (str[0] == "*") {
-            str = str.substr(1);
+            str = str.slice(1);
             msg = WORLD.COMMANDS["emote"].enter(me, str);
             if (!msg) {
                 msg = UTIL.htmlEncode(str);

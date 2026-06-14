@@ -95,9 +95,6 @@ export class TASK extends BASE {
     /** 执行定时任务（由 time 等任务子类实现） */
     run2?(): void;
 
-    /** BOSS任务：创建二级BOSS */
-    create_boss2?(user: USER): boolean;
-
     /** BOSS任务：自动掉落分配 */
     boss_auto_drops?(me: USER, boss: NPC, par: string): void;
 

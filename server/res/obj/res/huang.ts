@@ -14,6 +14,7 @@ export default class extends OBJ {
     otype = 3;
 
     on_use(me: CHARACTER) {
+        if (!me.environment) return me.send("你现在不能使用雄黄。");
         me.notify("<hic>你把雄黄捏碎，朝四周撒去。</hic>");
         var list: CHARACTER[] = [];
         for (var i = 0; i < me.environment.items.length; i++) {

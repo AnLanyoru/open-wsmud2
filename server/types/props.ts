@@ -174,6 +174,17 @@ export interface PropMap {
     /** 减伤（最终伤害减免） */ reduce_damage?: number;
     /** 背包最大容量 */ max_item_count?: number;
 
+    // ===== 日常属性 =====
+    /** 学习效率% */ study_per?: number;
+    /** 练习效率% */ lianxi_per?: number;
+    /** 打坐效率% */ dazuo_per?: number;
+    /** 采药效率加成数值 */ caiyao1?: number;
+    /** 钓鱼效率加成数值 */ diaoyu1?: number;
+    /** 挖矿效率加成数值 */ kuang1?: number;
+
+    // ===== 没用属性 =====
+    /** 无效果的介绍 */ desc?: string;
+
     /** 允许自定义属性 */
     // [key: string]: number | undefined;
 }

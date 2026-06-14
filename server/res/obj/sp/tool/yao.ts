@@ -11,7 +11,7 @@ export default class extends EQUIPMENT {
     on_create(path, par) {
         let lv = 1;
         if (par) {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par);
             if (!(lv > 0 && lv < 7)) return;
         }

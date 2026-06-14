@@ -19,7 +19,7 @@ export default class extends OBJ {
     on_create(path, par) {
         var lv = 0;
         if (par != undefined) {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par);
             if (!(lv >= 0 && lv < 8)) return;
         }

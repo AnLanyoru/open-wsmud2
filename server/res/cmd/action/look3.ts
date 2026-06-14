@@ -15,7 +15,7 @@ export default class extends COMMAND {
      */
     enter(me, index, userid) {
         if (userid.startsWith("fb_")) {
-            var area_index = parseInt(userid.substr(3));
+            var area_index = parseInt(userid.slice(3));
             var area = WORLD.AREAS[area_index];
             if (!area) return me.notify("没有这个副本。");
             var drop_items = area.query_drop_items();
@@ -32,7 +32,7 @@ export default class extends COMMAND {
             }
             // var book_index = item.path.indexOf("book/bc#");
             // if (book_index == 0) {
-            //     var skillid = item.path.substr(8);
+            //     var skillid = item.path.slice(8);
             //     var skill_base = SKILL.get(skillid);
             //     if (!skill_base) {
             //         return me.send("没有这个技能。");

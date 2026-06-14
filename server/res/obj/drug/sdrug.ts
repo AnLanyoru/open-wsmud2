@@ -1,3 +1,4 @@
+import type { USER } from "../../../core/char/user.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -11,8 +12,9 @@ export default class extends OBJ {
     distype = "marry";
     allow_die = true;
     transable = true;
+    level: number;
 
-    on_use(me) {
+    on_use(me: USER) {
         if (this.level === 2) {
             if (me.hp > 0)
                 return me.notify_fail('这颗丹药在你死亡的时候才会起作用。');
@@ -24,7 +26,7 @@ export default class extends OBJ {
                 if (me.force_skill.on_relive) {
                     me.force_skill.on_relive(me);
                 }
-                me.moveto(me.environment, null);
+                me.moveto(me.environment);
                 return me.send_room('<mag>$N吞下一颗' + this.color_name + '，重新获得了新生。</mag>');
             }
         }
@@ -69,10 +71,10 @@ export default class extends OBJ {
         }
     }
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 0;
         if (par) {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
             if (!(lv > 0)) lv = 0;
         }
         this.grade = 6;

@@ -23,7 +23,7 @@ export default class extends COMMAND {
         if (!area || area == "here") {
             if (!me.environment) return;
             var str = me.environment.path;
-            area = str.substr(0, str.lastIndexOf("/"));
+            area = str.slice(0, str.lastIndexOf("/"));
         }
         var path = area + "/"
         if (this.buffer[area]) return me.send(this.buffer[area]);

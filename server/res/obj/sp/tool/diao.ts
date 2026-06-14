@@ -9,10 +9,10 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.CLUB;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         let lv = 1;
         if (par) {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par);
             if (!(lv > 0 && lv < 7)) return;
         }

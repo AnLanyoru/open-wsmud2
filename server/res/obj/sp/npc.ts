@@ -9,6 +9,8 @@ export default class extends OBJ {
     desc = "一张契约";
     value = 100000;
     grade = 5;
+    /** 随从原型路径 */
+    npc_path: string;
     npcs = {
         wang: "follower/wang",
         shuang: "follower/shuang",
@@ -83,8 +85,8 @@ export default class extends OBJ {
             let old_name = follower.name;
             FOLLOWER.REPLACE(me, follower, npc);
             follower.master_json = null;
-            if (follower.actions) {
-                for (let item of follower.actions) {
+            if (follower.action_list) {
+                for (let item of follower.action_list) {
                     item.name = item.name.replace(old_name, npc.name);
                 }
             }
@@ -105,7 +107,7 @@ export default class extends OBJ {
         if (!par) {
             return;
         }
-        path = this.npcs[par.substr(1)];
+        path = this.npcs[par.slice(1)];
         if (!path) return;
         var npc = NPC.CLONE(path);
         if (!npc) return;

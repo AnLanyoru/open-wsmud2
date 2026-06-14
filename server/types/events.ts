@@ -176,6 +176,10 @@ export interface StatusDef {
     finish_msg?: string;
     /** 状态来源（技能/物品 ID） */
     source?: string;
+    /** 恢复气血数值 */
+    recover_hp?: number;
+    /** 恢复内力数值 */
+    recover_mp?: number;
 }
 
 // ============================================================

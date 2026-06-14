@@ -1,3 +1,4 @@
+import type { CHARACTER } from "../../../core/char/character.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -11,8 +12,9 @@ export default class extends OBJ {
     desc = "这是一份白驼山出产的蛇血丹，不知道什么功效";
     action_msg = "吃";
     transable = true;
+    drug_type: number;
 
-    on_use(me) {
+    on_use(me: CHARACTER) {
         me.notify("<hic>你吃掉一颗蛇血丹。</hic>");
         switch (this.drug_type) {
             case 1:
@@ -54,10 +56,10 @@ export default class extends OBJ {
         }
     }
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 0;
         if (par) {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
         }
         this.drug_type = lv;
         this.name = ["再生", "暴虐", "龟灵", "培元"][lv] + this.name;

@@ -12,7 +12,7 @@ export default class extends OBJ {
         if (!par) {
             par = 0;
         } else
-            par = par.substr(1);
+            par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv >= 0 && lv < 18)) return;
         this.name = ["鲢鱼", "草鱼", "鲤鱼", "鳊鱼", "鲮鱼", "鲂鱼", "黄颡鱼", "黄金鳉",

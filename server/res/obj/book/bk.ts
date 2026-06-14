@@ -13,7 +13,7 @@ export default class extends OBJ {
 
     on_create(path, par) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var skill = SKILL.get(par);
         if (!skill) return;
         this.skill = skill.id;
@@ -32,10 +32,10 @@ export default class extends OBJ {
     }
 
     on_use(me) {
-
-        var skill_base = SKILL.get(this.skill);
+        if (!this.skill) return me.notify_fail('这本秘籍似乎什么也没有记载。');
+        let skill_base = SKILL.get(this.skill);
         if (!skill_base) return me.notify('你不能从里面学到东西。');
-        var skill = me.skills[this.skill];
+        let skill = me.skills[this.skill];
         if (!skill) {
             skill = {
                 level: 0,

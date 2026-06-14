@@ -9,7 +9,7 @@ export default class extends OBJ {
 
     on_create(path, par) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv < 6)) return;
         this.grade = lv;
@@ -23,7 +23,7 @@ export default class extends OBJ {
             + wrap_name('钓鱼竿', this.grade), "一本" + wrap_name('药王神篇', this.grade)];
             for (var i = 0; i < list.length; i++) {
                 str.push("{cmd:\"use " + this.id + " ");
-                str.push(i + 1);
+                str.push(String(i + 1));
                 str.push("\",name:\"");
                 str.push(list[i]);
                 str.push("\"},");

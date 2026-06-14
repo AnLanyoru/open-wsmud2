@@ -71,7 +71,7 @@ class Apibase {
     deEncrypt(key, str) {
 
         if (!key || !str) return;
-        if (key.length > 16) key = key.substr(0, 16);
+        if (key.length > 16) key = key.slice(0, 16);
         key = Buffer.from(key, 'utf8');
         let decipher = crypto.createDecipheriv('aes-128-cbc', key, desvi);
         //decipher.setAutoPadding(true);
@@ -90,7 +90,7 @@ class Apibase {
 
     encrypt(str, key) {
         if (!key || !str) return;
-        if (key.length > 16) key = key.substr(0, 16);
+        if (key.length > 16) key = key.slice(0, 16);
         key = Buffer.from(key, 'utf8');
         let decipher = crypto.createCipheriv('aes-128-cbc', key, desvi);
 

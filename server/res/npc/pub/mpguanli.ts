@@ -76,7 +76,7 @@ export default class extends NPC {
 
     on_create(path: string, par?: string): void {
         if (!par) return;
-        this.family = FAMILIES[par.substr(1)]!;
+        this.family = FAMILIES[par.slice(1)]!;
         if (!this.family.customer) this.family.customer = {};
         if (this.family == FAMILIES.NONE) {
             this.name = "武馆后勤";

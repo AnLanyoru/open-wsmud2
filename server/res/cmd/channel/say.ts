@@ -19,7 +19,7 @@ export default class extends COMMAND {
         if (msg.length > 200) return me.notify("你说的太多了。");
         if (msg[0] == "/") {
             if (me.query_temp("admin") || me.query_temp("wiz"))
-                return me.command(msg.substr(1));
+                return me.command(msg.slice(1));
         }
         msg = UTIL.htmlEncode(UTIL.replace_word(msg));
         me.add_temp('chat2', 1, UTIL.diff_time());

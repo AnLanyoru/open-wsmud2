@@ -306,7 +306,7 @@ export default {
             elem.scrollTop = pos[1] - (height - pos[3]) / 2;
             elem.scrollLeft = pos[0] - (width - pos[2]) / 2;
         }
-        var map_path = rm.path.substr(0, rm.path.lastIndexOf("/"));
+        var map_path = rm.path.slice(0, rm.path.lastIndexOf("/"));
         if (map_path != this.CurMapID) {
             if (this.Buffer[map_path]) {
                 return this.ShowMap(this.Buffer[map_path], map_path);
@@ -321,7 +321,7 @@ export default {
         }
         var rm = this.Room;
         if (!rm) return;
-        var name = rm.path.substr(0, rm.path.lastIndexOf("/"));
+        var name = rm.path.slice(0, rm.path.lastIndexOf("/"));
         if (name == this.CurMapID) {
             $(".map-panel").slideDown("fast");
             this.IsShow = true;

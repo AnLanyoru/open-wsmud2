@@ -63,7 +63,7 @@ interface RoleRecord {
 }
 
 /** 玩家状态对象（打坐/练功/闭关等） */
-interface UserState {
+export interface UserState {
     /** 状态标题（如 "打坐中"） */
     title: string;
     /** 状态触发频率（心跳次数） */
@@ -185,7 +185,7 @@ export class USER extends CHARACTER {
 
     // ============ 社交与随从 ============
 
-    /** 随从描述列表 */
+    /** 随从列表 */
     follower: FollowerDesc[] | null = null;
 
     // ============ 设置与数据 ============

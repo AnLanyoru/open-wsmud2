@@ -1,6 +1,7 @@
 import {ROOM} from "../../../core/room/room.js";
 import {FOLLOWER} from "../../../core/char/follower.js";
 import type {CHARACTER} from "../../../core/char/character.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class MapRoom extends ROOM {
     name = "卧室";
@@ -22,14 +23,14 @@ export default class MapRoom extends ROOM {
         });
     }
 
-    on_enter(me) {
-        if (me.follower) {
+    on_enter(me: USER | FOLLOWER) {
+        if (me instanceof USER && me.follower) {
             for (var i = 0; i < me.follower.length; i++) {
                 FOLLOWER.CREATE(me, me.follower[i], this.on_npc_create.bind(this, me));
             }
         }
-        if (me.master) {
-            me.actions = [
+        if (me instanceof FOLLOWER && me.master) {
+            me.action_list = [
                 {cmd: "makelove " + me.id, name: "和" + me.name + "双修"}
             ];
             me.master_json = null;
@@ -47,17 +48,17 @@ export default class MapRoom extends ROOM {
         });
     }
 
-    on_leave(me) {
-        if (me.master) {
-            me.actions = null;
+    on_leave(me: USER | FOLLOWER) {
+        if (me instanceof FOLLOWER && me.master) {
+            me.action_list = null;
             me.master_json = null;
         }
         me.remove_status("room");
     }
 
-    on_npc_create(me, npc) {
+    on_npc_create(me: USER, npc: FOLLOWER) {
         if (!npc) return;
-        if (npc.environment && npc.environment.parent.id == "home") {
+        if (npc.environment?.parent?.id == "home") {
             if (!npc.team || npc.team != me.team) return;
         }
         if (!npc.hp) npc.hp = 1;

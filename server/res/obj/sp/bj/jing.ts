@@ -67,7 +67,7 @@ export default class extends OBJ {
 
     on_create(path: string, par?: string): void {
         if (!par) return;
-        var lv = parseInt(par.substr(1));
+        var lv = parseInt(par.slice(1));
         this.jing_index = lv;
         switch (lv) {
             case 1:

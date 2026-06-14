@@ -5,7 +5,6 @@ export default class extends OBJ {
     name = "药丸";
     desc = "一颗神秘的药丸";
     grade = 1;
-    prop = null;
 
     on_use(me) {
         me.notify("你吞下一颗" + this.color_name + "。");
@@ -25,7 +24,7 @@ export default class extends OBJ {
         var lv = 1;
         var type = 0;
         if (par) {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par[0]);
             type = parseInt(par[1]);
             if (!(lv > 0 && lv < 5)) lv = 1;
@@ -56,7 +55,7 @@ export default class extends OBJ {
         };
     }
 
-    create_type1(lv) {
+    create_type2(lv) {
         this.name = "飞燕丹";
         var val = [20, 50, 100, 200, 400][lv];
         this.desc = "一颗神秘的药丸，吃了后增加你" + val + "点后天身法。";

@@ -3,7 +3,7 @@ import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {SKILL} from "../../../core/skill/skill.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends OBJ {
     unit = "张";
@@ -12,7 +12,7 @@ export default class extends OBJ {
     grade = 5;
     value = 0;
 
-    on_use(me: CHARACTER): boolean | void {
+    on_use(me: USER): boolean | void {
         if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
         if (me.query_temp('tuolicd')) return me.notify_fail("你刚脱离门派没多久，频繁的背叛师门会被武林中人所不齿的。");
         if (!me.family || me.family == FAMILIES.NONE)
@@ -52,7 +52,11 @@ export default class extends OBJ {
             }
             if (up_count > 0) {
                 let obj = me.add_obj('book/up', up_count);
+                if (!obj){
+                    me.send("<hir>发生不存在的物品数据添加背包，请联系管理解决</hir>");
+                } else {
                 me.notify("你获得了" + obj.unit_name(up_count) + "。");
+                }
             }
 
             me.add_status({

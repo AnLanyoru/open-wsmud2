@@ -9,7 +9,7 @@ import {EVENTS} from "../../core/task/events.js";
 import type {USER} from "../../core/char/user.js";
 import type {CORPSE} from "../../core/item/corpse.js";
 
-export default class extends TASK {
+class BossTask extends TASK {
     id = "boss";
     quickly: boolean = false;
     boss: NPC[] | null = null;
@@ -145,6 +145,9 @@ export default class extends TASK {
         return list;
     }
 
+    /** BOSS任务：创建武神BOSS */
+    create_boss2?(user: USER): boolean;
+
     create_boss(player_level?: number) {
         var max_level = this.boss_levels[Number(WORLD.DATA.query_temp("fb_index", 0))];
         var boss_max = 0;
@@ -211,6 +214,8 @@ export default class extends TASK {
         corpse.query_damage = query_damage.bind(this);
     }
 }
+
+export default BossTask;
 
 const BOSSTASK = TASK.GET('boss');
 const BOSS_LEVELS = ["", "武士", "武师", "宗师", "武圣", "武帝", "武神"];

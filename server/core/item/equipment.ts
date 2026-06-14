@@ -12,6 +12,7 @@ import {EQUIP_TYPE, PROPERTIES} from '../const.js';
 import {SKILL} from '../skill/skill.js';
 import type {CHARACTER} from '../char/character.js';
 import type {USER} from '../char/user.js';
+import type { PropMap } from '../../types/props.js';
 
 /** Enhancement level icon strings */
 const level_desc: string[] = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
@@ -70,7 +71,7 @@ export class EQUIPMENT extends OBJ {
     /** 基础装备评分（按品级 * 100 计算） */
     score: number = 0;
     /** 附加属性（强化加成，由 levelchange_prop 动态计算） */
-    prop: Record<string, any> | null = null;
+    prop?: PropMap;
     /** 镶嵌宝石属性列表 */
     st_prop: StoneEntry[] | null = null;
     /** 剩余宝石孔数 */
@@ -94,14 +95,14 @@ export class EQUIPMENT extends OBJ {
     // ============ 回调函数（由资源文件覆写） ============
 
     /** 套装属性计算 — 触发时机：get_desc()/check_group() 查询套装效果时；传入已装备同套装件数 */
-    group_prop?(count: number): Record<string, number>;
+    group_prop?(count: number): PropMap | void;
 
     /** 装备时回调 — 触发时机：eq() 开头，条件检查通过后、属性加成应用前；返回 false 阻止装备 */
-    on_eq?: ((me: CHARACTER) => boolean | void);
+    on_eq?(me: CHARACTER): boolean | void;
     /** 卸下时回调 — 触发时机：uneq() 开头，属性移除之前 */
-    on_uneq?: ((me: CHARACTER) => void);
+    on_uneq?(me: CHARACTER): void;
     /** 防具防御回调 — 触发时机：damage() 中计算伤害减免时；返回减免后伤害 */
-    on_defense?: (me: CHARACTER, from: CHARACTER, sh: number) => number;
+    on_defense?(me: CHARACTER, from: CHARACTER, sh: number): number;
 
     /**
      * 应用/移除装备附加属性
@@ -550,7 +551,7 @@ export class EQUIPMENT extends OBJ {
      * @param path - 资源路径
      * @param par - 构造参数
      */
-    on_create(path: string, par?: string): void {
+    on_create(path?: string, par?: string): void {
         this.value = this.VALUES[this.grade] ?? 0;
     }
 

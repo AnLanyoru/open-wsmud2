@@ -13,7 +13,7 @@ export default class extends OBJ {
         if (!me.is_player) return me.notify("你不能用追杀令。");
         me.notify("请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：");
 
-        me.wait_input = readname.bind(this);
+        me.wait_input = this.readname.bind(this);
         return false;
     }
 
@@ -22,14 +22,13 @@ export default class extends OBJ {
             this.path = path + "#1";
             return;
         }
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv > 0 && lv <= 5)) return;
         this.grade = lv;
     }
-}
 
-function readname(me, cmd) {
+    readname(me, cmd) {
     if (!cmd) return me.send('请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：');
     var ss = cmd.split(' ');
     if (ss.length != 2) return me.notify("请说出你要追杀的玩家的名字(打开聊天框任意频道输入)：");
@@ -56,4 +55,6 @@ function readname(me, cmd) {
         fam.boss.do_command("chat", npc.name + "听令，即刻起追杀" + name + "，不得有误。");
     }
     npc.follow_kill(user);
+}
+    
 }

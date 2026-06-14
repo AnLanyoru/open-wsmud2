@@ -12,7 +12,7 @@ export default {
         var rm = MAP.Room.name;
         var index = rm.indexOf('-');
         if (index > -1) {
-            rm = rm.substr(0, index);
+            rm = rm.slice(0, index);
         }
         Dialog.title(rm);
         Dialog.footer("");

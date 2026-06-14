@@ -10,7 +10,7 @@ export default class extends OBJ {
 
     on_create(path, par) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var lv = parseInt(par);
         if (!(lv >= 0 && lv < 23)) return;
         this.name = ["当归", "芦荟", "山楂叶", "金银花", "石楠叶", "柴胡", "熟地黄", "沉香", "茯苓",

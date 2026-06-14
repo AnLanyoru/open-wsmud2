@@ -23,7 +23,7 @@ export default class extends OBJ {
 
     on_create(path, par) {
         if (!par) return;
-        par = par.substr(1);
+        par = par.slice(1);
         var skill = SKILL.get(par);
         if (!skill) return;
         this.skill = skill.id;

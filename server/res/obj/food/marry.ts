@@ -1,3 +1,4 @@
+import type { CHARACTER } from "../../../core/char/character.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -11,8 +12,9 @@ export default class extends OBJ {
     allow_fight = true;
     distype = "buff";
     transable = true;
+    level: number;
 
-    on_use(me) {
+    on_use(me: CHARACTER) {
         if (this.grade < 3) {
             var pname = ["fy_per", "zj_per", "gj_per",
                 "ds_per", "mz_per", "add_sh_per",
@@ -51,7 +53,7 @@ export default class extends OBJ {
         var lv = 0;
 
         if (par) {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
             if (!(lv > 0 && lv < 15)) lv = 0;
         }
         this.grade = parseInt(lv / 3) + 1;
@@ -71,7 +73,7 @@ export default class extends OBJ {
             this.distype = "hp";
         } else if (this.grade == 5) {
             this.desc += "吃了后会恢复你大量精力。";
-            this.distype = null;
+            this.distype = '';
         }
         this.value = this.grade * 1000;
     }

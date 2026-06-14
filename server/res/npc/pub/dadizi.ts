@@ -22,7 +22,7 @@ export default class extends NPC {
 
     on_create(path, par) {
         if (!par) return;
-        this.family = FAMILIES[par.substr(1)];
+        this.family = FAMILIES[par.slice(1)];
         this.init_from(this.family);
         if (this.family == FAMILIES.EMEI) {
             this.gender = 2;

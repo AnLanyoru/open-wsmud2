@@ -18,7 +18,7 @@ export default class extends COMMAND {
         if (str.length > 200) return me.notify("你说的太多了。");
         var msg = "";
         if (str[0] == "*") {
-            str = str.substr(1);
+            str = str.slice(1);
             msg = WORLD.COMMANDS["emote"].enter(me, str);
             if (msg) {
                 return me.send_team(JSON.stringify({type: "msg", ch: "tm", content: msg, uid: me.id}));

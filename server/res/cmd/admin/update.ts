@@ -49,8 +49,8 @@ export default class extends COMMAND {
             this.notify(me, "路径不合理");
             return Promise.resolve();
         }
-        var path = __PATH.WORLD + arg.substr(0, index + 1);
-        var fname = arg.substr(index + 1);
+        var path = __PATH.WORLD + arg.slice(0, index + 1);
+        var fname = arg.slice(index + 1);
         return BASE.UPDATE(path, fname).then(() => {
             BASE.CREATE(path, fname);
         });

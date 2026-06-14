@@ -23,7 +23,7 @@ export default class extends OBJ {
         if (!par) {
             this.path = path + "#0";
         } else {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
         }
         if (!(lv >= 0 && lv < 5)) return;
         this.grade = lv + 1;
