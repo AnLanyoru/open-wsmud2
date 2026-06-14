@@ -21,7 +21,6 @@
 ├── www/              # 前端构建产物（Vite 输出）
 ├── data/             # 数据库与数据文件（SQLite）
 ├── scripts/          # 部署脚本（打包、自动部署、启停）
-├── tools/            # 辅助工具脚本
 ├── web.js            # Web 服务器入口
 ├── main.mjs          # 游戏服务器入口
 ├── config.js         # 配置加载
