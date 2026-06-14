@@ -237,9 +237,9 @@ function query_damage(this: NPC) {
         if (user) {
             str.push(user.name);
             str.push("：");
-            str.push(this.damages![key]);
+            str.push(this.damages[key].toString());
             str.push("==");
-            str.push(parseInt(this.damages![key] * 100 / this.max_hp).toString());
+            str.push(parseInt(this.damages[key] * 100 / this.max_hp).toString());
             str.push("%\n");
         }
     }

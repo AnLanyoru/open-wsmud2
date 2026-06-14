@@ -22,8 +22,8 @@ export interface EventItem {
     command?: string;
     /** 检查玩家是否可参与 — 返回 true 表示该玩家可见此活动 */
     check?: (user: USER) => boolean;
-    /** 活动按钮点击回调 — 触发时机：玩家在活动面板中点击该活动按钮时 */
-    on_command?: (me: USER) => void;
+    /** 活动按钮点击回调 — 触发时机：玩家在活动面板中点击该活动按钮时 返回true则在回调后隐藏活动 */
+    on_command?: (me: USER, ...params: string[]) => void | boolean;
 
     /** 查询活动描述（由 EVENTS.add 通过 EVENT_BASE 原型注入默认实现） */
     query_desc?(me?: USER): string;

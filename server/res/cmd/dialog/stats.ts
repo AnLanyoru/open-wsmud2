@@ -63,7 +63,7 @@ export default class extends COMMAND {
 
     }
 
-    render_item(me: CHARACTER, cache: Record<string, UserStatsInst | undefined>, fam?: string, index?: string): void {
+    render_item(me: CHARACTER, cache: Record<string, UserStats | undefined>, fam?: string, index?: string): void {
         if (!fam) fam = "all";
         const stats = cache[fam];
 
@@ -83,10 +83,10 @@ export default class extends COMMAND {
     renderExp(me: CHARACTER, fam?: string): void {
         let stype = fam;
         if (!stype) stype = "all";
-        let stats: UserStatsInst | undefined = EXP_STATS[stype];
+        let stats: UserStats | undefined = EXP_STATS[stype];
 
         if (!stats) {
-            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+            stats = new UserStats(
                 (me: CHARACTER, item: { value: number }) => {
                     return me.exp < item.value
                 },
@@ -110,10 +110,10 @@ export default class extends COMMAND {
     renderMoney(me: CHARACTER, fam?: string): void {
         let stype = fam;
         if (!stype) stype = "all";
-        let stats: UserStatsInst | undefined = MONEY_STATS[stype];
+        let stats: UserStats | undefined = MONEY_STATS[stype];
 
         if (!stats) {
-            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+            stats = new UserStats(
                 (me: CHARACTER, item: { value: number }) => {
                     return me.money < item.value
                 },
@@ -149,10 +149,10 @@ export default class extends COMMAND {
     renderMP(me: CHARACTER, fam?: string): void {
         let stype = fam;
         if (!stype) stype = "all";
-        let stats: UserStatsInst | undefined = MP_STATS[stype];
+        let stats: UserStats | undefined = MP_STATS[stype];
 
         if (!stats) {
-            stats = new (UserStats as unknown as new (...args: any[]) => UserStatsInst)(
+            stats = new UserStats(
                 (me: CHARACTER, item: { value: number }) => {
                     return me.max_mp < item.value
                 },
@@ -290,89 +290,86 @@ interface UserStatsResult {
     name: string;
 }
 
-interface UserStatsInst {
-    result: UserStatsResult[] | null;
-    cache: string | null;
-    time: number;
+const EXP_STATS: Record<string, UserStats | undefined> = {};
+const MONEY_STATS: Record<string, UserStats | undefined> = {};
+const MP_STATS: Record<string, UserStats | undefined> = {};
+
+class UserStats {
+    result: UserStatsResult[] | null = null;
+    cache: string | null = null;
+    time: number = 0;
     lessThan: (me: CHARACTER | USER, item: UserStatsResult) => boolean;
     addItem: (me: CHARACTER | USER) => UserStatsResult;
-    maxCount: number;
-    type: string | null;
+    maxCount: number = 20;
+    type: string | null = null;
     fam: string | undefined;
-    formatter: (this: void, value: number) => string;
-    isExpire: () => boolean;
-    order: (append?: string) => void;
-    queue: (me: CHARACTER | USER) => void;
-}
 
-const EXP_STATS: Record<string, UserStatsInst | undefined> = {};
-const MONEY_STATS: Record<string, UserStatsInst | undefined> = {};
-const MP_STATS: Record<string, UserStatsInst | undefined> = {};
+    constructor(
+        order: (me: CHARACTER, item: UserStatsResult) => boolean,
+        added: (me: CHARACTER) => UserStatsResult,
+    ) {
+        this.lessThan = order;
+        this.addItem = added;
+    }
 
-function UserStats(this: UserStatsInst, order: (me: CHARACTER, item: UserStatsResult) => boolean, added: (me: CHARACTER) => UserStatsResult): void {
-    this.result = null;
-    this.cache = null;
-    this.time = 0;
-    this.lessThan = order;
-    this.addItem = added;
-    this.maxCount = 20;
-    this.type = null;
-}
+    formatter(val: number): string {
+        return String(val);
+    }
 
-UserStats.prototype.formatter = function (this: UserStatsInst, val: number): string {
-    return String(val);
-};
-UserStats.prototype.isExpire = function (this: UserStatsInst): boolean {
-    return Date.now() - this.time > 0;
-};
-UserStats.prototype.order = function (this: UserStatsInst, append?: string): void {
-    this.result = [];
-    this.time = Date.now() + 60000;
-    let fam = this.fam;
-    if (fam) fam = fam.toUpperCase();
-    for (let i = 0; i < WORLD.USERS.length; i++) {
-        const user = WORLD.USERS[i];
-        if (user.user_level > 4) continue;
-        if (fam && user.family!.id !== fam)
-            continue;
-        this.queue(user);
+    isExpire(): boolean {
+        return Date.now() - this.time > 0;
     }
-    const str: string[] = ['{"type":"dialog","dialog":"stats","items":['];
-    for (let i = 0; i < this.result!.length; i++) {
-        const u = this.result![i];
-        if (i > 0) str.push(",");
-        str.push('["', u.name, '",', this.formatter(u.value), ']');
-    }
-    str.push(']');
-    str.push(',"time":', String(Date.now()), '');
-    str.push(',"st":"', this.type ?? '', '"', append ?? "");
-    str.push(',"fam":"', this.fam ?? '', '"');
 
-    str.push("}");
-    this.cache = str.join("");
-};
-UserStats.prototype.queue = function (this: UserStatsInst, me: CHARACTER | USER): void {
-    let index = this.result!.length - 1;
-    if (index < 0) {
-        this.result!.push(this.addItem(me));
-        return;
-    }
-    let user = this.result![index];
-    if (this.result!.length >= this.maxCount && this.lessThan(me, user)) {
-        return;
-    }
-    while (index >= 0) {
-        user = this.result![index];
-        if (this.lessThan(me, user)) {
-            this.result!.splice(index + 1, 0, this.addItem(me));
-            break;
+    order(append?: string): void {
+        this.result = [];
+        this.time = Date.now() + 60000;
+        let fam = this.fam;
+        if (fam) fam = fam.toUpperCase();
+        for (let i = 0; i < WORLD.USERS.length; i++) {
+            const user = WORLD.USERS[i];
+            if (user.user_level > 4) continue;
+            if (fam && user.family!.id !== fam)
+                continue;
+            this.queue(user);
         }
-        index--;
+        const str: string[] = ['{"type":"dialog","dialog":"stats","items":['];
+        for (let i = 0; i < this.result!.length; i++) {
+            const u = this.result![i];
+            if (i > 0) str.push(",");
+            str.push('["', u.name, '",', this.formatter(u.value), ']');
+        }
+        str.push(']');
+        str.push(',"time":', String(Date.now()), '');
+        str.push(',"st":"', this.type ?? '', '"', append ?? "");
+        str.push(',"fam":"', this.fam ?? '', '"');
+
+        str.push("}");
+        this.cache = str.join("");
     }
-    if (index < 0) {
-        this.result!.splice(0, 0, this.addItem(me));
+
+    queue(me: CHARACTER | USER): void {
+        let index = this.result!.length - 1;
+        if (index < 0) {
+            this.result!.push(this.addItem(me));
+            return;
+        }
+        let user = this.result![index];
+        if (this.result!.length >= this.maxCount && this.lessThan(me, user)) {
+            return;
+        }
+        while (index >= 0) {
+            user = this.result![index];
+            if (this.lessThan(me, user)) {
+                this.result!.splice(index + 1, 0, this.addItem(me));
+                break;
+            }
+            index--;
+        }
+        if (index < 0) {
+            this.result!.splice(0, 0, this.addItem(me));
+        }
+        if (this.result!.length >= this.maxCount) {
+            this.result!.length = this.maxCount;
+        }
     }
-    if (this.result!.length >= this.maxCount) {
-        this.result!.length = this.maxCount;
-    }
-};
+}

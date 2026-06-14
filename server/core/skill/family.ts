@@ -419,8 +419,8 @@ export class FAMILY extends BASE {
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: "进入战场",
-            check: (me: Record<string, any>) => me.family === this,
-            on_command: function (me: Record<string, any>) {
+            check: (me: USER) => me.family === this,
+            on_command: function (me: USER) {
                 me.do_command('goto', 'fam3');
             }
         }

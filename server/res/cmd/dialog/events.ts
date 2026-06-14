@@ -12,14 +12,14 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, paras) {
+    enter(me, type, params) {
         let events = WORLD.USER_EVENTS;
         if (type) {
             for (let i = 0; i < events.length; i++) {
                 let evt = events[i];
                 if (evt.id === type) {
-                    if (this.check_command(me, evt)) {  // todo 旧代码是 check_command(evt, me)
-                        if (evt.on_command?.(me, paras)) {
+                    if (this.check_command(me, evt)) {
+                        if (evt.on_command?.(me, params)) {
                             me.send('{type:"dialog",dialog:"events",close:true}');
                         }
                     }
