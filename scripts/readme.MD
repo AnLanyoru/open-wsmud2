@@ -1,90 +1,84 @@
-# open-wsmud2 脚本使用指南
+# open-wsmud2 部署脚本使用指南
 
 ## 目录结构
 
 ```
 scripts/
 ├── readme.MD                          ← 本文件
-├── 首次部署/                           ← 首次部署：生成部署包 & 自动部署
-│   ├── linux/
-│   │   ├── 打包生成部署包.sh            → 编译+打包 → fast_start.tar
-│   │   └── 放置在部署包同目录启动自动部署.sh → 解压+安装+启动
-│   ├── mac/
-│   │   ├── 打包生成部署包.sh
-│   │   └── 放置在部署包同目录启动自动部署.sh
-│   └── windows/
-│       ├── 打包生成部署包.bat
-│       └── 放置在部署包同目录启动自动部署.bat
-├── 打包资源/                           ← 后续更新：生成更新包 & 自动更新
-│   ├── linux/
-│   │   ├── 打包生成更新包.sh            → 编译+打包(不含依赖) → release.tar
-│   │   └── 放置在更新包同目录启动自动更新资源.sh → 解压覆盖+重启
-│   ├── mac/
-│   │   ├── 打包生成更新包.sh
-│   │   └── 放置在更新包同目录启动自动更新资源.sh
-│   └── windows/
-│       ├── 打包生成更新包.bat
-│       └── 放置在更新包同目录启动自动更新资源.bat
-└── 启动脚本/                           ← 日常维护：重启服务
-    ├── readme.MD
-    ├── linux/start.sh
-    ├── mac/start.sh
-    └── windows/start.bat
+├── lib/
+│   └── common.sh                      ← 共享函数库
+├── unix/                              ← macOS / Linux
+│   ├── 打包生成部署包.sh                → fast_start.tar
+│   ├── 自动部署.sh                     → 解压+安装+启动
+│   ├── 打包生成更新包.sh                → release.tar
+│   ├── 自动更新.sh                     → 解压+重启
+│   ├── start.sh / stop.sh / restart.sh
+├── windows/                           ← Windows
+│   ├── 打包生成部署包.bat / 自动部署.bat
+│   ├── 打包生成更新包.bat / 自动更新.bat
+│   └── start.bat / stop.bat / restart.bat
+├── 首次部署/                           ← [已弃用]
+├── 打包资源/                           ← [已弃用]
+└── 启动脚本/                           ← [已弃用]
 ```
 
-## 使用流程
+## 包内容
 
-### 一、首次部署
+| 包名 | 内容 |
+|------|------|
+| `fast_start.tar` | 代码 + 资源 + `package.json` + `package-lock.json`，不含 `node_modules` 和 `.env` |
+| `release.tar` | 同上 |
 
-**在开发机上：**
+`node_modules` 不在包内，由目标服务器 `npm ci --production` 本地编译（`better-sqlite3` 是原生模块）。
+
+## 前置条件
+
+目标服务器需要 Node.js 18+ 及 C++ 编译工具：
+
+| 平台 | 编译工具 |
+|------|---------|
+| Linux | `apt install build-essential` 或 `yum install gcc-c++ make` |
+| macOS | `xcode-select --install` |
+| Windows | `npm install -g windows-build-tools` 或 Visual Studio Build Tools |
+
+## 一、首次部署
+
+**开发机打包：**
 ```bash
-# 根据目标服务器平台选择：
-bash scripts/首次部署/linux/打包生成部署包.sh
+bash scripts/unix/打包生成部署包.sh      # macOS / Linux
+scripts\windows\打包生成部署包.bat        # Windows
 ```
-执行后在同目录下生成 `fast_start.tar`（包含完整运行环境 + 依赖）。
 
-**将以下两个文件复制到服务器同一目录：**
+**复制到服务器（放在同一目录）：**
 - `fast_start.tar`
-- `放置在部署包同目录启动自动部署.sh`（或 `.bat`）
+- `unix/自动部署.sh`（或 `windows/自动部署.bat`）
 
-**在服务器上：**
+**服务器上运行：**
 ```bash
-bash 放置在部署包同目录启动自动部署.sh
+bash 自动部署.sh
 ```
-脚本会自动解压、安装依赖并启动服务。
 
-### 二、后续更新（游戏内容/代码更新）
+## 二、更新资源
 
-**在开发机上：**
+**开发机打包：**
 ```bash
-bash scripts/打包资源/linux/打包生成更新包.sh
+bash scripts/unix/打包生成更新包.sh
+scripts\windows\打包生成更新包.bat
 ```
-执行后在同目录下生成 `release.tar`（仅代码资源，不含 node_modules）。
 
-**将以下两个文件复制到服务器部署目录：**
+**复制到服务器（放在同一目录）：**
 - `release.tar`
-- `放置在更新包同目录启动自动更新资源.sh`
+- `unix/自动更新.sh`（或 `windows/自动更新.bat`）
 
-**在服务器上：**
+**服务器上运行：**
 ```bash
-bash 放置在更新包同目录启动自动更新资源.sh
-```
-脚本会自动解压覆盖旧文件并重启服务。
-
-### 三、日常重启
-
-如果只是重启服务（不更新代码），使用 `启动脚本/` 下的脚本：
-```bash
-bash scripts/启动脚本/linux/start.sh
+bash 自动更新.sh
 ```
 
-## 包内容说明
+## 三、日常维护
 
-| 包名 | 用途 | 含 node_modules | 含 TS 源码 |
-|------|------|:---:|:---:|
-| `fast_start.tar` | 首次部署 | ✓ | ✗ |
-| `release.tar` | 后续更新 | ✗ | ✗ |
-
-## 平台对应
-
-打包和部署必须使用与服务器相同平台的脚本，因为 `better-sqlite3` 等原生模块是平台相关的。
+```bash
+bash scripts/unix/start.sh              # 启动
+bash scripts/unix/stop.sh               # 停止
+bash scripts/unix/restart.sh            # 重启
+```
