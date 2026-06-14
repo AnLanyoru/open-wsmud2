@@ -324,7 +324,7 @@ export class CHARACTER extends ITEM {
     // ============ 环境与交互 ============
 
     /** 当前所在房间 */
-    environment: RoomClass;
+    environment?: RoomClass;
     /** 当前活动状态 */
     state: any = null;
     /** 等待用户输入的回调 */
