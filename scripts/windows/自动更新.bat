@@ -1,30 +1,29 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 :: ==============================================
-::   放置在更新包同目录 — 自动更新资源 (Windows)
-::   解压 release.tar 覆盖到当前目录并重启
+::   �����ڸ��°�ͬĿ¼ �� �Զ�������Դ (Windows)
+::   ��ѹ release.tar ���ǵ���ǰĿ¼������
 :: ==============================================
 
 set "SCRIPT_DIR=%~dp0"
 set "PACKAGE_NAME=release.tar"
 
 echo ============================================
-echo   自动更新资源 open-wsmud2 (Windows)
+echo   �Զ�������Դ open-wsmud2 (Windows)
 echo ============================================
 echo.
 
-:: --- 检查/安装 Node.js ---
+:: --- ���/��װ Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [WARN] 未检测到 Node.js，尝试自动安装...
+    echo [WARN] δ��⵽ Node.js�������Զ���װ...
 
     where winget >nul 2>nul
     if %errorlevel% equ 0 (
-        echo [INFO] 通过 winget 安装 Node.js...
+        echo [INFO] ͨ�� winget ��װ Node.js...
         winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
         if %errorlevel% equ 0 (
-            echo [INFO] Node.js 安装完成，请重新运行本脚本
+            echo [INFO] Node.js ��װ��ɣ����������б��ű�
             pause
             exit /b 0
         )
@@ -32,30 +31,30 @@ if %errorlevel% neq 0 (
 
     where choco >nul 2>nul
     if %errorlevel% equ 0 (
-        echo [INFO] 通过 Chocolatey 安装 Node.js...
+        echo [INFO] ͨ�� Chocolatey ��װ Node.js...
         choco install nodejs-lts -y
         if %errorlevel% equ 0 (
-            echo [INFO] Node.js 安装完成，请重新运行本脚本
+            echo [INFO] Node.js ��װ��ɣ����������б��ű�
             pause
             exit /b 0
         )
     )
 
-    echo [ERROR] 无法自动安装 Node.js
-    echo   请手动下载安装: https://nodejs.org/
+    echo [ERROR] �޷��Զ���װ Node.js
+    echo   ���ֶ����ذ�װ: https://nodejs.org/
     pause
     exit /b 1
 )
 
-:: --- 检查更新包 ---
+:: --- �����°� ---
 if not exist "%SCRIPT_DIR%%PACKAGE_NAME%" (
-    echo [ERROR] 未找到 %PACKAGE_NAME%
-    echo   请确保本脚本与 %PACKAGE_NAME% 在同一目录下。
+    echo [ERROR] δ�ҵ� %PACKAGE_NAME%
+    echo   ��ȷ�����ű��� %PACKAGE_NAME% ��ͬһĿ¼�¡�
     pause
     exit /b 1
 )
 
-:: --- 备份关键文件 ---
+:: --- ���ݹؼ��ļ� ---
 for /f "tokens=1-4 delims=/-: " %%a in ('echo %date% %time%') do (
     set "TIMESTAMP=%%a%%b%%c-%%d"
 )
@@ -64,61 +63,61 @@ mkdir "!BACKUP_DIR!" 2>nul
 
 if exist "%SCRIPT_DIR%.env" (
     copy "%SCRIPT_DIR%.env" "!BACKUP_DIR!\" >nul
-    echo [INFO] 已备份 .env
+    echo [INFO] �ѱ��� .env
 )
 if exist "%SCRIPT_DIR%config.js" (
     copy "%SCRIPT_DIR%config.js" "!BACKUP_DIR!\" >nul
-    echo [INFO] 已备份 config.js
+    echo [INFO] �ѱ��� config.js
 )
 if exist "%SCRIPT_DIR%package.json" (
     copy "%SCRIPT_DIR%package.json" "!BACKUP_DIR!\" >nul
 )
 
-:: --- 解压覆盖 ---
+:: --- ��ѹ���� ---
 echo.
-echo [1/2] 解压 %PACKAGE_NAME% (覆盖现有文件)...
+echo [1/2] ��ѹ %PACKAGE_NAME% (���������ļ�)...
 cd /d "%SCRIPT_DIR%"
 tar -xf "%PACKAGE_NAME%"
 if %errorlevel% neq 0 (
-    echo [ERROR] 解压失败！
+    echo [ERROR] ��ѹʧ�ܣ�
     pause
     exit /b %errorlevel%
 )
-echo   更新完成。
+echo   ������ɡ�
 
-:: --- 还原 .env ---
+:: --- ��ԭ .env ---
 if exist "!BACKUP_DIR!\.env" (
     copy /Y "!BACKUP_DIR!\.env" "%SCRIPT_DIR%" >nul
-    echo   .env 已从备份还原
+    echo   .env �Ѵӱ��ݻ�ԭ
 )
 
-:: --- 同步依赖 (更新可能引入新包，确保原生模块正确) ---
+:: --- ͬ������ (���¿��������°���ȷ��ԭ��ģ����ȷ) ---
 echo.
-echo 同步依赖...
+echo ͬ������...
 if exist "%SCRIPT_DIR%package-lock.json" (
     call npm ci --production 2>nul || call npm install --production
 ) else (
     call npm install --production
 )
-echo   依赖就绪。
+echo   ����������
 
-:: --- 重启服务 ---
+:: --- �������� ---
 echo.
-echo [2/2] 重启服务...
+echo [2/2] ��������...
 
-:: 停止旧进程
-echo 停止旧服务...
+:: ֹͣ�ɽ���
+echo ֹͣ�ɷ���...
 taskkill /f /im node.exe 2>nul
 timeout /t 2 /nobreak >nul
 echo.
 
-:: 启动服务
-echo 启动 Web 服务器 (http://localhost:8088)...
+:: ��������
+echo ���� Web ������ (http://localhost:8088)...
 start "open-wsmud Web" /B node "%SCRIPT_DIR%web.js"
 
-echo 启动游戏服务器...
+echo ������Ϸ������...
 node "%SCRIPT_DIR%main.mjs"
 
 echo.
-echo 服务已停止。
+echo ������ֹͣ��
 pause

@@ -7,6 +7,7 @@ www/
 data/100/
 data/def/
 .idea/
+.vscode/
 old/
 os/
 world/

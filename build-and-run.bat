@@ -15,7 +15,7 @@ echo.
 
 echo [2/3] Deploying...
 echo   - core -^> os/
-echo   - res  -^> world/ (è·¯å¾„é‡å†™: core/ -^> os/)
+echo   - res  -^> world/ (Â·¾¶ÖØÐ´: core/ -^> os/)
 node scripts/deploy.mjs
 if %errorlevel% neq 0 (
     echo Deploy failed!

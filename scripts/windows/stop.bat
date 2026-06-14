@@ -1,21 +1,20 @@
 @echo off
-chcp 65001 >nul
 :: ==============================================
-::   open-wsmud2 停止脚本 (Windows)
+::   open-wsmud2 ֹͣ�ű� (Windows)
 :: ==============================================
 
 echo ============================================
-echo   停止 open-wsmud2 服务
+echo   ֹͣ open-wsmud2 ����
 echo ============================================
 echo.
 
-echo 停止所有 node.exe 进程...
+echo ֹͣ���� node.exe ����...
 taskkill /f /im node.exe 2>nul
 
 if %errorlevel% equ 0 (
-    echo [INFO] 服务已停止。
+    echo [INFO] ������ֹͣ��
 ) else (
-    echo [INFO] 没有运行中的 node 进程。
+    echo [INFO] û�������е� node ���̡�
 )
 
 echo.

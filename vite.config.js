@@ -8,7 +8,7 @@ const hasProtocol = raw.includes('://');
 const startupUrl = `${hasProtocol ? raw : 'http://' + raw}:${process.env.WEB_PORT || '8088'}`;
 
 export default defineConfig({
-    root: './src/',
+    root: './web/',
     publicDir: false,
     build: {
         outDir: '../www/',

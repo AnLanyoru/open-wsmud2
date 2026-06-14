@@ -1,9 +1,8 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 :: ==============================================
-::   æ‰“åŒ…é¦–æ¬¡éƒ¨ç½²èµ„æºåŒ… (Windows)
-::   ç¼–è¯‘ â†’ éƒ¨ç½² â†’ æ‰“åŒ… â†’ fast_start.tar
+::   ´ò°üÊ×´Î²¿Êğ×ÊÔ´°ü (Windows)
+::   ±àÒë -> ²¿Êğ -> ´ò°ü -> fast_start.tar
 :: ==============================================
 
 set "SCRIPT_DIR=%~dp0"
@@ -12,78 +11,78 @@ set "OUTPUT_DIR=%SCRIPT_DIR%"
 set "PACKAGE_NAME=fast_start.tar"
 
 echo ============================================
-echo   æ‰“åŒ…é¦–æ¬¡éƒ¨ç½²èµ„æºåŒ… (Windows)
-echo   è¾“å‡º: %PACKAGE_NAME%
+echo   ´ò°üÊ×´Î²¿Êğ×ÊÔ´°ü (Windows)
+echo   Êä³ö: %PACKAGE_NAME%
 echo ============================================
 echo.
 
-:: --- æ£€æŸ¥ Node.js ---
+:: --- ¼ì²é Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] æœªæ‰¾åˆ° Node.jsï¼Œè¯·å…ˆå®‰è£… Node.js 18+
+    echo [ERROR] Î´ÕÒµ½ Node.js£¬ÇëÏÈ°²×° Node.js 18+
     pause
     exit /b 1
 )
 echo [INFO] Node.js
 node -v
 
-:: --- 0. åˆ‡æ¢åˆ°é¡¹ç›®æ ¹ ---
+:: --- 0. ÇĞ»»µ½ÏîÄ¿¸ù ---
 cd /d "%PROJECT_ROOT%"
 if not exist "package.json" (
-    echo [ERROR] æœªæ‰¾åˆ° package.jsonï¼Œè¯·ç¡®è®¤ PROJECT_ROOT è·¯å¾„æ­£ç¡®
+    echo [ERROR] Î´ÕÒµ½ package.json£¬ÇëÈ·ÈÏ PROJECT_ROOT Â·¾¶ÕıÈ·
     pause
     exit /b 1
 )
 
-:: --- 1. å®‰è£…ä¾èµ– ---
+:: --- 1. °²×°ÒÀÀµ ---
 echo.
-echo [1/5] å®‰è£…ä¾èµ–...
+echo [1/5] °²×°ÒÀÀµ...
 call npm install
 if %errorlevel% neq 0 (
-    echo [ERROR] ä¾èµ–å®‰è£…å¤±è´¥ï¼
+    echo [ERROR] ÒÀÀµ°²×°Ê§°Ü£¡
     pause
     exit /b %errorlevel%
 )
 echo.
 
-:: --- 2. ç¼–è¯‘ TypeScript ---
-echo [2/5] ç¼–è¯‘ TypeScript...
+:: --- 2. ±àÒë TypeScript ---
+echo [2/5] ±àÒë TypeScript...
 cd /d "%PROJECT_ROOT%\server"
 call npx tsc --outDir dist
 if %errorlevel% neq 0 (
-    echo [WARN] å­˜åœ¨ç±»å‹é”™è¯¯ï¼ŒJS è¾“å‡ºæ­£å¸¸ï¼Œç»§ç»­...
+    echo [WARN] ´æÔÚÀàĞÍ´íÎó£¬JS Êä³öÕı³££¬¼ÌĞø...
 )
 cd /d "%PROJECT_ROOT%"
 echo.
 
-:: --- 3. è¿è¡Œéƒ¨ç½² ---
-echo [3/5] è¿è¡Œéƒ¨ç½² (core â†’ os/, res â†’ world/)...
+:: --- 3. ÔËĞĞ²¿Êğ ---
+echo [3/5] ÔËĞĞ²¿Êğ (core -> os/, res -> world/)...
 node server\scripts\deploy.mjs
 if %errorlevel% neq 0 (
-    echo [ERROR] éƒ¨ç½²å¤±è´¥ï¼
+    echo [ERROR] ²¿ÊğÊ§°Ü£¡
     pause
     exit /b %errorlevel%
 )
 echo.
 
-:: --- 4. æ„å»ºå‰ç«¯ ---
-echo [4/5] æ„å»ºå‰ç«¯...
+:: --- 4. ¹¹½¨Ç°¶Ë ---
+echo [4/5] ¹¹½¨Ç°¶Ë...
 call npx vite build
 if %errorlevel% neq 0 (
-    echo [ERROR] å‰ç«¯æ„å»ºå¤±è´¥ï¼
+    echo [ERROR] Ç°¶Ë¹¹½¨Ê§°Ü£¡
     pause
     exit /b %errorlevel%
 )
 echo.
 
-:: --- 5. æ‰“åŒ… ---
-echo [5/5] æ‰“åŒ… %PACKAGE_NAME% ...
+:: --- 5. ´ò°ü ---
+echo [5/5] ´ò°ü %PACKAGE_NAME% ...
 cd /d "%PROJECT_ROOT%"
 
-:: æ¸…ç†æ—§åŒ…
+:: ÇåÀí¾É°ü
 if exist "%OUTPUT_DIR%%PACKAGE_NAME%" del "%OUTPUT_DIR%%PACKAGE_NAME%"
 
-:: æ³¨æ„: ä¸æ‰“åŒ… node_modules/ (better-sqlite3 æ˜¯åŸç”Ÿæ¨¡å—ï¼Œéœ€åœ¨ç›®æ ‡æœºå™¨ä¸Šç¼–è¯‘)
+:: ×¢Òâ: ²»´ò°ü node_modules/ (better-sqlite3 ÊÇÔ­ÉúÄ£¿é£¬ĞèÔÚÄ¿±ê»úÆ÷ÉÏ±àÒë)
 tar -cf "%OUTPUT_DIR%%PACKAGE_NAME%" ^
     web.js main.mjs config.js ^
     package.json package-lock.json ^
@@ -106,22 +105,22 @@ tar -cf "%OUTPUT_DIR%%PACKAGE_NAME%" ^
     2>nul
 
 if %errorlevel% neq 0 (
-    echo [ERROR] æ‰“åŒ…å¤±è´¥ï¼
+    echo [ERROR] ´ò°üÊ§°Ü£¡
     pause
     exit /b %errorlevel%
 )
 
 echo.
 echo ============================================
-echo   âœ“ æ‰“åŒ…å®Œæˆ
+echo   [OK] ´ò°üÍê³É
 echo   %OUTPUT_DIR%%PACKAGE_NAME%
 echo.
-echo   æ³¨æ„: ä¸å« node_modules/ (better-sqlite3 æ˜¯åŸç”Ÿæ¨¡å—)
-echo   ç›®æ ‡æœåŠ¡å™¨éœ€å…·å¤‡ Node.js + ç¼–è¯‘å·¥å…·
+echo   ×¢Òâ: ²»º¬ node_modules/ (better-sqlite3 ÊÇÔ­ÉúÄ£¿é)
+echo   Ä¿±ê·şÎñÆ÷Ğè¾ß±¸ Node.js + ±àÒë¹¤¾ß
 echo.
-echo   éƒ¨ç½²æ–¹æ³•ï¼š
-echo   1. å°† fast_start.tar ä¸ windows\è‡ªåŠ¨éƒ¨ç½².bat
-echo      ä¸€åŒå¤åˆ¶åˆ°æœåŠ¡å™¨ç›®æ ‡ç›®å½•
-echo   2. åœ¨æœåŠ¡å™¨ä¸Šè¿è¡Œ: è‡ªåŠ¨éƒ¨ç½².bat
+echo   ²¿Êğ·½·¨£º
+echo   1. ½« fast_start.tar Óë windows\×Ô¶¯²¿Êğ.bat
+echo      Ò»Í¬¸´ÖÆµ½·şÎñÆ÷Ä¿±êÄ¿Â¼
+echo   2. ÔÚ·şÎñÆ÷ÉÏÔËĞĞ: ×Ô¶¯²¿Êğ.bat
 echo ============================================
 pause

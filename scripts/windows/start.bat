@@ -1,11 +1,10 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 :: ==============================================
-::   open-wsmud2 å¯åŠ¨è„šæœ¬ (Windows)
+::   open-wsmud2 Æô¶¯½Å±¾ (Windows)
 :: ==============================================
 
-:: --- è‡ªåŠ¨å®šä½éƒ¨ç½²ç›®å½• ---
+:: --- ×Ô¶¯¶¨Î»²¿ÊğÄ¿Â¼ ---
 set "SCRIPT_DIR=%~dp0"
 if exist "%~dp0..\..\web.js" (
     set "DEPLOY_DIR=%~dp0..\.."
@@ -14,40 +13,40 @@ if exist "%~dp0..\..\web.js" (
 )
 
 echo ============================================
-echo   open-wsmud2 å¯åŠ¨ (Windows)
-echo   éƒ¨ç½²ç›®å½•: %DEPLOY_DIR%
+echo   open-wsmud2 Æô¶¯ (Windows)
+echo   ²¿ÊğÄ¿Â¼: %DEPLOY_DIR%
 echo ============================================
 echo.
 
-:: --- æ£€æŸ¥ Node.js ---
+:: --- ¼ì²é Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] æœªæ‰¾åˆ° Node.js
+    echo [ERROR] Î´ÕÒµ½ Node.js
     pause
     exit /b 1
 )
 
-:: --- æ£€æŸ¥æ–‡ä»¶ ---
+:: --- ¼ì²éÎÄ¼ş ---
 if not exist "%DEPLOY_DIR%\web.js" (
-    echo [ERROR] æœªæ‰¾åˆ° web.jsï¼Œè¯·ç¡®è®¤éƒ¨ç½²ç›®å½•æ­£ç¡®
+    echo [ERROR] Î´ÕÒµ½ web.js£¬ÇëÈ·ÈÏ²¿ÊğÄ¿Â¼ÕıÈ·
     pause
     exit /b 1
 )
 if not exist "%DEPLOY_DIR%\main.mjs" (
-    echo [ERROR] æœªæ‰¾åˆ° main.mjsï¼Œè¯·ç¡®è®¤éƒ¨ç½²ç›®å½•æ­£ç¡®
+    echo [ERROR] Î´ÕÒµ½ main.mjs£¬ÇëÈ·ÈÏ²¿ÊğÄ¿Â¼ÕıÈ·
     pause
     exit /b 1
 )
 
 cd /d "%DEPLOY_DIR%"
 
-:: --- å¯åŠ¨æœåŠ¡ ---
-echo å¯åŠ¨ Web æœåŠ¡å™¨ (http://localhost:8088)...
+:: --- Æô¶¯·şÎñ ---
+echo Æô¶¯ Web ·şÎñÆ÷ (http://localhost:8088)...
 start "open-wsmud Web" /B node web.js
 
-echo å¯åŠ¨æ¸¸æˆæœåŠ¡å™¨...
+echo Æô¶¯ÓÎÏ··şÎñÆ÷...
 node main.mjs
 
 echo.
-echo æœåŠ¡å·²åœæ­¢ã€‚
+echo ·şÎñÒÑÍ£Ö¹¡£
 pause

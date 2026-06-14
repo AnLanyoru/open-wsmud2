@@ -1,73 +1,72 @@
 @echo off
-chcp 65001 >nul
 setlocal enabledelayedexpansion
 :: ==============================================
-::   æ”¾ç½®åœ¨éƒ¨ç½²åŒ…åŒç›®å½• â€” è‡ªåŠ¨éƒ¨ç½² (Windows)
-::   è§£å‹ fast_start.tar å¹¶å¯åŠ¨æœåŠ¡
+::   ·ÅÖÃÔÚ²¿Êğ°üÍ¬Ä¿Â¼ ¡ª ×Ô¶¯²¿Êğ (Windows)
+::   ½âÑ¹ fast_start.tar ²¢Æô¶¯·şÎñ
 :: ==============================================
 
 set "SCRIPT_DIR=%~dp0"
 set "PACKAGE_NAME=fast_start.tar"
 
 echo ============================================
-echo   è‡ªåŠ¨éƒ¨ç½² open-wsmud2 (Windows)
+echo   ×Ô¶¯²¿Êğ open-wsmud2 (Windows)
 echo ============================================
 echo.
 
-:: --- æ£€æŸ¥/å®‰è£… Node.js ---
+:: --- ¼ì²é/°²×° Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [WARN] æœªæ£€æµ‹åˆ° Node.jsï¼Œå°è¯•è‡ªåŠ¨å®‰è£…...
+    echo [WARN] Î´¼ì²âµ½ Node.js£¬³¢ÊÔ×Ô¶¯°²×°...
 
-    :: æ–¹æ³•1: winget (Windows 10/11 è‡ªå¸¦)
+    :: ·½·¨1: winget (Windows 10/11 ×Ô´ø)
     where winget >nul 2>nul
     if %errorlevel% equ 0 (
-        echo [INFO] é€šè¿‡ winget å®‰è£… Node.js...
+        echo [INFO] Í¨¹ı winget °²×° Node.js...
         winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
         if %errorlevel% equ 0 (
-            echo [INFO] Node.js å®‰è£…å®Œæˆï¼Œè¯·é‡æ–°è¿è¡Œæœ¬è„šæœ¬
+            echo [INFO] Node.js °²×°Íê³É£¬ÇëÖØĞÂÔËĞĞ±¾½Å±¾
             pause
             exit /b 0
         )
     )
 
-    :: æ–¹æ³•2: choco
+    :: ·½·¨2: choco
     where choco >nul 2>nul
     if %errorlevel% equ 0 (
-        echo [INFO] é€šè¿‡ Chocolatey å®‰è£… Node.js...
+        echo [INFO] Í¨¹ı Chocolatey °²×° Node.js...
         choco install nodejs-lts -y
         if %errorlevel% equ 0 (
-            echo [INFO] Node.js å®‰è£…å®Œæˆï¼Œè¯·é‡æ–°è¿è¡Œæœ¬è„šæœ¬
+            echo [INFO] Node.js °²×°Íê³É£¬ÇëÖØĞÂÔËĞĞ±¾½Å±¾
             pause
             exit /b 0
         )
     )
 
-    :: æ— æ³•è‡ªåŠ¨å®‰è£…
-    echo [ERROR] æ— æ³•è‡ªåŠ¨å®‰è£… Node.js
-    echo   è¯·æ‰‹åŠ¨ä¸‹è½½å®‰è£…: https://nodejs.org/
+    :: ÎŞ·¨×Ô¶¯°²×°
+    echo [ERROR] ÎŞ·¨×Ô¶¯°²×° Node.js
+    echo   ÇëÊÖ¶¯ÏÂÔØ°²×°: https://nodejs.org/
     pause
     exit /b 1
 )
 echo [INFO] Node.js
 node -v
 
-:: --- ç¼–è¯‘å·¥å…·æé†’ ---
-echo [INFO] æ³¨æ„: better-sqlite3 éœ€è¦ C++ ç¼–è¯‘å·¥å…·
-echo       å¦‚å®‰è£…å¤±è´¥è¯·è¿è¡Œ: npm install -g windows-build-tools
+:: --- ±àÒë¹¤¾ßÌáĞÑ ---
+echo [INFO] ×¢Òâ: better-sqlite3 ĞèÒª C++ ±àÒë¹¤¾ß
+echo       Èç°²×°Ê§°ÜÇëÔËĞĞ: npm install -g windows-build-tools
 echo.
 
-:: --- æ£€æŸ¥éƒ¨ç½²åŒ… ---
+:: --- ¼ì²é²¿Êğ°ü ---
 if not exist "%SCRIPT_DIR%%PACKAGE_NAME%" (
-    echo [ERROR] æœªæ‰¾åˆ° %PACKAGE_NAME%
-    echo   è¯·ç¡®ä¿æœ¬è„šæœ¬ä¸ %PACKAGE_NAME% åœ¨åŒä¸€ç›®å½•ä¸‹ã€‚
+    echo [ERROR] Î´ÕÒµ½ %PACKAGE_NAME%
+    echo   ÇëÈ·±£±¾½Å±¾Óë %PACKAGE_NAME% ÔÚÍ¬Ò»Ä¿Â¼ÏÂ¡£
     pause
     exit /b 1
 )
 
-:: --- å¤‡ä»½ç°æœ‰æ–‡ä»¶ ---
+:: --- ±¸·İÏÖÓĞÎÄ¼ş ---
 if exist "%SCRIPT_DIR%web.js" (
-    echo [INFO] å¤‡ä»½ç°æœ‰éƒ¨ç½²...
+    echo [INFO] ±¸·İÏÖÓĞ²¿Êğ...
     for /f "tokens=1-4 delims=/-: " %%a in ('echo %date% %time%') do (
         set "TIMESTAMP=%%a%%b%%c-%%d"
     )
@@ -79,42 +78,42 @@ if exist "%SCRIPT_DIR%web.js" (
     for %%d in (node_modules os world www api web data) do (
         if exist "%SCRIPT_DIR%%%d" xcopy "%SCRIPT_DIR%%%d" "!BACKUP_DIR!\%%d\" /E /I /Q >nul 2>nul
     )
-    echo [INFO] å¤‡ä»½åˆ°: !BACKUP_DIR!
+    echo [INFO] ±¸·İµ½: !BACKUP_DIR!
 )
 
-:: --- è§£å‹ ---
+:: --- ½âÑ¹ ---
 echo.
-echo [1/3] è§£å‹ %PACKAGE_NAME% ...
+echo [1/3] ½âÑ¹ %PACKAGE_NAME% ...
 cd /d "%SCRIPT_DIR%"
 tar -xf "%PACKAGE_NAME%"
 if %errorlevel% neq 0 (
-    echo [ERROR] è§£å‹å¤±è´¥ï¼ŒåŒ…å¯èƒ½å·²æŸåï¼
+    echo [ERROR] ½âÑ¹Ê§°Ü£¬°ü¿ÉÄÜÒÑËğ»µ£¡
     pause
     exit /b %errorlevel%
 )
-echo   è§£å‹å®Œæˆã€‚
+echo   ½âÑ¹Íê³É¡£
 echo.
 
-:: --- å®‰è£…ä¾èµ– (å§‹ç»ˆæ‰§è¡Œï¼Œç¡®ä¿åŸç”Ÿæ¨¡å—ç¼–è¯‘æ­£ç¡®) ---
-echo [2/3] å®‰è£…ä¾èµ– (ç›®æ ‡å¹³å°åŸç”Ÿç¼–è¯‘)...
+:: --- °²×°ÒÀÀµ (Ê¼ÖÕÖ´ĞĞ£¬È·±£Ô­ÉúÄ£¿é±àÒëÕıÈ·) ---
+echo [2/3] °²×°ÒÀÀµ (Ä¿±êÆ½Ì¨Ô­Éú±àÒë)...
 if exist "%SCRIPT_DIR%package-lock.json" (
     call npm ci --production 2>nul || call npm install --production
 ) else (
     call npm install --production
 )
-echo   ä¾èµ–å°±ç»ªã€‚
+echo   ÒÀÀµ¾ÍĞ÷¡£
 echo.
 
-:: --- å¯åŠ¨æœåŠ¡ ---
-echo [3/3] å¯åŠ¨æœåŠ¡...
+:: --- Æô¶¯·şÎñ ---
+echo [3/3] Æô¶¯·şÎñ...
 echo.
 
-echo å¯åŠ¨ Web æœåŠ¡å™¨ (http://localhost:8088)...
+echo Æô¶¯ Web ·şÎñÆ÷ (http://localhost:8088)...
 start "open-wsmud Web" /B node "%SCRIPT_DIR%web.js"
 
-echo å¯åŠ¨æ¸¸æˆæœåŠ¡å™¨...
+echo Æô¶¯ÓÎÏ··şÎñÆ÷...
 node "%SCRIPT_DIR%main.mjs"
 
 echo.
-echo æœåŠ¡å·²åœæ­¢ã€‚
+echo ·şÎñÒÑÍ£Ö¹¡£
 pause
