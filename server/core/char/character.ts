@@ -5,7 +5,7 @@
 // Legacy JS runtime imports (will be replaced during migration)
 import {ITEM} from '../item.js';
 import {OBJ} from '../item/obj.js';
-import {SKILL} from '../skill/skill.js';
+import {SKILL, SkillItem} from '../skill/skill.js';
 import {WORLD} from '../world.js';
 import {UTIL} from '../util.js';
 import {WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES} from '../const.js';
@@ -1070,7 +1070,7 @@ export class CHARACTER extends ITEM {
     /**
      * 批量设置技能（NPC 初始化用）
      */
-    skill_map(...args: [string, number, (string | string[])?][]): void {
+    skill_map(...args: SkillItem[]): void {
         this.skills = this.skills || {};
         for (let i = 0; i < args.length; i++) {
             const item = args[i];

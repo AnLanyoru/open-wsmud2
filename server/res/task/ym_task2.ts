@@ -83,7 +83,7 @@ export default class extends USERTASK {
         }
         let lv = player.query_temp('ym_level', 0) ?? 0;
 
-        if (lv >= TITLES.length)
+        if (lv >= (TITLES.length - 1))
             return player.notify("程药发对你说道：你已经是最高等级的神捕，不用再证明自己。");
 
         const lv2 = player.query_temp('ym_lv2', 0);
@@ -167,8 +167,8 @@ export default class extends USERTASK {
 
         player.remove_temp("ym_task");
 
-        let level = player.query_temp("ym_level", 0) ?? 0;
-        if (level >= TITLES.length) return;
+        let level = player.query_temp("ym_level", 0);
+        if (level >= (TITLES.length - 1)) return;
 
         if (level === 0) {
             player.notify("<hic>你成功帮助衙门追捕犯人，获得称号【衙役】</hic>");
@@ -179,8 +179,11 @@ export default class extends USERTASK {
         } else {
             let level2 = player.add_temp("ym_lv2", 1);
             if (level2 >= UPGRADE_COUNT[level]) {
-
-                USERTASK.GET('yamen')!.on_finish(player);
+                let user_yamen_task = USERTASK.GET('yamen')
+                if (!user_yamen_task) {
+                    player.notify("<red>任务错误：无法找到衙门任务，无法完成。请联系管理解决</red>");
+                } else {
+                     user_yamen_task.on_finish?.(player); }
                 level = player.add_temp("ym_level", 1);
                 player.remove_temp("ym_lv2");
                 player.notify("<hic>你帮助衙门连续追捕犯人，获得称号：" + TITLES[level] + "。</hic>");

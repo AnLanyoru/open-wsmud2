@@ -1,6 +1,6 @@
 import {ROOM} from "../../../core/room/room.js";
 import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util";
+import {UTIL} from "../../../core/util/util.js";
 import {NPC} from "../../../core/char/npc.js";
 import {USER} from "../../../core/char/user.js";
 import {COMMAND} from "../../../core/command.js";
@@ -60,7 +60,7 @@ export default class extends ROOM {
             }
             this.hp = this.max_hp;
             this.mp = this.max_mp;
-            let rm_npc = this.environment.find_by_path("pub/wudao");
+            let rm_npc = this.environment!.find_by_path("pub/wudao");
             rm_npc && rm_npc.destroy();
             this.moveto('wudao/ding');
             this.notify("<hir>你的挑战失败了。</hir>");
@@ -68,7 +68,7 @@ export default class extends ROOM {
         let npc = this.items[0] as NPC;
         if (npc && !npc.is_player) {
             me.do_kill(npc);
-            npc.on_kill(me);
+            npc.on_kill!(me);
         }
     }
 

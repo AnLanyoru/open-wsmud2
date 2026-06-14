@@ -68,6 +68,8 @@ export class OBJ extends ITEM {
     otype: number = 0;
     /** 是否可交易 */
     transable: boolean = false;
+    /** 商品的货币类型 */
+    currency?: string;
 
     // ============ 显示属性 ============
 

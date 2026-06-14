@@ -2,7 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
-import {UTIL} from "../../../core/util";
+import {UTIL} from "../../../core/util/util.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {AREA} from "../../../core/room/area.js";
 import {ROOM} from "../../../core/room/room.js";
@@ -71,9 +71,9 @@ function fb_saodang(me, path, isdiff, count) {
         return me.notify("副本" + fb.name + "还没解锁!");
 
     if (me.is_full(-10)) return me.notify("你身上东西太多了!");
-    var area = next_room.parent;
+    let area = next_room.parent;
     if (!area) return me.notify("区域错误");
-    var unlock_name = isdiff ? "fb_sao1" : "fb_sao0";
+    let unlock_name = isdiff ? "fb_sao1" : "fb_sao0";
     if (area.unlock_index) {
         if (me.query_temp('fb_sao' + area.fb_index, 0) !== (isdiff ? 2 : 1))
             return me.notify("你需要" + area.name + (isdiff ? "(困难)" : "(普通)") + "单人模式完成100%才可以扫荡副本!");
@@ -85,7 +85,7 @@ function fb_saodang(me, path, isdiff, count) {
     count = parseInt(count);
 
     if (me.query_jingli() < area.expend) return me.notify("你的精力不够，无法扫荡副本。");
-    var fu = me.find_obj_bypath("cash/saodang");
+    let fu = me.find_obj_bypath("cash/saodang");
     if (!fu || fu.count < count) return me.notify_fail("你的扫荡符不够继续扫荡了。");
     if (count == 1) return fb_quick(me, area, isdiff);
     me.call_interval(fb_quick.bind(me, me, area, isdiff), 500, count, x => {

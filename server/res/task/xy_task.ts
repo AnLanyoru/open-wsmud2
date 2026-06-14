@@ -2,7 +2,7 @@ import {TASK} from "../../core/task/task.js";
 import {WORLD} from "../../core/world.js";
 import {OBJ} from "../../core/item/obj.js";
 import type {OddsEntry} from "../../core/item/obj.js";
-import {UTIL} from "../../core/util";
+import {UTIL} from "../../core/util/util.js";
 import {NPC} from "../../core/char/npc.js";
 import type {USER} from "../../core/char/user.js";
 import type {CORPSE} from "../../core/item/corpse.js";

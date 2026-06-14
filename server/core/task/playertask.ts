@@ -32,7 +32,7 @@ export class USERTASK extends BASE {
      */
     create(path: string): void {
         WORLD.TASKS.push(this);
-        this.on_create();
+        this.on_create?.();
     }
 
     /**
@@ -40,7 +40,7 @@ export class USERTASK extends BASE {
      * @param path - 任务资源文件路径
      */
     update(path: string): void {
-        this.on_create();
+        this.on_create?.();
         for (let i = 0; i < WORLD.TASKS.length; i++) {
             if (WORLD.TASKS[i].path == path) {
                 WORLD.TASKS[i] = this;

@@ -1,5 +1,6 @@
 import {NPC} from "../../../core/char/npc.js";
-import {UTIL} from "../../../core/util";
+import type { SkillItem } from "../../../core/skill/skill.js";
+import {UTIL} from "../../../core/util/util.js";
 
 export default class extends NPC {
     name = "";
@@ -14,7 +15,7 @@ export default class extends NPC {
     max_hp = 400;
     no_refresh = true;
     no_fight = true;
-    skills_def = [
+    skills_def: SkillItem[][] = [
         [
             ["force", 100], ["unarmed", 100], ["sword", 100], ["parry", 100], ["dodge", 100],
             ["hunyuanyiqi", 100, "force"], ["wudangchangquan", 100, "unarmed"], ["huashanshenfa", 100, "dodge"],
@@ -77,7 +78,7 @@ export default class extends NPC {
         if (level > 100) level = 100;
         const grade1 = Math.floor(level / 10);
         this.name = UTIL.random_name(this.gender);
-        this.skill_map.apply(this, this.skills_def[grade1]);
+        this.skill_map(...this.skills_def[grade1]);
         var color = ["hig", "hic", "hiy", "hiz", "hio", "ora"][parseInt(level / 20)];
         this.title = "<" + color + ">武道塔守护者</" + color + ">";
         this.set_objects(['eq/lv0/cloth', 1, 1], ["eq/lv0/jian", 1, 1]);

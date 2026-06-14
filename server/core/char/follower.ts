@@ -7,7 +7,6 @@ import {NPC} from './npc.js';
 import {FAMILIES} from '../skill/family.js';
 import {CORPSE} from '../item/corpse.js';
 import type {ROOM} from '../room/room.js';
-import {UTIL} from '../util.js';
 import {OBJ} from '../item/obj.js';
 import type {EQUIPMENT} from '../item/equipment.js';
 import type {SKILL} from '../skill/skill.js';

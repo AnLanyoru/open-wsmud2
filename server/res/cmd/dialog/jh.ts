@@ -7,7 +7,7 @@ import {AREA} from "../../../core/room/area.js";
 import {ROOM} from "../../../core/room/room.js";
 
 export default class extends COMMAND {
-    declare command: string;
+    command = "jh";
     allow_busy = true;
     allow_state = true;
     allow_die = true;

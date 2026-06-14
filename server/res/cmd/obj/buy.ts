@@ -1,6 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
-import {UTIL} from "../../../core/util";
+import {UTIL} from "../../../core/util/util.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
@@ -52,7 +52,7 @@ export default class extends COMMAND {
             me.notify("你拿不下那么多东西。");
             return;
         }
-        var need_money = sellitem.value * buy_count;
+        let need_money = sellitem.value * buy_count;
         if (sellitem.currency === "gongji" || sellitem.currency === "jungong") {
             if (!(sellitem.count == -1 || sellitem.count >= buy_count)) {
                 return me.notify(target.name + "没有那么多的" + sellitem.color_name + "兑换给你。");
@@ -62,11 +62,11 @@ export default class extends COMMAND {
                     return;
             }
             if (sellitem.count > 0) sellitem.count -= buy_count;
-            sell_obj = me.add_obj(sellitem.path, buy_count);
+            let sell_obj = me.add_obj(sellitem.path, buy_count);
             if (sell_obj) {
                 me.send_room("$N从$n兑换了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
             }
-            var money_name = sellitem.currency === "jungong" ? "jungong" : "gongji";
+            let money_name = sellitem.currency === "jungong" ? "jungong" : "gongji";
             me.send('{type:"dialog",dialog:"list",id:"' + sellitem.id + '",sell:' + buy_count + ',' + money_name + ':' + me.query_temp(money_name === "jungong" ? 'jg' : 'gongji', 0) + '}');
             if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
             return;
@@ -83,7 +83,7 @@ export default class extends COMMAND {
 
             me.money -= need_money;
             me.add_temp('money1', need_money, UTIL.diff_time());
-            sell_obj = me.add_obj(sellitem.path, buy_count);
+            let sell_obj = me.add_obj(sellitem.path, buy_count);
             if (sell_obj) {
                 me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
 
@@ -96,7 +96,7 @@ export default class extends COMMAND {
                 me.money -= need_money;
 
                 me.add_temp('money1', need_money, UTIL.diff_time());
-                var sell_obj = me.add_obj(sellitem.path, buy_count);
+                let sell_obj = me.add_obj(sellitem.path, buy_count);
                 if (sell_obj) {
                     me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
                 }
