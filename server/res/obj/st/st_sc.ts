@@ -1,5 +1,6 @@
 import {OBJ} from "../../../core/item/obj.js";
 import {WORLD} from "../../../core/world.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends OBJ {
     name = "碎裂的贪狼";
@@ -10,7 +11,7 @@ export default class extends OBJ {
     is_stone = true;
     transable = true;
     grade = 3;
-    prop = {
+    prop: PropMap = {
         str: 1
     };
     otype = 2;

@@ -1,5 +1,6 @@
 import {OBJ} from "../../../core/item/obj.js";
 import {WORLD} from "../../../core/world.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends OBJ {
     name = "碎裂的绿宝石";
@@ -12,17 +13,17 @@ export default class extends OBJ {
     combine_count = 10;
     combine_to = "st/st_gre#1";
     grade = 1;
-    prop = {
+    prop: PropMap = {
         mz: 1
     };
     otype = 2;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 0;
         if (!par) {
             this.path = path + "#0";
         } else {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par);
             if (!(lv > 0 && lv < 5)) return;
         }

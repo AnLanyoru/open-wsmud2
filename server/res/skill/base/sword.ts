@@ -1,4 +1,4 @@
-import {SKILL} from "../../../core/skill/skill.js";
+import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
 
 export default class extends SKILL {
@@ -14,7 +14,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("lian", {
+        this.set_pfm("lian", PERFORM.fromPlain({
             name: "连击",
             distime: 5,
             mp: 5,
@@ -36,7 +36,7 @@ export default class extends SKILL {
             }, query_desc: function (me, lv) {
                 return "快速对敌人攻击两次";
             }
-        });
+        }));
     }
 
     query_prop(lv, me) {

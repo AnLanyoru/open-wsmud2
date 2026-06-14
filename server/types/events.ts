@@ -9,6 +9,7 @@ import type {EQUIPMENT} from '../core/item/equipment.js';
 import type {ROOM} from '../core/room/room.js';
 import type {CORPSE} from '../core/item/corpse.js';
 import type {SKILL} from '../core/skill/skill.js';
+import type { PropMap } from './props.js';
 
 // ============================================================
 // CHARACTER 回调
@@ -145,20 +146,35 @@ export interface RoomCallbacks {
 // ============================================================
 
 export interface StatusDef {
+    /** 状态唯一标识 */
     id: string;
+    /** 状态名称（显示用） */
     name: string;
+    /** 状态描述 */
     desc?: string;
+    /** 持续时间（秒） */
     duration: number;
-    prop?: Record<string, number>;
+    /** 状态附带的属性加成/减益 */
+    prop?: PropMap;
+    /** 是否忙碌状态（不可行动） */
     is_busy?: boolean;
+    /** 是否昏迷状态 */
     is_faint?: boolean;
+    /** 覆盖优先级（数值越大优先级越高） */
     override?: number;
+    /** 状态叠加层数 */
     count?: number;
+    /** 定时触发回调（返回 true 则移除状态） */
     on_interval?: (me: CHARACTER, over_count: number) => boolean | void;
+    /** 状态附加时回调 */
     on_attach?: (me: CHARACTER) => void;
+    /** 状态过期时回调 */
     on_expire?: (me: CHARACTER) => void;
+    /** 状态开始时间戳 */
     start_time?: number;
+    /** 状态结束时的提示消息 */
     finish_msg?: string;
+    /** 状态来源（技能/物品 ID） */
     source?: string;
 }
 
@@ -169,11 +185,17 @@ export interface StatusDef {
 export interface LearnCondition {
     [key: string]: number | string | Record<string, number> | undefined;
 
+    /** 最大内力要求 */
     max_mp?: number;
+    /** 前置技能及等级要求 { 技能ID: 等级 } */
     skill?: Record<string, number>;
+    /** 臂力要求 */
     str1?: number;
+    /** 根骨要求 */
     con1?: number;
+    /** 性别要求（0/1 或 "男"/"女"） */
     gender?: number | string;
+    /** 学习条件描述文本 */
     desc?: string;
 }
 
@@ -182,5 +204,6 @@ export interface LearnCondition {
 // ============================================================
 
 export interface EquipCondition {
+    /** 动态条件字段（如 max_mp, skill, str1 等），值为对应的要求值 */
     [key: string]: string | number | undefined;
 }

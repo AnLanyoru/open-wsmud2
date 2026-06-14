@@ -8,6 +8,7 @@ import {UTIL} from './util.js';
 
 import type {ROOM} from './room/room.js';
 import type {ActionDef, ActionMap} from '../types/base.js';
+import type { PropMap } from '../types/props.js';
 
 // ============================================================
 // ITEM 类
@@ -67,7 +68,7 @@ export class ITEM extends BASE {
     /** 是否静默消息 */
     no_message: boolean = false;
     /** 属性加成映射 */
-    prop: Record<string, number> | null = null;
+    prop?: PropMap;
     /** 是否为容器 */
     is_container: boolean = false;
     /** 是否为角色 */
@@ -479,7 +480,7 @@ export class ITEM extends BASE {
     query_create_time(): Date | undefined {
         const id = this.id;
         if (!id) return;
-        const time = parseInt(id.substr(4), 16);
+        const time = parseInt(id.slice(4), 16);
         return new Date(time * 1000 + (UTIL as { begin: number }).begin);
     }
 

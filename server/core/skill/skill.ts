@@ -270,44 +270,44 @@ export class SKILL extends BASE {
     }
 
     /** 敌人死亡回调 — 触发时机：NPC/MONSTER die() 末尾，killer.attack_skill.on_enemy_die 调用时 */
-    on_enemy_die?: (me: CHARACTER, target: CHARACTER) => void;
+    on_enemy_die?(me: CHARACTER, target: CHARACTER): void;
 
     // ============ 战斗回调（由资源文件设置） ============
 
     /** 战斗开始回调 */
-    on_beginfight?: (me: CHARACTER, target: CHARACTER) => void;
+    on_beginfight?(me: CHARACTER, target: CHARACTER): void;
     /** 攻击前回调（每轮） */
-    on_before_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => void;
+    on_before_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): void;
     /** 攻击回调（返回额外伤害） */
-    on_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
+    on_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number;
     /** 攻击结束回调（一轮后） */
-    on_attack_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
+    on_attack_over?(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void;
     /** 一轮攻击完全结束回调 */
-    on_end_attack?: (me: CHARACTER, target: CHARACTER) => void;
+    on_end_attack?(me: CHARACTER, target: CHARACTER): void;
     /** 内功攻击回调（返回内功伤害） */
-    do_force_attack?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>) => number;
+    do_force_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number;
 
     /** 内功招架回调（返回减免伤害） */
     on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number;
 
     /** 内功攻击结束回调 */
-    on_force_over?: (me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number) => void;
+    on_force_over?(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void;
     /** 受到伤害回调（返回减免后伤害） */
-    on_damage?: (me: CHARACTER, from: CHARACTER, sh: number) => number;
+    on_damage?(me: CHARACTER, from: CHARACTER, sh: number): number;
     /** 闪避回调 */
-    on_dodge?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_dodge?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
     /** 闪避结束回调 */
-    on_dodge_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_dodge_over?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
     /** 招架回调 */
-    on_parry?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_parry?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
     /** 招架结束回调 */
-    on_parry_over?: (target: CHARACTER, me: CHARACTER, par: Record<string, any>) => void;
+    on_parry_over?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
     /** 绝招招架回调（返回是否招架成功） */
-    on_parry_pfm?: (target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number) => boolean;
+    on_parry_pfm?(target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number): boolean;
     /** 重算闪避回调（由资源文件动态注入） */
-    on_recount_dodge?: (me: CHARACTER) => number;
+    on_recount_dodge?(me: CHARACTER): number;
     /** 重算招架回调（由资源文件动态注入） */
-    on_recount_parry?: (me: CHARACTER) => number;
+    on_recount_parry?(me: CHARACTER): number;
     /** 内功转血比例 */
     force_rad?: number;
     /** 复活回调（由 biwu 等系统动态注入） */
@@ -1155,6 +1155,8 @@ export class PERFORM {
     no_auto?: boolean;
     /** 允许忙碌时使用 */
     allow_busy?: boolean;
+    /** 是否禁止复制 */
+    no_copy?: boolean;
 
     // ============ 绝招ID标识（由 update() 设置） ============
 

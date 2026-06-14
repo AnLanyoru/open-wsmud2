@@ -10,13 +10,13 @@ export default class extends OBJ {
     grade = 6;
     otype = 2;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 5;
         if (!par) {
             lv = 5 - parseInt(Math.log(this.random(400) + 1));
 
         } else {
-            lv = parseInt(par.substr(1));
+            lv = parseInt(par.slice(1));
         }
         this.path = path + "#" + lv;
         switch (lv) {

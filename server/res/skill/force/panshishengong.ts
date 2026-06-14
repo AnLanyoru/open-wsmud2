@@ -1,4 +1,6 @@
+import type { CHARACTER } from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     name = "磐石神功";
@@ -48,8 +50,8 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
-                    const par = {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+                    const par: PropMap = {
                         fy_per: 100
                     };
                     let fy = me.query_prop('pssg_fy');
@@ -60,10 +62,10 @@ export default class extends SKILL {
                         name: "磐石",
                         desc: "提高你的防御力",
                         prop: par,
-                        duration: 5000 + lv * 10
+                        duration: 5000 + lv * 10,
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = Math.floor((5000 + lv * 10) / 1000);
                     if (time > 60) time = 60;
                     return "在" + time + "秒内，提升自身防御100%。";

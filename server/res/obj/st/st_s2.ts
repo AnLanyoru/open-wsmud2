@@ -1,4 +1,5 @@
 import {OBJ} from "../../../core/item/obj.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends OBJ {
     name = "贪狼";
@@ -9,15 +10,15 @@ export default class extends OBJ {
     combined = true;
     is_stone = true;
     grade = 6;
-    prop = {
+    prop: PropMap = {
         str: 1
     };
     otype = 2;
 
-    on_create(path, par) {
+    on_create(path: string, par: string) {
         var lv = 0;
         if (par != undefined) {
-            par = par.substr(1);
+            par = par.slice(1);
             lv = parseInt(par);
             if (!(lv >= 0 && lv < 4)) return;
         }

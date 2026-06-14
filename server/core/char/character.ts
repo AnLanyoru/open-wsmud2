@@ -338,8 +338,6 @@ export class CHARACTER extends ITEM {
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
     equipment: (EQUIPMENT | null)[] | null = null;
-    /** 属性加成映射 */
-    prop: Record<string, number> | null = null;
     /** 临时数据 */
     temp: Record<string, any> | null = null;
     /** 战斗属性修饰 */

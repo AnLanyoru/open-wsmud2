@@ -153,11 +153,13 @@ export interface PropMap {
     /** 内功抗性/减免 */ force_rad?: number;
 
     // ===== 特殊属性 =====
-    /** 伤害差值（直接加减伤） */ diff_sh?: number;
-    /** 伤害差值百分比 */ diff_sh_per?: number;
+    /** 固定数值免伤 */ diff_sh?: number;
+    /** 免伤百分比 */ diff_sh_per?: number;
     /** 二次伤害差值百分比 */ diff_sh_per2?: number;
     /** 二次防御差值百分比 */ diff_fy_per2?: number;
     /** 忽视防御 */ ignore_fy?: number;
+    /** 最终伤害百分比 */ add_sh_per?: number;
+    /** 暴击伤害百分比 */ add_bjsh_per?: number;
     /** 忽视躲闪（无视对方闪避概率） */ ignore_mz?: number;
     /** 额外攻击次数 */ attack_num?: number;
     /** 经验获取加成（数值） */ exp_add?: number;

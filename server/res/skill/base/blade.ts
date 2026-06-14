@@ -1,4 +1,4 @@
-import {SKILL} from "../../../core/skill/skill.js";
+import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 
 export default class extends SKILL {
@@ -14,7 +14,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("zhan", {
+        this.set_pfm("zhan", PERFORM.fromPlain({
             name: "斩击",
             distime: 5000,
             mp: 5,
@@ -33,7 +33,7 @@ export default class extends SKILL {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }
-        });
+        }));
     }
 
     query_prop(lv, me) {
