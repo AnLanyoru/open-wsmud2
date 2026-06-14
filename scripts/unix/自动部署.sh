@@ -18,8 +18,8 @@ echo "  平台: $(uname -s)"
 echo "============================================"
 echo ""
 
-check_node
-check_build_tools
+ensure_node
+ensure_build_tools
 
 # --- 检查部署包 ---
 if [ ! -f "$SCRIPT_DIR/$PACKAGE_NAME" ]; then

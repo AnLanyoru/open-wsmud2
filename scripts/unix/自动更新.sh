@@ -18,6 +18,8 @@ echo "  平台: $(uname -s)"
 echo "============================================"
 echo ""
 
+ensure_node
+
 # --- 检查更新包 ---
 if [ ! -f "$SCRIPT_DIR/$PACKAGE_NAME" ]; then
     log_error "未找到 $PACKAGE_NAME"

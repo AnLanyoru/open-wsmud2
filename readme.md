@@ -10,14 +10,20 @@
 ## 项目结构
 
 ```
+├── server/           # TypeScript 源码
+│   ├── core/         #   游戏引擎（编译为 os/）
+│   ├── res/          #   游戏世界内容（编译为 world/）
+│   └── scripts/      #   部署脚本 (core → os/, res → world/)
+├── os/               # 游戏核心引擎（角色、物品、房间、技能、任务）— 编译产物
+├── world/            # 游戏世界内容（地图、NPC、物品、技能、门派、指令）— 编译产物
 ├── api/              # Web API 接口（用户、游戏）
-├── os/               # 游戏核心引擎（角色、物品、房间、技能、任务）
-├── world/            # 游戏世界内容（地图、NPC、物品、技能、门派、指令）
-├── src/              # 前端源码（Vite 项目）
-├── www/              # 前端构建产物
+├── web/              # Web 前端（登录、对话框、地图、游戏界面）
+├── www/              # 前端构建产物（Vite 输出）
 ├── data/             # 数据库与数据文件（SQLite）
+├── scripts/          # 部署脚本（打包、自动部署、启停）
+├── tools/            # 辅助工具脚本
 ├── web.js            # Web 服务器入口
-├── main.js           # 游戏服务器入口
+├── main.mjs          # 游戏服务器入口
 ├── config.js         # 配置加载
 ├── .env              # 环境变量
 └── vite.config.js    # Vite 构建配置
@@ -33,9 +39,16 @@
 # 1. 安装依赖
 npm install
 
-# 2. 配置环境变量（ .env 文件）
+# 2. 编译 TypeScript（server/ → os/ + world/）
+cd server && npx tsc --outDir dist && cd ..
+node server/scripts/deploy.mjs
 
-# 3. 同时启动 Web 服务器和游戏服务器
+# 3. 构建前端
+npx vite build
+
+# 4. 配置环境变量（ .env 文件）
+
+# 5. 同时启动 Web 服务器和游戏服务器
 npm start
 ```
 
@@ -50,13 +63,25 @@ npm start
 
 | 变量               | 说明              | 默认值                |
 |------------------|-----------------|--------------------|
+| `WEB_HOST`       | Web 服务器监听地址     | `0.0.0.0`          |
 | `WEB_PORT`       | Web 服务器端口       | `8088`             |
+| `WS_HOST`        | 游戏服务器监听地址       | `127.0.0.1`        |
 | `WS_PORT`        | 游戏 WebSocket 端口 | `31300`            |
+| `SERVER_NAME`    | 服务器名称           | `本地测试`          |
 | `MD5_PREFIX`     | MD5 加密前缀        | `12345`            |
-| `SESSION_SECRET` | Session 密钥      | `123`              |
+| `SESSION_SECRET` | Session 密钥       | `123`              |
 | `DESIV`          | DES 加密向量        | `1234123412341234` |
 
 ## 开发
+
+### 编译 TypeScript
+
+```bash
+cd server
+npx tsc --outDir dist
+cd ..
+node server/scripts/deploy.mjs    # core → os/, res → world/
+```
 
 ### 前端开发
 
@@ -123,4 +148,8 @@ SendCommand("call user_id this.add_obj(obj_path,10)");
 //热更新脚本文件(world/目录下的脚本代码可以热更新)
 SendCommand("update cmd/admin/test");
 
-``` 
+```
+
+## 生产环境快速部署
+
+参见 [scripts/readme.MD](scripts/readme.MD)

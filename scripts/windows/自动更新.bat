@@ -14,10 +14,35 @@ echo   自动更新资源 open-wsmud2 (Windows)
 echo ============================================
 echo.
 
-:: --- 检查 Node.js ---
+:: --- 检查/安装 Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] 未找到 Node.js
+    echo [WARN] 未检测到 Node.js，尝试自动安装...
+
+    where winget >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo [INFO] 通过 winget 安装 Node.js...
+        winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
+        if %errorlevel% equ 0 (
+            echo [INFO] Node.js 安装完成，请重新运行本脚本
+            pause
+            exit /b 0
+        )
+    )
+
+    where choco >nul 2>nul
+    if %errorlevel% equ 0 (
+        echo [INFO] 通过 Chocolatey 安装 Node.js...
+        choco install nodejs-lts -y
+        if %errorlevel% equ 0 (
+            echo [INFO] Node.js 安装完成，请重新运行本脚本
+            pause
+            exit /b 0
+        )
+    )
+
+    echo [ERROR] 无法自动安装 Node.js
+    echo   请手动下载安装: https://nodejs.org/
     pause
     exit /b 1
 )
