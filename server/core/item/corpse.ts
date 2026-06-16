@@ -25,6 +25,8 @@ export class CORPSE extends CONTAINER {
     owner_name: string | null = null;
     /** 来源角色 ID（由 init 设置） */
     fromid?: string;
+    /** 子物品列表 */
+    items: OBJ[] | null = null;
 
     /** BOSS任务：伤害查询回调（由资源文件动态设置） */
     query_damage?: () => string;

@@ -1,6 +1,7 @@
 import {NPC} from "../../../core/char/npc.js";
 import {UTIL} from "../../../core/util/util.js";
 import {TASK} from "../../../core/task/task.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "唐楠";
@@ -31,15 +32,17 @@ export default class extends NPC {
             "唐楠笑着说道：如果客官你着急想看明天的货，也不是不可以。",
             "唐楠说道：本当铺可以提前看货，当然要收取一点点报酬。"
         ]);
-        this.add_action("refresh", "刷新货物", function (me) {
+        this.add_action("refresh", "刷新货物", this.shop_refresh);
+    }
+    
+    shop_refresh(me: USER) {
             let count = me.query_temp("ref_count", 0);
             if (count > 5) return me.notify("唐楠对你说道：这位" + me.call() + "，本店近日就这么多货物了。");
             let cash = [10, 20, 30, 40, 50, 60][count];
             me.notify("唐楠对你说道：这位" + me.call() + "，加急上货需要" + cash + "两黄金。");
             me.send_commands("give " + this.id + " " + (cash * 10000) + " money", "给唐楠" + cash + "两黄金");
 
-        });
-    }
+        }
 
     on_sell(me) {
         var task = TASK.GET('goods');

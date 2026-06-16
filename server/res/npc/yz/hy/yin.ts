@@ -1,4 +1,7 @@
 import {NPC} from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
+import { CORPSE } from "../../../../core/item/corpse.js";
+import { OBJ } from "../../../../core/item/obj.js";
 
 export default class extends NPC {
     name = "尹小龙";
@@ -41,13 +44,13 @@ export default class extends NPC {
         );
     }
 
-    on_enter(me) {
+    on_enter(me: USER) {
         if (me.is_player) {
             this.die();
         }
     }
 
-    on_died(killer, corpse) {
+    on_died(killer: USER, corpse: CORPSE) {
 
         if (killer)
             corpse.items = null;
@@ -58,23 +61,25 @@ export default class extends NPC {
         }
     }
 
-    query_items(eny) {
-        let items = this.items;
-        if (!items || !items.length) return null;
+    owner: string | null = null;
+
+    query_items(eny: USER) {
+        let items = this.items as OBJ[];
+        if (!items || !items.length) return;
         if (this.owner) {
             if (this.owner === eny.id)
                 return items;
-            return null;
+            return;
         }
         let count = eny.query_temp('hy_ct', 0);
         if (count > 0) {
             this.owner = eny.id;
             return items;
         }
-        return null;
+        return;
     }
 
-    clear_items(eny) {
+    clear_items(eny: USER) {
         this.items = null;
         if (this.owner && this.owner === eny.id && eny.query_temp('hy_ct', 0) > 0) {
             eny.add_exp(0, 10000);

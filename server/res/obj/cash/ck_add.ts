@@ -1,3 +1,4 @@
+import { USER } from "../../../core/char/user.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends OBJ {
@@ -7,7 +8,7 @@ export default class extends OBJ {
     grade = 1;
     value = 0;
 
-    on_use(me) {
+    on_use(me: USER): boolean {
         if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
         var size = 10;
         if (me.max_store_count + size > 400) return me.notify_fail("仓库最多只能扩充到400格。");

@@ -566,16 +566,16 @@ export default class extends TASK {
         this.xy_area?.notify_update();
     }
 
-    jg_limit(me: Record<string, any>) {
+    jg_limit(me: USER) {
         return JUNGONG_LIMITS[me.level];
     }
 
-    is_jgmax(me: Record<string, any>) {
+    is_jgmax(me: USER) {
         return me.query_temp('jg_week', 0) >= JUNGONG_LIMITS[me.level];
     }
 
-    reward(me: Record<string, any>, msg = "") {
-        var status = WORLD.DATA.query_temp("xy_status", 0);
+    reward(me: USER, msg = "") {
+        const status = WORLD.DATA.query_temp<number>("xy_status", 0);
         if (!status) {
             return me.notify(msg + "最近没什么战事，你可以使用你累积的军功兑换物资！");
         }
@@ -586,7 +586,7 @@ export default class extends TASK {
         if (reward > 1) {
             return me.notify(msg + "你本周内的奖励军功已经领取过了！");
         }
-        var count = Number(WORLD.DATA.query_temp("xy_sc", 0));
+        var count = Number(WORLD.DATA.query_temp<number>("xy_sc", 0));
         if (!(count > 0 && count < 5))
             return me.notify(msg + "最近并没有军功奖励可领取。");
         let limit = REWARDS_LIMIT[me.level];
@@ -608,7 +608,7 @@ export default class extends TASK {
         if (me.query_temp("xy_bm")) {
             return me.notify_fail(msg + "你已经报名守城了。");
         }
-        const status = WORLD.DATA.query_temp("xy_status", 0);
+        const status = WORLD.DATA.query_temp<number>("xy_status", 0);
         if (status != 1) {
             return me.notify_fail(msg + "最近没什么战事，不用报名！");
         }

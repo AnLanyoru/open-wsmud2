@@ -1,4 +1,5 @@
 import {NPC} from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "流氓头";
@@ -34,12 +35,13 @@ export default class extends NPC {
             odds: 3000
         });
     }
-
-    on_kill(me) {
+    
+    call_lm: boolean;
+    on_kill(me: USER) {
         if (this.call_lm) return;
         this.call_lm = true;
         this.send_message("流氓头叫道：哪里来王八蛋来这里撒野");
-        NPC.CREATE("yz/lm/liumang", this.environment, function (bing) {
+        NPC.CREATE("yz/lm/liumang", this.environment!, function (bing) {
             bing.do_kill(me);
         }, 2);
     }

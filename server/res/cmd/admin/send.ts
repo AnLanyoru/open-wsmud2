@@ -1,6 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
+import {MessageEntry, WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
@@ -53,14 +53,7 @@ export default class extends COMMAND {
         var msgObj: {
             type: string;
             dialog: string;
-            message: {
-                id?: string;
-                name?: string;
-                content: string;
-                time: number;
-                attach: any[];
-                index?: number;
-            };
+            message: MessageEntry;
         } = {
             type: "dialog",
             dialog: "message",
@@ -73,12 +66,7 @@ export default class extends COMMAND {
             }
         };
         for (var i = 0; i < users.length; i++) {
-            let user_msg: {
-                time: number;
-                content: string;
-                attach: any[];
-                index?: number;
-            } = {
+            let user_msg: MessageEntry = {
                 time: msg.time,
                 content: msg.content,
                 attach: msg.attach

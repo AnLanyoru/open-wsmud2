@@ -12,16 +12,9 @@
 import {BASE} from '../base.js';
 import {ITEM} from '../item.js';
 import {UTIL} from '../util.js';
+import {WORLD} from '../world.js';
 import type {CHARACTER} from '../char/character.js';
 import type {SKILL} from '../skill/skill.js';
-
-// Lazy import WORLD to avoid circular deps: obj.ts -> world.ts -> ... -> obj.ts
-import type {IWorld} from '../world.js';
-
-let _WORLD: IWorld | null = null;
-import('../world.js').then(m => {
-    _WORLD = (m as { WORLD: IWorld }).WORLD;
-});
 
 /** __PATH global set at engine boot */
 declare var __PATH: Record<string, string>;
@@ -369,7 +362,7 @@ export class OBJ extends ITEM {
     // @ts-ignore - OBJ.CREATE has different semantics from BASE.CREATE (instance factory vs resource loader)
     static CREATE(otype: string, count?: number): OBJ {
         otype = otype.replace(/\\/g, "/");
-        let base = _WORLD?.OBJ_STROE.get(otype) as OBJ | undefined;
+        let base = WORLD.OBJ_STROE.get(otype) as OBJ | undefined;
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype) as OBJ;
             if (!base) throw new Error('没有物品' + otype + "的定义。");
@@ -394,7 +387,7 @@ export class OBJ extends ITEM {
         if (this.on_create) this.on_create(path, par);
         const cc = grade_color[this.grade] ?? 'wht';
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
-        _WORLD?.OBJ_STROE.set(this.path ?? '', this);
+        WORLD.OBJ_STROE.set(this.path ?? '', this);
     }
 
     /**

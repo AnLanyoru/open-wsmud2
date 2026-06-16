@@ -3,6 +3,8 @@ import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {USERTASK} from "../../../core/task/playertask.js";
 import {COMMAND} from "../../../core/command.js";
+import { stringify } from "json5";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "金古易";
@@ -44,7 +46,7 @@ export default class extends NPC {
             ["lingboweibu", 3000, "dodge"],
             ["taijiquan", 3000, "parry"],
             ["jiuyinbaiguzhao", 3000, "unarmed"]);
-        this.add_action("levelup", "提升境界", testLevel);
+        this.add_action("levelup", "提升境界", this.testLevel);
     }
 
     on_kill(me) {
@@ -111,8 +113,10 @@ export default class extends NPC {
                     me.notify("金古易对你说道：恭喜" + me.call() + "成为一代宗师，但要切记，习武之路荆棘满地，唯有戒骄戒躁继续努力方能更进一步！");
                     this.do_command("chat", "哈哈，不错，不错，恭喜" + me.name + "成为一代宗师！");
 
-                    USERTASK.GET('yamen').on_finish(me);
-                    USERTASK.GET('sm').on_finish(me);
+                    let yamen_task = USERTASK.GET('yamen')
+                    yamen_task && yamen_task.on_finish!(me);
+                    let sm_task = USERTASK.GET('sm');
+                    sm_task && sm_task.on_finish!(me);
 
                     me.level_up();
                     me.commands_json = null;
@@ -194,10 +198,10 @@ export default class extends NPC {
                 user.set_temp("st_leave", 1, 3600000 * 24 * 7);
             }
         }
-        COMMAND.DO("send", shifu, {
+        COMMAND.DO("send", shifu, stringify({
             content: str,
             attach: atts
-        });
+        }));
 
 
     }
@@ -205,12 +209,10 @@ export default class extends NPC {
     on_die() {
         this.call_out(this.relive, 10000);
     }
-}
 
-function testLevel(me) {
+    testLevel(me: USER) {
 
     me.send_room("$N向$n恭敬的问道：敢问老先生，" + me.callme() + "武功境界如何？\n", this);
-
 
     if (me.level == 4) {
         return checkWS(me);
@@ -220,10 +222,10 @@ function testLevel(me) {
     }
     this.tellResult(me);
 }
+}
 
-function checkWS(me) {
+function checkWS(me: USER) {
     if (me.query_temp("wd")) {
-
         return me.notify("金古易对你说道：武道塔的守门人，连我都看不出他的境界，他肯定知道些什么。");
     }
 

@@ -1,5 +1,8 @@
-import {NPC} from "../../../../core/char/npc.js";
-import {ROOM} from "../../../../core/room/room.js";
+import { CHARACTER } from "../../../../core/char/character.js";
+import { NPC } from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
+import { CORPSE } from "../../../../core/item/corpse.js";
+import { ROOM } from "../../../../core/room/room.js";
 
 export default class extends NPC {
     name = "铁虎";
@@ -42,17 +45,21 @@ export default class extends NPC {
         });
     }
 
-    on_kill(me) {
+    on_kill(me: USER) {
         if (!this.fight_type) {
             let rooms = ['yz/hy/jiaochang1', 'yz/hy/jiaochang3',
                 'yz/hy/jiaochang4', 'yz/hy/jiaochang5'];
             this.send_room('$N道：不知死活！');
-            let list = [];
+            let list: CHARACTER[] = [];
             for (let path of rooms) {
                 let room = ROOM.Get(path);
+                if (!room) {
+                    me.send('发生错误，无法找到房间' + path);
+                    continue;
+                }
                 for (let item of room.items) {
-                    if (item.hp > 0 && item.is('yz/hy/jiaotu')) {
-                        list.push(item);
+                    if (item.is_character && item.is('yz/hy/jiaotu')) {
+                        list.push(item as CHARACTER);
                     }
                 }
             }
@@ -64,16 +71,18 @@ export default class extends NPC {
 
     }
 
-    on_died(me, corpse) {
-        let eny = this.enemy[0];
+    on_died(me: USER, corpse: CORPSE) {
+        let eny = this.enemy?.[0];
         if (eny && eny.hp > 0 && eny.environment === this.die_room) {
             let count = eny.query_temp('hy_ct', 0);
             if (count > 0) {
                 eny.add_exp(0, 10000);
                 eny.add_temp('hy_ct', -1);
-                for (let item of corpse.items) {
-                    eny.send('你得到了' + item.unit_name() + "。");
-                    eny.add_obj(item);
+                if (corpse.items) {
+                    for (let item of corpse.items) {
+                        eny.send('你得到了' + item.unit_name() + "。");
+                        eny.add_obj(item);
+                    }
                 }
             }
 

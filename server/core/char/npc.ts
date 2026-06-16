@@ -117,11 +117,11 @@ export class NPC extends CHARACTER {
     on_master?(me: Record<string, any>): CHARACTER | boolean | void;
 
     /** 检查技能/学习回调 — 触发时机：玩家执行 cha 命令查看可学技能时；返回 false 阻止学习 */
-    on_checkskill?: (me: CHARACTER) => boolean | void;
+    on_checkskill?(me: CHARACTER): boolean | void;
     /** 绝招触发回调 — 触发时机：NPC 自动释放绝招之前 */
-    on_pfm?: (me: CHARACTER, target: CHARACTER) => void;
+    on_pfm?(me: CHARACTER, target: CHARACTER): void;
     /** 双修回调 — 触发时机：玩家对 NPC 执行双修命令时 */
-    on_makelove?: (me: Record<string, any>) => void;
+    on_makelove?(me: Record<string, any>): void;
 
     /** 主人进入回调 — 触发时机：主人（master）进入 NPC 所在房间时 */
     on_master_enter?(me: Record<string, any>): void;

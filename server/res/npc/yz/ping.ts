@@ -32,8 +32,12 @@ export default class extends NPC {
             me.notify_fail("平一指说道：老夫医一人，杀一人。杀一人，医一人，你要不要试试。");
             var lv = me.query_skill("lianyao", 0);
 
-            let grade = SKILL.get('lianyao').query_grade(me);
+            let lianyao_data = SKILL.get('lianyao')
+            if (!lianyao_data) {
+                me.send("<hir>全局炼药术数据丢失，请联系管理解决</hir>");
+                return false;}
 
+            let grade = lianyao_data.query_grade(me);
             var money1 = (lv + lv + 10) * 1000 * (grade + 1) / 2;
             var money2 = (lv + lv + 100) * 10000 * (grade + 1) / 2;
             var money3 = (lv + lv + 1000) * 100000 * (grade + 1) / 2;

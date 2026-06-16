@@ -2,6 +2,7 @@ import {NPC} from "../../../core/char/npc.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "朱熹";
@@ -33,11 +34,15 @@ export default class extends NPC {
         });
     }
 
-    on_checkskill(me) {
+    on_checkskill(me: USER) {
         if (!me.query_temp("learn/zhu")) {
             me.notify_fail("朱熹说道： 咦？" + me.name + "，我不记得收过你这个学生啊....");
             var lv = me.query_skill("literate", 0);
-            let grade = SKILL.get('literate').query_grade(me);
+            let literate_data = SKILL.get('literate')
+            if (!literate_data) {
+                me.send("<hir>全局读书写字数据丢失，请联系管理解决</hir>");
+                return false;}
+            let grade = literate_data.query_grade(me);
             var money1 = (lv + lv + 10) * 1000 * (grade + 1) / 2;
             var money2 = (lv + lv + 100) * 10000 * (grade + 1) / 2;
             var money3 = (lv + lv + 1000) * 100000 * (grade + 1) / 2;
@@ -65,12 +70,12 @@ export default class extends NPC {
         return true;
     }
 
-    on_teach(me) {
+    on_teach(me: USER) {
 
         return this.on_checkskill(me);
     }
 
-    do_teach(me, skill, lv) {
+    do_teach(me: USER, skill: SKILL, lv: number) {
         var money = me.query_temp("learn/zhu", 0);
         if (!money) {
             me.remove_temp("learn/zhu");

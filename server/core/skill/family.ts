@@ -117,7 +117,7 @@ export class FAMILY extends BASE {
 
     // ============ ITEM方法借用(FAMILY不继承ITEM,但复用其temp方法) ============
 
-    query_temp: <T = any>(name: string, def?: T) => T | undefined = ITEM.prototype.query_temp as any;
+    query_temp: <T = any>(name: string, def?: T) => T = ITEM.prototype.query_temp as any;
     set_temp: (name: string, value: any, time?: number) => void = ITEM.prototype.set_temp as any;
     remove_temp: (name: string) => void = ITEM.prototype.remove_temp as any;
     add_temp: (name: string, value: number, time?: number) => number = ITEM.prototype.add_temp as any;

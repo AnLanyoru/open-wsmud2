@@ -7,29 +7,18 @@
  *   Array.remove — 由 util.js 注入到 Array.prototype
  */
 
-import {createRequire} from 'module';
 import v8 from 'v8';
 
-const require = createRequire(import.meta.url);
-
-import {pathToFileURL} from 'url';
 import fs from 'fs';
 
-// Original JS framework modules (loaded at compile time via allowJs or declaration files)
 import './util.js';
-import {UTIL} from './util.js';
 import {BASE} from './base.js';
 import db from './db.js';
 import {FAMILIES} from './skill/family.js';
 import WORLD_DATA from './data.js';
 
-// New TS modules (this batch)
 import USERLOGIN_MODULE from './login.js';
 import LISTENER_MODULE from './ws.js';
-
-// Type-only imports from our type definitions
-// NOTE: IWorld and related types transitively import USER, CHARACTER, etc. from other agents' files.
-// Once all core/ type files exist, this import resolves fully.
 
 import type {Timestamp, UID} from '../types/base.js';
 import type {USER} from './char/user.js';
@@ -47,11 +36,6 @@ import type {CORPSE} from './item/corpse.js';
 import type {UserLoginModule} from './login.js';
 import type wsServer from './net-ws.js';
 import type {EventItem} from './task/events.js';
-
-// ============================================================
-// 全局类型声明
-// ============================================================
-
 
 // ============================================================
 // 常量
@@ -116,8 +100,15 @@ export interface AppConfig {
 
 /** 消息条目 */
 export interface MessageEntry {
+    /** 消息来源类型，不填默认为system */
+    id?: string;
+    /** 消息来源名称，不填默认为系统 */
+    name?: string;
+    /** 消息内容 */
     content: string;
+    /** 消息创建时间戳 */
     time: number;
+    /** 消息附加的物品奖励 */
     attach?: { name: string; obj: string; count: number }[];
     rec?: boolean;
     index?: number;
@@ -211,135 +202,6 @@ export interface GameSocket {
     [key: string]: any;
 }
 
-/** WORLD 的 MESSAGE 子系统 */
-export interface MessageSystem {
-    stores: Map<UID, Map<UID, MessageStoreEntry>>;
-    NOTICES: MessageEntry[];
-
-    pushUserMessage(toid: UID, from: { id: UID; name: string }, msg: MessageEntry): void;
-
-    getUserMessages(me: CHARACTER): { id: UID; name: string; content: string; time: number }[];
-
-    getMessageFromID(me: CHARACTER, from: UID, count?: number): MessageEntry[];
-
-    getMessageByIndex(me: CHARACTER, from: UID, index: number): MessageEntry | undefined;
-
-    save(): string;
-
-    saveNotice(): string;
-
-    load(data: { notices?: MessageEntry[]; messages?: any[] }): void;
-}
-
-
-/** WORLD 主接口 */
-export interface IWorld {
-    // 核心状态
-    USERS: USER[];
-    COMMANDS: Record<string, COMMAND>;
-    SKILLS: Record<string, SKILL>;
-    ROOMS: Record<string, ROOM>;
-    RUN_ROOMS: ROOM[];
-    DEFAULT_SKILLS: Record<string, SKILL>;
-    AREAS: AREA[];
-    TASKS: USERTASK[];
-    SYSTEMTASKS: TASK[];
-    USER_EVENTS: any[];
-    OBJ_STROE: Map<string, OBJ>;
-    NPC_STROE: Map<string, NPC>;
-    HEARTBEATCOUNT: number;
-
-    // 服务器状态
-    RECEIVED: ReceivedLog[];
-    LOGS: LogEntry[];
-    SERVERID: number;
-    SERVERS: ServerConfig[];
-    CONNECT_COUNT: number;
-    max_connect_count: number;
-    max_user_count: number;
-    SocketCount: number;
-
-    // 子系统
-    DATA: any;
-    USERLOGIN: any;
-    DB: any;
-    LISTENER: any;
-    MESSAGE: MessageSystem;
-
-    // 配置
-    status: number;
-    heart_beat_service: ReturnType<typeof setInterval> | null;
-    heartbeat_interval: number;
-    SERVER: ServerConfig | null;
-    DEFAULT_COMMAND: COMMAND | null;
-
-    // 方法
-    SocketIn(): void;
-
-    connect(socket: GameSocket): void;
-
-    check_connect(socket: GameSocket): boolean;
-
-    before_login(user: USER): boolean;
-
-    disconnect(socket: GameSocket): void;
-
-    request(request: string, socket: GameSocket): void;
-
-    saveRequest(): void;
-
-    startup(sid?: number): Promise<void>;
-
-    sendAll(msg: string): void;
-
-    getUser(id: UID | number): USER | undefined;
-
-    find_user(name: string): USER | undefined;
-
-    on_user_login(user: USER): void;
-
-    on_user_cross_login(user: any, data?: any): void;
-
-    on_user_relogin(user: USER): void;
-
-    heart_beat(): void;
-
-    login_out(user: USER): void;
-
-    send(text: string): void;
-
-    log(user: USER | null, cmd: string, msg: string): void;
-
-    saveLog(): void;
-
-    is_server(user: USER): boolean;
-
-    save(): Promise<boolean>;
-
-    writeHeapSnapshot(): void;
-
-    loadLocalData(): void;
-
-    on_cross_response(id: UID, sid: string): void;
-
-    can_cross(id: UID): boolean;
-
-    on_user_die(me: CHARACTER, killer: CHARACTER, corpse: CORPSE): void;
-
-    on_resource_loaded(): void;
-
-    on_startup(): void;
-
-    on_user_quit(user: USER): void;
-
-    on_user_save(user: USER): void;
-
-    on_heart_beat(now: number): void;
-
-    on_cross_chat?(msg: any): void;
-
-    close(): Promise<boolean>;
-}
 
 // ============================================================
 // World 类
@@ -420,10 +282,10 @@ class World {
          * @param from - 发送者（含 id / name）
          * @param msg - 消息内容
          */
-        pushUserMessage(toid: UID, from: any, msg: any): void {
+        pushUserMessage(toid: UID, from: { id: string; name: string }, msg: MessageEntry): void {
             let user = this.stores.get(toid);
             if (!user) {
-                user = new Map<UID, MessageStoreEntry>();
+                user = new Map<string, MessageStoreEntry>();
                 this.stores.set(toid, user);
             }
             let store = user.get(from.id);
@@ -439,9 +301,9 @@ class World {
          * 获取用户的消息列表摘要（每个发送者取最后一条 + 最新公告）
          * @param me - 当前用户
          */
-        getUserMessages(me: any): any[] {
+        getUserMessages(me: USER): MessageEntry[] {
             const store = this.stores.get(me.id);
-            const newMessages: any[] = [];
+            const newMessages: MessageEntry[] = [];
             if (this.NOTICES.length) {
                 const nt = this.NOTICES[this.NOTICES.length - 1];
                 newMessages.push({
@@ -454,7 +316,7 @@ class World {
             if (store) {
                 const diff_time = 24 * 3600000 * 30;
                 const now = Date.now();
-                store.forEach((x: any, y: string) => {
+                store.forEach((x: MessageStoreEntry, y: string) => {
                     const last = x.items[x.items.length - 1];
                     if (last) {
                         if (now - last.time < diff_time) {
@@ -477,8 +339,8 @@ class World {
          * @param from - 发送者 ID（或 "notice" 查公告）
          * @param count - 偏移量（跳过的条数）
          */
-        getMessageFromID(me: any, from: string, count?: number): any[] {
-            let items: any[] = [];
+        getMessageFromID(me: USER, from: string, count?: number): MessageEntry[] {
+            let items: MessageEntry[] = [];
             if (from !== 'notice') {
                 const store = this.stores.get(me.id);
                 if (!store) return [];
@@ -489,7 +351,7 @@ class World {
                 items = this.NOTICES;
             }
             count = count || 0;
-            const ary: any[] = [];
+            const ary: MessageEntry[] = [];
             const diff_time = 24 * 3600000 * 30;
             const now = Date.now();
             for (let i = 0; i < 13; i++) {
@@ -506,7 +368,7 @@ class World {
          * @param from - 发送者 ID
          * @param index - 消息索引
          */
-        getMessageByIndex(me: any, from: string, index: number): any | undefined {
+        getMessageByIndex(me: USER, from: string, index: number): MessageEntry | undefined {
             const store = this.stores.get(me.id);
             if (!store) return undefined;
             const list = store.get(from);

@@ -16,6 +16,9 @@ export class USERTASK extends BASE {
     /** 任务启动回调（由资源文件动态注入） */
     on_start?(player?: CHARACTER): any;
 
+    /** 任务快速完成模式调用 */
+    quick_start?(player?: CHARACTER): any;
+
     /** 任务完成回调（由资源文件动态注入） */
     on_finish?(player?: CHARACTER, par?: string): any;
 

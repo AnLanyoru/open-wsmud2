@@ -1,5 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
-import {USERTASK} from "../../../core/task/playertask.js";
+import { NPC } from "../../../core/char/npc.js";
+import { USER } from "../../../core/char/user.js";
+import { USERTASK } from "../../../core/task/playertask.js";
 
 export default class extends NPC {
     name = "林震南";
@@ -19,13 +20,15 @@ export default class extends NPC {
             ["unarmed", 150],
             ["dodge", 150],
             ["parry", 150]);
-        this.add_action("biao", "运镖", function (me) {
-
-            USERTASK.GET("yunbiao").on_start(me);
+        this.add_action("biao", "运镖", function (me: USER) {
+            let yunbiao_task = USERTASK.GET("yunbiao");
+            if (!yunbiao_task) return me.send("运镖系统暂未开放！");
+            yunbiao_task.on_start?.(me);
         });
         this.add_action("ksyb", "雇佣镖师", function (me) {
-
-            USERTASK.GET("yunbiao").quick_start(me);
+            let yunbiao_task = USERTASK.GET("yunbiao");
+            if (!yunbiao_task) return me.send("运镖系统暂未开放！");
+            yunbiao_task.quick_start?.(me);
         });
     }
 }

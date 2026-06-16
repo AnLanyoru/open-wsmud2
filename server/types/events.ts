@@ -209,5 +209,18 @@ export interface LearnCondition {
 
 export interface EquipCondition {
     /** 动态条件字段（如 max_mp, skill, str1 等），值为对应的要求值 */
-    [key: string]: string | number | undefined;
+    [key: string]: any;
+
+    /** 最大内力要求 */
+    max_mp?: number;
+    /** 前置技能及等级要求 { 技能ID: 等级 } */
+    skill?: Record<string, number>;
+    /** 臂力要求 */
+    str1?: number;
+    /** 根骨要求 */
+    con1?: number;
+    /** 性别要求（0/1 或 "男"/"女"） */
+    gender?: number | string;
+    /** 学习条件描述文本 */
+    desc?: string;
 }

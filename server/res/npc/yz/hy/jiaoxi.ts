@@ -1,6 +1,4 @@
 import {NPC} from "../../../../core/char/npc.js";
-import {WORLD} from "../../../../core/world.js";
-import {OBJ} from "../../../../core/item/obj.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {CHARACTER} from "../../../../core/char/character.js";
 

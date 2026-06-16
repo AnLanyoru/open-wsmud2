@@ -1,4 +1,5 @@
-import {NPC} from "../../../../core/char/npc.js";
+import { NPC } from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "韦春芳";
@@ -26,13 +27,15 @@ export default class extends NPC {
             obj: "sp/npc#wei",
             odds: 50
         });
-        this.add_action("shu", "赎回拳套", function (me) {
-            var obj = me.find_obj_bypath("sp/yz/qiantiao");
-            if (!obj) return me.notify("韦春芳对你说道：" + me.call() + "，你有抵押什么东西吗，欠条给我看看？");
-            me.notify("你拿出欠条在韦春芳面前晃了晃。");
-            me.notify("韦春芳说道：哟，赵爷终于有时间叫人过来了。");
-            me.send_commands("give " + this.id + " 50000 money", "给她5两黄金");
-        });
+        this.add_action("shu", "赎回拳套", this.shu);
+    }
+
+    shu(me: USER) {
+        var obj = me.find_obj_bypath("sp/yz/qiantiao");
+        if (!obj) return me.notify("韦春芳对你说道：" + me.call() + "，你有抵押什么东西吗，欠条给我看看？");
+        me.notify("你拿出欠条在韦春芳面前晃了晃。");
+        me.notify("韦春芳说道：哟，赵爷终于有时间叫人过来了。");
+        me.send_commands("give " + this.id + " 50000 money", "给她5两黄金");
     }
 
     on_enter(me) {

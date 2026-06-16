@@ -100,7 +100,7 @@ export default class extends NPC {
         if (!room) return;
         let obj = NPC.CLONE(this.path);
         room.item_changed(obj, true);
-        this.die_room = null;
+        this.die_room = undefined;
         this.equipment = null;
         this.items = null;
         this.skills = null;

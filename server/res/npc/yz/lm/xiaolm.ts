@@ -1,3 +1,4 @@
+import { CHARACTER } from "../../../../core/char/character.js";
 import {NPC} from "../../../../core/char/npc.js";
 
 export default class extends NPC {
@@ -39,11 +40,13 @@ export default class extends NPC {
         });
     }
 
-    on_kill(me) {
+    on_kill(me: CHARACTER) {
         this.each_item(item => {
             if (item != this && item.path == this.path) {
+                if (!item.is_character) return;
+                let char = item as CHARACTER
                 this.send_room("$N喊道：兄弟们有人搞事，并肩子上！");
-                item.do_kill(me);
+                char.do_kill(me);
             }
         }, this.environment);
     }

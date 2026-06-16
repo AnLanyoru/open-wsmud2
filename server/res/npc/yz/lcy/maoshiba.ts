@@ -1,4 +1,8 @@
-import {NPC} from "../../../../core/char/npc.js";
+import { CHARACTER } from "../../../../core/char/character.js";
+import { NPC } from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
+import { ITEM } from "../../../../core/item.js";
+import { CORPSE } from "../../../../core/item/corpse.js";
 
 export default class extends NPC {
     name = "茅十八";
@@ -32,13 +36,7 @@ export default class extends NPC {
             ["eq/lv0/duanyi", 1, 1],
             ["eq/lv1/dandao", 1, 1]
         );
-        this.add_action("gei1", "给黑龙鞭", function (me) {
-            var obj = me.find_obj_bypath("eq/lv2/hl_bian");
-            if (!obj) return me.notify("你身上没有黑龙鞭。");
-            me.notify("茅十八对你说道：这位" + me.call() + "，我这里有本五虎断门刀秘籍，如果你把史松的黑龙鞭给我，就送与你了。");
-
-            me.send_commands("give " + this.id + " " + obj.id, "给他");
-        });
+        this.add_action("gei1", "给黑龙鞭", this.give_hl_bian);
         this.set_drop({
             obj: "money/silver",
             min: 2,
@@ -55,6 +53,14 @@ export default class extends NPC {
         });
     }
 
+    give_hl_bian(me: USER) {
+        var obj = me.find_obj_bypath("eq/lv2/hl_bian");
+        if (!obj) return me.notify("你身上没有黑龙鞭。");
+        me.notify("茅十八对你说道：这位" + me.call() + "，我这里有本五虎断门刀秘籍，如果你把史松的黑龙鞭给我，就送与你了。");
+
+        me.send_commands("give " + this.id + " " + obj.id, "给他");
+    }
+
     on_accept(me, obj, count) {
         if (!obj.is("eq/lv2/hl_bian")) return false;
         me.notify("茅十八哈哈大笑道：史松这个狗贼，也有这般下场！", true);
@@ -69,26 +75,27 @@ export default class extends NPC {
         return true;
     }
 
-    on_die(me) {
+    on_die(me: CHARACTER) {
+        if (!this.environment) return;
         var item = this.environment.find_by_path("yz/lcy/shisong");
         if (item) {
-            this.call_out(getAllFromMe, 100, item, this.environment.items);
+            this.call_out(this.getAllFromMe, 100, item, this.environment.items);
         }
     }
-}
 
-function getAllFromMe(shi, items) {
-    shi.send_message("史松啐了一口：天地会反贼，人人得而诛之！");
-    for (var i = 0; i < items.length; i++) {
-        if (items[i].fromid == this.id) {
-            var objs = items[i].items;
-            if (objs) {
-                for (var j = 0; j < objs.length; j++) {
-                    shi.send_message("史松从" + items[i].color_name + "里拿出了" + objs[j].unit_name() + "。");
+    getAllFromMe(shi: NPC, items: CORPSE[]) {
+        shi.send_message("史松啐了一口：天地会反贼，人人得而诛之！");
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].fromid == this.id) {
+                var objs = items[i].items;
+                if (objs) {
+                    for (var j = 0; j < objs.length; j++) {
+                        shi.send_message("史松从" + items[i].color_name + "里拿出了" + objs[j].unit_name() + "。");
+                    }
+                    objs.length = 0;
                 }
+                break;
             }
-            objs.length = 0;
-            break;
         }
     }
 }

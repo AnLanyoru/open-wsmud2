@@ -1,4 +1,5 @@
 import {NPC} from "../../../../core/char/npc.js";
+import { CORPSE } from "../../../../core/item/corpse.js";
 
 export default class extends NPC {
     name = "史松";
@@ -53,14 +54,13 @@ export default class extends NPC {
     }
 
     on_die() {
+        if (!this.environment) return;
         var item = this.environment.find_by_path("yz/lcy/maoshiba");
         if (item) {
-            this.call_out(getAllFromMe, 100, item, this.environment.items);
+            this.call_out(this.getAllFromMe, 100, item, this.environment.items);
         }
     }
-}
-
-function getAllFromMe(mao, items) {
+    getAllFromMe(mao: NPC, items: CORPSE[]) {
     mao.send_message("茅十八哈哈大笑道：狗贼，你也有今天！");
     for (var i = 0; i < items.length; i++) {
         if (items[i].fromid == this.id) {
@@ -69,9 +69,11 @@ function getAllFromMe(mao, items) {
                 for (var j = 0; j < objs.length; j++) {
                     mao.send_message("茅十八从" + items[i].color_name + "里拿出了" + objs[j].unit_name() + "。");
                 }
-            }
             objs.length = 0;
+            }
             break;
         }
     }
 }
+}
+
