@@ -18,7 +18,7 @@ export default class extends COMMAND {
     enter(me, index, diff) {
         index = parseInt(index);
         let area = AREA.FBS?.[index];
-        if (!area || area.no_fb || !area.is_copy || !DIFFS[diff])
+        if (!area || area.not_fb || !area.is_copy || !DIFFS[diff])
             return me.send('你要看哪个副本？');
         index = area.fb_index;
         let key = "fb_first_" + (index + 1) + "_" + diff;

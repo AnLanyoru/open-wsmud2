@@ -65,9 +65,9 @@ export class AREA extends BASE {
     drop_list?: any[];
     /** 困难模式掉落列表缓存 */
     diff_drop_list?: any[];
-    /** 普通模式NPC掉落配置(NPC路径列表) */
+    /** 普通模式 NPC掉落配置(NPC路径列表) */
     drop_npcs0?: string[];
-    /** 困难模式NPC掉落配置(NPC路径列表) */
+    /** 困难模式 NPC掉落配置(NPC路径列表) */
     drop_npcs1?: string[];
 
     // ============ 门派与社交 ============
@@ -116,7 +116,7 @@ export class AREA extends BASE {
     /** 是否禁止组队 */
     no_team?: boolean;
     /** 特殊属性（由资源文件设置，用于 dialog JSON） */
-    sp?: string | Record<string, unknown>;
+    sp?: string | Record<string, any>;
     /** 在 getAllMaps 遍历中设置的区域索引 */
     area_index?: number;
     /** 门派武功列表（由 jh.ts 从 FAMILY 复制） */

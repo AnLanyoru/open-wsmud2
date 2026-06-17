@@ -12,7 +12,7 @@ import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
 import type { ActionMap, CommandAccessFlags } from '../../types/base.js';
-import type { ROOM as RoomClass } from '../room/room.js';
+import type { ROOM } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { NPC } from './npc.js';
 import type { GameSocket } from '../world.js';
@@ -313,7 +313,7 @@ export class CHARACTER extends ITEM {
     // ============ 环境与交互 ============
 
     /** 当前所在房间 */
-    environment?: RoomClass;
+    environment?: ROOM;
     /** 当前活动状态 */
     state?: UserState | null = null;
     /** 等待用户输入的回调 */
@@ -407,7 +407,7 @@ export class CHARACTER extends ITEM {
     /** 主人 ID */
     master?: string;
     /** 死亡复活房间 */
-    die_room?: RoomClass;
+    die_room?: ROOM;
     /** 闲聊消息列表 */
     chat_msg?: string[];
     /** 网络连接（USER 子类实现） */
@@ -576,7 +576,7 @@ export class CHARACTER extends ITEM {
      * @param oid 物品 ID
      * @param parent
      */
-    find_obj(oid: string, parent?: ITEM | RoomClass): ITEM | null {
+    find_obj(oid: string, parent?: ITEM | ROOM): ITEM | null {
         let items = this.items;
         if (parent) items = parent.items;
         return items ? this.find_obj_byid(items, oid) : null;
@@ -1896,11 +1896,12 @@ export class CHARACTER extends ITEM {
     /**
      * 移动到新房间
      */
-    moveto(rm: any, leave_msg?: string, in_msg?: string, dir?: string): boolean | undefined {
+    moveto(rm?: string | ROOM, leave_msg?: string, in_msg?: string, dir?: string): boolean | undefined {
         const cur_room = this.environment;
-        let next_room = rm;
+        let next_room: ROOM | undefined;
         if (typeof rm === 'string') {
-            next_room = WORLD.getRoom(rm);
+            let next_room_path = rm;
+            next_room = WORLD.getRoom(next_room_path);
             if (!next_room) return false;
             if (cur_room && next_room.parent === cur_room.parent) {
                 if (cur_room.owner) {

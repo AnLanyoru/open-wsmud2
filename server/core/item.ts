@@ -332,7 +332,7 @@ export class ITEM extends BASE {
     }
 
     /**
-     * 判断背包是否已满
+     * 判断子物品数量是否已满
      * @param val - 要添加的数量，不传则判断是否已达上限
      */
     is_full(val?: number): boolean {

@@ -4,7 +4,6 @@ import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {AREA} from "../../../core/room/area.js";
-import {ROOM} from "../../../core/room/room.js";
 
 export default class extends COMMAND {
     command = "jh";

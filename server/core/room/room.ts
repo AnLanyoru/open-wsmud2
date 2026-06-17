@@ -208,7 +208,7 @@ export class ROOM extends ITEM {
      * @param isshow - 是否显示
      * @param in_msg - 进入消息
      */
-    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg: string): void {
+    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg?: string): void {
         this.on_before_enter && this.on_before_enter(obj);
         if (obj.is_player) {
             obj.send(this.to_json());
@@ -817,7 +817,7 @@ export class ROOM extends ITEM {
      */
     query_copy(id: string): ROOM | undefined {
         if (!this.copy_rooms) this.copy_rooms = {};
-        return (this.copy_rooms as Record<string, any>)[id];
+        return this.copy_rooms[id];
     }
 
     /**

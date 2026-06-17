@@ -32,7 +32,7 @@ export default class extends OBJ {
 
         for (var i = 0; i < list.length; i++) {
             list[i].hp = list[i].max_hp;
-            list[i].moveto(WORLD.getRoom(exits.random())!.query_copy2(me), '毒蛇被熏的四散逃去。');
+            list[i].moveto(WORLD.getRoom(exits.random())?.query_copy2(me), '毒蛇被熏的四散逃去。');
         }
 
     }
