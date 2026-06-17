@@ -129,10 +129,11 @@ export class AREA extends BASE {
     // ============ 回调（由资源文件设置） ============
 
     /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
-    on_login?: (user: USER) => void;
+    on_login?(user: USER): void;
     /** 人物进入后回调 — 触发时机：人物首次进入该区域房间后 */
-    on_enterd?: (me: CHARACTER) => void;
-
+    on_enterd?(me: CHARACTER): void;
+    /** 自定义客户端地图渲染 */
+    render_map?(me: USER): void;
     /**
      * 区域创建回调
      */

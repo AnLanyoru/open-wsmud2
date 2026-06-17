@@ -64,7 +64,7 @@ export default class extends COMMAND {
             str.push("分后才可以另行收徒或拜师\"");
         }
         if (me.query_temp("husband")) {
-            var husband: USER | null = null;// WORLD.getUser(me.query_temp("husband"));
+            var husband: USER | undefined = WORLD.getUser(me.query_temp("husband"));
             str.push(",husband:\"");
             if (husband) {
                 str.push(husband.color_name ?? "");
@@ -73,7 +73,7 @@ export default class extends COMMAND {
             }
             str.push("\"");
         } else if (me.query_temp("wife")) {
-            var wife: USER | null = null;// WORLD.getUser(me.query_temp("wife"));
+            var wife: USER | undefined = WORLD.getUser(me.query_temp("wife"));
             str.push(",wife:\"");
             if (wife) {
                 str.push(wife.color_name ?? "");
@@ -90,7 +90,7 @@ export default class extends COMMAND {
                 if (follower) {
                     str.push('["', follower.long_name(), '","', follower.id, '"');
                     if (follower.state) {
-                        str.push(',"', follower.state.title, '",', String(now - follower.state.stime));
+                        str.push(',"', follower.state.title, '",', String(now - (follower.state.stime ?? 0)));
                     }
                     str.push('],');
                 }

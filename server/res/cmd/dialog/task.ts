@@ -32,7 +32,7 @@ export default class extends COMMAND {
                 task.start(me, target);
                 break;
             case "giveup":
-                task.giveup(me);
+                task.giveup?.(me);
                 break;
             case "fin2":
                 this.task_fin(me, task, 'ok');
@@ -42,7 +42,7 @@ export default class extends COMMAND {
     }
 
     task_fin(me: CHARACTER, task: USERTASK, par?: string): void {
-        if (task.on_finish(me, par)) {
+        if (task.on_finish?.(me, par)) {
             const obj: Record<string, any> = {
                 type: "dialog",
                 dialog: "tasks",

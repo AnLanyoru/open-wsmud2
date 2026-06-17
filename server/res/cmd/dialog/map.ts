@@ -1,7 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {AREA} from "../../../core/room/area";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "map";
@@ -14,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, area) {
+    enter(me: USER, area: string) {
         //if (!area) {
         //    if (!this.map_json) this.map_json = getAllMaps(me);
 
