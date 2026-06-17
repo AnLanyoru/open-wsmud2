@@ -41,7 +41,7 @@ export default class extends NPC {
         if (!exits || !exits.length) return;
         this.do_command('go', exits.random());
         for (let item of this.environment!.items) {
-            if (item instanceof CHARACTER && item.is_player) {
+            if (item.check_player()) {
                 this.send_room("$N喊道：这里有个小毛贼！");
                 return this.do_kill(item);
             }
@@ -101,7 +101,7 @@ export default class extends NPC {
         let obj = NPC.CLONE(this.path);
         room.item_changed(obj, true);
         this.die_room = undefined;
-        this.equipment = null;
+        this.equipment = [];
         this.items = null;
         this.skills = null;
     }

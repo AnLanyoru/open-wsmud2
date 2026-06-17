@@ -20,7 +20,9 @@ import type {ROOM} from '../room/room.js';
 export class MONSTER extends CHARACTER {
 
     // ============ 核心属性 ============
-
+    
+    /** 是怪物 */
+    is_monster: boolean = true
     /** 是否能说话 */
     can_speek: boolean = false;
     /** 是否自动释放绝招 */

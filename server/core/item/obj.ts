@@ -47,8 +47,8 @@ export class OBJ extends ITEM {
 
     // ============ 核心属性 ============
 
-    /** 单位名称（个/把/件 等） */
-    unit: string = "个";
+    /** 是否为物品 */
+    is_obj: boolean = true;
     /** 物品路径标识 */
     path: string = '';
     /** 物品数量 */

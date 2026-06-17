@@ -12,6 +12,7 @@ import type {EQUIPMENT} from '../item/equipment.js';
 import type {SKILL} from '../skill/skill.js';
 import type {FAMILY} from '../skill/family.js';
 import type {AREA} from '../room/area.js';
+import { ITEM } from '../item.js';
 
 // ============================================================
 // 模块级常量
@@ -101,7 +102,7 @@ interface FollowerState {
 // @ts-ignore: static CREATE override incompatible with base
 export class FOLLOWER extends CHARACTER {
     // ============ 核心属性 ============
-
+    is_follower: boolean = true;
     /** 是否自动释放绝招 */
     auto_pfm: boolean = true;
     /** 所属门派 */
@@ -129,9 +130,6 @@ export class FOLLOWER extends CHARACTER {
     action_list: CommandEntry[] | null = null;
 
     // ============ 战斗与装备 ============
-
-    /** 装备列表 */
-    equipment: EQUIPMENT[] | null = null;
 
     // ============ 物品与设置 ============
 
@@ -264,7 +262,7 @@ export class FOLLOWER extends CHARACTER {
             }
             my_npc.on_makelove = obj ? obj.on_makelove : undefined;
             my_npc.on_master_enter = obj ? obj.on_master_enter : undefined;
-            my_npc.equipment = (data.temp || data.eq) as any as EQUIPMENT[] | null;
+            my_npc.equipment = (data.temp || data.eq) as any as (EQUIPMENT | null)[];
             my_npc.settings = data.settings ?? {};
             my_npc.skills = data.skills as Record<string, any>;
             my_npc.path = obj.path;
@@ -303,7 +301,7 @@ export class FOLLOWER extends CHARACTER {
         }
         npc.on_makelove = obj.on_makelove;
         npc.on_master_enter = obj.on_master_enter;
-        npc.equipment = obj.equipment as any as EQUIPMENT[] | null;
+        npc.equipment = obj.equipment as any as (EQUIPMENT | null)[];
         npc.skills = obj.skills;
         npc.items = obj.items as any as OBJ[] | null;
         npc.id = par.id;
@@ -437,7 +435,8 @@ export class FOLLOWER extends CHARACTER {
             str.push(',eq:[');
             for (let i = 0; i < this.equipment.length; i++) {
                 if (i > 0) str.push(',');
-                if (this.equipment[i]) this.equipment[i].save_db(str);
+                let eq = this.equipment[i]
+                if (eq) eq.save_db(str);
                 else str.push('null');
             }
             str.push(']');
@@ -693,8 +692,8 @@ export class FOLLOWER extends CHARACTER {
 
     // ============ USER方法代理 ============
 
-    remove_obj(obj: OBJ | string, count?: number): OBJ | undefined {
-        return USER.prototype.remove_obj.call(this, obj, count) as OBJ | undefined;
+    remove_obj(obj: ITEM | string, count?: number): ITEM | null {
+        return USER.prototype.remove_obj.call(this, obj, count);
     }
 
     recount(): void {

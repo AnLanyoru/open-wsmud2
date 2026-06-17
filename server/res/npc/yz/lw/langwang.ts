@@ -2,8 +2,8 @@ import {MONSTER} from "../../../../core/char/monster.js";
 import {WORLD} from "../../../../core/world.js";
 import {OBJ} from "../../../../core/item/obj.js";
 import {ROOM} from "../../../../core/room/room.js";
-import {CHARACTER} from "../../../../core/char/character.js";
-import {NPC} from "../../../../core/char/npc.js";
+import type {CHARACTER} from "../../../../core/char/character.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class extends MONSTER {
     name = "狼王";
@@ -59,7 +59,7 @@ export default class extends MONSTER {
                 if (!rm) return;
                 for (var i = 0; i < rm.items.length; i++) {
                     const rmItem = rm.items[i];
-                    if (rmItem.is('yz/lw/lang') && rmItem instanceof NPC) {
+                    if (rmItem.is('yz/lw/lang') && rmItem.check_character()) {
                         rmItem.on_died = this.on_langdied.bind(this);
                         rmItem.moveto(this.environment!, undefined);
                         me.notify('一只小狼跟着你慢悠悠的溜达过来。');
@@ -108,10 +108,10 @@ export default class extends MONSTER {
     on_shedied(this: MONSTER, npc: CHARACTER, corpse: any): void {
         //四区吃蛇变身
         if (npc.is_player) return;
-        var me: CHARACTER | undefined;
+        var me: USER | undefined;
         for (var i = 0; i < npc.environment!.items.length; i++) {
             const item = npc.environment!.items[i];
-            if (item.is_player && item instanceof CHARACTER) {
+            if (item.check_player()) {
                 me = item;
                 break;
             }

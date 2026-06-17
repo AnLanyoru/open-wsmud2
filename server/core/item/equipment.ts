@@ -67,7 +67,8 @@ export class EQUIPMENT extends OBJ {
     otype: number = 4;
 
     // ============ 附加属性 ============
-
+    /** 不允许分解 */
+    no_fenjie?: boolean;
     /** 基础装备评分（按品级 * 100 计算） */
     score: number = 0;
     /** 附加属性（强化加成，由 levelchange_prop 动态计算） */
@@ -125,7 +126,7 @@ export class EQUIPMENT extends OBJ {
      */
     notify_action(me: CHARACTER, isadd: boolean): void {
         if (!this.on_use) return;
-        isadd = me.equipment?.[this.eq_type] === this;
+        isadd = me.equipment[this.eq_type] === this;
         if (isadd)
             me.send("{type:'addAction',id:'" + this.id + "',name:'" + this.name + "',distime:" + (this.distime || 0) + "}");
         else

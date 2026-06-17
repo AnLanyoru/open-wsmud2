@@ -1,21 +1,22 @@
 /**
  * USER 玩家类
  */
-import {CHARACTER} from './character.js';
-import {ROOM} from '../room/room.js';
-import {OBJ} from '../item/obj.js';
-import type {EQUIPMENT} from '../item/equipment.js';
-import {CORPSE} from '../item/corpse.js';
-import {SKILL} from '../skill/skill.js';
-import type {FAMILY} from '../skill/family.js';
-import type {AREA} from '../room/area.js';
-import {FOLLOWER} from './follower.js';
-import {WORLD} from '../world.js';
-import {UTIL} from '../util.js';
-import {WEAPON_TYPE} from '../const.js';
-import type {GameSocket} from '../world.js';
-import type {NPC} from './npc.js';
-import {FAMILIES} from '../skill/family.js';
+import { CHARACTER } from './character.js';
+import { ROOM } from '../room/room.js';
+import { OBJ } from '../item/obj.js';
+import type { EQUIPMENT } from '../item/equipment.js';
+import { CORPSE } from '../item/corpse.js';
+import { SKILL } from '../skill/skill.js';
+import type { FAMILY } from '../skill/family.js';
+import type { AREA } from '../room/area.js';
+import { FOLLOWER } from './follower.js';
+import { WORLD } from '../world.js';
+import { UTIL } from '../util.js';
+import { WEAPON_TYPE } from '../const.js';
+import type { GameSocket } from '../world.js';
+import type { NPC } from './npc.js';
+import { FAMILIES } from '../skill/family.js';
+import { ITEM } from '../item.js';
 
 // ============================================================
 // 模块级常量
@@ -169,8 +170,6 @@ export class USER extends CHARACTER {
     items: OBJ[] | null = null;
     /** 仓库物品 */
     stores: OBJ[] | null = null;
-    /** 装备列表 */
-    equipment: EQUIPMENT[] | null = null;
     /** 当前装备组 */
     eq_group: number = 0;
     /** 装备组定义 */
@@ -601,7 +600,8 @@ export class USER extends CHARACTER {
             str.push(',eq:[');
             for (let i = 0; i < this.equipment.length; i++) {
                 if (i > 0) str.push(',');
-                if (this.equipment[i]) this.equipment[i].save_db(str);
+                let eq = this.equipment[i]
+                if (eq) eq.save_db(str);
                 else str.push('null');
             }
             str.push(']');
@@ -760,7 +760,7 @@ export class USER extends CHARACTER {
      */
     add_title(title: string | null, type: string): void {
         if (!this.titles) this.titles = [];
-        const obj = {title, type, use: false};
+        const obj = { title, type, use: false };
         for (let i = 0; i < this.titles.length; i++) {
             if (this.titles[i].type == type) {
                 obj.use = this.titles[i].use;
@@ -961,15 +961,15 @@ export class USER extends CHARACTER {
     /**
      * 从背包移除物品
      */
-    remove_obj(obj: OBJ | string, count?: number): OBJ | undefined {
+    remove_obj(obj: ITEM | string, count?: number): ITEM | null {
         if (typeof obj === 'string') {
             obj = this.find_obj(obj) as OBJ;
         }
-        if (!obj) return;
+        if (!obj) return null;
         count = count || obj.count || 1;
         const newobj = this.remove_item(obj, count) as OBJ;
         if (newobj == obj) {
-            obj.notify_action(this, false);
+            if(obj.check_obj()) obj.notify_action(this, false);
         }
         this.items_changed(obj, count);
         return newobj;
@@ -978,7 +978,7 @@ export class USER extends CHARACTER {
     /**
      * 物品变更通知客户端
      */
-    items_changed(item: OBJ, drop_count?: number): void {
+    items_changed(item: ITEM, drop_count?: number): void {
         if (drop_count) {
             this.send('{type:"dialog",dialog:"pack",id:"' + item.id + '",remove:' + drop_count + ',money:' + this.money + '}');
         } else {
@@ -1002,20 +1002,22 @@ export class USER extends CHARACTER {
             if (item.is_equipment) {
                 str.push(',can_eq:1');
             }
-            if (item.on_use) {
-                str.push(',can_use:1');
+            if (item.check_obj()) {
+                if (item.on_use) {
+                    str.push(',can_use:1');
+                }
+                if (item.on_study) {
+                    str.push(',can_study:1');
+                }
+                if (item.on_open) {
+                    str.push(',can_open:1');
+                }
+                if (item.combine_count) {
+                    str.push(',can_combine:' + item.combine_count);
+                }
+                str.push(',value:');
+                str.push(item.transable ? item.value.toString() : '0');
             }
-            if (item.on_study) {
-                str.push(',can_study:1');
-            }
-            if (item.on_open) {
-                str.push(',can_open:1');
-            }
-            if (item.combine_count) {
-                str.push(',can_combine:' + item.combine_count);
-            }
-            str.push(',value:');
-            str.push(item.transable ? item.value.toString() : '0');
             str.push(',money:');
             str.push(this.money.toString());
             str.push('}');
@@ -1266,8 +1268,8 @@ export class USER extends CHARACTER {
         );
         this.fy = parseInt(
             (((this.str + this.con) / 10
-                    + this.query_prop('fy')
-                    + this.query_prop('con') * this.con / 10)
+                + this.query_prop('fy')
+                + this.query_prop('con') * this.con / 10)
                 * (100 + this.query_prop('fy_per')) / 100),
         );
         this.mz = parseInt(
@@ -1276,8 +1278,8 @@ export class USER extends CHARACTER {
         );
         this.ds = parseInt(
             ((this.dex / 2
-                    + this.query_prop('ds')
-                    + this.query_prop('dex') * this.dex / 10)
+                + this.query_prop('ds')
+                + this.query_prop('dex') * this.dex / 10)
                 * (100 + this.query_prop('ds_per')) / 100),
         );
         if (this.dodge_skill?.on_recount_dodge) {
@@ -1285,8 +1287,8 @@ export class USER extends CHARACTER {
         }
         this.zj = parseInt(
             ((this.str / 2
-                    + this.query_prop('zj')
-                    + this.query_prop('str') * this.str / 10)
+                + this.query_prop('zj')
+                + this.query_prop('str') * this.str / 10)
                 * (100 + this.query_prop('zj_per')) / 100),
         );
         if (this.parry_skill?.on_recount_parry) {

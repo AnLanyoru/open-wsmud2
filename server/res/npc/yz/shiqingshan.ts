@@ -53,7 +53,7 @@ export default class extends NPC {
                 }, 3);
             } else {
                 this.environment!.each_item(item => {
-                    if (item.is("pub/bing") && item instanceof CHARACTER) {
+                    if (item.is("pub/bing") && item.check_character()) {
                         item.do_kill(me);
                     }
                 }, this.environment!);

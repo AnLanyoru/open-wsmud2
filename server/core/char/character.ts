@@ -18,7 +18,8 @@ import type {FAMILY} from '../skill/family.js';
 import type {NPC} from './npc.js';
 import type {GameSocket} from '../world.js';
 import type { COMMAND } from '../command.js';
-import type { UserState } from './user.js';
+import type { USER, UserState } from './user.js';
+import type { FOLLOWER } from './follower.js';
 
 // Array.prototype 扩展方法（由 util.js 注入）
 declare global {
@@ -298,8 +299,6 @@ export class CHARACTER extends ITEM {
 
     /** 是否为角色 */
     is_character: boolean = true;
-    /** 是否为 NPC */
-    is_npc: boolean = false;
 
     // ============ 继承自 ITEM 的字段和方法类型声明（在此声明以便类型检查） ============
 
@@ -311,8 +310,6 @@ export class CHARACTER extends ITEM {
     id!: string;
     /** 金钱数量 */
     money: number = 0;
-    /** 是否为玩家 */
-    is_player: boolean = false;
     /** 是否静默消息 */
     no_message: boolean = false;
 
@@ -338,7 +335,7 @@ export class CHARACTER extends ITEM {
     /** buff/debuff 状态列表 */
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
-    equipment: (EQUIPMENT | null)[] | null = null;
+    equipment: (EQUIPMENT | null)[] = [];
     /** 临时数据 */
     temp: Record<string, any> = {};
     /** 战斗属性修饰 */
@@ -1811,14 +1808,17 @@ export class CHARACTER extends ITEM {
     /**
      * 移除物品
      */
-    remove_obj(obj: any, count?: number): any {
+    remove_obj(obj: string | ITEM, count?: number): ITEM | null {
+        let item: ITEM | null;
         if (typeof obj == 'string') {
-            obj = this.find_obj(obj);
+            item = this.find_obj(obj);
+        } else {
+            item = obj
         }
-        if (!obj) return;
-        count = count || obj.count || 1;
-        this.remove_item(obj, count);
-        return obj;
+        if (!item) return null;
+        count = count || item.count || 1;
+        this.remove_item(item, count);
+        return item;
     }
 
     /**

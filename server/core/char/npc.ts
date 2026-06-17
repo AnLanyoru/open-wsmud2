@@ -360,7 +360,7 @@ export class NPC extends CHARACTER {
         this.fight_type = 0;
         this.die_room = undefined;
         this.environment = undefined;
-        this.equipment = null;
+        this.equipment = [];
         this.items = null;
         this.skills = null;
         this.json = null;

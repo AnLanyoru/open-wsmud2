@@ -50,7 +50,7 @@ export default class extends NPC {
                 let room = ROOM.Get(path);
                 if (!room) continue;
                 for (let item of room.items) {
-                    if (item instanceof CHARACTER && !item.fight_type && item.hp > 0 && item.is('yz/hy/jiaotu')) {
+                    if (item.check_character() && !item.fight_type && item.is('yz/hy/jiaotu')) {
                         list.push(item);
                     }
                 }

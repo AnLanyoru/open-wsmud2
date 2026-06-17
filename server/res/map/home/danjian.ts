@@ -24,12 +24,12 @@ export default class MapRoom extends ROOM {
     }
 
     on_enter(me: USER | FOLLOWER) {
-        if (me instanceof USER && me.follower) {
+        if (me.check_player() && me.follower) {
             for (var i = 0; i < me.follower.length; i++) {
                 FOLLOWER.CREATE(me, me.follower[i], this.on_npc_create.bind(this, me));
             }
         }
-        if (me instanceof FOLLOWER && me.master) {
+        if (me.check_follower() && me.master) {
             me.action_list = [
                 {cmd: "makelove " + me.id, name: "和" + me.name + "双修"}
             ];
@@ -49,7 +49,7 @@ export default class MapRoom extends ROOM {
     }
 
     on_leave(me: USER | FOLLOWER) {
-        if (me instanceof FOLLOWER && me.master) {
+        if (me.check_follower() && me.master) {
             me.action_list = null;
             me.master_json = null;
         }

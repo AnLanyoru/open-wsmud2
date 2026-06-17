@@ -216,7 +216,7 @@ export class ROOM extends ITEM {
      * @param changed_msg - 变更消息(广播给房间内玩家)
      * @param dir - 移动方向
      */
-    item_changed(obj: OBJ | CHARACTER | NPC | USER | CORPSE, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
+    item_changed(obj: ITEM, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
         if (!obj) return;
         let msg: string | undefined;
         let obj_index = -1, isshow = !obj.query_temp('hidden');
@@ -226,7 +226,7 @@ export class ROOM extends ITEM {
                 obj_index = i;
                 continue;
             }
-            if (item.is_player && isshow) {
+            if (item.check_player() && isshow) {
                 item as USER;
                 if (!msg) msg = this.item_json(obj, isin);
                 item.send(msg);
@@ -236,7 +236,7 @@ export class ROOM extends ITEM {
                 }
 
             } else {
-                if (obj.is_character) {
+                if (obj.check_character()) {
                     if (isin && (item.on_enter)) {
                         item.on_enter(obj);
                     } else if (!isin && item.on_leave) {
@@ -250,9 +250,9 @@ export class ROOM extends ITEM {
             obj.environment = this;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
-                if (obj.is_player) obj.send(this.items_to_json());
+                if (obj.check_player()) obj.send(this.items_to_json());
 
-            } else if (obj.is_player) {
+            } else if (obj.check_player()) {
                 if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
                 obj.send(msg);
             }
@@ -267,7 +267,7 @@ export class ROOM extends ITEM {
      * @param item - 物件
      * @param isin - 是否进入
      */
-    item_json(item: OBJ | CHARACTER | NPC, isin: boolean): string {
+    item_json(item: ITEM, isin: boolean): string {
         if (!item) return "";
         const str: string[] = [];
         if (isin) {
@@ -280,8 +280,7 @@ export class ROOM extends ITEM {
             if (item.is_player) {
                 str.push(",p:1");
             }
-            // @ts-ignore 前面已经判断了类型
-            if (item.is_character && item.hp) {
+            if (item.check_character()) {
                 const ch = item as CHARACTER;
                 str.push(",mp:");
                 str.push(String(ch.mp));

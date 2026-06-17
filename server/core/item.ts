@@ -10,6 +10,11 @@ import type {ROOM} from './room/room.js';
 import type {ActionDef, ActionMap} from '../types/base.js';
 import type { PropMap } from '../types/props.js';
 import type { USER } from './char/user.js';
+import type { FOLLOWER } from './char/follower.js';
+import type { NPC } from './char/npc.js';
+import type { EQUIPMENT } from './item/equipment.js';
+import type { OBJ } from './item/obj.js';
+import type { CHARACTER } from './char/character.js';
 
 // ============================================================
 // ITEM 类
@@ -74,6 +79,8 @@ export class ITEM extends BASE {
     is_container: boolean = false;
     /** 是否为角色 */
     is_character: boolean = false;
+    /** 是否为随从 */
+    is_follower: boolean = false;
     /** 是否禁止拾取 */
     no_get: boolean = false;
     /** 是否为 NPC */
@@ -87,6 +94,8 @@ export class ITEM extends BASE {
 
     /** 是否为装备 */
     is_equipment: boolean = false;
+    /** 是否为物品 */
+    is_obj: boolean = true;
     /** 单位名称 */
     unit: string = '个';
     /** 冷却类型标识（用于区分同类物品共享冷却, 空字符串为使用id区分冷却） */
@@ -97,6 +106,30 @@ export class ITEM extends BASE {
     otype: number = 0;
     /** 经书索引（四十二章经专用） */
     jing_index?: number;
+    /** 检查是否为 NPC */
+    check_npc(): this is NPC {
+        return this.is_npc === true;
+    }
+    /** 检查是否为 随从 */
+    check_follower(): this is FOLLOWER {
+        return this.is_follower === true;
+    }
+    /** 检查是否为玩家 */
+    check_player(): this is USER {
+        return this.is_player === true;
+    }
+    /** 检查是否为装备 */
+    check_equipment(): this is EQUIPMENT {
+        return this.is_equipment === true;
+    }
+    /** 检查是否为物品 */
+    check_obj(): this is OBJ {
+        return this.is_obj === true;
+    }
+    /** 检查是否为生物 */
+    check_character(): this is CHARACTER {
+        return this.is_character === true;
+    }
 
     // ============ 消息发送（桩方法，由 CHARACTER 覆写） ============
 

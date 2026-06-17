@@ -10,21 +10,20 @@ export default class extends COMMAND {
 
     enter(player: CHARACTER, objid: string, isok: string): void {
         var obj = player.find_obj(objid);
-        if (!obj) {
+        if (!obj?.check_obj()) {
             return player.notify("你要分解什么装备？");
         }
         if (obj.is_locked) {
             return player.notify(obj.color_name + "处于锁定状态，无法丢弃，贩卖，分解。");
             //  player.send_commands('lockobj ' + obj.id, '解除锁定');
         }
-        if (!obj.is_equipment || obj.no_fenjie)
+        if (!obj.check_equipment() || obj.no_fenjie)
             return player.notify("这个东西分解不了。");
         if (!obj.grade) return player.notify(obj.color_name + "蕴含的力量太弱了，分解不出来什么东西。");
         if (obj.grade > 5) {
             return player.notify("你确定要分解" + obj.color_name + "吗？");
         }
         if (obj.grade >= 5) {
-            if (!(obj instanceof EQUIPMENT)) return player.notify("这个东西不能分解。");
             return this.fenjie2(player, obj, isok);
         }
 
@@ -94,7 +93,7 @@ export default class extends COMMAND {
             return player.notify(obj.color_name + "已经镶嵌宝石，清理宝石后才可以分解。");
         }
         var removedObj = player.remove_obj(obj);
-        if (!removedObj || !(removedObj instanceof EQUIPMENT)) return player.notify("你要分解什么装备?");
+        if (!removedObj || !removedObj.check_equipment()) return player.notify("你要分解什么装备?");
         obj = removedObj;
 
         let item = player.add_obj("st/yuanjing", count);

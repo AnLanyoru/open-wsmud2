@@ -57,7 +57,7 @@ export default class extends NPC {
         obj.moveto(rm);
         // this.do_command('chat', rm.name);
         this.die_room = undefined;
-        this.equipment = null;
+        this.equipment = [];
         this.items = null;
         this.skills = null;
     }
