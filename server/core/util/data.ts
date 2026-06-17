@@ -12,9 +12,13 @@ const fs = fs_sync.promises;
 // ============================================================
 
 /** 数据库角色记录格式 */
-interface RoleRecord {
+export interface RoleRecord {
     /** 角色 ID */
     id: string;
+    /** 用户 ID */
+    userid: string;
+    /** 角色称号 */
+    title: string;
     /** 角色名称 */
     name: string;
     /** 角色等级 */

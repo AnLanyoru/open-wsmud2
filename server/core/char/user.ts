@@ -17,6 +17,7 @@ import type { GameSocket } from '../world.js';
 import type { NPC } from './npc.js';
 import { FAMILIES } from '../skill/family.js';
 import { ITEM } from '../item.js';
+import { RoleRecord } from '../util/data.js';
 
 // ============================================================
 // 模块级常量
