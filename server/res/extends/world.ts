@@ -13,7 +13,7 @@
  */
 import {WORLD} from "../../core/world.js";
 import {USER} from "../../core/char/user.js";
-import db from "../../core/util/data.js";
+import { db } from "../../core/util/data.js";
 
 // 覆盖 os/world.js 中的空壳实现
 WORLD.connect = function (socket) {

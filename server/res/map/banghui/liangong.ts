@@ -8,8 +8,8 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("fenpei", "分配属性", null);
-        this.add_action("xiulian", "修炼", null);
+        this.add_action("fenpei", "分配属性");
+        this.add_action("xiulian", "修炼");
     }
 
     on_leave(me) {

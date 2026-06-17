@@ -1,6 +1,6 @@
 import {NPC} from "../../../../core/char/npc.js";
 
-export default class extends NPC {
+export default class GuanFuZi extends NPC {
     name = "关安基";
     desc = "只见他长长的胡子飘在胸前，模样甚是威严。因此人称关夫子。";
     title = "关夫子";

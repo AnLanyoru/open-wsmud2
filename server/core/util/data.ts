@@ -1,0 +1,316 @@
+/**
+ * 数据持久化模块 - 数据库操作 / 文件备份
+ */
+
+import fs_sync from "fs";
+import {WORLD} from "../world.js";
+
+const fs = fs_sync.promises;
+
+// ============================================================
+// 类型
+// ============================================================
+
+/** 数据库角色记录格式 */
+interface RoleRecord {
+    /** 角色 ID */
+    id: string;
+    /** 角色名称 */
+    name: string;
+    /** 角色等级 */
+    level: number;
+    /** 序列化后的完整角色数据 */
+    data: string;
+    /** 用户权限等级 */
+    user_level: number;
+}
+
+/** 请求日志条目 */
+interface RequestLog {
+    time: number;
+    user: string;
+    cmd: string;
+}
+
+/** 错误日志条目 */
+interface ErrorLog {
+    time: number;
+    user: string;
+    cmd: string;
+    msg: string;
+}
+
+/** 数据库接口（由启动脚本注入到 __CONFIG.DB） */
+interface DBInterface {
+    close(): Promise<void>;
+    getRoles(userid: number, server: number): Promise<RoleRecord[]>;
+    addRole(role: RoleRecord): Promise<RoleRecord>;
+    deleteRole(userid: number, roleid: string): Promise<void>;
+    saveRole(role: RoleRecord): Promise<void>;
+    getUserByID(id: string): any;
+    getData(userid: number, id: string): any;
+    updateRoleName(id: string, userid: number, name: string): any;
+    updateUserid(id: string, fromuserid: number, touserid: number): any;
+    getServers(): import("../world.js").ServerConfig[];
+}
+
+const DB: DBInterface = __CONFIG.DB;
+
+// ============================================================
+// 导出
+// ============================================================
+
+class DataBaseHandler {
+    /** 关闭数据库连接 */
+    close(): Promise<void> {
+        return DB.close();
+    }
+
+    /** 获取用户的所有角色 */
+    getRoles(userid: number, server: number): Promise<RoleRecord[]> {
+        return DB.getRoles(userid, server);
+    }
+
+    /** 创建新角色 */
+    async addRole(role: RoleRecord): Promise<RoleRecord> {
+        return await DB.addRole(role);
+    }
+
+    /** 删除角色 */
+    deleteRole(userid: number, roleid: string): Promise<void> {
+        return DB.deleteRole(userid, roleid);
+    }
+
+    /** 保存角色数据 */
+    saveRole(role: RoleRecord): Promise<void> {
+        return DB.saveRole(role);
+    }
+
+    /** 批量保存角色并写入本地备份文件 */
+    async saveRoles(roles: RoleRecord[]): Promise<void> {
+        const dt = new Date();
+        const path =
+            __PATH.DATA +
+            "bak/data" +
+            dt.getFullYear() +
+            "-" +
+            (dt.getMonth() + 1) +
+            "-" +
+            dt.getDate() +
+            "-" +
+            dt.getHours() +
+            ".js";
+        const stream = fs_sync.createWriteStream(path, {flags: "a"});
+        try {
+            stream.write("[");
+            for (const role of roles) {
+                await DB.saveRole(role);
+                this.localBak(stream, role);
+            }
+            stream.write("0]");
+        } catch (error) {
+            console.error("备份数据失败：", error);
+        } finally {
+            stream.end();
+        }
+    }
+
+    /** 将单个角色数据写入备份流 */
+    localBak(stream: fs_sync.WriteStream, role: RoleRecord): void {
+        stream.write('{id:"');
+        stream.write(role.id);
+        stream.write('",name:"');
+        stream.write(role.name);
+        stream.write('",userid:');
+        stream.write(role.userid.toString());
+        stream.write(',title:"');
+        stream.write(role.title);
+        stream.write('",level:');
+        stream.write(role.level.toString());
+        stream.write(",data:");
+        stream.write(role.data);
+        stream.write("},");
+    }
+
+    /** 保存请求日志到文件 */
+    saveRequest(recs: RequestLog[]): Promise<void> {
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const path = __PATH.DATA + "req/request" + f + ".txt";
+        const ary: (string | number)[] = [];
+        for (let i = 0; i < recs.length; i++) {
+            const r = recs[i];
+            ary.push(r.time);
+            ary.push(" ");
+            ary.push(r.user);
+            ary.push(" ");
+            ary.push(r.cmd);
+            ary.push("\r\n");
+        }
+        return fs.appendFile(path, ary.join(""));
+    }
+
+    /** 保存错误日志到文件 */
+    saveLogs(logs: ErrorLog[]): Promise<void> {
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const path = __PATH.DATA + "log/log" + f + ".txt";
+        const ary: (string | number)[] = [];
+        for (let i = 0; i < logs.length; i++) {
+            const r = logs[i];
+            ary.push(r.time);
+            ary.push(" ");
+            ary.push(r.user);
+            ary.push(" ");
+            ary.push(r.cmd);
+            ary.push(" ");
+            ary.push(r.msg);
+            ary.push("\r\n");
+        }
+        return fs.appendFile(path, ary.join(""));
+    }
+
+    /** 保存全局数据到文件（带本地备份） */
+    async saveData(content: string): Promise<void> {
+        const path = __PATH.DATA + "data.js";
+        const dt = new Date();
+        const f = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+        const tempDir = __PATH.DATA + "temp/";
+        if (!(await this.check_file(tempDir))) {
+            await fs.mkdir(tempDir);
+        }
+        const _dst = tempDir + "temp" + f + ".js";
+        if (await this.check_file(path)) {
+            await fs.copyFile(path, _dst);
+        }
+        return fs.writeFile(path, content);
+    }
+
+    /** 从文件读取全局数据 */
+    async readData(): Promise<any> {
+        const path = __PATH.DATA + "data.js";
+        try {
+            const data = await fs.readFile(path);
+            return (JSON as any).toObject(data);
+        } catch (error) {
+            console.error("数据读取失败", path, error);
+        }
+    }
+
+    /** 根据 ID 获取用户 */
+    getUserByID(id: string): any {
+        return DB.getUserByID(id);
+    }
+
+    /** 获取角色存档数据 */
+    getRoleData(userid: number, id: string): any {
+        return DB.getData(userid, id);
+    }
+
+    /** 修改角色名 */
+    change_name(id: string, userid: number, name: string): any {
+        return DB.updateRoleName(id, userid, name);
+    }
+
+    /** 迁移角色到另一个用户 */
+    change_userid(id: string, fromuserid: number, touserid: number): any {
+        return DB.updateUserid(id, fromuserid, touserid);
+    }
+
+    /** 检查文件或目录是否存在 */
+    async check_file(path: string): Promise<boolean> {
+        try {
+            await fs.access(path);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    /**
+     * 初始化数据目录结构 — 创建服务器数据目录及 bak/log/req/temp 子目录，
+     * 并从模板目录复制默认数据文件
+     */
+    async initDataDir(): Promise<void> {
+        __PATH.BASE_DATA = __PATH.DATA;
+        __PATH.DATA = __PATH.DATA + WORLD.SERVERID + "/";
+
+        if (!(await this.check_file(__PATH.DATA))) {
+            console.log("创建备份文件夹....");
+            await fs.mkdir(__PATH.DATA);
+        }
+        for (const sub of ["bak", "log", "req", "temp"]) {
+            const dir = __PATH.DATA + sub;
+            if (!(await this.check_file(dir))) {
+                await fs.mkdir(dir);
+            }
+        }
+        const paths = await fs.readdir(__PATH.DEF_DATA);
+        for (let i = 0; i < paths.length; i++) {
+            const _src = __PATH.DEF_DATA + paths[i];
+            const _dst = __PATH.DATA + paths[i];
+            if (!(await this.check_file(_dst))) {
+                const stat = await fs.stat(_src);
+                if (stat.isFile()) {
+                    await fs.copyFile(_src, _dst);
+                    console.log("创建备份文件 ", _dst, "....");
+                } else {
+                    await fs.mkdir(_dst);
+                    console.log("创建备份文件夹 ", _dst, "....");
+                }
+            }
+        }
+    }
+
+    /** 获取服务器列表 */
+    getServers(): import("../world.js").ServerConfig[] {
+        return DB.getServers();
+    }
+
+    // ============================================================
+    // 本地角色备份 — 崩溃恢复
+    // ============================================================
+
+    /**
+     * 读取最近一次未保存的本地角色备份
+     * 备份格式与 saveRoles 一致：`[{role},{role},...,0]`
+     */
+    getLocalRoles(): RoleRecord[] | null {
+        try {
+            const bakDir = __PATH.DATA + "bak/";
+            if (!fs_sync.existsSync(bakDir)) return null;
+            const files = fs_sync
+                .readdirSync(bakDir)
+                .filter((f: string) => f.startsWith("data") && f.endsWith(".js"))
+                .sort();
+            if (!files.length) return null;
+            const latest = bakDir + files[files.length - 1];
+            const raw = fs_sync.readFileSync(latest, "utf-8");
+            const content = raw.trim();
+            if (!content.startsWith("[")) return null;
+            const json = content.replace(/0\]$/, "]");
+            return (JSON as any).toObject(json) as RoleRecord[];
+        } catch (e: any) {
+            console.log("读取本地备份失败:", e.message);
+            return null;
+        }
+    }
+
+    /** 删除所有本地角色备份文件 */
+    deleteLocalRoles(): void {
+        try {
+            const bakDir = __PATH.DATA + "bak/";
+            if (!fs_sync.existsSync(bakDir)) return;
+            const files = fs_sync
+                .readdirSync(bakDir)
+                .filter((f: string) => f.startsWith("data") && f.endsWith(".js"));
+            for (const f of files) {
+                fs_sync.unlinkSync(bakDir + f);
+            }
+        } catch (e: any) {
+            console.log("删除本地备份失败:", e.message);
+        }
+    }
+};
+
+export var db = new DataBaseHandler()

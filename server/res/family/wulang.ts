@@ -1,3 +1,4 @@
+import { USER } from "../../core/char/user.js";
 import {FAMILY} from "../../core/skill/family.js";
 
 export default class extends FAMILY {
@@ -5,7 +6,7 @@ export default class extends FAMILY {
     name = "无浪门";
     top_name = "";
 
-    call(player, isbad) {
+    call(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贱人" : "小姑娘";
@@ -18,7 +19,7 @@ export default class extends FAMILY {
         }
     }
 
-    call_me(player, isbad) {
+    call_me(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 30) return isbad ? "本姑娘" : "小女子";

@@ -1,5 +1,6 @@
 import type {CHARACTER} from "../../core/char/character.js";
 import {FAMILY} from "../../core/skill/family.js";
+import type { SkillSet } from "../../core/skill/skill.js";
 
 export default class extends FAMILY {
     id = "GAIBANG";
@@ -17,7 +18,7 @@ export default class extends FAMILY {
     boss_guard = ["gaibang/xiaowu", "gaibang/andao4", "gaibang/andao3"];
     guard_rooms = ['gaibang/pomiao', 'gaibang/mishi', 'gaibang/andao2'];
     eqs = [];
-    npc_skills: [string, number, (string | string[])?][] = [
+    npc_skills: SkillSet = [
         ["dodge", 800],
         ["parry", 800],
         ["force", 800],

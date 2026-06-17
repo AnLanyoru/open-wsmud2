@@ -49,19 +49,6 @@ const DIE_MSG = [
 // 类型定义
 // ============================================================
 
-/** 数据库角色记录格式 */
-interface RoleRecord {
-    /** 角色 ID */
-    id: string;
-    /** 角色名称 */
-    name: string;
-    /** 角色等级 */
-    level: number;
-    /** 序列化后的完整角色数据 */
-    data: string;
-    /** 用户权限等级 */
-    user_level: number;
-}
 
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {

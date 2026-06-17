@@ -1,4 +1,6 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
+import GuanFuZi from "../../../npc/bj/tdh/guan.js";
 
 export default class extends ROOM {
     name = "内室";
@@ -17,11 +19,14 @@ export default class extends ROOM {
                 me.send_room("一个道人从洞里探出头来，看了$N一眼，又伸手把地板关上了。");
             }]
         ]);
-        this.add_action("knock", "敲地板", function (me) {
-            if (this.query_exits("bj/tdh/andao1")) {
-                return mo.notify("地板已经敲开了你还想干嘛？");
+        this.add_action("knock", "敲地板", this.knock);
+    }
+
+    knock(me: USER) {
+            if (this.query_exits("down")) {
+                return me.notify("地板已经敲开了你还想干嘛？");
             }
-            var npc = this.find_by_path("bj/tdh/guan");
+            var npc = this.find_by_path("bj/tdh/guan") as GuanFuZi;
             if (npc) {
                 me.notify("关夫子对你喝到：你想干什么？");
                 npc.do_kill(me);
@@ -33,6 +38,5 @@ export default class extends ROOM {
                 me.send_room("从地板里边伸出一双手把地板掀开了。");
                 this.add_exit("down", "bj/tdh/andao1");
             }
-        });
-    }
+        }
 }

@@ -1,4 +1,5 @@
 import {FAMILY} from "../../core/skill/family.js";
+import type { SkillSet } from "../../core/skill/skill.js";
 
 export default class extends FAMILY {
     id = "XIAOYAO";
@@ -13,7 +14,7 @@ export default class extends FAMILY {
         ["xiaoyao/xiaoyaozi", "xiaoyao/shishi2"]];
     boss_guard = ["xiaoyao/shishi2", "xiaoyao/shishi", "xiaoyao/linjian3"];
     guard_rooms = ['xiaoyao/muwu1', 'xiaoyao/muwu2', 'xiaoyao/muwu3', "xiaoyao/liangong"];
-    npc_skills = [
+    npc_skills: SkillSet = [
         ["dodge", 800],
         ["parry", 800],
         ["force", 800],

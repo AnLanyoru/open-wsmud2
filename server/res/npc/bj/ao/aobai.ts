@@ -1,6 +1,6 @@
 import {NPC} from "../../../../core/char/npc.js";
 
-export default class extends NPC {
+export default class AoBai extends NPC {
     name = "鳌拜";
     desc = "他就是满洲第一勇士，身穿一袭金边锦缎。他身材魁梧，相貌狰狞，太阳穴高高鼓起，似乎身怀绝世武功。";
     title = "满洲第一勇士";

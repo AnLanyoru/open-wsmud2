@@ -181,6 +181,7 @@ export interface PropMap {
     /** 采药效率加成数值 */ caiyao1?: number;
     /** 钓鱼效率加成数值 */ diaoyu1?: number;
     /** 挖矿效率加成数值 */ kuang1?: number;
+    /** 炼药效率加成数值 */ lianyao1?: number;
 
     // ===== 没用属性 =====
     /** 无效果的介绍 */ desc?: string;

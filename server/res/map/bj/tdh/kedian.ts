@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {WORLD} from "../../../../core/world.js";
 
@@ -11,7 +12,7 @@ export default class extends ROOM {
         this.add_action('lkfb', null, this.lkfb);
     }
 
-    lkfb(me, par) {
+    lkfb(me: USER, par?: string) {
         if (par) {
             WORLD.COMMANDS['cr'].enter(me, 'over');
             me.moveto(WORLD.getRoom('bj/hg/xiaolu'));
@@ -34,7 +35,7 @@ export default class extends ROOM {
             }
         }
         if (dir === 'west') {
-            this.actions['lkfb'].action(me);
+            this.lkfb(me);
             return false;
         }
     }

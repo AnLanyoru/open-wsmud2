@@ -1,5 +1,6 @@
 import {ROOM} from "../../../core/room/room.js";
 import type {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class MapRoom extends ROOM {
     name = "炼药房";
@@ -14,14 +15,14 @@ export default class MapRoom extends ROOM {
         });
     }
 
-    on_leave(me) {
+    on_leave(me: USER) {
 
         me.remove_status("room");
     }
 
-    on_enter(me) {
+    on_enter(me: USER) {
         if (me.is_player) {
-            let pt = me.query_party();
+            let pt = me.query_party?.();
             if (pt) {
                 var lg_level = pt.query_temp('lianyao', 0) * 1 + 1;
                 me.add_status({

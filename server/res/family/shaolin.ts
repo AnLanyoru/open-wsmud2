@@ -1,4 +1,5 @@
 import {FAMILY} from "../../core/skill/family.js";
+import type { SkillSet } from "../../core/skill/skill.js";
 import {UTIL} from "../../core/util/util.js";
 
 export default class extends FAMILY {
@@ -19,7 +20,7 @@ export default class extends FAMILY {
     boss_guard = ["shaolin/fangzhang", "shaolin/lianwu", "shaolin/houdian"];
     guard_rooms = ['shaolin/daxiong', 'shaolin/gulou', 'shaolin/zhonglou',
         'shaolin/liangong2'];
-    npc_skills = [
+    npc_skills: SkillSet = [
         ["dodge", 800],
         ["parry", 800],
         ["force", 800],
