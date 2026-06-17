@@ -2,7 +2,7 @@
  * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
  */
 import {CHARACTER} from './character.js';
-import {USER} from './user.js';
+import {USER, UserState} from './user.js';
 import {NPC} from './npc.js';
 import {FAMILIES} from '../skill/family.js';
 import {CORPSE} from '../item/corpse.js';
@@ -76,24 +76,6 @@ export interface ItemCommandsJson {
     commands: CommandEntry[];
 }
 
-/** 随从状态对象 */
-interface FollowerState {
-    /** 状态标题 */
-    title: string;
-    /** 状态触发频率（心跳次数） */
-    rate?: number;
-    /** 心跳累计计数 */
-    heat_count?: number;
-    /** 状态开始时间 */
-    start_time?: number;
-    /** 是否允许战斗中执行 */
-    allow_fight?: boolean;
-    /** 状态进入回调，返回 false 则自动停止 */
-    on_enter?: (me: CHARACTER) => boolean | void;
-    /** 状态停止回调，isauto 表示是否自动停止 */
-    on_stop?: (me: CHARACTER, isauto?: boolean) => boolean | void;
-}
-
 // ============================================================
 // FOLLOWER 类
 // ============================================================
@@ -159,7 +141,7 @@ export class FOLLOWER extends CHARACTER {
     on_master_enter?(me: USER): void;
 
     /** 主人学习回调 — 触发时机：主人通过随从学习技能时 */
-    on_master_learn?(me: USER, skill: SKILL): void;
+    on_master_learn?(me: USER, skill: string): boolean;
 
     /**
      * 查询随从设置
@@ -510,7 +492,7 @@ export class FOLLOWER extends CHARACTER {
                 }
             }
         }
-        const st = this.state as FollowerState;
+        const st = this.state;
         if (st && (!this.fight_type || st.allow_fight)) {
             st.heat_count! += 1;
             if (st.heat_count! >= st.rate!) {
@@ -525,9 +507,9 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 设置随从状态
      */
-    set_state(state: FollowerState | null, isauto?: boolean): void {
+    set_state(state: UserState | null, isauto?: boolean): void {
         if (this.state && !state) {
-            const oldState = this.state as FollowerState;
+            const oldState = this.state;
             if (oldState.on_stop) {
                 if (oldState.on_stop(this, isauto) == false) {
                     return;
@@ -568,7 +550,7 @@ export class FOLLOWER extends CHARACTER {
                 ...(this.state
                     ? [{
                         cmd: 'dc ' + this.id + ' stopstate',
-                        name: '停止' + (this.state as FollowerState).title.replace('中', '')
+                        name: '停止' + this.state.title.replace('中', '')
                     }]
                     : []),
                 ...(this.action_list || []),
@@ -658,7 +640,7 @@ export class FOLLOWER extends CHARACTER {
         }
         str.push(this.name);
         if (this.state) {
-            str.push('<hig>&lt;' + (this.state as FollowerState).title + '&gt;</hig>');
+            str.push('<hig>&lt;' + this.state.title + '&gt;</hig>');
         }
         this.color_name = str.join('');
         return this.color_name;

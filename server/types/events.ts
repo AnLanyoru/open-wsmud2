@@ -59,12 +59,6 @@ export interface NPCCallbacks extends CharacterCallbacks {
 // FOLLOWER 回调
 // ============================================================
 
-export interface FollowerCallbacks extends CharacterCallbacks {
-    /** 主人学习技能 */
-    on_master_learn?: (me: USER, skill: SKILL) => void;
-    /** 主人进入 */
-    on_master_enter?: (me: USER) => void;
-}
 
 // ============================================================
 // OBJ 回调

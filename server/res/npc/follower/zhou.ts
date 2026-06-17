@@ -1,4 +1,5 @@
 import { FOLLOWER } from "../../../core/char/follower.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends FOLLOWER {
     name = "周芷若";
@@ -30,11 +31,11 @@ export default class extends FOLLOWER {
             ["literate", 1000]);
     }
 
-    on_master_learn(me, sk) {
+    on_master_learn(me: USER, sk: string) {
         if (sk == "linjizhuang" || sk == "zhutianbu" || sk == "yitianjianfa" || sk == "jiuyinbaiguzhao") {
-
             return me.notify_fail("周芷若说道：师父教我不能让别人学会我们峨眉派的武功，师父的话我是要听的。");
         }
+        return true
     }
 
     on_master_enter(me) {

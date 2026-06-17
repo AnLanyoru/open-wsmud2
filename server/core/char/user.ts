@@ -53,6 +53,8 @@ const DIE_MSG = [
 
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {
+    /** 状态 id */
+    id?: string;
     /** 状态标题（如 "打坐中"） */
     title: string;
     /** 状态触发频率（心跳次数） */
@@ -69,10 +71,26 @@ export interface UserState {
     commands?: string;
     /** 是否允许战斗中执行 */
     allow_fight?: boolean;
+    /** 学习技能的引用 */
+    skill_base?: SKILL;
+    /** 当前学习技能的目标等级 */
+    max_level?: number;
+    /** 预学习技能的队列 */
+    queues?: {
+        skid: string,
+        max_level: number,
+    }[]
+    /** 学习技能的教导者 */
+    target?: CHARACTER;
+    /** 动作进行时阻止移动的提示 */
+    no_move?: string
+    
     /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
     on_enter?: (me: CHARACTER, dt?: number) => boolean | void;
     /** 状态停止回调，isauto 表示是否自动停止 */
     on_stop?: (me: CHARACTER, isauto?: boolean) => boolean | void;
+    /** 查询状态回调替代默认查询状态提示 */
+    on_check?: (this: UserState, me: CHARACTER) => boolean | void;
 }
 
 /** 称号条目 */

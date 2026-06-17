@@ -71,7 +71,6 @@ export default class extends NPC {
     }
 
     on_teach(me: USER) {
-
         return this.on_checkskill(me);
     }
 

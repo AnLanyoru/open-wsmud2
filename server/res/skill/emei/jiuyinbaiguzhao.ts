@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "九阴白骨爪";
@@ -31,7 +32,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = me.gj * (200 + lv / 10) / 100;
                     if (me.do_attack({
                         target: target,

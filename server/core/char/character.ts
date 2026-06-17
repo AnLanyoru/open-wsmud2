@@ -11,7 +11,7 @@ import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
-import type { ActionMap, CommandAccessFlags } from '../../types/base.js';
+import type { ActionMap } from '../../types/base.js';
 import type { ROOM } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { NPC } from './npc.js';
@@ -429,6 +429,12 @@ export class CHARACTER extends ITEM {
     pfm_rate?: number;
 
     // ============ 回调字段（可选，由资源文件在对象定义时设置） ============
+    /**
+     * 请求学习技能时的回调
+     * @param me 
+     * @param sk 
+     */
+    on_teach?(me: CHARACTER, sk: string): boolean;
 
     /** 对象创建后回调 — 触发时机：create() 方法末尾，资源文件加载/热更新实例化对象时 */
     on_create?(path: string, par?: string): void;
@@ -512,7 +518,7 @@ export class CHARACTER extends ITEM {
     query_party?(): any;
 
     /** 传授技能回调 — 触发时机：xue 命令中教师角色执行时会调用 */
-    do_teach?(me: CHARACTER, skill: import("../skill/skill.js").SKILL, lv: number): boolean | void;
+    do_teach?(me: CHARACTER, skill: SKILL, lv: number): boolean | void;
 
     constructor() {
         super();
