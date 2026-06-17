@@ -256,8 +256,11 @@ export class SKILL extends BASE {
         return;
     }
 
-    /** 练习技能回调 — 触发时机：lianxi 命令执行时检查；返回 false 阻止练习 */
+    /** 练习技能开始前回调 — 触发时机：lianxi 命令执行时检查；返回 false 阻止练习 */
     on_practice?(me: CHARACTER): boolean | void;
+
+    /** 每次练习技能提升前回调 — 触发时机：每次练习技能提升前检查；返回 false 阻止并结束练习 */
+    do_practice?(me: CHARACTER, lv: number): boolean | void;
 
     /** 查询激活属性 — 触发时机：装备/卸下技能计算属性加成时 */
     query_enable_prop(lv: number, me?: CHARACTER): EnablePropMap | undefined {

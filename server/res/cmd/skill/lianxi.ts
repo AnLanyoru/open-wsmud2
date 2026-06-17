@@ -184,7 +184,7 @@ function check_skill(me: USER, skill: SKILL, limit = true) {
 
 function do_learn(this: UserState, me: USER) {
     
-    if (!this.skill_base || !this.sum_pot)
+    if (!this.skill_base || this.sum_pot === undefined)
         return me.notify_fail("<hir>练习状态异常，请联系管理解决</hir>");
     if (me.pot > 0) {
 
