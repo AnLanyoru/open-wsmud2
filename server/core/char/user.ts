@@ -984,7 +984,7 @@ export class USER extends CHARACTER {
         }
         if (!obj) return null;
         count = count || obj.count || 1;
-        const newobj = this.remove_item(obj, count) as OBJ;
+        const newobj = this.remove_item(obj, count);
         if (newobj == obj) {
             if(obj.check_obj()) obj.notify_action(this, false);
         }

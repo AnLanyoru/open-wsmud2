@@ -46,9 +46,8 @@ export default class extends COMMAND {
             dialog: "skills",
             id: skid,
             desc: skill_base.query_desc(target, target.query_skill(skid, 1000)),
+            is_custom: skill_base.is_custom,
         };
-        if (skill_base.is_custom)
-            obj.is_custom = 1;
         if (!target.skills) target.skills = {};
         return player.send(JSON.stringify(obj));
     }

@@ -93,6 +93,9 @@ export class EQUIPMENT extends OBJ {
     /** 自定义卸下消息（替代默认卸下广播） */
     uneq_msg: string | null = null;
 
+    /** 不允许精炼 */
+    no_jinglian: boolean;
+
     // ============ 回调函数（由资源文件覆写） ============
 
     /** 套装属性计算 — 触发时机：get_desc()/check_group() 查询套装效果时；传入已装备同套装件数 */

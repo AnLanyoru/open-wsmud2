@@ -1,34 +1,37 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {ITEM} from "../../../core/item.js";
+import { COMMAND } from "../../../core/command.js";
+import { WORLD } from "../../../core/world.js";
+import { ITEM } from "../../../core/item.js";
+import type { USER } from "../../../core/char/user.js";
+import type { FOLLOWER } from "../../../core/char/follower.js";
 
 export default class extends COMMAND {
     command = "jinglian";
     regex = /^(\w+)(?:\s(\w+))?$/;
 
     /**
-     * @param {CHARACTER} player - 执行命令的角色
+     * @param player - 执行命令的角色
      */
-    enter(player, objid, isok) {
+    enter(player: USER | FOLLOWER, objid: string, isok: string) {
         var obj = player.find_obj(objid);
-        if (!obj) {
+        if (!obj || !obj.check_obj()) {
             return player.notify("你要精炼什么装备？");
         }
-        if (!obj.is_equipment || obj.no_jinglian) return player.notify("这个东西没办法精炼。");
+        if (!obj.check_equipment() || obj.no_jinglian) return player.notify("这个东西没办法精炼。");
         if (!obj.grade) return player.notify(obj.color_name + "品质太低了，承受不住再多的力量。");
         if (obj.level >= 12) return player.notify(obj.color_name + "已经到了极限，无法再承受更多的力量。");
 
-        var fallbackItem = {
+        var need_item = {
             path: obj.grade == 6 ? "st/yuanjing" : "st/xuanjing",
-            color_name: obj.grade == 6 ? "<hio>元晶</hio>" : "<hiw>玄晶</hiw>", count: 0
+            color_name: obj.grade == 6 ? "<hio>元晶</hio>" : "<hiw>玄晶</hiw>",
+            count: 0
         };
-        var item: { path: string; color_name: string; count: number } | ITEM = fallbackItem;
-
-        for (var i = 0; i < player.items.length; i++) {
-            if (player.items[i].is(fallbackItem.path)) {
-                item = player.items[i];
-                break;
+        let item: ITEM | typeof need_item = need_item;
+        if (player.items) {
+            for (let i = 0; i < player.items.length; i++) {
+                if (player.items[i].is(need_item.path)) {
+                    item = player.items[i];
+                    break;
+                }
             }
         }
         var lv = obj.level + 1;
@@ -51,11 +54,11 @@ export default class extends COMMAND {
         if (isok) {
             let isfull = isok === 'full';
             if (isfull) need_count = full_count;
-            if (item.count < need_count) {
-                return player.notify("你的" + item.color_name + "数量不够精炼。");
+            if (!item || item.count < need_count) {
+                return player.notify("你的" + need_item.color_name + "数量不够精炼。");
             }
-            item = player.remove_obj(item, need_count);
-            if (!item) player.notify("你的" + item.color_name + "数量不够精炼。");
+            item = player.remove_obj(item as ITEM, need_count) || need_item;
+            if (!item) player.notify("你的" + need_item.color_name + "数量不够精炼。");
 
             player.send_room("<hiw>$N用内力把" + item.color_name + "炼化，小心翼翼的引入" + obj.color_name + "。</hiw>");
             if (isfull) {
@@ -86,7 +89,7 @@ export default class extends COMMAND {
         if (item.count < need_count) {
             str.push("<red>");
         }
-        str.push(item.count, '/', need_count);
+        str.push(String(item.count), '/', String(need_count));
         if (item.count < need_count) {
             str.push("</red>");
         }
@@ -96,7 +99,7 @@ export default class extends COMMAND {
         if (item.count < full_count) {
             str.push("<red>");
         }
-        str.push(item.count, '/', full_count);
+        str.push(String(item.count), '/', String(full_count));
         if (item.count < need_count) {
             str.push("</red>");
         }

@@ -426,14 +426,14 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 移除的物品
      */
-    remove_item(obj: ITEM, count: number = 0): ITEM | null | undefined {
-        if (!obj || !this.items) return;
+    remove_item(obj: ITEM, count: number = 0): ITEM | null {
+        if (!obj || !this.items) return null;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item === obj) {
                 if (item.combined) {
                     const subitem = item.uncombine(count);
-                    if (!subitem) return;
+                    if (!subitem) return null;
                     if (subitem === item) {
                         this.items.splice(i, 1);
                     }
