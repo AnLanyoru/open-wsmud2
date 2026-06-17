@@ -1,5 +1,5 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import type {CHARACTER, TeamData} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 
@@ -125,7 +125,7 @@ export default class extends COMMAND {
             if (me.environment && me.environment.parent && me.environment.parent.no_team) return me.notify("你正在副本，无法加入队伍。");
             if (!player.team) {
                 //如果开始组队的玩家没有队伍就先创建个
-                const newTeam: CHARACTER[] & { alloc?: (obj: any) => void; id?: string } =
+                const newTeam: TeamData =
                     Object.assign([], {
                         alloc: team_dice,
                         id: UTIL.create_id()

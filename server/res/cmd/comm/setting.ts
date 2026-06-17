@@ -1,7 +1,6 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {NPC} from "../../../core/char/npc.js";
+import { COMMAND } from "../../../core/command.js";
+import { WORLD } from "../../../core/world.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "setting";
@@ -13,13 +12,13 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, key, value) {
+    enter(me: USER, key: string, value_input: string) {
         if (!me.is_player) return;
         if (!key) {
             var str = ['{type:"setting",items:{'];
 
-            if (me.setting) {
-                str.push(JSON.stringify(me.setting));
+            if (me.settings) {
+                str.push(JSON.stringify(me.settings));
             }
             str.push("}}");
             me.notify(str.join(""));
@@ -29,25 +28,25 @@ export default class extends COMMAND {
             let setting_item = setting_keys[key];
             if (!setting_item) return me.notify("无效设定项。");
 
-
+            // ---- 前处理：将 value_input 转为规范化的 value ----
+            let value: string | number = value_input;
             if (setting_item.type === 'String') {
-                if (value && setting_item.length && value.length > setting_item.length) {
+                if (value_input && setting_item.length && value_input.length > setting_item.length) {
                     return me.notify("设定值太长。");
                 }
-                if (value === 'none') value = "";
-                else if (setting_item.def && setting_item.def === value)
+                if (value_input === 'none') {
                     value = "";
-
+                } else if (setting_item.def && setting_item.def === value_input) {
+                    value = "";
+                }
             } else if (setting_item.type === 'Boolean') {
-                value = value || 0;
-                value = parseInt(value);
+                value = parseInt(value_input) || 0;
                 if (value !== 0 && value !== 1) return me.notify("无效设定值。");
-
             }
+            
             if (setting_item.on_setting) {
                 if (setting_item.on_setting(me, value) === false) return;
             }
-
 
             if (key == "no_message") {
                 me.no_message = (value == 1);
@@ -67,9 +66,7 @@ export default class extends COMMAND {
                     } else {
                         me.notify("<cyn>已关闭" + setting_item.desc + "</cyn>");
                     }
-
                 }
-
             }
 
 
@@ -83,8 +80,8 @@ export default class extends COMMAND {
         }
     }
 
-    clear(me) {
-        let str = [];
+    clear(me: USER) {
+        let str: string[] = [];
         for (let user of WORLD.USERS) {
             if (!user.settings) continue;
             for (let key in user.settings) {

@@ -1,19 +1,16 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import { TitleEntry, USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "title";
     allow_busy = true;
     allow_state = true;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
-    enter(me, index) {
+    enter(me: USER, index_input: string) {
         if (!me.titles) return me.notify("你还没有任何称号。");
-        index = parseInt(index);
+        let index = parseInt(index_input);
         if (!(index >= 0 && index < me.titles.length)) return me.notify("你没有这个称号。");
-        var title = null;
+        var title: TitleEntry | null = null;
         for (var i = 0; i < me.titles.length; i++) {
             if (i == index) {
                 if (me.titles[i].use) {
@@ -32,12 +29,12 @@ export default class extends COMMAND {
             me.notify("你决定使用" + title.title + "做为你的称号。");
 
         } else {
-            me.title = null;
+            me.title = undefined;
             me.notify("你决定不使用任何称号。");
 
         }
-        me.color_name = null;
-        me.environment.item_changed(me, true);
+        me.color_name = '';
+        me.environment?.item_changed(me, true);
 
     }
 }

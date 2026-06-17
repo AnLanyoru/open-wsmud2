@@ -2,6 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "zigong";
@@ -9,13 +10,13 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (me.gender == 2) return me.notify("你要割什么？");
         if (me.gender == 3) return me.notify("你都没有了还要割什么？");
-        var list = [];
+        var list: SKILL[] = [];
         for (var key in me.skills) {
             var skill = SKILL.get(key);
-            if (skill.learn_condition) {
+            if (skill?.learn_condition) {
                 if (skill.learn_condition.gender &&
                     skill.learn_condition.gender != 3) {
                     list.push(skill);

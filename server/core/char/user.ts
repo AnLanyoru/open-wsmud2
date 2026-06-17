@@ -105,7 +105,7 @@ export interface UserState {
 }
 
 /** 称号条目 */
-interface TitleEntry {
+export interface TitleEntry {
     /** 称号文本 */
     title: string;
     /** 称号类型 */
