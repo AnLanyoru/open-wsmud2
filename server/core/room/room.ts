@@ -399,7 +399,9 @@ export class ROOM extends ITEM {
         this.hidden_items = this.hidden_items || [];
         let cmd_lsit: RoomAction[] = []
         if (commands && typeof commands[0] == "string") {
-            commands = [commands];
+            cmd_lsit = [commands as RoomAction];
+        } else {
+            cmd_lsit = commands as RoomAction[]
         }
         const hidden_item: HiddenItem = {
             id: id,
