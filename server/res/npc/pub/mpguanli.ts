@@ -2,6 +2,7 @@ import {NPC} from "../../../core/char/npc.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {USERTASK} from "../../../core/task/playertask.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import ShiMenTask from "../../task/sm_task.js";
 
 export default class extends NPC {
     name = "门派后勤管理员";
@@ -66,7 +67,11 @@ export default class extends NPC {
         let need = NEEDS_GJ[level];
         if (gj >= need) {
             me.add_temp('gongji', -need);
-            USERTASK.GET('sm')?.on_finish(me);
+            let sm_task = USERTASK.GET('sm') as ShiMenTask | undefined;
+            if (!sm_task) {
+                return me.send("<hir>发生了一个错误，请联系管理员。错误详情：全局师门任务系统 未加载</hir>");
+            }
+            sm_task.on_finish(me);
             level = me.add_temp('sm_level', 1);
             me.send(`${this.name}说：恭喜你，现在是${me.family!.query_task_title(me)}了，你的师门物资获得大幅度提升。`);
         } else {

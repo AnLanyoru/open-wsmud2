@@ -109,7 +109,7 @@ export interface MessageEntry {
     /** 消息创建时间戳 */
     time: number;
     /** 消息附加的物品奖励 */
-    attach?: { name: string; obj: string; count: number }[];
+    attach?: { name?: string; obj: string; count: number }[];
     rec?: boolean;
     index?: number;
 }

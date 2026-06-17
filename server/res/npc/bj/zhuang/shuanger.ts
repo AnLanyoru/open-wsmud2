@@ -1,4 +1,5 @@
-import {NPC} from "../../../../core/char/npc.js";
+import { NPC } from "../../../../core/char/npc.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "双儿";
@@ -38,19 +39,20 @@ export default class extends NPC {
             obj: ["book/bc#shenxingbaibian", "book/bc#huashanjianfa", "book/bc#shenlongjian"],
             odds: 3000
         });
-        this.set_ask("跟我走吧", function (me) {
-            if (me.query_temp("fb/zhuang/shuang")) {
-                me.notify("<hiy>双儿道:夫人待我恩重如山,主人对我庄家又有大恩。夫人要我服侍主人,我一定尽心。</hiy>");
-                var obj = me.add_obj("sp/npc#shuang");
-                if (obj) {
-                    me.notify("你获得了" + obj.unit_name(1) + "。");
+        this.set_ask("跟我走吧", this.follow_me);
+    }
+    follow_me(me: USER) {
+        if (me.query_temp("fb/zhuang/shuang")) {
+            me.notify("<hiy>双儿道:夫人待我恩重如山,主人对我庄家又有大恩。夫人要我服侍主人,我一定尽心。</hiy>");
+            var obj = me.add_obj("sp/npc#shuang");
+            if (obj) {
+                me.notify("你获得了" + obj.unit_name(1) + "。");
 
-                }
-                me.remove_temp("fb/zhuang/shuang");
-                this.destroy();
-            } else {
-                me.notify("双儿睁大眼睛看着你说道：不行的,夫人没有同意。");
             }
-        });
+            me.remove_temp("fb/zhuang/shuang");
+            this.destroy();
+        } else {
+            me.notify("双儿睁大眼睛看着你说道：不行的,夫人没有同意。");
+        }
     }
 }

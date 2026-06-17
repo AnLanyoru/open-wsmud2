@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "小龙女";
     title = "<wht>玉女素心</wht>";
     desc = "她清丽异常，但也许是长居古墓之故，面色略白。";

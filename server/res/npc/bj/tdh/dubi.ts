@@ -1,4 +1,5 @@
 import {NPC} from "../../../../core/char/npc.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "独臂神尼";
@@ -14,10 +15,10 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.set_objects([
-            "eq/lv0/cloth", 1, 1,
-            "eq/lv1/fuchen", 1, 1
-        ]);
+        this.set_objects(
+            ["eq/lv0/cloth", 1, 1],
+            ["eq/lv1/fuchen", 1, 1]
+        );
         this.skill_map(
             ["dodge", 300],
             ["parry", 300],
@@ -40,7 +41,7 @@ export default class extends NPC {
             });
     }
 
-    on_checkskill(me) {
+    on_checkskill(me: USER) {
         if (me.query_temp("fb/tdh/dubi") == 2) {
             if (me.query_temp("fb/tdh/shenxing")) return me.notify_fail("独臂神尼说道：虽然不完整，也是秘籍，还请" + me.call() + "不要嫌弃。");
 
@@ -55,7 +56,7 @@ export default class extends NPC {
         return me.query_temp("fb/tdh/dubi") == 1;
     }
 
-    on_teach(me, sk) {
+    on_teach(me: USER, sk: string) {
         if (sk != "shenxingbaibian") return me.notify_fail("独臂神尼说道：贫尼只能教你神行百变。");
         return true;
     }

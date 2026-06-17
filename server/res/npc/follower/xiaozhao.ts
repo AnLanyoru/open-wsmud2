@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "小昭";
     desc = "她因年纪幼小，身材尚未长成，但更显得娇小玲珑、甜美可爱。";
     title = "<hiw>明教圣女</hiw>";

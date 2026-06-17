@@ -2,7 +2,7 @@ import {USERTASK} from "../../core/task/playertask.js";
 import {OBJ} from "../../core/item/obj.js";
 import type {OddsEntry} from "../../core/item/obj.js";
 
-export default class extends USERTASK {
+export default class ShiMenTask extends USERTASK {
     id = "sm";
 
     on_create() {

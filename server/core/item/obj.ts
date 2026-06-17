@@ -86,7 +86,7 @@ export class OBJ extends ITEM {
     /** JSON 描述缓存 */
     json: string | null = null;
     /** 临时数据 */
-    temp: Record<string, any> | null = null;
+    temp: Record<string, any> = {};
     /** 是否已锁定 */
     is_locked: boolean = false;
     /** 是否快捷栏物品 — EQUIPMENT 专用 */
@@ -238,7 +238,7 @@ export class OBJ extends ITEM {
      * @param target - 目标属性集
      * @param source - 来源属性集
      */
-    combineTemp(target: Record<string, number> | null | undefined, source: Record<string, number> | null | undefined): Record<string, number> | null | undefined {
+    combineTemp(target: Record<string, number>, source: Record<string, number>): Record<string, number> {
         if (!source) return target;
         if (!target) return source;
         for (const key in source) {
@@ -263,7 +263,7 @@ export class OBJ extends ITEM {
         if (this.is(obj)) {
             const other = obj as OBJ;
             if (other.temp || this.temp) {
-                this.temp = this.combineTemp(this.temp, other.temp) as Record<string, number> | null;
+                this.temp = this.combineTemp(this.temp, other.temp);
             }
             this.count += (other.count || 0);
         }

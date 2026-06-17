@@ -1,4 +1,5 @@
-import {NPC} from "../../../../core/char/npc.js";
+import { NPC } from "../../../../core/char/npc.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "庄夫人";
@@ -38,13 +39,15 @@ export default class extends NPC {
             obj: ["book/bc#shenxingbaibian", "book/bc#huashanjianfa", "book/bc#shenlongjian"],
             odds: 3000
         });
-        this.set_ask("吴之荣", function (me) {
-            if (me.query_temp("fb/zhuang/shuang")) return me.notify("庄夫人说道：多谢恩公代妾身手刃了次贼。");
-            me.notify("庄夫人说道：这个狗贼害的我家破人亡，我一定要手刃了这个奸贼。");
-            var obj = me.find_obj_bypath("sp/bj/wu");
-            if (obj)
-                me.send_commands("give " + this.id + " 1 " + obj.id, "给她吴之荣的头颅");
-        });
+        this.set_ask("吴之荣", this.ask_about_wuzhirong);
+    }
+
+    ask_about_wuzhirong(me: USER) {
+        if (me.query_temp("fb/zhuang/shuang")) return me.notify("庄夫人说道：多谢恩公代妾身手刃了次贼。");
+        me.notify("庄夫人说道：这个狗贼害的我家破人亡，我一定要手刃了这个奸贼。");
+        var obj = me.find_obj_bypath("sp/bj/wu");
+        if (obj)
+            me.send_commands("give " + this.id + " 1 " + obj.id, "给她吴之荣的头颅");
     }
 
     on_accept(me, obj, count) {

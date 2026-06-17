@@ -13,6 +13,7 @@ import type {USER} from '../char/user.js';
 import type {SKILL, SkillSet} from './skill.js';
 import type {AREA} from '../room/area.js';
 import type {TempValue} from '../../types/base.js';
+import type { CHARACTER } from "../char/character.js";
 
 // 懒加载 NPC 避免循环依赖: family.ts → npc.ts → character.ts (TDZ)
 let _NPC: {
@@ -48,14 +49,16 @@ export class FAMILY extends BASE {
     /** 门派ID */
     id: string = "";
     /** 临时数据（带过期时间为 TempValue 包装，否则为原始值） */
-    temp: Record<string, TempValue | any> | null = null;
+    temp: Record<string, TempValue | any> = {};
     /** 按品级缓存的技能索引 */
     skill_levels: SKILL[][] | null = null;
+    /** 门派开始回调 */
+    on_battle?(enemy: FAMILY): void;
     /** 门派战结算回调 — 触发时机：玩家领取门派战战利品时 */
     battle_settle?: (...args: any[]) => void;
 
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
-    on_kill(killer: Record<string, any>, victim: Record<string, any>): void {
+    on_kill(killer: CHARACTER, victim: CHARACTER): void {
     }
 
     /** 货物缓存（由 goods 任务设置） */
@@ -321,12 +324,12 @@ export class FAMILY extends BASE {
     /**
      * 门派NPC复活回调(这里的this通过bind绑定到NPC实例)
      */
-    on_famnpc_relive(this: Record<string, any>): void {
+    on_famnpc_relive(this: NPC): void {
         if (!this.die_room) return;
         this.die_room.item_changed(this, true);
-        this.die_room = null;
+        this.die_room = undefined;
 
-        if (this.equipment && this.items[0] && !this.equipment[0]) {
+        if (this.equipment && this.items?.[0] && !this.equipment[0]) {
             this.equip(this.items[0]);
         }
     }
@@ -334,7 +337,7 @@ export class FAMILY extends BASE {
     /**
      * 门派NPC死亡回调(这里的this通过bind绑定到NPC实例)
      */
-    on_npc_die(this: Record<string, any>, me: Record<string, any>): void {
+    on_npc_die(this: NPC, me: USER): void {
         var fam = FAMILIES[this.family.id];
         if (!me) return;
         var fam2 = FAMILIES[me.family.id];
@@ -359,7 +362,7 @@ export class FAMILY extends BASE {
      * @param killer - 击杀者（玩家）
      * @param target - 目标门派（当 killer 为空时使用）
      */
-    check_battle(npc: Record<string, any>, killer: Record<string, any>, target?: FAMILY): void {
+    check_battle(npc: CHARACTER, killer?: USER, target?: FAMILY): void {
         var to_fam = killer ? killer.family : target;
         if (!to_fam || !to_fam.can_battle || !this.can_battle) return;
 
@@ -378,7 +381,7 @@ export class FAMILY extends BASE {
                         killer.family.name + "欺人太甚，门下弟子" + killer.name + "击杀我派" +
                         npc.name + "，" + this.name + "众弟子听令，对" + killer.family.name + "弟子格杀勿论！");
             }
-            to_fam.on_battle(this);
+            to_fam.on_battle?.(this);
         }
 
         this.begin_attack(to_fam);
@@ -600,7 +603,7 @@ export class FAMILY extends BASE {
             id: this.id + "_settle",
             name: "门派战争",
             desc: "你的门派和" + target_fam.name + "战斗结束了，" + msg,
-            time: (this.temp!["battle"] as TempValue).e,
+            time: (this.temp["battle"] as TempValue).e,
             grade: 2,
             command: "领取战利品",
             check: (me: USER) => me.family === this,

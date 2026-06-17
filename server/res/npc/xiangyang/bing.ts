@@ -1,6 +1,8 @@
 import {NPC} from "../../../core/char/npc.js";
 import {WORLD} from "../../../core/world.js";
 import {TASK} from "../../../core/task/task.js";
+import type XiangYangTask from "../../task/xy_task.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "蒙古密探";
@@ -26,22 +28,25 @@ export default class extends NPC {
             ["feiyanzoubi", 300, "dodge"]);
     }
 
-    on_die(killer) {
+    on_die(killer: USER) {
 
 
         if (WORLD.DATA.query_temp("xy_status")) {
-            return this.call_out(this.relive, 600000);
+            this.call_out(this.relive, 600000);
+            return 
         }
-        var task = TASK.GET("xiangyang");
-        if (!task || task.is_start)
-            return this.call_out(this.relive, 600000);
-        task.on_mihan(killer);
+        var task = TASK.GET("xiangyang") as XiangYangTask | undefined;
+        if (!task || task.is_start){
+            this.call_out(this.relive, 600000);
+            return 
+        }
+        task.on_mihan();
         this.call_out(this.relive, 3600000);
     }
 
     relive() {
 
-        var task = TASK.GET("xiangyang");
+        var task = TASK.GET("xiangyang") as XiangYangTask | undefined;
         if (!task || task.is_start) {
             this.call_out(this.relive, 60000);
             return;
@@ -51,7 +56,7 @@ export default class extends NPC {
         var rm = task.xy_area.rooms.random();
         obj.moveto(rm);
         // this.do_command('chat', rm.name);
-        this.die_room = null;
+        this.die_room = undefined;
         this.equipment = null;
         this.items = null;
         this.skills = null;

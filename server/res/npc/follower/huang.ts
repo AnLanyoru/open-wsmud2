@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "黄蓉";
     desc = "这便是桃花岛岛主的独生女儿。她生性跳脱飞扬，喜欢四处乱跑。";
     title = "桃花岛主之女";

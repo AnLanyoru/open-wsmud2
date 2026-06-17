@@ -9,6 +9,7 @@ import {UTIL} from './util.js';
 import type {ROOM} from './room/room.js';
 import type {ActionDef, ActionMap} from '../types/base.js';
 import type { PropMap } from '../types/props.js';
+import type { USER } from './char/user.js';
 
 // ============================================================
 // ITEM 类
@@ -62,7 +63,7 @@ export class ITEM extends BASE {
     /** 带颜色的名称缓存 */
     color_name: string = '';
     /** 临时数据 */
-    temp: Record<string, any> | null = null;
+    temp: Record<string, any> = {};
     /** 是否为玩家 */
     is_player: boolean = false;
     /** 是否静默消息 */
@@ -135,7 +136,7 @@ export class ITEM extends BASE {
      * @param def - 默认值
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    query_temp<T = any>(name: string, def?: T, _me?: unknown): T {
+    query_temp<T = any>(name: string, def?: T, _me?: USER): T {
         if (!def) def = undefined as T;
         if (!this.temp) return def;
         const item = this.temp[name];
@@ -156,7 +157,7 @@ export class ITEM extends BASE {
      * @param time - 有效期（毫秒）
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void {
+    set_temp(name: string, value: any, time?: number, _me?: USER): void {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -185,7 +186,7 @@ export class ITEM extends BASE {
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      * @returns 累加后的值
      */
-    add_temp(name: string, value: number, time?: number, _me?: unknown): number {
+    add_temp(name: string, value: number, time?: number, _me?: USER): number {
         const val = (this.query_temp(name, 0, _me) as number) + value;
         this.set_temp(name, val, time, _me);
         return val;

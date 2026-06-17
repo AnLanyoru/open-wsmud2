@@ -4,14 +4,8 @@
 import {OBJ} from './obj.js';
 import {UTIL} from '../util.js';
 import type {USER} from '../char/user.js';
+import { ItemCommandsJson } from '../char/follower.js';
 
-/** 物品/容器描述 JSON 结构 */
-export interface ItemDescJson {
-    type: string;
-    id: string;
-    desc: string;
-    commands: Array<{ cmd: string; name: string }>;
-}
 
 export class CONTAINER extends OBJ {
 
@@ -98,7 +92,7 @@ export class CONTAINER extends OBJ {
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: ItemDescJson = {
+        const obj: ItemCommandsJson = {
             type: "item",
             id: this.id,
             desc: this.get_desc(me),

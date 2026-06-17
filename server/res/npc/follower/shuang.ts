@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "双儿";
     desc = "她是一个十分清秀的少女,大约十四五岁年纪，一张雪白的脸庞,眉弯嘴小,笑靥如花,正笑嘻嘻地看着你。";
     title = "<hiw>天下无双</hiw>";

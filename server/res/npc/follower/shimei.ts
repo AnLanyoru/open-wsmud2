@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "小师妹";
     desc = "她是宗门里最小的师妹，长得是娇柔可爱";
     gender = 2;

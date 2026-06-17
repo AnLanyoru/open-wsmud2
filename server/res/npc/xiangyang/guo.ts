@@ -1,3 +1,4 @@
+import { ItemCommandsJson } from "../../../core/char/follower.js";
 import {NPC} from "../../../core/char/npc.js";
 
 export default class extends NPC {
@@ -41,15 +42,15 @@ export default class extends NPC {
 
     query_commands(player) {
 
-        var json = {};
-        json.type = "item";
-        json.desc = this.desc;
-        json.id = this.id;
-        json.commands = [];
-        json.commands.push({
-            cmd: "look " + this.id,
-            name: "查看"
-        });
+        var json: ItemCommandsJson = {
+            type: "item",
+            desc: this.desc,
+            id: this.id,
+            commands: [{
+                cmd: "look " + this.id,
+                name: "查看"
+            }]
+        };
 
         this.json = JSON.stringify(json)
         return this.json;

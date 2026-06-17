@@ -1,6 +1,9 @@
 import {NPC} from "../../../core/char/npc.js";
 import {WORLD} from "../../../core/world.js";
 import {FAMILIES, FAMILY} from "../../../core/skill/family.js";
+import type { SkillItem } from "../../../core/skill/skill.js";
+import type ShouXiCommand from "../../cmd/comm/sx.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "大师兄";
@@ -20,7 +23,7 @@ export default class extends NPC {
         this.add_action('manage', '设置', this.manage);
     }
 
-    on_create(path, par) {
+    on_create(path: string, par?: string) {
         if (!par) return;
         this.family = FAMILIES[par.slice(1)];
         this.init_from(this.family);
@@ -36,7 +39,7 @@ export default class extends NPC {
 
     }
 
-    on_kill(me) {
+    on_kill(me: USER) {
         return me.notify_fail(this.name + '说道：' + this.callme() + "只接受比试。");
     }
 
@@ -44,7 +47,7 @@ export default class extends NPC {
 
         this.set_objects(["eq/lv0/cloth", 1, 1], ["eq/lv0/jian", 1, 1]);
 
-        var ary = [];
+        var ary: SkillItem[] = [];
         for (var i = 0; i < fam.npc_skills.length; i++) {
             ary.push([
                 fam.npc_skills[i][0],
@@ -55,14 +58,14 @@ export default class extends NPC {
         this.skill_map.apply(this, ary);
 
         this.max_mp = this.mp = 10000;
-        this.on_heart_beat = null;
-        this.on_damage = null;
+        delete this.on_heart_beat;
+        delete this.on_damage;
         this.hp = this.max_hp = 10000;
         this.init();
         this.recount();
     }
 
-    on_fight_over(me, issuc) {
+    on_fight_over(me: USER, issuc: boolean) {
         if (issuc) {
             me.notify(this.name + "对你嘿嘿嘿的笑了几声。");
         } else {
@@ -70,12 +73,14 @@ export default class extends NPC {
         }
     }
 
-    greeting(me) {
-        WORLD.COMMANDS.sx.do_greet(me, this);
+    greeting(me: USER) {
+        let sx_cmd = WORLD.COMMANDS.sx as ShouXiCommand
+        sx_cmd.do_greet(me);
     }
 
-    manage(me) {
-        WORLD.COMMANDS.sx.do_manage(me);
+    manage(me: USER) {
+        let sx_cmd = WORLD.COMMANDS.sx as ShouXiCommand
+        sx_cmd.do_manage(me);
     }
 }
 

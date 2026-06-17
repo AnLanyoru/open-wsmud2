@@ -8,7 +8,6 @@ export default class extends NPC {
     gender = 2;
     age = 28;
     per = 38;
-    max_mp = 1400;
     family = FAMILIES.EMEI;
     family_level = 5;
     level = 2;

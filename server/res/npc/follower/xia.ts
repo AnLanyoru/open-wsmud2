@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "夏雪宜";
     desc = "他就是人称“金蛇郎君”的一代怪杰——夏雪宜。";
     title = "<hiy>金蛇郎君</hiy>";

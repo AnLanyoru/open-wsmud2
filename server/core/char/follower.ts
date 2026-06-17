@@ -66,7 +66,7 @@ interface CommandEntry {
 }
 
 /** 发送给客户端的物件命令 JSON */
-interface ItemCommandsJson {
+export interface ItemCommandsJson {
     type: 'item';
     desc: string;
     id: string;

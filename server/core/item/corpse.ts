@@ -3,9 +3,9 @@
  */
 import type {OBJ} from './obj.js';
 import {CONTAINER} from './container.js';
-import type {ItemDescJson} from './container.js';
 import type {CHARACTER} from '../char/character.js';
 import type {USER} from '../char/user.js';
+import type { ItemCommandsJson } from '../char/follower.js';
 
 export class CORPSE extends CONTAINER {
 
@@ -126,7 +126,7 @@ export class CORPSE extends CONTAINER {
      */
     query_desc(me: USER): string {
         if (this.json) return this.json;
-        const obj: ItemDescJson = {
+        const obj: ItemCommandsJson = {
             type: "item",
             desc: this.get_desc(me),
             id: this.id,

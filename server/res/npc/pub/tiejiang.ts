@@ -3,6 +3,7 @@ import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
 import {UTIL} from "../../../core/util/util.js";
 import {EQUIP_TYPE, WEAPON_TYPE} from "../../../core/const.js";
+import DuanZaoCommand from "../../cmd/obj/duanzao.js";
 
 export default class extends NPC {
     name = "铁匠";
@@ -98,7 +99,13 @@ export default class extends NPC {
         if (me.remove_obj(item, 10)) {
             var obj = OBJ.CREATE("eq/cp#" + arg);
             obj.set_temp("name", str);
-            WORLD.COMMANDS.duanzao.default_template(obj, EQUIP_TYPE.WEAPON);
+
+            let duanzao_command = WORLD.COMMANDS.duanzao as DuanZaoCommand | undefined;
+            if (!duanzao_command) {
+                me.send("<hir>发生了一个错误，请联系管理员。错误详情：锻造指令未加载</hir>");
+                return;
+            }
+            duanzao_command.default_template(obj, EQUIP_TYPE.WEAPON);
             if (obj.on_reload) obj.on_reload(me);
             me.add_obj(obj);
             me.notify("铁匠说道：不错，这是你要的。");

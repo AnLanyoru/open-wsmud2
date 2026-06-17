@@ -3,7 +3,7 @@
  * 自动加载所有定义在 __COMMAND 文件夹下的命令文件
  */
 import {BASE} from './base.js';
-import {WORLD} from './world.js';
+import {MessageEntry, WORLD} from './world.js';
 import type {CHARACTER} from './char/character.js';
 import type {OBJ} from './item/obj.js';
 
@@ -172,9 +172,10 @@ export class COMMAND extends BASE {
      * @param cmd - 命令名
      * @param args - 参数列表
      */
-    static DO(cmd: string, ...args: string[]): void {
+    static DO(cmd: string, ...args: (string | Partial<MessageEntry>)[]): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
+            // @ts-expect-error 这里不确定 exec 的参数类型，交由具体命令处理
             cmdObj.enter(null, ...args);
         }
     }

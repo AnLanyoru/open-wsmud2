@@ -4,8 +4,9 @@ import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {EVENTS} from "../../../core/task/events.js";
+import type { USER } from "../../../core/char/user.js";
 
-export default class extends COMMAND {
+export default class ShouXiCommand extends COMMAND {
     command = "sx";
     allow_busy = true;
     allow_state = true;
@@ -15,7 +16,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, par1, par2) {
+    enter(me: USER, type: string, par1: string, par2: string) {
         if (type === 'greet') {
             this.do_greet(me);
         } else {
@@ -23,7 +24,7 @@ export default class extends COMMAND {
         }
     }
 
-    do_greet(me) {
+    do_greet(me: USER) {
         let npc = me.family.first_npc;
         if (!npc) return me.send('首席目前不在线。');
         if (me.level > 5) return me.notify("堂堂武神大人就不要凑热闹了好吧。");
@@ -72,7 +73,7 @@ export default class extends COMMAND {
         return true;
     }
 
-    do_manage(me, par1, par2) {
+    do_manage(me: USER, par1?: string, par2?: string) {
         let npc = me.family.first_npc;
         if (!npc) return me.send('你的门派还没有首席弟子。');
         if (!this.check_power(me, npc)) return;
@@ -99,7 +100,7 @@ export default class extends COMMAND {
                 'sx manage buff lianxi', '练习效率+20%',
                 'sx manage buff dazuo', '打坐效率+20%');
         }
-        let msg = null;
+        let msg: string;
         switch (par2) {
             case "xue":
                 me.family.add_temp("study_per", 20, 3600000);
@@ -128,7 +129,7 @@ export default class extends COMMAND {
         }
     }
 
-    manage_battle(me, par2) {
+    manage_battle(me: USER, par2?: string) {
         if (me.family === FAMILIES.NONE)
             return me.send('你无门无派，要干什么？');
         if (me.family === FAMILIES.SHASHOU)
@@ -171,11 +172,11 @@ export default class extends COMMAND {
         if (fam.query_temp('battle'))
             return me.send(fam.name + '刚结束战斗，趁人之危非君子所为。');
         me.family.set_temp("sxwar", 1, UTIL.diff_time());
-        me.family.check_battle(me, null, fam);
+        me.family.check_battle(me, undefined, fam);
         me.family.send_channel(me, "所有门下弟子听令，开始进攻" + fam.name);
     }
 
-    manage_battle2(me, par2) {
+    manage_battle2(me: USER, par2?: string) {
         if (me.family.query_temp("sxwar", 0) >= 5)
             return me.send('杀手楼每天最多可介入5次其他门派的战争。');
         if (me.family.query_temp('battle')) {
@@ -205,12 +206,11 @@ export default class extends COMMAND {
         if (!fam || fam === me.family) return me.send('你要进攻哪个门派？');
         if (!fam.battle_family)
             return me.send(fam.name + '没有发生战争，你无法介入 。');
-        sxwar = me.family.add_temp("sxwar", 1, UTIL.diff_time());
+        let sxwar = me.family.add_temp("sxwar", 1, UTIL.diff_time());
         me.family.add_temp('battle', 1, 3600000);
         me.family.set_temp('ss_target', fam.id, 3600000);
         me.family.send_channel(me, "门下所有杀手听令，开始进攻" + fam.name);
         me.send('<cyn>已选择' + fam.name + '作为目标门派，本日已开启' + sxwar + '/5次。</cyn>');
-
         EVENTS.add({
             id: "SHASHOU_bat",
             name: "门派战争",

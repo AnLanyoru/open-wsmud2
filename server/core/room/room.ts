@@ -118,7 +118,7 @@ export class ROOM extends ITEM {
     // ============ 玩法相关 ============
 
     /** 副本临时数据 */
-    temp: Record<string, any> | null = null;
+    temp: Record<string, any> = {};
     /** 副本分数（由 CHARACTER.add_fbscore 设置） */
     score?: number;
     /** 是否可钓鱼 */

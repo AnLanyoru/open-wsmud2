@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "周芷若";
     desc = "她秀若芝兰，淡雅脱俗，年纪虽小却十足是个绝色的美人胚子";
     title = "峨眉派第四代弟子";

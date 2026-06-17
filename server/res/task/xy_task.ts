@@ -10,6 +10,7 @@ import {AREA} from "../../core/room/area.js";
 import {ROOM} from "../../core/room/room.js";
 import {EVENTS} from "../../core/task/events.js";
 import {COMMAND} from "../../core/command.js";
+import { log } from "node:console";
 // todo 襄阳没做
 // 城门状态
 interface GateState {
@@ -25,7 +26,7 @@ interface GateState {
     boss?: NPC | null;
 }
 
-export default class extends TASK {
+export default class XiangYangTask extends TASK {
     id = "xiangyang";
     is_start = false;
     guards: NPC[] = [];
@@ -34,7 +35,7 @@ export default class extends TASK {
     start_handler: ReturnType<typeof setTimeout> | null = null;
     check_handler: ReturnType<typeof setTimeout> | null = null;
     create_handler: ReturnType<typeof setTimeout> | null = null;
-    xy_area: AREA | null = null;
+    xy_area: AREA;
     next_date: Date | null = null;
     drops_count: number = 0;
     allow_commands = {
@@ -88,7 +89,13 @@ export default class extends TASK {
         if (this.start_handler) clearTimeout(this.start_handler);
         var date = new Date();
         var week = date.getDay();
-        this.xy_area = AREA.Get('xiangyang') ?? null;
+        let xy_area = AREA.Get("xiangyang");
+        if (!xy_area) {
+            let err = new Error("错误：未找到襄阳区域，请确保资源文件正确加载");
+            console.error("【ERROR】", err.stack);
+            return false;
+        }
+        this.xy_area = xy_area;
         var next_date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + (week > 0 ? (7 - week) : 0), 20, 30);
         if (next_date < date) next_date = new Date(next_date.getFullYear(), next_date.getMonth(), next_date.getDate() + 7, 20, 30);
 
@@ -104,7 +111,7 @@ export default class extends TASK {
         if (!this.can_battle()) return;
         COMMAND.DO("rumor", "听说郭大侠收到线报蒙古大军近日将会进攻襄阳！");
         WORLD.DATA.set_temp("xy_status", 1);
-        this.xy_area?.notify_update();
+        this.xy_area.notify_update();
         this.call_out(this.run, 300000);
     }
 
@@ -521,7 +528,7 @@ export default class extends TASK {
         this.boss = null;
         this.guard = null;
         this.startup();
-        this.xy_area?.notify_update();
+        this.xy_area.notify_update();
         WORLD.DATA.remove_temp('xy_party');
 
         WORLD.DATA.remove_temp("xy_users");
@@ -563,7 +570,7 @@ export default class extends TASK {
     }
 
     reset() {
-        this.xy_area?.notify_update();
+        this.xy_area.notify_update();
     }
 
     jg_limit(me: USER) {
@@ -630,7 +637,7 @@ export default class extends TASK {
         me.set_temp('xy_bm', 1, 3600000);
         me.set_temp('xy_bm2', 1, UTIL.diff_time());
         WORLD.DATA.add_temp("xy_users", 1);
-        this.xy_area?.notify_update();
+        this.xy_area.notify_update();
         me.notify("<hic>你已经报名参与守城，一周内所获军功未到上限前可重复报名。</hic>");
         return true;
     }

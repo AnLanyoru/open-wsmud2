@@ -25,8 +25,9 @@ export class TASK extends BASE {
      * 创建回调 — 添加到 WORLD.SYSTEMTASKS 并启动
      */
     create(): void {
+        let is_success = this.startup();
+        if (is_success === false) return;
         WORLD.SYSTEMTASKS.push(this);
-        this.startup();
     }
 
     /**
@@ -62,10 +63,11 @@ export class TASK extends BASE {
 
     /**
      * 任务启动回调 — 子类覆写实现具体逻辑（如设置定时器、初始化状态）
+     * 返回 false 表示任务启动失败，create() 将不会将其添加到 WORLD.SYSTEMTASKS 中
      * @param oldtask - 旧任务实例（热更新时传入，用于迁移状态）
      */
-    startup(oldtask?: TASK): void {
-        return undefined;
+    startup(oldtask?: TASK): boolean | void {
+        undefined;
     }
 
     /**

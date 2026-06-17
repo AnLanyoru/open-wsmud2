@@ -197,13 +197,13 @@ export default class extends NPC {
                 me.add_title?.("", "mar");
                 user?.add_title?.("", "mar");
                 user && user.notify("<yel>你和" + me.name + "的夫妻关系解除了。</yel>");
-                var attach = user ? null : [{
+                var attach = user ? undefined : [{
                     obj: "sp/tool/fuqi#" + me.id,
                     count: 1
                 }];
                 COMMAND.DO("send", wife, {
                     content: me.name + "主动和你解除夫妻关系。",
-                    attach: attach
+                    attach
                 });
                 me.notify("赵铁笔呵呵笑道：好吧，你的婚姻关系已经解除了。");
                 me.set_temp("marry_leave", 1, 7 * 24 * 3600000);

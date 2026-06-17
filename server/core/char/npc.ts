@@ -3,19 +3,12 @@
 // ============================================================
 
 import {CHARACTER} from './character.js';
-
-// @ts-ignore - Legacy JS module
 import {FAMILIES} from '../skill/family.js';
 import type {FAMILY} from '../skill/family.js';
-// @ts-ignore - Legacy JS module
 import {ROOM} from '../room/room.js';
-// @ts-ignore - Legacy JS module
 import {OBJ} from '../item/obj.js';
-// @ts-ignore - Legacy JS module
 import {WORLD} from '../world.js';
-// @ts-ignore - Legacy JS module
 import {BASE} from '../base.js';
-// @ts-ignore - Legacy JS module
 import {CORPSE} from '../item/corpse.js';
 import type {EQUIPMENT} from '../item/equipment.js';
 import type {ActionMap} from '../../types/base.js';

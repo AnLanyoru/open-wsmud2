@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "<wht>浪翻云</wht>";
     desc = "他身形雄伟，面貌粗犷豪雄，脸目丑陋，一对黄睛似醒还醉";
     gender = 1;

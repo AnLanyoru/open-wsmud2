@@ -340,7 +340,7 @@ export class CHARACTER extends ITEM {
     /** 装备列表（按 EQUIP_TYPE 索引） */
     equipment: (EQUIPMENT | null)[] | null = null;
     /** 临时数据 */
-    temp: Record<string, any> | null = null;
+    temp: Record<string, any> = {};
     /** 战斗属性修饰 */
     combat_props: [string, number][] | null = null;
 

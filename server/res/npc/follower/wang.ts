@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "王语嫣";
     desc = "她似有烟霞轻笼，恍入仙境，当真非尘世中人。";
     title = "<him>神仙姐姐</him>";

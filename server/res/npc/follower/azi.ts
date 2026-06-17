@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "阿紫";
     desc = "她容颜俏丽，可眼神中总是透出一股邪气。";
     title = "星宿派小师妹";

@@ -8,7 +8,6 @@ export default class extends NPC {
     gender = 1;
     age = 67;
     per = 33;
-    max_mp = 20000;
     str = 30;
     con = 30;
     dex = 30;

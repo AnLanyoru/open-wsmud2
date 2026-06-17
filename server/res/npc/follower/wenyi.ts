@@ -1,6 +1,6 @@
-import {NPC} from "../../../core/char/npc.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
-export default class extends NPC {
+export default class extends FOLLOWER {
     name = "温仪";
     desc = "这是一个美如天仙的女子，眉宇间却是仿佛隐藏着深忧。";
     title = "温家小姐";

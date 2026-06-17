@@ -1,7 +1,7 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {MessageEntry, WORLD} from "../../../core/world.js";
-import {OBJ} from "../../../core/item/obj.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { MessageEntry, WORLD } from "../../../core/world.js";
+import { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "send";
@@ -13,27 +13,28 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, user, arg) {
+    enter(me: CHARACTER, user: string, arg: string | MessageEntry) {
         if (me && me.user_level < 5) return false;
         if (!arg) return me && me.send("没有消息内容。");
         var msg: any;
-        var is_str = typeof arg == "string";
-        if (is_str && arg[0] != "{") {
-            msg = {content: arg, time: Date.now()};
-        } else {
-            if (is_str) {
+        if (arg && typeof arg == "string") {
+            if (arg[0] != "{") {
+                msg = { content: arg, time: Date.now() };
+            } else {
                 // 保护Windows路径分隔符: 将非JSON转义的\替换为\\，防止JSON5吞掉反斜杠
                 arg = arg.replace(/\\(?!["\\/bfnrtu])/g, "\\\\");
+                msg = JSON.toObject(arg)
             }
-            msg = is_str ? JSON.toObject(arg) : arg;
-            if (!msg.content || !msg.attach) return me && me.send("格式错误。");
-            msg.time = Date.now();
-            for (var i = 0; i < msg.attach.length; i++) {
-                let attach = msg.attach[i];
-                var objItem = OBJ.CREATE(attach.obj, attach.count);
-                if (objItem) {
-                    attach.name = objItem.unit_name(attach.count);
-                }
+        } else {
+            msg = arg;
+        }
+        if (!msg.content || !msg.attach) return me && me.send("格式错误。");
+        msg.time = Date.now();
+        for (var i = 0; i < msg.attach.length; i++) {
+            let attach = msg.attach[i];
+            var objItem = OBJ.CREATE(attach.obj, attach.count);
+            if (objItem) {
+                attach.name = objItem.unit_name(attach.count);
             }
         }
         var users: CHARACTER[] = [];
