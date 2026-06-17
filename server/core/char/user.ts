@@ -186,7 +186,7 @@ export class USER extends CHARACTER {
     /** 背包物品 */
     items: OBJ[] | null = null;
     /** 仓库物品 */
-    stores: OBJ[] | null = null;
+    stores: OBJ[] = [];
     /** 当前装备组 */
     eq_group: number = 0;
     /** 装备组定义 */

@@ -37,7 +37,7 @@ export default class extends TASK {
     /**
      * 查询/生成玩家货物列表（带缓存）
      */
-    query_goods(me: CHARACTER): OBJ[] | undefined {
+    query_goods(me: CHARACTER): OBJ[] {
         var cached = this.customer[me.id];
         if (cached) return cached;
         var ref_count = me.query_temp("ref_count", 0) ?? 0;

@@ -81,9 +81,7 @@ export class TASK extends BASE {
      * 查询玩家货物列表 — 子类覆写（如押镖任务的货物）
      * @param me - 玩家角色
      */
-    query_goods(me: CHARACTER): OBJ[] | undefined {
-        return undefined;
-    }
+    query_goods?(me: CHARACTER): OBJ[];
 
     /**
      * 设置/清除玩家货物缓存 — 子类覆写

@@ -1,6 +1,7 @@
 import {ROOM} from "../../../core/room/room.js";
 import {WORLD} from "../../../core/world.js";
 import type {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class MapRoom extends ROOM {
     name = "赌场";
@@ -80,12 +81,12 @@ export default class MapRoom extends ROOM {
         }
     }
 
-    action_say(this: MapRoom, me: CHARACTER, par?: string) {
+    action_say(this: MapRoom, me: USER, par?: string) {
         WORLD.COMMANDS['say'].enter(me, par ?? '');
         if (par === '我要回档') {
             for (let item of this.items) {
-                if ('query_temp' in item && typeof item.query_temp === 'function') {
-                    const ch = item as CHARACTER;
+                if (item.check_player()) {
+                    const ch = item;
                     if (ch.query_temp('admin') || ch.query_temp('wiz')) {
                         ch.send_commands('rbok ' + me.id, '同意【' + me.name + '】回档');
                     }
@@ -98,7 +99,7 @@ export default class MapRoom extends ROOM {
     rbok(this: MapRoom, me: CHARACTER, par?: string) {
         if (!par) return;
         let item = this.find_obj(par);
-        if (item) {
+        if (item?.check_player()) {
             item.do_command('reback');
             me.send(item.name + "开始回档选项。");
         } else {

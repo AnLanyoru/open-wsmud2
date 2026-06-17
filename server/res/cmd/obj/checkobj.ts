@@ -1,5 +1,7 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import { COMMAND } from "../../../core/command.js";
+import type { USER } from "../../../core/char/user.js";
+import type { ITEM } from "../../../core/item.js";
+import type { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "checkobj";
@@ -11,15 +13,16 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid, type) {
-        var obj = null;
+    enter(player: USER, objid: string, type: string) {
+        var obj: ITEM | null = null;
         if (type == "item") {
             obj = player.find_obj(objid);
         } else if (type == "eq") {//装备和物品只能检查自己的
             if (player.equipment) {
                 for (var i = 0; i < player.equipment.length; i++) {
-                    if (player.equipment[i] && player.equipment[i].id == objid) {
-                        obj = player.equipment[i];
+                    let eq = player.equipment[i]
+                    if (eq?.id == objid) {
+                        obj = eq;
                         break;
                     }
                 }
@@ -27,17 +30,13 @@ export default class extends COMMAND {
 
         } else if (type == "store") {
             obj = player.find_obj_byid(player.stores, objid);
-
-        } else if (type == "sj") {
-            obj = player.find_obj_byid(player.books, objid);
-
         } else {
 
             var target = player.find_obj(type, player.environment);
             if (!target) return player.notify("你要从谁那里看?");
             if (target.on_checkobj) {
                 obj = target.on_checkobj(player, objid);
-            } else if (target.sell_list) {
+            } else if (target.check_npc() && target.sell_list) {
                 var selllist = target.sell_list;
                 if (target.on_sell) {
                     selllist = target.on_sell(player);
@@ -52,24 +51,22 @@ export default class extends COMMAND {
         if (!obj) {
             return player.notify("你要看什么？");
         }
-        player.notify(query_obj_desc(player, obj, type));
+        if (obj.check_obj()) player.notify(query_obj_desc(player, obj, type));
     }
 }
 
-function query_obj_desc(player, obj, type) {
+function query_obj_desc(player: USER, obj: OBJ, type: string) {
     var json = {
         type: "dialog",
         dialog: "pack",
         from: type,
         id: obj.id,
         desc: obj.get_desc(player),
+        commands: obj.actions
+            ? Object.keys(obj.actions)
+                .filter(key => obj.actions![key].name)
+                .map(key => ({ cmd: key, name: obj.actions![key].name }))
+            : [],
     };
-    if (obj.actions) {
-        json.commands = [];
-        for (var key in obj.actions) {
-            if (obj.actions[key].name)
-                json.commands.push({cmd: key, name: obj.actions[key].name});
-        }
-    }
     return JSON.stringify(json);
 }

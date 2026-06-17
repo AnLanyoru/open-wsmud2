@@ -125,6 +125,9 @@ export class NPC extends CHARACTER {
     /** 接受物品回调 — 触发时机：玩家 give 物品给 NPC 时 */
     on_accept?(me: CHARACTER, obj: string, count: number): boolean | void;
 
+    /** 查看在售物品回调 — 触发时机：玩家 查看 NPC 出售列表时 */
+    on_sell?(me: CHARACTER, obj?: string, count?: number): OBJ[];
+
     constructor() {
         super();
     }

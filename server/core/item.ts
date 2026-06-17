@@ -148,7 +148,10 @@ export class ITEM extends BASE {
     /** 查询用户设置（桩方法，玩家子类覆写） */
     query_setting?(_name: string): boolean | number;
 
+    /** 查询介绍 */
     query_desc?(me: CHARACTER, ...args: string[]): string;
+
+    on_checkobj?(player: USER, objid: string): ITEM;
 
     // ============ 堆叠操作 ============
 

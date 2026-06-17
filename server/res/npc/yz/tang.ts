@@ -2,6 +2,8 @@ import {NPC} from "../../../core/char/npc.js";
 import {UTIL} from "../../../core/util/util.js";
 import {TASK} from "../../../core/task/task.js";
 import { USER } from "../../../core/char/user.js";
+import type { OBJ } from "../../../core/item/obj.js";
+import goods_task from "../../task/goods_task.js";
 
 export default class extends NPC {
     name = "唐楠";
@@ -14,7 +16,7 @@ export default class extends NPC {
     max_mp = 1500;
     hp = 15000;
     max_hp = 15000;
-    sell_list = [];
+    sell_list: OBJ[] = [];
 
     constructor() {
         super();
@@ -44,8 +46,8 @@ export default class extends NPC {
 
         }
 
-    on_sell(me) {
-        var task = TASK.GET('goods');
+    on_sell(me: USER) {
+        var task = TASK.GET('goods') as goods_task;
         if (task) return task.query_goods(me);
         return this.sell_list;
     }

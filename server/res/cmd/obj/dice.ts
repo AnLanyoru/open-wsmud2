@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { OBJ } from "../../../core/item/obj.js";
 
 interface DiceItem {
     id: string;
@@ -24,7 +25,7 @@ export default class extends COMMAND {
         if (!me.team) return me.send("你没有在队伍里。");
         var objs = me.team.objs;
         if (!objs || !objs.length) return me.send("目前没有等待分配的战利品。");
-        var item: DiceItem | null = null;
+        var item: OBJ | null = null;
         for (var i = 0; i < objs.length; i++) {
             if (objs[i].id == objid) {
                 item = objs[i];
