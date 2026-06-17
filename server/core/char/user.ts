@@ -51,6 +51,11 @@ const DIE_MSG = [
 // ============================================================
 
 
+
+export interface StudyingBook{
+    color_name: string, 
+    max_level: number}
+
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {
     /** 状态 id */
@@ -88,6 +93,8 @@ export interface UserState {
     no_move?: string;
     /** 动作开始时间戳 */
     stime?: number;
+    /** 读书时的来源书籍 */
+    from_book?: StudyingBook;
     
     /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
     on_enter?: (me: CHARACTER, dt?: number) => boolean | void;

@@ -2126,7 +2126,7 @@ export class CHARACTER extends ITEM {
      */
     call(isbad?: boolean): string {
         if (!this.family) return this.gender == 2 ? '姑娘' : '壮士';
-        return (this.family as Record<string, any>).call(this, isbad);
+        return this.family.call(this, isbad);
     }
 
     /**
@@ -2134,7 +2134,7 @@ export class CHARACTER extends ITEM {
      */
     callme(isbad?: boolean): string {
         if (!this.family) return this.gender == 2 ? '小女子' : '在下';
-        return (this.family as Record<string, any>).call_me(this);
+        return this.family.call_me(this);
     }
 
     /**
