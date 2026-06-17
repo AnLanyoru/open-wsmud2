@@ -328,7 +328,7 @@ export class NPC extends CHARACTER {
     /** NPC 复活刷新 */
     relive(): void {
         if (!this.die_room) return;
-        const room = ROOM.Get(this.die_room.path);
+        const room = WORLD.getRoom(this.die_room.path);
         if (!room) return;
         const obj = room.find_obj_bypath(this.path);
         if (obj) return;

@@ -1900,8 +1900,7 @@ export class CHARACTER extends ITEM {
         const cur_room = this.environment;
         let next_room = rm;
         if (typeof rm === 'string') {
-            const _ROOM = ROOM;
-            next_room = _ROOM.Get(rm);
+            next_room = WORLD.getRoom(rm);
             if (!next_room) return false;
             if (cur_room && next_room.parent === cur_room.parent) {
                 if (cur_room.owner) {

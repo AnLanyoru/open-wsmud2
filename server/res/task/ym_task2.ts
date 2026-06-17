@@ -12,7 +12,7 @@ interface YmRequest {
     wz: string;
 }
 
-export default class extends USERTASK {
+export default class YaMenLevelUpTask extends USERTASK {
     id = "yamen2";
     requests: Map<string, YmRequest> = new Map();
 

@@ -61,7 +61,7 @@ function fb_saodang(me, path, isdiff, count) {
     if (!fb) {
         return me.notify("没有这个副本!");
     }
-    let next_room = ROOM.Get(fb.first ?? '');
+    let next_room = WORLD.getRoom(fb.first ?? '');
     if (!next_room) {
         return me.notify("没有这个房间");
     }
@@ -201,7 +201,7 @@ function fb_start(me, path) {
     if (!fb) {
         return me.notify("没有这个副本!");
     }
-    var next_room = ROOM.Get(fb.first ?? '');
+    var next_room = WORLD.getRoom(fb.first ?? '');
     if (!next_room) {
         return me.notify("没有这个副本!");
     }

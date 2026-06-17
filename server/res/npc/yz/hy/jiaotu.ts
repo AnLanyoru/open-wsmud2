@@ -2,6 +2,7 @@ import {NPC} from "../../../../core/char/npc.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {CORPSE} from "../../../../core/item/corpse.js";
 import {CHARACTER} from "../../../../core/char/character.js";
+import {WORLD} from "../../../../core/world.js";
 
 export default class extends NPC {
     name = "黑鹰教徒";
@@ -96,7 +97,7 @@ export default class extends NPC {
 
     relive(): void {
         if (!this.die_room) return;
-        var room = ROOM.Get(rooms.random());
+        var room = WORLD.getRoom(rooms.random());
         if (!room) return;
         let obj = NPC.CLONE(this.path);
         room.item_changed(obj, true);

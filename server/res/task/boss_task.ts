@@ -91,7 +91,7 @@ class BossTask extends TASK {
             if (!bs) return console.log("boss 创建失败");
             this.boss.push(bs);
             bs.event_id = 'boss' + level;
-            var rm = ROOM.RANDOM()!; //ROOM.Get("yz/nanmen");
+            var rm = ROOM.RANDOM()!; //WORLD.getRoom("yz/nanmen");
             rm.item_changed(bs, true);
             let desc = '听说' + bs.name + '出现在' + rm.long_name() + '一带';
             let msg = '{"type":"msg","ch":"rumor","content":"' + desc + '。"}';

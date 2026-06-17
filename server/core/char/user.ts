@@ -317,7 +317,7 @@ export class USER extends CHARACTER {
         this.send_loginmessage();
 
         if (!this.environment) {
-            const rm = ROOM.Get(this.quit_room!);
+            const rm = WORLD.getRoom(this.quit_room!);
             if (!rm) {
                 this.send('出现错误，请联系管理员报告BUG，谢谢！');
                 return;
@@ -502,8 +502,8 @@ export class USER extends CHARACTER {
         WORLD.STATS.checkStats(this);
         this.send_loginmessage();
         if (this.family) this.family.on_login(this);
-        let rm = ROOM.Get(this.query_temp('new') ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
-        if (!rm || rm.is_fb()) rm = ROOM.Get(DEFAULT_ROOM);
+        let rm = WORLD.getRoom(this.query_temp('new') ? 'new/new1' : this.quit_room ?? DEFAULT_ROOM);
+        if (!rm || rm.is_fb()) rm = WORLD.getRoom(DEFAULT_ROOM);
         if (rm!.is_copy()) {
             let copy_room = rm!.query_copy2(this);
             if (copy_room) {
@@ -522,7 +522,7 @@ export class USER extends CHARACTER {
         }
         this.check_state();
         if (this.follower && (!this.environment || (this.environment as ROOM).parent?.id !== 'home')) {
-            const home = ROOM.Get('home/yuanzi');
+            const home = WORLD.getRoom('home/yuanzi');
             if (home) {
                 let copy_home = home.query_copy2(this);
                 if (!copy_home) copy_home = home.create_copy2(this);
@@ -1096,7 +1096,7 @@ export class USER extends CHARACTER {
         const home: any = this.query_temp('home');
         if (!home) return null;
         if (!rm_name) rm_name = home == 1 ? 'home/danjian' : 'home/yuanzi';
-        const rm = ROOM.Get(rm_name);
+        const rm = WORLD.getRoom(rm_name);
         if (!rm) return null;
         let my_room = rm.query_copy2(this);
         if (!my_room) {
@@ -1182,7 +1182,7 @@ export class USER extends CHARACTER {
      * 清除家园和随从
      */
     clear_home(clear_follower: boolean = true): void {
-        let home = ROOM.Get('home/yuanzi');
+        let home = WORLD.getRoom('home/yuanzi');
         if (home) {
             home = home.query_copy(this.id);
             if (home) home.clear_copy(this);

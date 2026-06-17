@@ -1,6 +1,7 @@
 import { CHARACTER } from "../../../core/char/character.js";
 import {OBJ} from "../../../core/item/obj.js";
 import {ROOM} from "../../../core/room/room.js";
+import { WORLD } from "../../../core/world.js";
 
 export default class extends OBJ {
     name = "雄黄";
@@ -31,7 +32,7 @@ export default class extends OBJ {
 
         for (var i = 0; i < list.length; i++) {
             list[i].hp = list[i].max_hp;
-            list[i].moveto(ROOM.Get(exits.random())!.query_copy2(me), '毒蛇被熏的四散逃去。');
+            list[i].moveto(WORLD.getRoom(exits.random())!.query_copy2(me), '毒蛇被熏的四散逃去。');
         }
 
     }

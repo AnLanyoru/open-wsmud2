@@ -1,6 +1,7 @@
 import {ROOM} from "../../../../core/room/room.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
 import type HeiYingTieHu from "../../../npc/yz/hy/tiehu.js";
+import { WORLD } from "../../../../core/world.js";
 
 export default class MapRoom extends ROOM {
     name = "黑鹰厅";
@@ -43,7 +44,7 @@ export default class MapRoom extends ROOM {
         if (this.query_exits("down")) {
             this.remove_exit("down");
             this.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
-            const dilao = ROOM.Get('yz/hy/dilao');
+            const dilao = WORLD.getRoom('yz/hy/dilao');
             if (dilao) dilao.send("<cyn>铁门发出一阵沉闷的声响，又缓缓的关上了。</cyn>");
         }
     }

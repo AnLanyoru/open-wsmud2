@@ -1,7 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
-import {ROOM} from "../../../core/room/room.js";
+import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
     command = "go";
@@ -24,7 +23,7 @@ export default class extends COMMAND {
         //     console.log(me.name, cur_room.path);
         // }
 
-        var next_room = ROOM.Get(rm);
+        var next_room = WORLD.getRoom(rm);
         if (!next_room) {
             return me.notify(rm + "还没开放!");
         }
@@ -82,7 +81,7 @@ function sendOutMessage(player, dir) {
     return player.name + "往" + dir + "离开。";
 }
 
-function sendInMessage(player, dir) {
+function sendInMessage(player, dir?) {
     if (player.fight_type) {
         return player.name + "跌跌撞撞地跑了过来，模样有些狼狈。";
     }

@@ -1,5 +1,6 @@
 import {ROOM} from "../../../core/room/room.js";
 import type {CHARACTER} from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
 
 export default class MapRoom extends ROOM {
     name = "舍身崖";
@@ -10,7 +11,7 @@ export default class MapRoom extends ROOM {
         super();
         this.add_action("jumpdown", "跳下去", function (this: MapRoom, me: CHARACTER) {
             me.notify("你心一横，双眼一闭就从山崖上跳了下去。");
-            var rm = ROOM.Get("huashan/qiaobi");
+            var rm = WORLD.getRoom("huashan/qiaobi");
 
             if (!rm) return;
             if (this.owner) rm = rm.query_copy(this.owner) ?? rm;

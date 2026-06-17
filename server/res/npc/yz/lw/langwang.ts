@@ -55,7 +55,7 @@ export default class extends MONSTER {
         if (me.query_temp('langpi')) {
             me.notify(this.name + "龇牙弓背警惕的看着你。");
             if (!WORLD.DATA.query_temp('zq7', 0)) {
-                var rm = ROOM.Get('yz/lw/milin2')!.query_copy2(me);
+                var rm = WORLD.getRoom('yz/lw/milin2')!.query_copy2(me);
                 if (!rm) return;
                 for (var i = 0; i < rm.items.length; i++) {
                     const rmItem = rm.items[i];
@@ -69,7 +69,7 @@ export default class extends MONSTER {
             }
             return;
         }
-        var rm = ROOM.Get('yz/lw/milin2')!.query_copy2(me);
+        var rm = WORLD.getRoom('yz/lw/milin2')!.query_copy2(me);
         if (!rm) {
             return;
         }

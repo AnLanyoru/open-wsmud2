@@ -3,6 +3,7 @@ import { NPC } from "../../../../core/char/npc.js";
 import { USER } from "../../../../core/char/user.js";
 import { CORPSE } from "../../../../core/item/corpse.js";
 import { ROOM } from "../../../../core/room/room.js";
+import { WORLD } from "../../../../core/world.js";
 
 export default class HeiYingTieHu extends NPC {
     name = "铁虎";
@@ -52,7 +53,7 @@ export default class HeiYingTieHu extends NPC {
             this.send_room('$N道：不知死活！');
             let list: CHARACTER[] = [];
             for (let path of rooms) {
-                let room = ROOM.Get(path);
+                let room = WORLD.getRoom(path);
                 if (!room) {
                     me.send('发生错误，无法找到房间' + path);
                     continue;

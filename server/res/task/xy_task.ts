@@ -165,10 +165,10 @@ export default class XiangYangTask extends TASK {
     }
 
     create_guards() {
-        this.guard = ROOM.Get("xiangyang/guangchang")!.find_obj_bypath("xiangyang/guo") as unknown as NPC | null;
+        this.guard = WORLD.getRoom("xiangyang/guangchang")!.find_obj_bypath("xiangyang/guo") as unknown as NPC | null;
         if (!this.guard) {
             this.guard = NPC.CLONE("xiangyang/guo");
-            ROOM.Get("xiangyang/guangchang")!.item_changed(this.guard, true);
+            WORLD.getRoom("xiangyang/guangchang")!.item_changed(this.guard, true);
         }
 
         this.guard.on_die = this.on_guard_die.bind(this, this.guard);
@@ -181,7 +181,7 @@ export default class XiangYangTask extends TASK {
                 npc.name = UTIL.random_name(1);
                 npc.on_enter = this.check_enemy;
                 npc.is_dasong = true;
-                var rm = ROOM.Get(rooms[j] + i.toString())!;
+                var rm = WORLD.getRoom(rooms[j] + i.toString())!;
                 npc.on_die = this.on_guard_die.bind(this, npc);
 
                 rm.item_changed(npc, true);
@@ -195,7 +195,7 @@ export default class XiangYangTask extends TASK {
                     var npc = NPC.CLONE("xiangyang/shouwei" + (3 + i));
 
                     npc.name = UTIL.random_name(1);
-                    var rm = ROOM.Get(rooms[j] + i.toString())!;
+                    var rm = WORLD.getRoom(rooms[j] + i.toString())!;
                     npc.on_enter = this.check_enemy;
                     npc.is_dasong = true;
                     npc.on_die = this.on_guard_die.bind(this, npc);
@@ -214,7 +214,7 @@ export default class XiangYangTask extends TASK {
         for (var i = 0; i < this.gate_states.length; i++) {
             var gate = this.gate_states[i];
             if (!gate.enter_room) {
-                gate.enter_room = ROOM.Get(gate.enter);
+                gate.enter_room = WORLD.getRoom(gate.enter);
             }
             if (!gate.enter_room) continue;
             this.create_index = i;
@@ -225,7 +225,7 @@ export default class XiangYangTask extends TASK {
                 if (!gate.walls) {
                     gate.walls = [];
                     for (var j = 0; j < gate.wall_index.length; j++) {
-                        gate.walls.push(ROOM.Get("xiangyang/walle" + gate.wall_index[j])!);
+                        gate.walls.push(WORLD.getRoom("xiangyang/walle" + gate.wall_index[j])!);
                     }
                 }
                 for (var j = gate.wall_count; j < 10 + gate.step; j++) {
@@ -420,7 +420,7 @@ export default class XiangYangTask extends TASK {
         npc.on_die = this.on_bing_die.bind(this, npc);
         npc.on_died = this.on_bing_died;
 
-        ROOM.Get("xiangyang/guangchang")!.item_changed(npc, true, npc.name + "出现了。");
+        WORLD.getRoom("xiangyang/guangchang")!.item_changed(npc, true, npc.name + "出现了。");
         this.check_handler = this.call_out(this.finish.bind(this, 2), 600000);
     }
 

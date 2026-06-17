@@ -1,6 +1,7 @@
 import {NPC} from "../../../../core/char/npc.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {CHARACTER} from "../../../../core/char/character.js";
+import { WORLD } from "../../../../core/world.js";
 
 export default class HeiYingJiaoXi extends NPC {
     name = "黑鹰教习";
@@ -47,7 +48,7 @@ export default class HeiYingJiaoXi extends NPC {
             this.send_room('$N大声喊道：小的们，来活了！');
             let list: CHARACTER[] = [];
             for (let path of rooms) {
-                let room = ROOM.Get(path);
+                let room = WORLD.getRoom(path);
                 if (!room) continue;
                 for (let item of room.items) {
                     if (item.check_character() && !item.fight_type && item.is('yz/hy/jiaotu')) {

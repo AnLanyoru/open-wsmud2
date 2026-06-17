@@ -129,7 +129,7 @@ export default class MapRoom extends ROOM {
     }
 
     is_killlang(me: CHARACTER) {
-        var rm = ROOM.Get('yz/lw/milin2');
+        var rm = WORLD.getRoom('yz/lw/milin2');
         if (!rm) {
             return 0;
         }

@@ -284,7 +284,7 @@ export class FAMILY extends BASE {
     init(): void {
         if (!this.def_npcs) return;
         for (let item of this.def_npcs) {
-            let rm = ROOM.Get(item[1]);
+            let rm = WORLD.getRoom(item[1]);
             if (!rm) throw new Error('房间' + item[1] + "不存在");
             let npc = _NPC!.CLONE(item[0]);
             if (!npc) throw new Error('npc ' + item[0] + "不存在");
@@ -307,7 +307,7 @@ export class FAMILY extends BASE {
         for (let item of this.def_npcs!) {
             let spath = item[0];
             if (spath.startsWith(path)) {
-                let rm = ROOM.Get(item[1]);
+                let rm = WORLD.getRoom(item[1]);
                 if (!rm) continue;
                 let npc = rm.find_obj_bypath(spath);
                 if (npc) npc.destroy();
@@ -442,7 +442,7 @@ export class FAMILY extends BASE {
     create_guards(): void {
         if (!this.boss_guard || !this.boss) return;
 
-        var boss_room = this.get_room(ROOM.Get(this.boss_guard[0])!);
+        var boss_room = this.get_room(WORLD.getRoom(this.boss_guard[0])!);
         var npc = _NPC!.CLONE("pub/menpai");
         npc.init_from(this, 5);
         npc.name = this.boss.name;
@@ -459,7 +459,7 @@ export class FAMILY extends BASE {
             for (var j = 0; j < 2; j++) {
                 npc = _NPC!.CLONE("pub/menpai");
                 npc.init_from(this, i == 0 ? 4 : 3);
-                var rm = this.get_room(ROOM.Get(this.boss_guard[i])!);
+                var rm = this.get_room(WORLD.getRoom(this.boss_guard[i])!);
                 if (rm) {
                     this.npcs.push(npc);
                     rm.item_changed(npc, true);
@@ -654,7 +654,7 @@ export class FAMILY extends BASE {
         if (!npc) return;
 
         if (npc.environment?.is_shadow) {
-            var rm = ROOM.Get(npc.environment.path);
+            var rm = WORLD.getRoom(npc.environment.path);
             if (rm) {
                 var shadow_npc = rm.find_obj_bypath('pub/dadizi#' + this.id) as NPC;
                 if (shadow_npc) {

@@ -14,7 +14,7 @@ export default class extends ROOM {
     lkfb(me, par) {
         if (par) {
             WORLD.COMMANDS['cr'].enter(me, 'over');
-            me.moveto(ROOM.Get('bj/hg/nanmen'));
+            me.moveto(WORLD.getRoom('bj/hg/nanmen'));
             me.send('你顺着小路进入京城，来到奉天城门。');
         } else {
             me.send('你即将离开这个副本进入公共区域，是否确认？');

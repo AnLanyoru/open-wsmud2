@@ -11,13 +11,6 @@ import type {SKILL} from "../skill/skill.js";
 import type {ActionMap} from "../../types/base.js";
 import { BASE } from "../base.js";
 
-// 延迟加载 ROOM 避免循环依赖: area.ts → room.ts → area.ts
-let _ROOM: {
-    Get: (path: string) => any;
-} | null = null;
-import("./room.js").then((m: Record<string, any>) => {
-    _ROOM = m.ROOM as any;
-});
 
 export class AREA extends BASE {
 
@@ -345,8 +338,7 @@ export class AREA extends BASE {
 
     /** @param me */
     clear_copy(me: USER): void {
-        if (!_ROOM) return;
-        const room = _ROOM.Get(this.first!)?.query_copy2(me);
+        const room = WORLD.getRoom(this.first!)?.query_copy2(me);
         if (room)
             room.clear_copy(me);
     }

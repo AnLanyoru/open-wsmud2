@@ -537,7 +537,7 @@ export class ROOM extends ITEM {
         if (this.exits) {
             for (let dir in this.exits) {
                 if (!this.exits[dir]) continue;
-                const rm = ROOM.Get(this.exits[dir]);
+                const rm = WORLD.getRoom(this.exits[dir]);
                 if (!rm) continue;
                 obj.items[dir] = rm.name;
             }
@@ -952,19 +952,6 @@ export class ROOM extends ITEM {
     // ============ 静态方法 ============
 
     /**
-     * 根据路径获取房间
-     * @param path
-     */
-    static Get(path: string): ROOM | undefined {
-        const rm = WORLD.ROOMS[path];
-        if (!rm) {
-            console.log("room %s is not exist", path);
-            return undefined;
-        }
-        return rm;
-    }
-
-    /**
      * 查询副本房间的临时数据(按玩家隔离)
      * @param name
      * @param def
@@ -1078,7 +1065,7 @@ export class ROOM extends ITEM {
      * @param id - 房间路径
      */
     query(id: string): ROOM | undefined {
-        const room = ROOM.Get(id);
+        const room = WORLD.getRoom(id);
         if (!room) return undefined;
         if (this.owner) {
             return room.query_copy(this.owner);

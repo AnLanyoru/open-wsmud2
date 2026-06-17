@@ -868,7 +868,21 @@ class World {
         for (let i = 0; i < this.USERS.length; i++) {
             if (this.USERS[i].name == name) return this.USERS[i];
         }
-        return undefined;
+        return;
+    }
+
+    /**
+     * 根据路径获取房间
+     * @param path - 房间路径
+     */
+    getRoom(path?: string): ROOM | undefined {
+        if (!path) return;
+        const rm = this.ROOMS[path];
+        if (!rm) {
+            console.log("room %s is not exist", path);
+            return;
+        }
+        return rm;
     }
 
     /**

@@ -91,7 +91,7 @@ export default class extends COMMAND {
 
 
             me.environment.item_changed(me, false);
-            var room = ROOM.Get(recover_room);
+            var room = WORLD.getRoom(recover_room);
             me.hp = 1;
             me.clear_status();
             room.do_enter(me, true, "<wht>你忽然发现前面多了一个人影，不过那人影又好像已经在那里很久了，只是你一直没发觉。</wht>");

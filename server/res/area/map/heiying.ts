@@ -1,6 +1,7 @@
 import {AREA} from "../../../core/room/area.js";
 import {ROOM} from "../../../core/room/room.js";
 import type {CHARACTER} from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
 
 export default class extends AREA {
     name = "黑鹰校场";
@@ -30,7 +31,7 @@ export default class extends AREA {
     ];
 
     on_enter(me: CHARACTER) {
-        const next_room = ROOM.Get("yz/hy/tongdao");
+        const next_room = WORLD.getRoom("yz/hy/tongdao");
         if (!next_room) return;
         let copy_room = next_room.query_copy2(me);
         if (!copy_room) {

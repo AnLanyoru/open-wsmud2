@@ -1,18 +1,18 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import {ROOM} from "../../../core/room/room.js";
-import {USERTASK} from "../../../core/task/playertask.js";
+import { COMMAND } from "../../../core/command.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import { USERTASK } from "../../../core/task/playertask.js";
+import type { USER } from "../../../core/char/user.js";
+import type YaMenLevelUpTask from "../../task/ym_task2.js";
 
 export default class extends COMMAND {
     command = "goto";
     allow_fight = false;
     regex = /^(\w+)(?:\s+(\w+))$/;
     actions = {
-        home: function (me) {
 
+        home: function (me: USER) {
             let home = me.query_temp("home");
             if (!home) {
                 me.moveto('yz/home', me.name + '离开了。', me.name + "走了过来。", 'goto');
@@ -22,17 +22,20 @@ export default class extends COMMAND {
             }
             return true;
         },
-        kuang: function (me) {
+
+        kuang: function (me: USER) {
             WORLD.COMMANDS['wakuang'].enter(me);
             return true;
         },
-        bp: function (me) {
+
+        bp: function (me: USER) {
             let home = me.query_temp("pt");
             if (!home) {
                 me.moveto('yz/banghui', me.name + '离开了。', me.name + "走了过来。", 'goto');
                 me.notify("你还加入任何帮会，先和帮会管理员聊聊吧。");
             } else {
-                let rm = ROOM.Get("banghui/yuanzi");
+                let rm = WORLD.getRoom("banghui/yuanzi");
+                if (!rm) return me.notify_fail("<hir>资源丢失错误：帮派-大院 资源丢失</hir>");
                 let my_room = rm.query_copy2(me);
                 if (!my_room) {
                     my_room = rm.create_copy2(me);
@@ -41,9 +44,8 @@ export default class extends COMMAND {
             }
             return true;
         },
+
         fam1: function (me) {
-
-
             let master = me.query_temp('master');
             if (!master) return me.notify_fail('你无门无派，不知道师父在哪里。');
             let area = me.family.area;
@@ -54,6 +56,7 @@ export default class extends COMMAND {
             // WORLD.COMMANDS['cha'].render_skill(me,);
             return true;
         },
+
         fam2: function (me, fam) {
             let family = FAMILIES[fam] ?? me.family;
             if (!family) return me.notify_fail('没有这个门派。');
@@ -66,7 +69,9 @@ export default class extends COMMAND {
 
             me.moveto(room_path, me.name + "离开了。", me.name + "走了进来。", 'goto');
             return true;
-        }, fam3: function (me, to_fam) {
+        },
+
+        fam3: function (me: USER, to_fam: string | null) {
             if (!to_fam) {
                 to_fam = me.family.battle_family;
                 if (!to_fam)
@@ -75,13 +80,15 @@ export default class extends COMMAND {
             let target_fam = FAMILIES[to_fam];
             if (!target_fam || !target_fam.battle_family)
                 return me.send('门派战争已经结束了。');
-            let room = ROOM.Get(target_fam.area.first).query_copy(target_fam.id);
+            let room = WORLD.getRoom(target_fam.area?.first)?.query_copy(target_fam.id);
             if (!room) return me.send('门派战争已经结束了。');
             if (me.level < 1 && me.exp < 1000000) return me.send('那里正在进行门派战争，你实力不够还是不要掺和了。');
             me.moveto(room, me.name + "离开了。", me.name + "走了进来。", 'goto');
             return true;
-        }, fam4: function (me) {
-            const pt = me.query_party();
+        },
+
+        fam4: function (me: USER) {
+            const pt = me.query_party?.();
             if (!pt) return me.send('你还没加入任何帮派。');
             if (!pt.battle_family) return me.send('你的帮派没有进攻任何门派。');
             let fam = FAMILIES[pt.battle_family];
@@ -93,11 +100,12 @@ export default class extends COMMAND {
                 me.set_temp('pt_mp', 1, time);
                 count = me.add_temp('pt_mc', 1, UTIL.diff_week_time());
             }
-            me.moveto(pt.get_room(ROOM.Get(fam.area.first)),
+            me.moveto(pt.get_room(WORLD.getRoom(fam.area?.first)),
                 me.name + "走了。", me.name + "来了。", 'goto');
             me.notify('<cyn>你已进入帮派战区域，本周已参与' + count + '/7次。</cyn>');
             return true;
         },
+
         wd1: function (me) {
             let level = me.query_temp('wd_level', 0);
             if (level < 99)
@@ -109,6 +117,7 @@ export default class extends COMMAND {
 
             return true;
         },
+
         wd2: function (me) {
             if (me.query_temp('wd_level', 0) < 99)
                 return me.send('你要去哪里？');
@@ -125,8 +134,10 @@ export default class extends COMMAND {
                 return fam.first_npc.greeting(me);
             }
             return me.send('你的门派目前没有首席大弟子。');
-        }, yamen2: function (me) {
-            let task = USERTASK.GET('yamen2');
+        },
+        yamen2: function (me: USER) {
+            let task = USERTASK.GET('yamen2') as YaMenLevelUpTask;
+            if (!task) return me.notify_fail("<hir>衙门任务领取配置错误</hir>");
             task.to_taofan(me);
         }
     };
@@ -148,7 +159,7 @@ export default class extends COMMAND {
 function find_npc(family, path) {
     for (let item of family.def_npcs) {
         if (path !== item[0]) continue;
-        let rm = ROOM.Get(item[1]);
+        let rm = WORLD.getRoom(item[1]);
         if (!rm) continue;
         let npc = rm.find_obj_bypath(path);
 
