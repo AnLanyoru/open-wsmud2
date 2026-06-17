@@ -56,6 +56,5 @@ declare var __CONFIG: {
     [key: string]: any;
 };
 
-declare var WORLD: any;
-declare var ROOM: any;
-declare var FAMILIES: any;
+declare var WORLD: WOELD;
+declare var FAMILIES: FAMILIES;

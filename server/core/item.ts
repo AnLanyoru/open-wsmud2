@@ -263,7 +263,7 @@ export class ITEM extends BASE {
     add_action(
         cmd: string,
         name: string | null,
-        func: (...args: any[]) => any,
+        func?: ((...args: any[]) => any),
     ): ActionDef<this> | undefined {
         if (!cmd) return;
         if (!this.actions) this.actions = {};

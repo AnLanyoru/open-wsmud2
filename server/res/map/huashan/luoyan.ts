@@ -1,5 +1,6 @@
 import {ROOM} from "../../../core/room/room.js";
 import {BASE} from "../../../core/base.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends ROOM {
     name = "落雁峰";
@@ -8,12 +9,14 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("jumpup", "跳上去", function (me) {
+        this.add_action("jumpup", "跳上去", this.jump_up_to_jueding)
+    }
+    jump_up_to_jueding(me: USER) {
             if (me.query_skill("dodge", 0) >= 800) {
 
                 me.send_room("$N在绝壁前深深地吸了口气，猛地跃了起来。\n只见$N足尖在绝壁半空一点,再飞身跃起，已悠然飘落绝顶。");
                 var rm = ROOM.Get("huashan/jueding");
-
+                if (!rm) return me.notify_fail("<hir>地图资源加载错误：华山-绝顶 不存在</hir>")
                 if (this.owner) {
                     rm = rm.query_copy(this.owner) ?? rm;
                 } else {
@@ -25,14 +28,13 @@ export default class extends ROOM {
                     }
                 }
 
-                me.moveto(rm, null, me.name + "跳了进来。");
+                me.moveto(rm, '', me.name + "跳了进来。");
             } else {
                 me.send_room("$N在绝壁前站定,深吸一口气，猛然跃起，可还差一大截呢,看来是轻功不够好。");
             }
-        })
-    }
+        }
 
-    create_jueding(rm) {
+    create_jueding(rm: ROOM) {
 
         if (!rm.shadow_rooms) rm.shadow_rooms = [];
         for (var i = 0; i < rm.shadow_rooms.length; i++) {
@@ -40,7 +42,7 @@ export default class extends ROOM {
                 return rm.shadow_rooms[i];
             }
         }
-        var shadow = BASE.CREATE(__PATH.MAP, rm.path);
+        var shadow = BASE.CREATE(__PATH.MAP, rm.path) as ROOM;
         if (shadow) {
             rm.shadow_rooms.push(shadow);
         }

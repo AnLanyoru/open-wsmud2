@@ -1087,4 +1087,8 @@ export class ROOM extends ITEM {
     }
 }
 
-(globalThis as Record<string, any>).ROOM = ROOM;
+declare global {
+  var ROOM: any
+}
+
+globalThis.ROOM = ROOM;

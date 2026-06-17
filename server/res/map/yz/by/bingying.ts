@@ -1,15 +1,21 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "兵营";
     desc = "这里是兵营，密密麻麻到处都是官兵，有的在武将的指挥下列队操练，有的独自在练功，有的坐着、躺着正在休息。南墙下坐着主帅，不动声色地寻视着四周。看到你进来，他们全都向你包围了过来，形势看来不太妙。南边有一个<CMD cmd='look men'>门(men)</CMD>。";
     exits = {"south": "yz/by/bingqiku", "north": "yz/by/damen"};
+    south_open: boolean;
 
     constructor() {
         super();
         this.set_npc("yz/shiqingshan", ["pub/wujiang", 2]);
         this.set_item("men", "铁门", "这是一扇极厚的铁门。", [[
-            "open", "打开", function (me, par) {
+            "open", "打开", this.open_men
+        ]]);
+    }
+
+    open_men(me: USER, par: string) {
                 if (par != "men") {
                     return;
                 }
@@ -22,10 +28,8 @@ export default class extends ROOM {
                 }
                 return true;
             }
-        ]]);
-    }
 
-    on_leave(me, dir) {
+    on_leave(me: USER, dir: string) {
         if (dir == "south") {
             if (!this.south_open) {
                 me.notify("门还是关着的，你过不去。");

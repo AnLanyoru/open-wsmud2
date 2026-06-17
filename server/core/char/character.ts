@@ -2,31 +2,22 @@
 // CHARACTER - 生物基类
 // ============================================================
 
-// Legacy JS runtime imports (will be replaced during migration)
-import {ITEM} from '../item.js';
-import {OBJ} from '../item/obj.js';
-import {SKILL, SkillItem} from '../skill/skill.js';
-import {WORLD} from '../world.js';
-import {UTIL} from '../util.js';
-import {WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES} from '../const.js';
-import type {EQUIPMENT} from '../item/equipment.js';
+import { ITEM } from '../item.js';
+import { OBJ } from '../item/obj.js';
+import { SKILL, SkillItem } from '../skill/skill.js';
+import { WORLD } from '../world.js';
+import { UTIL } from '../util.js';
+import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
+import type { EQUIPMENT } from '../item/equipment.js';
 
-import type {StatusDef} from '../../types/events.js';
-import type {ActionMap} from '../../types/base.js';
-import type {ROOM as RoomClass} from '../room/room.js';
-import type {FAMILY} from '../skill/family.js';
-import type {NPC} from './npc.js';
-import type {GameSocket} from '../world.js';
+import type { StatusDef } from '../../types/events.js';
+import type { ActionMap } from '../../types/base.js';
+import type { ROOM as RoomClass } from '../room/room.js';
+import type { FAMILY } from '../skill/family.js';
+import type { NPC } from './npc.js';
+import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
-import type { USER, UserState } from './user.js';
-import type { FOLLOWER } from './follower.js';
-
-// Array.prototype 扩展方法（由 util.js 注入）
-declare global {
-    interface Array<T> {
-        remove(element: T): T | undefined;
-    }
-}
+import type { UserState } from './user.js';
 
 // ============================================================
 // 本地类型定义
@@ -1357,7 +1348,7 @@ export class CHARACTER extends ITEM {
      * 清除指定类型的负面状态
      * @returns 清除的状态数量
      */
-    clear_downside(type: boolean): number{
+    clear_downside(type: boolean): number {
         if (!this.status) return 0;
         let removed = '0';
         let count = 0;
@@ -3393,21 +3384,21 @@ const status_msg: string[] = [
 
 /** 人物攻击部位定义 */
 const CHARACTER_PARTS: AttackPart[] = [
-    {name: '左脚', hert: 0.8, crit: 0},
-    {name: '右脚', hert: 0.8, crit: 0},
-    {name: '左腿', hert: 0.85, crit: 0},
-    {name: '右腿', hert: 0.85, crit: 0},
-    {name: '小腹', hert: 0.91, crit: 3},
-    {name: '胸前', hert: 0.95, crit: 4},
-    {name: '后背', hert: 0.97, crit: 4},
-    {name: '头部', hert: 1.2, crit: 10},
-    {name: '颈部', hert: 1.1, crit: 5},
-    {name: '后心', hert: 1, crit: 4},
-    {name: '左肩', hert: 0.85, crit: 1},
-    {name: '右肩', hert: 0.89, crit: 1},
-    {name: '左手', hert: 0.85, crit: 0},
-    {name: '左手', hert: 0.85, crit: 0},
-    {name: '腰间', hert: 0.99, crit: 5},
+    { name: '左脚', hert: 0.8, crit: 0 },
+    { name: '右脚', hert: 0.8, crit: 0 },
+    { name: '左腿', hert: 0.85, crit: 0 },
+    { name: '右腿', hert: 0.85, crit: 0 },
+    { name: '小腹', hert: 0.91, crit: 3 },
+    { name: '胸前', hert: 0.95, crit: 4 },
+    { name: '后背', hert: 0.97, crit: 4 },
+    { name: '头部', hert: 1.2, crit: 10 },
+    { name: '颈部', hert: 1.1, crit: 5 },
+    { name: '后心', hert: 1, crit: 4 },
+    { name: '左肩', hert: 0.85, crit: 1 },
+    { name: '右肩', hert: 0.89, crit: 1 },
+    { name: '左手', hert: 0.85, crit: 0 },
+    { name: '左手', hert: 0.85, crit: 0 },
+    { name: '腰间', hert: 0.99, crit: 5 },
 ];
 
 /** 胜利消息 */

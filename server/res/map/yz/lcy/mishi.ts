@@ -1,4 +1,7 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
+import type maoshiba from "../../../npc/yz/lcy/maoshiba.js";
+import type shisong from "../../../npc/yz/lcy/shisong.js";
 
 export default class extends ROOM {
     name = "密室";
@@ -10,11 +13,11 @@ export default class extends ROOM {
         this.set_npc("yz/lcy/maoshiba");
     }
 
-    on_enter(me) {
+    on_enter(me: USER) {
         if (me.is_player) {
-            var mao = this.find_by_path("yz/lcy/maoshiba");
+            var mao = this.find_by_path("yz/lcy/maoshiba") as maoshiba;
             if (!mao) return;
-            var shi = this.find_by_path("yz/lcy/shisong");
+            var shi = this.find_by_path("yz/lcy/shisong") as shisong;
             if (!shi) return;
             me.notify("史松一拍腰间的软鞭，说道:在下黑龙鞭史松，奉鳌少保将令，捉拿天地会反贼。茅十八，受死吧！");
             shi.do_kill(mao);

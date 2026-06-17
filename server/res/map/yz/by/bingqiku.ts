@@ -2,6 +2,7 @@ import {ROOM} from "../../../../core/room/room.js";
 import {WORLD} from "../../../../core/world.js";
 import {OBJ} from "../../../../core/item/obj.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class MapRoom extends ROOM {
     name = "兵器库";
@@ -11,13 +12,7 @@ export default class MapRoom extends ROOM {
     constructor() {
         super();
         this.add_action("search", "搜索", this.search);
-        this.add_action('pushmen', null, function (me) {
-            if (me.equipment && me.equipment[0] && me.equipment[0].is('eq/lv1/qianjinquan')) {
-                me.send('你将手上的' + me.equipment[0].color_name + "严丝合缝的塞入墙上的孔洞，轻轻一扭，只听到咔嚓几声，地板打开一个大洞。");
-                return this.add_exit('down', 'yz/by/tongdao');
-            }
-            return me.send('你要打开什么？');
-        });
+        this.add_action('pushmen', null, this.push_men);
         this.add_action('lkfb', null, function (me, par) {
             WORLD.COMMANDS['cr'].enter(me, 'over');
             me.moveto(ROOM.Get('yz/hy/tongdao'));
@@ -25,6 +20,14 @@ export default class MapRoom extends ROOM {
             me.enable_area();
         });
     }
+
+    push_men(me: USER) {
+            if (me.equipment && me.equipment[0] && me.equipment[0].is('eq/lv1/qianjinquan')) {
+                me.send('你将手上的' + me.equipment[0].color_name + "严丝合缝的塞入墙上的孔洞，轻轻一扭，只听到咔嚓几声，地板打开一个大洞。");
+                return this.add_exit('down', 'yz/by/tongdao');
+            }
+            return me.send('你要打开什么？');
+        }
 
     search(this: MapRoom, me: CHARACTER) {
         if (me.query_temp("by_search")) {
