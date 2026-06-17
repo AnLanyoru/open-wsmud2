@@ -1,7 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "createrole";
@@ -10,7 +10,7 @@ export default class extends COMMAND {
     /**
      * @param me - 执行命令的角色
      */
-    enter(me: CHARACTER, par: string) {
+    enter(me: USER, par: string) {
         if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
         let pars = par.split(' ');
         var name = pars[0], gender = parseInt(pars[1]),
@@ -47,8 +47,9 @@ export default class extends COMMAND {
             return me.send('{"type":"regist","result":"属性之和必须等于80"}');
         }
 
-        me.ip_address = me.socket.remoteAddress;
-        if (!WORLD.USERLOGIN.check_user(me)) return;
+        me.ip_address = me.socket?.remoteAddress ?? '';
+        if (!me.ip_address) return me.send('{"type":"regist","result":"注册信息错误"}');
+        if (!WORLD.USERLOGIN.check_user(me, me.userid)) return;
 
         me.name = name;
         me.id = UTIL.create_id();
@@ -80,24 +81,24 @@ export default class extends COMMAND {
         this.save2db(me);
     }
 
-    async save2db(me) {
+    async save2db(me: USER) {
         try {
             let roleData = me.getData();
             roleData.server = WORLD.SERVERID;
             let suc = await WORLD.DB.addRole(roleData);
             if (suc) {
                 WORLD.USERS.push(me);
-                me.wait_input = null;
+                me.wait_input = undefined;
                 me.do_login();
             } else {
                 return me.send('{"type":"regist","result":"创建角色失败"}');
             }
-        } catch (err) {
+        } catch (err: any) {
             if (err.errno == 1062) {
-                me.id = null;
+                me.id = '';
                 return me.send('{"type":"regist","result":"角色名称重复，请重新输入"}');
             } else {
-                console.log("角色创建失败", err, pars);
+                console.log("角色创建失败", err);
                 return me.send('{"type":"regist","result":"创建角色失败"}');
             }
         }

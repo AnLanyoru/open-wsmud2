@@ -18,6 +18,7 @@ import type { NPC } from './npc.js';
 import { FAMILIES } from '../skill/family.js';
 import { ITEM } from '../item.js';
 import { RoleRecord } from '../util/data.js';
+import type { RoleData } from '../db.js';
 
 // ============================================================
 // 模块级常量
@@ -52,9 +53,10 @@ const DIE_MSG = [
 
 
 
-export interface StudyingBook{
-    color_name: string, 
-    max_level: number}
+export interface StudyingBook {
+    color_name: string,
+    max_level: number
+}
 
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {
@@ -95,7 +97,7 @@ export interface UserState {
     stime?: number;
     /** 读书时的来源书籍 */
     from_book?: StudyingBook;
-    
+
     /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
     on_enter?: (me: CHARACTER, dt?: number) => boolean | void;
     /** 状态停止回调，isauto 表示是否自动停止 */
@@ -141,6 +143,8 @@ export class USER extends CHARACTER {
     level: number = 0;
     /** 所属门派 */
     family: FAMILY = FAMILIES.NONE;
+    /** 注册时间 */
+    reg_time: number;
 
     // ============ 网络连接 ============
 
@@ -560,7 +564,7 @@ export class USER extends CHARACTER {
     /**
      * 获取玩家存档数据
      */
-    getData(): Record<string, any> {
+    getData(): RoleData {
         const str: string[] = ['{prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
             str.push(String((this as Record<string, any>)[SAVE_NUMPROP[i]]));
@@ -659,13 +663,14 @@ export class USER extends CHARACTER {
         }
         str.push(']}');
 
-        const role: Record<string, any> = {};
-        role.id = this.id;
-        role.userid = this.userid;
-        role.name = this.name;
-        role.level = this.level;
-        role.title = this.title || this.get_level_desc();
-        role.data = str.join('');
+        const role: RoleData = {
+            id: this.id,
+            userid: this.userid,
+            name: this.name,
+            level: this.level,
+            title: this.title || this.get_level_desc(),
+            data: str.join('')
+        };
         return role;
     }
 
@@ -986,7 +991,7 @@ export class USER extends CHARACTER {
         count = count || obj.count || 1;
         const newobj = this.remove_item(obj, count);
         if (newobj == obj) {
-            if(obj.check_obj()) obj.notify_action(this, false);
+            if (obj.check_obj()) obj.notify_action(this, false);
         }
         this.items_changed(obj, count);
         return newobj;

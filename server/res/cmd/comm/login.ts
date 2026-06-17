@@ -1,20 +1,21 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "login";
     allow_login = true;
 
-    /**
-     * @param {CHARACTER} user - 执行命令的角色
-     */
-    enter(user, id) {
+    enter(user: USER, id: string) {
         if (user.id) return;
 
         if (user.serverid !== WORLD.SERVERID) return;
 
-        user.ip_address = user.socket.remoteAddress;
+        user.ip_address = user.socket?.remoteAddress ?? "";
+        if (!user.ip_address) {
+            user.send("{type:'loginerror',msg:'登录失败...无法获取到你的IP'}")
+        }
         const oldUser = this.check_user(user, id);
         if (!oldUser) return;
         if (oldUser.id) {
@@ -24,7 +25,7 @@ export default class extends COMMAND {
         }
     }
 
-    check_user(loginuser, id) {
+    check_user(loginuser, id): USER | null {
         for (var i = 0; i < WORLD.USERS.length; i++) {
             let user = WORLD.USERS[i];
             if (user.id === id) {
@@ -32,10 +33,10 @@ export default class extends COMMAND {
             }
             //其他检测loginuser
         }
-        return {};
+        return null;
     }
 
-    async relogin(oldUser, user) {
+    async relogin(oldUser: USER, user: USER) {
         if (oldUser.userid === user.userid) {
             if (!this.on_user_relogin(oldUser, user) !== false) return;
             // 验证新连接token中的密码与数据库一致
@@ -53,13 +54,18 @@ export default class extends COMMAND {
             oldUser.password = user.password;
             oldUser.loginTime = user.loginTime;
 
-            oldUser.ip_address = user.socket.remoteAddress;
+            oldUser.ip_address = user.socket?.remoteAddress ?? '';
+            if (!user.ip_address) {
+                return user.send("{type:'loginerror',msg:'登录失败...无法获取到你的IP'}")
+            }
             oldUser.disconnect(true);
-            user.socket.setTimeout(0);
+            user.socket?.setTimeout(0);
             return oldUser.relogin(user);
         } else {
-            WORLD.log(null, "登陆失败：" + oldUser.id + ",原始ID："
-                + oldUser.userid + "，现在ID：" + user.userid);
+            WORLD.log(
+                null,
+                ",原始ID：" + oldUser.userid + "，现在ID：" + user.userid,
+                "登陆失败: " + oldUser.id);
             return user.send("{type:'loginerror',msg:'当前使用的登陆凭证和角色不一致'}");
         }
     }
@@ -99,7 +105,7 @@ export default class extends COMMAND {
             this.on_user_login(user);
         } catch (e) {
             console.error('登陆失败', e);
-            WORLD.log(user, "登陆失败", e.message);
+            WORLD.log(user, "登陆失败", e instanceof Error ? e.message : String(e));
             user.send("{type:'loginerror',msg:'数据加载失败'}");
         }
     }

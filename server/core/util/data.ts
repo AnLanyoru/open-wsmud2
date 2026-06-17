@@ -64,7 +64,7 @@ const DB: DBInterface = __CONFIG.DB;
 // 导出
 // ============================================================
 
-class DataBaseHandler {
+export class DataBaseHandler {
     /** 关闭数据库连接 */
     close(): Promise<void> {
         return DB.close();

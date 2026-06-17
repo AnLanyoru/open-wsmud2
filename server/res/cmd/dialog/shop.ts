@@ -1,8 +1,9 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {OBJ} from "../../../core/item/obj.js";
-import {UTIL} from "../../../core/util/util.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
+import { OBJ } from "../../../core/item/obj.js";
+import { UTIL } from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
 
 interface ShopItem {
     name?: string;
@@ -302,7 +303,7 @@ function format_moneys(me) {
     //  return `money:[${me.money},${me.cash_money},${me.query_temp('my', 0)}],mtype:"枚<hij>古币</hij>"`;
 }
 
-function query_age_discount(me) {
+function query_age_discount(me: USER) {
     var dt = Date.now() - me.reg_time * 60000;
     let age = Math.floor(dt / 86400000 / 12);
     if (age < 1) age = 1;

@@ -21,7 +21,7 @@ interface DBInterface {
 
     saveRole(role: RoleData): Promise<void>;
 
-    getUserByID(id: string): any;
+    getUserByID(id: number): any;
 
     getData(userid: number, id: string): any;
 
@@ -36,7 +36,7 @@ interface DBInterface {
 const DB: DBInterface = __CONFIG.DB;
 
 /** 角色存档数据 */
-interface RoleData {
+export interface RoleData {
     /** 角色唯一 ID */
     id: string;
     /** 角色名称 */
@@ -49,6 +49,9 @@ interface RoleData {
     level: number;
     /** 序列化后的角色完整数据 */
     data: string;
+    /** 所属服务器 */
+    server?: number;
+
 }
 
 /** 请求日志条目 */
@@ -236,7 +239,7 @@ export default {
      * 根据 ID 获取用户
      * @param id - 用户 ID
      */
-    getUserByID(id: string): any {
+    getUserByID(id: number): any {
         return DB.getUserByID(id);
     },
 

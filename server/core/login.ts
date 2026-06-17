@@ -17,18 +17,18 @@ export interface LoginUser {
 }
 
 /** 最小化用户参数类型（用于各方法签名） */
-interface LoginUserParam {
-    userid?: number;
+export interface LoginUserParam {
+    userid: number;
 
     send(msg: string): void;
 
-    socket?: { end(): void; remoteAddress?: string } | null;
-    user_level?: number;
+    socket: { end(): void; remoteAddress?: string } | null;
+    user_level: number;
     wait_input: ((...args: any[]) => void) | null;
-    password?: string;
-    loginTime?: number;
+    password: string;
+    loginTime: number;
     ip_address?: string;
-    serverid?: number;
+    serverid: number;
 }
 
 /** 解密后的会话数据 */
@@ -45,33 +45,7 @@ export interface DecryptedSession {
     level: number;
 }
 
-/** 用户登录模块接口 */
-export interface UserLoginModule {
-    /** 同 ID 最大同时连接数 */
-    max_idcount: number;
-    /** 同 IP 最大同时连接数 */
-    max_ipcount: number;
-
-    /** 登录错误处理，@param user 用户对象，@param msg 错误消息，@param close 是否关闭连接 */
-    login_error(user: LoginUserParam, msg: string, close?: boolean): false;
-
-    /** 解密用户会话信息，@param key 加密密钥，@param session Base64 加密数据 */
-    encryptUser(key: string, session: string): DecryptedSession | null;
-
-    /** 检查用户合法性，@param loginuser 登录用户对象，@param id 用户 ID */
-    check_user(loginuser: LoginUser, id: number): boolean;
-
-    /** 检查用户会话有效性，@param user 用户对象，@param str 会话字符串 */
-    check_session(user: LoginUserParam, str: string): Promise<false | undefined>;
-
-    /** 等待用户登录选择，@param user 用户对象，@param str 命令字符串 */
-    wait_login(user: LoginUserParam, str: string): void;
-
-    /** 加载用户角色列表，@param user 用户对象 */
-    load_roles(user: LoginUserParam): Promise<void>;
-}
-
-const USERLOGIN: UserLoginModule = {
+const USERLOGIN = {
     /** 同 ID 最大同时连接数 */
     max_idcount: 10,
     /** 同 IP 最大同时连接数 */
@@ -234,8 +208,9 @@ const USERLOGIN: UserLoginModule = {
             pars = str.slice(i + 1);
         }
         const command = WORLD.COMMANDS[cmd];
-        if (command && (command as { allow_login?: boolean }).allow_login) {
-            (WORLD.COMMANDS[cmd] as { enter(u: LoginUserParam, p: string): void }).enter(user, pars);
+        if (command.allow_login) {
+            // @ts-expect-error
+            WORLD.COMMANDS[cmd].enter(user, pars);
         }
     },
 

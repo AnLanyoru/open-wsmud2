@@ -33,9 +33,10 @@ import type {OBJ} from './item/obj.js';
 import type {NPC} from './char/npc.js';
 import type {EQUIPMENT} from './item/equipment.js';
 import type {CORPSE} from './item/corpse.js';
-import type {UserLoginModule} from './login.js';
+import type {LoginUserParam} from './login.js';
 import type wsServer from './net-ws.js';
 import type {EventItem} from './task/events.js';
+import { DataBaseHandler } from './util/data.js';
 
 // ============================================================
 // 常量
@@ -261,9 +262,9 @@ class World {
     /** 全局持久化数据 */
     DATA = WORLD_DATA;
     /** 登录/会话管理模块 */
-    USERLOGIN: UserLoginModule = USERLOGIN_MODULE;
+    USERLOGIN = USERLOGIN_MODULE;
     /** 数据库操作模块 */
-    DB: Record<string, (...args: any[]) => any> = db;
+    DB: typeof db = db;
     /** WebSocket 监听模块 */
     LISTENER: wsServer = LISTENER_MODULE;
 
