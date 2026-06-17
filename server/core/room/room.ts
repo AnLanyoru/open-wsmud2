@@ -12,7 +12,7 @@ import type {USER} from "../char/user.js";
 import { ItemCommandsJson } from "../char/follower.js";
 
 /** 房间命令元组 */
-type RoomAction = [cmd: string, name: string, action: (this: ROOM, ...args: string[]) => any];
+type RoomAction = [cmd: string, name: string, action: (...args: any[]) => any];
 
 /** 隐藏物品对象 */
 interface HiddenItem {
