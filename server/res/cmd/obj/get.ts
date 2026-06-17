@@ -1,16 +1,18 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
+import type { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "get";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s(\w+))?$/;
 
     /**
-     * @param {CHARACTER} player - 执行命令的角色
+     * @param player - 执行命令的角色
      */
-    enter(player, count, objid, from) {
+    enter(player: USER, count: string, objid: string, from: string) {
         if (!objid) return player.notify("你要捡什么东西？");
 
         if (from) {
@@ -18,14 +20,14 @@ export default class extends COMMAND {
             var container = player.find_obj(from, player.environment);
             if (!container) return player.notify("你要从哪拿走什么东西？");
             if (container == player) return player.notify("东西就在你身上");
-            if (container.is_character) return player.notify("你不能搜身。");
-            if (!container.is_container) return player.notify("你不能从" + container.name + "里拿走任何东西。");
+            if (container.check_character()) return player.notify("你不能搜身。");
+            if (!container.check_container()) return player.notify("你不能从" + container.name + "里拿走任何东西。");
 
             if (objid === "all") {
                 var items = container.query_items(player);
                 if (!items || !items.length) return player.notify("那里面没有东西。");
                 if (player.is_full()) return player.notify("你身上东西太多了。");
-                var no_get: import("../../../core/item.js").ITEM[] = [];
+                var no_get: OBJ[] = [];
                 for (var i = 0; i < items.length; i++) {
                     if (!getObj(player, items[i], container)) {
                         no_get.push(items[i]);
@@ -35,42 +37,41 @@ export default class extends COMMAND {
                 container.refresh();
             } else {
                 var obj = container.find_obj(objid);
-                if (!obj) return player.notify("你要捡起什么东西？");
+                if (!obj?.check_obj()) return player.notify("你要捡起什么东西？");
                 var get_count = obj.count;
                 if (obj.count < get_count) return player.notify("这里没有那么多的" + obj.name + "。");
-                if (obj.is_living && obj.is_living()) return player.notify(obj.name + "不用你背。");
                 if (obj.no_get) return player.notify("这个东西你捡不起来。");
                 if (obj.on_get && obj.on_get(player) === false) return;
                 if (player.is_full()) return player.notify("你身上东西太多了。");
-                obj = container.remove_item(obj, get_count);
-                if (!obj) return player.notify("你什么都没捡起来。");
-                obj.count = get_count;
-                player.add_obj(obj);
-                player.send_room("$N从" + container.name + "里拿出来" + UTIL.to_c(get_count) + obj.unit + obj.color_name + "。");
+                let get_obj = container.remove_item(obj, get_count);
+                if (!get_obj) return player.notify("你什么都没捡起来。");
+                get_obj.count = get_count;
+                player.add_obj(get_obj);
+                player.send_room("$N从" + container.name + "里拿出来" + UTIL.to_c(get_count) + get_obj.unit + get_obj.color_name + "。");
             }
 
         } else {
             // 从地上捡
             var parent = player.environment;
+            if (!parent) return player.notify_fail("你现在哪都不在.");
             var obj = parent.find_obj(objid);
-            if (!obj) return player.notify("你要捡起什么东西？");
+            if (!obj?.check_obj()) return player.notify("你要捡起什么东西？");
             var get_count = obj.count;
             if (obj.count < get_count) return player.notify("这里没有那么多的" + obj.name + "。");
-            if (obj.is_living && obj.is_living()) return player.notify(obj.name + "不用你背。");
             if (obj.no_get) return player.notify("这个东西你捡不起来。");
             if (obj.on_get && obj.on_get(player) === false) return;
             if (player.is_full()) return player.notify("你身上东西太多了。");
-            obj = parent.remove_item(obj, get_count);
-            if (!obj) return player.notify("你什么都没捡起来。");
-            obj.count = get_count;
-            player.add_obj(obj);
-            player.send_room("$N捡起" + UTIL.to_c(get_count) + obj.unit + obj.color_name + "。");
-            player.environment.item_changed(obj, false);
+            let get_obj = parent.remove_item(obj, get_count);
+            if (!get_obj) return player.notify("你什么都没捡起来。");
+            get_obj.count = get_count;
+            player.add_obj(get_obj);
+            player.send_room("$N捡起" + UTIL.to_c(get_count) + get_obj.unit + get_obj.color_name + "。");
+            parent.item_changed(get_obj, false);
         }
     }
 }
 
-function getObj(me, item, parent) {
+function getObj(me: USER, item: OBJ, parent) {
 
     if (!(item.count > 0)) return true;
     if (item.on_get && item.on_get(me) === false) return false;
@@ -83,7 +84,7 @@ function getObj(me, item, parent) {
         var list: CHARACTER[] = [];
         for (var i = 0; i < me.team.length; i++) {
             var tm = me.team[i];
-            if (tm.environment && tm.environment.parent === me.environment.parent) {
+            if (tm.environment && tm.environment.parent === me.environment?.parent) {
 
                 if (parent.on_getitem && parent.on_getitem(tm, item) === false) {
                     if (tm === me) return false;
@@ -96,7 +97,7 @@ function getObj(me, item, parent) {
             me.team.objs = me.team.objs || [];
             me.team.objs.push(item);
 
-            item.dice = {user: null, users: [], num: 0};
+            item.dice = { user: null, users: [], num: 0 };
 
             var str = ["{type:\"warn\",content:\"", item.color_name, '",time:60000,cmds:[',
                 "{cmd:\"dice 0 ", item.id, '",name:"有需求想要"},{cmd:"dice 1 ', item.id,
@@ -105,7 +106,7 @@ function getObj(me, item, parent) {
 
             for (let i = 0; i < list.length; i++) {
 
-                if (!list[i].is_player) {
+                if (!list[i].check_player()) {
                     var dtype = list[i].query_setting("auto_dice");
                     WORLD.COMMANDS["dice"].enter(list[i], dtype ? (dtype - 1) : 2, item.id);
                 } else {

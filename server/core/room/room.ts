@@ -3,7 +3,7 @@
  */
 import {BASE} from "../base.js";
 import {WORLD} from "../world.js";
-import {ITEM} from "../item.js";
+import {ITEM, RoomAction} from "../item.js";
 import {OBJ} from "../item/obj.js";
 import type {AREA} from "./area.js";
 import type {CHARACTER} from "../char/character.js";
@@ -11,19 +11,6 @@ import type {NPC} from "../char/npc.js";
 import type {USER} from "../char/user.js";
 import { ItemCommandsJson } from "../char/follower.js";
 
-/** 房间命令元组 */
-type RoomAction = [cmd: string, name: string, action: (...args: any[]) => any];
-
-/** 隐藏物品对象 */
-interface HiddenItem {
-    id: string;
-    name: string;
-    desc: string;
-    commands?: RoomAction[];
-    query_desc: (this: HiddenItem, player: USER) => string;
-    environment: ROOM;
-    json?: string;
-}
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -41,7 +28,7 @@ import("../char/npc.js").then((m: Record<string, any>) => {
  * @param this - 隐藏物品对象
  * @param player - 查看的玩家
  */
-function on_look_hidden_item(this: HiddenItem, player: USER): string {
+function on_look_hidden_item(this: ITEM, player: USER): string {
     if (this.json) return this.json;
     const json: ItemCommandsJson = {
         type: "item",
@@ -99,7 +86,7 @@ export class ROOM extends ITEM {
     /** 出口JSON缓存 */
     room_exits_json: string | null = null;
     /** 隐藏物品映射 */
-    hidden_items: HiddenItem[] | null = null;
+    hidden_items: ITEM[] | null = null;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
 
@@ -210,7 +197,7 @@ export class ROOM extends ITEM {
      */
     do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg?: string): void {
         this.on_before_enter && this.on_before_enter(obj);
-        if (obj.is_player) {
+        if (obj.check_player()) {
             obj.send(this.to_json());
             this.send_exits(obj);
         }
@@ -395,7 +382,7 @@ export class ROOM extends ITEM {
      * @param desc - 描述
      * @param commands - 命令列表
      */
-    set_item(id: string, name: string, desc: string, commands?: RoomAction[] | RoomAction): HiddenItem {
+    set_item(id: string, name: string, desc: string, commands?: RoomAction[] | RoomAction): ITEM {
         this.hidden_items = this.hidden_items || [];
         let cmd_lsit: RoomAction[] = []
         if (commands && typeof commands[0] == "string") {
@@ -403,14 +390,15 @@ export class ROOM extends ITEM {
         } else {
             cmd_lsit = commands as RoomAction[]
         }
-        const hidden_item: HiddenItem = {
+        const hidden_item: ITEM = new ITEM();
+        hidden_item.set({
             id: id,
             name: name,
             desc: desc,
             commands: cmd_lsit,
             query_desc: on_look_hidden_item,
             environment: this
-        };
+        })
 
         this.hidden_items.push(hidden_item);
         if (cmd_lsit) {
@@ -425,15 +413,16 @@ export class ROOM extends ITEM {
      * 根据ID查找物件(含隐藏物品)
      * @param oid
      */
-    find_obj(oid: string): any {
+    find_obj(oid: string): ITEM | null {
         const items = this.items;
-        if (!items) return;
+        if (!items) return null;
         const item = this.find_obj_byid.call(this, items, oid);
         if (item) return item;
-        if (!this.hidden_items) return;
+        if (!this.hidden_items) return null;
         for (let i = 0; i < this.hidden_items.length; i++) {
             if (this.hidden_items[i].id == oid) return this.hidden_items[i];
         }
+        return null
     }
 
     /**
@@ -615,10 +604,11 @@ export class ROOM extends ITEM {
         }
         if (obj) {
             for (let i = 0; i < this.items.length; i++) {
-                if (this.items[i].is_player) {
-                    this.items[i].send(this.to_json());
-                    this.send_exits(this.items[i]);
-                    this.items[i].send(this.items_to_json());
+                let item = this.items[i]
+                if (item.check_player()) {
+                    item.send(this.to_json());
+                    this.send_exits(item);
+                    item.send(this.items_to_json());
                 }
             }
         }
@@ -1043,8 +1033,9 @@ export class ROOM extends ITEM {
      */
     send(msg: string): void {
         for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player) {
-                this.items[i].send(msg);
+            let item = this.items[i]
+            if (item.check_player()) {
+                item.send(msg);
             }
         }
     }

@@ -220,9 +220,9 @@ export type TeamData = CHARACTER[] & {
     /** 队伍唯一 ID */
     id?: string;
     /** 战利品分配函数 */
-    alloc?: (obj: any) => void;
+    alloc: (obj: any) => void;
     /** 战利品分配列表（dice 命令用） */
-    objs?: { id: string; color_name: string; unit: string; dice: { users: string[]; num: number; user: string } }[];
+    objs?: OBJ[];
 };
 
 /** 角色类 */
@@ -649,11 +649,11 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 查询用户设置（基类返回 false）
+     * 查询用户设置（基类返回 0）
      */
-    query_setting(name: string): boolean | number {
-        return false;
-    }
+    query_setting(name: string): number {
+        return 0
+    };
 
     // ================================================================
     // 命令系统
@@ -1374,7 +1374,7 @@ export class CHARACTER extends ITEM {
         const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 player.send(msg);
             }
         }
@@ -1401,7 +1401,7 @@ export class CHARACTER extends ITEM {
         const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 player.send(msg);
             }
         }
@@ -1427,7 +1427,7 @@ export class CHARACTER extends ITEM {
         const msg = '{type:"status",id:"' + this.id + '",sid:[' + removed + '],action:"remove"}';
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 player.send(msg);
             }
         }
@@ -1447,7 +1447,7 @@ export class CHARACTER extends ITEM {
         const items = this.environment.items;
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 player.send(msg);
             }
         }
@@ -1609,7 +1609,7 @@ export class CHARACTER extends ITEM {
         const items = this.environment.items;
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 player.send(msg);
             }
         }
@@ -1946,7 +1946,7 @@ export class CHARACTER extends ITEM {
      */
     do_follow(target: CHARACTER | null): void {
         if (target) {
-            if (target.query_setting('no_follow')) {
+            if (target.check_player() && target.query_setting('no_follow')) {
                 this.notify(target.name + '不允许别人跟随。');
                 return;
             }
@@ -2229,7 +2229,7 @@ export class CHARACTER extends ITEM {
      * 格式化装备显示
      */
     format_equipments(call3: string, str: string[], eqcmd?: string): void {
-        if (this.query_setting('hide_equip')) {
+        if (this.check_player() && this.query_setting('hide_equip')) {
             str.push('看样子', call3, '不想让别人看自己的装备。');
         } else if (this.equipment && this.equipment.length) {
             const eqstr: string[] = [];
@@ -2330,9 +2330,9 @@ export class CHARACTER extends ITEM {
         const showdamage = type ? type === 'hp' : false;
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.is_player) {
+            if (player.check_player()) {
                 if (showdamage && this.damages && player.query_setting('show_damage')) {
-                    player.send(str + ',damage:' + (this.damages[player.id] || 0) + '}');
+                    player.send(str + ',damage:' + (this.damages?.[player.id] || 0) + '}');
                 } else {
                     player.send(str + '}');
                 }

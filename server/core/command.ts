@@ -61,7 +61,7 @@ export class COMMAND extends BASE {
      * @param arg - 命令参数
      * @returns 返回 false 表示命令执行失败
      */
-    enter(me: CHARACTER | null, ...arg: string[]): boolean | void {
+    enter(me: CHARACTER | null, ...arg: any[]): boolean | void {
         return undefined;
     }
 
@@ -176,7 +176,6 @@ export class COMMAND extends BASE {
     static DO(cmd: string, ...args: (string | Partial<MessageEntry>)[]): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
-            // @ts-expect-error 这里不确定 exec 的参数类型，交由具体命令处理
             cmdObj.enter(null, ...args);
         }
     }

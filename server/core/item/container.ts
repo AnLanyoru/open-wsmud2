@@ -80,9 +80,10 @@ export class CONTAINER extends OBJ {
 
     /**
      * 清空容器内所有物品
-     * @param me - 玩家对象
+     * @param me - 角色对象
+     * @param noget - 需保留的物品（未被拾取的）
      */
-    clear_items(me: USER): void {
+    clear_items(me: USER, noget?: OBJ[]): void {
         if (this.items) this.items.length = 0;
     }
 

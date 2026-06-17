@@ -15,7 +15,10 @@ import type { NPC } from './char/npc.js';
 import type { EQUIPMENT } from './item/equipment.js';
 import type { OBJ } from './item/obj.js';
 import type { CHARACTER } from './char/character.js';
+import type { CONTAINER } from './item/container.js';
 
+/** 房间命令元组 */
+export type RoomAction = [cmd: string, name: string, action: (...args: any[]) => any];
 // ============================================================
 // ITEM 类
 // ============================================================
@@ -60,6 +63,8 @@ export class ITEM extends BASE {
     actions: ActionMap<this> = null;
     /** JSON 缓存 */
     json: string | null = null;
+    /** 物品命令列表 */
+    commands?: RoomAction[];
 
     // ============ 公共属性（CHARACTER / OBJ / ROOM 等共有） ============
 
@@ -130,17 +135,20 @@ export class ITEM extends BASE {
     check_character(): this is CHARACTER {
         return this.is_character === true;
     }
+    /** 检查是否为容器 */
+    check_container(): this is CONTAINER {
+        return this.is_container === true;
+    }
 
     // ============ 消息发送（桩方法，由 CHARACTER 覆写） ============
 
     /** 发送消息到客户端（桩方法，玩家/NPC 子类覆写） */
-    send(_msg: string): void {
-    }
+    send?(_msg: string): void;
 
     /** 查询用户设置（桩方法，玩家子类覆写） */
-    query_setting(_name: string): boolean | number {
-        return false;
-    }
+    query_setting?(_name: string): boolean | number;
+
+    query_desc?(me: CHARACTER, ...args: string[]): string;
 
     // ============ 堆叠操作 ============
 
@@ -426,13 +434,13 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 移除的物品
      */
-    remove_item(obj: ITEM, count: number = 0): ITEM | null {
+    remove_item<T extends ITEM>(obj: T, count: number = 0): T | null {
         if (!obj || !this.items) return null;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item === obj) {
                 if (item.combined) {
-                    const subitem = item.uncombine(count);
+                    const subitem = item.uncombine(count) as T;
                     if (!subitem) return null;
                     if (subitem === item) {
                         this.items.splice(i, 1);
@@ -440,7 +448,7 @@ export class ITEM extends BASE {
                     return subitem;
                 } else {
                     this.items.splice(i, 1);
-                    return item;
+                    return item as T;
                 }
             }
         }

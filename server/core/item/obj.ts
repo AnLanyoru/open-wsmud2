@@ -63,7 +63,7 @@ export class OBJ extends ITEM {
     transable: boolean = false;
     /** 商品的货币类型 */
     currency?: string;
-
+    dice?: { user: null | string, users: string[], num: number }
     // ============ 显示属性 ============
 
     /** 带颜色标签的显示名称 */
