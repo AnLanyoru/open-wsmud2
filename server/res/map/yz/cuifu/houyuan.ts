@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
@@ -9,7 +10,11 @@ export default class extends ROOM {
         super();
         this.set_npc("yz/cuifu/cui");
         this.set_item("men", "门", "这扇门似乎通向一间密室。", [[
-            "open", "打开", function (me) {
+            "open", "打开", this.open_men
+        ]]);
+    }
+
+    open_men(me: USER) {
                 if (this.query_exits("east"))
                     return me.notify("这扇门已经是打开的。");
                 var obj = me.find_obj_bypath("sp/yz/yaoshi");
@@ -20,8 +25,6 @@ export default class extends ROOM {
                 me.remove_obj(obj, 1);
                 me.send_room("$N用一把钥匙打开了秘门，可是钥匙却断了。");
             }
-        ]]);
-    }
 
     on_leave(me, dir) {
         if (dir == "west") {

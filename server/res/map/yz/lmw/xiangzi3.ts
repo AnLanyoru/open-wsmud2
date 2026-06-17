@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {SKILL} from "../../../../core/skill/skill.js";
 
@@ -25,7 +26,6 @@ export default class extends ROOM {
                     title: "推石撵",
                     player: me,
                     rate: 2,
-                    skill_base: SKILL.get("unarmed"),
                     on_enter: do_work,
                     desc: '["你脸憋的通红，卯足了劲推着石撵转动。","你大喝一声，猛的发力，石撵呼的一下转了个圈。"]',
                 });
@@ -49,12 +49,14 @@ export default class extends ROOM {
     }
 }
 
-function do_work(me) {
+function do_work(me: USER) {
     if (me.mp < 10) {
         return me.notify_fail("你感觉自己的力气耗光了，再也推不动了。");
     }
     if (me.query_skill("unarmed", 0) > 100) return me.notify_fail("你感觉推这个东西跟玩似的，已经对你没有任何好处了。");
     me.add_mp(-10);
-    this.skill_base.add_exp(me, 30);
+    let unarmed_data = SKILL.get("unarmed");
+    if (!unarmed_data) return me.send("<hir>发生错误：无法找到基础资源：基本拳脚</hir>");
+    unarmed_data.add_exp(me, 30);
     me.notify_fail("<hic>你推了一圈，感觉自己对拳脚方面功夫多了些理解。</hic>");
 }

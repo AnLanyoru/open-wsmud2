@@ -1,6 +1,6 @@
 import {ROOM} from "../../../../core/room/room.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
-import type {NPC} from "../../../../core/char/npc.js";
+import type HeiYingTieHu from "../../../npc/yz/hy/tiehu.js";
 
 export default class MapRoom extends ROOM {
     name = "黑鹰厅";
@@ -30,8 +30,8 @@ export default class MapRoom extends ROOM {
     }
 
     on_enter(me: CHARACTER) {
-        if (me.is_player) {
-            let npc = this.find_by_path('yz/hy/tiehu') as NPC;
+        if (me.check_player()) {
+            let npc = this.find_by_path('yz/hy/tiehu') as HeiYingTieHu;
             if (npc && !npc.fight_type) {
                 npc.on_kill(me);
                 npc.do_kill(me);

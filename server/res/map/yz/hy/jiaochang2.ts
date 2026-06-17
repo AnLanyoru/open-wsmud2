@@ -1,4 +1,6 @@
+import { NPC } from "../../../../core/char/npc.js";
 import {ROOM} from "../../../../core/room/room.js";
+import type HeiYingJiaoXi from "../../../npc/yz/hy/jiaoxi.js";
 
 export default class extends ROOM {
     name = "校场";
@@ -15,7 +17,7 @@ export default class extends ROOM {
 
     on_enter(me) {
         if (me.is_player) {
-            let npc = this.find_by_path('yz/hy/jiaoxi');
+            let npc = this.find_by_path('yz/hy/jiaoxi') as HeiYingJiaoXi;
             if (npc && !npc.fight_type) {
                 npc.on_kill(me);
                 npc.do_kill(me);

@@ -1,4 +1,5 @@
 import {NPC} from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "女管家";
@@ -24,10 +25,10 @@ export default class extends NPC {
             ["unarmed", 100]);
     }
 
-    on_kill(me) {
+    on_kill(me: USER) {
         this.send_room("$N喊道：还愣着干嘛，快给我上！", me);
         this.each_item(item => {
-            if (item.path == "bj/ao/jiading") {
+            if (item.check_character() && item.path == "bj/ao/jiading") {
                 item.do_kill(me);
             }
         }, this.environment);

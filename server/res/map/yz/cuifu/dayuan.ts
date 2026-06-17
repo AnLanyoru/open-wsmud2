@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
@@ -12,7 +13,7 @@ export default class extends ROOM {
         ]);
     }
 
-    on_leave(me, dir) {
+    on_leave(me: USER, dir: string) {
         if (dir == "north") {
             var obj = this.find_by_path("yz/cuifu/guanjia");
             if (obj) {

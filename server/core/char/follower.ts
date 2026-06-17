@@ -70,7 +70,7 @@ interface CommandEntry {
 export interface ItemCommandsJson {
     type: 'item';
     desc: string;
-    id: string;
+    id?: string;
     name?: string;
     follower?: boolean;
     commands: CommandEntry[];

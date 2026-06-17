@@ -1,3 +1,5 @@
+import type { NPC } from "../../../../core/char/npc.js";
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
@@ -9,12 +11,15 @@ export default class extends ROOM {
         super();
         this.set_npc("yz/lcy/shisong");
         this.set_item("tai", "梳妆台", "一座绚丽夺目的梳妆台。", [
-            ["tui", "推", function (me) {
+            ["tui", "推", this.tui_shuzhuangtai]
+        ]);
+    }
+    tui_shuzhuangtai(me: USER) {
 
                 if (this.query_exits("enter"))
                     return me.notify("梳妆台已经被你推到一边了。");
                 me.send_room("$N试着推了推梳妆台，发现可以推动，$P再一使力，把梳妆台推到一边，后面露出一个黑乎乎的入口。");
-                var npc = this.find_by_path("yz/lcy/shisong");
+                var npc = this.find_by_path("yz/lcy/shisong") as NPC;
 
                 this.add_exit("enter", "yz/lcy/mishi");
                 if (npc) {
@@ -23,7 +28,5 @@ export default class extends ROOM {
                     me.notify("史松丢给你10两银子。");
                     npc.do_command("go", "enter");
                 }
-            }]
-        ]);
-    }
+            }
 }

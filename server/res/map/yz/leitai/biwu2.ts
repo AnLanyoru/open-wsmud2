@@ -70,7 +70,7 @@ export default class MapRoom extends ROOM {
                         obj.notify("<yel>你挑战失败。</yel>");
                     } else {
                         this.items.length = 0;
-                        obj.environment = null;
+                        obj.environment = undefined;
                     }
                     return;
                 }
@@ -80,7 +80,7 @@ export default class MapRoom extends ROOM {
                     if ('do_kill' in item && item.is_player) {
                         player = item;
                     } else {
-                        item.environment = null;
+                        item.environment = undefined;
                     }
                 }
                 if (player) {

@@ -32,7 +32,7 @@ export default class extends NPC {
     }
 
     no_marry(me: CHARACTER, par: string) {
-        var user = this.check_player(me);
+        var user = this.check_wife(me);
         if (!user) return;
         this.send_room("$N说道：离婚这个事情可不能草率，我得问问" + me.name + "愿不愿意。注意了，双方同意离婚后将解除婚姻关系。", user);
         this.send_room("<yel>$N对著$n问道：你愿意和" + me.name + "离婚吗？</yel>", user);
@@ -42,7 +42,7 @@ export default class extends NPC {
 
     no_marry_no(me: CHARACTER, par: string) {
         if (!me.query_temp("request_no_marry")) return me.notify("没人问你。");
-        var user = this.check_player(me);
+        var user = this.check_wife(me);
         if (!user) return;
         me.send_room("<mag>$N对著$n大声道：我不愿意！</mag>", user);
         me.remove_temp("request_no_marry");
@@ -51,7 +51,7 @@ export default class extends NPC {
 
     no_marry_yes(me: CHARACTER, par: string) {
         if (!me.query_temp("request_no_marry")) return me.notify("没人问你。");
-        var user = this.check_player(me);
+        var user = this.check_wife(me);
         if (!user) return;
         me.send_room("<mag>$N对著$n大声道：我愿意！</mag>", user);
         me.remove_temp("request_no_marry");
@@ -133,7 +133,7 @@ export default class extends NPC {
         }
     }
 
-    check_player(me: CHARACTER): false | CHARACTER {
+    check_wife(me: CHARACTER): false | CHARACTER {
         var wife = me.query_temp("wife") || me.query_temp("husband");
         if (!wife) {
             me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！");

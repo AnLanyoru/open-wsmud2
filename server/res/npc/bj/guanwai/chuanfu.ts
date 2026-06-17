@@ -28,15 +28,15 @@ export default class extends NPC {
             "船夫抬头望了望天色，说道：再晚些风雪更大，船就不好走了。",
             "船夫说道：往西过了江，就是船厂，再往南便是一片雪地。"
         ]);
-        this.set_ask("过江", function (me) {
-            me.notify("船夫说道：坐船到江对面一两黄金，风雪再大也给你送过去。");
-            me.send_commands("give " + this.id + " 10000 money", "交钱坐船");
-        });
+        this.set_ask("过江", this.ask_about_guojiang);
         this.set_ask("船厂", function (me) {
             me.notify("船夫说道：江对岸有个旧船厂，过了船厂就是白茫茫的雪地，进山的人都要小心。");
         });
     }
-
+    ask_about_guojiang(me) {
+            me.notify("船夫说道：坐船到江对面一两黄金，风雪再大也给你送过去。");
+            me.send_commands("give " + this.id + " 10000 money", "交钱坐船");
+        }
     on_leave(me, dir) {
         if (dir == "east" || dir == "west") {
             me.notify("船夫对你说道：江面化冻了，没船可不行。");

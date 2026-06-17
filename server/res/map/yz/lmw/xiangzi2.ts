@@ -1,4 +1,5 @@
-import {ROOM} from "../../../../core/room/room.js";
+import type { USER } from "../../../../core/char/user.js";
+import { ROOM } from "../../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "小巷子";
@@ -10,7 +11,7 @@ export default class extends ROOM {
         this.set_npc(["yz/lm/liumang", 2]);
     }
 
-    on_leave(me, dir) {
+    on_leave(me: USER, dir: string) {
         if (dir == "west" || dir == "north") {
             var obj = this.find_obj_bypath("yz/lm/liumang");
             if (obj) {

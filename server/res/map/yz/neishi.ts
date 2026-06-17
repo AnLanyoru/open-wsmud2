@@ -1,3 +1,4 @@
+import type { USER } from "../../../core/char/user.js";
 import {ROOM} from "../../../core/room/room.js";
 
 export default class extends ROOM {
@@ -8,6 +9,6 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("lianyao", "炼药");
+        this.add_action("lianyao", "炼药", (me: USER) => { me.notify_fail("炼药系统未制作") });
     }
 }

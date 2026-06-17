@@ -3,6 +3,7 @@ import {WORLD} from "../../../../core/world.js";
 import {UTIL} from "../../../../core/util/util.js";
 import {EVENTS} from "../../../../core/task/events.js";
 import {COMMAND} from "../../../../core/command.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class extends MONSTER {
     name = "黑龙";
@@ -41,11 +42,12 @@ export default class extends MONSTER {
             ["force", 380],
             ["bite", 380],
             ["heilong", 380, ["bite", "dodge", "parry"]]);
-        this.add_action('free', '放了它', function (me) {
-            me.send(this.name + '挣扎双翼连接的锁链哗啦作响：狡猾的人类，又想骗我什么？这根柱子灵纹封印，单靠蛮力无法破坏。');
-
-        });
+        this.add_action('free', '放了它', this.free_me);
     }
+
+    free_me (me: USER) {
+            me.send(this.name + '挣扎双翼连接的锁链哗啦作响：狡猾的人类，又想骗我什么？这根柱子灵纹封印，单靠蛮力无法破坏。');
+        }
 
     on_create() {
         this.hp = 55000;
@@ -54,13 +56,13 @@ export default class extends MONSTER {
     on_kill(me) {
         if (this.is_free) return false;
         if (!this.fight_type) {
-            this.environment.set_temp('kill_hl', 1, me);
+            this.environment?.set_temp('kill_hl', 1, me);
             me.send(this.name + "轻蔑道：找死！\n");
             this.do_kill(me);
         }
     }
 
-    heart_beat(dt) {
+    heart_beat(dt: number) {
         if (this.fight_type > 0) {
             this.fight_time++;
             if (this.fight_time > 60) {
@@ -72,8 +74,9 @@ export default class extends MONSTER {
         }
     }
 
-    on_enter(me) {
+    on_enter(me: USER) {
         let room = this.environment;
+        if (!room) return;
         if (room.query_temp('kill_hl', me)) {
             this.do_kill(me);
         } else {
@@ -82,7 +85,7 @@ export default class extends MONSTER {
         }
     }
 
-    on_free(me) {
+    on_free(me: USER) {
         this.is_free = true;
         this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
 
@@ -91,14 +94,14 @@ export default class extends MONSTER {
 
     }
 
-    to_next(me) {
+    to_next(me: USER) {
         this.full();
         this.send_room('$N身躯如墨色闪电般绷直，借反冲之力腾空而起，修长的身躯在空中蜿蜒盘旋，低沉的龙吟响彻锁龙井。');
 
         this.call_out(this.to_next2, 3000, me);
     }
 
-    to_next2(me) {
+    to_next2(me: USER) {
         if (!this.is_here(me))
             return this.destroy(this.name + '飞走了。');
         this.send_room('$N悬在半空低头审视着$n，最终什么也没说，庞大身躯骤然腾空，转瞬间便消失在锁龙井深处。', me);
@@ -106,7 +109,8 @@ export default class extends MONSTER {
         this.destroy();
 
         let items = me.team || [me];
-        let index = me.environment.parent.fb_index;
+        let index = me.environment?.parent?.fb_index;
+        if (!index) return me.send("<hir>龙脉副本配置错误！</hir>");
         const eqs = ['eq/lv2/lm_cloth',
             'eq/lv2/lm_tou',
             'eq/lv2/lm_shoes',
@@ -115,7 +119,7 @@ export default class extends MONSTER {
         for (let item of items) {
             if (item.environment !== me.environment)
                 continue;
-            if (!item.is_player) continue;
+            if (!item.check_player()) continue;
             if (!item.query_temp('fb_sao' + index, 0)) {
                 item.notify("你释放了被锁禁的黑龙，获得称号【黑龙使】。");
                 item.add_title('黑龙使', 'lm');

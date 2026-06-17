@@ -247,7 +247,7 @@ export class ITEM extends BASE {
      * 初始化 — 子类可覆写
      * @param _args - 参数列表
      */
-    init(..._args: unknown[]): void {
+    init(..._args: any[]): void {
         return undefined;
     }
 
@@ -263,7 +263,7 @@ export class ITEM extends BASE {
     add_action(
         cmd: string,
         name: string | null,
-        func: (...args: any[]) => unknown,
+        func: (...args: any[]) => any,
     ): ActionDef<this> | undefined {
         if (!cmd) return;
         if (!this.actions) this.actions = {};

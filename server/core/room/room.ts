@@ -9,7 +9,21 @@ import type {AREA} from "./area.js";
 import type {CHARACTER} from "../char/character.js";
 import type {NPC} from "../char/npc.js";
 import type {USER} from "../char/user.js";
-import type {CORPSE} from "../item/corpse.js";
+import { ItemCommandsJson } from "../char/follower.js";
+
+/** 房间命令元组 */
+type RoomAction = [cmd: string, name: string, action: (this: ROOM, ...args: string[]) => any];
+
+/** 隐藏物品对象 */
+interface HiddenItem {
+    id: string;
+    name: string;
+    desc: string;
+    commands?: RoomAction[];
+    query_desc: (this: HiddenItem, player: USER) => string;
+    environment: ROOM;
+    json?: string;
+}
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -27,21 +41,17 @@ import("../char/npc.js").then((m: Record<string, any>) => {
  * @param this - 隐藏物品对象
  * @param player - 查看的玩家
  */
-function on_look_hidden_item(this: Record<string, any>, player: Record<string, any>): string {
+function on_look_hidden_item(this: HiddenItem, player: USER): string {
     if (this.json) return this.json;
-    const json: Record<string, any> = {};
-    json.type = "item";
-    json.desc = this.desc;
-    if (this.commands) {
-        json.commands = [];
-        for (let i = 0; i < this.commands.length; i++) {
-            if (this.commands[i][1])
-                json.commands.push({
-                    cmd: this.commands[i][0] + " " + this.id,
-                    name: this.commands[i][1]
-                });
-        }
-    }
+    const json: ItemCommandsJson = {
+        type: "item",
+        desc: this.desc,
+        commands: this.commands?.filter(
+            cmd => cmd[0]
+        ).map(
+            cmd => ({ cmd: cmd[0] + " " + this.id, name: cmd[1] })
+        ) ?? [],
+    };
     this.json = JSON.stringify(json);
     return this.json;
 }
@@ -89,7 +99,7 @@ export class ROOM extends ITEM {
     /** 出口JSON缓存 */
     room_exits_json: string | null = null;
     /** 隐藏物品映射 */
-    hidden_items: Record<string, any>[] | null = null;
+    hidden_items: HiddenItem[] | null = null;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
 
@@ -385,25 +395,25 @@ export class ROOM extends ITEM {
      * @param desc - 描述
      * @param commands - 命令列表
      */
-    set_item(id: string, name: string, desc: string, commands?: any[]): Record<string, any> {
+    set_item(id: string, name: string, desc: string, commands?: RoomAction[] | RoomAction): HiddenItem {
         this.hidden_items = this.hidden_items || [];
-
+        let cmd_lsit: RoomAction[] = []
         if (commands && typeof commands[0] == "string") {
             commands = [commands];
         }
-        const hidden_item: any = {
+        const hidden_item: HiddenItem = {
             id: id,
             name: name,
             desc: desc,
-            commands: commands,
+            commands: cmd_lsit,
             query_desc: on_look_hidden_item,
             environment: this
         };
 
         this.hidden_items.push(hidden_item);
-        if (commands) {
-            for (let j = 0; j < commands.length; j++) {
-                this.add_action(commands[j][0], "", commands[j][2]);
+        if (cmd_lsit) {
+            for (let j = 0; j < cmd_lsit.length; j++) {
+                this.add_action(cmd_lsit[j][0], "", cmd_lsit[j][2]);
             }
         }
         return hidden_item;

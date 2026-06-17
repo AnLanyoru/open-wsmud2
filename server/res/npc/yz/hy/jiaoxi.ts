@@ -2,7 +2,7 @@ import {NPC} from "../../../../core/char/npc.js";
 import {ROOM} from "../../../../core/room/room.js";
 import {CHARACTER} from "../../../../core/char/character.js";
 
-export default class extends NPC {
+export default class HeiYingJiaoXi extends NPC {
     name = "黑鹰教习";
     desc = "他身穿黑袍，手持长刀";
     gender = 1;

@@ -1,4 +1,5 @@
 import {NPC} from "../../../../core/char/npc.js";
+import { USER } from "../../../../core/char/user.js";
 
 export default class extends NPC {
     name = "胡斐";
@@ -45,15 +46,7 @@ export default class extends NPC {
             obj: ["eq/lv0/cloth", "eq/lv0/dao", "eq/lv0/jian"],
             odds: 8000
         });
-        this.set_ask("阎基", function (me) {
-            var obj = me.find_obj_bypath("sp/bj/yanji");
-            if (obj) {
-                me.notify("胡斐说道：阎基是我的杀父仇人，如果你把他杀掉，在下必有重谢。");
-                me.send_commands("give " + this.id + " " + obj.id, "把阎基的头颅给胡斐");
-            } else {
-                me.notify("胡斐说道：阎基是我的杀父仇人。");
-            }
-        });
+        this.set_ask("阎基", this.ask_about_yanji);
         this.set_ask("闯王宝刀", function (me) {
 
             if (me.query_temp("fb/guanwai/hu")) {
@@ -74,7 +67,15 @@ export default class extends NPC {
             }
         });
     }
-
+    ask_about_yanji(me: USER) {
+            var obj = me.find_obj_bypath("sp/bj/yanji");
+            if (obj) {
+                me.notify("胡斐说道：阎基是我的杀父仇人，如果你把他杀掉，在下必有重谢。");
+                me.send_commands("give " + this.id + " " + obj.id, "把阎基的头颅给胡斐");
+            } else {
+                me.notify("胡斐说道：阎基是我的杀父仇人。");
+            }
+        }
     on_accept(me, obj, count) {
         if (!obj || !obj.path) return;
         if (obj.is("sp/bj/yanji")) {

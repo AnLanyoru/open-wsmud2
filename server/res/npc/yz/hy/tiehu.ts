@@ -4,7 +4,7 @@ import { USER } from "../../../../core/char/user.js";
 import { CORPSE } from "../../../../core/item/corpse.js";
 import { ROOM } from "../../../../core/room/room.js";
 
-export default class extends NPC {
+export default class HeiYingTieHu extends NPC {
     name = "铁虎";
     title = "黑鹰队长";
     desc = "他身高近七尺，虎背熊腰，脸上一道从眉骨延伸至下颌的刀疤";
