@@ -80,7 +80,7 @@ export default class extends COMMAND {
                             can_sd = me.query_temp('fb_sao' + index, Number(0)) === 1;
                         } else {
                             const sdVal = me.query_temp('fb_sao0', Number(0));
-                            can_sd = sdVal && sdVal >= index;
+                            can_sd = sdVal >= index;
                         }
                         if (can_sd) {
                             return me.send_commands('cr ' + fb.id, "进入副本", "cr " + fb.id + " 0 1", "扫荡一次",
@@ -101,7 +101,7 @@ export default class extends COMMAND {
                             can_sd = me.query_temp('fb_sao' + fb.index, Number(0)) === 2;
                         } else {
                             const sdVal = me.query_temp('fb_sao1', Number(0));
-                            can_sd = sdVal !== undefined && sdVal >= index;
+                            can_sd = sdVal >= index;
                         }
                         if (can_sd) {
                             return me.send_commands('cr ' + fb.id + " 1 0", "进入副本", "cr " + fb.id + " 1 1",

@@ -11,7 +11,7 @@ import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { StatusDef } from '../../types/events.js';
-import type { ActionMap } from '../../types/base.js';
+import type { ActionMap, CommandAccessFlags } from '../../types/base.js';
 import type { ROOM as RoomClass } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
 import type { NPC } from './npc.js';
@@ -725,7 +725,7 @@ export class CHARACTER extends ITEM {
     /**
      * 检查命令是否允许执行
      */
-    check_command(cmd: COMMAND): boolean {
+    check_command(cmd: Partial<COMMAND>): boolean {
         if ((cmd.allow_level ?? 0) > this.user_level) {
             this.send('什么？');
             return false;

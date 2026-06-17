@@ -6,6 +6,7 @@ import {BASE} from './base.js';
 import {MessageEntry, WORLD} from './world.js';
 import type {CHARACTER} from './char/character.js';
 import type {OBJ} from './item/obj.js';
+import type {CommandAccess} from '../types/base.js';
 
 export class COMMAND extends BASE {
 
@@ -103,7 +104,7 @@ export class COMMAND extends BASE {
     /**
      * 命令状态检查，可由子类通过 overrides 覆写允许标志
      */
-    check_command(me: CHARACTER, overrides?: Partial<Pick<COMMAND, 'allow_die' | 'allow_faint' | 'allow_state' | 'allow_fight' | 'allow_busy'>>): boolean {
+    check_command(me: CHARACTER, overrides?: Partial<COMMAND>): boolean {
         const allow_die = overrides?.allow_die ?? this.allow_die;
         const allow_faint = overrides?.allow_faint ?? this.allow_faint;
         const allow_state = overrides?.allow_state ?? this.allow_state;

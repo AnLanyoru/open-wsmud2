@@ -99,7 +99,7 @@ export class AREA extends BASE {
 
     /** 进阶难度索引 */
     jd_index?: number;
-    /** 解锁关卡索引 */
+    /** 只能通过索引解锁的关卡 */
     unlock_index?: number;
     /** 是否锁定（暂未开放） */
     is_lock?: boolean;
