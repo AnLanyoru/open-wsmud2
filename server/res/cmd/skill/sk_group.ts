@@ -26,7 +26,7 @@ export default class extends COMMAND {
             let enable_skill = eqs[i];
             if (!enable_skill && !skill.enable_skill) continue;
             if (enable_skill && skill.enable_skill === enable_skill) continue;
-            enable_command(me, sk_type, enable_skill, true);
+            enable_command(me, sk_type, enable_skill, 'true');
         }
 
         me.send(`{type:"dialog",dialog:"skills",sk_group:${index}}`);

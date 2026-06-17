@@ -3,6 +3,7 @@ import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { USER, UserState } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "lianxi";
@@ -13,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, skid, par) {
+    enter(me: USER, skid: string, par: string) {
         if (!me.skills) return;
         if (!(me.pot > 0)) return me.send('你的潜能不足。');
         if (me.state && me.state.id !== 'lianxi')
@@ -38,7 +39,8 @@ export default class extends COMMAND {
 
         var max = me.skill_limit();
         if (par) {
-            max = Math.min(par, max);
+            let target_level = Number(par)
+            max = Math.min(target_level, max);
             if (!(max > 0)) return me.send('错误的等级设置');
             if (max <= me.query_skill(skid))
                 return me.notify("你的" + skill_base.query_color_name(me) + "已经练习到" + max + "级了。");
@@ -46,6 +48,7 @@ export default class extends COMMAND {
         if (me.state) {
             if (me.state.skill_base === skill_base)
                 return me.send('你正在练习' + skill_base.query_color_name(me) + "。");
+            if (!me.state.queues) me.state.queues = [];
             for (let i = 0; i < me.state.queues.length; i++) {
                 if (me.state.queues[i].skid == skid) {
                     me.state.queues.splice(i, 1);
@@ -81,19 +84,17 @@ export default class extends COMMAND {
     }
 }
 
-export interface LianxiState {
-    max_level: number;
-    skill_base: SKILL;
-    queues: { skid: string; max_level: number }[];
-    sum_pot: number;
-}
 
-function on_check(this: LianxiState, me: CHARACTER) {
+function on_check(this: UserState, me: USER) {
+    
+    if (!this.queues || !this.target || !this.max_level)
+        return me.notify_fail("<hir>练习状态异常，请联系管理解决</hir>");
     let max_level = this.max_level;
     let speed = count_speed(me);
 
 
     let skill = this.skill_base;
+    if (!skill) return me.notify_fail("<hir>练习状态异常，请联系管理解决</hir>");
     let pot = skill.query_needexp(max_level, me) -
         skill.query_needexp(me.query_skill(skill.id, 0), me);
     let str = ['你正在练习', skill.query_color_name(me), '到', max_level, '级，当前练习速度', speed];
@@ -116,7 +117,7 @@ function on_check(this: LianxiState, me: CHARACTER) {
         pot = me.pot;
         str.push('潜能不足中断');
     }
-    str.push('，已消耗', this.sum_pot, '/', Math.floor(pot), '潜能。');
+    str.push('，已消耗', String(this.sum_pot), '/', Math.floor(pot), '潜能。');
     str.push('</hic>\n点击练习其他武功可添加到队列。');
     me.send(str.join(""));
 }
@@ -153,7 +154,7 @@ function to_next(me) {
     }
 }
 
-function check_skill(me, skill, limit = true) {
+function check_skill(me: USER, skill: SKILL, limit = true) {
 
     var lv = me.query_skill(skill.id, 0);
     if (limit && me.state && me.state.max_level && lv >= me.state.max_level) {
@@ -181,7 +182,10 @@ function check_skill(me, skill, limit = true) {
     return true;
 }
 
-function do_learn(this: LianxiState, me: CHARACTER) {
+function do_learn(this: UserState, me: USER) {
+    
+    if (!this.skill_base || !this.sum_pot)
+        return me.notify_fail("<hir>练习状态异常，请联系管理解决</hir>");
     if (me.pot > 0) {
 
         if (!check_skill(me, this.skill_base)) return false;
@@ -195,11 +199,9 @@ function do_learn(this: LianxiState, me: CHARACTER) {
 
 }
 
-function count_speed(me) {
+function count_speed(me: USER) {
     let pot = parseInt((me.int + me.query_prop("int")) * (100 + me.query_prop("lianxi_per")
         + me.family.query_temp('lianxi_per', 0)
         + WORLD.DATA.query_temp("lianxi_per", 0) + me.int) / 100);
-
-
     return pot;
 }

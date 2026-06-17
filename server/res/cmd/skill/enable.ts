@@ -1,7 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "enable";
@@ -9,9 +9,9 @@ export default class extends COMMAND {
     allow_fight = false;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, base, skill, no_sent) {
+    enter(me: USER, base: string, skill: string, no_sent: string) {
         if (!me.skills) return me.notify("你还不会任何技能。");
         var baseskill = me.skills[base];
         if (!baseskill) return me.notify("你还不会这个基本技能。");

@@ -15,7 +15,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me: CHARACTER, arg: string, isok: boolean) {
+    enter(me: CHARACTER, arg: string, isok: string) {
         if (!me.is_player) return;
         let player = me as USER;
         if (!arg) return this.render_books(player);

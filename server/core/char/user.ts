@@ -82,8 +82,12 @@ export interface UserState {
     }[]
     /** 学习技能的教导者 */
     target?: CHARACTER;
+    /** 动作已消耗的潜能 */
+    sum_pot?: number;
     /** 动作进行时阻止移动的提示 */
-    no_move?: string
+    no_move?: string;
+    /** 动作开始时间戳 */
+    stime?: number;
     
     /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
     on_enter?: (me: CHARACTER, dt?: number) => boolean | void;
