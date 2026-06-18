@@ -124,6 +124,8 @@ export class ROOM extends ITEM {
     biwu_step?: number;
     /** 是否禁止战斗 */
     no_fight?: boolean;
+    /** 是否无法复活 */
+    no_relive?: boolean;
 
     // ============ 公共房间缓存(静态) ============
 
@@ -133,17 +135,20 @@ export class ROOM extends ITEM {
     // ============ 回调（由资源文件设置） ============
 
     /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
-    on_leave(obj: Record<string, any>, dir: string): boolean | void {
+    on_leave(obj: ITEM, dir: string): boolean | void {
         return;
     }
+    
+    /** 房间中复活回调，目标复活前；返回 false 阻止复活 */
+    on_relive?(obj: CHARACTER, is_relive_here: boolean): boolean | void;
 
     /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
-    on_before_enter(obj: Record<string, any>): void {
+    on_before_enter(obj: ITEM): void {
         return;
     }
 
     /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
-    on_enter(obj: Record<string, any>): void {
+    on_enter(obj: ITEM): void {
         return;
     }
 
@@ -153,7 +158,7 @@ export class ROOM extends ITEM {
     }
 
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
-    on_login?: (user: Record<string, any>) => void;
+    on_login?: (user: USER) => void;
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
     /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */

@@ -10,7 +10,7 @@ import type {CHARACTER} from "../../../core/char/character.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 
 // todo 太多了审核不完，记得review
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "第一层";
     desc = "这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。";
     exits = {"up": "wudao/up", "out": "wudao/men"};
@@ -29,7 +29,6 @@ export default class MapRoom extends ROOM {
             me.clear_status();
         }
 
-        const room = this;
         npc.die = function (this: NPC, killer?: CHARACTER) {
             if (this.on_die && killer && this.on_die(killer) == false) {
                 this.hp = 1;

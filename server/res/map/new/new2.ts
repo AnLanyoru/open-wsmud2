@@ -3,7 +3,7 @@ import {UTIL} from "../../../core/util/util.js";
 import type {CHARACTER} from "../../../core/char/character.js";
 import type {NPC} from "../../../core/char/npc.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "训练室";
     desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识，就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。";
     exits = {"west": "new/new1", "south": "new/new3"};

@@ -684,7 +684,7 @@ export class USER extends CHARACTER {
     /**
      * 玩家死亡处理
      */
-    die(killer: CHARACTER): boolean | undefined {
+    die(killer?: CHARACTER): boolean | undefined {
         if (this.on_die && this.on_die(killer) === false) {
             this.hp = 1;
             return false;

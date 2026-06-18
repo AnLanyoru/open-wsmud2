@@ -1,16 +1,14 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
-import {ROOM} from "../../../core/room/room.js";
 import {USER} from "../../../core/char/user.js";
+import type WuMiaoRoom from "../../map/yz/wumiao.js";
 
 export default class extends COMMAND {
     command = "relive";
     allow_die = true;
 
 
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (!WORLD.is_server(me)) {
             return WORLD.on_cross_user_relive(me);
         }
@@ -56,20 +54,21 @@ export default class extends COMMAND {
                 if (me.force_skill.on_relive) {
                     me.force_skill.on_relive(me);
                 }
-                if (me.environment.on_relive && me.environment.on_relive(me, true) === false) {
+                if (me.environment?.on_relive && me.environment.on_relive(me, true) === false) {
                     return;
                 }
                 me.clear_status();
                 let room = me.environment;
-                me.environment = null;
-                me.moveto(room, null, "<mag>" + me.name + "的尸体发出阵阵光芒。</mag>");
+                me.environment = undefined;
+                me.moveto(room, '', "<mag>" + me.name + "的尸体发出阵阵光芒。</mag>");
             }, 5000);
 
 
         } else {
             var area = me.environment.parent;
-            var area_name = null;
-            if (area) area_name = area.name;
+            var area_name: string;
+            if (!area)  return me.notify("你不知道在哪。");
+            area_name = area.name;
 
 
             if (me.environment.on_relive && me.environment.on_relive(me, false) === false) {
@@ -81,17 +80,9 @@ export default class extends COMMAND {
             if (is_fb) {
                 me.environment.clear_copy(me);
             }
-            // if(me.query_temp('ns_bt')){
-            //     let npc=me.environment.find_obj_bypath('pub/nianshou');
-            //     if(npc){
-            //         npc.destroy();
-            //         //me.remove_temp('ns_bt');
-            //     }
-            // }
-
 
             me.environment.item_changed(me, false);
-            var room = WORLD.getRoom(recover_room);
+            var room = WORLD.getRoom(recover_room) as WuMiaoRoom;
             me.hp = 1;
             me.clear_status();
             room.do_enter(me, true, "<wht>你忽然发现前面多了一个人影，不过那人影又好像已经在那里很久了，只是你一直没发觉。</wht>");
@@ -110,7 +101,7 @@ export default class extends COMMAND {
             if (me.force_skill.on_relive) {
                 me.force_skill.on_relive(me);
             }
-            if ((!me.team || me.team[0] === me) && me.query_temp('fbbs', 0) === 1) {
+            if ((!me.team || me.team[0] === me) && me.query_temp('fbbs', Number(0)) === 1) {
                 me.remove_temp('fbbs');
             }
         }

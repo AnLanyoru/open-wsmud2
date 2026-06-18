@@ -443,7 +443,7 @@ export class CHARACTER extends ITEM {
     on_clone?(): void;
 
     /** 死亡前回调 — 触发时机：die() 方法开头，hp 归零之前；返回 false 可阻止死亡；world/ 资源可能传入额外 corpse 参数 */
-    on_die?(killer: CHARACTER, corpse?: any): boolean | void;
+    on_die?(killer?: CHARACTER, corpse?: any): boolean | void;
 
     /** 死亡后回调 — 触发时机：die() 方法末尾，尸体已生成、状态已清除之后 */
     on_died?(killer: CHARACTER | undefined, corpse: any): void;

@@ -1,8 +1,9 @@
 import {ROOM} from "../../../../core/room/room.js";
 import {WORLD} from "../../../../core/world.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
+import biwu from "../../../cmd/extend/biwu.js";
 
-export default class MapRoom extends ROOM {
+export default class BiWuLeiTaiRoom extends ROOM {
     name = "擂台";
     desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
     exits = {};
@@ -30,45 +31,45 @@ export default class MapRoom extends ROOM {
         if (act) act.allow_fight = true;
     }
 
-    action_fight(this: MapRoom, me: CHARACTER) {
+    action_fight(me: CHARACTER) {
         me.notify("你正在擂台比试。");
         return true;
     }
 
-    action_kill(this: MapRoom, me: CHARACTER) {
+    action_kill(me: CHARACTER) {
         me.notify("你正在擂台比试。");
         return true;
     }
 
-    action_dazuo(this: MapRoom, me: CHARACTER) {
+    action_dazuo(me: CHARACTER) {
         me.notify("你正在擂台比试。");
         return true;
     }
 
-    action_liaoshang(this: MapRoom, me: CHARACTER) {
+    action_liaoshang(me: CHARACTER) {
         me.notify("你正在擂台比试。");
         return true;
     }
 
-    action_perform(this: MapRoom, me: CHARACTER) {
+    action_perform(me: CHARACTER) {
         me.notify("擂台上自动出招。");
         return true;
     }
 
-    action_unequip(this: MapRoom, me: CHARACTER) {
+    action_unequip(me: CHARACTER) {
         me.notify("擂台上自动出招，不允许卸下装备。");
         return true;
     }
 
-    action_enable(this: MapRoom, me: CHARACTER) {
+    action_enable(me: CHARACTER) {
         me.notify("擂台上自动出招，不能更改武功。");
         return true;
     }
 
-    surrender(this: MapRoom, me: CHARACTER) {
-        if (WORLD.COMMANDS.biwu && typeof WORLD.COMMANDS.biwu === 'object' && 'surrender' in WORLD.COMMANDS.biwu) {
-            // @ts-ignore 动态借用比武命令的投降处理函数
-            WORLD.COMMANDS.biwu.surrender(me);
+    surrender(me: CHARACTER) {
+        let biwu_cmd = WORLD.COMMANDS.biwu as biwu
+        if (biwu_cmd) {
+            biwu_cmd.surrender(me);
         }
         return true;
     }

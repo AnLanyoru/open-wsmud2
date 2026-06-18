@@ -3,7 +3,6 @@ import {WORLD} from "../../../../core/world.js";
 import {UTIL} from "../../../../core/util/util.js";
 import {COMMAND} from "../../../../core/command.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
-import type {NPC} from "../../../../core/char/npc.js";
 
 /*
 1.脱光变身
@@ -15,7 +14,7 @@ import type {NPC} from "../../../../core/char/npc.js";
 7.杀小狼变身
 8.吃蛇变异
 */
-export default class MapRoom extends ROOM {
+export default class DeepMiLinRoom extends ROOM {
     name = "密林深处";
     desc = "这里是密林的深处，楠木参天，浓阴蔽日，再往里就没有路走了，一只大狼懒洋洋的趴着，四周散落着不少乱七八糟的物件。";
     exits = {"east": "yz/lw/milin2"};
@@ -29,7 +28,7 @@ export default class MapRoom extends ROOM {
         this.add_action("use", "", this.action_use);
     }
 
-    search(this: MapRoom, me: CHARACTER) {
+    search(me: CHARACTER) {
         if (me.query_temp("fb/lw/search")) {
             if (!WORLD.DATA.query_temp('zq4', 0) && this.is_time()) {
                 if (me.add_temp("fb/lw/search", 1) == 6) {
@@ -54,7 +53,7 @@ export default class MapRoom extends ROOM {
         }
     }
 
-    action_say(this: MapRoom, me: CHARACTER, par?: string) {
+    action_say(me: CHARACTER, par?: string) {
         if (!WORLD.DATA.query_temp('zq4', 0) && this.is_time() && (me.query_temp("fb/lw/search", 1) as number) > 3) {
             var npc = this.find_obj_bypath('yz/lw/langwang');
             if (npc && par == '小月月变身') {
@@ -65,7 +64,7 @@ export default class MapRoom extends ROOM {
         return false;
     }
 
-    action_drop(this: MapRoom, me: CHARACTER, count?: string, objid?: string) {
+    action_drop(me: CHARACTER, count?: string, objid?: string) {
         if (!objid) return false;
         var obj = me.find_obj(objid);
         if (!obj) {
@@ -92,7 +91,7 @@ export default class MapRoom extends ROOM {
         return false;
     }
 
-    action_use(this: MapRoom, me: CHARACTER, objid?: string, par?: string) {
+    action_use(me: CHARACTER, objid?: string, par?: string) {
         if (!objid) return false;
         var obj = me.find_obj(objid);
         if (!obj) {
@@ -179,7 +178,7 @@ export default class MapRoom extends ROOM {
         npc.do_kill(me);
     };
 
-    on_lwdie(this: MapRoom, me: CHARACTER, t: number) {
+    on_lwdie(me: CHARACTER, t: number) {
         var type = "zq" + t;
         if (WORLD.DATA.query_temp(type)) return;
         if (t % 2 === 0)

@@ -1,7 +1,7 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
+import { COMMAND } from "../../../core/command.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "chat";
@@ -9,10 +9,7 @@ export default class extends COMMAND {
     allow_state = true;
     allow_die = true;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
-    enter(me, str) {
+    enter(me: USER, str: string) {
         if (!str) return;
         if (me.master) return;
         if (str.length > 200) return me.notify("你说的太多了。");
@@ -44,7 +41,15 @@ export default class extends COMMAND {
         } else {
             msg = UTIL.htmlEncode(UTIL.replace_word(str));
         }
-        let content = {type: "msg", ch: "chat", content: msg, uid: me.id, lv: (me.level || 0), name: name};
+        let content = {
+            type: "msg",
+            ch: "chat",
+            content: msg,
+            uid: me.id,
+            lv: (me.level || 0),
+            name: name,
+            lv6: undefined
+        };
         if (me.level === 6) {
             let lv6 = me.query_temp('lv6');
             if (lv6) content.lv6 = lv6;

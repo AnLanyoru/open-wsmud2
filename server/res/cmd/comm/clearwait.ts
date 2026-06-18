@@ -8,6 +8,6 @@ export default class extends COMMAND {
      * @param player - 执行命令的角色
      */
     enter(player: CHARACTER) {
-        player.wait_input = null;
+        player.wait_input = undefined;
     }
 }

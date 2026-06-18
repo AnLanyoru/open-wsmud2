@@ -1,7 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "fam";
@@ -10,9 +10,9 @@ export default class extends COMMAND {
     allow_die = true;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, str) {
+    enter(me: USER, str: string) {
         if (!str) return;
         if (str.length > 200) return me.notify("你说的太多了。");
         if (me.query_temp("no_chat")) return me.notify("你目前被禁言中。");

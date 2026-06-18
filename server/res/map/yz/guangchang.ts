@@ -1,7 +1,7 @@
 import {ROOM} from "../../../core/room/room.js";
 import type {CHARACTER} from "../../../core/char/character.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "广场";
     desc = "这里是城市的正中心，一个很宽阔的广场，铺着青石地面。一些游手好闲的人在这里溜溜达达，经常有艺人在这里表演。中央有一棵<cmd cmd='look tree'>大榕树(tree)</cmd>，盘根错节，据传已有千年的树龄，是这座城市的历史见证。";
     exits = {
@@ -14,8 +14,7 @@ export default class MapRoom extends ROOM {
         this.set_item("tree", "大榕树", "一棵枝叶茂盛的大榕树，看来似乎可以爬上去", [[
             "climb", "爬", climb_tree
         ]]);
-        this.add_action("climb tree", "爬树", function (this: MapRoom) {
-        });
+        this.add_action("climb tree", "爬树");
     }
 }
 

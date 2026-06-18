@@ -2,6 +2,8 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
+import type { USER } from "../../../core/char/user.js";
+import emote from "./emote.js";
 
 export default class extends COMMAND {
     command = "pty";
@@ -12,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, str) {
+    enter(me: USER, str: string) {
         if (!str) return;
         if (str.length > 200) return me.notify("你说的太多了。");
         if (me.query_temp("no_chat")) return me.notify("你目前被禁言中。");
@@ -26,7 +28,8 @@ export default class extends COMMAND {
         var msg = "", name = me.name;
         if (str[0] == "*") {
             str = str.slice(1);
-            msg = WORLD.COMMANDS["emote"].enter(me, str);
+            let emei_cmd = WORLD.COMMANDS["emote"] as emote
+            msg = emei_cmd.enter(me, str) ?? '';
             if (!msg) {
                 msg = UTIL.htmlEncode(str);
                 msg = UTIL.replace_word(str);

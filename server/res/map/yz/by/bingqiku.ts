@@ -4,7 +4,7 @@ import {OBJ} from "../../../../core/item/obj.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
 import type { USER } from "../../../../core/char/user.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "兵器库";
     desc = "这里是兵器库，到处银光闪闪，让人眼花缭乱。宝刀、宝剑、金箍棒，大刀、长剑、哨棒，短刀、短剑、短棍，各色各样的兵器应有尽有，你一时不知道挑什么好。";
     exits = {"north": "yz/by/bingying"};
@@ -29,7 +29,7 @@ export default class MapRoom extends ROOM {
             return me.send('你要打开什么？');
         }
 
-    search(this: MapRoom, me: CHARACTER) {
+    search(me: USER) {
         if (me.query_temp("by_search")) {
             if (me.equipment && me.equipment[0] && me.equipment[0].is('eq/lv1/qianjinquan')) {
                 me.notify("你仔细搜了一圈，发现兵器库的后墙有一个形状十分眼熟的孔洞。");
@@ -56,7 +56,7 @@ export default class MapRoom extends ROOM {
         }
     }
 
-    on_leave(me: CHARACTER, dir: string) {
+    on_leave(me: USER, dir: string) {
         if (dir === 'down') {
             me.notify('你即将离开这个副本进入公共区域，是否确认？');
             me.send_commands('lkfb', '确定离开');

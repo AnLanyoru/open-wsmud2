@@ -61,7 +61,7 @@ export class COMMAND extends BASE {
      * @param arg - 命令参数
      * @returns 返回 false 表示命令执行失败
      */
-    enter(me: CHARACTER | null, ...arg: any[]): boolean | void {
+    enter(me: CHARACTER | null, ...arg: any[]): any {
         return undefined;
     }
 

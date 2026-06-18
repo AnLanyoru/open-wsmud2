@@ -38,7 +38,7 @@ export default class extends COMMAND {
             uid: me.id,
             lv: (me.level || 0),
             name: name,
-            server: WORLD.SERVER.name
+            server: WORLD.SERVER?.name
         });
 
         for (var i = 0; i < WORLD.USERS.length; i++) {

@@ -3,7 +3,7 @@ import {WORLD} from "../../../core/world.js";
 import type {CHARACTER} from "../../../core/char/character.js";
 import type { USER } from "../../../core/char/user.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "赌场";
     desc = "赌桌围着黑压压的赌徒，吆喝声、惊叹声、欢呼声、咒骂声、哄笑声和噼哩啪啦的声响使你的耳朵几乎无法忍受，赌桌旁的墙上贴有一张<cmd cmd='look paper'>纸</cmd>。";
     exits = {"east": "yz/nandajie1",};
@@ -22,7 +22,7 @@ export default class MapRoom extends ROOM {
         this.add_action("rbok", "", this.rbok);
     }
 
-    roll(this: MapRoom, me: CHARACTER, par?: string) {
+    roll(me: CHARACTER, par?: string) {
         if (!par) {
             if (!this.master) {
                 me.notify("<red>这里还没庄家，你要试着当庄家吗？</red>");
@@ -81,7 +81,7 @@ export default class MapRoom extends ROOM {
         }
     }
 
-    action_say(this: MapRoom, me: USER, par?: string) {
+    action_say(me: USER, par?: string) {
         WORLD.COMMANDS['say'].enter(me, par ?? '');
         if (par === '我要回档') {
             for (let item of this.items) {
@@ -96,7 +96,7 @@ export default class MapRoom extends ROOM {
         return true;
     }
 
-    rbok(this: MapRoom, me: CHARACTER, par?: string) {
+    rbok(me: CHARACTER, par?: string) {
         if (!par) return;
         let item = this.find_obj(par);
         if (item?.check_player()) {

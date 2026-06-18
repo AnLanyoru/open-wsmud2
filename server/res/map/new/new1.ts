@@ -1,8 +1,7 @@
 import {ROOM} from "../../../core/room/room.js";
 import type {CHARACTER} from "../../../core/char/character.js";
-import type {OBJ} from "../../../core/item/obj.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "训练室";
     desc = "这是一间空荡荡的训练室，所有要去闯荡江湖的人们都需要在这里学习一些基本知识， 就算你是MUD老鸟，你也需要了解下在没有命令可以输入的情况下如何挖泥。房子中间有个桌子，几张<cmd cmd='look yizi'><hig>椅子</hig></cmd>。";
     exits = {"east": "new/new2"};
@@ -13,8 +12,12 @@ export default class MapRoom extends ROOM {
         this.set_npc("new/daoshi");
         this.add_action("guid_start", null, this.guid_start);
         this.add_action("guide_over", null, this.guide_over);
-        this.set_item("yizi", "椅子", "这是一张椅子，可以坐。", [[
-            "zuo2", "坐下去", function (this: MapRoom, me: CHARACTER) {
+        this.set_item("yizi", "椅子", "这是一张椅子，可以坐。", [
+            ["zuo2", "坐下去", this.zuo_yizi]
+        ]);
+        this.add_action("zuo", "坐下来", this.zuo);
+    }
+    zuo_yizi(me: CHARACTER) {
                 me.notify("你拉开一张椅子坐了上去。");
                 var newLevel = me.query_temp<number>('new', 0);
                 if (newLevel === 3) {
@@ -22,11 +25,7 @@ export default class MapRoom extends ROOM {
                     this.call_out(next_guide4, 1000, me);
                 }
             }
-        ]]);
-        this.add_action("zuo", "坐下来", this.zuo);
-    }
-
-    guid_start(this: MapRoom, me: CHARACTER) {
+    guid_start(me: CHARACTER) {
         var lv = me.query_temp("new");
         if (lv != 1) return;
         me.set_temp("new", 2);
@@ -34,7 +33,7 @@ export default class MapRoom extends ROOM {
         on_guide(me);
     }
 
-    guide_over(this: MapRoom, me: CHARACTER) {
+    guide_over(me: CHARACTER) {
         var lv = me.query_temp("new");
         if (lv != 1) return;
         me.notify("指引者对你说：好吧，祝你游戏愉快！");
@@ -57,7 +56,7 @@ export default class MapRoom extends ROOM {
         }, 1000);
     }
 
-    zuo(this: MapRoom, me: CHARACTER) {
+    zuo(me: CHARACTER) {
         var lv = me.query_temp("new");
         if (lv == 2) {
             me.notify("你一屁股坐在地上。");

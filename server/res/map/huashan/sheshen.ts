@@ -1,15 +1,17 @@
 import {ROOM} from "../../../core/room/room.js";
-import type {CHARACTER} from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
+import type { USER } from "../../../core/char/user.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "舍身崖";
     desc = "这是一段极窄极险的山崖，四周云雾飞绕，下面渊深无底。如不小心，一失足掉下去，只怕连骨头都找不到。边上有个小山洞";
     exits = {"westdown": "huashan/zhenyue"};
 
     constructor() {
         super();
-        this.add_action("jumpdown", "跳下去", function (this: MapRoom, me: CHARACTER) {
+        this.add_action("jumpdown", "跳下去", this.jumpdown);
+    }
+    jumpdown(me: USER) {
             me.notify("你心一横，双眼一闭就从山崖上跳了下去。");
             var rm = WORLD.getRoom("huashan/qiaobi");
 
@@ -24,6 +26,5 @@ export default class MapRoom extends ROOM {
                 me.add_hp(-me.max_hp);
                 me.die();
             }
-        });
-    }
+        }
 }

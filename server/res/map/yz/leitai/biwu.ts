@@ -4,7 +4,7 @@ import { TASK } from "../../../../core/task/task.js";
 import { COMMAND } from "../../../../core/command.js";
 import type { CHARACTER } from "../../../../core/char/character.js";
 
-export default class MapRoom extends ROOM {
+export default class extends ROOM {
     name = "擂台";
     desc = "你正站在一个白玉汉石砌成方圆数十丈的大擂台上面，擂台下面的观众声嘶力竭的呐喊助威，加油！加油！加油！加油！加油！加油！";
     exits = { "down": "yz/leitai/ltx" };
@@ -13,19 +13,15 @@ export default class MapRoom extends ROOM {
 
     constructor() {
         super();
-        this.add_action("fight", "", function (this: MapRoom, me: CHARACTER) {
-            return me.notify("你正在比试。")
-        });
-        this.add_action("kill", "", function (this: MapRoom, me: CHARACTER) {
-            return me.notify("你正在比试。")
-        });
-        this.add_action("dazuo", "", function (this: MapRoom, me: CHARACTER) {
-            return me.notify("你正在比试。")
-        });
-        this.add_action("liaoshang", "", function (this: MapRoom, me: CHARACTER) {
-            return me.notify("你正在比试。")
-        });
+        this.add_action("fight", "", this.unable_to_do);
+        this.add_action("kill", "", this.unable_to_do);
+        this.add_action("dazuo", "", this.unable_to_do);
+        this.add_action("liaoshang", "", this.unable_to_do);
     }
+
+    unable_to_do(me: CHARACTER) {
+            return me.notify("你正在比试。")
+        }
 
     on_enter(me: CHARACTER) {
         me.full();

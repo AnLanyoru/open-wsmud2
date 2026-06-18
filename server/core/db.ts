@@ -17,7 +17,7 @@ interface DBInterface {
 
     addRole(role: RoleData): Promise<RoleData>;
 
-    deleteRole(userid: number, roleid: string): Promise<void>;
+    deleteRole(userid: number, roleid: string): Promise<boolean>;
 
     saveRole(role: RoleData): Promise<void>;
 
@@ -104,7 +104,7 @@ export default {
      * @param userid - 用户 ID
      * @param roleid - 角色 ID
      */
-    deleteRole(userid: number, roleid: string): Promise<void> {
+    deleteRole(userid: number, roleid: string): Promise<boolean> {
         return DB.deleteRole(userid, roleid);
     },
 
