@@ -1,17 +1,69 @@
-import {AREA} from "../../../core/room/area.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
+import { AREA } from "../../../core/room/area.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
 import type { USER } from "../../../core/char/user.js";
 
 export default class extends AREA {
-    name = "襄阳";
-    room_path = "xiangyang/";
     id = "xiangyang";
+    name = "襄阳城";
+    is_area = true;
     first = "xiangyang/guangchang";
+    no_cache = true;
+    index = 8;
+    room_path = "xiangyang/";
+    is_public = true;
     desc = "襄阳地处汉水中游，自古乃兵家必争之地。大侠郭靖、黄蓉夫妇率领江湖豪杰镇守此城，抵御蒙古大军南下，城中豪杰云集，是武林正道抗击外敌的重要据点。";
-    map = [];
-
-    // ... (map data and other methods unchanged, keeping existing class body)
+    map = [
+        { n: "中央广场", id: "xiangyang/guangchang", p: [0, 0], exits: ["w", "e", "s", "n"] },
+        { n: "东大街", id: "xiangyang/eastjie1", p: [1, 0] },
+        { n: "东大街", id: "xiangyang/eastjie2", p: [2, 0], exits: ["w", "e"] },
+        { n: "东大街", id: "xiangyang/eastjie3", p: [3, 0] },
+        { n: "东门", id: "xiangyang/eastgate1", p: [4, 0], exits: ["w", "e", "s", "n"] },
+        { n: "东门外", id: "xiangyang/eastgate2", p: [5, 0] },
+        { n: "西大街", id: "xiangyang/westjie1", p: [-1, 0] },
+        { n: "西大街", id: "xiangyang/westjie2", p: [-2, 0], exits: ["w", "e"] },
+        { n: "西大街", id: "xiangyang/westjie3", p: [-3, 0] },
+        { n: "西门", id: "xiangyang/westgate1", p: [-4, 0], exits: ["w", "e", "s", "n"] },
+        { n: "西门外", id: "xiangyang/westgate2", p: [-5, 0] },
+        { n: "南大街", id: "xiangyang/southjie1", p: [0, 1] },
+        { n: "南大街", id: "xiangyang/southjie2", p: [0, 2], exits: ["s", "n"] },
+        { n: "南大街", id: "xiangyang/southjie3", p: [0, 3] },
+        { n: "南门", id: "xiangyang/southgate1", p: [0, 4], exits: ["w", "e", "s", "n"] },
+        { n: "南门外", id: "xiangyang/southgate2", p: [0, 5] },
+        { n: "北大街", id: "xiangyang/northjie1", p: [0, -1] },
+        { n: "北大街", id: "xiangyang/northjie2", p: [0, -2], exits: ["s", "n"] },
+        { n: "北大街", id: "xiangyang/northjie3", p: [0, -3] },
+        { n: "北门", id: "xiangyang/northgate1", p: [0, -4], exits: ["w", "e", "s", "n"] },
+        { n: "北门外", id: "xiangyang/northgate2", p: [0, -5] },
+        { n: "城墙", id: "xiangyang/walle1", p: [4, -1] },
+        { n: "城墙", id: "xiangyang/walle2", p: [4, -2], exits: ["s", "n"] },
+        { n: "城墙", id: "xiangyang/walle3", p: [4, -3] },
+        { n: "城墙", id: "xiangyang/walle4", p: [4, -4], exits: ["s", "w"] },
+        { n: "城墙", id: "xiangyang/walle5", p: [3, -4] },
+        { n: "城墙", id: "xiangyang/walle6", p: [2, -4], exits: ["e", "w"] },
+        { n: "城墙", id: "xiangyang/walle7", p: [1, -4] },
+        { n: "城墙", id: "xiangyang/walle8", p: [-1, -4], exits: ["e", "w"] },
+        { n: "城墙", id: "xiangyang/walle9", p: [-2, -4] },
+        { n: "城墙", id: "xiangyang/walle10", p: [-3, -4], exits: ["e", "w"] },
+        { n: "城墙", id: "xiangyang/walle11", p: [-4, -4] },
+        { n: "城墙", id: "xiangyang/walle12", p: [-4, -3], exits: ["n", "s"] },
+        { n: "城墙", id: "xiangyang/walle13", p: [-4, -2] },
+        { n: "城墙", id: "xiangyang/walle14", p: [-4, -1], exits: ["n", "s"] },
+        { n: "城墙", id: "xiangyang/walle15", p: [-4, 1] },
+        { n: "城墙", id: "xiangyang/walle16", p: [-4, 2], exits: ["n", "s"] },
+        { n: "城墙", id: "xiangyang/walle17", p: [-4, 3] },
+        { n: "城墙", id: "xiangyang/walle18", p: [-4, 4], exits: ["n", "e"] },
+        { n: "城墙", id: "xiangyang/walle19", p: [-3, 4] },
+        { n: "城墙", id: "xiangyang/walle20", p: [-2, 4], exits: ["w", "e"] },
+        { n: "城墙", id: "xiangyang/walle21", p: [-1, 4] },
+        { n: "城墙", id: "xiangyang/walle22", p: [1, 4], exits: ["w", "e"] },
+        { n: "城墙", id: "xiangyang/walle23", p: [2, 4] },
+        { n: "城墙", id: "xiangyang/walle24", p: [3, 4], exits: ["w", "e"] },
+        { n: "城墙", id: "xiangyang/walle25", p: [4, 4] },
+        { n: "城墙", id: "xiangyang/walle26", p: [4, 3], exits: ["s", "n"] },
+        { n: "城墙", id: "xiangyang/walle27", p: [4, 2] },
+        { n: "城墙", id: "xiangyang/walle28", p: [4, 1], exits: ["s", "n"] },
+    ];
 
     query_actions(me: USER) {
         const actions: (string | number)[][] = [];
@@ -36,4 +88,44 @@ export default class extends AREA {
         }
         return actions;
     }
+    on_enter(me: USER) {
+
+        var status = WORLD.DATA.query_temp("xy_status", 0);
+        if (status !== 1) return;
+        var pt = WORLD.DATA.query_temp('xy_party');
+        if (pt) {
+            if (pt !== me.query_temp('pt'))
+                return me.notify_fail(pt + "正在协助守城，你还是不要去添乱了。");
+            if (!me.query_temp('xy_bm'))
+                me.set_temp('xy_bm', 1, 3600000);
+            return true;
+        }
+        if (!me.query_temp('xy_bm'))
+            return me.notify_fail("襄阳战事已起，需要报名参与守城才可进入。");
+
+        if (status === 1 && !this.is_bm(me)) {
+            var temp = me.temp["xy_hd"];
+            if (temp) {
+                var time = temp.e - Date.now();
+                if (time > 0) {
+                    return me.notify_fail("你还有" + parseInt(String(time / 3600000)) + "小时" + parseInt(String((time % 3600000) / 60000)) + "分才可以再次进入襄阳城。");
+                }
+            }
+            var pt2 = WORLD.DATA.query_temp('xy_party');
+            if (pt2 && pt2 !== me.query_temp('pt')) {
+                return me.notify_fail(pt2 + "正在协助守城，你还是不要去添乱了。");
+            }
+            var user_count = WORLD.DATA.query_temp("xy_users", 0);
+            if (user_count >= 40) return me.notify_fail("襄阳城已经有太多人参与守城了，你进不去。");
+            // me.set_temp('xy_hd', 1, 3600000 * 24 * 7);
+            // WORLD.DATA.add_temp("xy_users", 1);
+        }
+    }
+    is_bm(user: USER) {
+        var bm = user.query_temp('xy_bm');
+        if (!bm) return false;
+        return Date.now() - Number(bm) < 3600000;
+    }
+
+
 }
