@@ -8,7 +8,7 @@ export default class extends AREA {
     room_path = "xiangyang/";
     id = "xiangyang";
     first = "xiangyang/guangchang";
-    desc = "";
+    desc = "襄阳地处汉水中游，自古乃兵家必争之地。大侠郭靖、黄蓉夫妇率领江湖豪杰镇守此城，抵御蒙古大军南下，城中豪杰云集，是武林正道抗击外敌的重要据点。";
     map = [];
 
     // ... (map data and other methods unchanged, keeping existing class body)

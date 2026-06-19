@@ -18,7 +18,7 @@ export default class extends NPC {
     skills_def: SkillItem[][] = [
         [
             ["force", 100], ["unarmed", 100], ["sword", 100], ["parry", 100], ["dodge", 100],
-            ["hunyuanyiqi", 100, "force"], ["wudangchangquan", 100, "unarmed"], ["huashanshenfa", 100, "dodge"],
+            ["hunyuanyiqi", 100, "force"], ["wudangchangquan", 100, "unarmed"], ["feiyanhuixiang", 100, "dodge"],
             ["wudangjianfa", 100, "sword"], ["zhemeishou", 100, "parry"]
         ],
         [
