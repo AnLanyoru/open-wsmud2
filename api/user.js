@@ -177,8 +177,6 @@ class UserAPI extends APIBASE {
 module.exports = UserAPI;
 
 
-// this.inherits('api/base');
-
 // this.define = {
 //     Login: { method: "Post", paras: ["code", "pwd"] }
 // }

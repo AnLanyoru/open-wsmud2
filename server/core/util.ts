@@ -21,11 +21,6 @@ import('./skill/skill.js').then(m => {
 // 原型扩展 (副作用)
 // ============================================================
 
-/** Function.prototype.inherits — 原型继承工具 */
-Function.prototype.inherits = function (this: Function, superCtor: Function): void {
-    util.inherits(this, superCtor);
-};
-
 /** Array.prototype.remove — 移除第一个匹配元素 */
 Array.prototype.remove = function <T>(this: T[], item: T): boolean {
     for (let i = 0; i < this.length; i++) {
