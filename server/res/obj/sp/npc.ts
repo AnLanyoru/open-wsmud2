@@ -40,7 +40,7 @@ export default class extends OBJ {
         if (!me.is_player) return me.notify_fail("你不能使用契约书。");
         if (me.environment.parent.id != "home") return me.notify_fail("你只能在自己家使用契约。");
         if (!this.npc_path) return me.notify("你使用了契约书，可是没有任何反应。");
-        var npc = NPC.CLONE(this.npc_path);
+        var npc = FOLLOWER.CLONE(this.npc_path);
         if (!npc) return me.notify("你使用了契约书，可是没有任何反应。");
         var max = me.query_temp("max_follower", 3);
         var is_max = false;

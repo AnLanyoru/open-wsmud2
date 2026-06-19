@@ -114,7 +114,7 @@ export const PROPERTIES: Record<string, string> = {
     "diff_downside": "负面状态抵抗",
     "diff_downside_per": "负面状态抵抗",
     "diff_sh_per2": "伤害减免",         // 第二套伤害减免（不同计算阶段）
-    "diff_fy_per2": "伤害减免",         // 第二套伤害减免
+    "diff_fy_per2": "忽视对方防御",         // 第二套伤害减免
     "recover_per": "疗伤效果",
     // —— 生活技能 ——
     "lianyao1": "炼药效率",

@@ -306,7 +306,7 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 替换随从(版本更新)
      */
-    static REPLACE(me: USER, old: FOLLOWER, npc: NPC): void {
+    static REPLACE(me: USER, old: FOLLOWER, npc: FOLLOWER): void {
         if (!old || !npc) return;
         const copys = ['str', 'con', 'dex', 'int', 'gender', 'kar', 'per', 'name', 'title', 'desc', 'on_master_learn', 'on_master_enter'];
         for (let i = 0; i < copys.length; i++) {
@@ -316,7 +316,7 @@ export class FOLLOWER extends CHARACTER {
         if (!old.equipment) old.equipment = [];
         if (npc.equipment && npc.equipment[0]) {
             if (old.equipment[0]) {
-                (npc.items as any[]).push(npc.equipment[0]);
+                npc.items.push(npc.equipment[0]);
             } else {
                 old.equipment[0] = npc.equipment[0];
             }
@@ -324,7 +324,7 @@ export class FOLLOWER extends CHARACTER {
         }
         if (npc.items && npc.items.length) {
             for (let i = 0; i < npc.items.length; i++) {
-                old.items.push(npc.items[i] as any as OBJ);
+                old.items.push(npc.items[i]);
             }
             npc.items.length = 0;
         }

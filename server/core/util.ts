@@ -6,15 +6,15 @@ import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
 
-import util from 'util';
 import JSON5 from 'json5';
 import {PROPERTIES} from './const.js';
 import type { PropMap } from '../types/props.js';
+import type { SKILL } from './skill/skill.js';
 
 // 懒加载 SKILL 避免循环依赖
-let _SKILL: Record<string, Function> | null = null;
+let _SKILL: typeof SKILL | null = null;
 import('./skill/skill.js').then(m => {
-    _SKILL = m.SKILL as any as Record<string, Function>;
+    _SKILL = m.SKILL as any;
 });
 
 // ============================================================
@@ -274,11 +274,6 @@ export const UTIL = {
                         val > 0
                             ? str.push(PROPERTIES[item] + "：+" + val * count)
                             : str.push(PROPERTIES[item] + "：" + val * count);
-                    } else {
-                        p = _SKILL && _SKILL.SLOTS[item];
-                        if (p) {
-                            str.push((p as any as { format(v: number): string }).format(val * count));
-                        }
                     }
                     break;
                 }
