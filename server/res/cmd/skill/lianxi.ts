@@ -19,7 +19,7 @@ export default class extends COMMAND {
         if (!(me.pot > 0)) return me.send('你的潜能不足。');
         if (me.state && me.state.id !== 'lianxi')
             return me.send('你正在' + me.state.title + "。");
-        var skill = me.skills[skid];
+        var skill = me.skills.get(skid);
         if (!skill) return me.notify("你不会这个技能。");
 
         var skill_base = SKILL.get(skid);

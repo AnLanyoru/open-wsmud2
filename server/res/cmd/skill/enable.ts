@@ -13,7 +13,7 @@ export default class extends COMMAND {
      */
     enter(me: USER, base: string, skill: string, no_sent: string) {
         if (!me.skills) return me.notify("你还不会任何技能。");
-        var baseskill = me.skills[base];
+        var baseskill = me.skills.get(base);
         if (!baseskill) return me.notify("你还不会这个基本技能。");
         var baseskill_base = SKILL.get(base);
         if (!baseskill_base || baseskill_base.type !== SKILL_TYPES.BASE) {
@@ -21,7 +21,7 @@ export default class extends COMMAND {
         }
         var old_skill;
         if (baseskill.enable_skill) {
-            old_skill = me.skills[baseskill.enable_skill];
+            old_skill = me.skills.get(baseskill.enable_skill);
             if (!old_skill) return me.notify("技能错误，装备失败。");
             old_skill[base] = false;
             old_skill = SKILL.get(baseskill.enable_skill);
@@ -41,7 +41,7 @@ export default class extends COMMAND {
             me.remove_status(base, true);
         }
         if (skill && skill !== "none") {
-            var sp_skill = me.skills[skill];
+            var sp_skill = me.skills.get(skill);
             var sp_skill_base = SKILL.get(skill);
             if (!sp_skill) {
                 me.remove_status(base, true);

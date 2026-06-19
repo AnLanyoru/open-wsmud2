@@ -3,6 +3,7 @@ import {WORLD} from "../../../core/world.js";
 import {TASK} from "../../../core/task/task.js";
 import type XiangYangTask from "../../task/xy_task.js";
 import type { USER } from "../../../core/char/user.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 
 export default class extends NPC {
     name = "蒙古密探";
@@ -59,7 +60,7 @@ export default class extends NPC {
         this.die_room = undefined;
         this.equipment = [];
         this.items = null;
-        this.skills = {};
+        this.skills = new SkillsMap();
     }
 }
 

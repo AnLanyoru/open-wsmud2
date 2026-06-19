@@ -35,7 +35,7 @@ export default class extends OBJ {
         if (!this.skill) return me.notify_fail('这本秘籍似乎什么也没有记载。');
         let skill_base = SKILL.get(this.skill);
         if (!skill_base) return me.notify('你不能从里面学到东西。');
-        let skill = me.skills[this.skill];
+        let skill = me.skills.get(this.skill);
         if (!skill) {
             skill = {
                 level: 0,
@@ -45,7 +45,7 @@ export default class extends OBJ {
             skill_base.item_to_json(str, skill, me);
             str.push("}");
             me.notify(str.join(""));
-            me.skills[this.skill] = skill;
+            me.skills.set(this.skill, skill);
             if (skill_base.type == SKILL_TYPES.BASE) {
                 me.init_skill();
             }

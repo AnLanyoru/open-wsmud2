@@ -47,11 +47,11 @@ export default class extends COMMAND {
         str.push('","items":[');
         var skill_count = 0;
         if (skills) {
-            for (var skid in skills) {
+            for (const [skid, skillData] of skills) {
                 var skill_base = SKILL.get(skid);
                 if (!skill_base) continue;
                 if (skill_count > 0) str.push(",");
-                skill_base.item_to_json(str, skills[skid], target);
+                skill_base.item_to_json(str, skillData, target);
                 skill_count++;
 
             }

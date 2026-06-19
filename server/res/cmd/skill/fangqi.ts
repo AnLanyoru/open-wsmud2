@@ -14,7 +14,7 @@ export default class extends COMMAND {
      */
     enter(me, skillid, sid) {
         if (!me.skills) return me.notify("你还不会任何技能。");
-        var skill = me.skills[skillid];
+        var skill = me.skills.get(skillid);
         if (!skill) return me.notify("你还不会这个技能。");
         var skill_base = SKILL.get(skillid);
         if (!skill_base) return me.notify("没有这个技能。");

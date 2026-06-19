@@ -16,7 +16,7 @@ export default class extends COMMAND {
     enter(me: USER, sk: string, pfmid: string) {
         if (!sk || !pfmid) return me.notify("你要使用什么绝招。");
         if (!me.skills) return me.notify("你目前没有学会任何技能。");
-        var baseSkill = me.skills[sk];
+        var baseSkill = me.skills.get(sk);
         if (!baseSkill) return me.notify("你不会用这个技能。");
 
 
@@ -24,7 +24,7 @@ export default class extends COMMAND {
 
         if (!sp_skill) return me.notify("没有这个技能。");
 
-        var sp_myskill = me.skills[sp_skill.id];
+        var sp_myskill = me.skills.get(sp_skill.id);
 
         if (!sp_myskill || sp_myskill.disable)
             return me.notify("这个技能暂时无法使用，请联系管理员处理。");

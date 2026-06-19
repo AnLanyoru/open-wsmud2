@@ -170,8 +170,8 @@ class BossTask extends TASK {
         if (diff_level > 300) {
             sk_level = (level + 1) * 130;
         }
-        for (var item in boss.skills) {
-            boss.skills[item].level = sk_level;
+        for (const [item] of boss.skills) {
+            boss.skills.get(item)!.level = sk_level;
         }
         boss.diff_level = diff_level;
         boss.hp = boss.max_hp = diff_level * diff_level * 500;

@@ -3,6 +3,7 @@
 // ============================================================
 
 import {CHARACTER} from './character.js';
+import { SkillsMap } from './skills_map.js';
 import {FAMILIES} from '../skill/family.js';
 import type {FAMILY} from '../skill/family.js';
 import {ROOM} from '../room/room.js';
@@ -365,7 +366,7 @@ export class NPC extends CHARACTER {
         this.environment = undefined;
         this.equipment = [];
         this.items = null;
-        this.skills = {};
+        this.skills = new SkillsMap();
         this.json = null;
     }
 

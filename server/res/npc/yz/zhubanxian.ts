@@ -58,8 +58,8 @@ export default class extends NPC {
         }
         if (me.level == 0) {
             var check = {};
-            for (var sk in me.skills) {
-                var item = me.skills[sk];
+            for (const [sk, item] of me.skills) {
+                // item from destructuring
                 if (item.level >= 100) {
                     check[sk] = true;
                 }
@@ -80,9 +80,9 @@ export default class extends NPC {
             }
         } else if (me.level == 1) {
             var check = {};
-            for (var sk in me.skills) {
-                var item = me.skills[sk];
-                if (item.enable_skill && item.level >= 300 && me.skills[item.enable_skill].level >= 300) {
+            for (const [sk, item] of me.skills) {
+                // item from destructuring
+                if (item.enable_skill && item.level >= 300 && me.skills.get(item.enable_skill)!.level >= 300) {
                     check[sk] = true;
                 }
             }
@@ -100,9 +100,9 @@ export default class extends NPC {
             }
         } else if (me.level == 2) {
             var check = {};
-            for (var sk in me.skills) {
-                var item = me.skills[sk];
-                if (item.enable_skill && item.level >= 800 && me.skills[item.enable_skill].level >= 800) {
+            for (const [sk, item] of me.skills) {
+                // item from destructuring
+                if (item.enable_skill && item.level >= 800 && me.skills.get(item.enable_skill)!.level >= 800) {
                     check[sk] = true;
                 }
             }
@@ -136,9 +136,9 @@ export default class extends NPC {
             }
         } else if (me.level == 3) {
             var check = {};
-            for (var sk in me.skills) {
-                var item = me.skills[sk];
-                if (item.enable_skill && item.level >= 1500 && me.skills[item.enable_skill].level >= 1500) {
+            for (const [sk, item] of me.skills) {
+                // item from destructuring
+                if (item.enable_skill && item.level >= 1500 && me.skills.get(item.enable_skill)!.level >= 1500) {
                     check[sk] = true;
                 }
             }
@@ -229,10 +229,9 @@ function checkWS(me: USER) {
     }
 
     var check = {};
-    for (var sk in me.skills) {
-        var item = me.skills[sk];
+    for (const [sk, item] of me.skills) {
         if (item.enable_skill && item.level >= 2200 &&
-            me.skills[item.enable_skill].level >= 2200) {
+            me.skills.get(item.enable_skill)!.level >= 2200) {
             check[sk] = true;
         }
     }

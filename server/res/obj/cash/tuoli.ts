@@ -19,10 +19,9 @@ export default class extends OBJ {
             return me.notify_fail("你还没有门派，不需要叛师。");
         var list: SKILL[] = [];
         var up_count = 0;
-        for (var key in me.skills) {
+        for (const [key, skitem] of me.skills) {
             var skill = SKILL.get(key);
             if (skill && skill.family === me.family) {
-                let skitem = me.skills[key];
                 if (skitem.ref)
                     return me.notify_fail('请先取消' + skill.query_color_name(me) + '融合的绝招。');
                 if (skitem.addin && skitem.addin.length)
@@ -37,7 +36,7 @@ export default class extends OBJ {
         if (me.query_temp("tuoli")) {
             var sum = 0;
             for (var i = 0; i < list.length; i++) {
-                var needpot = list[i].query_needexp(me.skills![list[i].id].level, me);
+                var needpot = list[i].query_needexp(me.skills.get(list[i].id)!.level, me);
                 if (me.remove_skill(list[i].id)) {
                     if (needpot)
                         sum += needpot;

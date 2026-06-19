@@ -2,6 +2,8 @@
  * FOLLOWER 随从类 - 玩家的跟随者/NPC伙伴
  */
 import {CHARACTER} from './character.js';
+import type { SkillData } from './character.js';
+import { SkillsMap } from './skills_map.js';
 import {USER, UserState} from './user.js';
 import {NPC} from './npc.js';
 import {FAMILIES} from '../skill/family.js';
@@ -246,7 +248,7 @@ export class FOLLOWER extends CHARACTER {
             my_npc.on_master_enter = obj ? obj.on_master_enter : undefined;
             my_npc.equipment = (data.temp || data.eq) as any as (EQUIPMENT | null)[];
             my_npc.settings = data.settings ?? {};
-            my_npc.skills = data.skills as Record<string, any>;
+            my_npc.skills = SkillsMap.from(data.skills as Record<string, SkillData>);
             my_npc.path = obj.path;
             my_npc.items = me.read_items(data.items);
             my_npc.equipment = me.read_equipment(data.eq);
@@ -294,7 +296,7 @@ export class FOLLOWER extends CHARACTER {
         npc.on_makelove = obj.on_makelove;
         npc.on_master_enter = obj.on_master_enter;
         npc.equipment = obj.equipment;
-        npc.skills = obj.skills;
+        npc.skills = new SkillsMap(obj.skills);
         npc.items = (obj.items ?? []);
         npc.id = par.id;
         npc.path = obj.path;
@@ -316,7 +318,7 @@ export class FOLLOWER extends CHARACTER {
         for (let i = 0; i < copys.length; i++) {
             old[copys[i]] = npc[copys[i]];
         }
-        if (!old.skills) old.skills = {};
+        if (!old.skills) old.skills = new SkillsMap();
         if (!old.equipment) old.equipment = [];
         if (npc.equipment && npc.equipment[0]) {
             if (old.equipment[0]) {
@@ -333,11 +335,11 @@ export class FOLLOWER extends CHARACTER {
             npc.items.length = 0;
         }
 
-        for (const sk in npc.skills) {
-            const oldSkill = old.skills[sk];
+        for (const [sk, npcSkill] of npc.skills) {
+            const oldSkill = old.skills.get(sk);
             if (oldSkill && oldSkill.addin && oldSkill.addin.length) continue;
-            if (!oldSkill || (oldSkill.level || 0) < ((npc.skills as Record<string, any>)[sk]?.level || 0)) {
-                (old.skills as Record<string, any>)[sk] = (npc.skills as Record<string, any>)[sk];
+            if (!oldSkill || (oldSkill.level || 0) < (npcSkill?.level || 0)) {
+                old.skills.set(sk, npcSkill);
             }
         }
         if ((npc.exp || 0) > old.exp) old.exp = npc.exp || 0;

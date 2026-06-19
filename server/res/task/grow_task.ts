@@ -45,7 +45,7 @@ const temps = [
         desc: "通过秘籍或拜师学会一项技能，奖励：1000经验，1000潜能，<wht>铁剑</wht>\n<mem>可以通过去江湖-门派拜师，当铺购买秘籍，副本掉落武功秘籍等方式学习。</mem>",
         check: function (player) {
             if (!player.skills) return 1;
-            for (var item in player.skills) {
+            for (const item of player.skills.keys()) {
                 if (item != "force" && item != "unarmed") {
                     return 2;
                 }

@@ -3,6 +3,7 @@ import { CHARACTER } from "../../../core/char/character.js";
 import { USER } from "../../../core/char/user.js";
 import { NPC } from "../../../core/char/npc.js";
 import { ROOM } from "../../../core/room/room.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 import { WORLD } from "../../../core/world.js";
 import { UTIL } from "../../../core/util/util.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
@@ -148,12 +149,11 @@ export default class extends COMMAND {
                 if (obj.on_eq) obj.on_eq(npc);
             }
         }
-        npc.skills = {};
+        npc.skills = new SkillsMap();
         if (player.skills) {
-            for (const sk in player.skills) {
-                const item = player.skills[sk];
+            for (const [sk, item] of player.skills) {
                 if (typeof item === "number") {
-                    npc.skills[sk] = { level: item, exp: 0, enable_skill: null };
+                    npc.skills.set(sk, { level: item, exp: 0, enable_skill: null });
                 }
             }
         }

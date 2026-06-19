@@ -2,6 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import type { USER } from "../../../core/char/user.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 
 export default class extends COMMAND {
     command = "createrole";
@@ -77,7 +78,7 @@ export default class extends COMMAND {
         me.set_setting("ban_pk", 1);
         me.eq_groups = [];
         me.sk_groups = [];
-        me.skills = {};
+        me.skills = new SkillsMap();
         this.save2db(me);
     }
 

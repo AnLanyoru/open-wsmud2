@@ -2,6 +2,7 @@
  * USER 玩家类
  */
 import { CHARACTER } from './character.js';
+import { SkillsMap } from './skills_map.js';
 import { ROOM } from '../room/room.js';
 import { OBJ } from '../item/obj.js';
 import type { EQUIPMENT } from '../item/equipment.js';
@@ -445,7 +446,7 @@ export class USER extends CHARACTER {
         this.equipment = this.read_equipment(data.eq);
         this.settings = data.settings;
 
-        this.skills = data.skills ?? {};
+        this.skills = SkillsMap.from(data.skills);
         this.eq_groups = data.eq_groups;
         this.sk_groups = data.sk_groups ?? [null, [], []];
         this.temp = data.temp;
@@ -1062,7 +1063,7 @@ export class USER extends CHARACTER {
             for (let i = 0; i < bases.length; i++) {
                 const base_type = bases[i];
                 if (!base_type) continue;
-                const base_skill = this.skills[base_type];
+                const base_skill = this.skills.get(base_type);
                 if (base_skill) {
                     const sp_skill = SKILL.get(base_skill.enable_skill || base_type);
                     if (sp_skill && sp_skill.pfm) {
@@ -1085,7 +1086,7 @@ export class USER extends CHARACTER {
                         }
                     }
                     if (base_skill.enable_skill) {
-                        const pfmitem = this.query_ref_skill(this.skills[base_skill.enable_skill]);
+                        const pfmitem = this.query_ref_skill(this.skills.get(base_skill.enable_skill));
                         if (pfmitem && pfmitem.enable_skill && pfmitem.enable_skill === bases[i]) {
                             if (str.length > 1) str.push(',');
                             str.push('{id:"');

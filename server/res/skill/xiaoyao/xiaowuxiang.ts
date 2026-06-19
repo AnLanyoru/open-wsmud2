@@ -87,8 +87,8 @@ export default class extends SKILL {
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
 
-                    this.distime = pfm.query_distime(me, lv) ?? 0;
-                    this.release_time = pfm.query_releasetime(me, lv) ?? 0;
+                    this.distime = pfm.query_distime(me, lv);
+                    this.release_time = pfm.query_releasetime(me, lv);
 
                     if (sp_skill.grade <= 4 && isEnable && !me.is_in("yz/leitai/leitai") &&
                         sp_skill.family !== FAMILIES.MONSTER) {
@@ -148,14 +148,14 @@ export default class extends SKILL {
                     } else if (sk == "blade" && me.query_weapon_type() != WEAPON_TYPE.BLADE) {
                         return me.notify("你使用的武器不对。");
                     }
-                    if (pfm.enable_skill == sk && !me.skills["xiaowuxianggong"][sk]) {
+                    if (pfm.enable_skill == sk && !me.skills.get("xiaowuxianggong")?.[sk]) {
                         return me.notify_fail("<cyn>你的小无相功需要装备为" + baseSkill.name + "才可以使用【" + pfm.name + "】。</cyn>");
                     }
                     var up = 70 + parseInt(lv / 100);
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
-                    this.distime = pfm.query_distime?.(me, lv) ?? 0;
-                    this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
+                    this.distime = pfm.query_distime(me, lv);
+                    this.release_time = pfm.query_releasetime(me, lv);
                 },
                 query_desc: function (me: CHARACTER, lv: number) {
                     lv = 70 + parseInt(lv / 100);

@@ -3,6 +3,7 @@ import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 import type { USER, UserState } from "../../../core/char/user.js";
 import type { FOLLOWER } from "../../../core/char/follower.js";
 
@@ -20,7 +21,7 @@ export default class extends COMMAND {
         let target_npc = me.find_obj(target, me.environment);
         if (!target_npc || !target_npc.check_character()) return me.notify("你要跟谁学习技能？");
 
-        if (!me.skills) me.skills = {};
+        if (!me.skills) me.skills = new SkillsMap();
         var skill_base = SKILL.get(sk);
         if (!skill_base) return me.notify("没有这个技能。");
         if (skill_base.grade !== skill_base.query_grade(me)
@@ -46,12 +47,12 @@ export default class extends COMMAND {
         }
         if (BAN_SKILLS[sk]) return me.send(skill_base.color_name + '不能通过学习升级。');
 
-        if (!target_npc.skills?.[sk]) return me.notify(target_npc.name + "不会这个技能。");
+        if (!target_npc.skills?.get(sk)) return me.notify(target_npc.name + "不会这个技能。");
 
-        if (target_npc.skills[sk].disable) return me.notify("这个技能暂时不能学习，请联系管理员处理。");
+        if (target_npc.skills.get(sk)!.disable) return me.notify("这个技能暂时不能学习，请联系管理员处理。");
 
 
-        if (me.skills[sk + "2"]) return me.notify("你已经学会了的" + skill_base.color_name + "的进阶武功，不用再学习了。");
+        if (me.skills.get(sk + "2")) return me.notify("你已经学会了的" + skill_base.color_name + "的进阶武功，不用再学习了。");
         const skill_level = me.query_skill(sk, 0);
         if (skill_level === 0 && skill_base.do_learn(me) == false) return;
 
@@ -187,7 +188,7 @@ function to_next(me) {
 
 function checkSkillCount(me, sk) {
     var count = 0;
-    for (var skid in me.skills) {
+    for (const skid of me.skills.keys()) {
         if (skid == sk) return true;
         var skill_base = SKILL.get(skid);
         if (skill_base && skill_base.type == SKILL_TYPES.SKILL) {
@@ -242,7 +243,7 @@ function do_learn(this: UserState, me: CHARACTER) {
         me.notify("你的潜能不够，无法继续学习下去了。");
         return false;
     }
-    var skill = me.skills?.[this.skill_base.id];
+    var skill = me.skills?.get(this.skill_base.id);
     var lv = 0;
     if (skill) {
         lv = skill.level;

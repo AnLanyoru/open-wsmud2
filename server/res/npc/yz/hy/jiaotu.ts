@@ -3,6 +3,7 @@ import {ROOM} from "../../../../core/room/room.js";
 import {CORPSE} from "../../../../core/item/corpse.js";
 import {CHARACTER} from "../../../../core/char/character.js";
 import {WORLD} from "../../../../core/world.js";
+import { SkillsMap } from "../../../../core/char/skills_map.js";
 
 export default class extends NPC {
     name = "黑鹰教徒";
@@ -104,7 +105,7 @@ export default class extends NPC {
         this.die_room = undefined;
         this.equipment = [];
         this.items = null;
-        this.skills = {};
+        this.skills = new SkillsMap();
     }
 }
 

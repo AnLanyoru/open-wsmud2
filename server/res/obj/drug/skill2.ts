@@ -16,7 +16,7 @@ export default class extends OBJ {
         if (!(me.pot > 0)) return me.notify("你的潜能不够，好像没什么效果。");
         if (!me.skills) return me.notify("你还没有学会任何技能。");
         var list: SKILL[] = [];
-        for (var sk in me.skills) {
+        for (const sk of me.skills.keys()) {
             var base_skill = SKILL.get(sk);
             if (base_skill && base_skill.type != SKILL_TYPES.KNOWLEDGE && base_skill.grade <= this.grade) {
                 list.push(base_skill);
@@ -31,7 +31,7 @@ export default class extends OBJ {
         else if (level > 8) level = 3;
         else if (level > 4) level = 2;
         else level = 1;
-        var now_lv = me.skills[skillbase.id].level;
+        var now_lv = me.skills.get(skillbase.id)!.level;
         while (level) {
             needexp += skillbase.level_exp(now_lv + level, me);
             level--;

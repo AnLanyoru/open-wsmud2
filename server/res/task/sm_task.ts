@@ -1,6 +1,7 @@
 import {USERTASK} from "../../core/task/playertask.js";
 import {OBJ} from "../../core/item/obj.js";
 import type {OddsEntry} from "../../core/item/obj.js";
+import { SkillsMap } from "../../core/char/skills_map.js";
 
 export default class ShiMenTask extends USERTASK {
     id = "sm";
@@ -80,13 +81,13 @@ export default class ShiMenTask extends USERTASK {
             pot = pot * sm;
         }
         me.add_temp('gongji', gongji);
-        if (!me.skills) me.skills = {};
+        if (!me.skills) me.skills = new SkillsMap();
         me.add_exp(exp, pot);
 
 
         var list: string[] = [];
         for (var i = 0; i < me.family.skills2.length; i++) {
-            if (!me.skills[me.family.skills2[i].id]) {
+            if (!me.skills.get(me.family.skills2[i].id)) {
                 list.push(me.family.skills2[i].id);
             }
         }

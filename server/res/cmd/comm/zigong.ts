@@ -14,7 +14,7 @@ export default class extends COMMAND {
         if (me.gender == 2) return me.notify("你要割什么？");
         if (me.gender == 3) return me.notify("你都没有了还要割什么？");
         var list: SKILL[] = [];
-        for (var key in me.skills) {
+        for (const key of me.skills.keys()) {
             var skill = SKILL.get(key);
             if (skill?.learn_condition) {
                 if (skill.learn_condition.gender &&

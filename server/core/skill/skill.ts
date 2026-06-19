@@ -8,6 +8,7 @@ import {FAMILIES} from "./family.js";
 import type {FAMILY} from './family.js';
 import type {CHARACTER, DoAttackPar} from '../char/character.js';
 import {PROPERTIES, SKILL_TYPES} from "../const.js";
+import { SkillsMap } from "../char/skills_map.js";
 import type { PropMap } from "../../types/props.js";
 
 
@@ -422,7 +423,7 @@ export class SKILL extends BASE {
      */
     query_grade(me?: CHARACTER): number {
         if (!me) return this.grade;
-        const sk = me.skills ? me.skills[this.id] : undefined;
+        const sk = me.skills?.get(this.id);
         let lv = this.grade;
         if (sk) {
             if (sk.addin)
@@ -450,7 +451,7 @@ export class SKILL extends BASE {
      * @param lv
      */
     query_addin_prop(me: CHARACTER, lv: number): Record<string, number> | undefined {
-        const sk = me.skills ? me.skills[this.id] : undefined;
+        const sk = me.skills?.get(this.id);
         if (sk && sk.addin && sk.addin.length) {
             const prop: Record<string, number> = {};
             const grd = this.grade + sk.addin.length;
@@ -475,7 +476,7 @@ export class SKILL extends BASE {
      */
     is_enable(me: CHARACTER): boolean {
         if (this.type !== SKILL_TYPES.SKILL) return true;
-        const skill = me.skills ? me.skills[this.id] : undefined;
+        const skill = me.skills?.get(this.id);
         if (!skill || !this.can_enables) return false;
         for (let i = 0; i < this.can_enables.length; i++) {
             if (skill[this.can_enables[i]]) return true;
@@ -489,7 +490,7 @@ export class SKILL extends BASE {
      * @param baseskill
      */
     is_enable2(me: CHARACTER, baseskill: string): boolean {
-        const skill = me.skills ? me.skills[this.id] : undefined;
+        const skill = me.skills?.get(this.id);
         return skill ? skill[baseskill] : false;
     }
 
@@ -686,8 +687,8 @@ export class SKILL extends BASE {
      * @param exp
      */
     add_exp(me: CHARACTER, exp: number): boolean | undefined {
-        if (!me.skills) me.skills = {};
-        let skill = me.skills[this.id];
+        if (!me.skills) me.skills = new SkillsMap();
+        let skill = me.skills.get(this.id);
         if (!skill) {
             skill = {
                 level: 0,
@@ -698,7 +699,7 @@ export class SKILL extends BASE {
             this.item_to_json(str, skill, me);
             str.push("}");
             me.notify(str.join(""));
-            me.skills[this.id] = skill;
+            me.skills.set(this.id, skill);
             if (this.type === SKILL_TYPES.BASE) {
                 me.init_skill();
             }
@@ -764,7 +765,7 @@ export class SKILL extends BASE {
      */
     grade_up(me: CHARACTER, target_skill: SKILL): boolean {
         if (!me.skills) return false;
-        const skill = me.skills[this.id];
+        const skill = me.skills.get(this.id);
         if (!skill || !(skill.level >= 1000)) return false;
 
         if (me.remove_skill(this.id) === false) return false;
@@ -776,7 +777,7 @@ export class SKILL extends BASE {
             exp: 0,
             enable_skill: null
         };
-        me.skills[target_skill.id] = newSkill;
+        me.skills.set(target_skill.id, newSkill);
         const str: string[] = ['{type:"dialog",dialog:"skills",item:'];
         target_skill.item_to_json(str, newSkill, me);
         str.push("}");
@@ -956,9 +957,8 @@ export class SKILL extends BASE {
                 str.push(">\n");
             }
         }
-        const sk = me.skills ? me.skills[this.id] : undefined;
+        const sk = me.skills?.get(this.id);
         if (sk && sk.addin && sk.addin.length) {
-            str.push("\n<");
             str.push(isEnable ? cc : "blk");
             str.push(">");
 

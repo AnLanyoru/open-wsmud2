@@ -2,6 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 
 //查看不在同一房间的
 export default class extends COMMAND {
@@ -27,7 +28,7 @@ export default class extends COMMAND {
                 if (!skill_base) {
                     return me.send("没有这个技能。");
                 }
-                if (!me.skills) me.skills = {};
+                if (!me.skills) me.skills = new SkillsMap();
                 return me.send(skill_base.query_desc(me, 1000));
             }
             // var book_index = item.path.indexOf("book/bc#");

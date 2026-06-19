@@ -21,7 +21,7 @@ export default class extends COMMAND {
         const enable_command = WORLD.COMMANDS.enable.enter;
         for (let i = 0; i < SK_TYPES.length; i++) {
             let sk_type = SK_TYPES[i];
-            let skill = me.skills[sk_type];
+            let skill = me.skills.get(sk_type);
             if (!skill) continue;
             let enable_skill = eqs[i];
             if (!enable_skill && !skill.enable_skill) continue;
@@ -51,7 +51,7 @@ export default class extends COMMAND {
     save_eqgroup(me, index) {
         let eqs: string[] = [];
         for (let sk of SK_TYPES) {
-            let skill = me.skills[sk];
+            let skill = me.skills.get(sk);
             if (skill && skill.enable_skill) {
                 eqs.push(skill.enable_skill);
             } else {

@@ -19,6 +19,7 @@ import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
+import { SkillsMap } from './skills_map.js';
 
 // ============================================================
 // 本地类型定义
@@ -352,7 +353,7 @@ export class CHARACTER extends ITEM {
     // ============ 技能与装备 ============
 
     /** 技能映射 */
-    skills: Record<string, SkillData> = {};
+    skills: SkillsMap = new SkillsMap();
     /** buff/debuff 状态列表 */
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
@@ -811,6 +812,7 @@ export class CHARACTER extends ITEM {
     clone(): void {
         if (this.temp) this.temp = Object.create(this.temp);
         if (this.prop) this.prop = Object.create(this.prop);
+        if (this.skills) this.skills = new SkillsMap(this.skills);
         if (this.equipment) {
             const eqs: any[] = [];
             for (let i = 0; i < this.equipment.length; i++) {
@@ -859,15 +861,15 @@ export class CHARACTER extends ITEM {
         }
         if (this.is_player) this.score = 0;
         if (this.skills) {
-            for (const item in this.skills) {
+            for (const [item, skillData] of this.skills) {
                 const base_skill = SKILL.get(item);
                 if (!base_skill) {
-                    delete this.skills[item];
+                    this.skills.delete(item);
                     continue;
                 }
                 base_skill.attach_prop(this, this.query_skill(item));
                 if (this.is_player) {
-                    this.score += base_skill.query_score(this.skills[item].level, this);
+                    this.score += base_skill.query_score(skillData.level, this);
                 }
             }
         }
@@ -1086,15 +1088,16 @@ export class CHARACTER extends ITEM {
      * 查询技能等级（含属性加成）
      */
     query_skill(name: string, def?: number): number {
-        if (!this.skills || !this.skills[name]) return def || 0;
-        return this.skills[name].level + this.query_prop(name);
+        const skill = this.skills?.get(name);
+        if (!skill) return def || 0;
+        return skill.level + this.query_prop(name);
     }
 
     /**
      * 批量设置技能（NPC 初始化用）
      */
     skill_map(...args: SkillItem[]): void {
-        this.skills = this.skills || {};
+        if (!this.skills) this.skills = new SkillsMap();
         for (let i = 0; i < args.length; i++) {
             const item = args[i];
             if (!item) continue;
@@ -1108,13 +1111,13 @@ export class CHARACTER extends ITEM {
                 exp: 0,
                 enable_skill: null,
             };
-            this.skills[skill_base.id] = skill;
+            this.skills.set(skill_base.id, skill);
             if (item[2]) {
                 let enables = item[2];
                 if (typeof enables === 'string') enables = [enables];
                 for (let j = 0; j < enables.length; j++) {
                     skill[enables[j]] = true;
-                    this.skills[enables[j]].enable_skill = item[0];
+                    this.skills.get(enables[j])!.enable_skill = item[0];
                 }
             }
         }
@@ -1124,7 +1127,7 @@ export class CHARACTER extends ITEM {
      * 移除技能
      */
     remove_skill(skillid: string): boolean | undefined {
-        const skill = this.skills![skillid];
+        const skill = this.skills.get(skillid);
         if (!skill) return;
         const baseskill = SKILL.get(skillid);
         if (!baseskill) return false;
@@ -1132,21 +1135,21 @@ export class CHARACTER extends ITEM {
         if (baseskill.type == SKILL_TYPES.BASE) {
             if (skill.enable_skill) {
                 const old_skill = SKILL.get(skill.enable_skill);
-                if (!old_skill || !this.skills![skill.enable_skill]) {
+                if (!old_skill || !this.skills.get(skill.enable_skill)) {
                     return false;
                 }
                 old_skill.disenable(this, skillid);
-                this.skills![skill.enable_skill][skillid] = false;
+                this.skills.get(skill.enable_skill)![skillid] = false;
             }
         } else {
-            for (const key in this.skills) {
-                if (this.skills[key].enable_skill == skillid) {
-                    this.skills[key].enable_skill = null;
+            for (const [, val] of this.skills) {
+                if (val.enable_skill == skillid) {
+                    val.enable_skill = null;
                 }
             }
         }
         baseskill.release_prop(this, this.query_skill(skillid));
-        delete this.skills![skillid];
+        this.skills.delete(skillid);
         this.init_skill();
         this.recount();
         this.add_score(-baseskill.query_score(skill.level, this));
@@ -1158,8 +1161,8 @@ export class CHARACTER extends ITEM {
      * 设置技能等级
      */
     set_skill(skid: string, level: number): void {
-        if (!this.skills) this.skills = {};
-        let item = this.skills[skid];
+        if (!this.skills) this.skills = new SkillsMap();
+        let item = this.skills.get(skid);
         const skill_base = SKILL.get(skid);
         if (!skill_base) return;
         if (!item) {
@@ -1168,7 +1171,7 @@ export class CHARACTER extends ITEM {
                 exp: 0,
                 enable_skill: null,
             };
-            this.skills[skid] = item;
+            this.skills.set(skid, item);
             skill_base.attach_prop(this, level);
         } else {
             skill_base.release_prop(this, this.query_skill(skid));
@@ -1219,7 +1222,7 @@ export class CHARACTER extends ITEM {
      */
     is_enable_skill(skid: string, type: string): boolean | undefined {
         if (!this.skills) return;
-        const item = this.skills[skid];
+        const item = this.skills.get(skid);
         if (!item) return;
         return item[type];
     }
@@ -1229,10 +1232,10 @@ export class CHARACTER extends ITEM {
      */
     enable_skill(base: string, skill: string | null): boolean | undefined {
         if (!this.skills) return;
-        const baseskill = this.skills[base];
+        const baseskill = this.skills.get(base);
         if (!baseskill) return;
         if (baseskill.enable_skill) {
-            const old_skill = this.skills[baseskill.enable_skill];
+            const old_skill = this.skills.get(baseskill.enable_skill);
             if (!old_skill) return;
             old_skill[base] = false;
             const old_skill_base = SKILL.get(baseskill.enable_skill);
@@ -1241,7 +1244,7 @@ export class CHARACTER extends ITEM {
             }
         }
         if (skill) {
-            const sp_skill = this.skills[skill];
+            const sp_skill = this.skills.get(skill);
             if (baseskill && sp_skill) {
                 const sp_skill_base = SKILL.get(skill);
                 if (!sp_skill_base || sp_skill_base.enable(this, base) !== true) return false;
@@ -1276,7 +1279,7 @@ export class CHARACTER extends ITEM {
         if (!this.skills) {
             return WORLD.DEFAULT_SKILLS[skname];
         }
-        const skill = this.skills[skname];
+        const skill = this.skills.get(skname);
         if (skill) {
             const skill_base = SKILL.get(skill.enable_skill || skname);
             if (!skill_base) skill.enable_skill = null;
@@ -2986,7 +2989,7 @@ export class CHARACTER extends ITEM {
         }
         for (const base of bases) {
             if (!base) continue;
-            const base_skill = this.skills[base];
+            const base_skill = this.skills.get(base);
             if (!base_skill) continue;
 
             const sp_skill = SKILL.get(base_skill.enable_skill || base);
@@ -3000,7 +3003,7 @@ export class CHARACTER extends ITEM {
                 }
             }
             if (base_skill.enable_skill) {
-                const ref_pfm = this.query_ref_skill(this.skills[base_skill.enable_skill]);
+                const ref_pfm = this.query_ref_skill(this.skills.get(base_skill.enable_skill));
                 if (ref_pfm) {
                     this.add_auto_pfm(ref_pfm, base, level / 2, true);
                 }

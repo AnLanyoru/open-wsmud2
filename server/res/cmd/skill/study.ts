@@ -3,6 +3,7 @@ import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 import { StudyingBook, USER, UserState } from "../../../core/char/user.js";
 import { FOLLOWER } from "../../../core/char/follower.js";
 import type book from "../../obj/book/book.js";
@@ -62,10 +63,10 @@ export default class extends COMMAND {
             }
 
         if (!checkSkillCount(me, skill.id)) return;
-        if (!me.skills) me.skills = {};
+        if (!me.skills) me.skills = new SkillsMap();
 
 
-        if (me.skills[skill.id + "2"]) return me.notify("你已经学会了" + skill.color_name + "的进阶武功，不用再学习了。");
+        if (me.skills.get(skill.id + "2")) return me.notify("你已经学会了" + skill.color_name + "的进阶武功，不用再学习了。");
 
         // if (skill.do_learn && skill.do_learn(me, lv) == false) return false;
 
@@ -98,7 +99,7 @@ export default class extends COMMAND {
 
 function checkSkillCount(me, sk) {
     var count = 0;
-    for (var skid in me.skills) {
+    for (const skid of me.skills.keys()) {
         if (skid == sk) return true;
         var skill_base = SKILL.get(skid);
         if (skill_base && skill_base.type == SKILL_TYPES.SKILL) {

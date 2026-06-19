@@ -13,6 +13,7 @@
  */
 import {COPY_PROPS, WORLD} from "../../core/world.js";
 import {NPC} from "../../core/char/npc.js";
+import { SkillsMap } from "../../core/char/skills_map.js";
 import {OBJ} from "../../core/item/obj.js";
 import type {StatsTopEntry} from "../../core/world.js";
 import type {EQUIPMENT} from "../../core/item/equipment.js";
@@ -44,7 +45,7 @@ STATS.loadTopUser = function (data, npc) {
     for (let i = 0; i < COPY_PROPS.length; i++) {
         npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
     }
-    npc.skills = data.skills;
+    npc.skills = SkillsMap.from(data.skills as Record<string, any>);
     if (data.eq) {
         npc.equipment = [];
         for (let i = 0; i < data.eq.length; i++) {

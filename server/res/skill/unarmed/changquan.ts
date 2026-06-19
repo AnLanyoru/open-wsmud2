@@ -1,6 +1,6 @@
-import {SKILL, PERFORM} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import {WEAPON_TYPE} from "../../../core/const.js";
+import { SKILL, PERFORM } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import { WEAPON_TYPE } from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
@@ -65,68 +65,69 @@ export default class extends SKILL {
     ];
     pfm_set = {
         zhen:
-            {
-                name: "太祖八式",
-                distime: 16000,
-                enable_skill: "unarmed",
-                weapon_type: WEAPON_TYPE.UNARMED,
-                mp: 20,
-                release_time: 8000,
-                use: function (this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number) {
+        {
+            name: "太祖八式",
+            distime: 16000,
+            enable_skill: "unarmed",
+            weapon_type: WEAPON_TYPE.UNARMED,
+            mp: 20,
+            release_time: 8000,
+            use: function (this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number) {
 
-                    me.send_room("<hiy>只见$N跨立马步，稳定下盘，双拳有章有法的依次击向$n全身各处。</hiy>", target);
-                    target = null;
-                    var count = 0;
-                    var txt = ["一", "二", "三", "四", "五", "六", "七", "八"];
+                me.send_room("<hiy>只见$N跨立马步，稳定下盘，双拳有章有法的依次击向$n全身各处。</hiy>", target);
+                var count = 0;
+                var txt = ["一", "二", "三", "四", "五", "六", "七", "八"];
 
-                    let gj = me.gj + me.gj * me.query_prop('tzcq_sh') / 100;
-                    var time = this.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
-                    time -= time * me.query_prop('tzcq_rt') / 100;
-                    if (time > 80) {
-                        me.is_rash = time;
-                        me.call_interval(
-                            function () {
-                                if (!me.is_fighting()) return false;
-                                target = me.query_enemy();
-                                me.do_attack({
-                                    target: target,
-                                    gj: gj,
-                                    mz: me.mz,
-                                    attack_before: "<hiy>第" + txt[count] + "式</hiy>\n",
-                                    no_weapon: true
-                                });
-                                count++;
-                                if (!me.end_attack(target)) {
-                                    return false;
-                                }
-                            },
-                            time / 8,
-                            8,
-                            function () {
-                                me.is_rash = 0;
-                            }
-                        );
-                    } else {
-                        target = me.query_enemy();
-                        for (let i = 0; i < 8; i++) {
+                let gj = me.gj + me.gj * me.query_prop('tzcq_sh') / 100;
+                var time = this.query_releasetime(me, lv);
+                time -= time * me.query_prop('tzcq_rt') / 100;
+                if (time > 80) {
+                    me.is_rash = time;
+                    me.call_interval(
+                        function () {
+                            if (!me.is_fighting()) return false;
+                            let now_target = me.query_enemy();
+                            if (!now_target) return false;
                             me.do_attack({
-                                target: target,
+                                target: now_target,
                                 gj: gj,
                                 mz: me.mz,
-                                attack_before: "<hiy>第" + txt[i] + "式</hiy>\n",
+                                attack_before: "<hiy>第" + txt[count] + "式</hiy>\n",
                                 no_weapon: true
                             });
+                            count++;
+                            if (!me.end_attack(now_target)) {
+                                return false;
+                            }
+                        },
+                        time / 8,
+                        8,
+                        function () {
+                            me.is_rash = 0;
                         }
-                        me.end_attack(target);
+                    );
+                } else {
+                    let now_target = me.query_enemy();
+                    if (!now_target) return false;
+                    for (let i = 0; i < 8; i++) {
+                        me.do_attack({
+                            target: now_target,
+                            gj: gj,
+                            mz: me.mz,
+                            attack_before: "<hiy>第" + txt[i] + "式</hiy>\n",
+                            no_weapon: true
+                        });
                     }
-
-
-                },
-                query_desc: function (this: PERFORM, me: CHARACTER, lv: number) {
-                    var t = this.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
-                    return "跨立马步，稳定下盘，放弃防御专注进攻，" + Math.floor(t / 100) / 10 + "秒内快速出拳8次，攻击期间你无法躲闪";
+                    me.end_attack(now_target);
                 }
+
+
+            },
+            query_desc: function (this: PERFORM, me: CHARACTER, lv: number) {
+                var t = this.query_releasetime(me, lv);
+                return "跨立马步，稳定下盘，放弃防御专注进攻，" + Math.floor(t / 100) / 10 + "秒内快速出拳8次，攻击期间你无法躲闪";
             }
+        }
     };
 
     query_enable_prop(lv): EnablePropMap {

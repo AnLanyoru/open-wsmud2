@@ -2,6 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import { SkillsMap } from "../../../core/char/skills_map.js";
 
 export default class extends COMMAND {
     command = "checkskill";
@@ -48,7 +49,7 @@ export default class extends COMMAND {
             desc: skill_base.query_desc(target, target.query_skill(skid, 1000)),
             is_custom: skill_base.is_custom,
         };
-        if (!target.skills) target.skills = {};
+        if (!target.skills) target.skills = new SkillsMap();
         return player.send(JSON.stringify(obj));
     }
 }
