@@ -256,7 +256,7 @@ export class AREA extends BASE {
     query_npc_drops(npcs: string[] | undefined, items: any[]): void {
         if (!npcs || !npcs.length) return;
         for (let i = 0; i < npcs.length; i++) {
-            const npc = NPC.GET(npcs[i] as string);
+            const npc = NPC.GET_BASE(npcs[i]);
             if (!npc || !npc.drop_list) continue;
             items.push(npc.drop_list);
         }

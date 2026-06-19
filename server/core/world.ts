@@ -234,7 +234,7 @@ class World {
     /** 物品原型缓存 (path → OBJ 原型) */
     OBJ_STROE: Map<string, OBJ> = new Map();
     /** NPC 原型缓存 (path → NPC 原型) */
-    NPC_STROE: Map<string, NPC> = new Map();
+    NPC_STROE: Map<string, CHARACTER> = new Map();
     /** 心跳计数（用于定时保存） */
     HEARTBEATCOUNT: number = 0;
 

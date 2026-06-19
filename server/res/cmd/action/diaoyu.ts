@@ -1,7 +1,9 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {UTIL} from "../../../core/util/util.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
+import { UTIL } from "../../../core/util/util.js";
+import type { USER, UserState } from "../../../core/char/user.js";
+import type { FOLLOWER } from "../../../core/char/follower.js";
 
 export default class extends COMMAND {
     command = "diaoyu";
@@ -9,7 +11,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me) {
+    enter(me: USER | FOLLOWER) {
         if (!me.environment || !me.environment.can_diaoyu)
             return false;
         var wea = me.query_weapon();
@@ -34,7 +36,12 @@ export default class extends COMMAND {
     }
 }
 
-function on_check(me) {
+function on_check(this: UserState, me: USER) {
+    if (!this.yuer) {
+        me.send_room("$N没有初始化鱼饵，无法进行钓鱼。");
+        me.set_state(null);
+        return
+    }
     var exp = WORLD.DATA.exps[me.level]
         + WORLD.DATA.query_temp("diaoyu_exp", 0);
 
@@ -55,11 +62,11 @@ function on_check(me) {
     me.send(`你正在钓鱼，当前效率${grade}，每10秒获得${exp}经验，${pot}潜能，${str}。`);
 }
 
-function calculate_lv(grade) {
+function calculate_lv(grade: number) {
     // 权重基准(×10取整)
 
     // 根据grade启用对应品质上限（无红色档）
-    let maxTier;
+    let maxTier: number;
     if (grade > 30) maxTier = 5;      // 橙色
     else if (grade > 10) maxTier = 4; // 紫色
     else if (grade > 1) maxTier = 3;  // 黄色
@@ -70,8 +77,8 @@ function calculate_lv(grade) {
     const ranges = [[0, 2], [3, 5], [6, 8], [9, 11], [12, 14], [15, 17]];
 
     // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
-    const ranges_cumulative = [];
-    const rawWeights = [];
+    const ranges_cumulative: number[][] = [];
+    const rawWeights: number[] = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[i];
         if (i >= 1) {
@@ -85,7 +92,12 @@ function calculate_lv(grade) {
     return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
 
-function do_diaoyu(me) {
+function do_diaoyu(this: UserState, me: USER | FOLLOWER) {
+    if (!this.yuer) {
+        me.send_room("$N没有初始化鱼饵，无法进行钓鱼。");
+        me.set_state(null);
+        return
+    }
     let r_i = me.random(100);
     if (r_i > 89) {
         let er = this.yuer;
@@ -98,12 +110,12 @@ function do_diaoyu(me) {
             me.remove_obj(er, 1);
         } else {
             me.remove_obj(er);
-            er = query_er(me);
-            if (!er) {
+            let new_er = query_er(me);
+            if (!new_er) {
                 me.send_room("$N没有鱼饵了，无法继续钓鱼。");
                 me.set_state(null);
             } else {
-                this.yuer = er;
+                this.yuer = new_er;
             }
         }
     }
@@ -113,7 +125,7 @@ function do_diaoyu(me) {
     me.add_exp(exp, pot, 0);
 }
 
-function query_er(me) {
+function query_er(me: USER | FOLLOWER) {
     for (var i = 0; i < me.items.length; i++) {
         if (me.items[i].path.startsWith("sp/tool/er#")) {
             return me.items[i];

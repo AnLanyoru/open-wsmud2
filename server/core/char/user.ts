@@ -66,6 +66,10 @@ export interface UserState {
     title: string;
     /** 状态触发频率（心跳次数） */
     rate?: number;
+    /** 状态类型 */
+    type?: string;
+    /** 动作主体 */
+    player?: USER | FOLLOWER;
     /** 心跳累计计数 */
     heat_count?: number;
     /** 状态开始时间戳 */
@@ -97,6 +101,8 @@ export interface UserState {
     stime?: number;
     /** 读书时的来源书籍 */
     from_book?: StudyingBook;
+    /** 钓鱼时使用的鱼饵 */
+    yuer?: OBJ;
 
     /** 状态进入回调，dt 为当前时间戳，返回 false 则自动停止 */
     on_enter?: (me: CHARACTER, dt?: number) => boolean | void;

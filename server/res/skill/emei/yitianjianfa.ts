@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "倚天剑法";
@@ -89,7 +90,7 @@ export default class extends SKILL {
             }
     };
 
-    query_prop(lv, me) {
+    query_prop(lv: number, me: CHARACTER) {
         return {
             diff_fy_per: 5 + parseInt(lv / 300)
         };

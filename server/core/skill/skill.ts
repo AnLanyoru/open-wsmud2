@@ -1140,7 +1140,7 @@ export class PERFORM {
 
     // ============ 回调（由资源文件设置） ============
     /** 使用绝招回调(资源文件使用 — runtime调用pfm.use) */
-    use?(this: PERFORM, me: CHARACTER, target: CHARACTER | null, lv: number, sktype?: string): void | boolean;
+    use?(this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number, sktype?: string): void | boolean;
     /** 绝招伤害回调 — 触发时机：绝招每次造成伤害时（do_attack 中伤害计算后） */
     on_attack?: (me: CHARACTER, target: CHARACTER, lv: number, damage: number) => void;
     /** 查询绝招描述回调 — 触发时机：cha 命令查看技能详情时（query_pfm_desc 调用） */

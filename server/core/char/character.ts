@@ -18,6 +18,7 @@ import type { NPC } from './npc.js';
 import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
+import { BASE } from '../base.js';
 
 // ============================================================
 // 本地类型定义
@@ -794,7 +795,7 @@ export class CHARACTER extends ITEM {
     create(path: string, par?: string): void {
         if (par) this.path = path + par;
         if (this.on_create) this.on_create(path, par);
-        WORLD.NPC_STROE.set(this.path, this as any as NPC);
+        WORLD.NPC_STROE.set(this.path, this);
     }
 
     /**
@@ -3051,6 +3052,17 @@ export class CHARACTER extends ITEM {
      */
     private _random(n: number): number {
         return Math.floor(Math.random() * n);
+    }
+    /**
+     * 获取 NPC 模板（带缓存）
+     */
+    static GET_BASE(path: string): CHARACTER {
+        let base = WORLD.NPC_STROE.get(path);
+        if (!base) {
+            base = BASE.CREATE(__PATH.NPC, path) as NPC;
+            if (!base) throw new Error('没有人物' + path + '的定义。');
+        }
+        return base;
     }
 }
 

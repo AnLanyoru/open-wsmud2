@@ -148,7 +148,7 @@ const MASTER_NAME = function (me) {
     if (!path) return '无';
     if (MASTER_NAMES[path])
         return MASTER_NAMES[path];
-    let obj = NPC.GET(path);
+    let obj = NPC.GET_BASE(path);
     MASTER_NAMES[path] = obj.name;
     return obj.name
 }

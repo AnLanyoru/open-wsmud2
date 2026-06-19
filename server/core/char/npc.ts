@@ -428,22 +428,10 @@ export class NPC extends CHARACTER {
      * 克隆 NPC 实例
      */
     static CLONE(path: string): NPC {
-        const base = NPC.GET(path);
+        const base = CHARACTER.GET_BASE(path);
         const item = Object.create(base) as NPC;
         item.clone();
         return item;
-    }
-
-    /**
-     * 获取 NPC 模板（带缓存）
-     */
-    static GET(path: string): NPC {
-        let base = WORLD.NPC_STROE.get(path) as NPC | undefined;
-        if (!base) {
-            base = BASE.CREATE(__PATH.NPC, path) as NPC;
-            if (!base) throw new Error('没有人物' + path + '的定义。');
-        }
-        return base;
     }
 }
 

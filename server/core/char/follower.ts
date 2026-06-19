@@ -122,7 +122,7 @@ export class FOLLOWER extends CHARACTER {
     /** 背包金钱 */
     money: number = 0;
     /** 背包物品 */
-    items: OBJ[] | null = null;
+    items: OBJ[] = [];
 
     // login_message — 用于 set_setting 清除缓存（该字段在 USER 上定义，FOLLOWER 在运行时按需创建）
     login_message: string | null = null;
@@ -262,6 +262,16 @@ export class FOLLOWER extends CHARACTER {
     }
 
     /**
+     * 克隆 随从 实例
+     */
+    static CLONE(path: string): FOLLOWER {
+        const base = FOLLOWER.GET_BASE(path);
+        const item = Object.create(base) as FOLLOWER;
+        item.clone();
+        return item;
+    }
+
+    /**
      * 初始化单个随从
      */
     static INIT(me: USER, par: { path: string; id: string }): FOLLOWER | undefined {
@@ -272,20 +282,20 @@ export class FOLLOWER extends CHARACTER {
             npc = FOLLOWER.STORES.get(id) as FOLLOWER;
             if (npc) return npc;
         }
-        const obj = NPC.CLONE(par.path);
+        const obj = FOLLOWER.CLONE(par.path);
         if (!obj) return;
         npc = new FOLLOWER();
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            (npc as Record<string, any>)[SAVE_NUMPROP[i]] = (obj as Record<string, any>)[SAVE_NUMPROP[i]] || 0;
+            npc[SAVE_NUMPROP[i]] = obj[SAVE_NUMPROP[i]] || 0;
         }
         for (let i = 0; i < SAVE_STRPROP.length; i++) {
-            (npc as Record<string, any>)[SAVE_STRPROP[i]] = (obj as Record<string, any>)[SAVE_STRPROP[i]] || '';
+            npc[SAVE_STRPROP[i]] = obj[SAVE_STRPROP[i]] || '';
         }
         npc.on_makelove = obj.on_makelove;
         npc.on_master_enter = obj.on_master_enter;
-        npc.equipment = obj.equipment as any as (EQUIPMENT | null)[];
+        npc.equipment = obj.equipment;
         npc.skills = obj.skills;
-        npc.items = obj.items as any as OBJ[] | null;
+        npc.items = (obj.items ?? []);
         npc.id = par.id;
         npc.path = obj.path;
         npc.level = obj.level || 3;
@@ -316,7 +326,6 @@ export class FOLLOWER extends CHARACTER {
             }
             npc.equipment[0] = null;
         }
-        if (!old.items) old.items = [];
         if (npc.items && npc.items.length) {
             for (let i = 0; i < npc.items.length; i++) {
                 old.items.push(npc.items[i] as any as OBJ);
@@ -393,7 +402,7 @@ export class FOLLOWER extends CHARACTER {
             str.push(',');
         }
         str.push('0],');
-        const items = this.items || [];
+        const items = this.items;
         str.push('items:[');
         if (items) {
             for (let i = 0; i < items.length; i++) {

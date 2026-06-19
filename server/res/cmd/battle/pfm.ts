@@ -118,7 +118,7 @@ export default class extends COMMAND {
                 //me.attack_skill = sp_skill;
                 me.remove_status('weapon', true);
             }
-            isrelease = pfm.use?.(me, target ?? null, lv, sk) != false;
+            isrelease = pfm.use?.(me, target ?? me, lv, sk) != false;
         }
 
 
