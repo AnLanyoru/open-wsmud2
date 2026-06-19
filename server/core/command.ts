@@ -134,7 +134,7 @@ export class COMMAND extends BASE {
     for_item(item: Function, name?: string): void {
         if (this.exec) {
             name = name || this.command;
-            (item.prototype as Record<string, any>)["do_" + name] = this.exec;
+            item.prototype["do_" + name] = this.exec;
         }
     }
 

@@ -4,7 +4,7 @@
 
 import { ITEM } from '../item.js';
 import { OBJ } from '../item/obj.js';
-import { SKILL, SkillItem } from '../skill/skill.js';
+import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
 import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
@@ -166,6 +166,8 @@ interface AutoSkillEntry {
 
 /** 角色状态 — StatusDef 的运行时扩展 */
 interface CharacterStatus extends StatusDef {
+    /** 序列化为 JSON 字符串 */
+    to_json?(): string;
     /** 最大叠加层数 */
     max_count?: number;
     /** 是否不受减免影响 */
@@ -202,6 +204,33 @@ interface CharacterStatus extends StatusDef {
     start_time?: number;
     /** 当前叠加层数 */
     count?: number;
+}
+
+/** 将单个状态序列化为客户端 JSON 字符串 */
+function statusToJson(this: CharacterStatus): string {
+    const now = Date.now();
+    const parts: string[] = [];
+    parts.push('{sid:"');
+    parts.push(this.id);
+    parts.push('",name:"');
+    parts.push(this.name);
+    parts.push('",duration:');
+    if (this.on_interval) {
+        parts.push(String(this.duration * (this.duration_count || 1)));
+    } else {
+        parts.push(String(this.duration));
+    }
+    parts.push(',overtime:');
+    parts.push(String(now - (this.start_time || now)));
+    if (this.override === 1) {
+        parts.push(',"count":');
+        parts.push(String(this.count || 1));
+    }
+    if (this.downside) {
+        parts.push(',downside:true');
+    }
+    parts.push('}');
+    return parts.join('');
 }
 
 // Declaration for global runtime constants
@@ -1280,6 +1309,7 @@ export class CHARACTER extends ITEM {
     add_status(buff: CharacterStatus, from?: CHARACTER): boolean | undefined {
         if (this.hp <= 0) return false;
         if (!this.status) this.status = [];
+        buff.to_json = statusToJson;
         const sid = buff.id;
         buff.override = buff.override || 0;
         buff.count = buff.count || 1;
@@ -1315,6 +1345,7 @@ export class CHARACTER extends ITEM {
             if (this.status[i].id == sid) {
                 const item = this.status[i];
                 if (item.override !== buff.override) return false;
+                item.to_json = statusToJson;
                 if (item.override === 1) {
                     if (item.max_count && item.max_count <= (item.count || 0)) {
                         return false;
@@ -2875,17 +2906,17 @@ export class CHARACTER extends ITEM {
     /**
      * 释放绝招
      */
-    use_pfm(target: CHARACTER, pfm: any, level: number, sktype: string): boolean {
+    use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype: string): boolean {
         if (!pfm) return false;
         let isrelease = false;
         if (this.query_prop('no_pfm')) {
             this.send_room('<red>$N释放技能' + pfm.name + '，但是没有产生任何效果。</red>\n');
             this.remove_status('bikou');
             isrelease = true;
-        } else if (target && target.parry_skill && (target.parry_skill as Record<string, any>).on_parry_pfm) {
-            isrelease = (target.parry_skill as Record<string, any>).on_parry_pfm(target, this, pfm, level);
+        } else if (target.parry_skill.on_parry_pfm) {
+            isrelease = target.parry_skill.on_parry_pfm(target, this, pfm, level);
         } else {
-            isrelease = pfm.use(this, target, level, sktype) !== false;
+            isrelease = pfm.use?.(this, target, level, sktype) !== false;
         }
         if (isrelease !== false) {
             this.add_mp(-(pfm.query_mp(this, level) || 0));

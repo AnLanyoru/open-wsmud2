@@ -1,7 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "perform";
@@ -10,9 +10,10 @@ export default class extends COMMAND {
     regex = /^(\w+)\.(.+?)$/;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
+     * @param sk - 装备的基础技能
      */
-    enter(me, sk, pfmid) {
+    enter(me: USER, sk: string, pfmid: string) {
         if (!sk || !pfmid) return me.notify("你要使用什么绝招。");
         if (!me.skills) return me.notify("你目前没有学会任何技能。");
         var baseSkill = me.skills[sk];
@@ -33,7 +34,7 @@ export default class extends COMMAND {
         let pfm = sp_skill.get_pfm(pfmid);
         if (!pfm) {
             if (pfmid == 'ref') {
-                pfm = me.query_ref_skill(me.skills[baseSkill.enable_skill]);
+                pfm = me.query_ref_skill(baseSkill);
             }
             if (!pfm) {
                 return me.notify(sp_skill.name + "没有这个绝招。");
@@ -42,7 +43,7 @@ export default class extends COMMAND {
             }
 
         }
-        if (me.environment.no_fight && !pfm.allow_safe) return me.notify("这里不允许战斗。");
+        if (me.environment?.no_fight && !pfm.allow_safe) return me.notify("这里不允许战斗。");
 
 
         var name = "【" + pfm.name + "】";
@@ -62,7 +63,7 @@ export default class extends COMMAND {
         if (pfm.check && !pfm.check(me,
             lv, sk)) return;
         if (pfm.enable_skill && pfm.enable_skill != sk) {
-            return me.notify(name + "需要装备为" + SKILL.get(pfm.enable_skill).name + "才可以使用。");
+            return me.notify(name + "需要装备为" + SKILL.get(pfm.enable_skill)?.name + "才可以使用。");
         }
         if (sk === "throwing" && !me.can_throwing()) {
             return me.notify("你没有装备暗器，无法使用" + name);
@@ -117,7 +118,7 @@ export default class extends COMMAND {
                 //me.attack_skill = sp_skill;
                 me.remove_status('weapon', true);
             }
-            isrelease = pfm.use(me, target, lv, sk) != false;
+            isrelease = pfm.use?.(me, target ?? null, lv, sk) != false;
         }
 
 

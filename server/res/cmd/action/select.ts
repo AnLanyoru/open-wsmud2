@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import type {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "select,command";
@@ -7,17 +8,18 @@ export default class extends COMMAND {
     allow_state = true;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (!me.environment) return;
         if (arg) {
             var target = me.environment.find_obj(arg);
             if (!target) {
                 return me.notify("这里没有这个东西。");
             }
-            me.notify(target.query_commands(me));
-            if (target.hp) {
+            let target_cmd = target.query_commands?.(me)
+            if (target_cmd) me.notify(target_cmd);
+            if (target.check_character()) {
                 var str = ["{type:\"cmds\",items:["];
 
                 if (target.path && me.query_temp('yb_npc2') == target.path) {
@@ -32,9 +34,9 @@ export default class extends COMMAND {
                 }
 
             }
-            if (me.user_level > 0 && target.is_player) {
-                me.send_commands("setuser " + target.id + " chat1", "永久禁言",
-
+            if (me.user_level > 0 && target.check_player()) {
+                me.send_commands(
+                    "setuser " + target.id + " chat1", "永久禁言",
                     "setuser " + target.id + " chat2", "禁言24小时",
                     "setuser " + target.id + " quit", "踢出游戏",
                     "setuser " + target.id + " dis", "登录限制",
@@ -43,12 +45,12 @@ export default class extends COMMAND {
             }
 
         } else {
-            me.notify(me.environment.query_commands(me, true));
+            me.notify(me.environment.query_commands());
         }
     }
 
-    exec(me, target) {
-        var str = ['{type:"'];
+    exec(me: USER, target: CHARACTER) {
+        let str: (string | number)[] = ['{type:"'];
         str.push(me == target ? 'login"' : 'select"');
         if (target) {
             str.push(',hp:');
@@ -69,21 +71,14 @@ export default class extends COMMAND {
 
             str.push('",status:[');
             if (target.status) {
-                for (var item in target.status) {
-                    str.push(target.status[item].to_json());
+                for (let i = 0; i < target.status.length; i++) {
+                    if (i > 0) str.push(',');
+                    str.push(target.status[i].to_json!());
                 }
             }
             str.push(']');
         }
         str.push('}');
-        if (me != target) {
-            if (me.action_target) {
-                me.action_target.remove_listen(me);
-            }
-            me.action_target = target;
-            if (target)
-                me.action_target.add_listen(me);
-        }
-        return this.notify(str.join(""));
+        return me.notify(str.join(""));
     }
 }

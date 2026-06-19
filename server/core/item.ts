@@ -152,9 +152,12 @@ export class ITEM extends BASE {
     query_desc?(me: CHARACTER, ...args: string[]): string;
 
     on_checkobj?(player: USER, objid: string): ITEM;
+    /**
+     * 查看物品可操作列表
+     */
+    query_commands?(me?: CHARACTER): string | void;
 
     // ============ 堆叠操作 ============
-
     /**
      * 合并物品 — 相同物品合并 count 和 temp
      * @param obj - 要合并的物品

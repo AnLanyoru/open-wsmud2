@@ -1,5 +1,6 @@
+import type { USER } from "../../../core/char/user.js";
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import type { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "wakuang";
@@ -7,10 +8,10 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (!me.equipment || !me.equipment[0]
             || !me.equipment[0].path.startsWith("sp/tool/chu")) {
-            var chu = null;
+            let chu: OBJ | null = null;
             for (let item of me.items) {
                 if (!item.is_equipment) continue;
                 if (item.path.startsWith("sp/tool/chu")) {

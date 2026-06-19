@@ -1,6 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "shutdown";
@@ -8,12 +8,12 @@ export default class extends COMMAND {
     allow_state = true;
     allow_die = true;
     allow_level = 6;
-    handler = 0;
+    handler?: NodeJS.Timeout;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (arg == "stop") {
             if (this.handler) {
                 clearInterval(this.handler);

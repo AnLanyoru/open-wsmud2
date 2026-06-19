@@ -188,13 +188,13 @@ export class USER extends CHARACTER {
     /** 元宝(充值货币) */
     cash_money: number = 0;
     /** 背包物品 */
-    items: OBJ[] | null = null;
+    items: OBJ[] = [];
     /** 仓库物品 */
     stores: OBJ[] = [];
     /** 当前装备组 */
     eq_group: number = 0;
     /** 装备组定义 */
-    eq_groups: string[][] | null = null;
+    eq_groups: string[][] = [];
 
     // ============ 技能 ============
 
@@ -228,7 +228,6 @@ export class USER extends CHARACTER {
     no_combatmsg: boolean = false;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
-
     // ============ 消息发送 ============
 
     /**

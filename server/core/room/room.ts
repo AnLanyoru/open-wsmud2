@@ -583,7 +583,7 @@ export class ROOM extends ITEM {
         if (this.actions) {
             for (let cmd in this.actions) {
                 json.commands.push({
-                    name: (this.actions as Record<string, any>)[cmd].name,
+                    name: this.actions[cmd].name,
                     cmd: cmd
                 });
             }

@@ -8,93 +8,40 @@ import {FAMILIES} from "./family.js";
 import type {FAMILY} from './family.js';
 import type {CHARACTER} from '../char/character.js';
 import {PROPERTIES, SKILL_TYPES} from "../const.js";
+import type { PropMap } from "../../types/props.js";
 
 
 export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
 
 
-/**
- * query_enable_prop 内层返回值：属性名→加成数值
- * 这些属性通过 change_prop → add_prop 写入角色 prop 字典，由 recount() 读取计算六大战斗属性
- */
-export interface EnablePropValues {
-    /** 攻击力 */
-    gj?: number;
-    /** 攻击力百分比 */
-    gj_per?: number;
-    /** 命中值 */
-    mz?: number;
-    /** 命中值百分比 */
-    mz_per?: number;
-    /** 防御力 */
-    fy?: number;
-    /** 防御力百分比 */
-    fy_per?: number;
-    /** 闪避值 */
-    ds?: number;
-    /** 闪避值百分比 */
-    ds_per?: number;
-    /** 招架值 */
-    zj?: number;
-    /** 招架值百分比 */
-    zj_per?: number;
-    /** 臂力 */
-    str?: number;
-    /** 身法 */
-    dex?: number;
-    /** 根骨 */
-    con?: number;
-    /** 悟性 */
-    int?: number;
-    /** 暴击率百分比 */
-    bj_per?: number;
-    /** 攻击速度(减少延迟ms) */
-    gjsd?: number;
-    /** 攻击速度百分比 */
-    gjsd_per?: number;
-    /** 最大气血 */
-    max_hp?: number;
-    /** 最大内力 */
-    max_mp?: number;
-    /** 内力上限(独立于max_mp，由内功加成) */
-    limit_mp?: number;
-    /** 附加伤害百分比 */
-    add_sh_per?: number;
-    /** 伤害减免百分比 */
-    diff_sh_per?: number;
-    /** 忽视目标防御百分比 */
-    diff_fy_per?: number;
-    /** 描述文字(仅展示，不参与属性计算) */
-    desc?: string;
-}
 
 /** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
 export interface EnablePropMap {
     /** 空手技能 */
-    unarmed?: EnablePropValues;
+    unarmed?: PropMap;
     /** 招架技能 */
-    parry?: EnablePropValues;
+    parry?: PropMap;
     /** 内功技能 */
-    force?: EnablePropValues;
+    force?: PropMap;
     /** 轻功技能 */
-    dodge?: EnablePropValues;
+    dodge?: PropMap;
     /** 剑法技能 */
-    sword?: EnablePropValues;
+    sword?: PropMap;
     /** 刀法技能 */
-    blade?: EnablePropValues;
+    blade?: PropMap;
     /** 杖法技能 */
-    staff?: EnablePropValues;
+    staff?: PropMap;
     /** 棍法技能 */
-    club?: EnablePropValues;
+    club?: PropMap;
     /** 鞭法技能 */
-    whip?: EnablePropValues;
+    whip?: PropMap;
     /** 暗器技能 */
-    throwing?: EnablePropValues;
+    throwing?: PropMap;
     /** 噬咬技能(怪物专用) */
-    bite?: EnablePropValues;
+    bite?: PropMap;
 
     /** 允许 for...in 动态遍历时的字符串索引 */
-    [key: string]: EnablePropValues | undefined;
+    [key: string]: PropMap | undefined;
 }
 
 /** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
@@ -268,7 +215,7 @@ export class SKILL extends BASE {
     }
 
     /** 查询基础属性 — 触发时机：装备/卸下/升级技能计算属性加成时 */
-    query_prop(lv: number, me?: CHARACTER): Record<string, any> | undefined {
+    query_prop(lv: number, me?: CHARACTER): PropMap | undefined {
         return undefined;
     }
 
@@ -305,8 +252,10 @@ export class SKILL extends BASE {
     on_parry?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
     /** 招架结束回调 */
     on_parry_over?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
-    /** 绝招招架回调（返回是否招架成功） */
-    on_parry_pfm?(target: CHARACTER, me: CHARACTER, pfm: Record<string, any>, level: number): boolean;
+    /** 绝招招架回调（返回是否招架成功）
+     * @param sk 基础技能 sid
+     */
+    on_parry_pfm?(target: CHARACTER, me: CHARACTER, pfm: PERFORM, level: number, sk?: string): boolean;
     /** 重算闪避回调（由资源文件动态注入） */
     on_recount_dodge?(me: CHARACTER): number;
     /** 重算招架回调（由资源文件动态注入） */
@@ -989,10 +938,10 @@ export class SKILL extends BASE {
             str.push(cc);
             str.push(">\n");
         }
-        prop = this.query_enable_prop(lv, me);
+        let enable_prop = this.query_enable_prop(lv, me);
         let isEnable = this.type === SKILL_TYPES.KNOWLEDGE;
-        if (prop) {
-            for (let item in prop) {
+        if (enable_prop) {
+            for (let item in enable_prop) {
                 const is_enable = me.is_enable_skill(this.id, item);
                 if (is_enable) isEnable = true;
                 str.push("<");
@@ -1001,7 +950,7 @@ export class SKILL extends BASE {
                 const skItem = SKILL.get(item);
                 str.push(skItem ? skItem.name : item);
                 str.push("时：\n");
-                str.push(UTIL.prop_toString(prop[item]));
+                str.push(UTIL.prop_toString(enable_prop[item]));
                 str.push("</");
                 str.push(is_enable ? cc : "blk");
                 str.push(">\n");
@@ -1150,6 +1099,8 @@ export class PERFORM {
     use_type?: string | number;
     /** 武器类型（资源文件使用） */
     weapon_type?: string;
+    /** 不使用条件检查函数 */
+    no_check?: boolean;
     /** 使用条件检查函数 */
     check?: (me: CHARACTER, lv: number, base_type?: string) => boolean | string;
     /** 使用条件描述(不满足时显示) */
@@ -1158,6 +1109,11 @@ export class PERFORM {
     no_auto?: boolean;
     /** 允许忙碌时使用 */
     allow_busy?: boolean;
+    /** 允许昏迷时使用 */
+    allow_faint?: boolean;
+    /** 允许在安全区御使用 */
+    allow_safe?: boolean;
+    
     /** 是否禁止复制 */
     no_copy?: boolean;
 
@@ -1184,7 +1140,7 @@ export class PERFORM {
 
     // ============ 回调（由资源文件设置） ============
     /** 使用绝招回调(资源文件使用 — runtime调用pfm.use) */
-    use?: (this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number, sktype?: string) => void;
+    use?(this: PERFORM, me: CHARACTER, target: CHARACTER | null, lv: number, sktype?: string): void | boolean;
     /** 绝招伤害回调 — 触发时机：绝招每次造成伤害时（do_attack 中伤害计算后） */
     on_attack?: (me: CHARACTER, target: CHARACTER, lv: number, damage: number) => void;
     /** 查询绝招描述回调 — 触发时机：cha 命令查看技能详情时（query_pfm_desc 调用） */

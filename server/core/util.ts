@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 import util from 'util';
 import JSON5 from 'json5';
 import {PROPERTIES} from './const.js';
+import type { PropMap } from '../types/props.js';
 
 // 懒加载 SKILL 避免循环依赖
 let _SKILL: Record<string, Function> | null = null;
@@ -191,7 +192,7 @@ export const UTIL = {
      * @param sp - 分隔符（默认换行）
      * @param count - 倍率（默认 1）
      */
-    prop_toString(prop: Record<string, any> | null, sp?: string, count?: number): string {
+    prop_toString(prop?: PropMap, sp?: string, count?: number): string {
         if (!prop) return "";
         const str: string[] = [];
         count = count || 1;
