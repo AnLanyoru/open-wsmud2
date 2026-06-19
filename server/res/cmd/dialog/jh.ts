@@ -4,6 +4,7 @@ import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {AREA} from "../../../core/room/area.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "jh";
@@ -20,7 +21,7 @@ export default class extends COMMAND {
     /**
      * @param me - 执行命令的角色
      */
-    enter(me: CHARACTER, type?: string, arg?: string, isstart?: string): void {
+    enter(me: USER, type?: string, arg?: string, isstart?: string): void {
         if (!me.is_player) return;
         const unlock = me.query_temp("fb", 0) ?? 0;
         const unlock2 = me.query_temp("fb2", 0) ?? 0;
@@ -189,7 +190,7 @@ export default class extends COMMAND {
         }
     }
 
-    return_famdesc(me: CHARACTER, index: number): void {
+    return_famdesc(me: USER, index: number): void {
 
         if (!(index >= 0 && index < this.families.length)) return me.notify("没有这个门派。");
         const fb = this.families[index];
@@ -231,7 +232,7 @@ export default class extends COMMAND {
         me.send(fb.json);
     }
 
-    return_areadesc(me: CHARACTER, index: number): void {
+    return_areadesc(me: USER, index: number): void {
         if (!(index >= 0 && index < this.areas.length)) return me.notify("没有这个副本。");
         const fb = this.areas[index];
         if (!fb) return me.notify("没有这个区域。");
@@ -251,7 +252,7 @@ export default class extends COMMAND {
         me.send(fb.json);
     }
 
-    return_fbdesc(me: CHARACTER, index: number): void {
+    return_fbdesc(me: USER, index: number): void {
         if (!(index >= 0 && index < this.fbs.length)) return me.notify("没有这个副本。");
         const fb = this.fbs[index];
         if (!fb) return me.notify("没有这个副本。");

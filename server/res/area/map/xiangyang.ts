@@ -1,7 +1,7 @@
 import {AREA} from "../../../core/room/area.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
-import type {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends AREA {
     name = "襄阳";
@@ -13,7 +13,7 @@ export default class extends AREA {
 
     // ... (map data and other methods unchanged, keeping existing class body)
 
-    query_actions(me: CHARACTER) {
+    query_actions(me: USER) {
         const actions: (string | number)[][] = [];
         const index = Number(WORLD.DATA.query_temp("xiangyang") ?? 0) + 20;
         const status = WORLD.DATA.query_temp("xy_status", 0) ?? 0;

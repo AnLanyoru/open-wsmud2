@@ -4,6 +4,7 @@
 import {AREA} from "./area.js";
 import {WORLD} from "../world.js";
 import {FAMILIES} from "../skill/family.js";
+import type { USER } from "../char/user.js";
 
 export class FAMILY_AREA extends AREA {
 
@@ -18,8 +19,8 @@ export class FAMILY_AREA extends AREA {
      * @param me - 玩家对象
      * @returns 操作按钮列表 [[cmd, name, desc], ...]
      */
-    query_actions(me: any): any[] {
-        let actions: any[] = [];
+    query_actions(me: USER): string[][] {
+        let actions: string[][] = [];
         for (let item of stand_actions) {
             actions.push([
                 item[0] + " " + this.family, item[1], item[2]

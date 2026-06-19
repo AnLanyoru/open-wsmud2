@@ -14,15 +14,14 @@
 import {COPY_PROPS, WORLD} from "../../core/world.js";
 import {NPC} from "../../core/char/npc.js";
 import {OBJ} from "../../core/item/obj.js";
-import type {CHARACTER} from "../../core/char/character.js";
 import type {StatsTopEntry} from "../../core/world.js";
 import type {EQUIPMENT} from "../../core/item/equipment.js";
 
 const STATS = WORLD.STATS;
 
-STATS.load_tops = function (tops: StatsTopEntry[], defname: string = '武林高手', key: string = ""): CHARACTER[] {
+STATS.load_tops = function (tops: StatsTopEntry[], defname: string = '武林高手', key: string = ""): NPC[] {
     tops = tops ?? new Array(10).fill({path: "pub/gaoshou1"});
-    const ary: CHARACTER[] = [];
+    const ary: NPC[] = [];
     for (let i = 0; i < tops.length; i++) {
         let item = tops[i];
         let npc = NPC.CLONE("pub/gaoshou1");

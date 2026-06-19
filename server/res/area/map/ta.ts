@@ -1,7 +1,7 @@
 import {AREA} from "../../../core/room/area.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
-import type {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends AREA {
     id = "wudao";
@@ -23,7 +23,7 @@ export default class extends AREA {
         {n: "青龙台", id: "wudao/east", p: [2, -5]},
     ];
 
-    query_actions(_me: CHARACTER) {
+    query_actions(_me: USER) {
         const actions: (string | number)[][] = [];
         const name = WORLD.DATA.query_temp("wudao_max_user");
         if (name) {

@@ -501,7 +501,7 @@ class World {
          * @param defname - 默认名称
          * @param key - 门派标识
          */
-        load_tops(tops?: StatsTopEntry[], defname?: string, key?: string): CHARACTER[] {
+        load_tops(tops?: StatsTopEntry[], defname?: string, key?: string): NPC[] {
             return [];
         },
         /**

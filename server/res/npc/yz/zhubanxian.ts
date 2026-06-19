@@ -3,7 +3,6 @@ import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {USERTASK} from "../../../core/task/playertask.js";
 import {COMMAND} from "../../../core/command.js";
-import { stringify } from "json5";
 import { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
@@ -198,10 +197,10 @@ export default class extends NPC {
                 user.set_temp("st_leave", 1, 3600000 * 24 * 7);
             }
         }
-        COMMAND.DO("send", shifu, stringify({
+        COMMAND.DO("send", shifu, {
             content: str,
             attach: atts
-        }));
+        });
 
 
     }

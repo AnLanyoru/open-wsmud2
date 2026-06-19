@@ -9,10 +9,6 @@ import type {OBJ} from './item/obj.js';
 import type {CommandAccess} from '../types/base.js';
 
 export class COMMAND extends BASE {
-
-    /** 比武记录（由 world/cmd/extend/biwu.js 注入） */
-    biwu_record?: Record<string, any>;
-
     /** 进入副本回调（由 world/cmd/extend/ex.js 注入） */
     on_enter_fb?(me: CHARACTER | null, env: any): void;
 

@@ -84,11 +84,12 @@ const DATA = {
         }
         for (const key of FAMS_TATAS) {
             const tops = data['tops_' + key];
-            WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
-                tops,
-                (FAMILIES as Record<string, { name: string }>)[key].name + '弟子',
-                key,
-            );
+            const fam = FAMILIES[key];
+                WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
+                    tops,
+                    fam.name + '弟子',
+                    key,
+                );
         }
         const sc_stats = data.score_stats ?? {};
         WORLD.STATS.SC_STATS = {};
@@ -128,10 +129,12 @@ const DATA = {
      */
     create_def_tops(): void {
         for (const key of FAMS_TATAS) {
-            WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
-                undefined,
-                FAMILIES[key].name + '弟子',
-            );
+            const fam = FAMILIES[key];
+                WORLD.STATS['tops_' + key] = WORLD.STATS.load_tops(
+                    undefined,
+                    fam.name + '弟子',
+                );
+            
         }
     },
 
@@ -220,7 +223,7 @@ const DATA = {
      * 从数据库加载全局数据
      */
     async load(): Promise<void> {
-        const data = await WORLD.DB.readData(__PATH.DATA + 'data.js');
+        const data = await WORLD.DB.readData();
         this.temp = data?.temp ?? {};
         this.on_load(data ?? {});
     },

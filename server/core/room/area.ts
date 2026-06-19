@@ -89,7 +89,7 @@ export class AREA extends BASE {
     // ============ 交互属性 ============
 
     /** 区域级命令映射 */
-    actions?: ActionMap<this>;
+    actions: (string | number)[][] = [];
     /** 区域掉落物品列表 */
     drop_items?: any[];
     /** 区域掉落列表（资源文件直接定义） */
@@ -317,7 +317,7 @@ export class AREA extends BASE {
     /**
      * 查询区域命令
      */
-    query_actions(me?: any): any {
+    query_actions(me?: USER): (string | number)[][] {
         return this.actions;
     }
 

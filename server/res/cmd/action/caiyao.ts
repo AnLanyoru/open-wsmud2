@@ -75,7 +75,7 @@ function calculate_lv(grade) {
 
     // grade略微提升高品质概率：每一档高于白色的品质权重随grade和档位递增
     let total = 0;
-    const cumulative = [];
+    const cumulative: number[][] = [];
     for (let i = 0; i <= maxTier; i++) {
         let w = weights[tiers[i]];
         if (i >= 1) {
