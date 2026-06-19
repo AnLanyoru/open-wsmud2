@@ -87,8 +87,8 @@ export default class extends SKILL {
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
 
-                    this.distime = pfm.query_distime?.(me: CHARACTER, lv: number) ?? 0;
-                    this.release_time = pfm.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
+                    this.distime = pfm.query_distime(me, lv) ?? 0;
+                    this.release_time = pfm.query_releasetime(me, lv) ?? 0;
 
                     if (sp_skill.grade <= 4 && isEnable && !me.is_in("yz/leitai/leitai") &&
                         sp_skill.family !== FAMILIES.MONSTER) {
@@ -154,8 +154,8 @@ export default class extends SKILL {
                     var up = 70 + parseInt(lv / 100);
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
-                    this.distime = pfm.query_distime?.(me: CHARACTER, lv: number) ?? 0;
-                    this.release_time = pfm.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
+                    this.distime = pfm.query_distime?.(me, lv) ?? 0;
+                    this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
                 },
                 query_desc: function (me: CHARACTER, lv: number) {
                     lv = 70 + parseInt(lv / 100);

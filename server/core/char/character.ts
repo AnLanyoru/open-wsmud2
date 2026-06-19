@@ -352,7 +352,7 @@ export class CHARACTER extends ITEM {
     // ============ 技能与装备 ============
 
     /** 技能映射 */
-    skills: Record<string, SkillData> | null = null;
+    skills: Record<string, SkillData> = {};
     /** buff/debuff 状态列表 */
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
@@ -2907,7 +2907,7 @@ export class CHARACTER extends ITEM {
     /**
      * 释放绝招
      */
-    use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype: string): boolean {
+    use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype?: string): boolean {
         if (!pfm) return false;
         let isrelease = false;
         if (this.query_prop('no_pfm')) {

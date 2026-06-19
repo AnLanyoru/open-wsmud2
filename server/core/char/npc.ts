@@ -365,7 +365,7 @@ export class NPC extends CHARACTER {
         this.environment = undefined;
         this.equipment = [];
         this.items = null;
-        this.skills = null;
+        this.skills = {};
         this.json = null;
     }
 

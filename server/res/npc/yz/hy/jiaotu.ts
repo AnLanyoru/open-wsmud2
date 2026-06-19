@@ -104,7 +104,7 @@ export default class extends NPC {
         this.die_room = undefined;
         this.equipment = [];
         this.items = null;
-        this.skills = null;
+        this.skills = {};
     }
 }
 
