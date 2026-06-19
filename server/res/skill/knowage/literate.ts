@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     id = "literate";
@@ -116,7 +117,7 @@ export default class extends SKILL {
         }
     ];
 
-    query_prop(lv, me) {
+    query_prop(lv, me): PropMap {
         let grade = 0;
         if (me && me.is_player) {
             grade = this.query_grade(me);

@@ -1,6 +1,8 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "独孤九剑";
@@ -162,13 +164,13 @@ export default class extends SKILL {
         return this.attack_actions.random();
     }
 
-    query_prop(lv, me) {
+    query_prop(lv, me): PropMap {
         return {
             add_sh_per: 5 + parseInt(lv / 300)
         };
     }
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             sword: {
                 gj: lv * 2 + 10,

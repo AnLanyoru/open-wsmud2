@@ -1,5 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
+import type { CHARACTER } from "../../../core/char/character.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "毒蛇攻击";
@@ -13,7 +15,7 @@ export default class extends SKILL {
     desc = "毒蛇攻击方式，会中毒";
     can_enables = ["bite"];
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             bite: {
                 gj: lv,
@@ -24,7 +26,7 @@ export default class extends SKILL {
         };
     }
 
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par) {
         if (!par.is_dodged && !par.is_parried) {
             var lv = me.query_skill("dushegongji", 0);
             var sh = parseInt((lv / 10) + 10);
@@ -36,7 +38,7 @@ export default class extends SKILL {
                     duration: 3000,
                     duration_count: 4,
                     on_interval: function (me, count) {
-                        me.from_attack(sh * count, 999999, null, "<hir>$N觉得被蛇咬中的地方一阵发麻。</hir>");
+                        me.from_attack(sh * count, 999999, '', "<hir>$N觉得被蛇咬中的地方一阵发麻。</hir>");
                     },
                     downside: true,
                     override: 1

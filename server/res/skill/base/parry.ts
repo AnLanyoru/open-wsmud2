@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     id = "parry";
@@ -22,7 +23,7 @@ export default class extends SKILL {
     ];
     desc = "招架类技能的基础功法，坚持锻炼会提高你的招架能力";
 
-    query_prop(lv: number): Record<string, any> {
+    query_prop(lv: number): PropMap {
         return {zj: lv};
     }
 

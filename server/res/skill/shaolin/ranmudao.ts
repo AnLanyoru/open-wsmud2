@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "燃木刀法";
@@ -80,7 +81,7 @@ export default class extends SKILL {
         }
     };
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             blade: {
                 gj: parseInt(lv * 1.4 + 10),

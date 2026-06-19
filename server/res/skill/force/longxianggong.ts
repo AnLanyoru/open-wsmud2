@@ -1,4 +1,5 @@
 import {SKILL} from "../../../core/skill/skill.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "龙象般若功";
@@ -114,7 +115,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             force: {
                 gj: parseInt(lv * 1.9) + 10,

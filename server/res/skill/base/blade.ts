@@ -1,5 +1,6 @@
 import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     id = "blade";
@@ -36,7 +37,7 @@ export default class extends SKILL {
         }));
     }
 
-    query_prop(lv, me) {
+    query_prop(lv, me): PropMap {
         return {mz: lv};
     }
 }

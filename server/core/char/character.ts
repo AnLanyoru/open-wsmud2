@@ -1100,7 +1100,7 @@ export class CHARACTER extends ITEM {
             if (!item) continue;
             const skill_base = SKILL.get(item[0]);
             if (!skill_base) {
-                console.log(item[0] + ' not exits');
+                console.warn('技能 ID: ' + item[0] + ' 不存在');
                 continue;
             }
             const skill: SkillData = {
@@ -2732,7 +2732,7 @@ export class CHARACTER extends ITEM {
     /**
      * 接收攻击伤害（简化版）
      */
-    from_attack(sh: number, mz: number, gjmsg: string, shmsg: string, dsmsg: string, parrymsg?: string): boolean {
+    from_attack(sh: number, mz: number, gjmsg: string, shmsg: string, dsmsg?: string, parrymsg?: string): boolean {
         if (gjmsg) this.send_room(gjmsg);
         const is_dodged = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
         if (is_dodged) {

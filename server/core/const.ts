@@ -18,7 +18,7 @@ export const BASE_SKILLS: Record<string, string> = {
     FORCE: "force",   // 基本内功
     DODGE: "dodge",   // 基本轻功
     PARRY: "parry",   // 基本招架
-    BITE: "bite",     // 基本拳脚
+    BITE: "bite",     // 野兽叮咬
 };
 
 /**

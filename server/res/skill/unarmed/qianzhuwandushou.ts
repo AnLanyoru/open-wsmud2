@@ -1,5 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "千蛛万毒手";
@@ -111,13 +113,13 @@ export default class extends SKILL {
         }
     };
 
-    query_prop(lv, me) {
+    query_prop(lv, me): PropMap {
         return {
             per: (-parseInt(lv / 300) - 1)
         };
     }
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             unarmed: {
                 gj: parseInt(lv * 1.5 + 20),

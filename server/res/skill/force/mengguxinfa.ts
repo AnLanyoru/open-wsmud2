@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import { PropMap } from "../../../types/index.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "蒙古心法";
@@ -69,7 +70,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             force: {
                 gj: lv,

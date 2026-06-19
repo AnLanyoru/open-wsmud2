@@ -1,4 +1,5 @@
 import {SKILL} from "../../../core/skill/skill.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "五毒烟萝步";
@@ -69,7 +70,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             dodge: {
                 ds: parseInt(lv * 1.5) + 130,

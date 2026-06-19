@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     type = SKILL_TYPES.BASE;
@@ -14,7 +15,7 @@ export default class extends SKILL {
         "$N跳起来用前抓往$n的$l抓去", "$N猛的扑向$n的$l"
     ];
 
-    query_prop(lv: number): Record<string, any> {
+    query_prop(lv: number): PropMap {
         return {gj: parseInt(String(lv / 5)), mz: parseInt(String(lv / 5))};
     }
 

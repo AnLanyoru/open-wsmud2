@@ -1,5 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
+import type { PropMap } from "../../../types/props.js";
+import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "凌波微步";
@@ -61,13 +63,13 @@ export default class extends SKILL {
             }
     };
 
-    query_prop(lv, me) {
+    query_prop(lv, me): PropMap {
         return {
             ds_per: 5 + parseInt(lv / 300)
         };
     }
 
-    query_enable_prop(lv) {
+    query_enable_prop(lv): EnablePropMap {
         return {
             dodge: {
                 dex: parseInt(lv / 5) + 1,

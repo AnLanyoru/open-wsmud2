@@ -71,11 +71,6 @@ for (const src of files) {
     count++;
 }
 
-// 创建 os/util/data.js wrapper (world/ 模块通过此文件导入 DB)
-const dataJs = join(DEST, 'util', 'data.js');
-mkdirSync(dirname(dataJs), {recursive: true});
-writeFileSync(dataJs, "export { default } from '../db.js';\n", 'utf-8');
-
 console.log(`部署完成: ${count} 个文件复制到 ${DEST}`);
 console.log(`  wrapper: os/util/data.js`);
 

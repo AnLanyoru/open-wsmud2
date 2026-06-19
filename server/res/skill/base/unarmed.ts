@@ -1,5 +1,6 @@
 import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     id = "unarmed";
@@ -12,7 +13,7 @@ export default class extends SKILL {
         "$N提起拳头往$n的$l捶去", "$N对准$n的$l用力挥出一拳"
     ];
 
-    query_prop(lv: number): Record<string, any> {
+    query_prop(lv: number): PropMap {
         return {str: Math.floor(lv / 10)};
     }
 

@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
+import type { PropMap } from "../../../types/props.js";
 
 export default class extends SKILL {
     id = "lianyao";
@@ -8,7 +9,7 @@ export default class extends SKILL {
     desc = "使用药草制作各种丹药的技能，提高你的炼药成功率";
     type = SKILL_TYPES.KNOWLEDGE;
 
-    query_prop(lv: number): Record<string, any> {
+    query_prop(lv: number): PropMap {
         return {lianyao1: Math.floor(lv / 200)};
     }
 
