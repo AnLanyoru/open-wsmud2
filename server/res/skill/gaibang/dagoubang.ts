@@ -80,7 +80,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_msg: this.attack_msgs.random()
+                        attack_msg: this.attack_msgs!.random()
                     });
                 }
                 me.end_attack(target);

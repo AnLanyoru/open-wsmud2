@@ -80,7 +80,7 @@ export class ROOM extends ITEM {
     // ============ 容器与出口 ============
 
     /** 房间内的物品和角色 — 运行时CHARACTER或OBJ */
-    items: (CHARACTER | OBJ | NPC)[] = [];
+    items: ITEM[] = [];
     /** 出口映射 {方向: 目标路径} */
     exits: Record<string, string> | null = null;
     /** 出口JSON缓存 */
@@ -238,7 +238,7 @@ export class ROOM extends ITEM {
                 }
 
             } else {
-                if (obj.check_character()) {
+                if (obj.check_character() && item.check_character()) {
                     if (isin && (item.on_enter)) {
                         item.on_enter(obj);
                     } else if (!isin && item.on_leave) {
@@ -434,7 +434,7 @@ export class ROOM extends ITEM {
      * 根据路径查找物件
      * @param path
      */
-    find_by_path(path: string): CHARACTER | OBJ | NPC | undefined {
+    find_by_path(path: string): ITEM | undefined {
         const items = this.items;
         if (!items) return;
         for (let i = 0; i < items.length; i++) {

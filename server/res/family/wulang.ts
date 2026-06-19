@@ -1,4 +1,4 @@
-import { USER } from "../../core/char/user.js";
+import type { USER } from "../../core/char/user.js";
 import {FAMILY} from "../../core/skill/family.js";
 
 export default class extends FAMILY {

@@ -95,7 +95,8 @@ export default class extends SKILL {
                         duration: time,
                         prop: {
                             desc: "增加" + nl + "最大内力"
-                        }, on_attach: function (p) {
+                        },
+                        on_attach: function (p) {
                             p.max_mp += nl;
                             p.set_temp('bmsg_add', nl);
                             p.recount();

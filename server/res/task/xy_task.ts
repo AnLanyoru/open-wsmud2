@@ -131,7 +131,7 @@ export default class XiangYangTask extends TASK {
             for (let i = 0; i < room.items.length; i++) {
                 let item = room.items[i];
                 if (!('moveto' in item)) continue;
-                if (!item.is_player) continue;
+                if (!item.check_player()) continue;
                 if (item.query_temp('xy_bm'))
                     continue;
                 // moveto 可能返回字符串 'false'
@@ -324,7 +324,7 @@ export default class XiangYangTask extends TASK {
         npc.is_menggubing = true;
         rm.item_changed(npc, true, "一个" + npc.title + "冲了过来。");
         var item = rm.items.random();
-        if (item && ('moveto' in item) && item.is_player) {
+        if (item && item.check_player()) {
             npc.do_kill(item);
         }
         return npc;

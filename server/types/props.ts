@@ -56,11 +56,19 @@ export interface PropMap {
     /** 内功抗性/减免 */ force_rad?: number;
 
     // ===== 特殊属性 =====
+    /** 抗暴击 */ diff_bj?: number;
     /** 固定数值免伤 */ diff_sh?: number;
     /** 免伤百分比 */ diff_sh_per?: number;
     /** 破防百分比 */ diff_fy_per?: number;
     /** 免伤百分比 - 版本2 */ diff_sh_per2?: number;
     /** 破防百分比 - 版本2 */ diff_fy_per2?: number;
+
+    /** 数值忙乱减免 */ diff_busy?: number;
+    /** 百分比忙乱减免 */ diff_busy_per?: number;
+    /** 数值忙乱加成 */ busy?: number;
+    /** 百分比忙乱加成 */ busy_per?: number;
+    /** 百分比负面状态抵抗 */ diff_downside_per?: number;
+
     /** 忽视防御 */ ignore_fy?: number;
     /** 最终伤害百分比 */ add_sh_per?: number;
     /** 暴击伤害百分比 */ add_bjsh_per?: number;

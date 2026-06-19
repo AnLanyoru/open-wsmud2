@@ -55,7 +55,6 @@ export default class extends SKILL {
                             id: "faint",
                             is_faint: true,
                             duration: t,
-                            no_weapon: true,
                             name: "昏迷", downside: true,
                             finish_msg: "<hiy>慢慢的$N又恢复了知觉...</hiy>\n",
                             start_msg: "<hir>$N只觉得眼前一黑，接着什么都不知道了。</hir>\n"

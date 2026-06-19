@@ -78,15 +78,15 @@ export default class extends ROOM {
 
     on_leave(me: CHARACTER, dir: string) {
 
-        var npc: CHARACTER | OBJ | NPC | undefined = this.find_by_path("pub/wudao_boss");
+        var npc = this.find_by_path("pub/wudao_boss");
         if (dir == "up") {
             if (npc) {
                 return me.notify_fail(npc.name + "对你说道：打败我，你就可以上去。");
             }
             if (this.items.length > 1) {
-                let npcs: (CHARACTER | OBJ | NPC)[] = [];
+                let npcs: CHARACTER[] = [];
                 for (let item of this.items) {
-                    if (!item.is_player) {
+                    if (!item.check_player() && item.check_character()) {
                         npcs.push(item);
                     }
                 }

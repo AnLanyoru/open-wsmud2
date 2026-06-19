@@ -68,7 +68,7 @@ export default class WuMiaoRoom extends ROOM {
     on_heart_beat(dt: number): void {
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i];
-            if ('hp' in item) {
+            if (item.check_character()) {
                 item.add_hp(parseInt(String(item.max_hp / 10)));
                 item.add_mp(parseInt(String(item.max_mp / 10)));
             }

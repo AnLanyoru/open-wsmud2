@@ -20,6 +20,7 @@ import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
 import { SkillsMap } from './skills_map.js';
+import type { PropMap } from '../../types/props.js';
 
 // ============================================================
 // 本地类型定义
@@ -257,7 +258,6 @@ export type TeamData = CHARACTER[] & {
 };
 
 /** 角色类 */
-// ITEM 来自旧版 JS 模块，运行时路径正确
 export class CHARACTER extends ITEM {
 
     // ============ 核心标识属性 ============
@@ -276,6 +276,8 @@ export class CHARACTER extends ITEM {
     level: number = 0;
     /** 角色描述 */
     desc: string = '';
+    /** 门派地位 */
+    family_level: number = 0;
 
     // ============ 战斗属性 ============
 
@@ -324,8 +326,6 @@ export class CHARACTER extends ITEM {
 
     // ============ 继承自 ITEM 的字段和方法类型声明（在此声明以便类型检查） ============
 
-    /** 子物品列表 */
-    items: ITEM[] | null = null;
     /** 物件路径标识 */
     path!: string;
     /** 物件唯一 ID */
@@ -337,8 +337,6 @@ export class CHARACTER extends ITEM {
 
     /** JSON 缓存（继承自 ITEM） */
     json: string | null = null;
-    /** 可执行命令映射（继承自 ITEM） */
-    actions: ActionMap<this> | null = null;
 
 
     // ============ 环境与交互 ============
@@ -361,7 +359,7 @@ export class CHARACTER extends ITEM {
     /** 临时数据 */
     temp: Record<string, any> = {};
     /** 战斗属性修饰 */
-    combat_props: [string, number][] | null = null;
+    combat_props: [keyof PropMap | string, number][] | null = null;
 
     // ============ 战斗系统属性 ============
 
@@ -847,7 +845,7 @@ export class CHARACTER extends ITEM {
                     if (item.on_eq) item.on_eq(this);
                     if (item && item.group_name) {
                         groups[item.group_name] = (groups[item.group_name] || 0) + 1;
-                        const prop = item.group_prop!(groups[item.group_name]);
+                        const prop = item.group_prop?.(groups[item.group_name]);
                         if (prop) {
                             this.change_prop(prop, true);
                         }
@@ -939,8 +937,8 @@ export class CHARACTER extends ITEM {
     /**
      * 增加属性
      */
-    add_prop(p: string, v: number): void {
-        if (!p) return;
+    add_prop(p: keyof PropMap | string, v: number): void {
+        if (!p || p === 'desc') return;
         if (!this.prop) {
             this.prop = {};
         }
@@ -956,7 +954,8 @@ export class CHARACTER extends ITEM {
     /**
      * 查询属性加值
      */
-    query_prop(name: string): number {
+    query_prop(name: keyof PropMap | string): number {
+        if (!name || name === 'desc') return 0;
         if (this.prop) return this.prop[name] || 0;
         return 0;
     }
@@ -981,7 +980,7 @@ export class CHARACTER extends ITEM {
     /**
      * 批量变更属性
      */
-    change_prop(prop: Record<string, any>, isadd: boolean): void {
+    change_prop(prop: {desc?: string, skill?: PropMap} & PropMap, isadd: boolean): void {
         if (!prop) return;
         for (const item in prop) {
             switch (item) {
@@ -1008,7 +1007,7 @@ export class CHARACTER extends ITEM {
                     break;
                 }
                 default:
-                    this.add_prop(item, isadd ? prop[item] : -prop[item]);
+                    this.add_prop(item as keyof PropMap, isadd ? prop[item] : -prop[item]);
                     break;
             }
         }
@@ -1050,7 +1049,7 @@ export class CHARACTER extends ITEM {
     /**
      * 添加战斗临时属性
      */
-    add_combat_prop(name: string, val: number): void {
+    add_combat_prop(name: keyof PropMap, val: number): void {
         this.add_prop(name, val);
         if (!this.combat_props) this.combat_props = [];
         this.combat_props.push([name, val]);
@@ -2233,12 +2232,6 @@ export class CHARACTER extends ITEM {
         return null;
     }
 
-    /**
-     * 查询可执行命令菜单
-     */
-    query_commands(me?: CHARACTER): void {
-        // 子类覆写
-    }
 
     /**
      * 查询外观描述
@@ -2597,8 +2590,8 @@ export class CHARACTER extends ITEM {
 
         if (attackskill.on_before_attack && !par.is_throwing && !par.no_append_before)
             attackskill.on_before_attack(this, target, par);
-        if ((this.force_skill as Record<string, any>)?.on_before_attack && !par.no_append_before) {
-            (this.force_skill as Record<string, any>).on_before_attack(this, target, par);
+        if (this.force_skill.on_before_attack && !par.no_append_before) {
+            this.force_skill.on_before_attack(this, target, par);
         }
 
         this.attack_part = par.part ?? target.query_part();
@@ -2906,7 +2899,7 @@ export class CHARACTER extends ITEM {
     /**
      * 释放绝招
      */
-    use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype?: string): boolean {
+    use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype: string): boolean {
         if (!pfm) return false;
         let isrelease = false;
         if (this.query_prop('no_pfm')) {

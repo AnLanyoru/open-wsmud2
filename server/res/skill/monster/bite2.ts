@@ -31,7 +31,7 @@ export default class extends SKILL {
             weapon_type: WEAPON_TYPE.UNARMED,
             release_time: 3000,
             mp: 10,
-            attacks: [
+            attack_msgs: [
                 "<hir>$N张嘴朝$n的$l咬去</hir>", "<hir>$N抬起前爪往$n的$l一抓</hir>", "<hir>$N往$n的$l狠狠的扑了过去</hir>",
                 "<hir>$N跳起来用前抓往$n的$l抓去</hir>", "<hir>$N猛的扑向$n的$l</hir>"
             ],
@@ -43,7 +43,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz * 2,
-                        attack_msg: this.attacks[i]
+                        attack_msg: this.attack_msgs![i]
                     });
                 }
                 me.end_attack(target);

@@ -1,3 +1,4 @@
+import type { NPC } from "../../core/char/npc.js";
 import type { USER } from "../../core/char/user.js";
 import {FAMILY} from "../../core/skill/family.js";
 import type { SkillSet } from "../../core/skill/skill.js";
@@ -80,7 +81,7 @@ export default class extends FAMILY {
         }
     }
 
-    call_me(player, isbad) {
+    call_me(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 30) return "贫尼";
@@ -92,19 +93,19 @@ export default class extends FAMILY {
 
     }
 
-    on_kill(npc, me) {
+    on_kill(npc: NPC, me: USER) {
         if (this.boss) {
             this.boss.do_command("chat", "阿弥陀佛！" + me.family.name + "门下弟子" + me.name + "击杀我派弟子" + npc.name + "，众弟子听令，对" + me.family.name + "格杀勿论！");
         }
     }
 
-    on_battle(fam) {
+    on_battle(_fam: FAMILY) {
         if (this.boss) {
             this.boss.do_command("chat", "阿弥陀佛！");
         }
     }
 
-    create_name(npc) {
+    create_name(npc: NPC) {
         return ["", "", "", "玄", "橙", "慧", "道", "清"][npc.family_level] + UTIL.name2[this.random(UTIL.name2.length)];
     }
 }

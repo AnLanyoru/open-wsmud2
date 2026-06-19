@@ -7,6 +7,7 @@ import {MessageEntry, WORLD} from './world.js';
 import type {CHARACTER} from './char/character.js';
 import type {OBJ} from './item/obj.js';
 import type {CommandAccess} from '../types/base.js';
+import type { USER } from './char/user.js';
 
 export class COMMAND extends BASE {
     /** 进入副本回调（由 world/cmd/extend/ex.js 注入） */
@@ -53,7 +54,7 @@ export class COMMAND extends BASE {
      * @param arg - 命令参数
      * @returns 返回 false 表示命令执行失败
      */
-    enter(me: CHARACTER | null, ...arg: any[]): any {
+    enter(me: CHARACTER, ...arg: any[]): any {
         return undefined;
     }
 
@@ -168,6 +169,7 @@ export class COMMAND extends BASE {
     static DO(cmd: string, ...args: (string | Partial<MessageEntry>)[]): void {
         const cmdObj = WORLD.COMMANDS[cmd];
         if (cmdObj) {
+            //@ts-expect-error
             cmdObj.enter(null, ...args);
         }
     }

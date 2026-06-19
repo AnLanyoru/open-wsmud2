@@ -29,7 +29,7 @@ export default class extends ROOM {
 
     on_heart_beat(dt: number) {
         for (let item of this.items) {
-            if ('hp' in item && item.hp > 0) {
+            if (item.check_character()) {
                 return check_moveout(item);
             }
         }

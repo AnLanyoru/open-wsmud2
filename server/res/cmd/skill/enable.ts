@@ -19,28 +19,52 @@ export default class extends COMMAND {
         if (!baseskill_base || baseskill_base.type !== SKILL_TYPES.BASE) {
             return me.notify("没有这个基本技能。");
         }
-        var old_skill;
-        if (baseskill.enable_skill) {
-            old_skill = me.skills.get(baseskill.enable_skill);
-            if (!old_skill) return me.notify("技能错误，装备失败。");
-            old_skill[base] = false;
-            old_skill = SKILL.get(baseskill.enable_skill);
-            if (old_skill) {
-                old_skill.disenable(me, base, me.query_skill(baseskill.enable_skill));
-                //me.notify('{type:"dialog",dialog:"skills",id:"' + base + '",enable:false}');
-            }
+
+        if (skill === "none") {
+            // ===== 取消特殊技能 =====
+            var old_name = baseskill.enable_skill;
+            if (!old_name) return;
+            var old_user_skill = me.skills.get(old_name);
+            var old_skill_base = SKILL.get(old_name);
+            if (!old_user_skill || !old_skill_base) return me.notify("技能错误，取消失败。");
+
+            old_user_skill[base] = false;
+            old_skill_base.disenable(me, base);
             baseskill.enable_skill = null;
 
-        } else {
-            if (skill == "none") return;
-        }
-        if (WEAPON_SKILLS[base]) {
+            // 移除状态
+            if (WEAPON_SKILLS[base]) {
+                me.remove_status("weapon", true);
+            } else {
+                me.remove_status(base, true);
+            }
 
-            me.remove_status("weapon", true);
+            me.notify("你决定取消使用" + old_skill_base.query_color_name(me) + "做为" + baseskill_base.color_name + "的特殊技能。");
+            if (me.is_player)
+                me.notify('{type:"dialog",dialog:"skills",id:"' + base + '",enable:false}');
+            else
+                me.notify('{type:"dialog",dialog:"skills","from":"' + me.id + '",id:"' + base + '",enable:false}');
         } else {
-            me.remove_status(base, true);
-        }
-        if (skill && skill !== "none") {
+            // ===== 启用特殊技能 =====
+            // 先取消旧的
+            if (baseskill.enable_skill) {
+                var old_user_skill = me.skills.get(baseskill.enable_skill);
+                var old_skill_base = SKILL.get(baseskill.enable_skill);
+                if (old_user_skill && old_skill_base) {
+                    old_user_skill[base] = false;
+                    old_skill_base.disenable(me, base);
+                }
+                baseskill.enable_skill = null;
+            }
+
+            // 移除状态
+            if (WEAPON_SKILLS[base]) {
+                me.remove_status("weapon", true);
+            } else {
+                me.remove_status(base, true);
+            }
+
+            // 启用新技能
             var sp_skill = me.skills.get(skill);
             var sp_skill_base = SKILL.get(skill);
             if (!sp_skill) {
@@ -49,9 +73,9 @@ export default class extends COMMAND {
                 me.recount();
                 return me.notify("你不会这个技能。");
             }
-
             if (!sp_skill_base || sp_skill_base.enable(me, base, me.query_skill(skill)) !== true)
                 return false;
+
             baseskill.enable_skill = skill;
             sp_skill[base] = true;
             me.notify("你决定使用" + sp_skill_base.query_color_name(me) + "做为" + baseskill_base.color_name + "的特殊技能。");
@@ -59,20 +83,13 @@ export default class extends COMMAND {
                 me.notify('{type:"dialog",dialog:"skills",id:"' + base + '",enable:"' + skill + '"}');
             else
                 me.notify('{type:"dialog",dialog:"skills","from":"' + me.id + '",id:"' + base + '",enable:"' + skill + '"}');
-        } else {
-            baseskill.enable_skill = null;
-            me.notify("你决定取消使用" + old_skill.query_color_name(me) + "做为" + baseskill_base.color_name + "的特殊技能。");
-            if (me.is_player)
-                me.notify('{type:"dialog",dialog:"skills",id:"' + base + '",enable:false}');
-            else
-                me.notify('{type:"dialog",dialog:"skills","from":"' + me.id + '",id:"' + base + '",enable:false}');
         }
+
         if (!no_sent) {
             me.init_skill();
             me.recount();
             me.notify_hp();
         }
-
     }
 }
 

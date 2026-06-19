@@ -30,7 +30,7 @@ export default class extends ROOM {
     }
 
     on_enter(me: CHARACTER) {
-        if (!me.is_player) return;
+        if (!me.check_player()) return;
         const room = this;
         me.die = challenge_over;
         this.start_time = Date.now();
@@ -42,12 +42,14 @@ export default class extends ROOM {
             10,
             function () {
                 var npc: CHARACTER | undefined;
-                if (room.items.length > 0) {
-                    const first = room.items[0];
-                    if ('do_kill' in first && !first.is_player) {
-                        npc = first;
+                let npcs = room.items
+                let npc_num = npcs.length
+                if (npc_num > 0) {
+                    for (let _npc of npcs){
+                    if (_npc.check_npc()) {
+                        npc = _npc;
                     }
-                }
+                }}
                 if (npc) {
                     npc.do_kill(me);
                 }
@@ -65,7 +67,7 @@ export default class extends ROOM {
                 }
                 if (this.items.length == 1) {
                     var obj = this.items[0];
-                    if ('do_kill' in obj && obj.is_player) {
+                    if ('do_kill' in obj && obj.check_player()) {
                         obj.moveto(obj.query_temp("enter_room"), undefined, obj.name + "走了进来。", "endfight");
                         obj.notify("<yel>你挑战失败。</yel>");
                     } else {
@@ -77,7 +79,7 @@ export default class extends ROOM {
                 var player: CHARACTER | null = null;
                 for (var i = 0; i < this.items.length; i++) {
                     const item = this.items[i];
-                    if ('do_kill' in item && item.is_player) {
+                    if ('do_kill' in item && item.check_player()) {
                         player = item;
                     } else {
                         item.environment = undefined;

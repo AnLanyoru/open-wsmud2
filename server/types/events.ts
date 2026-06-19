@@ -149,7 +149,7 @@ export interface StatusDef {
     /** 持续时间（秒） */
     duration: number;
     /** 状态附带的属性加成/减益 */
-    prop?: PropMap;
+    prop?: PropMap & Record<string, number>;
     /** 是否忙碌状态（不可行动） */
     is_busy?: boolean;
     /** 是否昏迷状态 */

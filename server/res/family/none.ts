@@ -1,4 +1,6 @@
 import {FAMILY} from "../../core/skill/family.js";
+import type { NPC } from "../../core/char/npc.js";
+import type { USER } from "../../core/char/user.js";
 
 export default class extends FAMILY {
     id = "NONE";
@@ -19,7 +21,7 @@ export default class extends FAMILY {
         }
     }
 
-    call_me(player, isbad) {
+    call_me(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 30) return isbad ? "本姑娘" : "小女子";

@@ -34,17 +34,17 @@ export default class extends SKILL {
                 no_copy: true,
                 allow_busy: true,
                 release_time: 3000,
-                query_releasetime: function (me: CHARACTER, lv: number) {
-                    return this.release_time;
+                query_releasetime(me: CHARACTER, lv: number): number {
+                    return this.release_time!;
                 },
-                query_distime: function (me: CHARACTER, lv: number) {
-                    return this.distime;
+                query_distime(me: CHARACTER, lv: number) {
+                    return this.distime!;
                 },
-                query_name: function (me, type) {
-                    if (!type) return this.name;
+                query_name(me: CHARACTER, type: string) {
+                    if (!type) return this.name!;
                     return "无相" + ALLOW_TYPES[type];
                 },
-                use: function (me: CHARACTER, target: CHARACTER, lv: number, sk) {
+                use(me: CHARACTER, target: CHARACTER, lv: number, sk) {
                     var prev = target.query_temp("used_pfm");
                     if (!prev) return me.notify_fail("<cyn>" + target.name + "最近没有使用绝招，你无法模仿。</cyn>");
                     var str = prev.split("/");
@@ -85,7 +85,7 @@ export default class extends SKILL {
                     }
                     var up = 80 + parseInt(lv / 40);
                     if (up > 100) up = 100;
-                    me.use_pfm(target, pfm, parseInt(up * lv / 100));
+                    me.use_pfm(target, pfm, parseInt(up * lv / 100), sk);
 
                     this.distime = pfm.query_distime(me, lv);
                     this.release_time = pfm.query_releasetime(me, lv);
@@ -112,17 +112,17 @@ export default class extends SKILL {
                 allow_busy: true,
                 no_copy: true,
                 release_time: 3000,
-                query_releasetime: function (me: CHARACTER, lv: number) {
-                    return this.release_time;
+                query_releasetime(me: CHARACTER, lv: number): number {
+                    return this.release_time!;
                 },
-                query_distime: function (me: CHARACTER, lv: number) {
-                    return this.distime;
+                query_distime(me: CHARACTER, lv: number) {
+                    return this.distime!;
                 },
-                query_name: function (me, type) {
-                    if (!type) return this.name;
+                query_name(me, type): string {
+                    if (!type) return this.name!;
                     return "无我" + ALLOW_TYPES[type];
                 },
-                use: function (me: CHARACTER, target: CHARACTER, lv: number, sk) {
+                use(me: CHARACTER, target: CHARACTER, lv: number, sk: string) {
                     var prev = me.query_temp("copy_pfm_" + sk);
                     var baseSkill = SKILL.get(sk);
                     if (!baseSkill) return false;
@@ -153,7 +153,7 @@ export default class extends SKILL {
                     }
                     var up = 70 + parseInt(lv / 100);
                     if (up > 100) up = 100;
-                    me.use_pfm(target, pfm, parseInt(up * lv / 100));
+                    me.use_pfm(target, pfm, parseInt(up * lv / 100), sk);
                     this.distime = pfm.query_distime(me, lv);
                     this.release_time = pfm.query_releasetime(me, lv);
                 },

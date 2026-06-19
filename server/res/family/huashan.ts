@@ -1,3 +1,4 @@
+import type { NPC } from "../../core/char/npc.js";
 import type { USER } from "../../core/char/user.js";
 import {FAMILY} from "../../core/skill/family.js";
 import type { SkillSet } from "../../core/skill/skill.js";
@@ -71,7 +72,7 @@ export default class extends FAMILY {
         }
     }
 
-    call_me(player, isbad) {
+    call_me(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 30) return isbad ? "本姑娘" : "小女子";
@@ -82,7 +83,7 @@ export default class extends FAMILY {
         }
     }
 
-    on_kill(npc, me) {
+    on_kill(npc: NPC, me: USER) {
         if (this.boss) {
             this.boss.do_command("chat", me.family.name + "欺人太甚，门下弟子" + me.name + "击杀我派弟子" + npc.name + "，华山派众弟子听令，对" + me.family.name + "格杀勿论！");
         }
