@@ -33,7 +33,7 @@ export default class extends COMMAND {
             }
             //其他检测loginuser
         }
-        return null;
+        return {} as USER;
     }
 
     async relogin(oldUser: USER, user: USER) {
