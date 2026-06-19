@@ -57,7 +57,7 @@ export default class extends FAMILY {
         this.set_titles("峨眉派前掌门", "峨眉派掌门", "峨眉派长老", "峨眉派第三代弟子", "峨眉派第四代弟子", "峨眉派第五代弟子", "峨眉派第六代弟子");
     }
 
-    call(player, isbad) {
+    call(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贼尼" : "小师太";

@@ -6,7 +6,7 @@ export default class extends FAMILY {
     top_name = "武馆大弟子";
     top_family = "道门";
 
-    call(player, isbad) {
+    call(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贱人" : "小姑娘";

@@ -40,11 +40,6 @@ export interface OddsEntry {
 
 // @ts-ignore: static CREATE override incompatible with base
 export class OBJ extends ITEM {
-
-    constructor() {
-        super();
-    }
-
     // ============ 核心属性 ============
 
     /** 是否为物品 */

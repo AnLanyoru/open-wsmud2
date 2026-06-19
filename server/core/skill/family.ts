@@ -125,10 +125,6 @@ export class FAMILY extends BASE {
     remove_temp: (name: string) => void = ITEM.prototype.remove_temp as any;
     add_temp: (name: string, value: number, time?: number) => number = ITEM.prototype.add_temp as any;
 
-    constructor() {
-        super();
-    }
-
     // ============ 称谓管理 ============
 
     /**

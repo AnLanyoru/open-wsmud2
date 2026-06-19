@@ -56,7 +56,7 @@ export default class extends FAMILY {
         this.set_titles("逍遥派长老", "逍遥派第一代弟子", "逍遥派第二代弟子", "逍遥派第三代弟子", "逍遥派第四代弟子");
     }
 
-    call(player, isbad) {
+    call(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贱人" : "小姑娘";

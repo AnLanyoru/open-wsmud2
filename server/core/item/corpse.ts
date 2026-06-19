@@ -8,11 +8,6 @@ import type {USER} from '../char/user.js';
 import type { ItemCommandsJson } from '../char/follower.js';
 
 export class CORPSE extends CONTAINER {
-
-    constructor() {
-        super();
-    }
-
     // ============ 核心属性 ============
 
     /** 单位名称 */

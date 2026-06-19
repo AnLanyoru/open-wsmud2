@@ -551,10 +551,6 @@ export class CHARACTER extends ITEM {
     /** 传授技能回调 — 触发时机：xue 命令中教师角色执行时会调用 */
     do_teach?(me: CHARACTER, skill: SKILL, lv: number): boolean | void;
 
-    constructor() {
-        super();
-    }
-
     // ================================================================
     // 基础方法
     // ================================================================

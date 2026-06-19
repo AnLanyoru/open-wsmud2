@@ -25,10 +25,6 @@ export type RoomAction = [cmd: string, name: string, action: (...args: any[]) =>
 
 export class ITEM extends BASE {
 
-    constructor() {
-        super();
-    }
-
     // ============ 核心标识属性 ============
 
     /** 物件路径标识 */

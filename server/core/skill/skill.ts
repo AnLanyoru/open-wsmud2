@@ -163,7 +163,7 @@ export class SKILL extends BASE {
     // ============ 绝招与技能槽 ============
 
     /** 绝招字典(由资源文件设置-原始数据) */
-    pfm_set?: Record<string, Partial<PERFORM>>;
+    pfm_set?: Record<string, Partial<PERFORM>> = {};
     /** 绝招字典(运行时-处理后的PERFORM实例) */
     pfm: Record<string, PERFORM> = {};
     /** 进阶属性槽位(由资源文件设置) */
@@ -265,10 +265,6 @@ export class SKILL extends BASE {
     force_rad?: number;
     /** 复活回调（由 biwu 等系统动态注入） */
     on_relive?: (me: CHARACTER) => void;
-
-    constructor() {
-        super();
-    }
 
     // ============ 动作查询 ============
 
@@ -807,6 +803,17 @@ export class SKILL extends BASE {
      */
     set_pfm(name: string, obj: PERFORM): void {
         this.pfm[name] = obj;
+    }
+
+    /**
+     * 设置绝招
+     * @param name
+     * @param obj
+     */
+    set_pfm_data(name: string, obj: PERFORM): void {
+        if (!this.pfm_set) 
+            return console.error("设置技能绝招资源失败，不能在运行时注入绝招资源，请在初始化前注入");
+        this.pfm_set[name] = obj;
     }
 
     // ============ 生命周期 ============

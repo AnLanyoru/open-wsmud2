@@ -9,10 +9,6 @@ import { ItemCommandsJson } from '../char/follower.js';
 
 export class CONTAINER extends OBJ {
 
-    constructor() {
-        super();
-    }
-
     // ============ 核心属性 ============
 
     /** 是否为容器 */

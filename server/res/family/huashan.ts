@@ -1,3 +1,4 @@
+import type { USER } from "../../core/char/user.js";
 import {FAMILY} from "../../core/skill/family.js";
 import type { SkillSet } from "../../core/skill/skill.js";
 
@@ -57,7 +58,7 @@ export default class extends FAMILY {
         this.set_titles("华山派长老", "华山派第十三代弟子", "华山派第十四代弟子", "华山派第十五代弟子", "华山派第十六代弟子");
     }
 
-    call(player, isbad) {
+    call(player: USER, isbad?: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贱人" : "小姑娘";

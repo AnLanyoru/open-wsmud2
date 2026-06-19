@@ -17,10 +17,6 @@ export class TASK extends BASE {
     /** 备用定时器句柄 */
     handler: ReturnType<typeof setTimeout> | null = null;
 
-    constructor() {
-        super();
-    }
-
     /**
      * 创建回调 — 添加到 WORLD.SYSTEMTASKS 并启动
      */

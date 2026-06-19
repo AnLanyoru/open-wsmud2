@@ -33,11 +33,6 @@ export interface StoneEntry {
 }
 
 export class EQUIPMENT extends OBJ {
-
-    constructor() {
-        super();
-    }
-
     // ============ 装备标志 ============
 
     /** 是否为装备 */

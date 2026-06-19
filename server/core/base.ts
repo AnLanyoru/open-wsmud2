@@ -43,10 +43,6 @@ export class BASE {
     /** 事件存储 — add_event / fire_event 系统 */
     protected _events?: EventStore;
 
-    constructor() {
-        // 子类可覆写
-    }
-
     // ============ 批量属性设置 ============
 
     /**

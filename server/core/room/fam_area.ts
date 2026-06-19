@@ -7,11 +7,6 @@ import {FAMILIES} from "../skill/family.js";
 import type { USER } from "../char/user.js";
 
 export class FAMILY_AREA extends AREA {
-
-    constructor() {
-        super();
-    }
-
     // ============ 门派区域扩展(由extends合并) ============
 
     /**

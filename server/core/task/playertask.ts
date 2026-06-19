@@ -24,11 +24,7 @@ export class USERTASK extends BASE {
 
     /** 放弃任务回调（由资源文件动态注入） */
     giveup?(player?: CHARACTER): any;
-
-    constructor() {
-        super();
-    }
-
+    
     /**
      * 创建回调 — 注册到 WORLD.TASKS 列表
      * @param path - 任务资源文件路径

@@ -45,7 +45,7 @@ export default class extends FAMILY {
         this.set_titles("杀手楼主", "金牌杀手", "银牌杀手", "铜牌杀手", "见习杀手");
     }
 
-    call(player, isbad) {
+    call(player: USER, isbad: boolean) {
         var age = player.query_age();
         if (player.gender == 2) {
             if (age < 18) return isbad ? "小贱人" : "小姑娘";

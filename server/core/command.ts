@@ -45,10 +45,6 @@ export class COMMAND extends BASE {
     /** 默认锻造属性（由 duanzao 命令注入） */
     DEFAULT_PROPS?: Record<string | number, string | null>;
 
-    constructor() {
-        super();
-    }
-
     // ============ 核心方法（由子类重写） ============
 
     /**

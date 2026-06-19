@@ -4,11 +4,6 @@
 import {OBJ} from './obj.js';
 
 export class MONEY extends OBJ {
-
-    constructor() {
-        super();
-    }
-
     // ============ 核心属性 ============
 
     /** 是否为元宝（充值货币） */

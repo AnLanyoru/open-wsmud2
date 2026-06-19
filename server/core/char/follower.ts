@@ -128,11 +128,6 @@ export class FOLLOWER extends CHARACTER {
     // login_message — 用于 set_setting 清除缓存（该字段在 USER 上定义，FOLLOWER 在运行时按需创建）
     login_message: string | null = null;
 
-
-    constructor() {
-        super();
-    }
-
     // ============ 回调属性（由资源文件设置） ============
 
     /** 双修回调 — 触发时机：主人对随从执行双修命令时 */
