@@ -98,7 +98,7 @@ export default class extends SKILL {
         };
     }
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
                 gj: 30 + parseInt(lv * 1.8),

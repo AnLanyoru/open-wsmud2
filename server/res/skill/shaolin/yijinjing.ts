@@ -63,11 +63,11 @@ export default class extends SKILL {
 
                     me.send_room("<hiy>$N深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼。</hiy>");
                     if (!me.enemy) return false;
-                    var list: any[] = [];
+                    var list: CHARACTER[] = [];
                     var time = lv * 10 + 2000;
                     if (time > 7000) time = 7000;
                     for (let x of me.enemy) {
-                        if (x.hp > 0) {
+                        if (x.check_character()) {
                             list.push(x);
                         }
                     }
@@ -123,13 +123,13 @@ export default class extends SKILL {
             }
     };
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {
             diff_sh_per: 5 + parseInt(lv / 300),
         };
     }
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
                 max_hp: lv * 20,

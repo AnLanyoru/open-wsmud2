@@ -26,7 +26,7 @@ export default class extends SKILL {
     };
     can_enables = ["dodge"];
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
                 ds: parseInt(lv * 1.5 + 5),

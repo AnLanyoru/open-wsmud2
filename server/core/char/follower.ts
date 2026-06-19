@@ -49,11 +49,11 @@ interface FOLLOWER_DATA {
     /** 数值属性数组（按 SAVE_NUMPROP 顺序） */
     prop: number[];
     /** 临时数据 */
-    temp?: any[];
+    temp: Record<string, any>;
     /** 用户设置 */
     settings?: Record<string, number>;
     /** 技能数据 */
-    skills?: Record<string, any>;
+    skills?: Record<string, SkillData>;
     /** 背包物品 */
     items?: any[][];
     /** 装备列表 */
@@ -83,7 +83,6 @@ export interface ItemCommandsJson {
 // ============================================================
 
 /** 随从 */
-// @ts-ignore: static CREATE override incompatible with base
 export class FOLLOWER extends CHARACTER {
     // ============ 核心属性 ============
     is_follower: boolean = true;
@@ -156,13 +155,13 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 设置随从配置
      */
-    set_setting(name: string, value: string | number): void {
+    set_setting(name: string, value: number): void {
         if (!this.settings) this.settings = {};
-        if (!value || value == '0') {
+        if (!value || typeof value == "string" && value == '0') {
             delete this.settings[name];
         } else {
-            if (value == '1') value = 1;
-            this.settings[name] = value as unknown as number;
+            if (typeof value == "string" && value == '1') value = 1;
+            this.settings[name] = value;
         }
 
         this.login_message = null;
@@ -239,16 +238,16 @@ export class FOLLOWER extends CHARACTER {
             my_npc = new FOLLOWER();
             const obj = NPC.CLONE(data.path);
             for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-                (my_npc as Record<string, any>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
+                my_npc[SAVE_NUMPROP[i]] = data.prop[i] || 0;
             }
             for (let i = 0; i < SAVE_STRPROP.length; i++) {
-                (my_npc as Record<string, any>)[SAVE_STRPROP[i]] = (data as Record<string, any>)[SAVE_STRPROP[i]] || (obj as Record<string, any>)[SAVE_STRPROP[i]] || '';
+                my_npc[SAVE_STRPROP[i]] = data[SAVE_STRPROP[i]] || obj[SAVE_STRPROP[i]] || '';
             }
             my_npc.on_makelove = obj ? obj.on_makelove : undefined;
             my_npc.on_master_enter = obj ? obj.on_master_enter : undefined;
-            my_npc.equipment = (data.temp || data.eq) as any as (EQUIPMENT | null)[];
+            my_npc.temp = data.temp;
             my_npc.settings = data.settings ?? {};
-            my_npc.skills = SkillsMap.from(data.skills as Record<string, SkillData>);
+            my_npc.skills = SkillsMap.from(data.skills);
             my_npc.path = obj.path;
             my_npc.items = me.read_items(data.items);
             my_npc.equipment = me.read_equipment(data.eq);
@@ -385,7 +384,7 @@ export class FOLLOWER extends CHARACTER {
     /**
      * 创建随从
      */
-    static CREATE(me: USER, par: { path: string; id: string }, callback: (npc: FOLLOWER) => void): void {
+    static CREATE_FOLLOWER(me: USER, par: { path: string; id: string }, callback: (npc: FOLLOWER) => void): void {
         if (!par || !par.path) return;
         const id = me.id + '_' + par.id;
         const npc = FOLLOWER.STORES.get(id);

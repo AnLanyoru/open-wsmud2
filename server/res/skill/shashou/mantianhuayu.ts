@@ -93,13 +93,13 @@ export default class extends SKILL {
             }
     };
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {
             bj_per: 5 + parseInt(lv / 300)
         };
     }
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
                 gj: parseInt(lv * 1.4) + 4,

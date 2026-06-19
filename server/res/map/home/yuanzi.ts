@@ -15,7 +15,7 @@ export default class extends ROOM {
     on_enter(me) {
         if (me.follower && this.owner === me.id) {
             for (var i = 0; i < me.follower.length; i++) {
-                FOLLOWER.CREATE(me, me.follower[i], this.on_npc_create.bind(this, me));
+                FOLLOWER.CREATE_FOLLOWER(me, me.follower[i], this.on_npc_create.bind(this, me));
             }
         }
         if (me.master) {

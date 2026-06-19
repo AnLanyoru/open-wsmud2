@@ -165,13 +165,13 @@ export default class extends SKILL {
         return this.attack_actions.random();
     }
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {
             add_sh_per: 5 + parseInt(lv / 300)
         };
     }
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
                 gj: lv * 2 + 10,

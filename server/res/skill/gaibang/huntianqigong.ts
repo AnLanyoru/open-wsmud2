@@ -51,7 +51,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
                 gj: parseInt(lv * 1.2) + 10,

@@ -118,7 +118,7 @@ export default class extends SKILL {
         }
     ];
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         let grade = 0;
         if (me && me.is_player) {
             grade = this.query_grade(me);

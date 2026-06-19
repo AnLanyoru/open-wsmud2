@@ -155,14 +155,14 @@ export default class extends SKILL {
             }
     };
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {
             int: 10 + parseInt(lv / 10),
             zj_per: parseInt(lv / 300) + 5
         };
     }
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
                 gj: 20 + parseInt(lv * 1.3),

@@ -38,7 +38,7 @@ export default class extends SKILL {
         }));
     }
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {mz: lv};
     }
 }

@@ -59,7 +59,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             staff: {
                 gj: parseInt(lv * 1.8) + 10,

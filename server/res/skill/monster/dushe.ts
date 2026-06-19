@@ -15,7 +15,7 @@ export default class extends SKILL {
     desc = "毒蛇攻击方式，会中毒";
     can_enables = ["bite"];
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             bite: {
                 gj: lv,

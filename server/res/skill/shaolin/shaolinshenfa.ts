@@ -55,7 +55,7 @@ export default class extends SKILL {
             }
     };
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
                 ds: lv + 30

@@ -18,7 +18,7 @@ export default class extends SKILL {
         this.set_default(this.id);
     }
 
-    query_prop(lv, me): PropMap {
+    query_prop(lv: number, me: CHARACTER): PropMap {
         return {zj: lv};
     }
 }

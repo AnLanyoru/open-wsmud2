@@ -82,7 +82,7 @@ export default class extends SKILL {
         }
     };
 
-    query_enable_prop(lv): EnablePropMap {
+    query_enable_prop(lv: number): EnablePropMap {
         return {
             blade: {
                 gj: parseInt(lv * 1.4 + 10),
