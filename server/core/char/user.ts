@@ -344,7 +344,8 @@ export class USER extends CHARACTER {
         this.send_loginmessage();
 
         if (!this.environment) {
-            const rm = WORLD.getRoom(this.quit_room!);
+            let rm = WORLD.getRoom(this.quit_room ?? DEFAULT_ROOM);
+            if (!rm || rm.is_fb()) rm = WORLD.getRoom(DEFAULT_ROOM);
             if (!rm) {
                 this.send('出现错误，请联系管理员报告BUG，谢谢！');
                 return;

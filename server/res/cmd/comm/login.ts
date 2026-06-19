@@ -14,7 +14,7 @@ export default class extends COMMAND {
 
         user.ip_address = user.socket?.remoteAddress ?? "";
         if (!user.ip_address) {
-            user.send("{type:'loginerror',msg:'登录失败...无法获取到你的IP'}")
+            return user.send("{type:'loginerror',msg:'登录失败...无法获取到你的IP'}");
         }
         const oldUser = this.check_user(user, id);
         if (!oldUser) return;
