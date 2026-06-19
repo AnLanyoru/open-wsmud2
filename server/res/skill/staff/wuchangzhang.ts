@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "无常杖";
@@ -47,7 +48,7 @@ export default class extends SKILL {
                 releasetime_key: 'wcz_gcd',
                 mp: 20,
                 release_time: 10000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hiy>$N将手中的$W一荡，化作无数杖影扫向$n</hiy>", target);
                     var count = 5;
                     for (var i = 0; i < count; i++) {
@@ -60,7 +61,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
 
                     return "无常杖之无常五化，瞬间出招5次，收招较慢。";

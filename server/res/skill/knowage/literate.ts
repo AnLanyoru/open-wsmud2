@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     id = "literate";

@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "飞刀";
@@ -23,7 +24,7 @@ export default class extends SKILL {
                 enable_skill: "throwing",
                 release_time: 1000,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var msg = "<hic>$N手中$T寒光一闪，幻化出一道重影射向$n</hic>";
                     me.send_room(msg, target);
                     for (var i = 0; i < 2; i++) {
@@ -38,7 +39,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     return "使用连续两把飞刀攻击敌人";
                 }
             }

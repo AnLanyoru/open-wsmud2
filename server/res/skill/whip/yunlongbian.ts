@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "云龙鞭法";
@@ -46,7 +47,7 @@ export default class extends SKILL {
                 distime: 30000,
                 enable_skill: "whip",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = Math.round(lv * 100 / 5)
                     if (time < 2000) time = 2000;
                     else if (time > 10000) time = 10000;
@@ -68,7 +69,7 @@ export default class extends SKILL {
                     }
                     me.send_room(msg, target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = Math.round(lv / 50);
                     if (time < 2) time == 2;
                     else if (time > 10) time = 10;

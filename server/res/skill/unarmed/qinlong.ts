@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "擒龙手";
@@ -66,7 +67,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.UNARMED,
                 distime_per_key: 'qlz_cd',
                 mp: 30,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 8000;
                     let gj = me.gj * (100 + lv / 10 + me.query_prop('qlz_sh')) / 100;
 
@@ -104,7 +105,7 @@ export default class extends SKILL {
                         }
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     let sh = 100 + lv / 10;
                     return "对敌人造成" + sh + "%攻击力的伤害，如果身法出色则忙乱对方8秒";
                 }

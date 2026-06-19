@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "杀生决";
@@ -25,7 +26,7 @@ export default class extends SKILL {
                 enable_skill: "force",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var time = 10000 + lv * 5;
                     if (time > 20000) time = 20000;
@@ -41,7 +42,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 10 + parseInt(lv / 100);
 
                     var time = 10000 + lv * 5;
@@ -56,7 +57,7 @@ export default class extends SKILL {
             release_time: 0,
             no_auto: true,
             allow_busy: true,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
 
                 if (me.is_rash) return me.notify('你现在无法使用轻功身法。');
@@ -79,7 +80,7 @@ export default class extends SKILL {
                 // }
 
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var gj = 10 + parseInt(lv / 300);
                 var nl = 3000 + lv * 4;
                 if (nl > 15000) nl = 15000;

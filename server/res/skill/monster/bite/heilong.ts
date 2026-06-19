@@ -1,7 +1,7 @@
 import {SKILL} from "../../../../core/skill/skill.js";
 import {FAMILIES} from "../../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../../core/const.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type { PropMap } from "../../../../types/props.js";
 
 export default class extends SKILL {

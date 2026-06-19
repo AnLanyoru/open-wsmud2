@@ -1,7 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 
@@ -37,7 +37,7 @@ export default class extends SKILL {
                 enable_skill: "sword",
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<HIY>$N长啸一声：武林至尊、宝刀屠龙。号令天下，莫敢不从。倚天不出，谁与争锋 ！</hiy>\n <HIR>顿时风云变色，$N手中舞出漫天剑光........ \n<HIR>");
                     var str = ["<HIC>-----拔云见日!----- </HIC>\n", "<BLU>-----星河在天!-----</BLU> \n", "<HIY>-----倚天不出!----- </HIY>\n", "<HIR>-----谁与争锋!-----</HIR> \n"];
                     var gj = me.gj;
@@ -57,7 +57,7 @@ export default class extends SKILL {
                     // me.send_room("<HIR>$N暗念倚天剑决，身法陡然加快！</HIR>");
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     lv = parseInt(20 + (lv / 50));
                     return "倚天剑决，瞬间攻击4次，当前一次攻击命中后，下次攻击伤害增加" + lv + "%";
                 }
@@ -68,7 +68,7 @@ export default class extends SKILL {
                 enable_skill: "sword",
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 10 + parseInt(lv / 50);
                     var count = target.query_status("fumo");
                     if (!count) count = 1;
@@ -85,7 +85,7 @@ export default class extends SKILL {
                     // me.send_room("<HIR>$N暗念倚天剑决，身法陡然加快！</HIR>");
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 10 + parseInt(lv / 50);
                     return "对敌人造成伤害，每层伏魔增加" + per + "%伤害和命中，命中后伏魔重置，驱除对方的有益状态";
                 }
@@ -108,7 +108,7 @@ export default class extends SKILL {
         };
     }
 
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (!par.is_dodged && !par.is_parried) {
             target.add_status({
                 id: "fumo",

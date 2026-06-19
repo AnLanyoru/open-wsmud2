@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "白云心法";
@@ -56,7 +57,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = 10 + parseInt(lv / 100);
                     var time = 20000 + lv * 10;
                     me.send_room("<hiw>$N微一凝神，运起白云心法，将全身潜能尽数提起，宛如被云雾所笼罩</hiw>", target);
@@ -73,7 +74,7 @@ export default class extends SKILL {
                     });
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 10 + parseInt(lv / 100);
                     var time = 20000 + lv * 10;
                     return "使用白云心法提升战力，增加你" + gj + "%的攻击，防御，持续" + (time / 1000) + "秒";

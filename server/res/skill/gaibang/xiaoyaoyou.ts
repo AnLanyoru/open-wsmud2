@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "逍遥游";
@@ -29,7 +30,7 @@ export default class extends SKILL {
                 enable_skill: "dodge",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var gj = lv * 10 + 10000;
 
@@ -44,7 +45,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = lv * 10 + 10000;
                     return "" + (gj / 1000) + "秒内增加你" + lv + "命中。";
                 }

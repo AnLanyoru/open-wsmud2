@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "凌波微步";
@@ -32,7 +33,7 @@ export default class extends SKILL {
                 enable_skill: "dodge",
                 release_time: 0,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var gj = lv * 10;
                     if (gj < 3000) gj = 3000;
@@ -54,7 +55,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = lv * 10;
                     if (gj < 3000) gj = 3000;
                     else if (gj > 10000) gj = 10000;

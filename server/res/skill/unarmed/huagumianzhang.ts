@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "化骨绵掌";
@@ -46,7 +47,7 @@ export default class extends SKILL {
                 distime: 7000,
                 enable_skill: "unarmed",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var sh = me.do_attack({
                         attack_msg: "<mag>$N掌出如风，轻轻拍向$n的肩头。</mag>",
                         target: target,
@@ -55,7 +56,7 @@ export default class extends SKILL {
                         damage_msg: "<hir>结果只听扑的一声，$p被$P一掌拍中，只觉得全身暖洋洋的，感到有点轻飘无力。</hir>"
                     });
 
-                    if (sh > 0) {
+                    if (sh && sh > 0) {
                         var str = 10 + Math.round(lv / 5);
                         target.add_status({
                             id: "huagu",
@@ -72,7 +73,7 @@ export default class extends SKILL {
                     me.end_attack(target);
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 10 + Math.round(lv / 5);
                     var t = 10000 + lv * 10;
                     return "使用化骨绵掌的阴柔掌力，使敌人骨骼其软如绵，浑身无力，在" + (t / 1000) + "秒内减少" + gj + "点臂力。";
@@ -88,8 +89,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (!par.is_dodged && !par.is_parried && par.iscirt) {
             me.send_room("<hib>一股阴寒的掌力顺着$N的手掌侵入$n，$p不由得打了个冷颤。</hib>", target);
             var lv = me.query_skill("huagumianzhang", 0) + 10;

@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "唐诗剑法";
@@ -49,7 +50,7 @@ export default class extends SKILL {
                 release_time: 8000,
                 releasetime_key: 'tsjf_cz',
                 no_auto: true,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("\n$N大叫一声倒在地上，挣扎了几下，<HIR>死了</HIR>！\n");
                     var exp = (me.exp || 0);
                     exp = exp * lv / 1000;
@@ -70,7 +71,7 @@ export default class extends SKILL {
                         duration: time
                     }, me);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "躺下装死，敌人将放弃对你的进攻";
                 }

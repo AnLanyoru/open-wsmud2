@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "混天气功";
@@ -24,7 +25,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var time = 25000 + lv;
                     if (time > 30000) time = 30000;
@@ -41,7 +42,7 @@ export default class extends SKILL {
                         duration: time
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = (25000 + lv) / 1000;
                     if (time > 30) time = 30;
                     var gj = 600 + lv * 2;

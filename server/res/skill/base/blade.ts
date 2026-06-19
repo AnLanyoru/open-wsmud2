@@ -1,6 +1,7 @@
 import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     id = "blade";
@@ -19,7 +20,7 @@ export default class extends SKILL {
             name: "斩击",
             distime: 5000,
             mp: 5,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var msg = "<hic>$N看$n露出破绽，挥动$W斩向$n的$l</hic>";
                 var gj = 10 + lv;
                 me.do_attack({
@@ -30,7 +31,7 @@ export default class extends SKILL {
                 });
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }

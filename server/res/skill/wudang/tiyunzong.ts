@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "梯云纵";
@@ -34,8 +35,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_dodge_over(me, target, par) {
+    on_dodge_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_dodged && !me.query_temp("tiyunzong")) {
             var lv = me.query_skill("tiyunzong", 0);
             me.add_status({

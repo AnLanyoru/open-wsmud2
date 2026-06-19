@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "伏虎拳";
@@ -33,7 +34,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "unarmed",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var t = parseInt(me.str * 5 + lv / 30);
                     me.do_attack({
@@ -45,7 +46,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = parseInt(me.str * 5 + lv / 20);
                     return "使出全身力气迅猛一击造成" + t + "%攻击力的伤害，先天臂力越高，造成的伤害越大，";
                 }

@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "猴拳";
@@ -44,7 +45,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 releasetime_key: "hq_rt",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = me.gj + lv + 100;
                     gj = gj + me.query_prop('hq_sh') * me.gj / 100;
                     me.do_attack({
@@ -55,7 +56,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = lv + 100;
                     return "在近距离攻击即将完成的瞬间，突然爆发，造成基本攻击附加" + gj + "的伤害。";
                 }

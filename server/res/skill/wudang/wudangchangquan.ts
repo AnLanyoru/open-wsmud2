@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "武当长拳";
@@ -33,7 +34,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 10,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var sh = me.do_attack({
                         target: target,
                         attack_msg: "<hic>$N身行前探，双手抱环向$n推去</hic>",
@@ -52,7 +53,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 3000 + lv * 4;
                     return "命中敌人后，使敌人忙乱" + (time / 1000) + "秒，无法攻击，招架";
                 }

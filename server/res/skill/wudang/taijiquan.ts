@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "太极拳";
@@ -67,7 +68,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.UNARMED,
                 enable_skill: "unarmed",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     lv = 10 + parseInt(lv / 100);
                     if (lv > 20) lv = 20;
                     me.do_attack({
@@ -81,7 +82,7 @@ export default class extends SKILL {
                     })
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     lv = 10 + parseInt(lv / 100);
                     if (lv > 20) lv = 20;
@@ -105,8 +106,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_parried) {
             if (!me.query_temp("sk_taijiquan")) {
                 me.do_attack({

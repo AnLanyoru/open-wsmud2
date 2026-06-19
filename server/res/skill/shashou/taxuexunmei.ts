@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "踏雪寻梅";
@@ -30,7 +31,7 @@ export default class extends SKILL {
                 mp: 30,
                 release_time: 0,
                 no_auto: true,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = 3000 + lv * 5;
                     if (gj > 10000) gj = 10000;
                     me.send_room("<hiw>$N身体急转，化为一道白光，虚幻不定的出现在$N的周围\n</hiw>", target);
@@ -42,7 +43,7 @@ export default class extends SKILL {
                         ig_control: gj
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 3 + parseInt(lv / 200);
                     if (gj > 10) gj = 10;
                     return gj + "秒内免疫控制";

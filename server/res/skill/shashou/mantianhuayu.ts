@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "漫天花雨";
@@ -31,7 +32,7 @@ export default class extends SKILL {
                 distime: 18000,
                 // enable_skill: "throwing",
                 mp: 20,
-                use: function (me, target, lv, type) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number, type) {
                     let is_throwing = type !== 'sword';
                     if (is_throwing)
                         me.send_room("<hiy>$N手中$T一抖，幻出万点星光，如朵朵落花般撒向$n</hiy>", target);
@@ -52,7 +53,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "漫天暗器攻击敌人，每5%暴击增加一次攻击，最多10次";
                 }
@@ -64,7 +65,7 @@ export default class extends SKILL {
                 enable_skill: "throwing",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 5000 + parseInt(lv * 10 / 3);
                     if (time > 15000) time = 15000;
 
@@ -84,7 +85,7 @@ export default class extends SKILL {
                     }, me);
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 5 + parseInt(lv / 300);
                     if (time > 15) time = 15;
                     return "使用暗器攻击敌人，如果命中则使敌人定身" + time + "秒";

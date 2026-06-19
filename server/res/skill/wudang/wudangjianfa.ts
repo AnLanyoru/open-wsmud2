@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "武当剑法";
@@ -33,7 +34,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "sword",
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 70 + parseInt(lv / 10);
                     me.send_room("<hiw>凝神聚气，手中$W回转，划出一个闪亮的剑圈，套向$n而去。</hiw>", target);
                     for (var i = 0; i < 3; i++) {
@@ -47,7 +48,7 @@ export default class extends SKILL {
                     me.end_attack(target);
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 70 + parseInt(lv / 10);
 
                     return "连环三剑，如柔丝缠身，连绵不绝，每剑对敌人造成" + per + "%的伤害。";

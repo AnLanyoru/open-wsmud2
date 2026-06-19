@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "四象步法";
@@ -47,7 +48,7 @@ export default class extends SKILL {
                 enable_skill: "dodge",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var dex = 20 + Math.min(parseInt(lv / 500), 10);
                     me.send_room("<hiy>$N足尖轻点地面，凌空跃起，身形顿时变得飘忽不定，难以捉摸。</hiy>", target);
@@ -63,7 +64,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = (8000 + lv * 2) / 1000;
                     if (t > 20) t = 20;
                     var dex = 20 + Math.min(parseInt(lv / 500), 10);

@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "降龙十八掌";
@@ -45,7 +46,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 mp: 30,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 2000 + lv * 5;
                     if (time > 8000) time = 8000;
                     var is_parried = false;
@@ -75,7 +76,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 2000 + lv * 5;
                     if (time > 8000) time = 8000;
                     return " 以强劲的掌力猛击敌人，如果敌人招架失败，将在" + (time / 1000) + "秒内无法躲闪。";
@@ -105,13 +106,13 @@ export default class extends SKILL {
                 "<hir>-----履霜冰至-----</hir>\n却见$N门户大开，蓦地施出一招「履霜冰至」向$n的$l劈去",
                 "<hir>-----羝羊触蕃-----</hir>\n$N嗔目大喝，使出「羝羊触蕃」，双掌由下往上击向$n的$l",
                 "<hir>-----神龙摆尾-----</hir>\n$N左掌护胸，右掌使一招「神龙摆尾」上下晃动着击向$n的$l"
-            ], query_releasetime: function (me, lv) {
+            ], query_releasetime: function (me: CHARACTER, lv: number) {
                 lv = lv || me.query_skill("xianglongzhang", 0);
                 var t = 12000 - lv * 2;
                 if (t <= 8000) return 8000;
                 return t;
             },
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room("<hiy>$N凝神聚气，神态淡然，左手虚划，右手回转，聚气于胸前，双掌猛地推出，蕴含着降龙十八掌的十八般变化<hiy>\n");
                 me.is_rash = 12000 - lv * 2;
                 if (me.is_rash < 8000) me.is_rash = 8000;
@@ -122,13 +123,13 @@ export default class extends SKILL {
                 var $this = this;
                 me.call_interval(
                     function (i) {
-                        target = me.query_enemy();
-                        if (!target) {
+                        let now_target = me.query_enemy();
+                        if (!now_target) {
                             me.is_rash = 0;
                             return false;
                         }
                         if (me.do_attack({
-                            target: target,
+                            target: now_target,
                             gj: gj,
                             mz: me.mz,
                             attack_msg: $this.msgs[i],
@@ -136,8 +137,8 @@ export default class extends SKILL {
                         })) {
                             gj = gj * lv / 100;
                         }
-                        me.end_attack(target);
-                        if (!me.enemy.length) {
+                        me.end_attack(now_target);
+                        if (!me.enemy?.length) {
                             me.is_rash = 0;
                             return false;
                         }
@@ -147,7 +148,7 @@ export default class extends SKILL {
                     18
                 );
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var lv1 = 5 + parseInt(lv / 500);
                 if (lv1 > 9) lv1 = 9;
                 var time = (12000 - lv * 2) / 1000;

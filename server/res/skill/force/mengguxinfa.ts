@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import { PropMap } from "../../../types/index.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "蒙古心法";
@@ -40,7 +41,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 // use_type: 1,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var time = (10000 + lv * 10);
                     var gj = 10 + (lv / 100);
@@ -62,7 +63,7 @@ export default class extends SKILL {
                         duration: time
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = (10000 + lv * 10) / 1000;
                     var gj = parseInt(10 + (lv / 100));
                     return "增加自身防御" + time + "秒内，提升自身，攻击防御" + gj + "%。";

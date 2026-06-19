@@ -46,7 +46,7 @@ export default class extends SKILL {
                 });
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 return "凝聚真气奋力一击，造成" + me.gj + "<hir>(+" + lv + ")</hir><mag>(+" + (me.query_skill("zixiashengong", 0) * 2) + ")</mag>点伤害。";
             }
         },
@@ -56,7 +56,7 @@ export default class extends SKILL {
             enable_skill: "unarmed",
             weapon_type: WEAPON_TYPE.UNARMED,
             mp: 25,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 let par: DoAttackPar = {
                     gj: me.gj,
                     mz: me.mz,
@@ -86,7 +86,7 @@ export default class extends SKILL {
                 me.end_attack(target);
 
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 let time = Math.floor(5 + lv / 500);
                 if (time > 15) time = 15;
                 let fy = lv + 600;

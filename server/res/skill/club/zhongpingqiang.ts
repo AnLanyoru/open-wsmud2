@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "中平枪法";
@@ -42,7 +43,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "club",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 100 + parseInt(lv / 10);
                     var diff_fy = me.query_prop('zpqf_cc');
                     me.do_attack({
@@ -54,7 +55,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 200 + parseInt(lv / 5);
                     if (per > 500) per = 500;
                     return "对敌人造成" + per + "%攻击力的伤害";
@@ -65,7 +66,7 @@ export default class extends SKILL {
                 distime: 20000,
                 enable_skill: "club",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var per = 150 + parseInt(lv / 20);
                     if (per > 200) per = 200;
@@ -86,7 +87,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 50 + parseInt(lv / 50);
                     if (per > 100) per = 100;
                     return "攻击出其不意，增加你" + per + "%的命中，对敌人快速攻击，如果命中则对敌人再发起一次突击。";

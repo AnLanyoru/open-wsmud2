@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "蛇岛奇功";
@@ -51,7 +52,7 @@ export default class extends SKILL {
                 distime: 3000,
                 enable_skill: "parry",
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var add = parseInt(lv / 10) + 1;
                     var time = 5000 + lv * 10;
                     if (time > 20000) time = 20000;
@@ -72,7 +73,7 @@ export default class extends SKILL {
                         max_count: 10 + me.query_prop('sdqg_count')
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var add = parseInt(lv / 10) + 1;
                     var time = 5000 + lv * 10;
                     return "蛇岛奇功之唱仙法" + (time / 1000) + "秒增加你的攻击，防御，命中，躲闪，招架" + add + "，可叠加最多10层";
@@ -84,7 +85,7 @@ export default class extends SKILL {
                 distime: 20000,
                 enable_skill: "parry",
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var count = me.query_status("parry");
                     if (!count) return me.notify_fail("<hic>你深深地吸一囗气，想吼一嗓子，结果又憋了回去。</hic>");
                     let gj = me.gj * me.query_prop('sdqg_hxf') / 100;
@@ -99,7 +100,7 @@ export default class extends SKILL {
                     me.remove_status("parry", true);
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
 
                     return "蛇岛奇功之吼仙法，将你的唱仙法积累的力量一次性释放出去，每层造成" + lv + "伤害，无法招架";

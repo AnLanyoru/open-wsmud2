@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "泰山剑法";
@@ -46,7 +47,7 @@ export default class extends SKILL {
                 distime: 22000,
                 enable_skill: "sword",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hir>$N一招「七星落长空」挺$w向$n当胸刺去，剑光闪烁，$w发出嗡嗡之声，罩住了$n胸口“膻中”、“神藏”、“灵墟”、“神封”、“步廊”、“幽门”、“通谷”七处大穴</hir>", target);
                     var count = 7;
                     var per = 50 + parseInt(lv / 50);
@@ -85,7 +86,7 @@ export default class extends SKILL {
                         }
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 50 + parseInt(lv / 50);
                     var p2 = 3 + parseInt(lv / 500);
                     return "瞬间七剑攻击敌方要穴，每剑造成" + per + "%伤害，每命中一剑减少敌人" + p2 + "%的躲闪和防御。";

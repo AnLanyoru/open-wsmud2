@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "黑龙心法";
@@ -38,7 +39,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     me.send_room("<hic>$N喉间发出一声低沉吼叫，内息如墨自丹田翻涌而上游走全身！！</hic>");
 
@@ -65,7 +66,7 @@ export default class extends SKILL {
                         finish_msg: "$N的黑龙护体运行完毕，将内力收回丹田。"
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = (10000 + lv * 10) / 1000;
                     var gj = lv;
                     return "提升全身潜力，在" + time + "秒内，提升自身防御力" + gj + "点。";
@@ -83,7 +84,7 @@ export default class extends SKILL {
         };
     }
 
-    on_force_parry(me, target) {
+    on_force_parry(me: CHARACTER, target: CHARACTER) {
         let sh = me.query_temp('sk_heilong');
         if (sh > 0) {
             me.send_combat(

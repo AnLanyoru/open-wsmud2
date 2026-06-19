@@ -1,6 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type { CHARACTER } from "../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {

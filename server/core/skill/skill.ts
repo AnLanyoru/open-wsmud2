@@ -6,7 +6,7 @@ import {WORLD} from "../world.js";
 import {UTIL} from "../util.js";
 import {FAMILIES} from "./family.js";
 import type {FAMILY} from './family.js';
-import type {CHARACTER} from '../char/character.js';
+import type {CHARACTER, DoAttackPar} from '../char/character.js';
 import {PROPERTIES, SKILL_TYPES} from "../const.js";
 import type { PropMap } from "../../types/props.js";
 
@@ -227,31 +227,31 @@ export class SKILL extends BASE {
     /** 战斗开始回调 */
     on_beginfight?(me: CHARACTER, target: CHARACTER): void;
     /** 攻击前回调（每轮） */
-    on_before_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): void;
+    on_before_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void;
     /** 攻击回调（返回额外伤害） */
-    on_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number;
+    on_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
     /** 攻击结束回调（一轮后） */
-    on_attack_over?(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void;
+    on_attack_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
     /** 一轮攻击完全结束回调 */
     on_end_attack?(me: CHARACTER, target: CHARACTER): void;
     /** 内功攻击回调（返回内功伤害） */
-    do_force_attack?(me: CHARACTER, target: CHARACTER, par: Record<string, any>): number;
+    do_force_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
 
     /** 内功招架回调（返回减免伤害） */
-    on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: Record<string, any>): number;
+    on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: DoAttackPar): number;
 
     /** 内功攻击结束回调 */
-    on_force_over?(me: CHARACTER, target: CHARACTER, par: Record<string, any>, sh: number): void;
+    on_force_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
     /** 受到伤害回调（返回减免后伤害） */
     on_damage?(me: CHARACTER, from: CHARACTER, sh: number): number;
     /** 闪避回调 */
-    on_dodge?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
+    on_dodge?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
     /** 闪避结束回调 */
-    on_dodge_over?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
+    on_dodge_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
     /** 招架回调 */
-    on_parry?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
+    on_parry?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
     /** 招架结束回调 */
-    on_parry_over?(target: CHARACTER, me: CHARACTER, par: Record<string, any>): void;
+    on_parry_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
     /** 绝招招架回调（返回是否招架成功）
      * @param sk 基础技能 sid
      */

@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "叫花棒法";
@@ -30,7 +31,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "club",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var p = 50 + lv;
                     if (me.do_attack({
                         target: target,
@@ -52,7 +53,7 @@ export default class extends SKILL {
                     }
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var p = 50 + lv;
                     return "攻击敌方下三路，命中后减少对方" + p + "躲闪。";
                 }

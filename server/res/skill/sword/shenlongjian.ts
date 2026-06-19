@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "神龙剑";
@@ -47,7 +48,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "sword",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<CYN>$N后跃一步，手捏剑决，口中念念有词，突然大喝一声「神龙天降」！！</CYN>", target);
                     var sh = me.do_attack({
                         target: target,
@@ -79,7 +80,7 @@ export default class extends SKILL {
                         });
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = 3000 + lv;
                     return "诡异的剑法迷惑敌人，命中后对敌人造成伤害，并且使敌人忙乱" + t / 1000 + "秒。";
                 }

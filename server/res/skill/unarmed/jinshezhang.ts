@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "金蛇游身掌";
@@ -52,7 +53,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var per = 100 + parseInt(lv / 100) + me.query_prop('jsys_sh');
                     var gj = me.gj * per / 100;
@@ -77,7 +78,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     var per = 100 + parseInt(lv / 100);
                     return "对敌人造成你攻击力" + per + "%的伤害，命中后使敌人在8秒内无法闪避";

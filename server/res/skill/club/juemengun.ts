@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "绝门棍";
@@ -52,7 +53,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "club",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var p = 120 + Math.round((lv / 5));
                     var gj = me.gj * p / 100 + me.gj * me.query_prop('jm_sh') / 100;
                     var mz = me.mz + 20 + me.mz * me.query_prop('jm_mz') / 100;
@@ -65,7 +66,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var p = 120 + Math.round((lv / 5));
                     return "快速混乱的闷棍，看似无章法，却使敌人难以躲闪，增加自身命中20，造成" + p + "%攻击力的伤害。";
                 }

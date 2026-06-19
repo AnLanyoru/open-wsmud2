@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "胡家刀法";
@@ -60,7 +61,7 @@ export default class extends SKILL {
                 releasetime_per_key: 'hjdf_sf_per',
                 mp: 20,
                 is_weapon_buff: true,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hiw>$N施出「八方藏刀式」，手中的$W吞吞吐吐，变化莫测，笼罩了$n周身要害！</hiw>", target);
 
                     let mz = me.mz * 1.1;
@@ -73,15 +74,16 @@ export default class extends SKILL {
                         function () {
                             if (!me.can_attack()) return false;
 
-                            target = me.query_enemy();
+                            let now_target = me.query_enemy();
+                            if (!now_target) return false;
                             me.do_attack({
-                                target: target,
+                                target: now_target,
                                 gj: gj,
                                 mz: mz,
                                 attack_before: "<hiw>紧跟着</hiw>",
                                 no_append: true
                             });
-                            if (!me.end_attack(target)) {
+                            if (!me.end_attack(now_target)) {
                                 return false;
                             }
                         },
@@ -89,13 +91,13 @@ export default class extends SKILL {
                         8
                     );
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     return "快速出刀，释放成功后在5秒内出刀8次，每刀命中增加10%";
                 }
             }
     };
 
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_parried) {
             if (!me.query_temp("sk/hu/parry")) {
                 me.do_attack({

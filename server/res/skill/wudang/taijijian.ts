@@ -3,6 +3,7 @@ import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "太极剑法";
@@ -63,7 +64,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.SWORD,
                 release_time: 0,
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = lv * 10 + 3000;
                     if (time > 15000) time = 15000;
                     me.send_room("<mag>$N使出太极剑【缠字决】，$n一时之间手忙脚乱，无法攻击</mag>", target);
@@ -75,7 +76,7 @@ export default class extends SKILL {
                         is_busy: true
                     }, me);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = lv * 10 + 3000;
                     if (time > 15000) time = 15000;
 
@@ -89,7 +90,7 @@ export default class extends SKILL {
                 enable_skill: "sword",
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = parseInt(lv / 10) + 110;
                     if (per > 200) per = 200;
                     me.send_room("<mag>$N使出太极剑【连字决】，身法突然加快</mag>", target);
@@ -104,7 +105,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var count = parseInt(lv / 10) + 10;
                     if (count > 100) count = 100;
                     return "快速出剑，瞬间对敌人快速攻击7次，攻击中命中增加" + count + "%";
@@ -118,7 +119,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
                 release_time: 1000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 3000 + lv * 10;
                     var gj = 100 + parseInt(lv / 5);
                     var per = 10 + parseInt(lv / 200);
@@ -145,7 +146,7 @@ export default class extends SKILL {
                     }
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 3000 + lv * 10;
                     var gj = 100 + parseInt(lv / 5);
                     var per = 10 + parseInt(lv / 200);
@@ -172,7 +173,7 @@ export default class extends SKILL {
         };
     }
 
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (!par.is_dodged && !par.is_parried) {
             if (!me.query_temp("sk/taijijian/sword")) {
                 me.send_room("<cyn>$n一招失势被$N的剑招所乱！</cyn>", target);

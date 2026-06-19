@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "一指禅";
@@ -30,7 +31,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = (lv * 5 + 2000);
                     if (time > 10000) time = 10000;
                     var sh = me.do_attack({
@@ -54,7 +55,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = (lv * 5 + 2000);
                     if (time > 10000) time = 10000;
                     return "一指禅之惊魔一指，运用无形剑气攻击敌人，命中后昏迷" + time / 1000 + "秒。";

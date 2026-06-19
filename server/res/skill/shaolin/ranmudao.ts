@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "燃木刀法";
@@ -32,7 +33,7 @@ export default class extends SKILL {
                 // enable_skill: "parry",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<HIR>$N仰天怒吼，全身登时腾起滔天烈焰。\n</HIR>", target);
                     var time = 8000 + lv * 5;
                     if (time > 200000) time = 200000;
@@ -48,7 +49,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 8000 + lv * 5;
                     if (time > 200000) time = 200000;
                     let add_fy = (lv * 2 + 500);
@@ -60,7 +61,7 @@ export default class extends SKILL {
             enable_skill: "blade",
             weapon_type: WEAPON_TYPE.BLADE,
             mp: 20,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 lv = 50 + parseInt(lv / 20);
                 me.send_room("<HIy>$N双手持刀，对天咆哮，所施正是燃木刀法绝学「焚尽八荒」。霎时呼啸声大作，但见一股澎湃无比的罡劲至$N刀间涌出，云贯向$n而去</HIy>", target);
                 var count = 8;
@@ -74,7 +75,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 lv = 50 + parseInt(lv / 20);
                 return "燃木刀法绝学「焚尽八荒」，瞬间用罡气攻击敌方8次，每次攻击造成" + lv + "%伤害";
             }
@@ -97,12 +98,11 @@ export default class extends SKILL {
         };
     }
 
-    on_attack(me, target) {
+    on_attack(me: CHARACTER, target: CHARACTER) {
         me.send_combat("<red>$n被烈焰划过，身上一道焦黑</red>", target);
         return me.fy;
     }
-
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         let sh = me.query_temp("sk_ranmu");
         if (sh) {
             if (par.is_parried) sh = sh * 2;

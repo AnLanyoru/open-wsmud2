@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "八卦棍法";
@@ -57,7 +58,7 @@ export default class extends SKILL {
                 enable_skill: "club",
                 distime_key: 'bgg_cd',
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var p = 1 + Math.round((lv / 100));
                     if (p > 8) p = 8;
                     me.send_room("<hir>$N脚下踏着先天八卦的图式，身随意转，手随心动，顿时无数棍影从四面八方涌向$n</hir>\n", target);
@@ -76,7 +77,7 @@ export default class extends SKILL {
 
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var p = 1 + Math.round((lv / 100));
                     if (p > 8) p = 8;
                     return "瞬间对敌人攻击" + p + "次";

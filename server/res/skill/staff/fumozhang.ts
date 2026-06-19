@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "伏魔杖";
@@ -31,7 +32,7 @@ export default class extends SKILL {
                 enable_skill: "staff",
                 weapon_type: WEAPON_TYPE.STAFF,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hiy>$N大喝一声，手中$W杖端化出无数个圆圈，凝滞沉重，劈头盖脸向$n砸去</hiy>\n", target);
 
                     var count = target.query_status("fmz");
@@ -51,7 +52,7 @@ export default class extends SKILL {
                     }
                     target.remove_status("fmz", true);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "罗汉伏魔，每层BUFF增加80%伤害";
                 }
@@ -69,8 +70,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (!par.is_dodged && !par.is_parried) {
             var lv = me.query_skill("fumozhang", 0);
             lv = 5 + parseInt(lv / 100);

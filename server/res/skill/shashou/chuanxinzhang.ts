@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "穿心掌";
@@ -32,7 +33,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var p = 100 + parseInt(lv / 100);
                     var t = 6000 + lv;
@@ -62,7 +63,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var p = 100 + parseInt(lv / 100);
                     var t = 6 + parseInt(lv / 1000);
                     if (t > 10) t = 10;

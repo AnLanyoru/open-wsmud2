@@ -1,7 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
-import { CHARACTER } from "../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
@@ -54,7 +54,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 200 + parseInt(lv / 10);
                     return "快速狠辣的攻击，命中后对敌人造成你攻击力" + gj + "%的伤害，在8秒内使敌人无法闪避。";
                 }
@@ -65,7 +65,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     lv = 30 - lv / 100;
                     if (lv < 10) lv = 10;
                     var count = parseInt((100 - target.hp * 100 / target.max_hp) / lv) + 3;
@@ -80,7 +80,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var calcLv = 30 - lv / 100;
                     if (calcLv < 10) calcLv = 10;
                     return "对敌人进行快速攻击3次，对方的气血每降低" + calcLv + "%，你的攻击次数增加1次";

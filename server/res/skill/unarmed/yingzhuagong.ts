@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "鹰爪功";
@@ -46,7 +47,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "unarmed",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var t = 100 + parseInt(lv / 20) + me.query_prop('yzg_sh')
                     me.do_attack({
@@ -59,7 +60,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = 100 + parseInt(lv / 20);
 
                     return "使出全身力气迅猛一击造成" + t + "%攻击力的伤害，命中增加100%";

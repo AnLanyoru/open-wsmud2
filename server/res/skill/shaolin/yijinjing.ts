@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "易筋经";
@@ -26,7 +27,7 @@ export default class extends SKILL {
                 mp: 20,
                 use_type: 2,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hiy>只听$N高呼佛号，运起佛光普照，霎那间全身竟犹如镀金一般，发出灿灿金光。</hiy>");
                     var tm = me.team || [me];
                     for (var i = 0; i < tm.length; i++) {
@@ -46,7 +47,7 @@ export default class extends SKILL {
                     }
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     return "召唤佛光守护，增加你和你队友的气血" + (lv * 10) + "，防御" + lv + "。";
                 }
             },
@@ -58,7 +59,7 @@ export default class extends SKILL {
                 mp: 20,
                 use_type: 2,
                 release_time: 1000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     me.send_room("<hiy>$N深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼。</hiy>");
                     if (!me.enemy) return false;
@@ -88,7 +89,7 @@ export default class extends SKILL {
                         me.end_attack(x);
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = lv * 10 + 2000;
                     if (time > 7000) time = 7000;
                     return "深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼，对附近敌人造成你最大内力10%(" + (me.max_mp / 10) + ")的伤害，如果敌人最大内力小于你的内力将昏迷" + (time / 1000) + "秒。";
@@ -101,7 +102,7 @@ export default class extends SKILL {
                 mp: 20,
                 use_type: 2,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var zhaoLv = 30 + parseInt(lv / 100);
                     me.send_room("<hiy>$N高呼佛号，全身真气鼓动，犹如金铸之钟，坚不可摧。</hiy>");
                     me.add_status({
@@ -115,7 +116,7 @@ export default class extends SKILL {
                     });
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var calcLv2 = 30 + parseInt(lv / 100);
                     return "减少你受到的伤害，10秒内增加" + calcLv2 + "%伤害减免。";
                 }

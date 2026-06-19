@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "神形百变";
@@ -52,7 +53,7 @@ export default class extends SKILL {
                 distime_key: 'sxbb_cd',
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var t = (5000 + lv * 3);
                     if (t > 10000) t = 10000;
                     t += me.query_prop('sxbb_cx');
@@ -67,7 +68,7 @@ export default class extends SKILL {
                         }
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = (5000 + lv * 3) / 1000;
                     if (t > 10) t = 10;
                     return "把神行百变轻功运用到极致，使敌人难以捕捉到你的身影，" + t + "秒内增加你100%的躲闪";

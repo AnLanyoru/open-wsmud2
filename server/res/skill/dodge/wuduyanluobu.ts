@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "五毒烟萝步";
@@ -42,7 +43,7 @@ export default class extends SKILL {
                 distime: 30000,
                 enable_skill: "dodge",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 2000 + lv * 3;
                     if (time > 10000) time = 10000;
                     var msg = "<HIC>$N身行忽的一变，使出「金蛇游身」的绝技，身法越来越快。\n\n只见$N飞快的绕场游走，瞻之在前，望之在后，一时间到处都是$N的身影。</HIC>\n";
@@ -62,7 +63,7 @@ export default class extends SKILL {
                     }
                     me.send_room(msg, target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 2000 + lv * 4;
                     if (time > 10000) time = 10000;
                     return "金蛇游身，如有万蛇缠身，成功后使敌人忙乱" + (time / 1000) + "秒。";

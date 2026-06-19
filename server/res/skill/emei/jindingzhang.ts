@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "金顶绵掌";
@@ -34,7 +35,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var sh = me.gj + (100 + lv * parseInt((lv / 500) + 1));
                     me.do_attack({
                         target: target,
@@ -45,7 +46,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var sh = (100 + lv * parseInt((lv / 500) + 1));
                     return "平淡无奇的招式，却如佛光普照般使敌人难以躲闪，对敌方造成你的攻击附加" + sh + "的伤害。";
                 }

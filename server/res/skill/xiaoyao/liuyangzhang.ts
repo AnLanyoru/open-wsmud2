@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "天山六阳掌";
@@ -38,7 +39,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
                 release_time: 8000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var time = 12000 - lv;
                     if (time < 10000) time = 10000;
@@ -79,7 +80,7 @@ export default class extends SKILL {
                     }
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 12000 - lv;
                     if (time < 10000) time = 10000;
                     var fu = 10 + parseInt(lv / 300);
@@ -91,12 +92,12 @@ export default class extends SKILL {
             distime: 12000,
             enable_skill: "unarmed",
             mp: 20,
-            check: function (me, lv) {
+            check: function (me: CHARACTER, lv: number) {
                 if (lv < 30) return false;
                 return true;
             },
             use_condition: "需要天山六阳掌等级30",
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room("<hir>$N长笑一声，双掌快速拍向$n，竟如惊涛骇浪般汹涌而去！</hir>", target);
                 var mz = me.mz;
                 var gj = me.gj;
@@ -118,7 +119,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var sp = 50 + parseInt(lv / 30);
                 return "以迅猛的掌力瞬间攻击对方三次，造成伤害后下次增加攻击" + sp + "%，否则增加" + sp + "%命中";
             }
@@ -127,7 +128,7 @@ export default class extends SKILL {
             distime: 10000,
             enable_skill: "unarmed",
             mp: 20,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 lv = 10 + parseInt(lv / 100);
                 if (lv > 20) lv = 20;
                 me.do_attack({
@@ -140,7 +141,7 @@ export default class extends SKILL {
                 })
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 lv = 10 + parseInt(lv / 100);
                 if (lv > 20) lv = 20;
                 var gj = parseInt(me.max_mp * lv / 100);

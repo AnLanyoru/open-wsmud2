@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "小无相功";
@@ -33,17 +34,17 @@ export default class extends SKILL {
                 no_copy: true,
                 allow_busy: true,
                 release_time: 3000,
-                query_releasetime: function (me, lv) {
+                query_releasetime: function (me: CHARACTER, lv: number) {
                     return this.release_time;
                 },
-                query_distime: function (me, lv) {
+                query_distime: function (me: CHARACTER, lv: number) {
                     return this.distime;
                 },
                 query_name: function (me, type) {
                     if (!type) return this.name;
                     return "无相" + ALLOW_TYPES[type];
                 },
-                use: function (me, target, lv, sk) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number, sk) {
                     var prev = target.query_temp("used_pfm");
                     if (!prev) return me.notify_fail("<cyn>" + target.name + "最近没有使用绝招，你无法模仿。</cyn>");
                     var str = prev.split("/");
@@ -86,8 +87,8 @@ export default class extends SKILL {
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
 
-                    this.distime = pfm.query_distime?.(me, lv) ?? 0;
-                    this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
+                    this.distime = pfm.query_distime?.(me: CHARACTER, lv: number) ?? 0;
+                    this.release_time = pfm.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
 
                     if (sp_skill.grade <= 4 && isEnable && !me.is_in("yz/leitai/leitai") &&
                         sp_skill.family !== FAMILIES.MONSTER) {
@@ -96,7 +97,7 @@ export default class extends SKILL {
                         me.set_temp("copy_pfm_" + pfm.enable_skill, prev);
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     lv = 80 + parseInt(lv / 40);
                     if (lv > 100) lv = 100;
                     return "使用前一个攻击你的绝招攻击敌人，效果是你小无相功等级的" + lv + "%，如果你的小无相品阶不低于对方技能的品阶并且装备的基础武功相同，你将学会这个绝招";
@@ -111,17 +112,17 @@ export default class extends SKILL {
                 allow_busy: true,
                 no_copy: true,
                 release_time: 3000,
-                query_releasetime: function (me, lv) {
+                query_releasetime: function (me: CHARACTER, lv: number) {
                     return this.release_time;
                 },
-                query_distime: function (me, lv) {
+                query_distime: function (me: CHARACTER, lv: number) {
                     return this.distime;
                 },
                 query_name: function (me, type) {
                     if (!type) return this.name;
                     return "无我" + ALLOW_TYPES[type];
                 },
-                use: function (me, target, lv, sk) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number, sk) {
                     var prev = me.query_temp("copy_pfm_" + sk);
                     var baseSkill = SKILL.get(sk);
                     if (!baseSkill) return false;
@@ -153,10 +154,10 @@ export default class extends SKILL {
                     var up = 70 + parseInt(lv / 100);
                     if (up > 100) up = 100;
                     me.use_pfm(target, pfm, parseInt(up * lv / 100));
-                    this.distime = pfm.query_distime?.(me, lv) ?? 0;
-                    this.release_time = pfm.query_releasetime?.(me, lv) ?? 0;
+                    this.distime = pfm.query_distime?.(me: CHARACTER, lv: number) ?? 0;
+                    this.release_time = pfm.query_releasetime?.(me: CHARACTER, lv: number) ?? 0;
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     lv = 70 + parseInt(lv / 100);
                     if (lv > 100) lv = 100;
                     return "使用你无相模仿并学会的绝招，效果是你小无相功等级的" + lv + "%，绝招需要和你的小无相装备的基本技能一样";
@@ -164,7 +165,7 @@ export default class extends SKILL {
             }
     };
 
-    query_attack_action(me, target) {
+    query_attack_action(me: CHARACTER, target: CHARACTER) {
         let type = me.query_weapon_type();
         if (type === WEAPON_TYPE.NONE)
             return this.attack_actions.random();

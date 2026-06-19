@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "华山剑法";
@@ -32,7 +33,7 @@ export default class extends SKILL {
                 enable_skill: "sword",
                 mp: 20,
                 release_time: 10000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<CYN>$N使出华山派绝技「剑掌五连环」，身法陡然加快！</CYN>", target);
                     var count = 5;
                     for (var i = 0; i < count; i++) {
@@ -45,7 +46,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "华山剑法之剑掌五连环，瞬间出招5次，收招较慢。";
                 }

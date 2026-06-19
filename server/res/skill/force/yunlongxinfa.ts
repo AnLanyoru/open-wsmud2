@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "云龙心法";
@@ -42,7 +43,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     me.send_room("<hir>$N长吸一口气，运起云龙神功已将全身潜力尽数提起！</hir>");
                     const prop: { gj: number; mz?: number } = {
@@ -68,7 +69,7 @@ export default class extends SKILL {
                         finish_msg: "$N的云龙神功运行完毕，将内力收回丹田。"
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = (10000 + lv * 10) / 1000;
                     var gj = lv;
                     return "提升全身潜力，在" + time + "秒内，提升自身攻击力" + gj + "点。";

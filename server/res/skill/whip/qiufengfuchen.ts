@@ -1,4 +1,4 @@
-import type {CHARACTER} from "../../../core/char/character.js";
+import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 
@@ -68,7 +68,7 @@ export default class extends SKILL {
                     }
                     me.send_room(msg, target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = Math.round(lv / 50);
                     if (time < 2) time == 2;
                     else if (time > 10) time = 10;

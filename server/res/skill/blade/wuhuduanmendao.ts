@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "五虎断门刀";
@@ -45,7 +46,7 @@ export default class extends SKILL {
                 enable_skill: "blade",
                 weapon_type: WEAPON_TYPE.BLADE,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = parseInt(50 + lv / 5);
                     let max = 300 + me.str + me.query_prop('whd_sh_max');
                     if (gj > max) gj = max;
@@ -64,7 +65,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     var gj = parseInt(50 + lv / 5);
                     let max = 300 + me.str + me.query_prop('whd_sh_max');

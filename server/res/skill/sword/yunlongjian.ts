@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "云龙剑";
@@ -51,11 +52,11 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "sword",
                 mp: 20,
-                check: function (me, lv) {
+                check: function (me: CHARACTER, lv: number) {
                     if (lv < 30) return false;
                     return true;
                 },
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 50 + parseInt(lv / 10);
                     var mz = 100 + parseInt(per / 3);
                     if (mz > 150) mz = 150;
@@ -74,7 +75,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 50 + parseInt(lv / 10);
                     var mz = parseInt(per / 3);
                     if (mz > 150) mz = 150;

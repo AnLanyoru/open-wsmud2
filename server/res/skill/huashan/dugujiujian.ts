@@ -3,6 +3,7 @@ import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "独孤九剑";
@@ -74,7 +75,7 @@ export default class extends SKILL {
                 enable_skill: "sword",
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = lv * 10 + 5000;
                     if (time > 15000) time = 15000;
                     me.send_room("<him>$N凝神聚气，挥洒手中兵器，进入无招无我，剑心通明境界！\n</him>", target);
@@ -92,7 +93,7 @@ export default class extends SKILL {
                     me.reauto_attack();
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     var time = lv * 10 + 5000;
                     if (time > 15000) time = 15000;
@@ -104,7 +105,7 @@ export default class extends SKILL {
                 distime: 10000,
                 enable_skill: "parry",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var weap = target.query_weapon();
                     if (!weap || weap.weapon_type === WEAPON_TYPE.NONE) return me.notify("对方没有兵刃，你不用担心。");
                     me.send_room("<HIC>$N举剑画弧，默潜独孤九剑之「破字诀」, 绵绵剑意，漫天铺地袭向$n</HIC>", target);
@@ -116,7 +117,7 @@ export default class extends SKILL {
                         me.send_room("<cyn>可是$n看破了$N的剑路，抽身后退，使$N的「破字诀」没有起到作用。\n</cyn>", target);
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "独孤九剑之破字诀，卸下对方兵刃，技能等级越高成功率越高。";
                 }
@@ -126,13 +127,13 @@ export default class extends SKILL {
                 distime: 30000,
                 enable_skill: "sword",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var sh = me.do_attack({
                         target: target,
                         attack_msg: "<hib>$N施出独孤九剑「破气式」，手中$W中攻直进，遥指$n的气海要穴。</hib>",
                         miss_msg: "<CYN>可$n深知$N这招的厉害，当即向后横移数尺，躲闪开来。</CYN>",
                         no_parry: true,
-                        damaga_msg: "<hir>$n被$N一剑划过气门，登感一阵锥心的刺痛，全身真气源源而泻！</hir>"
+                        damage_msg: "<hir>$n被$N一剑划过气门，登感一阵锥心的刺痛，全身真气源源而泻！</hir>"
                     });
                     if (sh) {
                         target.add_mp(-lv * 10);
@@ -149,7 +150,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = 3000 + lv * 5;
                     if (time > 10000) time = 10000;
                     return "独孤九剑之破气式，精准攻击敌方气海要穴，无法招架，命中后减少敌人" + (lv * 10) + "的内力，并使敌人忙乱" + (time / 1000) + "秒。";
@@ -186,7 +187,7 @@ export default class extends SKILL {
         };
     }
 
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_parried) {
             if (!me.query_temp("sk_dugu_parry")) {
                 me.do_attack({

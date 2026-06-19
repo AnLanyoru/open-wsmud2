@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "韦陀棍";
@@ -33,7 +34,7 @@ export default class extends SKILL {
                 distime: 20000,
                 enable_skill: "club",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var p = 120 + Math.round((lv / 50));
                     var t = (lv * 10 + 2000);
                     if (t > 12000) t = 12000;
@@ -55,7 +56,7 @@ export default class extends SKILL {
                     }
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var p = 120 + Math.round((lv / 50));
                     var t = (lv * 10 + 2000) / 1000;
                     if (t > 12) t = 12;

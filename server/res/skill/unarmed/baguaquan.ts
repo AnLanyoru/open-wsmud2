@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "八卦拳";
@@ -48,7 +49,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var t = 10 + parseInt(lv / 100);
                     if (t > 20) t = 20;
@@ -67,7 +68,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var t = 10 + parseInt(lv / 100);
                     if (t > 20) t = 20;
                     return "对敌人造成你" + t + "%最大内力的伤害。";

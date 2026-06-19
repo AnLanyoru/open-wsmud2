@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "天长掌法";
@@ -48,7 +49,7 @@ export default class extends SKILL {
                 distime: 20000,
                 enable_skill: "unarmed",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 100 + parseInt(lv / 5) + me.query_prop('tcz_sh');
                     var per2 = 100 + parseInt(lv / 50);
 
@@ -61,7 +62,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 100 + parseInt(lv / 5);
                     return "攻击敌人造成" + per + "%的伤害，等级越高命中越高";
                 }

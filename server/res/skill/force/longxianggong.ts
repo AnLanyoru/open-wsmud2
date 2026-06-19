@@ -1,5 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "龙象般若功";
@@ -45,7 +46,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = 50 + parseInt(lv / 100);
                     var time = 10000 + lv * 10;
                     if (time > 15000) time = 15000;
@@ -65,7 +66,7 @@ export default class extends SKILL {
                     });
                     me.remove_temp("xqs");
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 50 + parseInt(lv / 100);
                     var time = 10000 + lv * 10;
                     if (time > 15000) time = 15000;
@@ -80,7 +81,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 use_type: 2,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = 50 + parseInt(lv / 100);
                     if (gj > 80) gj = 80;
                     var time = 10000 + lv * 10;
@@ -105,7 +106,7 @@ export default class extends SKILL {
                     });
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = 50 + parseInt(lv / 100);
                     if (gj > 80) gj = 80;
                     var time = 10000 + lv * 10;
@@ -127,7 +128,7 @@ export default class extends SKILL {
         };
     }
 
-    on_force_parry(me, target, sh) {
+    on_force_parry(me: CHARACTER, target: CHARACTER, sh: number) {
         var lv = me.query_temp("xqs");
         if (lv) {
             var hp = me.do_recover(lv * sh / 100);

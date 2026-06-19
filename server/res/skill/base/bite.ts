@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     type = SKILL_TYPES.BASE;

@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "北冥神功";
@@ -24,7 +25,7 @@ export default class extends SKILL {
         //    mp: 20,
         //    release_time: 5000,
         //    no_auto:true,
-        //    use: function (me, target, lv) {
+        //    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
         //        var gj = Math.round(lv / 10);
         //        var mp = parseInt((gj * 120) / 100);
@@ -45,7 +46,7 @@ export default class extends SKILL {
         //            me.send_room("<hiy>可是$p看破了$P的企图，机灵地闪了开去。\n</hiy>", target);
         //        }
         //    },
-        //    query_desc: function (me, lv) {
+        //    query_desc: function (me: CHARACTER, lv: number) {
         //        var gj = Math.round(lv  / 10);
         //        return "战斗中吸取别人的" + gj + "点最大内力，此招损人利己，慎用！";
         //    }
@@ -59,13 +60,13 @@ export default class extends SKILL {
                 mp: 0,
                 release_time: 0,
                 no_auto: true,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var gj = lv * 5;
                     me.send_room("<him>$N默运北冥神功，周身紫气环绕，转眼间已恢复活力！\n</him>", target);
                     me.add_mp(gj);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = lv * 5;
                     return "战斗中恢复自己" + gj + "点内力。";
                 }
@@ -77,7 +78,7 @@ export default class extends SKILL {
             release_time: 0,
             no_auto: true,
             use_type: 2,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 if (me.query_temp('bmsg_add'))
                     return me.notify('你已经附加凝神诀的效果了。');
                 me.send_room("<hig>$N神凝丹田，息游紫府，周围灵气如潮水般朝$P汇聚过来。</hig>");
@@ -102,7 +103,7 @@ export default class extends SKILL {
                         },
                         on_expire: function (p) {
                             p.max_mp -= nl;
-                            p.remove_temp('bmsg_add', nl);
+                            p.remove_temp('bmsg_add');
                             p.recount();
                             p.notify_hp();
                         }
@@ -110,7 +111,7 @@ export default class extends SKILL {
                 }
 
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var gj = Math.round(lv * 100) + 60000;
                 var nl = 100 + lv * 10;
                 return "增加你和你附近队友的最大内力" + nl + "，持续" + (gj / 1000) + "秒";
@@ -133,14 +134,14 @@ export default class extends SKILL {
         };
     }
 
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_parried) {
             target.add_mp(-me.query_skill("beimingshengong", 0) - 10);
             //me.send_room("<hib>$n顿觉全身内力如水银般循孔飞泄而出！</hib>\n", target);
         }
     }
 
-    do_force_attack(me, target) {
+    do_force_attack(me: CHARACTER, target: CHARACTER) {
 
         if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
             if (!me.query_temp("sk_beiming")) {
@@ -151,7 +152,7 @@ export default class extends SKILL {
 
                     if (target.mp > mp) {
                         target.notify("<hir>你顿觉全身内力如水银般循孔飞泄而出！</hir>");
-                        me.notify("<hir>你觉得" + target.name + "的内力自手掌源源不绝地流了进来。</hir>", target);
+                        me.notify("<hir>你觉得" + target.name + "的内力自手掌源源不绝地流了进来。</hir>");
 
                         target.mp -= mp;
                         me.max_mp += gj;

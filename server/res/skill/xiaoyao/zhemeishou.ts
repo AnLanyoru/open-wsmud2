@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "天山折梅手";
@@ -39,7 +40,7 @@ export default class extends SKILL {
                 distime: 16000,
                 enable_skill: "parry",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var weap = target.query_weapon();
                     if (!weap || weap.weapon_type === WEAPON_TYPE.NONE) return me.notify("对方没有兵刃，你不用担心。");
                     if (target.attack_skill && target.attack_skill.id === 'dugujiujian4') {
@@ -52,7 +53,7 @@ export default class extends SKILL {
                         me.send_room("<cyn>$N使出空手入白刃的绝招, 可是$n的看破了$N的企图，立刻采取守势，使$N没能夺下兵刃。</cyn>", target);
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
 
                     return "卸下对方兵刃，技能等级越高成功率越高。";
                 }

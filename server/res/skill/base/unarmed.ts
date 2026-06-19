@@ -1,6 +1,7 @@
 import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     id = "unarmed";
@@ -25,7 +26,7 @@ export default class extends SKILL {
             distime: 5000,
             mp: 5,
             release_time: 0,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var msg = "<hig>$N看准时机，双拳蓄力对准$n的$l用力砸去</hig>";
                 var gj = 10 + lv;
                 me.do_attack({
@@ -37,7 +38,7 @@ export default class extends SKILL {
                 });
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }

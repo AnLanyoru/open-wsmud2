@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "临济十二庄";
@@ -23,7 +24,7 @@ export default class extends SKILL {
                 mp: 20,
                 use_type: 2,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = parseInt(lv / 300) + 10;
                     me.notify("<hiy>你暗运龙鹤两庄，启天门，闭地户，聚精成力，顿觉气力倍增。</hiy>");
                     me.add_status({
@@ -41,7 +42,7 @@ export default class extends SKILL {
                     });
 
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = parseInt(lv / 300) + 10;
                     return "每两秒内恢复你" + gj + "%气血，持续5次";
                 }
@@ -53,7 +54,7 @@ export default class extends SKILL {
                 mp: 20,
                 release_time: 0,
                 allow_busy: true,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var gj = parseInt(me.gj * (lv / 5 + 100) / 100) + 2000;
                     me.send_room("<hiy>$N宝相庄严，双手合十，天地间的真气如游龙般汇聚而来。</hiy>");
                     var ts = me.team || [me];
@@ -72,7 +73,7 @@ export default class extends SKILL {
 
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = parseInt(me.gj * (lv / 5 + 100) / 100) + 2000;
                     return "战斗中恢复自己和附近队友" + gj + "点气血，并消除队友的忙乱状态。";
                 }
@@ -86,7 +87,7 @@ export default class extends SKILL {
         //        release_time: 0,
         //        no_auto: true,
         //        use_type: 1,
-        //        use: function (me, target, lv) {
+        //        use: function (me: CHARACTER, target: CHARACTER, lv: number) {
         //            me.send_room("<mag>$N凝聚幽冥二气，口宣佛号: 阿弥陀佛！如鬼神之音，贯通两界！ </mag>");
         //            var items = me.environment.items;
         //            var hf = 30 + parseInt(lv / 15);
@@ -104,7 +105,7 @@ export default class extends SKILL {
         //                }
         //            }
         //        },
-        //        query_desc: function (me, lv) {
+        //        query_desc: function (me: CHARACTER, lv: number) {
 
         //            return "沟通幽冥之力，唤回游离在天地间的灵魂，使附近玩家复活（需剃度）。";
         //        }

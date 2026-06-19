@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "密宗大手印";
@@ -50,7 +51,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var lv2 = me.query_skill("mizongxinfa", 0);
                     var gj = lv + lv2;
                     let per = me.query_prop('dsy_sh1');
@@ -76,7 +77,7 @@ export default class extends SKILL {
                     });
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = lv + me.query_skill("mizongxinfa", 0);
                     return "默运密宗心法，双手结印，对敌人造成自身攻击力附加" + gj + "(密宗大手印等级+密宗心法等级)的伤害。";
                 }

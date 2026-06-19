@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "太极神功";
@@ -24,7 +25,7 @@ export default class extends SKILL {
                 mp: 20,
                 use_type: 2,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     me.send_room("<hiy>$N闭目凝神，心如点转，双手抱环划破虚空，周身灵气如指引般汇聚在$P周身，一阴一阳仿若真灵护体。</hiy>");
 
                     var diff = 30 + parseInt(lv / 300);
@@ -50,7 +51,7 @@ export default class extends SKILL {
                     me.hp += lv * 10;
                     me.notify_hp();
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var diff = 30 + parseInt(lv / 300);
                     var qx = lv * 10;
                     var time = lv * 10 + 20000;

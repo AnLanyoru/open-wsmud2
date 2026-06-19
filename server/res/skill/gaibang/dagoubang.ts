@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "打狗棒";
@@ -30,7 +31,7 @@ export default class extends SKILL {
                 enable_skill: "club",
                 mp: 20,
                 release_time: 1800,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     var time = 3000 + lv * 5;
                     var ds = 10 + parseInt(lv / 100);
@@ -53,7 +54,7 @@ export default class extends SKILL {
                         me.end_attack(target);
                     }
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var time = parseInt((6000 + lv * 2) / 1000);
                     if (time > 10) time = 10;
                     var ds = 10 + parseInt(lv / 100);
@@ -70,7 +71,7 @@ export default class extends SKILL {
                 "<hiw>$N举起$w，居高临下使一招「打草惊蛇」敲向$n的$l</hiw>",
                 "<hiw>$N施出「拨狗朝天」，$w由下往上向$n撩去</hiw>"
             ],
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var count = 3 + parseInt(lv / 100);
                 if (count > 10) count = 10;
                 me.send_room("<hiw>$N手中青光一闪，响起阵阵风声，手中$W犹若千百根相似，层层叠叠将$n笼罩。</hiw>\n", target);
@@ -84,7 +85,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var count = 3 + parseInt(lv / 100);
                 if (count > 10) count = 10;
                 return "快速对敌人攻击" + count + "次";

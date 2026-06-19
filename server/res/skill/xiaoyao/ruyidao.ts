@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "如意刀";
@@ -38,7 +39,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.BLADE,
                 mp: 20,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
 
                     me.send_room("<HIR>只见狂风突起，$N深吸一口气，舞动【随风起舞式】，四周飘起越来越多的树叶！</HIR>", target);
                     me.add_status({
@@ -53,7 +54,7 @@ export default class extends SKILL {
                         finish_msg: "<cyn>$N的【随风起舞式】舞动完毕，周围落叶撒满一地。</cyn>"
                     });
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     return "随风起舞，10秒内增加自身身法" + (parseInt(lv / 10) + 5) + "，臂力" + (parseInt(lv / 10) + 5);
                 }
             }

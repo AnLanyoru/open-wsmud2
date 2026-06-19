@@ -1,4 +1,4 @@
-import type { CHARACTER } from "../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";

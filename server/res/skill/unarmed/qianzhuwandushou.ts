@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "千蛛万毒手";
@@ -50,7 +51,7 @@ export default class extends SKILL {
                 enable_skill: "unarmed",
                 weapon_type: WEAPON_TYPE.UNARMED,
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     if (me.do_attack({
                         target: target,
                         gj: me.gj,
@@ -82,7 +83,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var gj = parseInt(me.gj * (lv / 300));
                     return "将全身毒力集中在一点刺向敌人，命中后使敌人在12秒内持续受到" + gj + "点伤害。";
                 }
@@ -91,7 +92,7 @@ export default class extends SKILL {
             distime: 60000,
             enable_skill: "parry",
             mp: 80,
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var msg = "<red>$N仰天一声长啸，强催内劲，全身竟浮现出隐隐碧绿之色。喝道：“万蛊噬天”。毒气弥漫，瞬间笼罩$P全身！</red>\n";
                 me.send_room(msg);
                 var time = 10000 + lv * 10;
@@ -102,7 +103,7 @@ export default class extends SKILL {
                     duration: time
                 });
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 var gj = lv + me.query_skill('wudushengong', 0);
                 gj = 200 + parseInt(gj * (gj / 1000 + 1));
 
@@ -131,8 +132,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_parry_over(me, target, par) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (me.query_temp("wangu")) {
             var lv = me.query_skill("wudushengong", 0) + me.query_skill("qianzhuwandushou", 0);
             var gj = 200 + parseInt(lv * (lv / 1000 + 1));

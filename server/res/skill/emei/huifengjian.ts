@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "回风拂柳剑";
@@ -35,7 +36,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
                 release_time: 0,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var miss = "<cyn>可是$p轻轻一笑，侧身右转，闪了开去</cyn>";
                     if (me.do_attack({
                         attack_msg: "<hir>$N屈腕云剑，剑光如彩碟纷飞，幻出点点星光，右手$w陡然使出一式「灭剑」跃跃洒洒飘向$n</hir>",
@@ -58,7 +59,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var sh = 10 + parseInt(lv / 100);
                     return "对敌方造成伤害，并使对方在之后10秒内受到的伤害增加" + sh + "%";
                 }
@@ -70,7 +71,7 @@ export default class extends SKILL {
                 weapon_type: WEAPON_TYPE.SWORD,
                 mp: 10,
                 release_time: 5000,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var per = 10 + parseInt(lv / 100);
                     var sh = 100 + parseInt(lv / 10);
                     var miss = "<hic>可是$p轻轻一笑，侧身右转，伸出两指，正弹在$P的剑上，长剑在$p身侧划过，毫发无伤。</hic>";
@@ -85,7 +86,7 @@ export default class extends SKILL {
                     })
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var sh = 100 + parseInt(lv / 10);
                     var per = 10 + parseInt(lv / 100);
                     return "对敌方造成" + sh + "%攻击力无视对方" + per + "%防御的伤害";

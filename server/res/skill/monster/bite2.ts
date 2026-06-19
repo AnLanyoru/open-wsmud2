@@ -2,6 +2,7 @@ import { SKILL } from "../../../core/skill/skill.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 import { SKILL_TYPES, WEAPON_TYPE } from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     type = SKILL_TYPES.SKILL;
@@ -33,7 +34,7 @@ export default class extends SKILL {
                 "<hir>$N张嘴朝$n的$l咬去</hir>", "<hir>$N抬起前爪往$n的$l一抓</hir>", "<hir>$N往$n的$l狠狠的扑了过去</hir>",
                 "<hir>$N跳起来用前抓往$n的$l抓去</hir>", "<hir>$N猛的扑向$n的$l</hir>"
             ],
-            use: function (me, target, lv) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var count = 5;
                 me.send_room("<red>$N目露凶光，猛的朝$n扑了过去</red>", target);
                 for (var i = 0; i < count; i++) {
@@ -46,7 +47,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me, lv) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 return "野兽类撕咬";
             }
         }

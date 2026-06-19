@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "狂风快剑";
@@ -40,7 +41,7 @@ export default class extends SKILL {
                 distime: 20000,
                 enable_skill: "sword",
                 mp: 20,
-                use: function (me, target, lv) {
+                use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     if (me.query_temp('kuangfeng')) return me.notify("你的夺命连环还没释放完。");
 
                     me.send_room("<hir>$N一声清啸，手中$W犹如狂风般劈头向$n刺去。</hir>\n", target);
@@ -62,7 +63,7 @@ export default class extends SKILL {
                     }
                     me.end_attack(target);
                 },
-                query_desc: function (me, lv) {
+                query_desc: function (me: CHARACTER, lv: number) {
                     var per = 10 - parseInt(lv / 100);
                     if (per < 3) per = 3;
                     return "夺命连环三仙剑是剑宗狂风剑法的精髓，瞬间攻出三剑，如果三剑全部命中" + (me.gjsd / 1000) + "秒后会继续触发夺命连环但是命中会降低" + per + "%";
@@ -82,8 +83,7 @@ export default class extends SKILL {
             }
         };
     }
-
-    on_attack_over(me, target, par) {
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         let kf_count = me.query_temp("kuangfeng");
         if (kf_count) {
             me.send_room("<hir>$N一击奏效，手中快剑如狂风般继续攻来</hir>\n");

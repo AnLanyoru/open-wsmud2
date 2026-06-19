@@ -2586,18 +2586,18 @@ export class CHARACTER extends ITEM {
     /**
      * 执行一次攻击
      */
-    do_attack(par: DoAttackPar): number | void {
-        if (this.is_faint || this.hp <= 0 || !this.fight_type) return;
+    do_attack(par: DoAttackPar): number {
+        if (this.is_faint || this.hp <= 0 || !this.fight_type) return 0;
         let target = par.target;
         if (!target) {
             target = this.query_enemy();
-            if (!target) return;
+            if (!target) return 0;
         }
         const weapon = this.query_weapon();
         const attackskill = par.no_weapon ? this.noweapon_skill : this.attack_skill;
 
-        if ((attackskill as Record<string, any>).on_before_attack && !par.is_throwing && !par.no_append_before)
-            (attackskill as Record<string, any>).on_before_attack(this, target, par);
+        if (attackskill.on_before_attack && !par.is_throwing && !par.no_append_before)
+            attackskill.on_before_attack(this, target, par);
         if ((this.force_skill as Record<string, any>)?.on_before_attack && !par.no_append_before) {
             (this.force_skill as Record<string, any>).on_before_attack(this, target, par);
         }
@@ -2691,7 +2691,7 @@ export class CHARACTER extends ITEM {
                 par.power_gj = power_gj;
                 sh -= target.force_skill.on_force_parry(target, this, sh, par);
                 if (this.hp <= 0 || !target.fight_type) {
-                    return;
+                    return 0;
                 }
             }
             if (sh > 0)
