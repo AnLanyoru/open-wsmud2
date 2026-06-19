@@ -132,7 +132,7 @@ export default class extends SKILL {
                             target: now_target,
                             gj: gj,
                             mz: me.mz,
-                            attack_msg: $this.msgs[i],
+                            attack_msg: $this.msgs![i],
                             no_weapon: true
                         })) {
                             gj = gj * lv / 100;

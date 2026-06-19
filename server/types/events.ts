@@ -9,7 +9,7 @@ import type {EQUIPMENT} from '../core/item/equipment.js';
 import type {ROOM} from '../core/room/room.js';
 import type {CORPSE} from '../core/item/corpse.js';
 import type {SKILL} from '../core/skill/skill.js';
-import type { PropMap } from './props.js';
+import type { DynamicProp, PropMap } from './props.js';
 
 // ============================================================
 // CHARACTER 回调
@@ -149,7 +149,7 @@ export interface StatusDef {
     /** 持续时间（秒） */
     duration: number;
     /** 状态附带的属性加成/减益 */
-    prop?: PropMap & Record<string, number>;
+    prop?: PropMap;
     /** 是否忙碌状态（不可行动） */
     is_busy?: boolean;
     /** 是否昏迷状态 */

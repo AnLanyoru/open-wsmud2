@@ -200,7 +200,7 @@ export const UTIL = {
                 case "desc3":
                 case "desc4":
                 case "desc5":
-                    str.push(prop[item] as string);
+                    str.push(prop[item]);
                     break;
                 case "releasetime":
                 case "distime":

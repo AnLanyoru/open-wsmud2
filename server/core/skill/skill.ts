@@ -1141,7 +1141,8 @@ export class PERFORM {
 
     /** 攻击消息数组(用于多段攻击) */
     attack_msgs?: string[];
-
+    /** 顺序攻击消息数组(用于多段攻击) */
+    msgs?: string[];
     /** 伤害消息 */
     damage_msg?: string;
 

@@ -40,7 +40,7 @@ export default class extends SKILL {
                         name: "无痕",
                         desc: "你无法被控制",
                         duration: gj,
-                        ig_control: gj
+                        ig_control: true
                     });
                 },
                 query_desc: function (me: CHARACTER, lv: number) {

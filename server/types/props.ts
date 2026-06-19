@@ -13,6 +13,10 @@
  *   };
  *   ```
  */
+
+export type DynamicProp = Record<string, string | number>;
+
+
 export interface PropMap {
     // ===== 基础属性 =====
     /** 臂力 */ str?: number;
