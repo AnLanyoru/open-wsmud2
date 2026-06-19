@@ -56,7 +56,7 @@ export default class extends SKILL {
                         gj: me.gj * gj / 100,
                         mz: me.mz,
                         no_weapon: true,
-                        attck_msg: "<hiy>$N运转真气，将内力注于掌风之中，双掌猛然拍向$n，气势宏大，犹如排山倒海。</hiy>"
+                        attack_msg: "<hiy>$N运转真气，将内力注于掌风之中，双掌猛然拍向$n，气势宏大，犹如排山倒海。</hiy>"
                     })) {
                         me.add_status({
                             id: "unarmed",

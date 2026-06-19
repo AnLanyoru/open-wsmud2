@@ -94,7 +94,7 @@ export default class extends SKILL {
                         gj: lv * count + gj,
                         attack_msg: "<hiy>$N深深地吸一囗气，忽然仰天长啸，高声狂叫：不死神龙，唯我不败！</hiy>",
                         damage_msg: "<hir>$n只觉脑中一阵剧痛，金星乱冒，犹如有万条金龙在眼前舞动。</hir>",
-                        dodge_msg: "<cyn>$n哈哈一笑，飘身跃开，让$N这一吼全然落空。</cyn>",
+                        miss_msg: "<cyn>$n哈哈一笑，飘身跃开，让$N这一吼全然落空。</cyn>",
                         no_parry: true
                     });
                     me.remove_status("parry", true);

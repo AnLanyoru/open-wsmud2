@@ -1249,3 +1249,6 @@ export class PERFORM {
     }
 
 }
+
+/** 绝招字典类型（由资源文件的 pfm_set 使用） */
+export type PerformData = Record<string, Partial<PERFORM>>;
