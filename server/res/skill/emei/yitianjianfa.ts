@@ -3,7 +3,7 @@ import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import type { PropMap } from "../../../types/props.js";
-import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "倚天剑法";
@@ -29,7 +29,7 @@ export default class extends SKILL {
             sword: 500
         }
     };
-    pfm_set = {
+    pfm_set: PerformData = {
         yi:
             {
                 name: "倚天剑决",

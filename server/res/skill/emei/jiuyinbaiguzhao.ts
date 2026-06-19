@@ -2,7 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
-import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "九阴白骨爪";
@@ -25,7 +25,7 @@ export default class extends SKILL {
             unarmed: 300
         }
     };
-    pfm_set = {
+    pfm_set: PerformData = {
         duo:
             {
                 name: "夺命",

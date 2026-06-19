@@ -1,4 +1,5 @@
 import { SKILL } from "../../../core/skill/skill.js";
+import type { PerformData } from "../../../core/skill/skill.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 import { SKILL_TYPES, WEAPON_TYPE } from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
@@ -21,7 +22,7 @@ export default class extends SKILL {
     }
 
     can_enables = ["bite"];
-    pfm_set = {
+    pfm_set: PerformData = {
         puyao:
         {
             name: "撕咬",

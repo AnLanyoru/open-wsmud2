@@ -1,7 +1,7 @@
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import type { PropMap } from "../../../types/props.js";
-import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 
 export default class extends SKILL {
     name = "磐石神功";
@@ -42,7 +42,7 @@ export default class extends SKILL {
             }
         }
     ];
-    pfm_set = {
+    pfm_set: PerformData = {
         power:
             {
                 name: "磐石决",

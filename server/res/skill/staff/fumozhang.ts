@@ -1,6 +1,6 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
-import type { EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -24,7 +24,7 @@ export default class extends SKILL {
         }
     };
     can_enables = ["staff"];
-    pfm_set = {
+    pfm_set: PerformData = {
         fumo:
             {
                 name: "罗汉伏魔",
