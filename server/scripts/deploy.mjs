@@ -1,7 +1,7 @@
 /**
  * deploy.mjs — 将编译产物从 server/dist/core/ 部署到 os/
  */
-import {copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync} from 'fs';
+import {copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync} from 'fs';
 import {dirname, join, relative, resolve} from 'path';
 import {fileURLToPath} from 'url';
 
@@ -26,10 +26,32 @@ function walkDir(dir) {
     return files;
 }
 
+/**
+ * 清理目标目录中的编译残留文件（.js.map / .d.ts / .d.ts.map）
+ * 这些文件不应该出现在运行时目录中
+ */
+function cleanStale(dir) {
+    if (!existsSync(dir)) return;
+    const files = walkDir(dir);
+    let cleaned = 0;
+    for (const f of files) {
+        if (f.endsWith('.js.map') || f.endsWith('.d.ts') || f.endsWith('.d.ts.map')) {
+            rmSync(f);
+            cleaned++;
+        }
+    }
+    if (cleaned > 0) {
+        console.log(`  清理残留: ${cleaned} 个文件 (${dir})`);
+    }
+}
+
 if (!existsSync(SRC)) {
     console.error('错误: dist/core/ 不存在，请先运行 npm run build');
     process.exit(1);
 }
+
+// 部署前清理目标目录中的编译残留
+cleanStale(DEST);
 
 const files = walkDir(SRC);
 let count = 0;
@@ -64,6 +86,9 @@ const RES_SRC = join(ROOT, 'server', 'dist', 'res');
 const RES_DEST = join(ROOT, 'world');
 
 if (existsSync(RES_SRC)) {
+    // 部署前清理目标目录中的编译残留
+    cleanStale(RES_DEST);
+
     const resFiles = walkDir(RES_SRC);
     let resCount = 0;
 

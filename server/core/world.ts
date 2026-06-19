@@ -1180,10 +1180,14 @@ async function loadResource(): Promise<void> {
             const stat = fs.statSync(sub_path);
             if (stat.isDirectory()) {
                 count += readdir(basePath, sub_path + '/');
-            } else {
+            } else if (files[i].endsWith('.js') && !files[i].endsWith('.js.map')) {
                 const fname = sub_path.replace(basePath, '').replace('.js', '');
-                BASE.CREATE(basePath, fname);
-                count++;
+                try {
+                    BASE.CREATE(basePath, fname);
+                    count++;
+                } catch (e: any) {
+                    console.error('create %s error:', basePath + fname, e.message);
+                }
             }
         }
         return count;
