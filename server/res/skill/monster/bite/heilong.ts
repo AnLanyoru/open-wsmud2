@@ -10,7 +10,7 @@ export default class extends SKILL {
     id = "heilong";
     grade = 5;
     family = FAMILIES.MONSTER;
-    desc = "水系怪兽的绝世神功";
+    desc = "黑龙所修的绝世神功";
     attack_actions = [
         "$N张开血盆大口，朝$n的$l猛咬过去",
         "$N发出一声怒吼，扑向$n的$l",
@@ -30,7 +30,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        tulong: {
+        tushui: {
             name: "黑龙吐水",
             distime: 30000,
             enable_skill: "bite",

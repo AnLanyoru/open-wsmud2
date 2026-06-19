@@ -1067,7 +1067,7 @@ export class USER extends CHARACTER {
     on_skillchanged(): void {
         const str: string[] = ['{type:"perform",skills:['];
         if (this.skills) {
-            const bases = ['', 'force', 'unarmed', 'dodge', 'parry', 'throwing'];
+            const bases = ['', 'force', 'unarmed', 'dodge', 'parry', 'bite', 'throwing'];
             const weapon = this.query_weapon_type();
             if (weapon !== WEAPON_TYPE.NONE) bases[0] = weapon;
             for (let i = 0; i < bases.length; i++) {

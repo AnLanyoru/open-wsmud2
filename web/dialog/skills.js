@@ -247,10 +247,11 @@ export default {
                 var item = this.items[i];
                 this.skills[item.id] = item;
             }
-            if (this.items.length > 10 && this.selected_item < 0) {
-                this.footerChanged(0);
+            if (this.selected_item < 0) {
+                this.footerChanged(0, true);
             }
             this.createSkillItems(this.items);
+            this.create_footer();
         }
         if (data.sk_group >= 0) {
             this.sk_group = data.sk_group;
@@ -281,6 +282,7 @@ export default {
             SendCommand("cha none");
             Dialog.icon("book");
             this.create_footer();
+            this.createSkillItems(this.items);
         }
     },
     isEnable: function (item, skills) {
