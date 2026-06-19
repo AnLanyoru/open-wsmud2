@@ -6,6 +6,7 @@
 import {WORLD} from './world.js';
 import {FAMILIES} from './skill/family.js';
 import type {StatsTopEntry, WeaponRankEntry} from './world.js';
+import type { USER } from './char/user.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -38,7 +39,7 @@ const DATA = {
     /** 运行时临时数据（持久化到 data.js） */
     temp: {} as Record<string, any>,
     /** 经验等级倍率表（按 level 索引） */
-    exps: [15, 20, 30, 40, 50, 100, 200, 80, 90, 100, 110, 120, 130],
+    exps: [10, 20, 30, 40, 50, 100, 200, 80, 90, 100, 110, 120, 130],
 
     /** 宝石价值表（按 grade 索引） */
     stone_values: [1000, 5000, 30000, 150000, 1000000, 10000000],
@@ -62,8 +63,8 @@ const DATA = {
      * 根据玩家等级获取随机经验值
      * @param me - 玩家角色
      */
-    get_exp(me: { random(n: number): number; level: number }): number {
-        return me.random(5) + (this.exps as number[])[me.level];
+    get_exp(me: USER): number {
+        return me.random(5) + this.exps[me.level];
     },
 
     /**
@@ -235,7 +236,7 @@ const DATA = {
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
     query_temp<T>(name: string, def?: T, _me?: unknown): T {
-        if (!def) def = undefined as T;
+        if (def === undefined) def = undefined as T;
         const item = this.temp[name];
         if (item && item.e) {
             if (Date.now() <= item.e) {

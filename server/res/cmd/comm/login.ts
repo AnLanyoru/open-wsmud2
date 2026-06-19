@@ -110,11 +110,12 @@ export default class extends COMMAND {
         }
     }
 
-    on_user_login(user) {
+    on_user_login(user: USER) {
         user.send("欢迎登陆<HIW>MUD游戏</HIW>");
 
 
-        const area = user.environment.parent;
+        const area = user.environment?.parent;
+        if (!area) return user.notify_fail("登陆失败, 房间加载错误")
         area.on_login && area.on_login(user);
 
         if (user.force_skill.on_relive) {

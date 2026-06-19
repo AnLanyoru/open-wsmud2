@@ -343,6 +343,7 @@ export class USER extends CHARACTER {
         this.socket.user = this;
         this.send_loginmessage();
 
+        let needEnter = false;
         if (!this.environment) {
             let rm = WORLD.getRoom(this.quit_room ?? DEFAULT_ROOM);
             if (!rm || rm.is_fb()) rm = WORLD.getRoom(DEFAULT_ROOM);
@@ -351,11 +352,19 @@ export class USER extends CHARACTER {
                 return;
             }
             this.environment = rm;
+            needEnter = true;
         }
-        this.send((this.environment as ROOM).to_json());
-        (this.environment as ROOM).send_exits(this);
-        this.send((this.environment as ROOM).items_to_json());
-        this.send_room(this.name + '重新连线。');
+
+        if (needEnter) {
+            // 环境丢失后恢复：需要完整进入房间流程（加入items、通知其他玩家）
+            (this.environment as ROOM).do_enter(this, true, this.name + '重新连线。');
+        } else {
+            // 环境正常：仅刷新客户端数据
+            this.send((this.environment as ROOM).to_json());
+            (this.environment as ROOM).send_exits(this);
+            this.send((this.environment as ROOM).items_to_json());
+            this.send_room(this.name + '重新连线。');
+        }
         if ((this.environment as ROOM & { on_relogin?: (me: USER) => void }).on_relogin) {
             (this.environment as ROOM & { on_relogin?: (me: USER) => void }).on_relogin!(this);
         }

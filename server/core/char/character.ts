@@ -1934,10 +1934,9 @@ export class CHARACTER extends ITEM {
      */
     moveto(rm?: string | ROOM, leave_msg?: string, in_msg?: string, dir?: string): boolean | undefined {
         const cur_room = this.environment;
-        let next_room: ROOM | undefined;
+        let next_room: ROOM | undefined = typeof rm === 'string' ? undefined : rm;
         if (typeof rm === 'string') {
-            let next_room_path = rm;
-            next_room = WORLD.getRoom(next_room_path);
+            next_room = WORLD.getRoom(rm);
             if (!next_room) return false;
             if (cur_room && next_room.parent === cur_room.parent) {
                 if (cur_room.owner) {

@@ -1,6 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "caiyao";
@@ -32,7 +33,7 @@ export default class extends COMMAND {
     }
 }
 
-function on_check(me) {
+function on_check(me: USER) {
     var exp = WORLD.DATA.exps[me.level]
         + WORLD.DATA.query_temp("caiyao_exp", 0)
         + me.query_prop('caiyao_exp');
@@ -96,7 +97,7 @@ function calculate_lv(grade) {
     return 0;
 }
 
-function do_cai(me) {
+function do_cai(me: USER) {
     let r_i = me.random(100);
     if (r_i > 89) {
         let grade = me.query_prop('caiyao1');
