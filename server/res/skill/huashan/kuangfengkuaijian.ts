@@ -84,7 +84,7 @@ export default class extends SKILL {
         };
     }
     on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
-        let kf_count = me.query_temp("kuangfeng");
+        let kf_count = me.query_temp("kuangfeng", 0);
         if (kf_count) {
             me.send_room("<hir>$N一击奏效，手中快剑如狂风般继续攻来</hir>\n");
             var isMIss = false;

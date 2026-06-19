@@ -48,10 +48,10 @@ export default class extends COMMAND {
             uid: me.id,
             lv: (me.level || 0),
             name: name,
-            lv6: undefined
+            lv6: 0
         };
         if (me.level === 6) {
-            let lv6 = me.query_temp('lv6');
+            let lv6 = me.query_temp('lv6', 0);
             if (lv6) content.lv6 = lv6;
         }
         msg = JSON.stringify(content);

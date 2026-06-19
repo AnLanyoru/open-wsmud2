@@ -92,7 +92,7 @@ export default class extends COMMAND {
             if (!pt) return me.send('你还没加入任何帮派。');
             if (!pt.battle_family) return me.send('你的帮派没有进攻任何门派。');
             let fam = FAMILIES[pt.battle_family];
-            let count = me.query_temp('pt_mc');
+            let count = me.query_temp('pt_mc', 0);
             if (!me.query_temp('pt_mp')) {
                 if (count >= 7)
                     return me.notify('你本周内参与帮派战的次数已满。');

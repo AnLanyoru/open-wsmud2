@@ -129,7 +129,7 @@ export default class extends SKILL {
     }
 
     on_force_parry(me: CHARACTER, target: CHARACTER, sh: number) {
-        var lv = me.query_temp("xqs");
+        var lv = me.query_temp("xqs", 0);
         if (lv) {
             var hp = me.do_recover(lv * sh / 100);
             if (hp) {

@@ -7,6 +7,7 @@ import {WORLD} from './world.js';
 import {FAMILIES} from './skill/family.js';
 import type {StatsTopEntry, WeaponRankEntry} from './world.js';
 import type { USER } from './char/user.js';
+import type { FOLLOWER } from './char/follower.js';
 
 // ============================================================
 // 全局声明（运行时注入）
@@ -63,7 +64,7 @@ const DATA = {
      * 根据玩家等级获取随机经验值
      * @param me - 玩家角色
      */
-    get_exp(me: USER): number {
+    get_exp(me: USER | FOLLOWER): number {
         return me.random(5) + this.exps[me.level];
     },
 

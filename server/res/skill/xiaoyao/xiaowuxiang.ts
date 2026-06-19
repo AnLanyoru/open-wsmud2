@@ -45,7 +45,7 @@ export default class extends SKILL {
                     return "无相" + ALLOW_TYPES[type];
                 },
                 use(me: CHARACTER, target: CHARACTER, lv: number, sk) {
-                    var prev = target.query_temp("used_pfm");
+                    var prev = target.query_temp("used_pfm", '');
                     if (!prev) return me.notify_fail("<cyn>" + target.name + "最近没有使用绝招，你无法模仿。</cyn>");
                     var str = prev.split("/");
                     var sp_skill = SKILL.get(str[0]);
@@ -123,7 +123,7 @@ export default class extends SKILL {
                     return "无我" + ALLOW_TYPES[type];
                 },
                 use(me: CHARACTER, target: CHARACTER, lv: number, sk: string) {
-                    var prev = me.query_temp("copy_pfm_" + sk);
+                    var prev = me.query_temp("copy_pfm_" + sk, '');
                     var baseSkill = SKILL.get(sk);
                     if (!baseSkill) return false;
                     if (!prev) {

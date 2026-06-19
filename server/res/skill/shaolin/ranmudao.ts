@@ -103,7 +103,7 @@ export default class extends SKILL {
         return me.fy;
     }
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
-        let sh = me.query_temp("sk_ranmu");
+        let sh = me.query_temp("sk_ranmu", 0);
         if (sh) {
             if (par.is_parried) sh = sh * 2;
             target.send_combat("<HIR>$n的护体真气灼伤了$N的真元！！</HIR>", me);

@@ -85,7 +85,7 @@ export default class extends SKILL {
     }
 
     on_force_parry(me: CHARACTER, target: CHARACTER) {
-        let sh = me.query_temp('sk_heilong');
+        let sh = me.query_temp('sk_heilong', 0);
         if (sh > 0) {
             me.send_combat(
                 '<blk>$n被$N的黑龙护体反弹了' + sh + '点伤害！！</blk>\n',
