@@ -1195,7 +1195,7 @@ export class USER extends CHARACTER {
         const max: number = (this.query_temp('max_follower') as number) || 3;
         if (this.follower.length >= max) return false;
         for (let i = 0; i < this.follower.length; i++) {
-            if (this.follower[i].path == (npc as { path: string }).path) {
+            if (this.follower[i].path == npc.path) {
                 return false;
             }
         }

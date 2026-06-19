@@ -656,7 +656,7 @@ export class SKILL extends BASE {
         str.push(',"exp":');
         skill_item.exp = skill_item.exp || 0;
         str.push(String(parseInt(String(skill_item.exp * 100 / this.level_exp(skill_item.level, me)))));
-        if (this.can_enables) {
+        if (this.can_enables && this.can_enables.length) {
             str.push(',"can_enables":[');
             for (let i = 0; i < this.can_enables.length; i++) {
                 if (i > 0) str.push(",");

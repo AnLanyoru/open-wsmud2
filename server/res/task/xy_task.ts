@@ -501,7 +501,7 @@ export default class XiangYangTask extends TASK {
         }
         this.guards.length = 0;
         this.is_start = false;
-        var index = Number(WORLD.DATA.query_temp("xiangyang")) + 20;
+        var index = WORLD.DATA.query_temp("xiangyang", 0) + 20;
         if (issuc == 1) {
             this.send_message("武神历" + UTIL.to_c(index) + "年蒙古可汗蒙哥被击杀于襄阳城下，襄阳城大获全胜！", true);
             this.send_message("郭大侠犒赏全军，前往襄阳城领取！", true);

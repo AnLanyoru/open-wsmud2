@@ -237,6 +237,8 @@ class World {
     NPC_STROE: Map<string, CHARACTER> = new Map();
     /** 心跳计数（用于定时保存） */
     HEARTBEATCOUNT: number = 0;
+    /** 玩家可恢复物品/技能存储 (playerId → entries[]) */
+    RECOVER_OBJS: Map<string, any[]> = new Map();
 
     // ========== 服务器状态 ==========
 
@@ -1120,6 +1122,60 @@ class World {
             if (this.SERVERS[i].id === sid) return this.SERVERS[i];
         }
         return null;
+    }
+
+    /**
+     * 记录可恢复的物品/技能
+     * @param player - 玩家对象
+     * @param obj - 物品对象或数据对象
+     * @param type - 类型: 0=丢弃, 1=出售, 2=分解, 3=遗忘技能, 12=商店回购
+     * @param extra - 额外数据(如分解数量)
+     */
+    add_recover_obj(player: any, obj: any, type: number, extra?: any): void {
+        if (!player || !obj) return;
+        let list = this.RECOVER_OBJS.get(player.id);
+        if (!list) {
+            list = [];
+            this.RECOVER_OBJS.set(player.id, list);
+        }
+        // 限制每个玩家最多保存50条可恢复记录
+        if (list.length >= 50) {
+            list.shift();
+        }
+        const entry: Record<string, any> = {
+            type: type,
+            time: Date.now(),
+        };
+        // 根据类型保存不同格式的数据
+        if (type === 3) {
+            // 遗忘技能: obj是{id, name, up_count, addin, level, pot}
+            entry.id = obj.id;
+            entry.name = obj.name;
+            entry.up_count = obj.up_count;
+            entry.addin = obj.addin;
+            entry.level = obj.level;
+            entry.pot = obj.pot;
+        } else if (type === 12) {
+            // 商店回购: obj是{name, count, value, limit_key, max_key, id, rcash, path}
+            entry.id = obj.id;
+            entry.name = obj.name;
+            entry.count = obj.count;
+            entry.value = obj.value;
+            entry.limit_key = obj.limit_key;
+            entry.max_key = obj.max_key;
+            entry.rcash = obj.rcash;
+            entry.path = obj.path;
+            if (extra !== undefined) entry.mtype = extra;
+        } else {
+            // 物品类(丢弃/出售/分解): obj是OBJ实例
+            entry.id = obj.id;
+            entry.path = obj.path;
+            entry.name = obj.color_name || obj.name;
+            entry.count = obj.count || 1;
+            entry.value = obj.value;
+            if (extra !== undefined) entry.extra = extra;
+        }
+        list.push(entry);
     }
 
     /**
