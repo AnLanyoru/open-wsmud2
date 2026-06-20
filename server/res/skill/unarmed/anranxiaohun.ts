@@ -15,10 +15,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2320,
-                mz: 1720,
-                int: 262,
-                con: 262,
+                gj: Math.floor(lv * 2.32),
+                mz: Math.floor(lv * 1.72),
+                int: 2 + Math.floor(lv * 0.26),
+                con: 2 + Math.floor(lv * 0.26),
                 diff_downside_per: 10,
             },
         };
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "无中生有",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1734,
+            mp: 34,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无中生有
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "呆若木鸡",
             distime: 36000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 呆若木鸡

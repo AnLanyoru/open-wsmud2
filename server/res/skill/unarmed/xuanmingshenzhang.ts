@@ -15,8 +15,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2320,
-                mz: 2220,
+                gj: Math.floor(lv * 2.32),
+                mz: Math.floor(lv * 2.22),
                 add_sh_per: 5,
                 diff_fy_per: 5,
             },
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "寒毒",
             distime: 5000,
             enable_skill: "unarmed",
-            mp: 2065,
+            mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 寒毒

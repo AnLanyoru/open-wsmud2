@@ -27,14 +27,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1510,
-                str: 168,
-                mz: 1510,
+                gj: Math.floor(lv * 1.51),
+                str: Math.floor(lv * 0.168),
+                mz: Math.floor(lv * 1.51),
             },
             parry: {
-                zj: 1510,
-                str: 168,
-                fy: 1510,
+                zj: Math.floor(lv * 1.51),
+                str: Math.floor(lv * 0.168),
+                fy: Math.floor(lv * 1.51),
             },
         };
     }
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "五神剑",
             distime: 13000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 五神剑
@@ -61,7 +61,7 @@ export default class extends SKILL {
             name: "五神赋",
             distime: 30000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 五神赋

@@ -26,15 +26,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                con: 510,
-                dex: 501,
-                limit_mp: 245000,
+                con: Math.floor(lv * 0.51),
+                dex: 1 + Math.floor(lv * 0.5),
+                limit_mp: lv * 245,
                 desc: "当你命中敌人后，会吸取对方内力增加自身最大内力; 唯一将你内力的80%转化为气血",
             },
             parry: {
-                zj: 1820,
-                dex: 252,
-                max_hp: 13000,
+                zj: Math.floor(lv * 1.82),
+                dex: 2 + Math.floor(lv * 0.25),
+                max_hp: lv * 13,
                 desc: "当你招架成功后会吸取对方内力增加自身最大内力",
             },
         };

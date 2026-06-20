@@ -15,15 +15,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2005,
-                mz: 2010,
+                gj: 5 + lv * 2,
+                mz: 10 + lv * 2,
                 add_sh_per: 4,
                 diff_fy_per: 4,
             },
             parry: {
-                gj: 2005,
-                mz: 2010,
-                con: 135,
+                gj: 5 + lv * 2,
+                mz: 10 + lv * 2,
+                con: 5 + Math.floor(lv * 0.13),
                 diff_sh_per: 4,
             },
         };
@@ -34,7 +34,7 @@ export default class extends SKILL {
             name: "击破",
             distime: 16000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 击破
@@ -51,7 +51,7 @@ export default class extends SKILL {
             name: "日月连环",
             distime: 28000,
             enable_skill: "unarmed",
-            mp: 1275,
+            mp: 25,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 日月连环

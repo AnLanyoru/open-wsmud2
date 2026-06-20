@@ -16,14 +16,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2005,
-                fy: 2005,
-                mz: 2020,
-                str: 253,
+                gj: 5 + lv * 2,
+                fy: 5 + lv * 2,
+                mz: 20 + lv * 2,
+                str: 3 + Math.floor(lv * 0.25),
             },
             parry: {
-                zj: 2005,
-                fy: 2100,
+                zj: 5 + lv * 2,
+                fy: Math.floor(lv * 2.1),
                 diff_sh_per: 4,
             },
             // Global/base properties:
@@ -36,7 +36,7 @@ export default class extends SKILL {
             name: "降龙",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1530,
+            mp: 30,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 降龙
@@ -53,7 +53,7 @@ export default class extends SKILL {
             name: "十八掌",
             distime: 25000,
             enable_skill: "unarmed",
-            mp: 1530,
+            mp: 30,
             release_time: 4179,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 十八掌

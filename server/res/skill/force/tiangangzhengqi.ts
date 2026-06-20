@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 15800,
-                fy: 2150,
-                limit_mp: 160000,
+                max_hp: Math.floor(lv * 15.8),
+                fy: Math.floor(lv * 2.15),
+                limit_mp: lv * 160,
                 desc: "唯一将你内力的90%转化为气血",
             },
         };
@@ -40,7 +40,7 @@ export default class extends SKILL {
             name: "正气诀",
             distime: 45000,
             enable_skill: "force",
-            mp: 2550,
+            mp: 50,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 正气诀

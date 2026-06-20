@@ -27,13 +27,13 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1620,
-                mz: 1520,
-                dex: 143,
+                gj: Math.floor(lv * 1.62),
+                mz: Math.floor(lv * 1.52),
+                dex: 3 + Math.floor(lv * 0.14),
             },
             parry: {
-                zj: 1520,
-                fy: 1020,
+                zj: Math.floor(lv * 1.52),
+                fy: 20 + lv * 1,
             },
         };
     }
@@ -43,7 +43,7 @@ export default class extends SKILL {
             name: "三阴毒爪",
             distime: 18000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 三阴毒爪
@@ -60,7 +60,7 @@ export default class extends SKILL {
             name: "追魂爪",
             distime: 18000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 追魂爪

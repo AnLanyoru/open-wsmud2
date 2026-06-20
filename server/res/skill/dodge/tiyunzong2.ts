@@ -27,8 +27,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2005,
-                dex: 250,
+                ds: 5 + lv * 2,
+                dex: Math.floor(lv * 0.25),
                 fy_per: 8,
                 desc: "当成功躲闪对方攻击时增加1000躲闪，命中，可叠加",
             },

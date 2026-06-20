@@ -28,14 +28,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1720,
+                gj: Math.floor(lv * 1.72),
                 bj_per: 4,
-                mz: 1710,
+                mz: Math.floor(lv * 1.71),
             },
             parry: {
-                zj: 1420,
-                ds: 1420,
-                dex: 144,
+                zj: Math.floor(lv * 1.42),
+                ds: Math.floor(lv * 1.42),
+                dex: 4 + Math.floor(lv * 0.14),
             },
         };
     }
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "掌心雷",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 掌心雷

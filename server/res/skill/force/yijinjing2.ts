@@ -15,11 +15,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 20000,
-                fy: 2005,
+                max_hp: lv * 20,
+                fy: 5 + lv * 2,
                 diff_bj: 3,
                 fy_per: 8,
-                limit_mp: 285000,
+                limit_mp: lv * 285,
                 desc: "唯一将你内力的90%转化为气血",
             },
             // Global/base properties:
@@ -32,7 +32,7 @@ export default class extends SKILL {
             name: "佛光守护",
             distime: 30000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 佛光守护
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "狮子吼",
             distime: 30000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 狮子吼
@@ -66,7 +66,7 @@ export default class extends SKILL {
             name: "金刚罩",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 金刚罩

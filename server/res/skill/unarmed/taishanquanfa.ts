@@ -27,13 +27,13 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1310,
-                str: 125,
-                fy: 1510,
+                gj: Math.floor(lv * 1.31),
+                str: 5 + Math.floor(lv * 0.12),
+                fy: Math.floor(lv * 1.51),
             },
             parry: {
-                zj: 1310,
-                fy: 1200,
+                zj: Math.floor(lv * 1.31),
+                fy: Math.floor(lv * 1.2),
             },
         };
     }
@@ -43,7 +43,7 @@ export default class extends SKILL {
             name: "泰山压顶",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 5100,
+            mp: 100,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 泰山压顶

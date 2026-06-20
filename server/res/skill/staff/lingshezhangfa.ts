@@ -22,15 +22,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             staff: {
-                gj: 1210,
-                mz: 1000,
-                dex: 100,
-                zj: 1000,
+                gj: Math.floor(lv * 1.21),
+                mz: lv * 1,
+                dex: Math.floor(lv * 0.1),
+                zj: lv * 1,
                 desc: "你的攻击会使敌人受到3356点蛇毒伤害",
             },
             parry: {
-                zj: 1605,
-                fy: 2010,
+                zj: 5 + Math.floor(lv * 1.6),
+                fy: 10 + lv * 2,
             },
         };
     }
@@ -40,7 +40,7 @@ export default class extends SKILL {
             name: "灵蛇出洞",
             distime: 10000,
             enable_skill: "staff",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 灵蛇出洞

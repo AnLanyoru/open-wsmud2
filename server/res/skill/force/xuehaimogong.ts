@@ -35,10 +35,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 1612,
-                fy: 1780,
+                gj: 2 + Math.floor(lv * 1.61),
+                fy: Math.floor(lv * 1.78),
                 diff_fy_per: 6,
-                limit_mp: 140000,
+                limit_mp: lv * 140,
                 desc: "唯一将你内力的75%转化为气血",
             },
         };
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "血魔",
             distime: 60000,
             enable_skill: "force",
-            mp: 2040,
+            mp: 40,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 血魔
@@ -66,7 +66,7 @@ export default class extends SKILL {
             name: "血祭",
             distime: 60000,
             enable_skill: "force",
-            mp: 2856,
+            mp: 56,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 血祭

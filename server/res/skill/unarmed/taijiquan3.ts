@@ -27,15 +27,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2605,
-                mz: 2605,
-                str: 500,
-                con: 500,
+                gj: 5 + Math.floor(lv * 2.6),
+                mz: 5 + Math.floor(lv * 2.6),
+                str: Math.floor(lv * 0.5),
+                con: Math.floor(lv * 0.5),
             },
             parry: {
-                zj: 2020,
-                fy: 2010,
-                max_hp: 20000,
+                zj: 20 + lv * 2,
+                fy: 10 + lv * 2,
+                max_hp: lv * 20,
                 desc: "当你成功招架后会使敌人的攻击更加强力的转向自己，无法躲闪",
             },
         };
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "震字决",
             distime: 19000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 震字决

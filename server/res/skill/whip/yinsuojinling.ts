@@ -15,10 +15,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             whip: {
-                gj: 1010,
-                mz: 1210,
-                dex: 210,
-                con: 210,
+                gj: 10 + lv * 1,
+                mz: Math.floor(lv * 1.21),
+                dex: Math.floor(lv * 0.21),
+                con: Math.floor(lv * 0.21),
             },
         };
     }
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "隔空点穴",
             distime: 30000,
             enable_skill: "whip",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 隔空点穴

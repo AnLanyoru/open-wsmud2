@@ -28,9 +28,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2020,
-                str: 251,
-                mz: 1603,
+                gj: 20 + lv * 2,
+                str: 1 + Math.floor(lv * 0.25),
+                mz: 3 + Math.floor(lv * 1.6),
                 mz_per: 10,
             },
         };
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "惊魔一指",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 惊魔一指

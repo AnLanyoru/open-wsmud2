@@ -36,10 +36,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 1404,
-                ds: 1404,
+                gj: 4 + Math.floor(lv * 1.4),
+                ds: 4 + Math.floor(lv * 1.4),
                 per: 3,
-                limit_mp: 100000,
+                limit_mp: lv * 100,
                 desc: "唯一将你内力的80%转化为气血",
             },
         };
@@ -50,7 +50,7 @@ export default class extends SKILL {
             name: "轻舞",
             distime: 28000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 轻舞

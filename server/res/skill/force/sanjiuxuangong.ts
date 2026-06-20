@@ -15,16 +15,16 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: 3320,
+                fy: Math.floor(lv * 3.32),
                 fy_per: 12,
                 diff_sh_per: 7,
                 hp_per: 10,
-                limit_mp: 300000,
+                limit_mp: lv * 300,
                 desc: "进入战斗后减少55%伤害，被命中后降低; 唯一将你内力的95%转化为气血",
             },
             unarmed: {
-                gj: 3320,
-                mz: 2320,
+                gj: Math.floor(lv * 3.32),
+                mz: Math.floor(lv * 2.32),
                 gj_per: 9,
                 mz_per: 8,
             },
@@ -36,7 +36,7 @@ export default class extends SKILL {
             name: "仙体术",
             distime: 55000,
             enable_skill: "unarmed",
-            mp: 1275,
+            mp: 25,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 仙体术

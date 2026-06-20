@@ -16,8 +16,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2030,
-                mz: 1820,
+                gj: 30 + lv * 2,
+                mz: Math.floor(lv * 1.82),
                 mz_per: 8,
                 add_bjsh_per: 12,
                 desc: "命中敌人后会使敌方防御减少1%，伤害加深1%，可叠加最高20层",
@@ -32,7 +32,7 @@ export default class extends SKILL {
             name: "倚天剑决",
             distime: 15000,
             enable_skill: "sword",
-            mp: 510,
+            mp: 10,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 倚天剑决
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "号令天下",
             distime: 30000,
             enable_skill: "sword",
-            mp: 510,
+            mp: 10,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 号令天下

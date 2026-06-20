@@ -35,8 +35,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             blade: {
-                gj: 2010,
-                mz: 2020,
+                gj: 10 + lv * 2,
+                mz: 20 + lv * 2,
                 gjsd_per: 10,
                 add_sh_per: 8,
             },
@@ -48,7 +48,7 @@ export default class extends SKILL {
             name: "入魔",
             distime: 60000,
             enable_skill: "blade",
-            mp: 7140,
+            mp: 140,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 入魔

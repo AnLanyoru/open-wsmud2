@@ -31,9 +31,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 1756,
-                max_hp: 20000,
-                limit_mp: 145000,
+                gj: 6 + Math.floor(lv * 1.75),
+                max_hp: lv * 20,
+                limit_mp: lv * 145,
                 desc: "唯一将你内力的70%转化为气血",
             },
         };
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "寒冰",
             distime: 40000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 寒冰

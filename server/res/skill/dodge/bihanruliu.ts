@@ -29,9 +29,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 1335,
-                mz: 1230,
-                con: 85,
+                ds: 5 + Math.floor(lv * 1.33),
+                mz: Math.floor(lv * 1.23),
+                con: 5 + Math.floor(lv * 0.08),
             },
         };
     }
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "行云流水",
             distime: 35000,
             enable_skill: "dodge",
-            mp: 1275,
+            mp: 25,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 行云流水

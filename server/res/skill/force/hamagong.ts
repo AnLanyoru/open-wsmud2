@@ -31,15 +31,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: 2100,
-                gj: 1635,
-                limit_mp: 150000,
+                fy: Math.floor(lv * 2.1),
+                gj: 5 + Math.floor(lv * 1.63),
+                limit_mp: lv * 150,
                 desc: "唯一将你内力的70%转化为气血",
             },
             unarmed: {
-                gj: 1412,
-                mz: 1412,
-                str: 200,
+                gj: 2 + Math.floor(lv * 1.41),
+                mz: 2 + Math.floor(lv * 1.41),
+                str: Math.floor(lv * 0.2),
             },
         };
     }
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "蛤蟆吸气",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 蛤蟆吸气
@@ -66,7 +66,7 @@ export default class extends SKILL {
             name: "蛤蟆冲击",
             distime: 5000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 蛤蟆冲击

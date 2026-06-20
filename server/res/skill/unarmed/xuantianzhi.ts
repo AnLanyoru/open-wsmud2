@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1430,
-                mz: 1435,
-                dex: 86,
+                gj: Math.floor(lv * 1.43),
+                mz: 5 + Math.floor(lv * 1.43),
+                dex: Math.floor(lv * 0.086),
             },
         };
     }
@@ -39,7 +39,7 @@ export default class extends SKILL {
             name: "寒阴指劲",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 765,
+            mp: 15,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 寒阴指劲

@@ -28,14 +28,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2020,
-                mz: 2020,
+                gj: 20 + lv * 2,
+                mz: 20 + lv * 2,
                 diff_fy_per: 6,
             },
             parry: {
-                zj: 2020,
-                fy: 2020,
-                max_hp: 20000,
+                zj: 20 + lv * 2,
+                fy: 20 + lv * 2,
+                max_hp: lv * 20,
             },
         };
     }
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "夺魄",
             distime: 18000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 夺魄
@@ -62,7 +62,7 @@ export default class extends SKILL {
             name: "风卷残云",
             distime: 18000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 风卷残云

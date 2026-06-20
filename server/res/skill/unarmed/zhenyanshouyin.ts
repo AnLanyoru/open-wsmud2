@@ -15,9 +15,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1920,
-                str: 334,
-                mz: 1803,
+                gj: Math.floor(lv * 1.92),
+                str: 4 + Math.floor(lv * 0.33),
+                mz: 3 + Math.floor(lv * 1.8),
             },
         };
     }
@@ -27,7 +27,7 @@ export default class extends SKILL {
             name: "九字真言",
             distime: 15000,
             enable_skill: "unarmed",
-            mp: 2550,
+            mp: 50,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 九字真言
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "不死法印",
             distime: 60000,
             enable_skill: "unarmed",
-            mp: 3570,
+            mp: 70,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 不死法印

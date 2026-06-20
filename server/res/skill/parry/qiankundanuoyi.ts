@@ -14,8 +14,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: 2700,
-                fy: 1600,
+                zj: Math.floor(lv * 2.7),
+                fy: Math.floor(lv * 1.6),
                 hp_per: 5,
                 fy_per: 5,
                 desc: "当你招架会积蓄力量，最高12层，每层增加1000防御，招架成功积蓄两层，失败积蓄一层",
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "大挪移",
             distime: 9840,
             enable_skill: "parry",
-            mp: 1020,
+            mp: 20,
             release_time: 3600,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 大挪移
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "倒转乾坤",
             distime: 22140,
             enable_skill: "parry",
-            mp: 2856,
+            mp: 56,
             release_time: 3600,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 倒转乾坤

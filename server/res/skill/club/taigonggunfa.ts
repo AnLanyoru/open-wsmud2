@@ -33,8 +33,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             club: {
-                gj: 1208,
-                mz: 1508,
+                gj: 8 + Math.floor(lv * 1.2),
+                mz: 8 + Math.floor(lv * 1.5),
             },
         };
     }
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "缠丝钓",
             distime: 32000,
             enable_skill: "club",
-            mp: 1530,
+            mp: 30,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 缠丝钓
@@ -61,7 +61,7 @@ export default class extends SKILL {
             name: "愿者上钩",
             distime: 60000,
             enable_skill: "club",
-            mp: 5100,
+            mp: 100,
             release_time: 10000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 愿者上钩

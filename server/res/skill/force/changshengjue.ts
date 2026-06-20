@@ -17,7 +17,7 @@ export default class extends SKILL {
                 fy_per: 15,
                 hp_per: 15,
                 diff_sh_per: 10,
-                limit_mp: 1000000,
+                limit_mp: lv * 1000,
                 desc: "不灭当你的气血降低到10%时候会恢复大量气血，并短时间无视伤害，冷却10分钟; 唯一将你内力的150%转化为气血",
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "天地决",
             distime: 60000,
             enable_skill: "force",
-            mp: 188700,
+            mp: 3700,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 天地决
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "混沌诀",
             distime: 60000,
             enable_skill: "force",
-            mp: 118320,
+            mp: 2320,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 混沌诀

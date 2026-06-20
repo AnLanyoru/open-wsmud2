@@ -27,13 +27,13 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1610,
-                str: 125,
-                max_hp: 10000,
+                gj: Math.floor(lv * 1.61),
+                str: 5 + Math.floor(lv * 0.12),
+                max_hp: lv * 10,
             },
             parry: {
-                zj: 1610,
-                fy: 1200,
+                zj: Math.floor(lv * 1.61),
+                fy: Math.floor(lv * 1.2),
             },
         };
     }
@@ -43,7 +43,7 @@ export default class extends SKILL {
             name: "七伤",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 5100,
+            mp: 100,
             release_time: 7000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 七伤

@@ -27,14 +27,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1520,
-                mz: 1420,
-                dex: 127,
+                gj: Math.floor(lv * 1.52),
+                mz: Math.floor(lv * 1.42),
+                dex: Math.floor(lv * 0.127),
             },
             parry: {
-                zj: 1410,
-                max_hp: 5010,
-                dex: 127,
+                zj: Math.floor(lv * 1.41),
+                max_hp: 10 + lv * 5,
+                dex: Math.floor(lv * 0.127),
             },
         };
     }
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "松月无影",
             distime: 20000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 松月无影

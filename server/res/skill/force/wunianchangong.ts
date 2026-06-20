@@ -14,12 +14,12 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 30000,
-                fy: 3005,
+                max_hp: lv * 30,
+                fy: 5 + lv * 3,
                 hp_per: 13,
                 fy_per: 13,
                 diff_sh_per: 8,
-                limit_mp: 250000,
+                limit_mp: lv * 250,
                 desc: "唯一将你内力的100%转化为气血",
             },
         };
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "净念",
             distime: 30000,
             enable_skill: "force",
-            mp: 2550,
+            mp: 50,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 净念
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "无念",
             distime: 30000,
             enable_skill: "force",
-            mp: 2040,
+            mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无念
@@ -64,7 +64,7 @@ export default class extends SKILL {
             name: "闭口禅",
             distime: 50000,
             enable_skill: "force",
-            mp: 4080,
+            mp: 80,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 闭口禅

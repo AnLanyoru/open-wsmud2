@@ -16,21 +16,21 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                str: 335,
-                dex: 335,
-                con: 335,
-                limit_mp: 300000,
+                str: 5 + Math.floor(lv * 0.33),
+                dex: 5 + Math.floor(lv * 0.33),
+                con: 5 + Math.floor(lv * 0.33),
+                limit_mp: lv * 300,
                 desc: "唯一将你内力的75%转化为气血",
             },
             unarmed: {
-                str: 335,
-                dex: 335,
-                con: 335,
+                str: 5 + Math.floor(lv * 0.33),
+                dex: 5 + Math.floor(lv * 0.33),
+                con: 5 + Math.floor(lv * 0.33),
             },
             sword: {
-                str: 335,
-                dex: 335,
-                con: 335,
+                str: 5 + Math.floor(lv * 0.33),
+                dex: 5 + Math.floor(lv * 0.33),
+                con: 5 + Math.floor(lv * 0.33),
             },
         };
     }
@@ -40,7 +40,7 @@ export default class extends SKILL {
             name: "无相",
             distime: 60000,
             enable_skill: "sword",
-            mp: 2040,
+            mp: 40,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无相
@@ -57,7 +57,7 @@ export default class extends SKILL {
             name: "无我",
             distime: 20000,
             enable_skill: "sword",
-            mp: 2040,
+            mp: 40,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无我

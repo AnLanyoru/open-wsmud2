@@ -17,11 +17,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 20100,
+                max_hp: Math.floor(lv * 20.1),
                 hp_per: 8,
-                con: 338,
+                con: Math.floor(lv * 0.338),
                 diff_fy_per: 6,
-                limit_mp: 285000,
+                limit_mp: lv * 285,
                 desc: "命中后对敌人造成附加伤害(年龄越大伤害越高); 唯一将你内力的95%转化为气血",
             },
         };
@@ -32,7 +32,7 @@ export default class extends SKILL {
             name: "不老长春",
             distime: 28000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 不老长春
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "唯我独尊",
             distime: 40000,
             enable_skill: "force",
-            mp: 2040,
+            mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 唯我独尊

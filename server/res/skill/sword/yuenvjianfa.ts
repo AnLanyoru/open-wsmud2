@@ -32,9 +32,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1116,
-                mz: 1822,
-                dex: 140,
+                gj: 16 + Math.floor(lv * 1.1),
+                mz: 2 + Math.floor(lv * 1.82),
+                dex: Math.floor(lv * 0.14),
                 diff_fy_per: 6,
             },
         };
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "猿跃式",
             distime: 30000,
             enable_skill: "sword",
-            mp: 3825,
+            mp: 75,
             release_time: 1000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 猿跃式
@@ -62,7 +62,7 @@ export default class extends SKILL {
             name: "破竹式",
             distime: 10000,
             enable_skill: "sword",
-            mp: 4590,
+            mp: 90,
             release_time: 1500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破竹式

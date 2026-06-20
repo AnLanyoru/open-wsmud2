@@ -26,11 +26,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 30000,
-                con: 338,
-                fy: 1950,
+                max_hp: lv * 30,
+                con: Math.floor(lv * 0.338),
+                fy: Math.floor(lv * 1.95),
                 recover_per: 10,
-                limit_mp: 198000,
+                limit_mp: lv * 198,
                 desc: "唯一将你内力的85%转化为气血",
             },
         };
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "金针渡穴",
             distime: 15000,
             enable_skill: "force",
-            mp: 3060,
+            mp: 60,
             release_time: 1500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 金针渡穴
@@ -58,7 +58,7 @@ export default class extends SKILL {
             name: "万法不侵",
             distime: 60000,
             enable_skill: "force",
-            mp: 7650,
+            mp: 150,
             release_time: 2000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 万法不侵

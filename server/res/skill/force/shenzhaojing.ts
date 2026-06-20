@@ -31,18 +31,18 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                str: 176,
-                con: 176,
-                dex: 176,
-                int: 176,
-                limit_mp: 150000,
+                str: Math.floor(lv * 0.176),
+                con: Math.floor(lv * 0.176),
+                dex: Math.floor(lv * 0.176),
+                int: Math.floor(lv * 0.176),
+                limit_mp: lv * 150,
                 desc: "唯一将你内力的80%转化为气血",
             },
             unarmed: {
-                gj: 1700,
-                mz: 1700,
-                str: 210,
-                con: 210,
+                gj: Math.floor(lv * 1.7),
+                mz: Math.floor(lv * 1.7),
+                str: Math.floor(lv * 0.21),
+                con: Math.floor(lv * 0.21),
             },
         };
     }
@@ -52,7 +52,7 @@ export default class extends SKILL {
             name: "神照",
             distime: 60000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 神照
@@ -69,7 +69,7 @@ export default class extends SKILL {
             name: "拳经",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 拳经

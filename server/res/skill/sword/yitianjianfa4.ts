@@ -16,8 +16,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 3000,
-                mz: 3000,
+                gj: lv * 3,
+                mz: lv * 3,
                 mz_per: 10,
                 diff_fy_per: 10,
                 add_bjsh_per: 13,
@@ -31,7 +31,7 @@ export default class extends SKILL {
             name: "渡魔",
             distime: 15000,
             enable_skill: "sword",
-            mp: 60690,
+            mp: 1190,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 渡魔
@@ -48,7 +48,7 @@ export default class extends SKILL {
             name: "渡佛",
             distime: 60000,
             enable_skill: "sword",
-            mp: 70890,
+            mp: 1390,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 渡佛

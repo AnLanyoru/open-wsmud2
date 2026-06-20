@@ -38,13 +38,13 @@ export default class extends SKILL {
                 dazuo_per: 20,
                 expend_mp_per: 10,
                 per: 3,
-                max_hp: 10000,
-                limit_mp: 150000,
+                max_hp: lv * 10,
+                limit_mp: lv * 150,
                 desc: "唯一将你内力的70%转化为气血",
             },
             dodge: {
-                ds: 1500,
-                dex: 176,
+                ds: Math.floor(lv * 1.5),
+                dex: Math.floor(lv * 0.176),
             },
         };
     }
@@ -54,7 +54,7 @@ export default class extends SKILL {
             name: "明玉",
             distime: 60000,
             enable_skill: "dodge",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 明玉
@@ -71,7 +71,7 @@ export default class extends SKILL {
             name: "太上忘情",
             distime: 30000,
             enable_skill: "dodge",
-            mp: 1530,
+            mp: 30,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 太上忘情

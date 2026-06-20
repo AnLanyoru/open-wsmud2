@@ -22,7 +22,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: 1300,
+                zj: Math.floor(lv * 1.3),
             },
         };
     }
@@ -32,7 +32,7 @@ export default class extends SKILL {
             name: "开合之道",
             distime: 60000,
             enable_skill: "parry",
-            mp: 6630,
+            mp: 130,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 开合之道

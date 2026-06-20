@@ -16,8 +16,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
-                gj: 3000,
-                mz: 3000,
+                gj: lv * 3,
+                mz: lv * 3,
                 bj_per: 7,
                 mz_per: 8,
                 add_sh_per: 10,
@@ -31,7 +31,7 @@ export default class extends SKILL {
             name: "审判",
             distime: 60000,
             enable_skill: "throwing",
-            mp: 57120,
+            mp: 1120,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 审判
@@ -48,7 +48,7 @@ export default class extends SKILL {
             name: "天罚",
             distime: 13000,
             enable_skill: "throwing",
-            mp: 97410,
+            mp: 1910,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 天罚

@@ -15,8 +15,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1605,
-                mz: 1805,
+                gj: 5 + Math.floor(lv * 1.6),
+                mz: 5 + Math.floor(lv * 1.8),
                 mz_per: 8,
                 gj_per: 8,
             },
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "万佛朝宗",
             distime: 25000,
             enable_skill: "unarmed",
-            mp: 6120,
+            mp: 120,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 万佛朝宗
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "灭魔",
             distime: 48000,
             enable_skill: "unarmed",
-            mp: 6120,
+            mp: 120,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 灭魔

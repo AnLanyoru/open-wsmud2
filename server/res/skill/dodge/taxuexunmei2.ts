@@ -15,9 +15,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2100,
-                mz: 1710,
-                dex: 510,
+                ds: Math.floor(lv * 2.1),
+                mz: Math.floor(lv * 1.71),
+                dex: Math.floor(lv * 0.51),
                 bj_per: 4,
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "无痕",
             distime: 45000,
             enable_skill: "dodge",
-            mp: 1530,
+            mp: 30,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无痕

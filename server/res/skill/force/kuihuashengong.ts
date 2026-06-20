@@ -14,14 +14,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 4100,
-                mz: 2910,
-                limit_mp: 560000,
+                gj: Math.floor(lv * 4.1),
+                mz: Math.floor(lv * 2.91),
+                limit_mp: lv * 560,
                 desc: "唯一将你内力的70%转化为气血",
             },
             dodge: {
-                ds: 4012,
-                dex: 400,
+                ds: 12 + lv * 4,
+                dex: Math.floor(lv * 0.4),
             },
         };
     }
@@ -31,7 +31,7 @@ export default class extends SKILL {
             name: "鬼魅",
             distime: 28500,
             enable_skill: "dodge",
-            mp: 2020,
+            mp: 40,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 鬼魅

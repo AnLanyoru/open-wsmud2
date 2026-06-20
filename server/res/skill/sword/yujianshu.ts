@@ -15,15 +15,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2215,
-                mz: 2015,
+                gj: 5 + Math.floor(lv * 2.21),
+                mz: 15 + lv * 2,
                 bj_per: 5,
                 add_bjsh_per: 12,
                 desc: "命中敌人后积累一道剑气",
             },
             parry: {
-                zj: 2112,
-                fy: 1100,
+                zj: 2 + Math.floor(lv * 2.11),
+                fy: Math.floor(lv * 1.1),
                 diff_bj: 5,
             },
         };
@@ -34,7 +34,7 @@ export default class extends SKILL {
             name: "万剑诀",
             distime: 18000,
             enable_skill: "sword",
-            mp: 2295,
+            mp: 45,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 万剑诀
@@ -51,7 +51,7 @@ export default class extends SKILL {
             name: "天剑诀",
             distime: 25000,
             enable_skill: "sword",
-            mp: 1530,
+            mp: 30,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 天剑诀

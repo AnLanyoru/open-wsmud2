@@ -14,11 +14,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                str: 1000,
-                dex: 1000,
-                con: 1000,
-                int: 1000,
-                limit_mp: 1050000,
+                str: lv * 1,
+                dex: lv * 1,
+                con: lv * 1,
+                int: lv * 1,
+                limit_mp: lv * 1050,
                 desc: "破碎每次的攻击都附加最大内力1%的伤害，当你空手时附加的内力加倍，并吸收部分伤害; 唯一将你内力的140%转化为气血",
             },
         };
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "战神决",
             distime: 60000,
             enable_skill: "force",
-            mp: 46920,
+            mp: 920,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 战神决
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "湮灭",
             distime: 45000,
             enable_skill: "force",
-            mp: 64770,
+            mp: 1270,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 湮灭

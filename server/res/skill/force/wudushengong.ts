@@ -14,9 +14,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 8000,
-                fy: 1000,
-                limit_mp: 55000,
+                max_hp: lv * 8,
+                fy: lv * 1,
+                limit_mp: lv * 55,
                 desc: "唯一将你内力的70%转化为气血",
             },
         };

@@ -22,9 +22,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1610,
-                int: 127,
-                mz: 1010,
+                gj: Math.floor(lv * 1.61),
+                int: Math.floor(lv * 0.127),
+                mz: 10 + lv * 1,
             },
         };
     }
@@ -34,7 +34,7 @@ export default class extends SKILL {
             name: "三连环",
             distime: 15000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 三连环

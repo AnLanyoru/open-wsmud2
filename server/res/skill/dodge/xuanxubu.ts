@@ -26,8 +26,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2100,
-                dex: 251,
+                ds: Math.floor(lv * 2.1),
+                dex: 1 + Math.floor(lv * 0.25),
                 ds_per: 4,
                 desc: "当你躲闪成后顺势反击敌人",
             },
@@ -39,7 +39,7 @@ export default class extends SKILL {
             name: "幻影",
             distime: 45000,
             enable_skill: "dodge",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 幻影

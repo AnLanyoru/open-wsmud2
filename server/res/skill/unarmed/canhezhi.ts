@@ -27,10 +27,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1520,
-                mz: 1520,
+                gj: Math.floor(lv * 1.52),
+                mz: Math.floor(lv * 1.52),
                 bj_per: 4,
-                int: 169,
+                int: Math.floor(lv * 0.169),
                 desc: "命中后使敌人受到的伤害增加1001可叠加10层",
             },
         };
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "参合之殇",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 参合之殇

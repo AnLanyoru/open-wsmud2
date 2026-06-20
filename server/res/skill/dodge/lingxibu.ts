@@ -14,10 +14,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2300,
-                mz: 2300,
-                dex: 281,
-                int: 261,
+                ds: Math.floor(lv * 2.3),
+                mz: Math.floor(lv * 2.3),
+                dex: 1 + Math.floor(lv * 0.28),
+                int: 1 + Math.floor(lv * 0.26),
                 diff_downside_per: 15,
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "比翼",
             distime: 60000,
             enable_skill: "dodge",
-            mp: 6120,
+            mp: 120,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 比翼

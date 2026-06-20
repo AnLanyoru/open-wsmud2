@@ -14,9 +14,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2310,
-                gj: 1910,
-                fy: 1910,
+                ds: Math.floor(lv * 2.31),
+                gj: Math.floor(lv * 1.91),
+                fy: Math.floor(lv * 1.91),
                 gj_per: 8,
                 fy_per: 8,
                 desc: "躲闪失败后会额外增加一次躲闪判定，并增加10%有效值",

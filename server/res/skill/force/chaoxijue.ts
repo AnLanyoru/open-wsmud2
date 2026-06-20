@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 1220,
-                fy: 1220,
-                limit_mp: 105000,
+                gj: Math.floor(lv * 1.22),
+                fy: Math.floor(lv * 1.22),
+                limit_mp: lv * 105,
                 desc: "潮汐命中后增加自身潮汐层数; 唯一将你内力的85%转化为气血",
             },
         };
@@ -40,7 +40,7 @@ export default class extends SKILL {
             name: "潮起",
             distime: 25000,
             enable_skill: "force",
-            mp: 1275,
+            mp: 25,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 潮起
@@ -57,7 +57,7 @@ export default class extends SKILL {
             name: "潮落",
             distime: 25000,
             enable_skill: "force",
-            mp: 1275,
+            mp: 25,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 潮落

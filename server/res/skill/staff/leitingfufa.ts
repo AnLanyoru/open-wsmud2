@@ -32,8 +32,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             staff: {
-                gj: 1210,
-                str: 102,
+                gj: Math.floor(lv * 1.21),
+                str: 2 + Math.floor(lv * 0.1),
             },
         };
     }
@@ -43,7 +43,7 @@ export default class extends SKILL {
             name: "雷霆开山",
             distime: 4000,
             enable_skill: "staff",
-            mp: 1020,
+            mp: 20,
             release_time: 7000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 雷霆开山

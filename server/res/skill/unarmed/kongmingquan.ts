@@ -30,9 +30,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1720,
-                str: 167,
-                mz: 1720,
+                gj: Math.floor(lv * 1.72),
+                str: Math.floor(lv * 0.167),
+                mz: Math.floor(lv * 1.72),
             },
         };
     }
@@ -42,7 +42,7 @@ export default class extends SKILL {
             name: "乱拳",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 乱拳
@@ -59,7 +59,7 @@ export default class extends SKILL {
             name: "左右互搏",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 左右互搏

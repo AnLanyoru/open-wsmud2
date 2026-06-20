@@ -32,9 +32,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             blade: {
-                gj: 1510,
+                gj: Math.floor(lv * 1.51),
                 bj_per: 4,
-                dex: 200,
+                dex: Math.floor(lv * 0.2),
             },
         };
     }
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "狂风二十一式",
             distime: 30000,
             enable_skill: "blade",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 狂风二十一式

@@ -14,8 +14,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 2100,
-                con: 210,
+                ds: Math.floor(lv * 2.1),
+                con: Math.floor(lv * 0.21),
             },
         };
     }

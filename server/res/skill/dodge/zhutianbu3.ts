@@ -26,9 +26,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 3000,
-                con: 252,
-                dex: 252,
+                ds: lv * 3,
+                con: 2 + Math.floor(lv * 0.25),
+                dex: 2 + Math.floor(lv * 0.25),
             },
         };
     }
@@ -38,7 +38,7 @@ export default class extends SKILL {
             name: "万佛化身",
             distime: 28500,
             enable_skill: "dodge",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 万佛化身

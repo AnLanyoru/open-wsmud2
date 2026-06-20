@@ -15,29 +15,29 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 3000,
-                mz: 3000,
+                gj: lv * 3,
+                mz: lv * 3,
                 add_sh_per: 4,
                 diff_sh_per: 4,
                 desc: "唯一将你内力的135%转化为气血",
             },
             dodge: {
-                ds: 3000,
-                dex: 600,
+                ds: lv * 3,
+                dex: Math.floor(lv * 0.6),
                 ds_per: 4,
                 mz_per: 4,
             },
             parry: {
-                zj: 3000,
+                zj: lv * 3,
                 hp_per: 6,
-                con: 600,
-                str: 600,
+                con: Math.floor(lv * 0.6),
+                str: Math.floor(lv * 0.6),
             },
             unarmed: {
-                gj: 3000,
-                mz: 3000,
-                con: 600,
-                str: 600,
+                gj: lv * 3,
+                mz: lv * 3,
+                con: Math.floor(lv * 0.6),
+                str: Math.floor(lv * 0.6),
             },
         };
     }
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "种魔",
             distime: 42750,
             enable_skill: "unarmed",
-            mp: 98940,
+            mp: 1940,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 种魔
@@ -64,7 +64,7 @@ export default class extends SKILL {
             name: "道心",
             distime: 42750,
             enable_skill: "unarmed",
-            mp: 95880,
+            mp: 1880,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 道心
@@ -81,7 +81,7 @@ export default class extends SKILL {
             name: "鬼影",
             distime: 38000,
             enable_skill: "unarmed",
-            mp: 79560,
+            mp: 1560,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 鬼影
@@ -98,7 +98,7 @@ export default class extends SKILL {
             name: "拳罡",
             distime: 9500,
             enable_skill: "unarmed",
-            mp: 49470,
+            mp: 970,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 拳罡
@@ -115,7 +115,7 @@ export default class extends SKILL {
             name: "补天道",
             distime: 42750,
             enable_skill: "unarmed",
-            mp: 100980,
+            mp: 1980,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 补天道

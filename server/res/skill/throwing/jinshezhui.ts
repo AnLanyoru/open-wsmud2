@@ -27,7 +27,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
-                gj: 1010,
+                gj: 10 + lv * 1,
             },
         };
     }
@@ -37,7 +37,7 @@ export default class extends SKILL {
             name: "千蛇出洞",
             distime: 10000,
             enable_skill: "throwing",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 千蛇出洞

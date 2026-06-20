@@ -14,12 +14,12 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 3100,
-                mz: 3100,
+                gj: Math.floor(lv * 3.1),
+                mz: Math.floor(lv * 3.1),
                 mz_per: 10,
                 add_sh_per: 10,
                 diff_fy_per: 10,
-                limit_mp: 900000,
+                limit_mp: lv * 900,
                 desc: "灵动当你开始战斗的5秒内无法被控制; 唯一将你内力的120%转化为气血",
             },
         };
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "心有灵犀",
             distime: 30000,
             enable_skill: "force",
-            mp: 58650,
+            mp: 1150,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 心有灵犀
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "剑心通明",
             distime: 60000,
             enable_skill: "force",
-            mp: 132600,
+            mp: 2600,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 剑心通明

@@ -15,10 +15,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
-                gj: 2510,
-                mz: 2008,
-                str: 258,
-                int: 258,
+                gj: Math.floor(lv * 2.51),
+                mz: 8 + lv * 2,
+                str: Math.floor(lv * 0.258),
+                int: Math.floor(lv * 0.258),
             },
         };
     }
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "乾坤一掷",
             distime: 20000,
             enable_skill: "throwing",
-            mp: 1479,
+            mp: 29,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 乾坤一掷

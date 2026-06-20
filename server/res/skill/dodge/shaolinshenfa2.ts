@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 1810,
-                str: 254,
-                dex: 254,
+                ds: Math.floor(lv * 1.81),
+                str: 4 + Math.floor(lv * 0.25),
+                dex: 4 + Math.floor(lv * 0.25),
                 desc: "当你躲闪失败会增加你1000防御，可叠加10层",
             },
         };

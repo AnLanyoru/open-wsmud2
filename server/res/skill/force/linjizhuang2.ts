@@ -15,11 +15,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 35000,
-                con: 336,
-                fy: 2100,
+                max_hp: lv * 35,
+                con: Math.floor(lv * 0.336),
+                fy: Math.floor(lv * 2.1),
                 fy_per: 6,
-                limit_mp: 280000,
+                limit_mp: lv * 280,
                 desc: "唯一将你内力的95%转化为气血",
             },
         };
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "鹤翔庄",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 鹤翔庄
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "游龙庄",
             distime: 30000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 游龙庄

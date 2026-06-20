@@ -15,9 +15,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                max_hp: 300000,
-                int: 1000,
-                zj: 2000,
+                max_hp: lv * 300,
+                int: lv * 1,
+                zj: lv * 2,
                 fy_per: 10,
                 zj_per: 10,
                 desc: "无极招架成功后，召唤三清之一使用你装备的技能攻击",
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "阴阳无极",
             distime: 55000,
             enable_skill: "parry",
-            mp: 39780,
+            mp: 780,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 阴阳无极
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "大道无极",
             distime: 45000,
             enable_skill: "parry",
-            mp: 140250,
+            mp: 2750,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 大道无极

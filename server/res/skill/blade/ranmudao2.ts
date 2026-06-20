@@ -16,17 +16,17 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             blade: {
-                gj: 2010,
-                str: 500,
-                mz: 1510,
-                fy: 2010,
+                gj: 10 + lv * 2,
+                str: Math.floor(lv * 0.5),
+                mz: Math.floor(lv * 1.51),
+                fy: 10 + lv * 2,
                 desc: "燃木真焰你的攻击会附加自身120%防御力的伤害",
             },
             parry: {
-                zj: 2100,
-                fy: 2100,
-                con: 500,
-                max_hp: 11000,
+                zj: Math.floor(lv * 2.1),
+                fy: Math.floor(lv * 2.1),
+                con: Math.floor(lv * 0.5),
+                max_hp: lv * 11,
             },
         };
     }
@@ -36,7 +36,7 @@ export default class extends SKILL {
             name: "护体真焰",
             distime: 30000,
             enable_skill: "blade",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 护体真焰
@@ -53,7 +53,7 @@ export default class extends SKILL {
             name: "焚尽八荒",
             distime: 20000,
             enable_skill: "blade",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 焚尽八荒

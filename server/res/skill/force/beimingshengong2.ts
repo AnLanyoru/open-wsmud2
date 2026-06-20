@@ -27,15 +27,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                con: 510,
-                dex: 334,
-                limit_mp: 165000,
+                con: Math.floor(lv * 0.51),
+                dex: 4 + Math.floor(lv * 0.33),
+                limit_mp: lv * 165,
                 desc: "当你命中敌人后，会吸取对方内力增加自身最大内力; 唯一将你内力的80%转化为气血",
             },
             parry: {
-                zj: 1820,
-                dex: 252,
-                max_hp: 13000,
+                zj: Math.floor(lv * 1.82),
+                dex: 2 + Math.floor(lv * 0.25),
+                max_hp: lv * 13,
                 desc: "当你招架成功后会吸取对方内力增加自身最大内力",
             },
         };
@@ -63,7 +63,7 @@ export default class extends SKILL {
             name: "凝神诀",
             distime: 30000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 凝神诀

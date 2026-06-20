@@ -18,10 +18,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 20000,
-                mz: 2200,
+                max_hp: lv * 20,
+                mz: Math.floor(lv * 2.2),
                 diff_fy_per: 6,
-                limit_mp: 285000,
+                limit_mp: lv * 285,
                 desc: "命中后会使敌人减少攻击，躲闪，命中1%; 唯一将你内力的90%转化为气血",
             },
         };
@@ -32,7 +32,7 @@ export default class extends SKILL {
             name: "追魂",
             distime: 15000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 追魂
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "逆转九阴",
             distime: 60000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 逆转九阴

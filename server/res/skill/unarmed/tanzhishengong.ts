@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1820,
-                str: 201,
-                mz: 1000,
+                gj: Math.floor(lv * 1.82),
+                str: 1 + Math.floor(lv * 0.2),
+                mz: lv * 1,
             },
         };
     }
@@ -39,7 +39,7 @@ export default class extends SKILL {
             name: "弹指惊雷",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 弹指惊雷
@@ -56,7 +56,7 @@ export default class extends SKILL {
             name: "点穴",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 点穴

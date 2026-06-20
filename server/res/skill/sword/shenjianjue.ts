@@ -27,7 +27,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                mz: 2100,
+                mz: Math.floor(lv * 2.1),
                 bj_per: 4,
             },
         };
@@ -38,7 +38,7 @@ export default class extends SKILL {
             name: "剑芒",
             distime: 30000,
             enable_skill: "sword",
-            mp: 2550,
+            mp: 50,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 剑芒
@@ -55,7 +55,7 @@ export default class extends SKILL {
             name: "剑气",
             distime: 20000,
             enable_skill: "sword",
-            mp: 2550,
+            mp: 50,
             release_time: 3700,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 剑气

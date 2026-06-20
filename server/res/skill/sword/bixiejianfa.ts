@@ -18,16 +18,16 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2010,
-                mz: 1520,
-                dex: 127,
+                gj: 10 + lv * 2,
+                mz: Math.floor(lv * 1.52),
+                dex: Math.floor(lv * 0.127),
                 bj_per: 8,
                 desc: "你的攻击会快速攻击多次",
             },
             parry: {
-                zj: 2310,
+                zj: Math.floor(lv * 2.31),
                 diff_sh_per: 4,
-                dex: 127,
+                dex: Math.floor(lv * 0.127),
             },
         };
     }
@@ -37,7 +37,7 @@ export default class extends SKILL {
             name: "刺目",
             distime: 45000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 刺目

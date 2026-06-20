@@ -28,15 +28,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 1520,
-                mz: 1510,
-                str: 250,
-                dex: 250,
+                gj: Math.floor(lv * 1.52),
+                mz: Math.floor(lv * 1.51),
+                str: Math.floor(lv * 0.25),
+                dex: Math.floor(lv * 0.25),
             },
             parry: {
-                zj: 1520,
-                fy: 1510,
-                con: 250,
+                zj: Math.floor(lv * 1.52),
+                fy: Math.floor(lv * 1.51),
+                con: Math.floor(lv * 0.25),
             },
         };
     }
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "破玉",
             distime: 16000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破玉
@@ -63,7 +63,7 @@ export default class extends SKILL {
             name: "劈石",
             distime: 38000,
             enable_skill: "unarmed",
-            mp: 1275,
+            mp: 25,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 劈石

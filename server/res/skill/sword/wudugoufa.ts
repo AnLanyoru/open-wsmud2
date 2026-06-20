@@ -32,8 +32,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                str: 201,
-                mz: 1410,
+                str: 1 + Math.floor(lv * 0.2),
+                mz: Math.floor(lv * 1.41),
                 desc: "当你命中敌人后对敌人造成毒素伤害",
             },
         };
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "金钩锁魂",
             distime: 25000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 金钩锁魂

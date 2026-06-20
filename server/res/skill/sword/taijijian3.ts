@@ -16,9 +16,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2020,
+                gj: 20 + lv * 2,
                 mz: 6,
-                zj: 2020,
+                zj: 20 + lv * 2,
             },
             // Global/base properties:
             // {"int":176,"zj_per":8} 
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "缠字诀",
             distime: 19000,
             enable_skill: "sword",
-            mp: 1530,
+            mp: 30,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 缠字诀
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "连字诀",
             distime: 14250,
             enable_skill: "sword",
-            mp: 510,
+            mp: 10,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 连字诀
@@ -64,7 +64,7 @@ export default class extends SKILL {
             name: "随字决",
             distime: 19000,
             enable_skill: "sword",
-            mp: 510,
+            mp: 10,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 随字决

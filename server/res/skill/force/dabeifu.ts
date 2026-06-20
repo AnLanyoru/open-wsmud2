@@ -14,11 +14,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                con: 2005,
+                con: 5 + lv * 2,
                 diff_bj: 8,
                 diff_downside_per: 15,
                 expend_mp_per: 15,
-                limit_mp: 290000,
+                limit_mp: lv * 290,
                 desc: "唯一将你内力的100%转化为气血",
             },
         };
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "搜魂手",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 搜魂手
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "移穴法",
             distime: 60000,
             enable_skill: "force",
-            mp: 6120,
+            mp: 120,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 移穴法

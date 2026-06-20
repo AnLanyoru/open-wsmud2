@@ -16,15 +16,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2010,
+                gj: 10 + lv * 2,
                 gjsd: 250,
                 bj_per: 4,
-                mz: 2010,
+                mz: 10 + lv * 2,
             },
             parry: {
-                zj: 2010,
-                str: 334,
-                dex: 334,
+                zj: 10 + lv * 2,
+                str: 4 + Math.floor(lv * 0.33),
+                dex: 4 + Math.floor(lv * 0.33),
             },
             // Global/base properties:
             // {"add_sh_per":8} 
@@ -36,7 +36,7 @@ export default class extends SKILL {
             name: "无招",
             distime: 30000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无招
@@ -53,7 +53,7 @@ export default class extends SKILL {
             name: "破字诀",
             distime: 30000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破字诀
@@ -70,7 +70,7 @@ export default class extends SKILL {
             name: "破气诀",
             distime: 20000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破气诀

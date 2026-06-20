@@ -15,11 +15,11 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: 20000,
-                fy: 2000,
-                zj: 2000,
+                max_hp: lv * 20,
+                fy: lv * 2,
+                zj: lv * 2,
                 fy_per: 6,
-                limit_mp: 298000,
+                limit_mp: lv * 298,
                 desc: "唯一将你内力的100%转化为气血",
             },
         };
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "真武除邪",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 真武除邪
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "一气化三清",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 一气化三清

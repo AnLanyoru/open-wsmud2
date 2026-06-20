@@ -14,10 +14,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 2100,
+                gj: Math.floor(lv * 2.1),
                 add_sh_per: 8,
                 diff_busy: 4000,
-                limit_mp: 286000,
+                limit_mp: lv * 286,
                 desc: "当你命中敌人会造成4000内功伤害，不可招架; 唯一将你内力的80%转化为气血",
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "十步杀一人",
             distime: 30000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 十步杀一人
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "白首太玄",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 白首太玄

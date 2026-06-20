@@ -16,10 +16,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             club: {
-                gj: 2100,
-                mz: 2000,
-                con: 200,
-                str: 200,
+                gj: Math.floor(lv * 2.1),
+                mz: lv * 2,
+                con: Math.floor(lv * 0.2),
+                str: Math.floor(lv * 0.2),
             },
         };
     }
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "绊字决",
             distime: 20000,
             enable_skill: "club",
-            mp: 1020,
+            mp: 20,
             release_time: 1800,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 绊字决
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "天下无狗",
             distime: 20000,
             enable_skill: "club",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 天下无狗

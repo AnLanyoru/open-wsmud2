@@ -15,12 +15,12 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 3000,
-                fy: 3000,
+                gj: lv * 3,
+                fy: lv * 3,
                 fy_per: 10,
                 diff_sh_per: 10,
                 diff_bj: 10,
-                limit_mp: 990000,
+                limit_mp: lv * 990,
                 desc: "唯一将你内力的130%转化为气血; 金刚装备后将你12%防御力转化为固定免伤",
             },
         };
@@ -31,7 +31,7 @@ export default class extends SKILL {
             name: "不灭金身",
             distime: 60000,
             enable_skill: "force",
-            mp: 72420,
+            mp: 1420,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 不灭金身
@@ -48,7 +48,7 @@ export default class extends SKILL {
             name: "万法皆空",
             distime: 50000,
             enable_skill: "force",
-            mp: 117300,
+            mp: 2300,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 万法皆空

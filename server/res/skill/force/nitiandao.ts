@@ -17,7 +17,7 @@ export default class extends SKILL {
                 hp_per: 15,
                 diff_sh_per: 10,
                 add_sh_per: 10,
-                limit_mp: 1100000,
+                limit_mp: lv * 1100,
                 desc: "逆转将受到的13.3%伤害转为自己的气血和内力; 唯一将你内力的150%转化为气血",
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "一念轮回",
             distime: 57000,
             enable_skill: "force",
-            mp: 87720,
+            mp: 1720,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 一念轮回
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "一念寂灭",
             distime: 57000,
             enable_skill: "force",
-            mp: 100470,
+            mp: 1970,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 一念寂灭

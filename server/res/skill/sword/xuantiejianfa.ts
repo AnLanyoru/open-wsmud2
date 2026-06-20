@@ -15,16 +15,16 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2010,
-                mz: 2020,
-                str: 335,
+                gj: 10 + lv * 2,
+                mz: 20 + lv * 2,
+                str: 5 + Math.floor(lv * 0.33),
                 diff_fy_per: 8,
             },
             parry: {
-                zj: 2010,
-                fy: 2310,
+                zj: 10 + lv * 2,
+                fy: Math.floor(lv * 2.31),
                 fy_per: 13,
-                max_hp: 20000,
+                max_hp: lv * 20,
             },
         };
     }
@@ -51,7 +51,7 @@ export default class extends SKILL {
             name: "重剑无锋",
             distime: 30000,
             enable_skill: "sword",
-            mp: 2040,
+            mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 重剑无锋

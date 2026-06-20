@@ -15,7 +15,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             blade: {
-                gj: 3200,
+                gj: Math.floor(lv * 3.2),
                 mz_per: 8,
                 gj_per: 8,
                 add_sh_per: 8,
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "修罗炼狱",
             distime: 28500,
             enable_skill: "blade",
-            mp: 65280,
+            mp: 1280,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 修罗炼狱
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "六道轮回",
             distime: 57000,
             enable_skill: "blade",
-            mp: 70380,
+            mp: 1380,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 六道轮回

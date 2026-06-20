@@ -31,10 +31,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: 1310,
-                max_hp: 10050,
+                fy: Math.floor(lv * 1.31),
+                max_hp: 50 + lv * 10,
                 fy_per: 6,
-                limit_mp: 103000,
+                limit_mp: lv * 103,
                 desc: "唯一将你内力的77%转化为气血",
             },
         };
@@ -45,7 +45,7 @@ export default class extends SKILL {
             name: "镇岳",
             distime: 60000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 镇岳

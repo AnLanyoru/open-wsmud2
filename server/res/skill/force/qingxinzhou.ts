@@ -36,9 +36,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                int: 176,
+                int: Math.floor(lv * 0.176),
                 diff_downside_per: 10,
-                limit_mp: 175000,
+                limit_mp: lv * 175,
                 desc: "唯一将你内力的82%转化为气血",
             },
         };
@@ -49,7 +49,7 @@ export default class extends SKILL {
             name: "破妄曲",
             distime: 16000,
             enable_skill: "force",
-            mp: 3978,
+            mp: 78,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破妄曲
@@ -66,7 +66,7 @@ export default class extends SKILL {
             name: "安神曲",
             distime: 16000,
             enable_skill: "force",
-            mp: 3978,
+            mp: 78,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 安神曲
@@ -83,7 +83,7 @@ export default class extends SKILL {
             name: "共鸣",
             distime: 45000,
             enable_skill: "force",
-            mp: 6528,
+            mp: 128,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 共鸣

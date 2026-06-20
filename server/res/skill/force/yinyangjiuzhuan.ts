@@ -18,7 +18,7 @@ export default class extends SKILL {
                 add_sh_per: 10,
                 diff_fy_per: 10,
                 diff_sh_per: 10,
-                limit_mp: 950000,
+                limit_mp: lv * 950,
                 desc: "唯一将你内力的125%转化为气血",
             },
         };
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "转阴阳",
             distime: 30000,
             enable_skill: "force",
-            mp: 6120,
+            mp: 120,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 转阴阳
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "定乾坤",
             distime: 60000,
             enable_skill: "force",
-            mp: 107100,
+            mp: 2100,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 定乾坤
@@ -64,7 +64,7 @@ export default class extends SKILL {
             name: "镇天地",
             distime: 60000,
             enable_skill: "force",
-            mp: 84150,
+            mp: 1650,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 镇天地

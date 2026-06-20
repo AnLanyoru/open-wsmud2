@@ -14,10 +14,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: 2200,
-                fy: 2200,
+                zj: Math.floor(lv * 2.2),
+                fy: Math.floor(lv * 2.2),
                 diff_bj: 4,
-                dex: 333,
+                dex: 3 + Math.floor(lv * 0.33),
             },
         };
     }
@@ -27,7 +27,7 @@ export default class extends SKILL {
             name: "星移",
             distime: 30000,
             enable_skill: "parry",
-            mp: 2550,
+            mp: 50,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 星移
@@ -44,7 +44,7 @@ export default class extends SKILL {
             name: "斗转",
             distime: 30000,
             enable_skill: "parry",
-            mp: 4590,
+            mp: 90,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 斗转

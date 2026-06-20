@@ -26,8 +26,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: 1830,
-                fy: 1820,
+                zj: Math.floor(lv * 1.83),
+                fy: Math.floor(lv * 1.82),
                 diff_bj: 3,
             },
         };
@@ -38,7 +38,7 @@ export default class extends SKILL {
             name: "反势",
             distime: 35000,
             enable_skill: "parry",
-            mp: 2040,
+            mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 反势
@@ -55,7 +55,7 @@ export default class extends SKILL {
             name: "缠势",
             distime: 40000,
             enable_skill: "parry",
-            mp: 3570,
+            mp: 70,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 缠势

@@ -15,8 +15,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 2005,
-                mz: 2010,
+                gj: 5 + lv * 2,
+                mz: 10 + lv * 2,
                 add_sh_per: 4,
                 diff_fy_per: 4,
                 desc: "当你命中敌人后会对附近一名敌人产生溅射伤害",
@@ -29,7 +29,7 @@ export default class extends SKILL {
             name: "无形剑气",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 1530,
+            mp: 30,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 无形剑气
@@ -46,7 +46,7 @@ export default class extends SKILL {
             name: "六脉纵横",
             distime: 20000,
             enable_skill: "unarmed",
-            mp: 1530,
+            mp: 30,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 六脉纵横

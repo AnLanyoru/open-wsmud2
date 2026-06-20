@@ -28,9 +28,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 3000,
-                mz: 3000,
-                dex: 1002,
+                gj: lv * 3,
+                mz: lv * 3,
+                dex: 2 + lv * 1,
                 desc: "你对种了生死符的敌人伤害增加50%",
             },
         };
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "生死符",
             distime: 28500,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 生死符
@@ -58,7 +58,7 @@ export default class extends SKILL {
             name: "阳关三叠",
             distime: 11400,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 阳关三叠
@@ -75,7 +75,7 @@ export default class extends SKILL {
             name: "白虹贯日",
             distime: 14250,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 3000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 白虹贯日

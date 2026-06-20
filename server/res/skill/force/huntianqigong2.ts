@@ -27,10 +27,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 2020,
-                con: 254,
-                fy: 2030,
-                limit_mp: 158000,
+                gj: 20 + lv * 2,
+                con: 4 + Math.floor(lv * 0.25),
+                fy: 30 + lv * 2,
+                limit_mp: lv * 158,
                 desc: "唯一将你内力的70%转化为气血",
             },
         };
@@ -41,7 +41,7 @@ export default class extends SKILL {
             name: "天罡",
             distime: 45000,
             enable_skill: "force",
-            mp: 1020,
+            mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 天罡

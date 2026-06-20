@@ -16,15 +16,15 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 2010,
-                mz: 2010,
-                dex: 250,
+                gj: 10 + lv * 2,
+                mz: 10 + lv * 2,
+                dex: Math.floor(lv * 0.25),
                 gjsd: 250,
                 bj_per: 4,
             },
             dodge: {
-                ds: 1916,
-                dex: 333,
+                ds: 16 + Math.floor(lv * 1.9),
+                dex: 3 + Math.floor(lv * 0.33),
                 gjsd: 250,
             },
         };
@@ -35,7 +35,7 @@ export default class extends SKILL {
             name: "夺命连环",
             distime: 30000,
             enable_skill: "sword",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 夺命连环

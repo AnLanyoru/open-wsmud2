@@ -37,6 +37,7 @@
     "@types/node": "^25.9.1",
     "concurrently": "^9.1.2",
     "esbuild": "^0.28.0",
+    "pinyin": "^4.0.0",
     "typescript": "^6.0.3"
   }
 }

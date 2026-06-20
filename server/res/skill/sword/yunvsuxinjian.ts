@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1510,
-                mz: 1610,
-                dex: 176,
+                gj: Math.floor(lv * 1.51),
+                mz: Math.floor(lv * 1.61),
+                dex: Math.floor(lv * 0.176),
             },
         };
     }
@@ -39,7 +39,7 @@ export default class extends SKILL {
             name: "双剑合璧",
             distime: 60000,
             enable_skill: "sword",
-            mp: 5100,
+            mp: 100,
             release_time: 1000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 双剑合璧

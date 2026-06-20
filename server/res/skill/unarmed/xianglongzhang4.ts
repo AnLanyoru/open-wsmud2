@@ -16,10 +16,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 3000,
-                mz: 3000,
-                str: 1000,
-                con: 1000,
+                gj: lv * 3,
+                mz: lv * 3,
+                str: lv * 1,
+                con: lv * 1,
                 gj_per: 10,
                 desc: "摧毁命中敌人后逐步瓦解敌方防御",
             },
@@ -31,7 +31,7 @@ export default class extends SKILL {
             name: "降龙",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 73950,
+            mp: 1450,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 降龙
@@ -48,7 +48,7 @@ export default class extends SKILL {
             name: "破灭",
             distime: 30000,
             enable_skill: "unarmed",
-            mp: 117300,
+            mp: 2300,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 破灭

@@ -27,9 +27,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 1320,
-                mz: 1620,
-                dex: 108,
+                gj: Math.floor(lv * 1.32),
+                mz: Math.floor(lv * 1.62),
+                dex: 8 + Math.floor(lv * 0.1),
                 desc: "唯一攻击时有概率打出音波伤人",
             },
         };
@@ -40,7 +40,7 @@ export default class extends SKILL {
             name: "七绝音",
             distime: 36000,
             enable_skill: "sword",
-            mp: 3060,
+            mp: 60,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 七绝音
@@ -57,7 +57,7 @@ export default class extends SKILL {
             name: "魔音贯耳",
             distime: 47000,
             enable_skill: "sword",
-            mp: 4080,
+            mp: 80,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 魔音贯耳

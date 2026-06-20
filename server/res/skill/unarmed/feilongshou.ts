@@ -23,7 +23,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                mz: 2024,
+                mz: 24 + lv * 2,
             },
         };
     }
@@ -33,7 +33,7 @@ export default class extends SKILL {
             name: "探龙",
             distime: 18000,
             enable_skill: "unarmed",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 探龙

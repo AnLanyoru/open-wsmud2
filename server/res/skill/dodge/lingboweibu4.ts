@@ -15,9 +15,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                dex: 1000,
-                ds: 3000,
-                mz: 3000,
+                dex: lv * 1,
+                ds: lv * 3,
+                mz: lv * 3,
                 ds_per: 10,
                 mz_per: 10,
                 desc: "无相躲闪成功后模仿对方的技能绝招",
@@ -30,7 +30,7 @@ export default class extends SKILL {
             name: "凌波",
             distime: 60000,
             enable_skill: "dodge",
-            mp: 86190,
+            mp: 1690,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 凌波
@@ -47,7 +47,7 @@ export default class extends SKILL {
             name: "化蝶",
             distime: 60000,
             enable_skill: "dodge",
-            mp: 111180,
+            mp: 2180,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 化蝶

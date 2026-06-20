@@ -15,9 +15,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             club: {
-                gj: 2015,
-                mz: 2015,
-                fy: 2015,
+                gj: 15 + lv * 2,
+                mz: 15 + lv * 2,
+                fy: 15 + lv * 2,
                 diff_sh_per: 3,
             },
         };
@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: "金刚伏魔",
             distime: 20000,
             enable_skill: "club",
-            mp: 1020,
+            mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 金刚伏魔
