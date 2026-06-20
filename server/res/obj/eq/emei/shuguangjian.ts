@@ -19,20 +19,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { gj: 55, mz: 35 };
-                this.desc = "峨眉派正式弟子的制式配剑，轻盈灵动。";
+                this.desc = "峨眉弟子的青锋剑，剑走轻灵，锋芒初现。";
                 break;
             case 3:
                 this.prop = { gj: 132, con: 15, mz: 120 };
-                this.desc = "峨眉派精英弟子的佩剑，剑光如水。";
+                this.desc = "峨眉入室弟子的佩剑，剑光如秋水，寒而不戾。";
                 break;
             case 4:
                 this.prop = { gj: 300, con: 25, mz: 320, diff_fy_per: 5 };
-                this.desc = "峨眉派长老的佩剑，佛光剑气合一，破敌护身。";
+                this.desc = "峨眉执事的佩剑，剑含佛光，斩业护生。";
                 this.group_name = "shuguang4";
                 break;
             case 5:
                 this.prop = { gj: 490, con: 35, mz: 500, mz_per: 10, diff_fy_per: 6 };
-                this.desc = "峨眉派镇派宝剑，剑身映照晨光，如曙光初现，破暗除魔。";
+                this.desc = "峨眉长老的佩剑，剑映晨光，如曙光初现，破暗除魔。";
                 this.group_name = "shuguang5";
                 break;
         }

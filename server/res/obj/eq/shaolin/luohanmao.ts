@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 76, str: 5 };
-                this.desc = "少林寺正式弟子的僧帽，灰布缝制。";
+                this.desc = "少林沙弥的灰布僧帽，初入空门，六根始净。";
                 break;
             case 3:
                 this.prop = { fy: 142, str: 15, max_hp: 1500 };
-                this.desc = "少林寺精英弟子的僧帽，厚实软和。";
+                this.desc = "少林武僧的厚布僧帽，沉稳扎实，佛性渐深。";
                 break;
             case 4:
                 this.prop = { fy: 248, max_hp: 3500, con: 20, str: 25 };
-                this.desc = "少林寺长老的毗卢帽，绣有梵文真言。";
+                this.desc = "少林首座的毗卢帽，梵文加持，佛力护顶。";
                 this.group_name = "luohan4";
                 break;
             case 5:
                 this.prop = { fy: 355, fy_per: 5, str: 35, con: 30, hp_per: 5 };
-                this.desc = "少林寺镇派僧帽，形如罗汉顶戴，庄严肃穆。";
+                this.desc = "少林长老的僧帽，形如罗汉顶戴，庄严肃穆。";
                 this.group_name = "luohan5";
                 break;
         }

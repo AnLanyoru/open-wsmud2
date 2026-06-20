@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 76, int: 5 };
-                this.desc = "武当派正式弟子的木簪，简朴实用。";
+                this.desc = "武当道童的木簪，质朴无华，束发修心。";
                 break;
             case 3:
                 this.prop = { fy: 142, int: 15, con: 10 };
-                this.desc = "武当派精英弟子的玉簪，温润养神。";
+                this.desc = "武当入室弟子的玉簪，温润养神，气定心闲。";
                 break;
             case 4:
                 this.prop = { fy: 248, int: 25, con: 20, distime_per: 5 };
-                this.desc = "武当派长老的道簪，以灵玉雕琢，佩戴后气定神闲，招式流转更快。";
+                this.desc = "武当执事的道簪，灵玉雕琢，灵台清明，招不应心。";
                 this.group_name = "zhenwu4";
                 break;
             case 5:
                 this.prop = { fy: 355, int: 35, con: 35, distime_per: 10, distime: 1000 };
-                this.desc = "武当派镇派之簪，以玄铁为骨，白玉为表，通体散发清冷道韵，佩戴后灵台清明。";
+                this.desc = "武当长老之簪，玄铁为骨白玉为表，散发清冷道韵，灵台清明。";
                 this.group_name = "zhenwu5";
                 break;
         }

@@ -18,15 +18,15 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 76, str: 5 };
-                this.desc = "丐帮正式弟子的头巾，随性洒脱。";
+                this.desc = "丐帮弟子的头巾，随性洒脱。";
                 break;
             case 3:
                 this.prop = { fy: 142, str: 15, mz: 35 };
-                this.desc = "丐帮精英弟子的混天巾，不羁豪放。";
+                this.desc = "丐帮执事的混天巾，不羁豪放。";
                 break;
             case 4:
                 this.prop = { fy: 248, max_hp: 3500, con: 20, str: 25 };
-                this.desc = "丐帮长老的铁冠，坚韧不屈。";
+                this.desc = "丐帮护法的头冠，坚韧不屈。";
                 this.group_name = "huntian4";
                 break;
             case 5:

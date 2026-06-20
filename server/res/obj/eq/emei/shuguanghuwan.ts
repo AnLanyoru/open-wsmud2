@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 50, mz: 20 };
-                this.desc = "峨眉派正式弟子的护腕，轻巧灵便。";
+                this.desc = "峨眉弟子的布腕，轻巧贴身，不碍出招。";
                 break;
             case 3:
                 this.prop = { fy: 115, mz: 40, zj: 45 };
-                this.desc = "峨眉派精英弟子的护腕，银光流转。";
+                this.desc = "峨眉入室弟子的银腕，腕动如风，招招精准。";
                 break;
             case 4:
                 this.prop = { fy: 210, mz: 100, zj: 100, bj_per: 2 };
-                this.desc = "峨眉派长老的护腕，出手如电，招招要害。";
+                this.desc = "峨眉执事的护腕，出手如电，直取要害。";
                 this.group_name = "shuguang4";
                 break;
             case 5:
                 this.prop = { fy: 310, mz: 180, zj: 200, bj_per: 4, add_bjsh_per: 20 };
-                this.desc = "峨眉派镇派护腕，白金光华闪耀，攻时如雷霆万钧。";
+                this.desc = "峨眉长老的护腕，白金光华闪耀，攻如雷霆万钧。";
                 this.group_name = "shuguang5";
                 break;
         }

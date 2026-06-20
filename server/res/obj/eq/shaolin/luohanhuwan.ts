@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 50, str: 5 };
-                this.desc = "少林寺正式弟子的护腕，粗布裹铁片制成。";
+                this.desc = "少林沙弥的粗布护腕，初习拳棒，根基之始。";
                 break;
             case 3:
                 this.prop = { fy: 112, str: 15, max_hp: 1500 };
-                this.desc = "少林寺精英弟子的护腕，以兽皮鞣制。";
+                this.desc = "少林武僧的兽皮护腕，臂沉力猛，降龙伏虎。";
                 break;
             case 4:
                 this.prop = { fy: 208, max_hp: 3500, con: 20, str: 25 };
-                this.desc = "少林寺长老的护腕，精钢锻造，臂力过人。";
+                this.desc = "少林首座的精钢护腕，金刚怒目，力破千军。";
                 this.group_name = "luohan4";
                 break;
             case 5:
                 this.prop = { fy: 305, mz: 185, str: 35, con: 30, hp_per: 5 };
-                this.desc = "少林寺镇派护腕，以玄铁铸造，上刻降龙伏虎之形。";
+                this.desc = "少林长老的护腕，玄铁铸就，上刻降龙伏虎之形。";
                 this.group_name = "luohan5";
                 break;
         }

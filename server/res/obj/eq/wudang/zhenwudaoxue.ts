@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 67, con: 8 };
-                this.desc = "武当派正式弟子的制式布靴，结实耐磨。";
+                this.desc = "武当道童的布靴，踏石无痕，初习梯云之纵。";
                 break;
             case 3:
                 this.prop = { fy: 156, con: 15, int: 12 };
-                this.desc = "武当派精英弟子的皮靴，轻便舒适，久行不倦。";
+                this.desc = "武当入室弟子的皮靴，轻便舒适，登高如履平地。";
                 break;
             case 4:
                 this.prop = { fy: 231, dex: 20, int: 20, con: 20 };
-                this.desc = "武当派长老的云履，以特殊材质制成，行走间有踏云之感。";
+                this.desc = "武当执事的云履，足下生风，身形飘忽。";
                 this.group_name = "zhenwu4";
                 break;
             case 5:
                 this.prop = { fy: 320, dex: 30, int: 30, con: 30, diff_sh_per: 5 };
-                this.desc = "武当派镇派之靴，轻便灵动，踏雪无痕，登萍渡水如履平地。";
+                this.desc = "武当长老之靴，轻便灵动，踏雪无痕，登萍渡水如履平地。";
                 this.group_name = "zhenwu5";
                 break;
         }

@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 76, con: 5 };
-                this.desc = "少林寺正式弟子的布腰带，结实朴素。";
+                this.desc = "少林沙弥的布腰带，朴实无华，束身修心。";
                 break;
             case 3:
                 this.prop = { fy: 142, con: 15, dazuo_per: 5 };
-                this.desc = "少林寺精英弟子的腰带，内蕴静心之效。";
+                this.desc = "少林武僧的腰带，内蕴禅静，气沉丹田。";
                 break;
             case 4:
                 this.prop = { fy: 248, max_hp: 3500, con: 20, dazuo_per: 8 };
-                this.desc = "少林寺长老的束带，打坐时气沉丹田，事半功倍。";
+                this.desc = "少林首座的束带，打坐入定，事半功倍。";
                 this.group_name = "luohan4";
                 break;
             case 5:
                 this.prop = { fy: 355, limit_mp: 4500, str: 35, con: 30, dazuo_per: 10 };
-                this.desc = "少林寺镇派腰带，以金丝编成，束于腰间内力源源不绝。";
+                this.desc = "少林长老的腰带，金丝编成，束于腰间内力源源不绝。";
                 this.group_name = "luohan5";
                 break;
         }

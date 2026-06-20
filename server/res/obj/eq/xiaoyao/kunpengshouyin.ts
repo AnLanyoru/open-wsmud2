@@ -19,20 +19,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { gj: 55, str: 10 };
-                this.desc = "逍遥派正式弟子的手印，轻巧灵动。";
+                this.desc = "逍遥弟子的铁手印，轻巧灵动，初试锋芒。";
                 break;
             case 3:
                 this.prop = { gj: 132, str: 25, mz: 120 };
-                this.desc = "逍遥派精英弟子的手印，以玄铁打造，刚柔并济。";
+                this.desc = "逍遥入室弟子的玄铁手印，刚柔相济，攻守兼备。";
                 break;
             case 4:
                 this.prop = { gj: 367, str: 35, mz: 320, gjsd_per: 5 };
-                this.desc = "逍遥派长老的手印，出手如鲲鹏展翅，快如闪电。";
+                this.desc = "逍遥护法的手印，出手如鲲鹏展翼，遮天蔽日。";
                 this.group_name = "kunpeng4";
                 break;
             case 5:
                 this.prop = { gj: 458, str: 55, mz: 500, gjsd_per: 10, releasetime: 1500 };
-                this.desc = "逍遥派镇派手印，戴于掌间如鲲鹏展翼，力可擎天。";
+                this.desc = "逍遥长老的手印，戴于掌间如鲲鹏展翼，力可擎天。";
                 this.group_name = "kunpeng5";
                 break;
         }

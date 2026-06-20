@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { limit_mp: 500, fy: 76 };
-                this.desc = "逍遥派正式弟子的腰带，朴实耐用。";
+                this.desc = "逍遥弟子的布腰带，朴实耐用，束腰养气。";
                 break;
             case 3:
                 this.prop = { fy: 142, limit_mp: 1500, dazuo_per: 5 };
-                this.desc = "逍遥派精英弟子的皮带，吐纳更顺畅。";
+                this.desc = "逍遥入室弟子的皮带，吐纳顺畅，气走周天。";
                 break;
             case 4:
                 this.prop = { fy: 248, limit_mp: 2500, dazuo_per: 10, dex: 25 };
-                this.desc = "逍遥派长老的束带，气息悠长，内力深厚。";
+                this.desc = "逍遥护法的束带，气息如北冥之水，深不可测。";
                 this.group_name = "kunpeng4";
                 break;
             case 5:
                 this.prop = { fy: 355, limit_mp: 4500, dazuo_per: 15, dex: 35, releasetime_per: 10 };
-                this.desc = "逍遥派镇派腰带，灵兽筋鞣制，束于腰间内力如北冥之海，深不可测。";
+                this.desc = "逍遥长老的腰带，灵兽筋鞣制，内力如北冥之海，深不可测。";
                 this.group_name = "kunpeng5";
                 break;
         }

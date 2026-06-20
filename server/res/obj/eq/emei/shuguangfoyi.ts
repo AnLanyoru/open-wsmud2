@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 120, max_hp: 500 };
-                this.desc = "峨眉派正式弟子的佛衣，素洁大方。";
+                this.desc = "峨眉弟子的素衣，一尘不染，初悟佛缘。";
                 break;
             case 3:
                 this.prop = { fy: 230, max_hp: 1200, con: 15 };
-                this.desc = "峨眉派精英弟子的佛衣，慈悲为怀。";
+                this.desc = "峨眉入室弟子的佛衣，慈光隐隐，悲悯自生。";
                 break;
             case 4:
                 this.prop = { fy: 340, max_hp: 2800, con: 25, hp_per: 3 };
-                this.desc = "峨眉派长老的佛衣，佛光普照，气血充盈。";
+                this.desc = "峨眉执事的佛衣，佛光护体，气血如潮。";
                 this.group_name = "shuguang4";
                 break;
             case 5:
                 this.prop = { fy: 450, max_hp: 4500, con: 36, hp_per: 10, diff_sh_per: 5 };
-                this.desc = "峨眉派镇派佛衣，佛光萦绕，身着如沐晨光，护体疗伤。";
+                this.desc = "峨眉长老的佛衣，佛光萦绕，如沐晨光，护体疗伤。";
                 this.group_name = "shuguang5";
                 break;
         }

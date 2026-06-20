@@ -19,20 +19,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { gj: 55, zj: 40 };
-                this.desc = "武当派正式弟子的制式配剑，剑身轻盈灵动。";
+                this.desc = "武当道童的制式长剑，剑身轻盈，初窥太极剑意。";
                 break;
             case 3:
                 this.prop = { gj: 132, str: 25, zj: 120 };
-                this.desc = "武当派精英弟子的配剑，以精钢百炼而成，锐利异常。";
+                this.desc = "武当入室弟子的精钢剑，百炼而成，锋锐内敛。";
                 break;
             case 4:
                 this.prop = { gj: 290, str: 35, zj: 320, busy: 1000 };
-                this.desc = "武当派长老的佩剑，剑身隐现太极流光，出剑可扰敌心神。";
+                this.desc = "武当执事的佩剑，剑身隐现太极流光，如封似闭。";
                 this.group_name = "zhenwu4";
                 break;
             case 5:
                 this.prop = { gj: 460, str: 55, zj: 500, zj_per: 10, busy: 3000 };
-                this.desc = "武当派镇派宝剑，剑身修长，剑柄刻有太极八卦图案，剑出如龙吟。";
+                this.desc = "武当长老的佩剑，剑身修长，剑柄刻太极八卦，剑出如龙吟。";
                 this.group_name = "zhenwu5";
                 break;
         }

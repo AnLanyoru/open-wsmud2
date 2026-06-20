@@ -18,20 +18,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { fy: 76, con: 5 };
-                this.desc = "武当派正式弟子的布腰带，简单实用。";
+                this.desc = "武当道童的布带，简朴实用，束腰立志。";
                 break;
             case 3:
                 this.prop = { fy: 142, con: 15, str: 10 };
-                this.desc = "武当派精英弟子的腰带，以坚韧兽皮制成。";
+                this.desc = "武当入室弟子的兽皮带，吐纳随心，真气渐长。";
                 break;
             case 4:
                 this.prop = { fy: 248, con: 25, str: 20, zj_per: 5 };
-                this.desc = "武当派长老的束带，以灵兽筋鞣制，束腰护身。";
+                this.desc = "武当执事的束带，灵兽筋鞣制，真气如缕，绵延不绝。";
                 this.group_name = "zhenwu4";
                 break;
             case 5:
                 this.prop = { fy: 355, con: 45, str: 30, expend_mp_per: 10, zj_per: 10 };
-                this.desc = "武当派镇派腰带，以蛟龙筋鞣制而成，束于腰间真气自生，内力如江海不绝。";
+                this.desc = "武当长老的腰带，蛟龙筋鞣制，束于腰间真气自生，如江海不绝。";
                 this.group_name = "zhenwu5";
                 break;
         }

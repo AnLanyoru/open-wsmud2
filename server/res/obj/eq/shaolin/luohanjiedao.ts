@@ -19,20 +19,20 @@ export default class extends EQUIPMENT {
         switch (lv) {
             case 2:
                 this.prop = { gj: 65, str: 5 };
-                this.desc = "少林寺正式弟子的制式戒刀，刀背厚实，沉稳有力。";
+                this.desc = "少林沙弥的戒刀，刀背厚实，沉稳有度。";
                 break;
             case 3:
                 this.prop = { gj: 152, str: 25, zj: 120 };
-                this.desc = "少林寺精英弟子的戒刀，以百炼精钢铸就，削铁如泥。";
+                this.desc = "少林武僧的戒刀，百炼精钢铸就，削铁如泥。";
                 break;
             case 4:
                 this.prop = { gj: 380, max_hp: 3500, str: 35, zj: 320 };
-                this.desc = "少林寺长老的戒刀，刀身泛着淡淡佛光，斩妖除魔。";
+                this.desc = "少林首座的戒刀，刀泛佛光，降魔卫道。";
                 this.group_name = "luohan4";
                 break;
             case 5:
                 this.prop = { gj: 560, gj_per: 10, str: 55, zj: 500, zj_per: 10 };
-                this.desc = "少林寺镇派戒刀，刀身刻有金刚经文，挥动间佛光隐现，降魔伏妖。";
+                this.desc = "少林长老的戒刀，刀刻金刚经文，挥动间佛光隐现，降魔伏妖。";
                 this.group_name = "luohan5";
                 break;
         }
