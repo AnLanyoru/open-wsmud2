@@ -583,20 +583,20 @@ export class USER extends CHARACTER {
     getData(): RoleData {
         const str: string[] = ['{prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            str.push(String((this as Record<string, any>)[SAVE_NUMPROP[i]]));
+            str.push(this[SAVE_NUMPROP[i]]);
             str.push(',');
         }
         str.push('0');
         str.push('],quit_room:"');
         if (this.environment) {
-            if (this.environment.is_fb() || (this.environment as ROOM & { no_save?: boolean }).no_save
-                || (this.environment.parent as AREA & { no_save?: boolean }).no_save) {
-                str.push(this.query_temp('enter_room') as string);
+            if (this.environment.is_fb() || this.environment.no_save
+                || this.environment.parent?.no_save) {
+                str.push(this.query_temp('enter_room'));
             } else {
-                str.push((this.environment as ROOM).path);
+                str.push(this.environment.path);
             }
         } else {
-            str.push(this.query_temp('enter_room', DEFAULT_ROOM) as string);
+            str.push(this.query_temp('enter_room', DEFAULT_ROOM));
         }
         str.push('"');
 

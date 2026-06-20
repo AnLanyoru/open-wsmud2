@@ -1448,11 +1448,6 @@ desc = `中央有棵<cmd cmd='look tree'>大榕树(tree)</cmd>。`;
 
 如果不使用 `<cmd>` 标签，玩家仍然可以通过输入 `look tree` 来查看隐藏物品——但 `<cmd>` 标签会在描述中生成可点击的链接，提升用户体验。
 
-### 14.5 `is_heartbeat` 是标记属性
-
-`is_heartbeat = true` **不是**心跳工作的必要条件。引擎不读取此属性。心跳只要求：
-1. 房间在 `WORLD.RUN_ROOMS` 中（所有基础房间默认在）。
-2. 房间定义了 `on_heart_beat(dt: number) {}` 方法。
 
 ### 14.6 不要在构造器中做耗时操作
 

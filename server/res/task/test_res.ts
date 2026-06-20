@@ -21,7 +21,7 @@ const need_test_objs: TestResRoot = {
             "门派装备兑换券(橙色)": ["cash/menpaiduihuan#5", 8],
         },
     },
-    随从礼包: ["sp/npc#follower/shuang", 10],
+    随从礼包: ["sp/npc#shuang", 10],
 };
 
 export default class extends USERTASK {
@@ -31,7 +31,7 @@ export default class extends USERTASK {
     // ============ 数据访问 ============
 
     private getNode(me: CHARACTER): TestResRoot {
-        const path: string[] = me.query_temp("tr_path", []);
+        const path: string[] = JSON.parse(me.query_temp("tr_path", "[]"));
         let node: TestResNode = need_test_objs;
         for (const key of path) {
             if (this.isBranch(node)) {
@@ -69,15 +69,15 @@ export default class extends USERTASK {
     // ============ UI 查询 ============
 
     query_title(me: CHARACTER): string | undefined {
-        const depth = (me.query_temp("tr_path", []) as string[]).length;
+        const depth: number = JSON.parse(me.query_temp("tr_path", '[]')).length;
         if (depth > 0) {
             return `<hic>测试资源领取</hic> <mem>(第${depth + 1}层)</mem>`;
         }
         return `<hic>测试资源领取</hic>`;
     }
 
-    query_desc(me: CHARACTER): string | undefined {
-        const path: string[] = me.query_temp("tr_path", []);
+    query_desc(me: CHARACTER): string {
+        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
         const node = this.getNode(me);
         const keys = Object.keys(node);
 
@@ -131,7 +131,7 @@ export default class extends USERTASK {
      * - 非根菜单时额外显示 [返回上层] [主菜单]
      */
     private sendMenuButtons(me: CHARACTER): void {
-        const path: string[] = me.query_temp("tr_path", []);
+        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
         const node = this.getNode(me);
         const keys = Object.keys(node);
         if (keys.length === 0) return;
@@ -140,7 +140,8 @@ export default class extends USERTASK {
         const key = keys[cur];
         const value: TestResNode = node[key];
         const args: string[] = [];
-
+        
+        args.push("task test_res fin", "切换选择");
         if (this.isLeaf(value)) {
             args.push("task test_res fin2", `领取 ${key}`);
         } else if (this.isBranch(value)) {
@@ -153,6 +154,7 @@ export default class extends USERTASK {
         }
 
         if (args.length > 0) {
+            me.send(this.query_desc(me));
             me.send_commands(...args);
         }
     }
@@ -183,10 +185,10 @@ export default class extends USERTASK {
     }
 
     start(me: CHARACTER): boolean | void {
-        const path: string[] = me.query_temp("tr_path", []);
+        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
         if (path.length > 0) {
             path.pop();
-            me.set_temp("tr_path", path);
+            me.set_temp("tr_path", JSON.stringify(path));
             me.set_temp("tr_cur", 0);
             me.notify(path.length === 0
                 ? "<hic>已返回测试资源主菜单。</hic>"
@@ -199,7 +201,7 @@ export default class extends USERTASK {
     }
 
     giveup(me: CHARACTER): void {
-        me.set_temp("tr_path", []);
+        me.set_temp("tr_path", '[]');
         me.set_temp("tr_cur", 0);
         me.notify("<hic>已返回测试资源主菜单。</hic>");
         this.sendMenuButtons(me);
@@ -236,7 +238,7 @@ export default class extends USERTASK {
     private applySelection(me: CHARACTER, key: string, value: TestResNode): boolean {
         if (this.isLeaf(value)) {
             const [objPath, count] = value;
-            const path: string[] = me.query_temp("tr_path", []);
+            const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
 
             const obj = me.add_obj(objPath, count);
             if (obj) {
@@ -247,17 +249,14 @@ export default class extends USERTASK {
                 me.notify(`<red>物品【${objPath}】创建失败，请联系管理员。</red>`);
                 return false;
             }
-
-            me.set_temp("tr_path", []);
-            me.set_temp("tr_cur", 0);
             this.sendMenuButtons(me);
             return true;
         }
 
         if (this.isBranch(value)) {
-            const path: string[] = me.query_temp("tr_path", []);
+            const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
             path.push(key);
-            me.set_temp("tr_path", path);
+            me.set_temp("tr_path", JSON.stringify(path));
             me.set_temp("tr_cur", 0);
             me.notify(`<hic>进入【${key}】子菜单，共 ${Object.keys(value).length} 项可选。</hic>`);
             this.sendMenuButtons(me);

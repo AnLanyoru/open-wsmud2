@@ -41,7 +41,8 @@ export class AREA extends BASE {
     first?: string;
 
     // ============ 副本相关 ============
-
+    /** 是否为不持久化区域 */
+    no_save?: boolean;
     /** 是否为副本区域 */
     is_copy: boolean = false;
     /** 是否支持多人副本 */

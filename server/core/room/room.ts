@@ -96,7 +96,8 @@ export class ROOM extends ITEM {
     parent: AREA | null = null;
 
     // ============ 副本与镜像 ============
-
+    /** 是否为不持久化房间 */
+    no_save?: boolean;
     /** 是否为副本房间 */
     is_copy_room: boolean = false;
     /** 是否为镜像房间 */

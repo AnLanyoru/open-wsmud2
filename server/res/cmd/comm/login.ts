@@ -85,7 +85,7 @@ export default class extends COMMAND {
         return true;
     }
 
-    async loginIn(user, id) {
+    async loginIn(user: USER, id) {
         try {
             const data = await WORLD.DB.getRoleData(user.userid, id);
             if (!data) return user.send("{type:'loginerror',msg:'角色读取失败，请重新登陆 '}");
@@ -99,7 +99,7 @@ export default class extends COMMAND {
 
             user.loadData(data);
             user.do_login();
-            user.wait_input = null;
+            user.wait_input = undefined;
             if (user.socket)
                 user.socket.setTimeout(0);
             this.on_user_login(user);
@@ -112,8 +112,6 @@ export default class extends COMMAND {
 
     on_user_login(user: USER) {
         user.send("欢迎登陆<HIW>MUD游戏</HIW>");
-
-
         const area = user.environment?.parent;
         if (!area) return user.notify_fail("登陆失败, 房间加载错误")
         area.on_login && area.on_login(user);

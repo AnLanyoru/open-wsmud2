@@ -2,12 +2,12 @@
 // ITEM — 所有游戏物件的基类（物品、角色、房间等）
 // ============================================================
 
-import {BASE} from './base.js';
+import { BASE } from './base.js';
 
-import {UTIL} from './util.js';
+import { UTIL } from './util.js';
 
-import type {ROOM} from './room/room.js';
-import type {ActionDef, ActionMap} from '../types/base.js';
+import type { ROOM } from './room/room.js';
+import type { ActionDef, ActionMap } from '../types/base.js';
 import type { PropMap } from '../types/props.js';
 import type { USER } from './char/user.js';
 import type { FOLLOWER } from './char/follower.js';
@@ -16,6 +16,16 @@ import type { EQUIPMENT } from './item/equipment.js';
 import type { OBJ } from './item/obj.js';
 import type { CHARACTER } from './char/character.js';
 import type { CONTAINER } from './item/container.js';
+
+
+export interface ValidValue{
+    e: number,
+    v: number | string,
+}
+
+function check_valid_value(value: number | string | ValidValue): value is ValidValue{
+    return typeof value === "object" && "e" in value && "v" in value
+}
 
 /** 房间命令元组 */
 export type RoomAction = [cmd: string, name: string, action: (...args: any[]) => any];
@@ -179,8 +189,8 @@ export class ITEM extends BASE {
      * @param def - 默认值
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    query_temp<T>(name: string, def?: T, _me?: USER): T {
-        if (def === undefined) def = undefined as T;
+    query_temp<T extends string | number>(name: string, def?: T, _me?: USER): T {
+        if (def === undefined) def = 0 as T;
         if (!this.temp) return def;
         const item = this.temp[name];
         if (item && item.e) {
@@ -200,7 +210,7 @@ export class ITEM extends BASE {
      * @param time - 有效期（毫秒）
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    set_temp(name: string, value: any, time?: number, _me?: USER): void {
+    set_temp(name: string, value: number | string, time?: number, _me?: USER): void {
         if (!this.temp) this.temp = {};
         if (time) {
             this.temp[name] = {
@@ -578,14 +588,14 @@ export class ITEM extends BASE {
      * @param timeout - 过期时限（毫秒），默认 120000
      * @returns JSON 字符串
      */
-    format_temp(temp: Record<string, any> | null | undefined, timeout: number = 120000): string {
+    format_temp(temp: Record<string, number | string | ValidValue> | null | undefined, timeout: number = 120000): string {
         if (!temp) return '{}';
         const dt = Date.now() + timeout;
-        const tmp: string[] = ['{'];
+        const tmp: (string | number)[] = ['{'];
         for (const key in temp) {
             const v = temp[key];
             if (!v) continue;
-            if (v.e) {
+            if (check_valid_value(v)) {
                 if (dt > v.e || !v.v) continue;
                 if (tmp.length > 1) tmp.push(',');
                 tmp.push('"');

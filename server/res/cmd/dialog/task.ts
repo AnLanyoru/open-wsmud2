@@ -16,7 +16,7 @@ export default class extends COMMAND {
         const task = USERTASK.GET(tid);
         if (!task) return me.notify("没有这个任务。");
         let target: CHARACTER | null = null;
-        if (!oid && !(ALLOW_COMMANDS[cmd])) {
+        if (!oid && !(ALLOW_COMMANDS.includes(cmd))) {
             oid = cmd;
             cmd = 'start';
         }
@@ -67,9 +67,8 @@ export default class extends COMMAND {
     }
 }
 
-const ALLOW_COMMANDS: Record<string, boolean> = {
-    start: true,
-    giveup: true,
-    fin: true,
-    fin2: true
-};
+const ALLOW_COMMANDS = [
+    "start",
+    "giveup",
+    "fin",
+    "fin2"];
