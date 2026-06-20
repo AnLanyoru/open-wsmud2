@@ -7,6 +7,7 @@ cd /d "%~dp0server"
 
 echo.
 echo [1/3] Compiling TypeScript (core + res)...
+if exist dist rmdir /s /q dist
 call npx tsc --outDir dist
 if %errorlevel% neq 0 (
     echo Type errors found, but JS output is OK, continuing...
@@ -15,7 +16,7 @@ echo.
 
 echo [2/3] Deploying...
 echo   - core -^> os/
-echo   - res  -^> world/ (Â·¾¶ÖØÐ´: core/ -^> os/)
+echo   - res  -^> world/ (Â·ï¿½ï¿½ï¿½ï¿½Ð´: core/ -^> os/)
 node scripts/deploy.mjs
 if %errorlevel% neq 0 (
     echo Deploy failed!

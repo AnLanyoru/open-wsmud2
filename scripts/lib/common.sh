@@ -175,6 +175,7 @@ build_full() {
 
     log_info "编译 TypeScript..."
     cd "$root/server"
+    rm -rf dist
     npx tsc --outDir dist 2>/dev/null || log_warn "存在类型错误，JS 输出正常，继续..."
     cd "$root"
     echo ""
@@ -195,6 +196,7 @@ build_light() {
 
     log_info "编译 TypeScript..."
     cd "$root/server"
+    rm -rf dist
     npx tsc --outDir dist 2>/dev/null || log_warn "存在类型错误，JS 输出正常，继续..."
     cd "$root"
     echo ""

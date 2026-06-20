@@ -48,6 +48,7 @@ echo.
 :: --- 2. 编译 TypeScript ---
 echo [2/5] 编译 TypeScript...
 cd /d "%PROJECT_ROOT%\server"
+if exist dist rmdir /s /q dist
 call npx tsc --outDir dist
 if %errorlevel% neq 0 (
     echo [WARN] 存在类型错误，JS 输出正常，继续...

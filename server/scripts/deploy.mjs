@@ -50,6 +50,13 @@ if (!existsSync(SRC)) {
     process.exit(1);
 }
 
+// Phase 1: 部署前清空 os/core/ 中的旧部署文件，避免残留
+const CORE_DEST = join(DEST, 'core');
+if (existsSync(CORE_DEST)) {
+    rmSync(CORE_DEST, {recursive: true});
+    console.log(`清理目标: ${CORE_DEST}`);
+}
+
 // 部署前清理目标目录中的编译残留
 cleanStale(DEST);
 
@@ -81,6 +88,12 @@ const RES_SRC = join(ROOT, 'server', 'dist', 'res');
 const RES_DEST = join(ROOT, 'world');
 
 if (existsSync(RES_SRC)) {
+    // 部署前清空 world/ 全部旧文件，避免残留
+    if (existsSync(RES_DEST)) {
+        rmSync(RES_DEST, {recursive: true});
+        console.log(`清理目标: ${RES_DEST}`);
+    }
+
     // 部署前清理目标目录中的编译残留
     cleanStale(RES_DEST);
 
@@ -106,4 +119,13 @@ if (existsSync(RES_SRC)) {
     }
 
     console.log(`资源部署完成: ${resCount} 个文件复制到 ${RES_DEST} (路径已重写)`);
+}
+
+// ============================================================
+// Phase 3: 清理编译中间产物 dist/，避免下次编译残留
+// ============================================================
+const DIST_DIR = join(ROOT, 'server', 'dist');
+if (existsSync(DIST_DIR)) {
+    rmSync(DIST_DIR, {recursive: true});
+    console.log(`清理编译产物: ${DIST_DIR}`);
 }
