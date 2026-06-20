@@ -21,6 +21,9 @@ const need_test_objs: TestResRoot = {
             "门派装备兑换券(橙色)": ["cash/menpaiduihuan#5", 8],
         },
     },
+    神器测试: {
+        "崆峒印": ["eq/kongtongyin", 1]
+    },
     随从礼包: ["sp/npc#shuang", 10],
 };
 
