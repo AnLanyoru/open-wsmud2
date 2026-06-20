@@ -584,7 +584,7 @@ export class USER extends CHARACTER {
     getData(): RoleData {
         const str: string[] = ['{prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            str.push(this[SAVE_NUMPROP[i]] ?? Math.floor(Date.now() / 60000));
+            str.push(JSON.stringify(this[SAVE_NUMPROP[i]]));
             str.push(',');
         }
         str.push('0');

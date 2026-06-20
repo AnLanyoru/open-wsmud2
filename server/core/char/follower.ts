@@ -394,7 +394,7 @@ export class FOLLOWER extends CHARACTER {
     save(me: USER): string {
         const str: string[] = ['prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            str.push((this[SAVE_NUMPROP[i]] || Date.now() / 60000).toString());
+            str.push(JSON.stringify(this[SAVE_NUMPROP[i]]));
             str.push(',');
         }
         str.push('0],');
