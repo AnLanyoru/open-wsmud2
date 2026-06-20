@@ -233,6 +233,14 @@ export const PROPERTIES = {
     "no_pfm": "禁止绝招",
 };
 
+export const PfmFlag = {
+    /** 阻止继续释放绝招的流程，表现为根本放不出来，不会进入冷却 */
+    BLOCK: 1 << 0, // 0b0001 
+    /** 阻止释放绝招产生效果，扣蓝cd不生效 */
+    NO_USE: 1 << 1, // 0b0010
+    /** 消耗效果 */
+    EXPEND_STATU: 1 << 3, // 0b0010
+} as const;// 提取所有标记联合类型，强类型校验
 /**
  * 品级颜色标签 — 按 grade 索引: 0=普通(wht) 1=精良(hig) 2=高级(hic) 3=稀有(hiy) 4=绝世(HIZ) 5=传说(hio) 6=神器(ord)
  */

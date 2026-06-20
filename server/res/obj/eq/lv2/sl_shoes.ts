@@ -1,5 +1,6 @@
 import {EQUIPMENT} from "../../../../core/item/equipment.js";
 import {EQUIP_TYPE} from "../../../../core/const.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     name = "神龙靴";
@@ -9,7 +10,7 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.SHOES;
     value = 30000;
     hole_count = 1;
-    prop = {
+    prop: PropMap = {
         fy: 25,
         max_hp: 180,
         dex: 6

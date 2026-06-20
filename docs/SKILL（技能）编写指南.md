@@ -335,7 +335,7 @@ export default class extends SKILL {
         super();
         this.set_default(this.id);
         // 基础技能也可以有绝招
-        this.set_pfm("lian", PERFORM.fromPlain({
+        this.set_pfm_data("lian", {
             name: "连击",
             distime: 5,
             mp: 5,
@@ -358,16 +358,13 @@ export default class extends SKILL {
             query_desc: function (me: CHARACTER, lv: number) {
                 return "快速对敌人攻击两次";
             }
-        }));
+        });
     }
 }
 ```
 
 **要点：**
 - `attack_actions` 是数组，每个元素是一个带 `$` 占位符的描述模板，战斗中随机选取
-- 绝招通过 `this.set_pfm("key", PERFORM.fromPlain({...}))` 在构造函数中注册
-- `PERFORM.fromPlain(...)` 将普通对象转换为 `PERFORM` 实例，是标准写法
-
 ### 6.3 基本刀法 (blade)
 
 ```typescript
@@ -391,7 +388,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("zhan", PERFORM.fromPlain({
+        this.set_pfm_data("zhan", {
             name: "斩击",
             distime: 5000,
             mp: 5,
@@ -410,7 +407,7 @@ export default class extends SKILL {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }
-        }));
+        });
     }
 
     query_prop(lv: number, me: CHARACTER): PropMap {
@@ -523,7 +520,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("zhong", PERFORM.fromPlain({
+        this.set_pfm_data("zhong", {
             name: "重击",
             distime: 5000,
             mp: 5,
@@ -544,7 +541,7 @@ export default class extends SKILL {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }
-        }));
+        });
     }
 }
 ```

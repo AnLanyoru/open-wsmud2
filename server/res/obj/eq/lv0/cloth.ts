@@ -1,5 +1,6 @@
 import {EQUIPMENT} from "../../../../core/item/equipment.js";
 import {EQUIP_TYPE} from "../../../../core/const.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     unit = "件";
@@ -7,7 +8,7 @@ export default class extends EQUIPMENT {
     desc = "杨记出产的布衣，结实耐用";
     value = 1000;
     eq_type = EQUIP_TYPE.CLOTH;
-    prop = {
+    prop: PropMap = {
         fy: 1
     };
 }

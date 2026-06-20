@@ -7,10 +7,10 @@ import { OBJ } from '../item/obj.js';
 import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
-import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
+import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES, PfmFlag } from '../const.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
-import { PfmFlag, type PfmFlagType, type StatusDef } from '../../types/events.js';
+import type { PfmFlagType, StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
 import type { ROOM } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';

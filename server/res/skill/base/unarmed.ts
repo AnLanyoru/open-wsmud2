@@ -21,7 +21,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("zhong", PERFORM.fromPlain({
+        this.set_pfm_data("zhong", {
             name: "重击",
             distime: 5000,
             mp: 5,
@@ -42,7 +42,7 @@ export default class extends SKILL {
                 var gj = 10 + lv;
                 return "强力的一击，对敌人造成基本攻击附加" + gj + "的伤害。";
             }
-        }));
+        });
     }
 }
 

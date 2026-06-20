@@ -1,5 +1,6 @@
 import {EQUIPMENT} from "../../../../core/item/equipment.js";
 import {EQUIP_TYPE, WEAPON_TYPE} from "../../../../core/const.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     unit = "把";
@@ -9,7 +10,7 @@ export default class extends EQUIPMENT {
     grade = 5;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
-    prop = {
+    prop: PropMap = {
         gj: 480,
         mz: 150,
         mz_per: 10,

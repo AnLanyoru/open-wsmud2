@@ -10,6 +10,7 @@ import type { ROOM } from '../core/room/room.js';
 import type { CORPSE } from '../core/item/corpse.js';
 import type { PERFORM, SKILL } from '../core/skill/skill.js';
 import type { DynamicProp, PropMap } from './props.js';
+import type { PfmFlag } from '../core/const.js';
 
 // ============================================================
 // CHARACTER 回调
@@ -178,14 +179,6 @@ export interface StatusDef {
     recover_mp?: number;
 }
 
-export const PfmFlag = {
-    /** 阻止继续释放绝招的流程，表现为根本放不出来，不会进入冷却 */
-    BLOCK: 1 << 0, // 0b0001 
-    /** 阻止释放绝招产生效果，扣蓝cd不生效 */
-    NO_USE: 1 << 1, // 0b0010
-    /** 消耗效果 */
-    EXPEND_STATU: 1 << 3, // 0b0010
-} as const;// 提取所有标记联合类型，强类型校验
 export type PfmFlagType = typeof PfmFlag[keyof typeof PfmFlag];
 
 // ============================================================

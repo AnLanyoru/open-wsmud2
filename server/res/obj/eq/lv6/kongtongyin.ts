@@ -1,8 +1,9 @@
 import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
+import { PfmFlag, EQUIP_TYPE } from "../../../../core/const.js";
 import type { CHARACTER } from "../../../../core/char/character.js";
-import { PfmFlag, PfmFlagType } from "../../../../types/events.js";
+import { PfmFlagType } from "../../../../types/events.js";
 import type { PERFORM } from "../../../../core/skill/skill.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     unit = "方";
@@ -12,7 +13,7 @@ export default class extends EQUIPMENT {
     grade = 6;
     eq_type = EQUIP_TYPE.JEWELS;
     distime = 600000;
-    prop = {
+    prop: PropMap = {
         fy: 200,
         str: 100,
         mz: 160,

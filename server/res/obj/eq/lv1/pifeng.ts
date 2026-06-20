@@ -1,5 +1,6 @@
 import {EQUIPMENT} from "../../../../core/item/equipment.js";
 import {EQUIP_TYPE} from "../../../../core/const.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     name = "员外披肩";
@@ -8,7 +9,7 @@ export default class extends EQUIPMENT {
     grade = 1;
     eq_type = EQUIP_TYPE.CAPE;
     value = 20000;
-    prop = {
+    prop: PropMap = {
         fy: 5,
         max_hp: 30
     };

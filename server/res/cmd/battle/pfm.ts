@@ -1,8 +1,8 @@
 import { COMMAND } from "../../../core/command.js";
 import { SKILL } from "../../../core/skill/skill.js";
-import { WEAPON_TYPE } from "../../../core/const.js";
+import {PfmFlag,  WEAPON_TYPE } from "../../../core/const.js";
 import type { USER } from "../../../core/char/user.js";
-import { PfmFlag, PfmFlagType } from "../../../types/events.js";
+import { PfmFlagType } from "../../../types/events.js";
 import type { CharacterStatus } from "../../../core/char/character.js";
 
 export default class extends COMMAND {

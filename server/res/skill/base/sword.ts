@@ -16,7 +16,7 @@ export default class extends SKILL {
     constructor() {
         super();
         this.set_default(this.id);
-        this.set_pfm("lian", PERFORM.fromPlain({
+        this.set_pfm_data("lian", {
             name: "连击",
             distime: 5,
             mp: 5,
@@ -38,7 +38,7 @@ export default class extends SKILL {
             }, query_desc: function (me: CHARACTER, lv: number) {
                 return "快速对敌人攻击两次";
             }
-        }));
+        });
     }
 
     query_prop(lv: number, me: CHARACTER): PropMap {

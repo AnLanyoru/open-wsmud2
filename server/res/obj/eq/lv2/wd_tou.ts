@@ -1,5 +1,6 @@
 import {EQUIPMENT} from "../../../../core/item/equipment.js";
 import {EQUIP_TYPE} from "../../../../core/const.js";
+import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
     name = "疤面面具";
@@ -9,7 +10,7 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.HEAD;
     value = 30000;
     hole_count = 2;
-    prop = {
+    prop: PropMap = {
         per: -20,
         add_sh_per: 8
     };

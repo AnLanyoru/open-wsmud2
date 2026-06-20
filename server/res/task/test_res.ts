@@ -22,7 +22,7 @@ const need_test_objs: TestResRoot = {
         },
     },
     神器测试: {
-        "崆峒印": ["eq/kongtongyin", 1]
+        "崆峒印": ["eq/lv6/kongtongyin", 1]
     },
     随从礼包: ["sp/npc#shuang", 10],
 };

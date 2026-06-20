@@ -810,7 +810,7 @@ export class SKILL extends BASE {
      * @param name
      * @param obj
      */
-    set_pfm_data(name: string, obj: PERFORM): void {
+    set_pfm_data(name: string, obj: Partial<PERFORM>): void {
         if (!this.pfm_set) 
             return console.error("设置技能绝招资源失败，不能在运行时注入绝招资源，请在初始化前注入");
         this.pfm_set[name] = obj;
