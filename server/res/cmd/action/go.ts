@@ -99,7 +99,7 @@ function sendInMessage(player, dir?) {
     var face = getFace(player) + "的" + player.name;
     var weapon = player.weapon_name();
     if (weapon) face += "手执" + weapon;
-    if (!player.get_equipment(EQUIP_TYPE.CLOTH) && !player.get_equipment(EQUIP_TYPE.PANTS)) {
+    if (!player.get_equipment(EQUIP_TYPE.CLOTH)) {  //  && !player.get_equipment(EQUIP_TYPE.PANTS)
         face += "全身清洁溜溜的";
     }
     return face + "走了过来。";
