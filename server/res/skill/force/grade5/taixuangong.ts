@@ -18,7 +18,7 @@ export default class extends SKILL {
                 add_sh_per: 8,
                 diff_busy: 4000,
                 limit_mp: lv * 286,
-                desc: "当你命中敌人会造成4000内功伤害，不可招架; 唯一：将你内力的80%转化为气血",
+                desc: "当你命中敌人会造成4000内功伤害，不可招架\n唯一：将你内力的80%转化为气血",
             },
         };
     }

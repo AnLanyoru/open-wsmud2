@@ -20,7 +20,7 @@ export default class extends SKILL {
                 diff_sh_per: 7,
                 hp_per: 10,
                 limit_mp: lv * 300,
-                desc: "进入战斗后减少55%伤害，被命中后降低; 唯一：将你内力的95%转化为气血",
+                desc: "进入战斗后减少55%伤害，被命中后降低\n唯一：将你内力的95%转化为气血",
             },
             unarmed: {
                 gj: Math.floor(lv * 3.32),

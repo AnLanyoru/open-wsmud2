@@ -21,7 +21,7 @@ export default class extends SKILL {
                 diff_sh_per: 10,
                 diff_bj: 10,
                 limit_mp: lv * 990,
-                desc: "唯一：将你内力的130%转化为气血; 金刚装备后将你12%防御力转化为固定免伤",
+                desc: "唯一：将你内力的130%转化为气血\n金刚装备后将你12%防御力转化为固定免伤",
             },
         };
     }

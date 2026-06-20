@@ -35,7 +35,7 @@ export default class extends SKILL {
                 hp_per: 4,
                 fy_per: 4,
                 limit_mp: lv * 155,
-                desc: "唯一：将你内力的90%转化为气血; 命中后会化掉对方4000当前内力",
+                desc: "唯一：将你内力的90%转化为气血\n命中后会化掉对方4000当前内力",
             },
         };
     }

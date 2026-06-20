@@ -21,7 +21,7 @@ export default class extends SKILL {
                 add_sh_per: 10,
                 mz_per: 10,
                 bj_per: 4,
-                desc: "无剑你的剑无法被卸下; 无我战斗中进入忘我境界，持续提高你的战斗力",
+                desc: "无剑：你的剑无法被卸下\n无我：战斗中进入忘我境界，持续提高你的战斗力",
             },
         };
     }

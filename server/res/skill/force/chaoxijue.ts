@@ -30,7 +30,7 @@ export default class extends SKILL {
                 gj: Math.floor(lv * 1.22),
                 fy: Math.floor(lv * 1.22),
                 limit_mp: lv * 105,
-                desc: "潮汐命中后增加自身潮汐层数; 唯一：将你内力的85%转化为气血",
+                desc: "潮汐命中后增加自身潮汐层数\n唯一：将你内力的85%转化为气血",
             },
         };
     }

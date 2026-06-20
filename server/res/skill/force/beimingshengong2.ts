@@ -30,7 +30,7 @@ export default class extends SKILL {
                 con: Math.floor(lv * 0.51),
                 dex: 4 + Math.floor(lv * 0.33),
                 limit_mp: lv * 165,
-                desc: "当你命中敌人后，会吸取对方内力增加自身最大内力; 唯一：将你内力的80%转化为气血",
+                desc: "当你命中敌人后，会吸取对方内力增加自身最大内力\n唯一：将你内力的80%转化为气血",
             },
             parry: {
                 zj: Math.floor(lv * 1.82),

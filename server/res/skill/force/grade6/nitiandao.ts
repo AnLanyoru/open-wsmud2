@@ -18,7 +18,7 @@ export default class extends SKILL {
                 diff_sh_per: 10,
                 add_sh_per: 10,
                 limit_mp: lv * 1100,
-                desc: "逆转将受到的13.3%伤害转为自己的气血和内力; 唯一：将你内力的150%转化为气血",
+                desc: "逆转：将受到的13.3%伤害转为自己的气血和内力\n唯一：将你内力的150%转化为气血",
             },
         };
     }

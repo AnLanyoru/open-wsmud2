@@ -22,7 +22,7 @@ export default class extends SKILL {
                 con: Math.floor(lv * 0.338),
                 diff_fy_per: 6,
                 limit_mp: lv * 285,
-                desc: "命中后对敌人造成附加伤害(年龄越大伤害越高); 唯一：将你内力的95%转化为气血",
+                desc: "命中后对敌人造成附加伤害(年龄越大伤害越高)\n唯一：将你内力的95%转化为气血",
             },
         };
     }

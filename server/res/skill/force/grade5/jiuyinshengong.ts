@@ -22,7 +22,7 @@ export default class extends SKILL {
                 mz: Math.floor(lv * 2.2),
                 diff_fy_per: 6,
                 limit_mp: lv * 285,
-                desc: "命中后会使敌人减少攻击，躲闪，命中1%; 唯一：将你内力的90%转化为气血",
+                desc: "命中后会使敌人减少攻击，躲闪，命中1%\n唯一：将你内力的90%转化为气血",
             },
         };
     }

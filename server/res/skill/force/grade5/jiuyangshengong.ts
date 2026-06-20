@@ -19,7 +19,7 @@ export default class extends SKILL {
                 diff_sh_per: 6,
                 hp_per: 6,
                 limit_mp: lv * 290,
-                desc: "当被命中后对敌人造成5333点反震伤害; 唯一：将你内力的100%转化为气血",
+                desc: "当被命中后对敌人造成5333点反震伤害\n唯一：将你内力的100%转化为气血",
             },
         };
     }
