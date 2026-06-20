@@ -530,17 +530,52 @@ export default class extends AREA {
 
 持久副本的 `query_owner()` 方法必须被覆写，返回副本所有者的唯一标识。引擎根据此标识创建和查找独立副本实例。
 
-### 7.6 副本临时数据
+### 7.6 临时数据（temp）操作规范
 
-副本房间支持按玩家隔离的临时数据：
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+
+#### 通用操作接口（ITEM 体系：USER / CHARACTER / NPC / OBJ 等）
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动返回默认值。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+
+#### 副本房间专用接口（ROOM，需要 `me` 参数做玩家隔离）
+
+副本房间的 temp 方法覆写自 ROOM 类，**必须传入 `me` 参数**以按玩家隔离数据：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, me: USER, def?: T) => T \| undefined` | 按玩家查询副本临时数据 |
+| `set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 按玩家设置副本临时数据 |
+| `add_temp` | `(name: string, value: number, me: USER, time?: number) => number` | 按玩家累加副本临时数据 |
 
 ```typescript
-// 在副本入口房间设置/查询数据（自动按玩家隔离）
+// ✅ 正确：通过副本入口房间操作按玩家隔离的 temp
 const entryRoom = WORLD.getRoom(area.first);
 entryRoom.set_temp("boss_killed", true, me, 3600000);  // 设置，有效期1小时
 const val = entryRoom.query_temp("boss_killed", me, false);  // 查询
 entryRoom.add_temp("monster_count", 1, me);            // 累加
+
+// ✅ 正确：玩家自身的 temp 操作
+me.set_temp("xy_bm", 1, 3600000);   // 报名标记，1小时有效
+const bm = me.query_temp("xy_bm", 0);  // 查询，默认0
+
+// ❌ 错误：直接访问 temp 对象
+me.temp["xy_bm"] = 1;          // 禁止！
+const bm = me.temp["xy_bm"];    // 禁止！
 ```
+
+#### 核心约束
+
+1. **禁止直接访问 `temp` 对象**：`obj.temp["key"]` 或 `obj.temp.key` 是**不允许**的，必须使用上述四个方法。直接访问会绕过过期检查机制，且不符合序列化规范。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或运行时错误。例如 `me.query_temp("count", 0)` 而非 `me.query_temp("count")`。
+3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数单位是**毫秒**（不是秒）。例如 1 小时 = `3600000`。
+4. **过期机制**：当值以 `{v, e}` 格式存储（带过期时间）且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
+5. **`remove_temp` 设为 `null`**：不会删除键名，这是为了 JSON 序列化时保留键位的兼容性设计。
 
 ---
 

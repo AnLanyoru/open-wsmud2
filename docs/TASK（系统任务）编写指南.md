@@ -17,14 +17,15 @@
 9. [WORLD 全局对象](#9-world-全局对象)
 10. [EVENTS 活动事件系统](#10-events-活动事件系统)
 11. [WORLD.DATA 全局持久化数据](#11-worlddata-全局持久化数据)
-12. [玩家角色相关 API](#12-玩家角色相关-api)
-13. [NPC 与物品创建](#13-npc-与物品创建)
-14. [完整示例一：定时排行榜任务](#14-完整示例一定时排行榜任务)
-15. [完整示例二：周期广播清理任务](#15-完整示例二周期广播清理任务)
-16. [完整示例三：世界 BOSS 事件任务](#16-完整示例三世界-boss-事件任务)
-17. [完整示例四：商城货物刷新任务](#17-完整示例四商城货物刷新任务)
-18. [任务的热更新机制](#18-任务的热更新机制)
-19. [常见问题与陷阱](#19-常见问题与陷阱)
+12. [临时数据（temp）操作规范](#12-临时数据temp操作规范)
+13. [玩家角色相关 API](#13-玩家角色相关-api)
+14. [NPC 与物品创建](#14-npc-与物品创建)
+15. [完整示例一：定时排行榜任务](#15-完整示例一定时排行榜任务)
+16. [完整示例二：周期广播清理任务](#16-完整示例二周期广播清理任务)
+17. [完整示例三：世界 BOSS 事件任务](#17-完整示例三世界-boss-事件任务)
+18. [完整示例四：商城货物刷新任务](#18-完整示例四商城货物刷新任务)
+19. [任务的热更新机制](#19-任务的热更新机制)
+20. [常见问题与陷阱](#20-常见问题与陷阱)
 
 ---
 
@@ -620,7 +621,73 @@ let ms = UTIL.diff_week_time(20);    // 到下周一 20 点
 
 ---
 
-## 12. 玩家角色相关 API
+## 12. 临时数据（temp）操作规范
+
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+
+### 12.1 玩家临时数据（per-player）
+
+每个玩家独立存储，持久化在玩家角色存档中。通过 `me`（USER 实例）调用：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 有效期（**毫秒**），省略则永久。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，不删除键名）。 |
+
+```typescript
+// ✅ 正确：通过方法操作
+let count = me.query_temp<number>("bcc", 0);        // 必须提供默认值
+let flag = me.query_temp("xy_bm", 0);
+me.set_temp("bcc", 1);                               // 永久
+me.set_temp("bcc", 1, 3600000);                      // 1小时后过期
+let newVal = me.add_temp("bcc", 1);                  // 累加
+me.remove_temp("bcc");
+
+// ❌ 错误：直接访问 temp 对象
+me.temp["bcc"] = 1;          // 禁止！
+let val = me.temp["bcc"];    // 禁止！
+```
+
+### 12.2 全局临时数据（WORLD.DATA）
+
+全服共享，持久化在 `data.js` 中：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取全局值。**必须提供默认值**。 |
+| `set_temp` | `(name: string, value: unknown, time?: number) => void` | 写入全局值。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加全局数值。 |
+| `remove_temp` | `(name: string) => void` | 移除（设为 `null`）。 |
+
+```typescript
+// ✅ 正确
+WORLD.DATA.set_temp("xy_status", 1);                      // 不超时
+WORLD.DATA.set_temp("xy_status", 10, 3600000);             // 1小时后过期
+let status = WORLD.DATA.query_temp("xy_status", 0) ?? 0;   // 必须默认值
+let count = WORLD.DATA.add_temp("boss_count", 1);           // 累加
+WORLD.DATA.remove_temp("xy_status");
+```
+
+### 12.3 核心约束
+
+1. **禁止直接访问 `temp` 对象**：无论 `me.temp`、`WORLD.DATA.temp` 还是其他对象的 `.temp`，都不允许直接读写，必须使用上述四个方法。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或类型错误。
+   ```typescript
+   // ❌ 错误
+   let count = me.query_temp("count") + 1;  // key 不存在时为 undefined + 1 = NaN
+   // ✅ 正确
+   let count = me.query_temp("count", 0) + 1;
+   ```
+3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**，不是秒。
+4. **过期机制**：值以 `{v, e}` 格式存储时，`query_temp` 在 `Date.now() > e` 时自动返回默认值。
+5. **`remove_temp` 设为 `null`**：不删除键名，用于 JSON 序列化兼容。
+6. **作用范围区分**：`me.query_temp()` = 单个玩家，`WORLD.DATA.query_temp()` = 全服共享。不要混淆。
+
+---
+
+## 13. 玩家角色相关 API
 
 TASK 中经常需要与玩家交互，以下是最常用的 CHARACTER/USER API。
 
@@ -697,7 +764,7 @@ me.add_exp(1000, 500);  // +1000 经验, +500 潜能
 
 ---
 
-## 13. NPC 与物品创建
+## 14. NPC 与物品创建
 
 TASK 中经常需要动态创建 NPC 和物品。
 
@@ -771,7 +838,7 @@ let items = OBJ.create_by_odds([
 
 ---
 
-## 14. 完整示例一：定时排行榜任务
+## 15. 完整示例一：定时排行榜任务
 
 **功能**：每日 20:00 结算排行榜，发送奖励邮件。展示定时任务的标准模式。
 
@@ -963,7 +1030,7 @@ const FAMS_TATAS = ['WUDANG', 'HUASHAN', 'SHAOLIN',
 
 ---
 
-## 15. 完整示例二：周期广播清理任务
+## 16. 完整示例二：周期广播清理任务
 
 **功能**：每 20 分钟随机播报一条系统消息，每天凌晨 4 点检查清理过期日志文件，凌晨 5 点清理邮件和商店缓存。
 
@@ -1056,7 +1123,7 @@ export default class extends TASK {
 
 ---
 
-## 16. 完整示例三：世界 BOSS 事件任务
+## 17. 完整示例三：世界 BOSS 事件任务
 
 **功能**：每小时检测一次，在 21 点左右刷新 BOSS。根据玩家等级创建不同等级的 BOSS，将 BOSS 放入随机房间，创建活动事件供玩家参与，记录伤害，BOSS 死亡后按伤害分配掉落。
 
@@ -1247,7 +1314,7 @@ export default class extends TASK {
 
 ---
 
-## 17. 完整示例四：商城货物刷新任务
+## 18. 完整示例四：商城货物刷新任务
 
 **功能**：每天中午 12 点刷新各门派商城的可兑换物资。展示状态迁移（热更新时保留缓存）和货物缓存模式。
 
@@ -1351,7 +1418,7 @@ export default class extends TASK {
 
 ---
 
-## 18. 任务的热更新机制
+## 19. 任务的热更新机制
 
 ### 手动触发热更新
 
@@ -1409,7 +1476,7 @@ startup() {
 
 ---
 
-## 19. 常见问题与陷阱
+## 20. 常见问题与陷阱
 
 ### 1. 定时器泄漏
 

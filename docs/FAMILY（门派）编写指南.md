@@ -256,16 +256,27 @@ is_battle(fam: FAMILY): boolean      // 是否与指定门派交战
 
 **注意**：不要覆盖 `create`、`update`、`init` 方法，除非你明确了解其作用。如有额外初始化逻辑，在构造函数中完成。
 
-#### 临时数据方法（继承自 ITEM）
+#### 临时数据（temp）操作规范
 
-```typescript
-query_temp<T>(name: string, def?: T): T | undefined
-set_temp(name: string, value: any, time?: number): void
-remove_temp(name: string): void
-add_temp(name: string, value: number, time?: number): number
-```
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
 
-`set_temp` 的可选 `time` 参数（毫秒）用于设置自动过期时间，过期后 `query_temp` 返回 `undefined`。频繁用于门派战倒计时等场景。
+FAMILY 的 temp 方法借用自 `ITEM.prototype`，因此签名与 ITEM 体系一致：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
+| `set_temp` | `(name: string, value: any, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+
+**核心约束：**
+
+1. **禁止直接访问 `temp` 对象**：`fam.temp["battle"]` 或 `fam.temp.battle` 是**不允许**的。门派战中所有临时数据（战斗倒计时、增益标记等）必须通过上述四个方法操作。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
+3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**。门派战 30 分钟倒计时 = `1800000`。
+4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值。
+5. **`remove_temp` 设为 `null`**：不删除键名。
+6. **FAMILY 的 temp 数据持久化**：FAMILY 的 `temp` 和 `tops`（排行榜）会通过 `FAMILY.SAVE()` / `FAMILY.LOAD()` 进行序列化和反序列化，跨服务器重启持久化。
 
 ---
 

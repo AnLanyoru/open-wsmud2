@@ -2112,21 +2112,44 @@ me.send_room("$N吃下一" + this.unit + this.name + "。", this);
 // $N → 玩家名, $o → 物品名
 ```
 
-### transient 数据（temp）
+### 临时数据（temp）操作规范
 
-`this.temp` 存储在数据库中的额外数据，可用于：
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
 
-- 记录物品状态
-- 存储自定义数量（如剩余使用次数）
-- 存储过期时间（配合 `set_temp` 的 `time` 参数）
+OBJ 继承自 ITEM，因此拥有完整的 temp 操作接口：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+
+**物品 temp 的典型用途：**
+- 记录物品使用次数或剩余使用次数
+- 存储物品自定义状态
+- 存储过期时间标记
 
 ```typescript
-// 设置临时数据（带过期时间）
-this.set_temp("charge", 5, 3600000);  // 1 小时后过期
-
-// 查询
+// ✅ 正确
+this.set_temp("charge", 5, 3600000);  // 1小时后过期
 var charge = this.query_temp("charge", 0);
+this.add_temp("use_count", 1);        // 累加使用次数
+this.remove_temp("charge");
+
+// ❌ 错误：直接访问 temp 对象
+this.temp["charge"] = 5;     // 禁止！
+var c = this.temp["charge"]; // 禁止！
 ```
+
+**核心约束：**
+
+1. **禁止直接访问 `temp` 对象**：`obj.temp["key"]` 或 `obj.temp.key` 是**不允许**的，必须使用上述四个方法。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
+3. **时间单位为毫秒**：`time` 参数是**毫秒**。例如 1 小时 = `3600000`。
+4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值。
+5. **`remove_temp` 设为 `null`**：不删除键名，用于 JSON 序列化兼容。
+6. **物品 temp 持久化**：物品的 `temp` 数据会随物品序列化存储到数据库。`format_temp()` 在保存时会丢弃即将过期（120秒内）的条目。
 
 ---
 

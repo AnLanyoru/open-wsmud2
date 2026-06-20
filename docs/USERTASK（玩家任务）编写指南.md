@@ -287,24 +287,33 @@ if (task) {
 
 以下方法在 `on_finish`、`start`、`query_desc` 等所有回调中的 `me` 参数上可用。
 
-#### 临时数据操作（从 ITEM 继承）
+#### 临时数据（temp）操作规范
 
-```typescript
-// 设置临时数据
-me.set_temp(key: string, value: any, duration?: number): void
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
 
-// 查询临时数据（defaultValue 在 key 不存在时返回）
-me.query_temp<T>(key: string, defaultValue?: T): T
+USER 继承自 CHARACTER → ITEM，因此拥有完整的 temp 操作接口：
 
-// 累加数值型临时数据，返回累加后的值
-me.add_temp(key: string, value: number, duration?: number): number
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动返回默认值。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
 
-// 移除临时数据
-me.remove_temp(key: string): void
-```
+**核心约束：**
 
-> **重要**：`duration` 参数是过期时间（毫秒）。例如 `me.set_temp("buff", true, 60000)` 表示 60 秒后自动过期。
-> `query_temp` 的默认值参数**必须**提供，避免未定义时的类型错误。
+1. **禁止直接访问 `temp` 对象**：`me.temp["progress"]` 或 `me.temp.progress` 是**不允许**的，必须使用上述四个方法。直接访问会绕过过期检查机制。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或类型错误。
+   ```typescript
+   // ❌ 错误：key 不存在时为 undefined + 1 = NaN
+   let count = me.query_temp("count") + 1;
+   // ✅ 正确
+   let count = me.query_temp("count", 0) + 1;
+   ```
+3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**（不是秒）。例如 24 小时 = `86400000`。
+4. **过期机制**：当值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
+5. **`remove_temp` 设为 `null`**：不会真正删除键名。
+6. **单例模式中玩家数据隔离**：USERTASK 是单例，所有玩家状态**必须**通过 `me.set_temp()` / `me.query_temp()` 存储（每个玩家独立），**禁止**将玩家进度存储在任务实例的 `this` 属性上。
 
 #### 奖励发放
 

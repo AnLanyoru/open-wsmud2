@@ -231,6 +231,55 @@ import {ROOM} from "../../../core/room/room.js";
 
 ---
 
+### 4.10 临时数据（temp）操作规范
+
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+
+**重要**：ROOM 覆写了 ITEM 的 temp 方法，**签名不同**——需要额外的 `me` 参数来按玩家隔离副本数据：
+
+#### 普通房间（继承自 ITEM，与 USER/CHARACTER/NPC 签名相同）
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取房间自身临时值。**必须提供默认值**。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入房间自身临时值。`time` 为有效期（**毫秒**）。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，不删除键名）。 |
+
+#### 副本房间（ROOM 覆写版本，需要 `me` 参数做玩家隔离）
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, me: USER, def?: T) => T \| undefined` | 按玩家查询副本临时数据。**`me` 是第二个参数**。 |
+| `set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 按玩家设置副本临时数据。**`me` 是第三个参数**。 |
+| `add_temp` | `(name: string, value: number, me: USER, time?: number) => number` | 按玩家累加副本临时数据。**`me` 是第三个参数**。 |
+
+> **注意**：ROOM 没有覆写 `remove_temp`，副本房间使用继承自 ITEM 的版本（设为 `null`）。
+
+```typescript
+// ✅ 正确：副本房间按玩家隔离操作 temp
+const firstRoom = this.query_fb_first(me.query_teamid());
+if (firstRoom) {
+    firstRoom.set_temp("boss_killed", true, me, 3600000);  // me 是第3个参数
+    const killed = firstRoom.query_temp("boss_killed", me, false);  // me 是第2个参数
+    firstRoom.add_temp("kill_count", 1, me);               // me 是第3个参数
+}
+
+// ❌ 错误：直接访问 temp 对象
+room.temp["boss_killed"] = true;  // 禁止！
+```
+
+**核心约束：**
+
+1. **禁止直接访问 `temp` 对象**：`room.temp["key"]` 或 `room.temp.key` 是**不允许的**。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
+3. **时间单位为毫秒**：`time` 参数是**毫秒**。例如 1 小时 = `3600000`。
+4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
+5. **`remove_temp` 设为 `null`**：不删除键名。
+6. **副本房间必须传 `me`**：ROOM 覆写的 `query_temp` / `set_temp` / `add_temp` 与 ITEM 签名不同——`me` 参数是**必须的**，用于按玩家隔离副本数据。参数位置：`query_temp(name, me, def?)`、`set_temp(name, value, me, time?)`、`add_temp(name, value, me, time?)`。
+
+---
+
 ## 5. 构造方法
 
 ROOM 的 constructor 中应调用 `super()`，然后可以调用以下方法来配置房间。

@@ -527,6 +527,39 @@ me.set_temp("kezhan", 1, 1000 * 3600 * 24);  // 24小时有效
 
 ---
 
+### 5.3 临时数据（temp）操作规范
+
+> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+
+NPC 继承自 CHARACTER → ITEM，因此拥有完整的 temp 操作接口：
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动清除并返回默认值。 |
+| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
+| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
+| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+
+**核心约束：**
+
+1. **禁止直接访问 `temp` 对象**：`npc.temp["key"]` 或 `npc.temp.key` 是**不允许**的，必须使用上述四个方法。直接访问会绕过过期检查，且不符合序列化规范。
+2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或运行时错误。
+   ```typescript
+   // ✅ 正确
+   const count = me.query_temp("kezhan", 0);
+   // ❌ 错误：缺少默认值，可能返回 undefined
+   const count = me.query_temp("kezhan");
+   ```
+3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数单位是**毫秒**。例如 24 小时 = `1000 * 3600 * 24`。
+   ```typescript
+   me.set_temp("kezhan", 1, 1000 * 3600 * 24);  // 24小时有效
+   ```
+4. **过期机制**：当值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。设置带过期时间的值时，引擎会自动包装为 `{v: value, e: Date.now() + time}` 格式。
+5. **`remove_temp` 设为 `null`**：不会真正删除键名，这是为了 JSON 序列化时保留键位。
+6. **适用于所有 ITEM 子类**：以上接口同样适用于 `me`（USER）、NPC 自身（`this`）、OBJ 等所有继承自 ITEM 的对象。
+
+---
+
 ## 6. 回调函数参考
 
 回调函数可以直接在 class 中定义为方法（method）。引擎在特定时机自动调用这些方法。
