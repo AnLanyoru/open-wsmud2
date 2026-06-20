@@ -7,7 +7,7 @@ import {createRequire} from 'module';
 const require = createRequire(import.meta.url);
 
 import JSON5 from 'json5';
-import {PROPERTIES} from './const.js';
+import {PROPERTIES, GRADE_COLORS} from './const.js';
 import type { PropMap } from '../types/props.js';
 import type { SKILL } from './skill/skill.js';
 
@@ -179,6 +179,17 @@ export const UTIL = {
     htmlEncode(str: string): string {
         if (!str) return str;
         return str.replace(/>/g, "&gt;").replace(/</g, "&lt;");
+    },
+
+    /**
+     * 按品级给名称上色
+     * @param name - 物品名称
+     * @param grade - 品级（0-6）
+     * @returns 带颜色标签的字符串，如 "<hiy>名称</hiy>"
+     */
+    gradeColor(name: string, grade: number): string {
+        const cc = GRADE_COLORS[grade] ?? 'wht';
+        return `<${cc}>${name}</${cc}>`;
     },
 
     /**

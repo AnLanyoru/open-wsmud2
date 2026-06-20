@@ -13,14 +13,12 @@ import {BASE} from '../base.js';
 import {ITEM} from '../item.js';
 import {UTIL} from '../util.js';
 import {WORLD} from '../world.js';
+import {GRADE_COLORS} from '../const.js';
 import type {CHARACTER} from '../char/character.js';
 import type {SKILL} from '../skill/skill.js';
 
 /** __PATH global set at engine boot */
 declare var __PATH: Record<string, string>;
-
-/** Grade color tags */
-const grade_color: string[] = ["wht", "hig", "hic", "hiy", "HIZ", "hio", "ord"];
 
 /** 掉落概率条目（用于 create_by_odds 随机掉落系统） */
 export interface OddsEntry {
@@ -380,7 +378,7 @@ export class OBJ extends ITEM {
         if (par) this.path = path + par;
         this.create_id();
         if (this.on_create) this.on_create(path, par);
-        const cc = grade_color[this.grade] ?? 'wht';
+        const cc = GRADE_COLORS[this.grade] ?? 'wht';
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
         WORLD.OBJ_STROE.set(this.path ?? '', this);
     }
@@ -398,7 +396,7 @@ export class OBJ extends ITEM {
      * 查询品级颜色标签
      */
     query_grade_color(): string {
-        return grade_color[this.grade] ?? 'wht';
+        return GRADE_COLORS[this.grade] ?? 'wht';
     }
 
     /**

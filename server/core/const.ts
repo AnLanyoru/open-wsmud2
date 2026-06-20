@@ -232,3 +232,8 @@ export const PROPERTIES = {
     /** 禁止绝招 — 使目标无法释放绝招 */
     "no_pfm": "禁止绝招",
 };
+
+/**
+ * 品级颜色标签 — 按 grade 索引: 0=普通(wht) 1=精良(hig) 2=高级(hic) 3=稀有(hiy) 4=绝世(HIZ) 5=传说(hio) 6=神器(ord)
+ */
+export const GRADE_COLORS = ["wht", "hig", "hic", "hiy", "HIZ", "hio", "ord"];

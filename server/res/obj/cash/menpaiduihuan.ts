@@ -1,5 +1,6 @@
 import { OBJ } from "../../../core/item/obj.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
+import { UTIL } from "../../../core/util.js";
 import type { CHARACTER } from "../../../core/char/character.js";
 
 const QUALITIES = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
@@ -143,21 +144,21 @@ export default class extends OBJ {
         const fac = FACTIONS[faction];
         if (!fac) return me.notify("未知的门派。");
 
-        (this.temp as Record<string, any>).faction = faction;
+        me.set_temp("menpai_faction", faction, 600000);
 
         const q = QUALITIES[this.grade] ?? "传说";
         me.notify(`<hiy>请选择${fac.name}的${q}装备：</hiy>`);
 
         const cmds: string[] = [];
         for (const eq of fac.eqs) {
-            cmds.push(`use ${this.id} ${eq.key}`, eq.name);
+            cmds.push(`use ${this.id} ${eq.key}`, UTIL.gradeColor(eq.name, this.grade));
         }
         me.send_commands(...cmds);
         return false;
     }
 
     private _showPreview(me: CHARACTER, eqKey: string) {
-        const faction = (this.temp as Record<string, any>).faction as string;
+        const faction = me.query_temp<string>("menpai_faction");
         if (!faction) {
             // 没选门派直接点了装备，回到第一步
             return this._showFactions(me);
@@ -167,7 +168,7 @@ export default class extends OBJ {
         const eq = fac?.eqs.find((e) => e.key === eqKey);
         if (!eq) return me.notify("未知的装备。");
 
-        (this.temp as Record<string, any>).eq = eqKey;
+        me.set_temp("menpai_eq", eqKey, 600000);
 
         const eqPath = `eq/${faction}/${eqKey}#${this.grade}`;
         const preview = OBJ.CREATE(eqPath) as EQUIPMENT;
@@ -176,7 +177,7 @@ export default class extends OBJ {
         }
 
         const q = QUALITIES[this.grade] ?? "传说";
-        me.notify(`<hiy>${fac.name} · ${eq.name}（${q}）</hiy>`);
+        me.notify(`<hiy>${fac.name} · ${UTIL.gradeColor(eq.name, this.grade)}（${q}）</hiy>`);
         me.notify(preview.query_desc(me));
 
         me.send_commands(
@@ -187,8 +188,8 @@ export default class extends OBJ {
     }
 
     private _doExchange(me: CHARACTER) {
-        const faction = (this.temp as Record<string, any>).faction as string;
-        const eqKey = (this.temp as Record<string, any>).eq as string;
+        const faction = me.query_temp<string>("menpai_faction");
+        const eqKey = me.query_temp<string>("menpai_eq");
 
         if (!faction || !eqKey) {
             return me.notify("操作超时，请重新使用兑换券。");
@@ -204,8 +205,8 @@ export default class extends OBJ {
             return me.notify("装备创建失败，请联系管理员。");
         }
 
-        delete (this.temp as Record<string, any>).faction;
-        delete (this.temp as Record<string, any>).eq;
+        me.remove_temp("menpai_faction");
+        me.remove_temp("menpai_eq");
 
         me.add_obj(equipment);
         me.notify(`<hiy>你使用门派装备兑换券兑换了${equipment.color_name}。</hiy>`);
