@@ -13,7 +13,7 @@ const party_css = `
 }
 
 .dialog-party>.dialog-party-add>input {
-    border: 1px solid gray;
+    border: 1px solid var(--border-secondary);
     background-color: transparent;
     color: unset;
     resize: none;
@@ -75,12 +75,12 @@ const party_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 2em;
     cursor: pointer;
 }
@@ -103,7 +103,7 @@ const party_css = `
 
 .dialog-party>.party-item>.party-item-cmd {
     flex: 0;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     padding-left: 1em;
     padding-right: 1em;
 }

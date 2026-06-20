@@ -427,11 +427,11 @@ const jh_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -440,7 +440,7 @@ const jh_css = `
 .fb-actions>.fb-action>.action-desc {
     flex: 1;
     white-space: nowrap;
-    color: gray;
+    color: var(--text-muted);
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -454,7 +454,7 @@ const jh_css = `
 
 .fb-actions>.fb-action>.action-name {
     flex: 0;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     padding-left: 1em;
     padding-right: 1em;
 }
@@ -487,11 +487,11 @@ const jh_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
 }
 
@@ -502,18 +502,18 @@ const jh_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
 }
 
 .dialog-fb>.fb-left>.fb-content>.line {
     height: 1.25em;
     width: 0px;
-    border-left: 1px solid #343434;
+    border-left: 1px solid var(--border-primary);
     margin-left: auto;
     margin-right: auto;
     margin-top: -1em;

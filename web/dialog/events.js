@@ -10,14 +10,14 @@ const events_css = `
 
 .dialog-events>.empty {
     text-align: center;
-    color: gray;
+    color: var(--text-muted);
     margin-bottom: 3em;
     margin-top: 3em;
 }
 
 .dialog-events>.event-item {
     border-radius: 6px;
-    background-color: #111111;
+    background-color: var(--bg-surface);
     border-left-width: 4px;
     border-left-style: solid;
     position: relative;

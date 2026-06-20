@@ -1,6 +1,137 @@
 /* ========================================
    global.css - 全局基础样式
    ======================================== */
+
+/* ========================================
+   主题变量 - CSS Custom Properties
+   ======================================== */
+:root,
+body[data-theme="dark"] {
+    --bg-body: black;
+    --bg-surface: #111;
+    --bg-surface2: #222;
+    --bg-input: black;
+    --text-body: #008000;
+    --text-secondary: #cecece;
+    --text-tertiary: #bdc3c7;
+    --text-muted: gray;
+    --text-muted2: #898989;
+    --text-header: #C0C0C0;
+    --text-title: #ffff00;
+    --border-primary: #343434;
+    --border-secondary: gray;
+    --switch-bg: #222;
+    --switch-on-bg: #008000;
+    --switch-knob: gray;
+    --switch-knob-on: #eee;
+    --switch-text: #898989;
+    --switch-text-on: #eee;
+    --color-item-border: #cecece;
+    --color-item-select: #ff0000;
+    --dialog-header-bg: #222;
+    --dialog-footer-bg: #222;
+    --dialog-footer-select: #555;
+    --dialog-confirm-bg: #111;
+    --warn-bg: #111;
+    --scroll-flag-bg: #222;
+    --scroll-flag-color: #555;
+    --state-bar-bg: #111;
+    --chat-input-bg: #bebebe;
+    --chat-input-color: #343434;
+    --chat-btn-bg: #ababab;
+    --btn-bg: black;
+    --btn-border: gray;
+    --btn-color: gray;
+    --tool-bg: gray;
+    --tool-color: #111;
+    --tool-hover: #666;
+    --font-family: "Microsoft YaHei UI";
+}
+
+body[data-theme="light"] {
+    --bg-body: #f0f0f0;
+    --bg-surface: #e0e0e0;
+    --bg-surface2: #d0d0d0;
+    --bg-input: white;
+    --text-body: #222;
+    --text-secondary: #444;
+    --text-tertiary: #555;
+    --text-muted: #777;
+    --text-muted2: #888;
+    --text-header: #333;
+    --text-title: #333;
+    --border-primary: #ccc;
+    --border-secondary: #aaa;
+    --switch-bg: #ccc;
+    --switch-on-bg: #4CAF50;
+    --switch-knob: #999;
+    --switch-knob-on: #fff;
+    --switch-text: #888;
+    --switch-text-on: #fff;
+    --color-item-border: #aaa;
+    --color-item-select: #e74c3c;
+    --dialog-header-bg: #d8d8d8;
+    --dialog-footer-bg: #d8d8d8;
+    --dialog-footer-select: #bbb;
+    --dialog-confirm-bg: #e0e0e0;
+    --warn-bg: #e8e8e8;
+    --scroll-flag-bg: #d0d0d0;
+    --scroll-flag-color: #999;
+    --state-bar-bg: #e0e0e0;
+    --chat-input-bg: #fff;
+    --chat-input-color: #333;
+    --chat-btn-bg: #d0d0d0;
+    --btn-bg: #f0f0f0;
+    --btn-border: #aaa;
+    --btn-color: #555;
+    --tool-bg: #aaa;
+    --tool-color: #fff;
+    --tool-hover: #888;
+    --font-family: "Microsoft YaHei UI";
+}
+
+body[data-theme="book"] {
+    --bg-body: #f5f0e6;
+    --bg-surface: #ede4d3;
+    --bg-surface2: #e0d5c0;
+    --bg-input: #faf7f0;
+    --text-body: #4a3728;
+    --text-secondary: #6b5a4e;
+    --text-tertiary: #7a6b5d;
+    --text-muted: #9c8b7a;
+    --text-muted2: #a89880;
+    --text-header: #5c4033;
+    --text-title: #5c4033;
+    --border-primary: #c4b5a5;
+    --border-secondary: #b8a58b;
+    --switch-bg: #d5c9b5;
+    --switch-on-bg: #8b7355;
+    --switch-knob: #b8a58b;
+    --switch-knob-on: #f5f0e6;
+    --switch-text: #a89880;
+    --switch-text-on: #f5f0e6;
+    --color-item-border: #b8a58b;
+    --color-item-select: #c0392b;
+    --dialog-header-bg: #e0d5c0;
+    --dialog-footer-bg: #e0d5c0;
+    --dialog-footer-select: #c4b5a5;
+    --dialog-confirm-bg: #ede4d3;
+    --warn-bg: #ede4d3;
+    --scroll-flag-bg: #d5c9b5;
+    --scroll-flag-color: #b8a58b;
+    --state-bar-bg: #ede4d3;
+    --chat-input-bg: #faf7f0;
+    --chat-input-color: #4a3728;
+    --chat-btn-bg: #e0d5c0;
+    --btn-bg: #f5f0e6;
+    --btn-border: #b8a58b;
+    --btn-color: #6b5a4e;
+    --tool-bg: #b8a58b;
+    --tool-color: #f5f0e6;
+    --tool-hover: #9c8b7a;
+    --font-family: "Georgia", "Noto Serif SC", "SimSun", "KaiTi", serif;
+}
+
 html,
 body {
     margin: 0px;
@@ -14,10 +145,19 @@ body {
 }
 
 body {
-    background-color: black;
-    font-family: "Microsoft YaHei UI";
-    color: #008000;
+    background-color: var(--bg-body);
+    font-family: var(--font-family);
+    color: var(--text-body);
     font-size: 14px;
+}
+
+/* 书页纹理 */
+body[data-theme="book"] {
+    background-color: #f5f0e6;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(160, 140, 110, 0.04) 3px, rgba(160, 140, 110, 0.04) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 100%, rgba(160, 140, 110, 0.02) 100%);
+    background-attachment: fixed;
 }
 
 * {

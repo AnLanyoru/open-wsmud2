@@ -10,6 +10,14 @@
 </head>
 
 <body>
+<script>
+  (function() {
+    var theme = localStorage.getItem("ui_theme");
+    if (theme) {
+      document.body.setAttribute("data-theme", theme);
+    }
+  })();
+</script>
 <script type="module" src="./startup.js"></script>
 </body>
 

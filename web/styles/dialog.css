@@ -20,7 +20,7 @@
 .dialog > .dialog-header {
     height: 2.5em;
     line-height: 2.5em;
-    background-color: #222;
+    background-color: var(--dialog-header-bg);
     padding-left: 0.5em;
     display: flex;
     flex-direction: row;
@@ -75,7 +75,7 @@
 
 
 .dialog > .dialog-footer {
-    background-color: #222;
+    background-color: var(--dialog-footer-bg);
     white-space: nowrap;
     height: 2.5em;
     user-select: none;
@@ -97,7 +97,7 @@
 }
 
 .dialog > .dialog-footer > .footer-item {
-    color: #bdc3c7;
+    color: var(--text-tertiary);
     display: inline-block;
     width: 5em;
     text-align: center;
@@ -110,7 +110,7 @@
     width: 2em;
     height: 2em;
     border-radius: 2em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 2em;
     margin-left: 1em;
     margin-top: 0.25em;
@@ -123,8 +123,8 @@
 
 
 .dialog > .dialog-footer > .select {
-    background-color: #555;
-    color: #bdc3c7;
+    background-color: var(--dialog-footer-select);
+    color: var(--text-tertiary);
 }
 
 
@@ -132,7 +132,7 @@
     width: 2em;
     height: 2em;
     border-radius: 2em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 2em;
     margin-top: .25em;
     margin-right: 0.5em;
@@ -154,11 +154,11 @@
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     padding-top: 0.5em;
     padding-bottom: 0.5em;
     position: relative;
@@ -178,10 +178,10 @@
 }
 
 .dialog-score h3 {
-    color: #C0C0C0;
+    color: var(--text-header);
     margin: 0.625em;
-    border-top: 1px solid #343434;
-    border-bottom: 1px solid #343434;
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
     font-size: 1em;
     line-height: 2em;
 }
@@ -205,10 +205,10 @@
 }
 
 .dialog-score2 h3 {
-    color: #C0C0C0;
+    color: var(--text-header);
     margin: 0.625em;
-    border-top: 1px solid #343434;
-    border-bottom: 1px solid #343434;
+    border-top: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--border-primary);
     font-size: 1em;
 }
 
@@ -224,11 +224,11 @@
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
 }
 
 .dialog-titles > .selected {
@@ -240,7 +240,7 @@
     display: inline-block;
     color: #00ff00;
     padding-left: 2em;
-    background-color: #343434;
+    background-color: var(--border-primary);
     padding-right: 2em;
     border-left: 1px solid #121212;
     cursor: pointer;

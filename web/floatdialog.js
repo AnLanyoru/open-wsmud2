@@ -6,9 +6,9 @@ const float_css = `
     position: fixed;
     z-index: 100;
     width: 24em;
-    background: #000;
+    background: var(--bg-body);
     border-radius: 6px;
-    border: 1px solid #343434;
+    border: 1px solid var(--border-primary);
     box-shadow: 0 0 40px rgba(0,0,0,0.7);
     user-select: none;
     overflow: hidden;
@@ -33,11 +33,11 @@ const float_css = `
     line-height: 2em;
     padding-left: 1em;
     border-radius: 4px;
-    border-left: 2px solid gray;
+    border-left: 2px solid var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: default;
     display: flex;
     flex-direction: row;
@@ -102,21 +102,18 @@ const float_css = `
     max-height: 50vh;
     overflow-y: auto;
     overflow-x: hidden;
-    background: #000;
+    background: var(--bg-body);
     border-radius: 6px;
-    border: 1px solid #343434;
+    border: 1px solid var(--border-primary);
     box-shadow: 0 0 40px rgba(0,0,0,0.7);
 }
 
-.float-dialog-unified>.unified-fade {
-    background: linear-gradient(to bottom, transparent, #000);
-}
 .float-dialog-unified>.unified-fade {
     position: sticky;
     bottom: 0;
     left: 0; right: 0;
     height: 2.5em;
-    background: linear-gradient(to bottom, transparent, #111);
+    background: linear-gradient(to bottom, transparent, var(--bg-surface));
     pointer-events: none;
     border-radius: 0 0 6px 6px;
 }
@@ -154,11 +151,11 @@ const float_css = `
     line-height: 2em;
     padding-left: 1em;
     border-radius: 4px;
-    border-left: 2px solid gray;
+    border-left: 2px solid var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     display: flex;
     flex-direction: row;
 }
@@ -208,7 +205,7 @@ const float_css = `
     color: #e77;
 }
 .float-warn {
-    border-top-color: gray !important;
+    border-top-color: var(--border-secondary) !important;
 }
 .float-warn .float-view-btn {
     color: #5a8a5a !important;

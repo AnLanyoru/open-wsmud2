@@ -288,12 +288,12 @@ const message_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
 
 }
@@ -353,12 +353,12 @@ const message_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 2em;
     cursor: pointer;
 }
@@ -383,12 +383,12 @@ const message_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 2em;
     display: flex;
     flex-direction: row;
@@ -403,28 +403,28 @@ const message_css = `
 
 .dialog-relation>.relation-item>.relation-cmd {
     flex: 0;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     padding-left: 1em;
     padding-right: 1em;
     cursor: pointer;
-    border-left: 2px solid #111;
+    border-left: 2px solid var(--bg-surface);
 }
 
 .detail-item {
     margin-bottom: 0.5em;
     margin-top: 0.5em;
     padding: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     padding-left: 1em;
     border-radius: 4px;
     border-top-width: 2px;
     border-top-style: solid;
-    border-top-color: gray;
+    border-top-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
 }
 
 .detail-item>.detail-name {
@@ -433,7 +433,7 @@ const message_css = `
 
 .detail-item>.detail-time {
     margin-left: 1em;
-    color: gray;
+    color: var(--text-muted);
 }
 
 .detail-item>.detail-content {
@@ -442,8 +442,8 @@ const message_css = `
 
 .detail-item>.detail-rec {
     margin-top: 1em;
-    background-color: #222;
-    color: gray;
+    background-color: var(--bg-surface2);
+    color: var(--text-muted);
     display: inline-block;
     font-size: 0.8em;
     padding-left: 1em;

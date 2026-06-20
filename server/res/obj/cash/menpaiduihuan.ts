@@ -3,89 +3,6 @@ import { EQUIPMENT } from "../../../core/item/equipment.js";
 import { UTIL } from "../../../core/util.js";
 import type { CHARACTER } from "../../../core/char/character.js";
 
-const QUALITIES = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
-
-const FACTIONS: Record<string, { name: string; eqs: { key: string; name: string }[] }> = {
-    wudang: {
-        name: "武当派",
-        eqs: [
-            { key: "zhenwujian", name: "真武剑" },
-            { key: "zhenwudaopao", name: "真武道袍" },
-            { key: "zhenwudaoxue", name: "真武道靴" },
-            { key: "zhenwudaozan", name: "真武道簪" },
-            { key: "zhenwuhuwan", name: "真武护腕" },
-            { key: "zhenwuyaodai", name: "真武腰带" },
-        ],
-    },
-    shaolin: {
-        name: "少林派",
-        eqs: [
-            { key: "luohanjiedao", name: "罗汉戒刀" },
-            { key: "luohansengpao", name: "罗汉僧袍" },
-            { key: "luohansengxie", name: "罗汉僧鞋" },
-            { key: "luohanmao", name: "罗汉帽" },
-            { key: "luohanhuwan", name: "罗汉护腕" },
-            { key: "luohanyaodai", name: "罗汉腰带" },
-        ],
-    },
-    huashan: {
-        name: "华山派",
-        eqs: [
-            { key: "junzijian", name: "君子剑" },
-            { key: "junziqingshan", name: "君子青衫" },
-            { key: "junzixue", name: "君子靴" },
-            { key: "junzitoujin", name: "君子头巾" },
-            { key: "junzihushou", name: "君子护手" },
-            { key: "junzipandai", name: "君子鞶带" },
-        ],
-    },
-    emei: {
-        name: "峨眉派",
-        eqs: [
-            { key: "shuguangjian", name: "曙光剑" },
-            { key: "shuguangfoyi", name: "曙光佛衣" },
-            { key: "shuguangxie", name: "曙光鞋" },
-            { key: "shuguangfazan", name: "曙光发簪" },
-            { key: "shuguanghuwan", name: "曙光护腕" },
-            { key: "shuguangshuyao", name: "曙光束腰" },
-        ],
-    },
-    xiaoyao: {
-        name: "逍遥派",
-        eqs: [
-            { key: "kunpengshouyin", name: "鲲鹏手印" },
-            { key: "kunpengchangpao", name: "鲲鹏长袍" },
-            { key: "kunpengxue", name: "鲲鹏靴" },
-            { key: "kunpengguan", name: "鲲鹏冠" },
-            { key: "kunpenghushou", name: "鲲鹏护手" },
-            { key: "kunpengyaodai", name: "鲲鹏腰带" },
-        ],
-    },
-    gaibang: {
-        name: "丐帮",
-        eqs: [
-            { key: "huntiangun", name: "混天棍" },
-            { key: "huntiansuoyi", name: "混天蓑衣" },
-            { key: "huntianmaxie", name: "混天麻鞋" },
-            { key: "huntianhuwan", name: "混天护腕" },
-            { key: "huntianguan", name: "混天冠" },
-            { key: "huntianyaodai", name: "混天腰带" },
-        ],
-    },
-    xiangyang: {
-        name: "襄阳",
-        eqs: [
-            { key: "dasongjunqiang", name: "大宋军枪" },
-            { key: "dasongjunfu", name: "大宋军服" },
-            { key: "dasongjunmao", name: "大宋军帽" },
-            { key: "dasongjunxue", name: "大宋军靴" },
-            { key: "menggujunqiang", name: "蒙古军枪" },
-            { key: "menggujunfu", name: "蒙古军服" },
-            { key: "lizimao", name: "笠子帽" },
-            { key: "menggujunxue", name: "蒙古军靴" },
-        ],
-    },
-};
 
 export default class extends OBJ {
     unit = "张";
@@ -97,12 +14,11 @@ export default class extends OBJ {
     combined = true;
 
     on_create(path: string, par?: string) {
-        if (!par) {
-            this.path = path + "#5";
-            return;
-        }
+        if (!par) return;
         const lv = parseInt(par.slice(1));
-        if (!(lv >= 2 && lv <= 5)) return;
+        if (!(lv >= 2 && lv <= 5)) {
+            return false;
+        };
         this.grade = lv;
         const q = QUALITIES[this.grade] ?? "传说";
         this.name = "门派装备兑换券";
@@ -215,3 +131,87 @@ export default class extends OBJ {
         return true;
     }
 }
+
+const QUALITIES = ["普通", "精良", "高级", "稀有", "绝世", "传说", "神器"];
+
+const FACTIONS: Record<string, { name: string; eqs: { key: string; name: string }[] }> = {
+    wudang: {
+        name: "武当派",
+        eqs: [
+            { key: "zhenwujian", name: "真武剑" },
+            { key: "zhenwudaopao", name: "真武道袍" },
+            { key: "zhenwudaoxue", name: "真武道靴" },
+            { key: "zhenwudaozan", name: "真武道簪" },
+            { key: "zhenwuhuwan", name: "真武护腕" },
+            { key: "zhenwuyaodai", name: "真武腰带" },
+        ],
+    },
+    shaolin: {
+        name: "少林派",
+        eqs: [
+            { key: "luohanjiedao", name: "罗汉戒刀" },
+            { key: "luohansengpao", name: "罗汉僧袍" },
+            { key: "luohansengxie", name: "罗汉僧鞋" },
+            { key: "luohanmao", name: "罗汉帽" },
+            { key: "luohanhuwan", name: "罗汉护腕" },
+            { key: "luohanyaodai", name: "罗汉腰带" },
+        ],
+    },
+    huashan: {
+        name: "华山派",
+        eqs: [
+            { key: "junzijian", name: "君子剑" },
+            { key: "junziqingshan", name: "君子青衫" },
+            { key: "junzixue", name: "君子靴" },
+            { key: "junzitoujin", name: "君子头巾" },
+            { key: "junzihushou", name: "君子护手" },
+            { key: "junzipandai", name: "君子鞶带" },
+        ],
+    },
+    emei: {
+        name: "峨眉派",
+        eqs: [
+            { key: "shuguangjian", name: "曙光剑" },
+            { key: "shuguangfoyi", name: "曙光佛衣" },
+            { key: "shuguangxie", name: "曙光鞋" },
+            { key: "shuguangfazan", name: "曙光发簪" },
+            { key: "shuguanghuwan", name: "曙光护腕" },
+            { key: "shuguangshuyao", name: "曙光束腰" },
+        ],
+    },
+    xiaoyao: {
+        name: "逍遥派",
+        eqs: [
+            { key: "kunpengshouyin", name: "鲲鹏手印" },
+            { key: "kunpengchangpao", name: "鲲鹏长袍" },
+            { key: "kunpengxue", name: "鲲鹏靴" },
+            { key: "kunpengguan", name: "鲲鹏冠" },
+            { key: "kunpenghushou", name: "鲲鹏护手" },
+            { key: "kunpengyaodai", name: "鲲鹏腰带" },
+        ],
+    },
+    gaibang: {
+        name: "丐帮",
+        eqs: [
+            { key: "huntiangun", name: "混天棍" },
+            { key: "huntiansuoyi", name: "混天蓑衣" },
+            { key: "huntianmaxie", name: "混天麻鞋" },
+            { key: "huntianhuwan", name: "混天护腕" },
+            { key: "huntianguan", name: "混天冠" },
+            { key: "huntianyaodai", name: "混天腰带" },
+        ],
+    },
+    xiangyang: {
+        name: "襄阳",
+        eqs: [
+            { key: "dasongjunqiang", name: "大宋军枪" },
+            { key: "dasongjunfu", name: "大宋军服" },
+            { key: "dasongjunmao", name: "大宋军帽" },
+            { key: "dasongjunxue", name: "大宋军靴" },
+            { key: "menggujunqiang", name: "蒙古军枪" },
+            { key: "menggujunfu", name: "蒙古军服" },
+            { key: "lizimao", name: "笠子帽" },
+            { key: "menggujunxue", name: "蒙古军靴" },
+        ],
+    },
+};

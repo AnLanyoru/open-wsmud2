@@ -37,6 +37,7 @@ const Setting = {
     top_safe_distance: 0,
     bottom_safe_distance: 0,
     float_dialog: 0,
+    theme: "dark",
     no_load: true,
     load: function (data) {
         Dialog.keys.init_key();
@@ -53,13 +54,18 @@ const Setting = {
         this.loadLocal();
     },
     loadLocal: function () {
-        var localKeys = ["top_safe_distance", "bottom_safe_distance"];
+        var localKeys = ["top_safe_distance", "bottom_safe_distance", "theme"];
         for (var i = 0; i < localKeys.length; i++) {
             var val = localStorage.getItem("ui_" + localKeys[i]);
             if (val !== null) {
-                var num = parseInt(val) || 0;
-                this[localKeys[i]] = num;
-                this.set_prop(localKeys[i], num);
+                if (localKeys[i] === "theme") {
+                    this[localKeys[i]] = val;
+                    this.set_prop(localKeys[i], val);
+                } else {
+                    var num = parseInt(val) || 0;
+                    this[localKeys[i]] = num;
+                    this.set_prop(localKeys[i], num);
+                }
             }
         }
     }, set_prop: function (key, value) {
@@ -168,6 +174,9 @@ const Setting = {
             case "bottom_safe_distance":
                 $(".container").css("padding-bottom", value + "px");
                 break;
+            case "theme":
+                document.body.setAttribute("data-theme", value);
+                break;
 
         }
     },
@@ -175,7 +184,11 @@ const Setting = {
         this[key] = value;
 
         this.set_prop(key, value);
-        SendCommand("setting " + key + " " + value);
+        if (key === "theme") {
+            localStorage.setItem("ui_" + key, value);
+        } else {
+            SendCommand("setting " + key + " " + value);
+        }
     },
     launchFullScreen: function (element) {
         element = element || document.documentElement;

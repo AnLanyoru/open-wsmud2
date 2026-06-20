@@ -28,19 +28,49 @@ export default class extends USERTASK {
     id = "test_res";
     sort = 99;
 
+    // ============ tr_path_cur 编解码 ============
+
+    /** 解析 "0_2_1" → { path: [0, 2], cur: 1 }，最后一个数字为光标，其余为路径下标 */
+    private parsePathCur(raw: string): { path: number[]; cur: number } {
+        if (!raw || raw === "") return { path: [], cur: 0 };
+        const parts = raw.split("_").map(Number);
+        if (parts.length === 0) return { path: [], cur: 0 };
+        const cur = parts.pop()!;
+        return { path: parts, cur };
+    }
+
+    /** 编码 path + cur → "0_2_1" */
+    private encodePathCur(path: number[], cur: number): string {
+        return [...path, cur].join("_");
+    }
+
+    /** 将路径下标解析为键名（用于面包屑展示） */
+    private getPathKeys(path: number[]): string[] {
+        const keys: string[] = [];
+        let node: TestResNode = need_test_objs;
+        for (const idx of path) {
+            if (!this.isBranch(node)) break;
+            const nodeKeys = Object.keys(node);
+            if (idx >= nodeKeys.length) break;
+            const key = nodeKeys[idx];
+            keys.push(key);
+            node = node[key];
+        }
+        return keys;
+    }
+
     // ============ 数据访问 ============
 
     private getNode(me: CHARACTER): TestResRoot {
-        const path: string[] = JSON.parse(me.query_temp("tr_path", "[]"));
+        const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
         let node: TestResNode = need_test_objs;
-        for (const key of path) {
-            if (this.isBranch(node)) {
-                const next = node[key];
-                if (next && this.isBranch(next)) {
-                    node = next;
-                } else {
-                    break;
-                }
+        for (const idx of path) {
+            if (!this.isBranch(node)) break;
+            const keys = Object.keys(node);
+            if (idx >= keys.length) break;
+            const next = node[keys[idx]];
+            if (next && this.isBranch(next)) {
+                node = next;
             } else {
                 break;
             }
@@ -52,7 +82,7 @@ export default class extends USERTASK {
         const node = this.getNode(me);
         const max = Object.keys(node).length;
         if (max === 0) return 0;
-        const cur = me.query_temp("tr_cur", 0);
+        const { cur } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
         return Math.min(cur, max - 1);
     }
 
@@ -69,7 +99,8 @@ export default class extends USERTASK {
     // ============ UI 查询 ============
 
     query_title(me: CHARACTER): string | undefined {
-        const depth: number = JSON.parse(me.query_temp("tr_path", '[]')).length;
+        const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
+        const depth = path.length;
         if (depth > 0) {
             return `<hic>测试资源领取</hic> <mem>(第${depth + 1}层)</mem>`;
         }
@@ -77,7 +108,7 @@ export default class extends USERTASK {
     }
 
     query_desc(me: CHARACTER): string {
-        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
+        const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
         const node = this.getNode(me);
         const keys = Object.keys(node);
 
@@ -90,7 +121,8 @@ export default class extends USERTASK {
 
         // 面包屑导航
         if (path.length > 0) {
-            const breadcrumb = ["<mem>测试资源领取</mem>", ...path.map((k) => `<mem>${k}</mem>`)];
+            const pathKeys = this.getPathKeys(path);
+            const breadcrumb = ["<mem>测试资源领取</mem>", ...pathKeys.map((k) => `<mem>${k}</mem>`)];
             lines.push(breadcrumb.join(" <mem>→</mem> "));
             lines.push("");
         }
@@ -131,7 +163,7 @@ export default class extends USERTASK {
      * - 非根菜单时额外显示 [返回上层] [主菜单]
      */
     private sendMenuButtons(me: CHARACTER): void {
-        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
+        const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
         const node = this.getNode(me);
         const keys = Object.keys(node);
         if (keys.length === 0) return;
@@ -164,6 +196,7 @@ export default class extends USERTASK {
     on_finish(me: CHARACTER, par?: string): boolean {
         if (!par) {
             // 无参数：切换光标
+            const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
             const node = this.getNode(me);
             const keys = Object.keys(node);
             if (keys.length === 0) {
@@ -172,7 +205,7 @@ export default class extends USERTASK {
             }
             const cur = this.getCursor(me);
             const next = (cur + 1) % keys.length;
-            me.set_temp("tr_cur", next);
+            me.set_temp("tr_path_cur", this.encodePathCur(path, next));
             this.sendMenuButtons(me);
             return true;
         }
@@ -185,24 +218,22 @@ export default class extends USERTASK {
     }
 
     start(me: CHARACTER): boolean | void {
-        const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
+        const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
         if (path.length > 0) {
             path.pop();
-            me.set_temp("tr_path", JSON.stringify(path));
-            me.set_temp("tr_cur", 0);
+            me.set_temp("tr_path_cur", this.encodePathCur(path, 0));
             me.notify(path.length === 0
                 ? "<hic>已返回测试资源主菜单。</hic>"
                 : "<hic>已返回上一层。</hic>");
         } else {
-            me.set_temp("tr_cur", 0);
+            me.set_temp("tr_path_cur", this.encodePathCur([], 0));
             me.notify("<hic>测试资源领取菜单已刷新。</hic>");
         }
         this.sendMenuButtons(me);
     }
 
     giveup(me: CHARACTER): void {
-        me.set_temp("tr_path", '[]');
-        me.set_temp("tr_cur", 0);
+        me.set_temp("tr_path_cur", "0");
         me.notify("<hic>已返回测试资源主菜单。</hic>");
         this.sendMenuButtons(me);
     }
@@ -238,11 +269,12 @@ export default class extends USERTASK {
     private applySelection(me: CHARACTER, key: string, value: TestResNode): boolean {
         if (this.isLeaf(value)) {
             const [objPath, count] = value;
-            const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
+            const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
 
             const obj = me.add_obj(objPath, count);
             if (obj) {
-                const fullPath = [...path, key].join(" → ");
+                const pathKeys = this.getPathKeys(path);
+                const fullPath = [...pathKeys, key].join(" → ");
                 me.notify(`<hig>你领取了【${key}】：${obj.unit_name(count)}。</hig>`);
                 me.notify(`<mem>路径：测试资源领取 → ${fullPath}</mem>`);
             } else {
@@ -254,10 +286,12 @@ export default class extends USERTASK {
         }
 
         if (this.isBranch(value)) {
-            const path: string[] = JSON.parse(me.query_temp("tr_path", '[]'));
-            path.push(key);
-            me.set_temp("tr_path", JSON.stringify(path));
-            me.set_temp("tr_cur", 0);
+            const { path } = this.parsePathCur(me.query_temp("tr_path_cur", "0"));
+            const node = this.getNode(me);
+            const keys = Object.keys(node);
+            const idx = keys.indexOf(key);
+            path.push(idx);
+            me.set_temp("tr_path_cur", this.encodePathCur(path, 0));
             me.notify(`<hic>进入【${key}】子菜单，共 ${Object.keys(value).length} 项可选。</hic>`);
             this.sendMenuButtons(me);
             return true;

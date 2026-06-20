@@ -8,7 +8,7 @@ const task_css = `
 
 .dialog-tasks>.task-item {
     border-radius: 6px;
-    background-color: #111111;
+    background-color: var(--bg-surface);
     border-left-width: 4px;
     border-left-style: solid;
     position: relative;
@@ -62,7 +62,7 @@ const task_css = `
 .task-item>.task-btn {
     width: 4.5em;
     display: inline-block;
-    border-left: 1px solid #343434;
+    border-left: 1px solid var(--border-primary);
     text-align: center;
     font-weight: bold;
     background-color: transparent;
@@ -73,11 +73,11 @@ const task_css = `
 }
 
 .task-item>.task-btn:hover {
-    background-color: #222;
+    background-color: var(--bg-surface2);
 }
 
 .dialog-tasks>.task-item>.start {
-    color: gray;
+    color: var(--text-muted);
 }
 
 .dialog-tasks>.task-item>.finish {

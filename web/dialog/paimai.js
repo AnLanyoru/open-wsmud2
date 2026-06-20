@@ -13,10 +13,10 @@ const paimai_css = `
 
 .dialog-pms>.pm-item {
     border-radius: 6px;
-    background-color: #111111;
+    background-color: var(--bg-surface);
     border-left-width: 4px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     position: relative;
     padding-left: 0.5em;
     line-height: 2em;
@@ -26,7 +26,7 @@ const paimai_css = `
 
 .dialog-pms>.selected {
     border-left-color: #00ff00;
-    background-color: #222;
+    background-color: var(--bg-surface2);
 }
 
 .dialog-pms>.pm-item>.pm-title {
@@ -42,13 +42,13 @@ const paimai_css = `
 .dialog-pms>.pm-item>.pm-mem {
 
     padding-right: 1em;
-    color: gray;
+    color: var(--text-muted);
     font-size: 0.8em;
 }
 
 .dialog-pms>.pm-item>.pm-add {
     width: 4em;
-    border-left: 1px solid #343434;
+    border-left: 1px solid var(--border-primary);
     text-align: center;
     color: #008080
 }

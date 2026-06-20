@@ -55,6 +55,9 @@ export default {
                         this.customElement.find("#" + prop).show().val(value != 1 ? value : "");
                     }
                     break;
+                case "theme":
+                    this.select_value(item.find(".color-item"), value);
+                    break;
                 case "top_safe_distance":
                 case "bottom_safe_distance":
                     item.find(".setting-range").val(value);
@@ -290,6 +293,9 @@ export default {
             case "font":
                 value = elem[0].style.fontFamily;
                 if (!value) value = "none";
+                break;
+            case "theme":
+                value = elem.attr('value');
                 break;
         }
         Setting.save(forProp, value);
@@ -629,6 +635,16 @@ const setting_template = `
                     <span class="color-item" style="background-color:#bdc3c7"></span>
                 </span>
             </div>
+            <div class="setting-item" for="theme">
+                <span class="title">
+                    界面主题
+                </span>
+                <span class="color-list">
+                    <span class="color-item theme-item select" value="dark">暗</span>
+                    <span class="color-item theme-item" value="light">亮</span>
+                    <span class="color-item theme-item" value="book">书</span>
+                </span>
+            </div>
             <div class="setting-item" for="combat_size">
                 <span class="title">
                     底部操作栏大小
@@ -888,11 +904,11 @@ const setting_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -913,7 +929,7 @@ const setting_css = `
     width: 3em;
     height: 1.25em;
     display: inline-block;
-    border: 2px solid #cecece;
+    border: 2px solid var(--color-item-border);
     line-height: 1.25em;
     text-align: center;
     border-radius: 1em;
@@ -921,30 +937,30 @@ const setting_css = `
 }
 
 .color-list>.select {
-    border-color: #ff0000;
+    border-color: var(--color-item-select);
 }
 .setting-item>.button {
     flex: 0;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     padding-left: 1em;
     padding-right: 1em;
-    border-left: 1px solid gray;
+    border-left: 1px solid var(--border-secondary);
 }
 
 .setting-item>.button:active {
-    background-color: #111;
+    background-color: var(--bg-surface);
 }
 
 
 .setting>h3 {
-    color: #C0C0C0;
-    border-bottom: 1px solid #343434;
+    color: var(--text-header);
+    border-bottom: 1px solid var(--border-primary);
     padding-bottom: 0.5em;
 }
 
 .setting>.settingbox {
     margin-left: 0.625em;
-    border: 1px solid gray;
+    border: 1px solid var(--border-secondary);
     background-color: transparent;
     color: unset;
     resize: none;
@@ -956,18 +972,18 @@ const setting_css = `
     flex: 1;
     max-width: 8em;
     margin: 0 0.5em;
-    accent-color: #008000;
+    accent-color: var(--switch-on-bg);
     cursor: pointer;
 }
 
 .setting .range-value {
     width: 2.5em;
     text-align: center;
-    color: #cecece;
+    color: var(--text-secondary);
 }
 
 .setting>.setting-ok {
-    border: 1px solid gray;
+    border: 1px solid var(--border-secondary);
     background-color: transparent;
     color: unset;
     width: 5rem;
@@ -1001,8 +1017,8 @@ const setting_css = `
 
 .extend-list>.buttons>button {
     margin: 0.5em;
-    color: gray;
-    background-color: #111;
+    color: var(--text-muted);
+    background-color: var(--bg-surface);
     line-height: 2em;
 }
 
@@ -1020,16 +1036,16 @@ const setting_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
-    border-top: 1px solid #222;
-    border-bottom: 1px solid #222;
+    border-top: 1px solid var(--bg-surface2);
+    border-bottom: 1px solid var(--bg-surface2);
     border-right: 1px solid transparent;
 }
 
@@ -1037,8 +1053,8 @@ const setting_css = `
     flex: 1;
     border: none;
     outline: none;
-    background-color: black;
-    color: #cecece;
+    background-color: var(--bg-input);
+    color: var(--text-secondary);
     padding-left: 1em;
 }
 
@@ -1065,7 +1081,7 @@ const setting_css = `
     padding-inline-start: 0.5em;
     width: 100%;
     text-align: center;
-    color: gray;
+    color: var(--text-muted);
     flex: 1;
     overflow: auto;
     list-style-position: inside;
@@ -1082,8 +1098,8 @@ const setting_css = `
 
 .extend-menus>button {
     margin: 1em 0px;
-    color: gray;
-    background-color: #111;
+    color: var(--text-muted);
+    background-color: var(--bg-surface);
 }
 
 .skey-item {
@@ -1092,11 +1108,11 @@ const setting_css = `
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: gray;
+    border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -1106,12 +1122,12 @@ const setting_css = `
     flex: 1;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: gray;
+    color: var(--text-muted);
     overflow: hidden;
 }
 
 .skey-item>.skey-key {
-    background-color: #222;
+    background-color: var(--bg-surface2);
     width: 7em;
     text-align: center;
 }
@@ -1123,7 +1139,7 @@ const setting_css = `
     width: 5em;
     line-height: 2em;
     border-radius: 1em;
-    background: #222;
+    background: var(--switch-bg);
     cursor: pointer;
     -ms-user-select: none;
     -moz-user-select: none;
@@ -1139,7 +1155,7 @@ const setting_css = `
     height: 2em;
     width: 2em;
     border-radius: 1em;
-    background: gray;
+    background: var(--switch-knob);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     transition: 0.3s;
     -webkit-transition: 0.3s;
@@ -1147,23 +1163,23 @@ const setting_css = `
 }
 
 .switch>.switch-text {
-    color: #898989;
+    color: var(--switch-text);
     margin-left: 0.625em;
 }
 
 .on {
-    background-color: #008000;
+    background-color: var(--switch-on-bg);
 }
 
 .on>.switch-button {
     right: 0px;
     left: auto;
-    background-color: #eee;
+    background-color: var(--switch-knob-on);
 }
 
 .on>.switch-text {
     margin-right: 0.625em;
     margin-left: 0px;
-    color: #eee;
+    color: var(--switch-text-on);
 }
 `;

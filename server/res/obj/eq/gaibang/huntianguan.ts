@@ -31,7 +31,7 @@ export default class extends EQUIPMENT {
                 break;
             case 5:
                 this.prop = { fy: 355, fy_per: 5, str: 35, con: 30, hp_per: 5 };
-                this.desc = "丐帮镇派之冠，虽看似随意，实则蕴含丐帮千年武学精华。";
+                this.desc = "丐帮长老的头冠，虽看似随意，实则蕴含丐帮千年武学精华。";
                 this.group_name = "huntian5";
                 break;
         }

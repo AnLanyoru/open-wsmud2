@@ -183,7 +183,7 @@ const shop_css = `
 
 .dialog-shop>.shop-item {
     border-radius: 6px;
-    background-color: #111111;
+    background-color: var(--bg-surface);
     border-left-width: 4px;
     border-left-style: solid;
     position: relative;
@@ -250,7 +250,7 @@ const shop_css = `
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     flex-wrap: wrap;
 }
 

@@ -462,7 +462,7 @@ const skills_css = `
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
 }
 
@@ -513,7 +513,7 @@ const skills_css = `
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
@@ -529,7 +529,7 @@ const skills_css = `
 
 .dialog-skills>.book-item>.book-action {
     flex: 0;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     padding-left: 1em;
     padding-right: 1em;
 }

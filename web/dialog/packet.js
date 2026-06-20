@@ -521,13 +521,13 @@ const packet_css = `
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
 }
 
 .eq-list>.empty {
-    border-color: gray;
-    color: gray;
+    border-color: var(--border-secondary);
+    color: var(--text-muted);
 }
 
 .eq-list>.eq-item>.eq-name {
@@ -537,7 +537,7 @@ const packet_css = `
 
 .eq-list>.eq-item>.eq-type {
     background-color: #333;
-    color: gray;
+    color: var(--text-muted);
     line-height: 1.875em;
     display: inline-block;
     height: 1.875em;
@@ -546,7 +546,7 @@ const packet_css = `
 }
 
 .obj-list>.obj-item {
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 1.875em;
     min-height: 1.875em;
     padding-left: 0.3125em;
@@ -572,10 +572,10 @@ const packet_css = `
     padding-left: 0.5em;
     padding-right: 0.5em;
     line-height: 1.5em;
-    background-color: #222;
+    background-color: var(--bg-surface2);
     border-radius: 0.5em;
     margin-top: 0.2em;
-    color: gray;
+    color: var(--text-muted);
     display: none;
     cursor: pointer;
     user-select: none;
@@ -631,7 +631,7 @@ const list_css = `
     line-height: 2em;
     width: 5em;
     text-align: center;
-    background-color: #111;
+    background-color: var(--bg-surface);
     border-radius: 4px;
     margin-bottom: 0.5em;
     margin-right: 0.5em;
@@ -641,7 +641,7 @@ const list_css = `
 }
 
 .dialog-list>.otype-list>.select {
-    background-color: #222;
+    background-color: var(--bg-surface2);
     color: #00ff00;
     border-left-width: 2px;
     border-left-style: solid;
@@ -674,7 +674,7 @@ const list_css = `
     flex: 1;
 }
 .trade-list>.obj-item {
-    background-color: #111;
+    background-color: var(--bg-surface);
     line-height: 1.875em;
     min-height: 1.875em;
     padding-left: 0.3125em;

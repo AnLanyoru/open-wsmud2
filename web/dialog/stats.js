@@ -268,7 +268,7 @@ const stats_css = `
     white-space: nowrap;
     line-height: 2em;
     text-align: center;
-    background-color: #111;
+    background-color: var(--bg-surface);
     border-radius: 4px;
     margin-bottom: 0.5em;
     margin-right: 0.5em;
@@ -278,7 +278,7 @@ const stats_css = `
 }
 
 .stats-container-left>.select {
-    background-color: #222;
+    background-color: var(--bg-surface2);
     color: #00ff00;
     border-left-width: 2px;
     border-left-style: solid;
@@ -298,7 +298,7 @@ const stats_css = `
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 0.5em;
-    background-color: #111;
+    background-color: var(--bg-surface);
     cursor: pointer;
     color: inherit;
 }
@@ -346,7 +346,7 @@ const stats_css = `
 .stats-span {
     float: right;
     padding-right: 10px;
-    color: #C0C0C0;
+    color: var(--text-header);
     line-height: 2.5em;
 }
 
