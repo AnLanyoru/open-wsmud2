@@ -14,9 +14,9 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.JEWELS;
     distime = 600000;
     prop: PropMap = {
-        fy: 200,
-        str: 100,
-        mz: 160,
+        gj_per: 10,
+        mz_per: 10,
+        str: 300,
         diff_fy_per: 10,
         desc: "激活后可以镇压敌人的下个绝招60秒，无法抵抗，冷却时间600秒"
     };
@@ -39,7 +39,7 @@ export default class extends EQUIPMENT {
             id: "kongtong",
             name: "镇压",
             desc: "你被崆峒印镇压，无法释放绝招",
-            duration: 30000,
+            duration: 60000,
             downside: false,
             on_pfm: this.on_pfm
         }, me);

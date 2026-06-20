@@ -1,13 +1,13 @@
 /**
  * SKILL 技能基类 & PERFORM 绝招类
  */
-import {BASE} from "../base.js";
-import {WORLD} from "../world.js";
-import {UTIL} from "../util.js";
-import {FAMILIES} from "./family.js";
-import type {FAMILY} from './family.js';
-import type {CHARACTER, DoAttackPar} from '../char/character.js';
-import {PROPERTIES, SKILL_TYPES} from "../const.js";
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { UTIL } from "../util.js";
+import { FAMILIES } from "./family.js";
+import type { FAMILY } from './family.js';
+import type { CHARACTER, DoAttackPar } from '../char/character.js';
+import { PROPERTIES, SKILL_TYPES } from "../const.js";
 import { SkillsMap } from "../char/skills_map.js";
 import type { PropMap } from "../../types/props.js";
 
@@ -811,7 +811,7 @@ export class SKILL extends BASE {
      * @param obj
      */
     set_pfm_data(name: string, obj: Partial<PERFORM>): void {
-        if (!this.pfm_set) 
+        if (!this.pfm_set)
             return console.error("设置技能绝招资源失败，不能在运行时注入绝招资源，请在初始化前注入");
         this.pfm_set[name] = obj;
     }
@@ -1122,7 +1122,7 @@ export class PERFORM {
     allow_faint?: boolean;
     /** 允许在安全区御使用 */
     allow_safe?: boolean;
-    
+
     /** 是否禁止复制 */
     no_copy?: boolean;
 
@@ -1211,16 +1211,16 @@ export class PERFORM {
 
     /** 查询冷却时间 */
     query_distime(me: CHARACTER, lv?: number, isref?: boolean): number {
-        var dis = this.distime ?? 0;
+        let dis = this.distime ?? 0;
         if (!dis) dis = me.gjsd;
-        if (isref) dis = dis * 2;
+        if (isref) dis *= 2;
+        dis = me.query_prop("distime")
         if (this.distime_key) {
-            /** 临时绝招冷却变化标识 */
-            const dt_key = "dt/" + this.origin_skill + "/" + this.pid;
-            dis = dis - me.query_prop("distime") - me.query_prop(this.distime_key) + me.query_temp(dt_key, 1);
-        } else {
-            dis = dis - me.query_prop("distime");
-        }
+            dis -= me.query_prop(this.distime_key);
+        } 
+        /** 临时绝招冷却变化标识 */
+        const dt_key = "dt/" + this.origin_skill + "/" + this.pid;
+        dis += me.query_temp(dt_key, 0)
         if (this.distime_per_key) {
             dis = dis - dis * (me.query_prop("distime_per") + me.query_prop(this.distime_per_key)) / 100;
         } else {
