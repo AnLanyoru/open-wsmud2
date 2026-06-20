@@ -715,7 +715,7 @@ export class CHARACTER extends ITEM {
      */
     do_command(cmdName: string, str?: string): void {
         str = str || '';
-        let cmd: COMMAND | undefined = WORLD.COMMANDS[cmdName] as COMMAND | undefined;
+        let cmd: COMMAND | null = WORLD.COMMANDS[cmdName];
         let pars: [CHARACTER, ...string[]];
         if (cmd && cmd.regex && str) {
             const match = cmd.regex.exec(str);
@@ -726,7 +726,7 @@ export class CHARACTER extends ITEM {
         if (this.do_item_action(this.environment, cmdName, pars)) {
             return;
         }
-        cmd = cmd || (WORLD.DEFAULT_COMMAND as COMMAND | undefined);
+        cmd = cmd || WORLD.DEFAULT_COMMAND;
         if (cmd) {
             if (!this.check_command(cmd)) return;
             if (cmd.enter.apply(cmd, pars) !== false) {

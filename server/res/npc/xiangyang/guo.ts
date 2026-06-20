@@ -50,8 +50,8 @@ export default class extends NPC {
         // 军功兑换 — 1点军功兑换100两白银
         this.add_action("xy_jgdh", "军功兑换", function (this: NPC, me: USER) {
             const jg = Number(me.query_temp("jg", 0)) || 0;
-            if (jg <= 0) return me.notify_fail("你没有可兑换的军功。");
-            let num = 100
+            if (jg <= 0) return me.notify("你没有可兑换的军功。");
+            let num = 1
             me.add_temp("jg", -num);
             me.add_money(10000 * num);
             me.notify("<hiy>你兑换了" + num + "点军功，获得" + num + "两黄金。剩余军功：" + (jg - 1) + "。</hiy>");
@@ -61,13 +61,13 @@ export default class extends NPC {
         this.add_action("xy_jx", "捐献军饷", function (this: NPC, me: USER) {
             const task = TASK.GET("xiangyang") as XiangYangTask | undefined;
             const max = task?.jg_limit(me) ?? 0;
-            if (!(max > 0)) return me.notify_fail("你还是先历练历练再来捐献军饷吧。");
+            if (!(max > 0)) return me.notify("你还是先历练历练再来捐献军饷吧。");
             const current = me.query_temp("jg_week", 0);
-            if (current >= max) return me.notify_fail("你本周的军功已经达到上限，无需再捐。");
+            if (current >= max) return me.notify("你本周的军功已经达到上限，无需再捐。");
             let least_num = max - current
             let rate = 3 * least_num; // 3 gold = 300 silver
             let need_money = rate * 10000
-            if (me.money < need_money) return me.notify_fail(`你没有足够的黄金，获得${least_num}点军功需要捐献${rate}两黄金。`);
+            if (me.money < need_money) return me.notify(`你没有足够的黄金，获得${least_num}点军功需要捐献${rate}两黄金。`);
 
             me.add_money(-need_money);
             const newWeek = me.add_temp("jg_week", least_num, UTIL.diff_week_time());
