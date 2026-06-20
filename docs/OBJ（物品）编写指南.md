@@ -243,7 +243,7 @@ on_create?(path?: string, par?: string): void;
 
 ### on_init(me?)
 
-物品**被分配给角色时**调用（如 `me.add_obj_or_load()` 时）。
+物品**被分配给角色时**调用（如 `me.add_obj()` 时）。
 
 ```typescript
 on_init?(me: CHARACTER): void;
@@ -1784,7 +1784,7 @@ OBJ.clone_to("eq/lv0/jian", container);     // 给容器放一把铁剑
 ```typescript
 // 创建并添加物品到玩家背包
 var item = OBJ.CREATE("drug/yao#1", 3);
-me.add_obj_or_load(item);  // 自动堆叠并触发 on_init/on_reload
+me.add_obj(item);  // 自动堆叠并触发 on_init/on_reload
 ```
 
 ### 克隆已有物品
