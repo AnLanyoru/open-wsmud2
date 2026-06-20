@@ -105,7 +105,7 @@ export default class extends OBJ {
         this.grade = lv;
         const q = QUALITIES[this.grade] ?? "传说";
         this.name = "门派装备兑换券";
-        this.desc = `一张可以兑换${q}门派装备的兑换券，使用后可自选门派和装备。`;
+        this.desc = `一张可以兑换门派${q}装备的兑换券，使用后可自选门派和装备。`;
     }
 
     on_use(me: CHARACTER, par?: string) {

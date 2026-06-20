@@ -1,6 +1,6 @@
-import {USERTASK} from "../../core/task/playertask.js";
-import {WORLD} from "../../core/world.js";
-import type {CHARACTER} from "../../core/char/character.js";
+import { USERTASK } from "../../core/task/playertask.js";
+import { WORLD } from "../../core/world.js";
+import type { CHARACTER } from "../../core/char/character.js";
 
 export default class extends USERTASK {
     id = "growup";
