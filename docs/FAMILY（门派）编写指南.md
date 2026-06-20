@@ -88,6 +88,63 @@ export default class extends FAMILY {
 
 ---
 
+### 类型标注准则
+
+> **编写门派时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型：**
+   ```typescript
+   // ✅ 正确
+   def_npcs: string[][] = [
+       ["shaolin/xuannan", "shaolin/fangzhang"],
+   ];
+   npc_skills: SkillSet = [
+       ["dodge", 800],
+       ["force", 800],
+       ["yijinjing", 800, "force"],
+   ];
+   boss_skills: SkillSet = [
+       ["dodge", 800],
+       ["yijinjing2", 800, "force"],
+   ];
+
+   // ❌ 错误：缺少类型标注
+   def_npcs = [["shaolin/xuannan", "shaolin/fangzhang"]];
+   npc_skills = [["dodge", 800]];
+   ```
+
+2. **重写方法必须显式标注参数类型和返回类型：**
+   ```typescript
+   // ✅ 正确
+   call(me: USER, isbad?: boolean): string {
+       var age = me.query_age();
+       if (me.gender == 2) {
+           if (age < 18) return isbad ? "小贱人" : "小姑娘";
+           else return isbad ? "贱人" : "姑娘";
+       }
+       return isbad ? "臭贼" : "壮士";
+   }
+   call_me(me: USER, isbad?: boolean): string {
+       return isbad ? "大爷我" : "在下";
+   }
+   on_kill(npc: NPC, me: USER): void {
+       if (this.boss) {
+           this.boss.do_command("chat", "门派被攻击！");
+       }
+   }
+   on_battle(enemy: FAMILY): void {
+       if (this.boss) {
+           this.boss.do_command("chat", "迎战！");
+       }
+   }
+
+   // ❌ 错误：缺少参数类型和返回类型
+   call(me, isbad) { return "朋友"; }
+   on_kill(npc, me) { }
+   ```
+
+---
+
 ## 3. FAMILY 基类详解
 
 ### 3.1 类层次

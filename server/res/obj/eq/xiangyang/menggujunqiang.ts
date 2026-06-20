@@ -18,11 +18,11 @@ export default class extends EQUIPMENT {
         this.grade = lv;
         switch (lv) {
             case 2:
-                this.prop = { gj: 60, str: 10, zj: 60 };
+                this.prop = { gj: 60, zj: 60 };
                 this.desc = "蒙古探马的短枪，简单粗陋。";
                 break;
             case 3:
-                this.prop = { gj: 145, str: 22, zj: 150, diff_fy_per: 2 };
+                this.prop = { gj: 145, str: 22, zj: 150 };
                 this.desc = "蒙古轻骑的长枪，草原驰骋的利器。";
                 break;
             case 4:

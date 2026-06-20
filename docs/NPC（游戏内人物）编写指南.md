@@ -114,6 +114,60 @@ server/res/npc/bj/ao/jiading.ts   →  import {NPC} from "../../../../core/char/
 
 ---
 
+### 类型标注准则
+
+> **编写 NPC 时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型：
+   ```typescript
+   // ✅ 正确：标注类型
+   prop: Record<string, number> = {
+       gj: 8000,
+       fy: 3000,
+       mz: 5000,
+   };
+
+   // ❌ 错误：缺少类型标注
+   prop = {
+       gj: 8000,
+       fy: 3000,
+   };
+   ```
+
+2. **重写方法必须显式标注参数类型和返回类型。** 覆写父类（NPC/CHARACTER/ITEM/BASE）的方法时，所有参数和返回值都必须标注类型：
+   ```typescript
+   // ✅ 正确
+   on_enter(me: CHARACTER): void {
+       me.notify("欢迎光临！");
+   }
+   on_accept(me: CHARACTER, obj: string, count: number): boolean {
+       if (obj !== "money") return false;
+       return true;
+   }
+   on_master(me: CHARACTER): boolean | void {
+       if (me.query_skill("force", 0) < 100) return false;
+   }
+
+   // ❌ 错误：缺少参数类型和返回类型
+   on_enter(me) {
+       me.notify("欢迎光临！");
+   }
+   on_accept(me, obj, count) {
+       if (obj !== "money") return false;
+       return true;
+   }
+   ```
+
+3. **回调函数中的 `this` 需特别留意。** `add_action` 中传入普通函数时，如需访问 NPC 实例，使用箭头函数或提前保存引用，同时标注参数类型：
+   ```typescript
+   // ✅ 正确：箭头函数保持 this 指向 + 参数类型标注
+   this.add_action("zhudian", "住店", (me: CHARACTER): void => {
+       this.send_room("$N说道：客官请进。");
+   });
+   ```
+
+---
+
 ## 3. NPC 类的继承体系
 
 ```
@@ -908,7 +962,7 @@ export default class extends NPC {
             mz: 5000,
             ds: 4000,
             bj: 30
-        };
+        } as Record<string, number>;
     }
 }
 ```
@@ -946,7 +1000,7 @@ export default class extends NPC {
         );
     }
 
-    on_accept(me, obj, count) {
+    on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
         // 接受物品的逻辑（如收购药材）
         if (obj === "drug/cao") {
             me.notify("平一指点一点头说道：这药草成色不错。");
@@ -954,7 +1008,7 @@ export default class extends NPC {
         }
     }
 
-    on_enter(me) {
+    on_enter(me: CHARACTER): void {
         me.notify("平一指向你点头致意：这位" + me.call() + "，看病还是买药？");
     }
 }
@@ -1103,13 +1157,13 @@ export default class extends NPC {
     }
 
     // 检查是否可学习（必须是自己徒弟）
-    on_teach(me, sk) {
+    on_teach(me: CHARACTER, sk: string): boolean | void {
         if (!this.is(me.query_temp("master")))
             return me.notify_fail(this.name + "对你说道：请教？这怎么敢当！");
     }
 
     // 拜师条件检查
-    on_master(me) {
+    on_master(me: CHARACTER): boolean | void {
         if (me.query_skill("huashanxinfa", 0) < 100)
             return me.notify_fail("岳不群说道：你的华山心法掌握程度还不够，需要多加练习。");
         if (me.query_skill("huashanjianfa", 0) < 100)
@@ -1162,7 +1216,7 @@ export default class extends NPC {
     }
 
     // 被击杀时设置任务标记
-    on_die(killer) {
+    on_die(killer: CHARACTER): boolean | void {
         killer.set_temp("fb/ao/wu", 1);
     }
 }
@@ -1205,7 +1259,7 @@ export default class extends NPC {
         me.notify("赵铁笔说道：解除师徒关系需要缴纳手续费。");
     }
 
-    on_accept(me, obj, count) {
+    on_accept(me: CHARACTER, obj: string, count: number): boolean {
         if (obj !== "money") return false;
         if (count === 10000000) {  // 1000 两黄金
             me.notify("赵铁笔说道：你的师徒关系已经解除了。");
@@ -1243,7 +1297,7 @@ export default class extends NPC {
     no_fight = false;   // 可攻击（默认）
 
     // 覆写 die() 方法，防止死亡
-    die() {
+    die(): boolean {
         this.clear_combat_prop();
         this.add_hp(this.max_hp);
         this.send_room('$N身上破损的木头剥落，再次神采奕奕，精气十足。\n');

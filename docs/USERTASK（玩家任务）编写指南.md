@@ -45,6 +45,57 @@ USERTASK（玩家任务）是游戏引擎中为每个玩家独立设计的任务
 
 ---
 
+### 类型标注准则
+
+> **编写玩家任务时，必须遵循以下类型标注规则：**
+
+1. **重写方法必须显式标注参数类型和返回类型：**
+   ```typescript
+   // ✅ 正确
+   query_title(me: CHARACTER): string | undefined {
+       return `<hic>我的任务</hic>`;
+   }
+   query_desc(me: CHARACTER): string | undefined {
+       return `进度：${me.query_temp("progress", 0)}/10`;
+   }
+   query_state(me: CHARACTER): number | undefined {
+       let progress = me.query_temp("progress", 0);
+       if (progress >= 10) return 2;
+       if (progress > 0) return 1;
+       return 0;
+   }
+   start(me: CHARACTER): boolean | void {
+       me.set_temp("progress", 0);
+       me.notify("<hic>任务开始！</hic>");
+   }
+   on_finish(me: CHARACTER): boolean {
+       let progress = me.query_temp("progress", 0);
+       if (progress < 10) return false;
+       me.set_temp("progress", 0);
+       me.add_exp(10000, 5000);
+       return true;
+   }
+   on_create(): void {
+       const old = USERTASK.GET('my_task');
+       if (old) this.runtimeMap = (old as typeof this).runtimeMap;
+   }
+
+   // ❌ 错误：缺少参数类型和返回类型
+   start(me) { me.set_temp("progress", 0); }
+   on_finish(me) { return true; }
+   query_state(me) { return 1; }
+   ```
+
+2. **类属性为对象时需标注类型：**
+   ```typescript
+   // ✅ 正确
+   stages: StageDef[] = [
+       { id: 0, title: "收集物资", ... },
+   ];
+   ```
+
+---
+
 ## 2. 继承体系
 
 ### 类层次
@@ -519,14 +570,14 @@ import {OBJ} from "../../core/item/obj.js";
 export default class DailyRewardTask extends USERTASK {
     id = "daily_reward";
 
-    on_create() {
+    on_create(): void {
         // 可在热更新时恢复状态
     }
 
     /**
      * 查询可领取次数（根据时间累积计算）
      */
-    query_claimable(me): number {
+    query_claimable(me: CHARACTER): number {
         let baseTime = me.query_temp("daily_base_time", 0);
         if (!baseTime) return 0;
 
@@ -536,14 +587,14 @@ export default class DailyRewardTask extends USERTASK {
         return Math.min(count, 7);
     }
 
-    query_title(me) {
+    query_title(me: CHARACTER): string | undefined {
         let count = this.query_claimable(me);
         let completed = me.query_temp("daily_done", false);
         if (completed) return `<hig>每日任务（已完成）</hig>`;
         return `<hic>每日任务</hic>`;
     }
 
-    query_desc(me) {
+    query_desc(me: CHARACTER): string | undefined {
         let count = this.query_claimable(me);
         let completed = me.query_temp("daily_done", false);
 
@@ -566,7 +617,7 @@ export default class DailyRewardTask extends USERTASK {
         return "等待奖励累积中……";
     }
 
-    query_state(me) {
+    query_state(me: CHARACTER): number | undefined {
         let completed = me.query_temp("daily_done", false);
         if (completed) return 3; // 已完成
 
@@ -578,7 +629,7 @@ export default class DailyRewardTask extends USERTASK {
     /**
      * 玩家主动开始任务
      */
-    start(me) {
+    start(me: CHARACTER): boolean | void {
         if (!me.query_temp("daily_base_time", 0)) {
             // 首次启动，记录基准时间
             me.set_temp("daily_base_time", Date.now());
@@ -588,7 +639,7 @@ export default class DailyRewardTask extends USERTASK {
         }
     }
 
-    on_finish(me) {
+    on_finish(me: CHARACTER): boolean {
         let count = this.query_claimable(me);
         if (!(count > 0)) {
             me.notify("<red>暂无奖励可领取。</red>");
@@ -644,7 +695,7 @@ export default class DailyRewardTask extends USERTASK {
         return true;
     }
 
-    giveup(me) {
+    giveup(me: CHARACTER): void {
         me.remove_temp("daily_base_time");
         me.remove_temp("daily_done");
         me.notify("<hic>你放弃了每日任务。</hic>");
@@ -669,13 +720,13 @@ export default class HuntTask extends USERTASK {
     /** 任务目标数量 */
     targetCount = 20;
 
-    query_title(me) {
+    query_title(me: CHARACTER): string | undefined {
         let progress = me.query_temp("hunt_progress", 0);
         if (progress >= this.targetCount) return `<hig>狩猎任务（可领取）</hig>`;
         return `<hic>狩猎任务</hic>`;
     }
 
-    query_desc(me) {
+    query_desc(me: CHARACTER): string | undefined {
         let progress = me.query_temp("hunt_progress", 0);
         let isActive = me.query_temp("hunt_active", false);
 
@@ -696,7 +747,7 @@ export default class HuntTask extends USERTASK {
         // return `[${'■'.repeat(filled)}${'□'.repeat(barLength - filled)}] ${progress}/${this.targetCount}`;
     }
 
-    query_state(me) {
+    query_state(me: CHARACTER): number | undefined {
         if (!me.query_temp("hunt_active", false)) return 0; // 未激活，不显示
         let progress = me.query_temp("hunt_progress", 0);
         if (progress >= this.targetCount) return 2; // 可领取
@@ -706,7 +757,7 @@ export default class HuntTask extends USERTASK {
     /**
      * 从 NPC 处接取任务
      */
-    start(me) {
+    start(me: CHARACTER): boolean | void {
         if (me.query_temp("hunt_active", false)) {
             me.notify("你已经在进行狩猎任务了。");
             return false;
@@ -734,7 +785,7 @@ export default class HuntTask extends USERTASK {
         }
     }
 
-    on_finish(me) {
+    on_finish(me: CHARACTER): boolean {
         if (!me.query_temp("hunt_active", false)) {
             me.notify("<red>你没有接取狩猎任务。</red>");
             return false;
@@ -897,14 +948,14 @@ export default class MultiStageTask extends USERTASK {
     /**
      * 获取玩家当前阶段
      */
-    getStage(me): number {
+    getStage(me: CHARACTER): number {
         return me.query_temp("multi_stage", 0) ?? 0;
     }
 
     /**
      * 推进到下一阶段
      */
-    nextStage(me): boolean {
+    nextStage(me: CHARACTER): boolean {
         let stage = this.getStage(me);
         if (stage >= this.stages.length) {
             me.notify("你已经完成了所有阶段。");
@@ -934,14 +985,14 @@ export default class MultiStageTask extends USERTASK {
         return true;
     }
 
-    query_title(me) {
+    query_title(me: CHARACTER): string | undefined {
         let stage = this.getStage(me);
         if (stage >= this.stages.length) return `<hig>历练任务（已完成）</hig>`;
         if (this.stages[stage].checkComplete(me)) return `<hiy>历练任务（可提交）</hiy>`;
         return `<hic>历练任务</hic>`;
     }
 
-    query_desc(me) {
+    query_desc(me: CHARACTER): string | undefined {
         let stage = this.getStage(me);
         if (stage >= this.stages.length) {
             return "你已经完成了所有阶段的历练任务！<br><mem>感谢你的付出</mem>";
@@ -957,14 +1008,14 @@ export default class MultiStageTask extends USERTASK {
         return `当前阶段【${s.title}】（${stage + 1}/${this.stages.length}）<br>${s.desc}${progressStr}`;
     }
 
-    query_state(me) {
+    query_state(me: CHARACTER): number | undefined {
         let stage = this.getStage(me);
         if (stage >= this.stages.length) return 3; // 全部完成
         if (this.stages[stage].checkComplete(me)) return 2; // 当前阶段可提交
         return 1; // 进行中
     }
 
-    start(me) {
+    start(me: CHARACTER): boolean | void {
         let stage = this.getStage(me);
         if (stage > 0) {
             me.notify("你已经开始了历练任务，继续努力吧。");
@@ -980,12 +1031,12 @@ export default class MultiStageTask extends USERTASK {
     /**
      * 提交当前阶段（由 NPC 交互调用）
      */
-    on_finish(me) {
+    on_finish(me: CHARACTER): boolean {
         return this.nextStage(me);
     }
 
     // 阶段 0 专用：添加木材
-    add_wood(me, count = 1) {
+    add_wood(me: CHARACTER, count: number = 1): void {
         let stage = this.getStage(me);
         if (stage !== 0) {
             me.notify("你现在不需要木材。");
@@ -999,7 +1050,7 @@ export default class MultiStageTask extends USERTASK {
     }
 
     // 阶段 1 专用：标记货物送达
-    mark_delivery(me) {
+    mark_delivery(me: CHARACTER): void {
         let stage = this.getStage(me);
         if (stage !== 1) return;
         me.set_temp("stage_1_done", true);
@@ -1007,14 +1058,14 @@ export default class MultiStageTask extends USERTASK {
     }
 
     // 阶段 2 专用：标记山贼击败
-    mark_boss_killed(me) {
+    mark_boss_killed(me: CHARACTER): void {
         let stage = this.getStage(me);
         if (stage !== 2) return;
         me.set_temp("stage_2_done", true);
         me.notify("<hiy>你击败了山贼头目！回去找管事提交吧。</hiy>");
     }
 
-    giveup(me) {
+    giveup(me: CHARACTER): void {
         // 放弃任务，清理所有阶段数据
         for (let i = 0; i < this.stages.length; i++) {
             me.remove_temp(`stage_${i}_count`);
@@ -1266,28 +1317,28 @@ import {USERTASK} from "../../core/task/playertask.js";
 export default class MyTask extends USERTASK {
     id = "my_task";
 
-    query_title(me) {
+    query_title(me: CHARACTER): string | undefined {
         return `<hic>我的任务</hic>`;
     }
 
-    query_desc(me) {
+    query_desc(me: CHARACTER): string | undefined {
         let progress = me.query_temp("progress", 0);
         return `进度：${progress}/10`;
     }
 
-    query_state(me) {
+    query_state(me: CHARACTER): number | undefined {
         let progress = me.query_temp("progress", 0);
         if (progress >= 10) return 2;
         if (progress > 0) return 1;
         return 0;
     }
 
-    start(me) {
+    start(me: CHARACTER): boolean | void {
         me.set_temp("progress", 0);
         me.notify("<hic>任务开始！</hic>");
     }
 
-    on_finish(me) {
+    on_finish(me: CHARACTER): boolean {
         let progress = me.query_temp("progress", 0);
         if (progress < 10) return false;
         me.set_temp("progress", 0);

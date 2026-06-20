@@ -89,6 +89,54 @@ book/book#sword   → 路径 "book/book#sword"，par 参数为 "#sword"
 
 ---
 
+### 类型标注准则
+
+> **编写物品时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型：
+   ```typescript
+   // ✅ 正确
+   prop: PropMap = { gj: 10, fy: 5 };
+   condition = {
+       skill: { sword: 100 },
+       str: 30,
+   } as Record<string, unknown>;
+
+   // ❌ 错误：缺少类型标注
+   prop = { gj: 10, fy: 5 };
+   ```
+
+2. **重写方法必须显式标注参数类型和返回类型：**
+   ```typescript
+   // ✅ 正确
+   on_use(me: CHARACTER): boolean | void {
+       let hp = me.add_hp(100);
+       if (hp) me.notify("你恢复了" + hp + "点气血。");
+   }
+   on_create(path: string, par: string): void {
+       if (!par) return;
+       var lv = parseInt(par.slice(1));
+   }
+
+   // ❌ 错误：缺少类型标注
+   on_use(me) {
+       let hp = me.add_hp(100);
+   }
+   on_create(path, par) { ... }
+   ```
+
+3. **`group_prop` 和 `on_defense` 必须标注参数与返回类型：**
+   ```typescript
+   group_prop(count: number): PropMap | void {
+       if (count == 3) return { int: 10 };
+   }
+   on_defense(me: CHARACTER, from: CHARACTER, sh: number): number {
+       return Math.floor(sh * 0.9);
+   }
+   ```
+
+---
+
 ## 3. 类继承体系
 
 ```
@@ -366,7 +414,7 @@ export default class extends OBJ {
     action_msg = "吃";      // 快捷按钮文字
     transable = true;       // 可交易出售
 
-    on_use(me: CHARACTER) {
+    on_use(me: CHARACTER): void {
         let hp = me.add_hp(parseInt(String(me.max_hp * 0.3)));
         if (hp) {
             me.notify("<hig>你服下一颗金创药，恢复了" + hp + "点气血。</hig>");
@@ -741,7 +789,7 @@ export default class extends EQUIPMENT {
     value = 2000;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
-    prop = {
+    prop: PropMap = {
         gj: 1    // 攻击 +1
     };
 }
@@ -761,7 +809,7 @@ export default class extends EQUIPMENT {
     grade = 0;
     eq_type = EQUIP_TYPE.CLOTH;
     value = 200;
-    prop = {
+    prop: PropMap = {
         fy: 1      // 防御 +1
     };
 }
@@ -781,7 +829,7 @@ export default class extends EQUIPMENT {
     grade = 4;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
-    prop = { gj: 100, mz: 50, fy: 20 };
+    prop: PropMap = { gj: 100, mz: 50, fy: 20 };
     condition = {
         skill: { sword: 100 },  // 剑法 100 级以上
         str: 30,                 // 后天臂力 30 以上
@@ -807,7 +855,7 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     hole_count = 2;          // 2 个宝石孔
-    prop = {
+    prop: PropMap = {
         gj: 80,
         int: 10,
         add_sh_per: 2
@@ -815,7 +863,7 @@ export default class extends EQUIPMENT {
     group_name = "lm2";      // 套装组名：同组名的装备组成套装
 
     // 根据已装备件数返回对应属性加成
-    group_prop(count: number) {
+    group_prop(count: number): PropMap | void {
         if (count == 3) {
             return { int: 10 };           // 3 件套：悟性 +10
         } else if (count == 5) {
@@ -873,20 +921,20 @@ export default class extends EQUIPMENT {
     unit = "枚";
     grade = 4;
     eq_type = EQUIP_TYPE.RING;
-    prop = { gj: 50, fy: 50 };
+    prop: PropMap = { gj: 50, fy: 50 };
     eq_msg = "$N戴上了$o，戒指闪耀出七彩光芒。";  // 自定义装备广播
     uneq_msg = "$N摘下了$o，光芒随之消散。";        // 自定义卸下广播
 
-    on_eq(me) {
+    on_eq(me: CHARACTER): boolean | void {
         me.notify("你感受到一股神秘的力量涌入体内。");
         // 返回 false 阻止装备
     }
 
-    on_uneq(me) {
+    on_uneq(me: CHARACTER): void {
         me.notify("那股神秘的力量消失了。");
     }
 
-    on_defense(me, from, sh) {
+    on_defense(me: CHARACTER, from: CHARACTER, sh: number): number {
         // 额外减伤 10%
         return Math.floor(sh * 0.9);
     }
@@ -919,7 +967,7 @@ export default class extends EQUIPMENT {
         this.prop = {
             gj: [1, 10, 40, 120, 340, 490, 690][lv],
             kuang1: [1, 5, 10, 15, 20, 25, 30][lv],   // 挖矿效率
-        };
+        } as PropMap;
 
         if (this.grade === 6) {
             this.name = "移山镐";

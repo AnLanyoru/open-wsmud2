@@ -47,6 +47,59 @@
 
 ---
 
+### 类型标注准则
+
+> **编写房间时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型。** 如 `exits`、`hidden_items` 等对象类属性需标注类型：
+   ```typescript
+   // ✅ 正确
+   exits: Record<string, string> = {
+       east: "yz/beidajie2",
+       west: "yz/wumiao",
+   };
+
+   // ❌ 错误
+   exits = {
+       east: "yz/beidajie2",
+   };
+   ```
+
+2. **重写方法（回调钩子）必须显式标注参数类型和返回类型：**
+   ```typescript
+   // ✅ 正确
+   on_enter(me: CHARACTER): void {
+       me.notify("欢迎来到" + this.name);
+   }
+   on_leave(me: CHARACTER, dir: string): boolean | void {
+       if (dir === "up") return me.notify_fail("必须先打败守卫。");
+   }
+   on_heart_beat(dt: number): void {
+       for (const item of this.items) {
+           if (item.check_character()) {
+               item.add_hp(Math.floor(item.max_hp / 10));
+           }
+       }
+   }
+
+   // ❌ 错误：缺少参数类型和返回类型
+   on_enter(me) { me.notify("欢迎"); }
+   on_leave(me, dir) { return false; }
+   ```
+
+3. **`add_action` / `set_item` 的回调函数必须标注参数类型：**
+   ```typescript
+   // ✅ 正确
+   this.add_action("diao", "钓鱼", (me: CHARACTER): void => {
+       WORLD.COMMANDS['diaoyu'].enter(me);
+   });
+   function climbTree(me: CHARACTER, par?: string): void {
+       me.moveto("yz/tree1");
+   }
+   ```
+
+---
+
 ## 2. 类层次结构
 
 ```
@@ -1070,7 +1123,7 @@ export default class extends ROOM {
     }
 }
 
-function climbTree(me: CHARACTER, par?: string) {
+function climbTree(me: CHARACTER, par?: string): void {
     if (par !== "tree") return me.notify("你要爬什么？");
     me.moveto("yz/tree1", me.name + "爬了上去。", me.name + "从下面爬了上来。");
 }
@@ -1094,8 +1147,8 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.add_action("diao", "钓鱼", function(me) {
-            return WORLD.COMMANDS['diaoyu'].enter(me);
+        this.add_action("diao", "钓鱼", function(me: CHARACTER): void {
+            WORLD.COMMANDS['diaoyu'].enter(me);
         });
     }
 }
@@ -1162,16 +1215,16 @@ export default class extends ROOM {
         this.add_action("say", "", this.onSay);
     }
 
-    rollHandler(me: CHARACTER, par?: string) {
+    rollHandler(me: CHARACTER, par?: string): void {
         // 骰子游戏逻辑
         me.notify("你掷出了骰子。");
     }
 
-    onSay(me: CHARACTER, par?: string) {
+    onSay(me: CHARACTER, par?: string): void {
         // 处理说话命令
     }
 
-    on_leave(me: CHARACTER) {
+    on_leave(me: CHARACTER): void {
         if (me === this.master) {
             this.master = null;
         }

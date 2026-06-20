@@ -194,7 +194,7 @@ import {FAMILIES} from "../../../core/skill/family.js";
 
 // 类型导入（只用于类型标注，编译时被擦除）
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap, LearnCondition } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 ```
 
@@ -205,6 +205,59 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
   - 如果以后调整路径，按实际层级调整 `../` 数量
 
 **注意：** 路径中的扩展名 `.js` 不可省略，即使源文件是 `.ts`。
+
+### 5.1 类型标注准则
+
+> **编写技能时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型，即使 TypeScript 能推断。例如：
+   ```typescript
+   // ✅ 正确：标注类型
+   learn_condition: LearnCondition = {
+       max_mp: 700,
+       skill: { unarmed: 50 }
+   };
+   pfm_set: PerformData = {
+       // ...
+   };
+
+   // ❌ 错误：缺少类型标注
+   learn_condition = {
+       max_mp: 700,
+       skill: { unarmed: 50 }
+   };
+   ```
+
+2. **重写方法必须显式标注参数类型和返回类型。** 覆写父类方法时，所有参数和返回值都必须标注类型：
+   ```typescript
+   // ✅ 正确
+   query_prop(lv: number, me?: CHARACTER): PropMap {
+       return { str: Math.floor(lv / 10) };
+   }
+   query_enable_prop(lv: number): EnablePropMap {
+       return { sword: { gj: lv + 10 } };
+   }
+
+   // ❌ 错误：缺少参数类型和返回类型
+   query_prop(lv, me) {
+       return { str: Math.floor(lv / 10) };
+   }
+   ```
+
+3. **回调函数参数必须标注类型。** `pfm_set` 中 `use`、`query_desc`、`check` 等回调的形参和返回值必须标注：
+   ```typescript
+   // ✅ 正确
+   use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+       me.do_attack({ target: target });
+       me.end_attack(target);
+   },
+   query_desc: function (me: CHARACTER, lv: number): string {
+       return "绝招描述";
+   },
+   check: function (me: CHARACTER, lv: number, base_type?: string): boolean {
+       return lv >= 100;
+   }
+   ```
 
 ---
 
@@ -554,7 +607,7 @@ export default class extends SKILL {
     can_enables = ["sword"];
 
     // 学习条件
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 5000,
         skill: {
             sword: 200,     // 需要基本剑法 200 级
@@ -694,7 +747,7 @@ query_enable_prop(lv: number): EnablePropMap {
 `learn_condition` 用于控制玩家学习该技能的门槛。支持以下字段：
 
 ```typescript
-learn_condition = {
+learn_condition: LearnCondition = {
     // ---- 前置技能等级要求 ----
     skill: {
         sword: 400,        // 需要基本剑法 400 级
@@ -772,7 +825,7 @@ export default class extends SKILL {
     family = FAMILIES.HUASHAN;
     desc = "华山派的内功心法，气宗的立派根本，以修炼时身上紫气环绕而得名";
     can_enables = ["force"];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 300,
         skill: { force: 300 }
     };
@@ -850,7 +903,7 @@ export default class extends SKILL {
         "$n左脚一点右脚背，身形往上一拔，一招「一鹤冲天」，轻轻巧巧地避开了这一招。"
     ];
     desc = "华山派轻功身法，招式如飞燕般灵动不可捉摸。";
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 500,
         skill: { dodge: 60 }
     };
@@ -969,18 +1022,18 @@ pfm_set: PerformData = {
         allow_faint: false,         // 允许在昏迷时使用
         allow_safe: false,          // 允许在安全区使用
         no_check: false,            // 跳过条件检查
-        check: function(me, lv, base_type?) { ... },  // 自定义使用条件
+        check: function(me: CHARACTER, lv: number, base_type?: string): boolean { ... },  // 自定义使用条件
         use_condition: "需要手持长剑",  // 条件描述（不满足时显示）
 
         // === 核心回调（必填）===
-        use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+        use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
             // 绝招逻辑
             me.do_attack({ ... });
             me.end_attack(target);
         },
 
         // === 描述回调（建议实现）===
-        query_desc: function(me: CHARACTER, lv: number) {
+        query_desc: function(me: CHARACTER, lv: number): string {
             return "绝招的详细描述文本";
         },
 
@@ -1009,7 +1062,7 @@ zhan: {
     distime: 5000,
     mp: 5,
     enable_skill: "sword",
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var gj = 10 + lv;
         me.do_attack({
             target: target,
@@ -1019,7 +1072,7 @@ zhan: {
         });
         me.end_attack(target);
     },
-    query_desc: function (me: CHARACTER, lv: number) {
+    query_desc: function (me: CHARACTER, lv: number): string {
         var gj = 10 + lv;
         return "强力一击，附加" + gj + "点伤害。";
     }
@@ -1045,7 +1098,7 @@ wu: {
         "<hiw>$N使出一招「棒打双犬」...</hiw>",
         "<hiw>$N手中$w左右晃动...</hiw>",
     ],
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var count = 3 + parseInt(lv / 100);
         if (count > 10) count = 10;
         me.send_room("<hiw>$N手中青光一闪...</hiw>\n", target);
@@ -1059,7 +1112,7 @@ wu: {
         }
         me.end_attack(target);
     },
-    query_desc: function (me: CHARACTER, lv: number) {
+    query_desc: function (me: CHARACTER, lv: number): string {
         var count = 3 + parseInt(lv / 100);
         if (count > 10) count = 10;
         return "快速攻击" + count + "次";
@@ -1088,7 +1141,7 @@ shiba: {
         if (t <= 8000) return 8000;
         return t;
     },
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         me.send_room("<hiy>$N凝神聚气...</hiy>\n");
         me.is_rash = 12000 - lv * 2;
         if (me.is_rash < 8000) me.is_rash = 8000;
@@ -1149,7 +1202,7 @@ wu: {
     enable_skill: "sword",
     mp: 20,
     release_time: 0,
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var time = lv * 10 + 5000;
         if (time > 15000) time = 15000;
         me.send_room("<him>$N凝神聚气，挥洒手中兵器，进入无招无我，剑心通明境界！\n</him>", target);
@@ -1166,7 +1219,7 @@ wu: {
         me.set_temp("weapon", 1, time);
         me.reauto_attack();
     },
-    query_desc: function (me: CHARACTER, lv: number) {
+    query_desc: function (me: CHARACTER, lv: number): string {
         var time = lv * 10 + 5000;
         if (time > 15000) time = 15000;
         return "独孤九剑之无招胜有招，" + (time / 1000) + "秒内...出招速度加快到极限...";
@@ -1189,7 +1242,7 @@ poqi: {
     distime: 30000,
     enable_skill: "sword",
     mp: 20,
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var sh = me.do_attack({
             target: target,
             attack_msg: "<hib>$N施出独孤九剑「破气式」...</hib>",
@@ -1212,7 +1265,7 @@ poqi: {
         }
         me.end_attack(target);
     },
-    query_desc: function (me: CHARACTER, lv: number) {
+    query_desc: function (me: CHARACTER, lv: number): string {
         // ...
     }
 }
@@ -1234,7 +1287,7 @@ qi: {
     enable_skill: "unarmed",
     mp: 30,
     release_time: 0,
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var time = 2000 + lv * 5;
         if (time > 8000) time = 8000;
         var is_parried = false;
@@ -1280,7 +1333,7 @@ pojian: {
     distime: 10000,
     enable_skill: "parry",
     mp: 20,
-    use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+    use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
         var weap = target.query_weapon();
         if (!weap || weap.weapon_type === WEAPON_TYPE.NONE)
             return me.notify("对方没有兵刃，你不用担心。");
@@ -1292,7 +1345,7 @@ pojian: {
             me.send_room("<cyn>可是$n看破了$N的剑路...</cyn>", target);
         }
     },
-    query_desc: function (me: CHARACTER, lv: number) {
+    query_desc: function (me: CHARACTER, lv: number): string {
         return "独孤九剑之破字诀，卸下对方兵刃。";
     }
 }
@@ -1314,7 +1367,7 @@ somePfm: {
     mp: 30,                        // 基础内力消耗
 
     // 可以用自定义函数覆盖冷却/出招计算
-    query_releasetime: function (me: CHARACTER, lv: number) {
+    query_releasetime: function (me: CHARACTER, lv: number): number {
         // 自定义出招时间计算
         lv = lv || me.query_skill("my_skill", 0);
         var t = 5000 - lv * 2;
@@ -1724,7 +1777,7 @@ export default class extends SKILL {
     can_enables = ["sword"];
 
     // 学习条件
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 1000,
         skill: { sword: 50 }
     };
@@ -1737,7 +1790,7 @@ export default class extends SKILL {
             enable_skill: "sword",
             mp: 20,
             release_time: 10000,  // 出招时间10秒
-            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room("<CYN>$N使出华山派绝技「剑掌五连环」，身法陡然加快！</CYN>", target);
                 var count = 5;
                 for (var i = 0; i < count; i++) {
@@ -1750,7 +1803,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 return "华山剑法之剑掌五连环，瞬间出招5次，收招较慢。";
             }
         }
@@ -1812,7 +1865,7 @@ export default class extends SKILL {
     // 可装备为拳脚 或 招架
     can_enables = ["unarmed", "parry"];
 
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 20000,
         skill: { unarmed: 500 }
     };
@@ -1857,7 +1910,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 var time = 2000 + lv * 5;
                 if (time > 8000) time = 8000;
                 return "以强劲的掌力猛击敌人，如果敌人招架失败，将在" + (time / 1000) + "秒内无法躲闪。";
@@ -1890,7 +1943,7 @@ export default class extends SKILL {
                 "<hir>-----羝羊触蕃-----</hir>\n$N嗔目大喝...",
                 "<hir>-----神龙摆尾-----</hir>\n$N左掌护胸，右掌使一招「神龙摆尾」..."
             ],
-            query_releasetime: function (me: CHARACTER, lv: number) {
+            query_releasetime: function (me: CHARACTER, lv: number): number {
                 lv = lv || me.query_skill("xianglongzhang", 0);
                 var t = 12000 - lv * 2;
                 if (t <= 8000) return 8000;
@@ -1926,7 +1979,7 @@ export default class extends SKILL {
                     18
                 );
             },
-            query_desc: function (me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 var lv1 = 5 + parseInt(lv / 500);
                 if (lv1 > 9) lv1 = 9;
                 var time = (12000 - lv * 2) / 1000;
@@ -2007,7 +2060,7 @@ export default class extends SKILL {
     // ========== 技能配置 ==========
     can_enables = ["sword", "parry"];
 
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 3000,
         skill: {
             sword: 100,
@@ -2040,7 +2093,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function (me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 var count = 3 + parseInt(lv / 100);
                 if (count > 8) count = 8;
                 return "狂风剑法绝技，瞬间刺出" + count + "剑，令敌人防不胜防。";
@@ -2074,7 +2127,7 @@ export default class extends SKILL {
                 });
                 me.reauto_attack();
             },
-            query_desc: function (me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 var time = 10000 + lv * 10;
                 if (time > 20000) time = 20000;
                 return "激发剑意，" + (time / 1000) + "秒内攻击速度+30%，命中+" + lv + "，最终伤害+" + (parseInt(lv / 100) + 5) + "%";

@@ -101,6 +101,51 @@ export default class extends TASK {
 
 ---
 
+### 类型标注准则
+
+> **编写系统任务时，必须遵循以下类型标注规则：**
+
+1. **对象类型属性必须显式标注类型：**
+   ```typescript
+   // ✅ 正确
+   customer: Record<string, OBJ[] | null> = {};
+   next_time: Date | null = null;
+
+   // ❌ 错误
+   customer = {};
+   ```
+
+2. **重写方法必须显式标注参数类型和返回类型：**
+   ```typescript
+   // ✅ 正确
+   startup(oldtask?: TASK): boolean | void {
+       this.handler = this.call_out(this.run, 60000);
+   }
+   stop(): void {
+       if (this.handler) clearTimeout(this.handler);
+   }
+   run(): void {
+       // 任务逻辑
+   }
+   query_goods(me: CHARACTER): OBJ[] {
+       return this.customer[me.id] || [];
+   }
+
+   // ❌ 错误：缺少返回类型
+   startup(oldtask) { ... }
+   stop() { ... }
+   ```
+
+3. **NPC 回调绑定时的类型处理。** 当将 TASK 方法赋值给 NPC 回调时，注意 `this` 指向变化，使用 `bind` 或闭包，同时保持参数类型：
+   ```typescript
+   // ✅ 正确
+   boss.on_died = (killer: CHARACTER, corpse: CORPSE): void => {
+       this.handleBossDeath(boss, killer, corpse);
+   };
+   ```
+
+---
+
 ## 4. TASK 基类详解
 
 ### 完整定义（位于 `server/core/task/task.ts`）
