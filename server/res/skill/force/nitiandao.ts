@@ -26,10 +26,10 @@ export default class extends SKILL {
     pfm_set: PerformData = {
         pfm_0: {
             name: "一念轮回",
-            distime: 57000,
+            distime: 60000,
             enable_skill: "force",
             mp: 1720,
-            release_time: 3000,
+            release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 一念轮回
                 // 将敌人的技能重置冷却
@@ -43,10 +43,10 @@ export default class extends SKILL {
         },
         pfm_1: {
             name: "一念寂灭",
-            distime: 57000,
+            distime: 60000,
             enable_skill: "force",
             mp: 1970,
-            release_time: 3000,
+            release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 一念寂灭
                 // 压制附近敌人当前内力的12%，加快对方的能力流失，内力消耗增加10000+20%。
