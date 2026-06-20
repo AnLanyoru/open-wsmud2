@@ -1,7 +1,9 @@
-import {COMMAND} from "../../../core/command.js";
-import {SKILL} from "../../../core/skill/skill.js";
-import {WEAPON_TYPE} from "../../../core/const.js";
+import { COMMAND } from "../../../core/command.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { WEAPON_TYPE } from "../../../core/const.js";
 import type { USER } from "../../../core/char/user.js";
+import { PfmFlag, PfmFlagType } from "../../../types/events.js";
+import type { CharacterStatus } from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "perform";
@@ -86,56 +88,30 @@ export default class extends COMMAND {
         if (pfm.check && !pfm.no_check && !pfm.check(me, lv)) {
             return;
         }
-        var key = "pfm/" + sk + "/" + pfmid;
+        /** 绝招标识 */
+        const key = "pfm/" + sk + "/" + pfmid;
         if (me.query_temp(key)) {
             return me.notify(pfm.name + "还没准备好，你还不能使用。");
         }
-        var target = me.query_enemy();
+        const target = me.query_enemy();
         if (!pfm.use_type) {
             if (!target) return me.notify("你要用绝招对付谁？");
-
         }
-
-        var now = Date.now();
+        const now = Date.now();
         if (me.release_time && now < me.release_time)//上个技能还没释放完
         {
             return me.notify("你上个技能还没释放完成。");
         }
-
-
-        var isrelease = false;
-
-        if (me.query_prop('no_pfm')) {
-
-            me.send_room("<red>$N释放技能" + pfm.name + "，但是没有产生任何效果。</red>\n");
-            me.remove_status('bikou');
-            isrelease = true;
-        } else if (target && target.parry_skill && target.parry_skill.on_parry_pfm) {
-            isrelease = target.parry_skill.on_parry_pfm(target, me, pfm, lv, sk);
-
-        } else {
-            if (pfm.is_weapon && sp_skill != me.attack_skill) {
-                //me.attack_skill = sp_skill;
-                me.remove_status('weapon', true);
-            }
-            isrelease = pfm.use?.(me, target ?? me, lv, sk) != false;
-        }
-
-
+        let isrelease = me.check_pfm_use(target ?? me, pfm, lv, sk)
         if (isrelease) {
             me.add_mp(-pfm.query_mp(me, lv) || 0);
-            //释放成功才算释放时间
-            // if (!pfm.use_type) {
-            //     //保存目标被释放的技能
-            //     me.set_temp("used_pfm", pfm.id, 20000);
-            // }
             me.set_temp("used_pfm", pfm.id, 20000);
-            var time = pfm.query_releasetime(me, lv) ?? 0;
+            const time = pfm.query_releasetime(me, lv) ?? 0;
             if (time) me.release_time = time + now;
             else me.release_time = 0;
 
-            var distime = pfm.query_distime(me, lv, is_ref);
-            var rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
+            const distime = pfm.query_distime(me, lv, is_ref);
+            const rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
             me.set_temp(key, 1, distime + rtime);
             me.notify('{type:"dispfm",id:"' + sk + "." + pfmid + '",rtime:'

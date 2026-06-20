@@ -66,6 +66,7 @@ export interface PropMap {
     /** 绝招冷却时间百分比减免 */ distime_per?: number;
     /** 对方受到的伤害增加% */ add_sh?: number;
     /** 无法防御（值>0生效） */ no_fy?: number;
+    /** 禁止绝招（值>0生效） */ no_pfm?: number;
     /** 疗伤效果百分比 */ recover_per?: number;
     /** 双修效率 */ shuangxiu?: number;
     /** 闭关经验 */ xiulian_exp?: number;

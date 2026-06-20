@@ -890,6 +890,7 @@ export class SKILL extends BASE {
                     || pfm.enable_skill === 'staff' || pfm.enable_skill === 'club') {
                     pfm.is_weapon = true;
                 }
+                pfm.origin_skill = this.id
                 pfm.id = this.id + "/" + key;
                 pfm.pid = key;
                 this.pfm[key] = pfm;
@@ -1070,8 +1071,10 @@ export class SKILL extends BASE {
 export class PERFORM {
     // ============ 核心属性（由资源文件部分设置，update() 补全） ============
 
+    /** 来源技能id */
+    origin_skill: string;
     /** 绝招名称 */
-    name?: string;
+    name: string;
     /** 内力消耗 */
     mp?: number;
     /** 出招时间(毫秒) */
@@ -1084,7 +1087,6 @@ export class PERFORM {
     distime_min?: number;
     /** 出招时间最小值 */
     releasetime_min?: number;
-
     // ============ 消耗减免Key ============
 
     /** 冷却时间减免key(针对特定属性) */
@@ -1213,7 +1215,9 @@ export class PERFORM {
         if (!dis) dis = me.gjsd;
         if (isref) dis = dis * 2;
         if (this.distime_key) {
-            dis = dis - me.query_prop("distime") - me.query_prop(this.distime_key);
+            /** 临时绝招冷却变化标识 */
+            const dt_key = "dt/" + this.origin_skill + "/" + this.id;
+            dis = dis - me.query_prop("distime") - me.query_prop(this.distime_key) + me.query_temp(dt_key, 1);
         } else {
             dis = dis - me.query_prop("distime");
         }

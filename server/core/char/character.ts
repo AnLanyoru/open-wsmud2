@@ -10,7 +10,7 @@ import { UTIL } from '../util.js';
 import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES } from '../const.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
-import type { StatusDef } from '../../types/events.js';
+import { PfmFlag, type PfmFlagType, type StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
 import type { ROOM } from '../room/room.js';
 import type { FAMILY } from '../skill/family.js';
@@ -152,7 +152,7 @@ export interface DoAttackPar {
 
 interface AutoSkillEntry {
     /** 绝招对象 */
-    pfm: any;
+    pfm: PERFORM;
     /** 技能等级 */
     level: number;
     /** 唯一标识（基础技能/绝招 ID） */
@@ -168,7 +168,7 @@ interface AutoSkillEntry {
 }
 
 /** 角色状态 — StatusDef 的运行时扩展 */
-interface CharacterStatus extends StatusDef {
+export interface CharacterStatus extends StatusDef {
     /** 序列化为 JSON 字符串 */
     to_json?(): string;
     /** 最大叠加层数 */
@@ -980,7 +980,7 @@ export class CHARACTER extends ITEM {
     /**
      * 批量变更属性
      */
-    change_prop(prop: {desc?: string, skill?: PropMap} & PropMap, isadd: boolean): void {
+    change_prop(prop: { desc?: string, skill?: PropMap } & PropMap, isadd: boolean): void {
         if (!prop) return;
         for (const item in prop) {
             switch (item) {
@@ -2900,22 +2900,34 @@ export class CHARACTER extends ITEM {
      */
     use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype: string): boolean {
         if (!pfm) return false;
-        let isrelease = false;
-        if (this.query_prop('no_pfm')) {
-            this.send_room('<red>$N释放技能' + pfm.name + '，但是没有产生任何效果。</red>\n');
-            this.remove_status('bikou');
-            isrelease = true;
-        } else if (target.parry_skill.on_parry_pfm) {
-            isrelease = target.parry_skill.on_parry_pfm(target, this, pfm, level);
-        } else {
-            isrelease = pfm.use?.(this, target, level, sktype) !== false;
-        }
+        let isrelease = this.check_pfm_use(target, pfm, level, sktype);
         if (isrelease !== false) {
             this.add_mp(-(pfm.query_mp(this, level) || 0));
             this.set_temp('used_pfm', pfm.id, 20000);
             return true;
         }
         return false;
+    }
+
+    check_pfm_use(target: CHARACTER, pfm: PERFORM, lv: number, sk: string): boolean {
+        if (this.status) {
+            const len = this.status.length;
+            for (let i = 0; i < len; i++) {
+                const statu: CharacterStatus = this.status[i]
+                const res = statu?.on_pfm?.(this, target, pfm, lv, sk);
+                if (!res) continue;
+                if (res & PfmFlag.EXPEND_STATU) this.remove_status(statu.id);
+                if (res & PfmFlag.BLOCK) return false;
+                if (res & PfmFlag.NO_USE) return true;
+            }
+        }
+        if (target && target.parry_skill && target.parry_skill.on_parry_pfm) {
+            return target.parry_skill.on_parry_pfm(target, this, pfm, lv, sk);
+        }
+        if (pfm.is_weapon && pfm.origin_skill != this.attack_skill.id) {
+            this.remove_status('weapon', true);
+        }
+        return pfm.use?.(this, target, lv, sk) != false;
     }
 
     /**
