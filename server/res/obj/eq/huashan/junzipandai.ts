@@ -1,0 +1,50 @@
+import {EQUIPMENT} from "../../../../core/item/equipment.js";
+import {EQUIP_TYPE} from "../../../../core/const.js";
+
+export default class extends EQUIPMENT {
+    name = "君子鞶带";
+    desc = "华山派镇派鞶带，青玉为扣，束腰后身形如风，来去自如。";
+    unit = "条";
+    eq_type = EQUIP_TYPE.WAIST;
+
+    on_create(path, par) {
+        let lv = 5;
+        if (par) {
+            par = par.slice(1);
+            lv = parseInt(par);
+            if (!(lv >= 2 && lv <= 5)) return;
+        }
+        this.grade = lv;
+        switch (lv) {
+            case 2:
+                this.prop = { fy: 76, dex: 5 };
+                this.desc = "华山派正式弟子的布腰带。";
+                break;
+            case 3:
+                this.prop = { fy: 142, dex: 15, dazuo_per: 5 };
+                this.desc = "华山派精英弟子的皮带，行动便利。";
+                break;
+            case 4:
+                this.prop = { fy: 248, dex: 25, dazuo_per: 10, diff_busy: 1000 };
+                this.desc = "华山派长老的玉带，无拘无束，来去自如。";
+                this.group_name = "junzi4";
+                break;
+            case 5:
+                this.prop = { fy: 355, dex: 45, dazuo_per: 15, diff_busy: 3000, int: 30 };
+                this.desc = "华山派镇派鞶带，青玉为扣，束腰后身形如风，来去自如。";
+                this.group_name = "junzi5";
+                break;
+        }
+        EQUIPMENT.prototype.on_create.apply(this);
+    }
+
+    group_prop(count: number) {
+        if (this.grade == 4) {
+            if (count == 3) return { dex: 50 };
+            if (count == 5) return { mz_per: 8, diff_busy_per: 8 };
+        } else if (this.grade == 5) {
+            if (count == 3) return { dex: 100 };
+            if (count == 5) return { mz_per: 10, diff_busy_per: 10 };
+        }
+    }
+}
