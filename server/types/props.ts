@@ -58,6 +58,27 @@ export interface PropMap {
     /** 潜能获取百分比加成 */ pot_per?: number;
     /** 内力加力上限 */ limit_mp?: number;
     /** 内功抗性/减免 */ force_rad?: number;
+    /** 绝招释放时间（固定值减少） */ releasetime?: number;
+    /** 绝招冷却时间（固定值减少） */ distime?: number;
+    /** 内力消耗（固定值减少） */ expend_mp?: number;
+    /** 内力消耗百分比减免 */ expend_mp_per?: number;
+    /** 绝招释放时间百分比减免 */ releasetime_per?: number;
+    /** 绝招冷却时间百分比减免 */ distime_per?: number;
+    /** 对方受到的伤害增加% */ add_sh?: number;
+    /** 无法防御（值>0生效） */ no_fy?: number;
+    /** 疗伤效果百分比 */ recover_per?: number;
+    /** 双修效率 */ shuangxiu?: number;
+    /** 闭关经验 */ xiulian_exp?: number;
+    /** 炼药产出 */ lianyao2?: number;
+    /** 炼药经验百分比 */ lianyao_exp_per?: number;
+    /** 挖矿经验 */ kuang_exp?: number;
+    /** 挖矿潜能 */ kuang_pot?: number;
+    /** 钓鱼经验 */ diaoyu_exp?: number;
+    /** 钓鱼潜能 */ diaoyu_pot?: number;
+    /** 采药经验 */ caiyao_exp?: number;
+    /** 采药潜能 */ caiyao_pot?: number;
+    /** 分解获得的玄晶 */ fenjie?: number;
+    /** 负面状态抵抗（数值） */ diff_downside?: number;
 
     // ===== 特殊属性 =====
     /** 抗暴击 */ diff_bj?: number;
