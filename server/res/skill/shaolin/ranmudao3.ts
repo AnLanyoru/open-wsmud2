@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "ranmudao3";
     grade = 6;
     family = FAMILIES.SHAOLIN;
+    is_hidden = true;
     desc = "少林寺七十二绝技之燃木刀法";
     can_enables = ["blade","parry"];
     attack_actions = SKILL.get("blade")?.attack_actions || [];

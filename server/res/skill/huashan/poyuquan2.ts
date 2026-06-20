@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "劈石破玉拳";
     id = "poyuquan2";
+    source_skill = "poyuquan";
     grade = 4;
     family = FAMILIES.HUASHAN;
     desc = "华山派拳脚功夫，原为劈石及破玉两路拳法绝学";

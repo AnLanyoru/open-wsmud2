@@ -7,6 +7,7 @@ export default class extends SKILL {
     name = "太极拳";
     id = "taijiquan3";
     grade = 5;
+    is_hidden = true;
     
     desc = "无";
     can_enables = ["unarmed","parry"];

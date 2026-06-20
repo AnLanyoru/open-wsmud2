@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "九阴白骨爪";
     id = "jiuyinbaiguzhao2";
+    source_skill = "jiuyinbaiguzhao";
     grade = 4;
     family = FAMILIES.EMEI;
     desc = "九阴真经里记载的外门功夫，阴狠毒辣";

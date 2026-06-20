@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "诸天化身步";
     id = "zhutianbu2";
+    source_skill = "zhutianbu";
     grade = 4;
     family = FAMILIES.EMEI;
     desc = "峨眉派轻功身法，如有千万化身。";

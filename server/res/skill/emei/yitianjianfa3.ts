@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "yitianjianfa3";
     grade = 5;
     family = FAMILIES.EMEI;
+    is_hidden = true;
     desc = "峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];

@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "太极剑法";
     id = "taijijian2";
+    source_skill = "taijijian";
     grade = 5;
     family = FAMILIES.WUDANG;
     desc = "由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一";

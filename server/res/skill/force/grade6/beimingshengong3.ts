@@ -7,6 +7,7 @@ export default class extends SKILL {
     name = "北冥神功";
     id = "beimingshengong3";
     grade = 6;
+    is_hidden = true;
     
     desc = "逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。";
     can_enables = ["force","parry"];

@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "yijinjing4";
     grade = 6;
     family = FAMILIES.SHAOLIN;
+    is_ultimate = true;
     desc = "上古佛门心法，金刚不灭万法皆空";
     can_enables = ["force"];
 

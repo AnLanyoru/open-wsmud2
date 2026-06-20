@@ -8,6 +8,7 @@ export default class extends SKILL {
     name = "降龙十八掌";
     id = "xianglongzhang3";
     grade = 6;
+    is_hidden = true;
     family = FAMILIES.GAIBANG;
     desc = "丐帮的降龙十八掌，至刚至猛，威震天下";
     can_enables = ["unarmed","parry"];

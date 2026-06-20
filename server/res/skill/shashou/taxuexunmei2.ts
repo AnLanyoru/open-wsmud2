@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "踏雪寻梅";
     id = "taxuexunmei2";
+    source_skill = "taxuexunmei";
     grade = 5;
     family = FAMILIES.SHASHOU;
     desc = "踏雪寻梅是杀手楼一种特别厉害的上乘轻功，即使穿着铁鞋踩在雪上，也不会留下一点脚印。";

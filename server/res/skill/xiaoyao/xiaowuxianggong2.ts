@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "小无相功";
     id = "xiaowuxianggong2";
+    source_skill = "xiaowuxianggong";
     grade = 5;
     family = FAMILIES.XIAOYAO;
     desc = "逍遥派的一门奇特武功，其主要特点是不着形相，无迹可寻，可以模仿别人的绝学";

@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "dugujiujian4";
     grade = 6;
     family = FAMILIES.HUASHAN;
+    is_ultimate = true;
     desc = "上古剑门镇派之术，无剑无我，手持天地";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];

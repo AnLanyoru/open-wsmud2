@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "漫天花雨";
     id = "mantianhuayu2";
+    source_skill = "mantianhuayu";
     grade = 5;
     family = FAMILIES.SHASHOU;
     desc = "杀手楼的暗器武功，使用的时候如漫天星光而得名";

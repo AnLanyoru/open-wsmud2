@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "lingboweibu4";
     grade = 6;
     family = FAMILIES.XIAOYAO;
+    is_ultimate = true;
     desc = "上古逍遥门所传，凌波踏四方，逍遥游天下";
     can_enables = ["dodge"];
 
@@ -20,7 +21,7 @@ export default class extends SKILL {
                 mz: lv * 3,
                 ds_per: 10,
                 mz_per: 10,
-                desc: "无相躲闪成功后模仿对方的技能绝招",
+                desc: "无相：躲闪成功后模仿对方的技能绝招",
             },
         };
     }

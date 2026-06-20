@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "yitianjianfa4";
     grade = 6;
     family = FAMILIES.EMEI;
+    is_ultimate = true;
     desc = "上古梵门绝技，灭神魔渡天下";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];

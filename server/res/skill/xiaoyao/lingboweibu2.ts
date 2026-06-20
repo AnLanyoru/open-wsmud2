@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "凌波微步";
     id = "lingboweibu2";
+    source_skill = "lingboweibu";
     grade = 5;
     family = FAMILIES.XIAOYAO;
     desc = "无";

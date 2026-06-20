@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "taijishengong4";
     grade = 6;
     family = FAMILIES.WUDANG;
+    is_ultimate = true;
     desc = "上古道家传承，玄门正宗";
     can_enables = ["parry"];
 

@@ -7,6 +7,7 @@ export default class extends SKILL {
     name = "诸天化身步";
     id = "zhutianbu3";
     grade = 5;
+    is_hidden = true;
     
     desc = "峨眉派轻功身法，如有千万化身。";
     can_enables = ["dodge"];

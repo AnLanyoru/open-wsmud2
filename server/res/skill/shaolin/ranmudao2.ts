@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "燃木刀法";
     id = "ranmudao2";
+    source_skill = "ranmudao";
     grade = 5;
     family = FAMILIES.SHAOLIN;
     desc = "少林寺七十二绝技之燃木刀法";

@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "独孤九剑";
     id = "dugujiujian2";
+    source_skill = "dugujiujian";
     grade = 5;
     family = FAMILIES.HUASHAN;
     desc = "为独孤求败所创，以无招胜有招的宗旨胜破天下武功。";

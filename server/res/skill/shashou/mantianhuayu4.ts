@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "mantianhuayu4";
     grade = 6;
     family = FAMILIES.SHASHOU;
+    is_ultimate = true;
     desc = "上古法家不传之秘，替天行法";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];

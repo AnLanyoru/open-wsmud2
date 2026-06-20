@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "liuyangzhang3";
     grade = 6;
     family = FAMILIES.XIAOYAO;
+    is_hidden = true;
     desc = "逍遥派的天山六阳掌，绝招生死符让人谈虎色变。";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];

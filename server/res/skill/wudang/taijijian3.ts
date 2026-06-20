@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "taijijian3";
     grade = 6;
     family = FAMILIES.WUDANG;
+    is_hidden = true;
     desc = "由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];

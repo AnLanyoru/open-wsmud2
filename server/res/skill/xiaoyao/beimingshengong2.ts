@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "北冥神功";
     id = "beimingshengong2";
+    source_skill = "beimingshengong";
     grade = 4;
     family = FAMILIES.XIAOYAO;
     desc = "逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。";

@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "降龙十八掌";
     id = "xianglongzhang2";
+    source_skill = "xianglongzhang";
     grade = 5;
     family = FAMILIES.GAIBANG;
     desc = "丐帮的降龙十八掌，至刚至猛，威震天下";

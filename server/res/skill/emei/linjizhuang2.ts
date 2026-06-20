@@ -8,6 +8,7 @@ export default class extends SKILL {
     name = "临济十二庄";
     id = "linjizhuang2";
     grade = 5;
+    source_skill = "linjizhuang";
     family = FAMILIES.EMEI;
     desc = "峨眉派内功心法";
     can_enables = ["force"];

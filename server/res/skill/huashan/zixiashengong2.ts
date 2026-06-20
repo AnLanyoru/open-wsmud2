@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "紫霞神功";
     id = "zixiashengong2";
+    source_skill = "zixiashengong";
     grade = 4;
     family = FAMILIES.HUASHAN;
     desc = "华山派的内功心法，气宗的立派根本，以修炼时身上紫气环绕而得名";

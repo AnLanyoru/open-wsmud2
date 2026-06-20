@@ -7,6 +7,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "狂风快剑";
     id = "kuangfengkuaijian2";
+    source_skill = "kuangfengkuaijian";
     grade = 5;
     family = FAMILIES.HUASHAN;
     desc = "华山派的剑宗的立宗剑法，以快闻名";

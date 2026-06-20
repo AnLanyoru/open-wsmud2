@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "dugujiujian3";
     grade = 6;
     family = FAMILIES.HUASHAN;
+    is_hidden = true;
     desc = "为独孤求败所创，以无招胜有招的宗旨胜破天下武功。";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];

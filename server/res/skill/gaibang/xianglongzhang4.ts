@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = "xianglongzhang4";
     grade = 6;
     family = FAMILIES.GAIBANG;
+    is_ultimate = true;
     desc = "上古墨门以此功法义行天下，战神不败";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
