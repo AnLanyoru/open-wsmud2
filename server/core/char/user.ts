@@ -446,8 +446,9 @@ export class USER extends CHARACTER {
         this.name = role.name;
         this.level = role.level;
         const data: any = JSON.toObject(role.data);
+        const prop = data.prop || [];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            (this as Record<string, any>)[SAVE_NUMPROP[i]] = data.prop[i] || 0;
+            this[SAVE_NUMPROP[i]] = prop[i] || 0;
         }
         this.quit_room = data.quit_room;
         this.items = this.read_items(data.items);
@@ -583,7 +584,7 @@ export class USER extends CHARACTER {
     getData(): RoleData {
         const str: string[] = ['{prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            str.push(this[SAVE_NUMPROP[i]]);
+            str.push(this[SAVE_NUMPROP[i]] ?? Math.floor(Date.now() / 60000));
             str.push(',');
         }
         str.push('0');

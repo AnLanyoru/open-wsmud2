@@ -394,7 +394,7 @@ export class FOLLOWER extends CHARACTER {
     save(me: USER): string {
         const str: string[] = ['prop:['];
         for (let i = 0; i < SAVE_NUMPROP.length; i++) {
-            str.push(((this as Record<string, any>)[SAVE_NUMPROP[i]] || 0).toString());
+            str.push((this[SAVE_NUMPROP[i]] || Date.now() / 60000).toString());
             str.push(',');
         }
         str.push('0],');
