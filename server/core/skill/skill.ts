@@ -1216,7 +1216,7 @@ export class PERFORM {
         if (isref) dis = dis * 2;
         if (this.distime_key) {
             /** 临时绝招冷却变化标识 */
-            const dt_key = "dt/" + this.origin_skill + "/" + this.id;
+            const dt_key = "dt/" + this.origin_skill + "/" + this.pid;
             dis = dis - me.query_prop("distime") - me.query_prop(this.distime_key) + me.query_temp(dt_key, 1);
         } else {
             dis = dis - me.query_prop("distime");
