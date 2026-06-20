@@ -167,7 +167,7 @@ export default class YaMenLevelUpTask extends USERTASK {
 
         player.remove_temp("ym_task");
 
-        let level = player.query_temp("ym_level", 0);
+        let level = player.query_temp("ym_level", Number(0));
         if (level >= (TITLES.length - 1)) return;
 
         if (level === 0) {

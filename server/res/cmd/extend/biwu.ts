@@ -22,7 +22,7 @@ export default class extends COMMAND {
     };
     regex = /^(emei|wudang|shaolin|huashan|xiaoyao|gaibang|shashou|none)?\s*(\d+)(?:\s+(ok))?$/;
 
-    enter(me: CHARACTER, fam?: string, type?: string, par?: string) {
+    enter(me: CHARACTER, fam: string, type?: string, par?: string) {
         if (!me.can_trans?.()) return;
         if (!this.check_command(me, this.biwu_state)) return;
         const index = parseInt(type!);
@@ -58,7 +58,7 @@ export default class extends COMMAND {
         this.start_biwu(me, fam, index - 1);
     }
 
-    start_biwu(me: CHARACTER, fam: string | undefined, index: number) {
+    start_biwu(me: CHARACTER, fam: string, index: number) {
         let tops = WORLD.STATS.TOPS;
         if (fam) tops = WORLD.STATS["tops_" + fam.toUpperCase()] || [];
         if (!tops) return me.send("错误的对手，无法挑战。");

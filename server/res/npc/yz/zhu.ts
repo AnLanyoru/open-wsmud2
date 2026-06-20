@@ -75,7 +75,7 @@ export default class extends NPC {
     }
 
     do_teach(me: USER, skill: SKILL, lv: number) {
-        var money = me.query_temp("learn/zhu", 0);
+        var money = me.query_temp("learn/zhu", Number(0));
         if (!money) {
             me.remove_temp("learn/zhu");
             me.notify("朱熹点了点头，说道：嗯，这次就先教到这里。");

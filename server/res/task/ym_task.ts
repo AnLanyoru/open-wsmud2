@@ -1,15 +1,16 @@
+import type { USER } from "../../core/char/user.js";
 import {USERTASK} from "../../core/task/playertask.js";
 import {WORLD} from "../../core/world.js";
 
 export default class extends USERTASK {
     id = "yamen";
 
-    query_title(me) {
+    query_title(me: USER) {
         let tag = TAGS[me.query_temp('ym_level', 0)];
         return `<${tag}>衙门兼职</${tag}>`;
     }
 
-    query_desc(me) {
+    query_desc(me: USER) {
         let lv = me.query_temp("ym_level", 0);
         if (!(lv > 0)) return;
 

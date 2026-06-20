@@ -58,12 +58,12 @@ export default class extends NPC {
                 return me.notify(this.name +
                     "对你说道：这位" + me.call() + "和本馆素无瓜葛，升职从何说起？");
         }
-        let level = me.query_temp('sm_level', 0) ?? 0;
+        let level = me.query_temp('sm_level', Number());
         if (level >= 5) return me.send(this.name +
             "对你说道：这位" + me.call() + "已经是最高级别的职位了。");
         if (me.level < NEEDS_LEVEL[level])
             return me.send(`${this.name}说道：这位${me.call()}，${fam!.query_job_title(level + 1)}可不是谁都能当的，最少得是${NEEDS_LEVEL_DESC[level]}才行。`);
-        let gj = me.query_temp('gongji', 0) ?? 0;
+        let gj = me.query_temp('gongji', Number());
         let need = NEEDS_GJ[level];
         if (gj >= need) {
             me.add_temp('gongji', -need);

@@ -51,7 +51,7 @@ export default class extends NPC {
 
     on_accept(me: CHARACTER, obj: string, count: number): boolean | void {
         if (obj !== 'money') return false;
-        let home = me.query_temp('home', 0);
+        let home = me.query_temp('home', Number());
         if (home === 2) return me.notify_fail("管家的说道：你已经购买住宅了。");
         if (home) {
             if (count !== 18000000)

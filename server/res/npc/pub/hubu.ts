@@ -179,7 +179,7 @@ export default class extends NPC {
 
         if (obj == "money") {
             if (count == 8000000) {
-                var wife = me.query_temp("wife") || me.query_temp("husband");
+                var wife = me.query_temp("wife", String()) || me.query_temp("husband", String());
                 if (!wife) return me.notify_fail("赵铁笔说道：你还没结婚呢，离什么婚！");
                 var user = WORLD.getUser(String(wife));
                 if (me.query_temp("wife")) {
@@ -211,7 +211,7 @@ export default class extends NPC {
                 return true;
             }
             if (count == 10000000) {
-                var tudi = me.query_temp("tudi");
+                var tudi = me.query_temp("tudi", String());
                 if (!tudi) return me.notify_fail("赵铁笔说道：你没有徒弟！");
                 var user = WORLD.getUser(String(tudi));
                 me.remove_temp("tudi");
@@ -237,9 +237,9 @@ export default class extends NPC {
             }
 
             if (count == 5000000) {
-                var shifu = me.query_temp("shifu");
+                var shifu = me.query_temp("shifu", String());
                 if (!shifu) return me.notify_fail("赵铁笔说道：你没有徒弟！");
-                var user = WORLD.getUser(String(shifu));
+                var user = WORLD.getUser(shifu);
                 me.remove_temp("shifu");
                 me.remove_temp("shifu_n");
                 me.set_temp("st_leave", 1, 3600000 * 24 * 7);

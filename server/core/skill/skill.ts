@@ -1127,7 +1127,7 @@ export class PERFORM {
     // ============ 绝招ID标识（由 update() 设置） ============
 
     /** 完整绝招ID (格式: skillId/pfmName) */
-    id?: string;
+    id: string;
     /** 绝招名(在技能内的key) */
     pid?: string;
     /** 是否为武器绝招 */
