@@ -19,7 +19,7 @@ export default class extends SKILL {
                 diff_downside_per: 15,
                 expend_mp_per: 15,
                 limit_mp: lv * 290,
-                desc: "唯一将你内力的100%转化为气血",
+                desc: "唯一：将你内力的100%转化为气血",
             },
         };
     }

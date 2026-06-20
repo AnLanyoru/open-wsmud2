@@ -30,7 +30,7 @@ export default class extends SKILL {
                 gj: Math.floor(lv * 1.32),
                 mz: Math.floor(lv * 1.62),
                 dex: 8 + Math.floor(lv * 0.1),
-                desc: "唯一攻击时有概率打出音波伤人",
+                desc: "唯一：攻击时有概率打出音波伤人",
             },
         };
     }

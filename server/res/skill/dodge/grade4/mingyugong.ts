@@ -40,7 +40,7 @@ export default class extends SKILL {
                 per: 3,
                 max_hp: lv * 10,
                 limit_mp: lv * 150,
-                desc: "唯一将你内力的70%转化为气血",
+                desc: "唯一：将你内力的70%转化为气血",
             },
             dodge: {
                 ds: Math.floor(lv * 1.5),

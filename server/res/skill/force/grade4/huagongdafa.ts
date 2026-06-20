@@ -34,7 +34,7 @@ export default class extends SKILL {
                 fy: Math.floor(lv * 1.51),
                 gj: Math.floor(lv * 1.51),
                 limit_mp: lv * 155,
-                desc: "当你命中敌人后会吸取对方内力增加自身最大内力; 唯一将你内力的75%转化为气血",
+                desc: "当你命中敌人后会吸取对方内力增加自身最大内力\n唯一：将你内力的75%转化为气血",
             },
         };
     }

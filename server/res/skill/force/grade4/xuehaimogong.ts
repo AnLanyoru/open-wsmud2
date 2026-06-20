@@ -39,7 +39,7 @@ export default class extends SKILL {
                 fy: Math.floor(lv * 1.78),
                 diff_fy_per: 6,
                 limit_mp: lv * 140,
-                desc: "唯一将你内力的75%转化为气血",
+                desc: "唯一：将你内力的75%转化为气血",
             },
         };
     }

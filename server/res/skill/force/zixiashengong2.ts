@@ -31,7 +31,7 @@ export default class extends SKILL {
                 mz: Math.floor(lv * 1.51),
                 add_sh_per: 4,
                 limit_mp: lv * 160,
-                desc: "唯一将你内力的70%转化为气血",
+                desc: "唯一：将你内力的70%转化为气血",
             },
         };
     }

@@ -20,7 +20,7 @@ export default class extends SKILL {
                 dex: 5 + Math.floor(lv * 0.33),
                 con: 5 + Math.floor(lv * 0.33),
                 limit_mp: lv * 300,
-                desc: "唯一将你内力的75%转化为气血",
+                desc: "唯一：将你内力的75%转化为气血",
             },
             unarmed: {
                 str: 5 + Math.floor(lv * 0.33),

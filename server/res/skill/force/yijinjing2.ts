@@ -20,7 +20,7 @@ export default class extends SKILL {
                 diff_bj: 3,
                 fy_per: 8,
                 limit_mp: lv * 285,
-                desc: "唯一将你内力的90%转化为气血",
+                desc: "唯一：将你内力的90%转化为气血",
             },
             // Global/base properties:
             // {"diff_sh_per":8} 

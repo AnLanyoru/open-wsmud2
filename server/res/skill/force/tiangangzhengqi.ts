@@ -30,7 +30,7 @@ export default class extends SKILL {
                 max_hp: Math.floor(lv * 15.8),
                 fy: Math.floor(lv * 2.15),
                 limit_mp: lv * 160,
-                desc: "唯一将你内力的90%转化为气血",
+                desc: "唯一：将你内力的90%转化为气血",
             },
         };
     }

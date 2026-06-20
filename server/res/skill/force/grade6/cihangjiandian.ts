@@ -20,7 +20,7 @@ export default class extends SKILL {
                 add_sh_per: 10,
                 diff_fy_per: 10,
                 limit_mp: lv * 900,
-                desc: "灵动当你开始战斗的5秒内无法被控制; 唯一将你内力的120%转化为气血",
+                desc: "灵动当你开始战斗的5秒内无法被控制; 唯一：将你内力的120%转化为气血",
             },
         };
     }

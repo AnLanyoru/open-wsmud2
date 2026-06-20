@@ -35,7 +35,7 @@ export default class extends SKILL {
                 max_hp: 50 + lv * 10,
                 fy_per: 6,
                 limit_mp: lv * 103,
-                desc: "唯一将你内力的77%转化为气血",
+                desc: "唯一：将你内力的77%转化为气血",
             },
         };
     }

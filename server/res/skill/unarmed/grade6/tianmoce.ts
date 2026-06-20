@@ -19,7 +19,7 @@ export default class extends SKILL {
                 mz: lv * 3,
                 add_sh_per: 4,
                 diff_sh_per: 4,
-                desc: "唯一将你内力的135%转化为气血",
+                desc: "唯一：将你内力的135%转化为气血",
             },
             dodge: {
                 ds: lv * 3,
