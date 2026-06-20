@@ -7,7 +7,7 @@ export default class extends EQUIPMENT {
     desc = "武当至宝，先天太极";
     value = 5000000;
     grade = 6;
-    eq_type = EQUIP_TYPE.JEWELS;
+    eq_type = EQUIP_TYPE.CLOTH;
     prop = {
         fy: 780,
         con: 150,
