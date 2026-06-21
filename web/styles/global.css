@@ -115,7 +115,7 @@ body[data-theme="light"] {
     --text-secondary: #5F5E5A;
     --text-tertiary: #6E6D69;
     --text-muted: #878580;
-    --text-muted2: #9D9B95;
+    --text-muted2: #444444;
     --text-header: #37352F;
     --text-title: #37352F;
     --border-primary: #D5CDC0;
@@ -215,7 +215,7 @@ body[data-theme="book"] {
     --text-secondary: #5A5545;
     --text-tertiary: #6E6858;
     --text-muted: #827C6A;
-    --text-muted2: #948E7C;
+    --text-muted2: #444444;
     --text-header: #1A1A18;
     --text-title: #1A1A18;
     --border-primary: #C2B698;
