@@ -37,7 +37,7 @@
 
 
 .dialog > .dialog-header > .dialog-title {
-    color: #808000;
+    color: var(--dialog-title-color);
     font-weight: bold;
     overflow-x: hidden;
     text-overflow: ellipsis;
@@ -46,14 +46,14 @@
 }
 
 .dialog > .dialog-header > .dialog-icon {
-    color: #808000;
+    color: var(--dialog-icon-color);
     margin-top: 0.65em;
     margin-right: 0.25em;
 }
 
 .dialog > .dialog-header > .dialog-close {
     line-height: 2em;
-    color: gray;
+    color: var(--dialog-close-color);
     cursor: pointer;
     font-size: 1.25em;
     margin-right: 4px;
@@ -70,7 +70,7 @@
 }
 
 .dialog > .dialog-footer > .ok {
-    color: #00FFFF;
+    color: var(--dialog-ok-color);
 }
 
 
@@ -201,7 +201,7 @@
 .dialog-score2 .value {
     display: inline-block;
     line-height: 1.6em;
-    color: #00ff00;
+    color: var(--dialog-highlight);
 }
 
 .dialog-score2 h3 {
@@ -232,17 +232,17 @@
 }
 
 .dialog-titles > .selected {
-    border-left-color: #00FF00;
+    border-left-color: var(--dialog-highlight);
 }
 
 .dialog-titles > .title-item > .btn-noused {
     float: right;
     display: inline-block;
-    color: #00ff00;
+    color: var(--dialog-highlight);
     padding-left: 2em;
     background-color: var(--border-primary);
     padding-right: 2em;
-    border-left: 1px solid #121212;
+    border-left: 1px solid var(--border-primary);
     cursor: pointer;
 }
 

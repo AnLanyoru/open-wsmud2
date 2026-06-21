@@ -536,8 +536,8 @@ const packet_css = `
 }
 
 .eq-list>.eq-item>.eq-type {
-    background-color: #333;
-    color: var(--text-muted);
+    background-color: var(--bg-surface2);
+    color: var(--text-body);
     line-height: 1.875em;
     display: inline-block;
     height: 1.875em;

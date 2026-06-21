@@ -2,6 +2,9 @@ export default {
     DIRS: ["west", "north", "south", "east", "northwest", "southwest", "northeast", "southeast",
         "down", "up", "westdown", "northdown", "southdown", "eastdown", "westup", "northup", "southup", "eastup", "enter", "out"],
     REG: /<(\w+)>(.+)<\/\w+>/,
+    cssVar: function (name, fallback) {
+        return getComputedStyle(document.body).getPropertyValue(name).trim() || fallback || '';
+    },
     CreateExitsMap: function (exits, w, name) {
         var str = name.split("-");
         if (str.length > 1) name = str[str.length - 1];
@@ -35,7 +38,7 @@ export default {
         }
         var html = [];
         html.push('<svg style="margin-left:-2em" height="' + height + '" width="' + w + '">');
-        html.push('<rect x="' + l + '" y="' + t + '"  fill="dimgrey" stroke-width="1" stroke="gray" ');
+        html.push('<rect x="' + l + '" y="' + t + '"  fill="' + this.cssVar('--map-room-fill', 'dimgrey') + '" stroke-width="1" stroke="' + this.cssVar('--map-room-stroke', 'gray') + '" ');
         html.push('width="' + unitW + '" height="' + unitH + '"></rect>');
         html.push(' <text x="' + (l + 30) + '" y="' + (t + 14) + '"  text-anchor="middle" style="font-size:12px;" ');
         this.pushName(html, name, true);
@@ -101,13 +104,13 @@ export default {
             var rm_name = exits[dir];
             if (dir == "south_2") dir = "down";
             else if (dir == "north_2") dir = "up";
-            html.push('<rect x="' + pos[0] + '" y="' + pos[1] + '" dir="' + dir + '" fill="#232323" stroke-width="1" stroke="gray" ');
+            html.push('<rect x="' + pos[0] + '" y="' + pos[1] + '" dir="' + dir + '" fill="' + this.cssVar('--map-exit-fill', '#232323') + '" stroke-width="1" stroke="' + this.cssVar('--map-room-stroke', 'gray') + '" ');
             html.push('width="' + unitW + '" height="' + unitH + '"></rect>');
             html.push(' <text x="' + (pos[0] + 30) + '" y="' + (pos[1] + 14) + '" dir="' + dir + '" text-anchor="middle" style="font-size:12px;"');
             this.pushName(html, rm_name, false);
 
             if (pos1) {
-                html.push('<line  stroke="gray" ');
+                html.push('<line  stroke="' + this.cssVar('--map-room-stroke', 'gray') + '" ');
                 html.push(" x1='" + pos1[0] + "' y1='" + pos1[1] + "' x2='" + pos2[0] + "' y2='" + pos2[1] + "'");
                 if (dir.indexOf("up") > -1 || dir.indexOf("down") > -1) {
                     html.push(" stroke-dasharray='5,5'");
@@ -122,13 +125,8 @@ export default {
 
         html.push("</svg>");
         return html.join("");
-    }, colors: {
-        "hig": "#00FF00", "hir": "#FF0000", "him": "#FF00FF",
-        "hic": "#00FFFF", "hiy": "#FFFF00", "red": "#800000",
-        "wht": "#C0C0C0", "mag": "#800080", "red": "#800000"
-        , "hiw": "#FFFFFF", "gre": "#008000", "blu": "#000080", "hib": "#0000FF"
-    }, GetColor: function (name, issel) {
-        return this.colors[name.toLowerCase()] || "dimgrey";
+    }, GetColor: function (name) {
+        return this.cssVar('--mud-' + name.toLowerCase(), 'dimgrey');
     },
     ShowMap: function (map, id) {
         if (!map) return;
@@ -159,7 +157,7 @@ export default {
             var l = (map[i].p[0] + offX) * unitX + off_x + 20;
             var t = (map[i].p[1] + offY) * unitY + 20;
             html.push("x='" + l + "' y='" + t + "'");
-            html.push(' fill="dimgrey" stroke-width="1" stroke="gray" ');
+            html.push(' fill="' + this.cssVar('--map-room-fill', 'dimgrey') + '" stroke-width="1" stroke="' + this.cssVar('--map-room-stroke', 'gray') + '" ');
             html.push('width="' + unitW + '" height="' + unitH + '"></rect>');
             var exits = map[i].exits;
             if (exits) {
@@ -203,7 +201,7 @@ export default {
                             break;
                     }
                     if (pos1) {
-                        html.push('<line  stroke="gray" ');
+                        html.push('<line  stroke="' + this.cssVar('--map-room-stroke', 'gray') + '" ');
                         html.push(" x1='" + pos1[0] + "' y1='" + pos1[1] + "' x2='" + pos2[0] + "' y2='" + pos2[1] + "'");
                         if (RegExp.$3) {
                             html.push(" stroke-dasharray='5,5'");
@@ -238,7 +236,7 @@ export default {
             html.push('>' + mathch[2] + '</text>');
         } else {
             html.push(' fill="');
-            html.push(issel ? "#232323" : "dimgrey");
+            html.push(this.cssVar(issel ? '--map-current-fill' : '--map-room-fill'));
             html.push('">' + rm_name + '</text>');
         }
     },
@@ -290,15 +288,15 @@ export default {
         if (!this.IsShow) return;
 
         if (this.CurRoomItem) {
-            this.CurRoomItem.attr("fill", "dimgrey");
-            this.CurRoomItem.attr("stroke", "gray");
+            this.CurRoomItem.attr("fill", this.cssVar('--map-room-fill', 'dimgrey'));
+            this.CurRoomItem.attr("stroke", this.cssVar('--map-room-stroke', 'gray'));
         }
         this.CurRoomItem = null;
         var item = this.MapContent.find("rect[rm='" + rm.path + "']");
         if (item.length) {
             this.CurRoomItem = item;
-            this.CurRoomItem.attr("fill", "#bebebe");
-            this.CurRoomItem.attr("stroke", "gray");
+            this.CurRoomItem.attr("fill", this.cssVar('--map-current-fill', '#bebebe'));
+            this.CurRoomItem.attr("stroke", this.cssVar('--map-room-stroke', 'gray'));
             var pos = [item.attr("x"), item.attr("y"), item.attr("width"), item.attr("height")];
             var elem = document.querySelector(".map-panel");
             var height = elem.offsetHeight;

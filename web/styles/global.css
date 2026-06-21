@@ -46,90 +46,245 @@ body[data-theme="dark"] {
     --tool-color: #111;
     --tool-hover: #666;
     --font-family: "Microsoft YaHei UI";
+
+    /* MUD 颜色标签 — 暗黑终端风格 (保持原色) */
+    --mud-nor: #008000;
+    --mud-gre: #008000;
+    --mud-blk: #505050;
+    --mud-blu: #000080;
+    --mud-cyn: #008080;
+    --mud-red: #800000;
+    --mud-mag: #800080;
+    --mud-yel: #808000;
+    --mud-wht: #C0C0C0;
+    --mud-ora: #d26900;
+    --mud-hik: #808080;
+    --mud-hig: #00FF00;
+    --mud-hir: #FF0000;
+    --mud-hib: #0000FF;
+    --mud-hic: #00FFFF;
+    --mud-him: #FF00FF;
+    --mud-hiy: #FFFF00;
+    --mud-hiw: #FFFFFF;
+    --mud-hio: #FFA500;
+    --mud-hij: #FFD700;
+    --mud-hiz: #912CEE;
+    --mud-ord: #FF4500;
+    --mud-bblk: #FFFFFF;
+    --mud-bblu: #000080;
+    --mud-bcyn: #008080;
+    --mud-bred: #800000;
+    --mud-bmag: #800080;
+    --mud-byel: #808000;
+    --mud-bwht: #C0C0C0;
+    --mud-bhik: #808080;
+    --mud-hbblu: #0000FF;
+    --mud-hbgrn: #00FF00;
+    --mud-hbcyn: #00FFFF;
+    --mud-hbred: #FF0000;
+    --mud-hbmag: #FF00FF;
+    --mud-hbyel: #FFFF00;
+    --mud-hbwht: #FFFFFF;
+
+    /* 对话框专用颜色 */
+    --dialog-title-color: #808000;
+    --dialog-icon-color: #808000;
+    --dialog-close-color: gray;
+    --dialog-ok-color: #00FFFF;
+    --dialog-highlight: #00FF00;
+    --exit-color: #FFFF00;
+    --map-room-fill: dimgrey;
+    --map-room-stroke: gray;
+    --map-exit-fill: #232323;
+    --map-current-fill: #bebebe;
 }
 
+/* Notion-pre-ai — 亮色主题 (暖调加深) */
 body[data-theme="light"] {
-    --bg-body: #f0f0f0;
-    --bg-surface: #e0e0e0;
-    --bg-surface2: #d0d0d0;
-    --bg-input: white;
-    --text-body: #222;
-    --text-secondary: #444;
-    --text-tertiary: #555;
-    --text-muted: #777;
-    --text-muted2: #888;
-    --text-header: #333;
-    --text-title: #333;
-    --border-primary: #ccc;
-    --border-secondary: #aaa;
-    --switch-bg: #ccc;
-    --switch-on-bg: #4CAF50;
-    --switch-knob: #999;
-    --switch-knob-on: #fff;
-    --switch-text: #888;
-    --switch-text-on: #fff;
-    --color-item-border: #aaa;
-    --color-item-select: #e74c3c;
-    --dialog-header-bg: #d8d8d8;
-    --dialog-footer-bg: #d8d8d8;
-    --dialog-footer-select: #bbb;
-    --dialog-confirm-bg: #e0e0e0;
-    --warn-bg: #e8e8e8;
-    --scroll-flag-bg: #d0d0d0;
-    --scroll-flag-color: #999;
-    --state-bar-bg: #e0e0e0;
-    --chat-input-bg: #fff;
-    --chat-input-color: #333;
-    --chat-btn-bg: #d0d0d0;
-    --btn-bg: #f0f0f0;
-    --btn-border: #aaa;
-    --btn-color: #555;
-    --tool-bg: #aaa;
-    --tool-color: #fff;
-    --tool-hover: #888;
-    --font-family: "Microsoft YaHei UI";
+    --bg-body: #EBE5DB;
+    --bg-surface: #E1DACF;
+    --bg-surface2: #D5CDC0;
+    --bg-input: #EBE5DB;
+    --text-body: #37352F;
+    --text-secondary: #5F5E5A;
+    --text-tertiary: #6E6D69;
+    --text-muted: #878580;
+    --text-muted2: #9D9B95;
+    --text-header: #37352F;
+    --text-title: #37352F;
+    --border-primary: #D5CDC0;
+    --border-secondary: #C8BFB0;
+    --switch-bg: #D5CDC0;
+    --switch-on-bg: #37352F;
+    --switch-knob: #FFFFFF;
+    --switch-knob-on: #FFFFFF;
+    --switch-text: #878580;
+    --switch-text-on: #FFFFFF;
+    --color-item-border: #C8BFB0;
+    --color-item-select: #9E3024;
+    --dialog-header-bg: #E1DACF;
+    --dialog-footer-bg: #E1DACF;
+    --dialog-footer-select: #D5CDC0;
+    --dialog-confirm-bg: #E1DACF;
+    --warn-bg: #E1DACF;
+    --scroll-flag-bg: #D5CDC0;
+    --scroll-flag-color: #5F5E5A;
+    --state-bar-bg: #E1DACF;
+    --chat-input-bg: #E1DACF;
+    --chat-input-color: #37352F;
+    --chat-btn-bg: #D5CDC0;
+    --btn-bg: #E1DACF;
+    --btn-border: #C8BFB0;
+    --btn-color: #37352F;
+    --tool-bg: #D5CDC0;
+    --tool-color: #37352F;
+    --tool-hover: #C8BFB0;
+    --font-family: "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+
+    /* MUD 颜色标签 — 深暖降亮 */
+    --mud-nor: #37352F;
+    --mud-gre: #37352F;
+    --mud-blk: #5F5E5A;
+    --mud-blu: #1D4A7A;
+    --mud-cyn: #006B5E;
+    --mud-red: #9E3024;
+    --mud-mag: #654080;
+    --mud-yel: #6E5F20;
+    --mud-wht: #5F5E5A;
+    --mud-ora: #A8551E;
+    --mud-hik: #787670;
+    --mud-hig: #3A8A3A;
+    --mud-hir: #B8403A;
+    --mud-hib: #256A8E;
+    --mud-hic: #007A6E;
+    --mud-him: #7B4A8E;
+    --mud-hiy: #B8930A;
+    --mud-hiw: #2D2B26;
+    --mud-hio: #B8651A;
+    --mud-hij: #C07A0E;
+    --mud-hiz: #6E3A85;
+    --mud-ord: #B85020;
+    --mud-bblk: #FFFFFF;
+    --mud-bblu: #1D4A7A;
+    --mud-bcyn: #006B5E;
+    --mud-bred: #9E3024;
+    --mud-bmag: #654080;
+    --mud-byel: #6E5F20;
+    --mud-bwht: #9D9B95;
+    --mud-bhik: #787670;
+    --mud-hbblu: #256A8E;
+    --mud-hbgrn: #3A8A3A;
+    --mud-hbcyn: #007A6E;
+    --mud-hbred: #B8403A;
+    --mud-hbmag: #7B4A8E;
+    --mud-hbyel: #B8930A;
+    --mud-hbwht: #FFFFFF;
+
+    /* 对话框专用 */
+    --dialog-title-color: #37352F;
+    --dialog-icon-color: #6E6D69;
+    --dialog-close-color: #878580;
+    --dialog-ok-color: #006B5E;
+    --dialog-highlight: #3A8A3A;
+    --exit-color: #7A5A10;
+    --map-room-fill: #D5CDC0;
+    --map-room-stroke: #C8BFB0;
+    --map-exit-fill: #BFB6A8;
+    --map-current-fill: #A89F90;
 }
 
+/* Stripe Press — 书卷主题 (暖调加深) */
 body[data-theme="book"] {
-    --bg-body: #f5f0e6;
-    --bg-surface: #ede4d3;
-    --bg-surface2: #e0d5c0;
-    --bg-input: #faf7f0;
-    --text-body: #4a3728;
-    --text-secondary: #6b5a4e;
-    --text-tertiary: #7a6b5d;
-    --text-muted: #9c8b7a;
-    --text-muted2: #a89880;
-    --text-header: #5c4033;
-    --text-title: #5c4033;
-    --border-primary: #c4b5a5;
-    --border-secondary: #b8a58b;
-    --switch-bg: #d5c9b5;
-    --switch-on-bg: #8b7355;
-    --switch-knob: #b8a58b;
-    --switch-knob-on: #f5f0e6;
-    --switch-text: #a89880;
-    --switch-text-on: #f5f0e6;
-    --color-item-border: #b8a58b;
-    --color-item-select: #c0392b;
-    --dialog-header-bg: #e0d5c0;
-    --dialog-footer-bg: #e0d5c0;
-    --dialog-footer-select: #c4b5a5;
-    --dialog-confirm-bg: #ede4d3;
-    --warn-bg: #ede4d3;
-    --scroll-flag-bg: #d5c9b5;
-    --scroll-flag-color: #b8a58b;
-    --state-bar-bg: #ede4d3;
-    --chat-input-bg: #faf7f0;
-    --chat-input-color: #4a3728;
-    --chat-btn-bg: #e0d5c0;
-    --btn-bg: #f5f0e6;
-    --btn-border: #b8a58b;
-    --btn-color: #6b5a4e;
-    --tool-bg: #b8a58b;
-    --tool-color: #f5f0e6;
-    --tool-hover: #9c8b7a;
-    --font-family: "Georgia", "Noto Serif SC", "SimSun", "KaiTi", serif;
+    --bg-body: #DBD2B8;
+    --bg-surface: #CFC4A8;
+    --bg-surface2: #C2B698;
+    --bg-input: #E3DCC6;
+    --text-body: #1A1A18;
+    --text-secondary: #5A5545;
+    --text-tertiary: #6E6858;
+    --text-muted: #827C6A;
+    --text-muted2: #948E7C;
+    --text-header: #1A1A18;
+    --text-title: #1A1A18;
+    --border-primary: #C2B698;
+    --border-secondary: #B5A88A;
+    --switch-bg: #C2B698;
+    --switch-on-bg: #1A3F5C;
+    --switch-knob: #DBD2B8;
+    --switch-knob-on: #DBD2B8;
+    --switch-text: #827C6A;
+    --switch-text-on: #DBD2B8;
+    --color-item-border: #C2B698;
+    --color-item-select: #8A3A24;
+    --dialog-header-bg: #CFC4A8;
+    --dialog-footer-bg: #CFC4A8;
+    --dialog-footer-select: #C2B698;
+    --dialog-confirm-bg: #CFC4A8;
+    --warn-bg: #CFC4A8;
+    --scroll-flag-bg: #C2B698;
+    --scroll-flag-color: #6E6858;
+    --state-bar-bg: #CFC4A8;
+    --chat-input-bg: #E3DCC6;
+    --chat-input-color: #1A1A18;
+    --chat-btn-bg: #C2B698;
+    --btn-bg: #DBD2B8;
+    --btn-border: #C2B698;
+    --btn-color: #1A1A18;
+    --tool-bg: #C2B698;
+    --tool-color: #DBD2B8;
+    --tool-hover: #B5A88A;
+    --font-family: "Georgia", "Noto Serif SC", "Source Serif 4", "SimSun", "KaiTi", serif;
+
+    /* MUD 颜色标签 — 深暖降亮 */
+    --mud-nor: #1A1A18;
+    --mud-gre: #1A1A18;
+    --mud-blk: #5A5545;
+    --mud-blu: #153A52;
+    --mud-cyn: #0A6058;
+    --mud-red: #8A3A24;
+    --mud-mag: #5A3A68;
+    --mud-yel: #6E5A22;
+    --mud-wht: #5A5545;
+    --mud-ora: #944A20;
+    --mud-hik: #6E6858;
+    --mud-hig: #2E6E2E;
+    --mud-hir: #9A4530;
+    --mud-hib: #154A65;
+    --mud-hic: #0A7568;
+    --mud-him: #704870;
+    --mud-hiy: #9A8028;
+    --mud-hiw: #121210;
+    --mud-hio: #9A5825;
+    --mud-hij: #8E7218;
+    --mud-hiz: #623A7A;
+    --mud-ord: #9A4820;
+    --mud-bblk: #FFFFFF;
+    --mud-bblu: #153A52;
+    --mud-bcyn: #0A6058;
+    --mud-bred: #8A3A24;
+    --mud-bmag: #5A3A68;
+    --mud-byel: #6E5A22;
+    --mud-bwht: #948E7C;
+    --mud-bhik: #6E6858;
+    --mud-hbblu: #154A65;
+    --mud-hbgrn: #2E6E2E;
+    --mud-hbcyn: #0A7568;
+    --mud-hbred: #9A4530;
+    --mud-hbmag: #704870;
+    --mud-hbyel: #9A8028;
+    --mud-hbwht: #FFFFFF;
+
+    /* 对话框专用 */
+    --dialog-title-color: #1A1A18;
+    --dialog-icon-color: #5A5545;
+    --dialog-close-color: #827C6A;
+    --dialog-ok-color: #0A6058;
+    --dialog-highlight: #2E6E2E;
+    --exit-color: #153A52;
+    --map-room-fill: #C2B698;
+    --map-room-stroke: #B5A88A;
+    --map-exit-fill: #A89B80;
+    --map-current-fill: #9A8D72;
 }
 
 html,
@@ -153,7 +308,7 @@ body {
 
 /* 书页纹理 */
 body[data-theme="book"] {
-    background-color: #f5f0e6;
+    background-color: var(--bg-body);
     background-image:
         repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(160, 140, 110, 0.04) 3px, rgba(160, 140, 110, 0.04) 4px),
         repeating-linear-gradient(90deg, transparent, transparent 100%, rgba(160, 140, 110, 0.02) 100%);
@@ -291,43 +446,43 @@ CMD {
 }
 
 NOR {
-    color: #008000;
+    color: var(--mud-nor);
 }
 
 GRE {
-    color: #008000;
+    color: var(--mud-gre);
 }
 
 BLK {
-    color: #505050;
+    color: var(--mud-blk);
 }
 
 BLU {
-    color: #000080;
+    color: var(--mud-blu);
 }
 
 CYN {
-    color: #008080;
+    color: var(--mud-cyn);
 }
 
 RED {
-    color: #800000;
+    color: var(--mud-red);
 }
 
 MAG {
-    color: #800080;
+    color: var(--mud-mag);
 }
 
 YEL {
-    color: #808000;
+    color: var(--mud-yel);
 }
 
 WHT {
-    color: #C0C0C0;
+    color: var(--mud-wht);
 }
 
 ORA {
-    color: #d26900;
+    color: var(--mud-ora);
 }
 
 opt {
@@ -335,114 +490,114 @@ opt {
 }
 
 HIK {
-    color: #808080;
+    color: var(--mud-hik);
 }
 
 HIB {
-    color: #0000FF;
+    color: var(--mud-hib);
 }
 
 HIG {
-    color: #00FF00;
+    color: var(--mud-hig);
 }
 
 HIC {
-    color: #00FFFF;
+    color: var(--mud-hic);
 }
 
 HIR {
-    color: #FF0000;
+    color: var(--mud-hir);
 }
 
 HIM {
-    color: #FF00FF
+    color: var(--mud-him);
 }
 
 HIY {
-    color: #FFFF00;
+    color: var(--mud-hiy);
 }
 
 HIW {
-    color: #FFFFFF;
+    color: var(--mud-hiw);
 }
 
 HIO {
-    color: #FFA500;
+    color: var(--mud-hio);
 }
 
 HIJ {
-    color: #FFD700;
+    color: var(--mud-hij);
 }
 
 HIZ {
-    color: #912CEE;
+    color: var(--mud-hiz);
 }
 
 ORD {
-    color: #FF4500;
+    color: var(--mud-ord);
 }
 
 FLA {
 }
 
 BBLK {
-    background-color: #FFFFFF;
+    background-color: var(--mud-bblk);
 }
 
 BBLU {
-    background-color: #000080;
+    background-color: var(--mud-bblu);
 }
 
 BCYN {
-    background-color: #008080;
+    background-color: var(--mud-bcyn);
 }
 
 BRED {
-    background-color: #800000;
+    background-color: var(--mud-bred);
 }
 
 BMAG {
-    background-color: #800080;
+    background-color: var(--mud-bmag);
 }
 
 BYEL {
-    background-color: #808000;
+    background-color: var(--mud-byel);
 }
 
 BWHT {
-    background-color: #C0C0C0;
+    background-color: var(--mud-bwht);
 }
 
 BHIK {
-    background-color: #808080;
+    background-color: var(--mud-bhik);
 }
 
 HBBLU {
-    background-color: #0000FF;
+    background-color: var(--mud-hbblu);
 }
 
 HBGRN {
-    background-color: #00FF00;
+    background-color: var(--mud-hbgrn);
 }
 
 HBCYN {
-    background-color: #00FFFF;
+    background-color: var(--mud-hbcyn);
 }
 
 HBRED {
-    background-color: #FF0000;
+    background-color: var(--mud-hbred);
 }
 
 HBMAG {
-    background-color: #FF00FF
+    background-color: var(--mud-hbmag);
 }
 
 HBYEL {
-    background-color: #FFFF00;
+    background-color: var(--mud-hbyel);
 }
 
 HBWHT {
-    background-color: #FFFFFF;
+    background-color: var(--mud-hbwht);
 }
 
 CMD {

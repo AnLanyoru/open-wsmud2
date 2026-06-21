@@ -80,7 +80,7 @@
     line-height: 2em;
     padding-left: 0.5em;
     padding-right: 0.5em;
-    border: 1px solid #808080;
+    border: 1px solid var(--border-secondary);
     margin-right: 0.5em;
     margin-bottom: 0.5em;
     display: inline-block;
@@ -416,7 +416,7 @@
 }
 
 .room_exits > .exits-item {
-    color: #FFFF00;
+    color: var(--exit-color);
 }
 
 .room-item {
@@ -501,7 +501,7 @@
 
 .state-bar > .stop {
     display: inline-block;
-    color: #808080;
+    color: var(--text-muted);
     text-align: center;
     cursor: pointer;
     width: 3.75em;
