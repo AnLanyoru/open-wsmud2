@@ -410,6 +410,13 @@ const Process = {
         if (Setting.float_dialog == 1) {
             var text = Process._lastMessageText || '';
             Process._lastMessageText = '';
+            if (Setting.float_archive == 1 && text) {
+                // Remove all lines that were brought into the float dialog
+                var lines = text.split('\n');
+                for (var li = 0; li < lines.length; li++) {
+                    Process.message.pop();
+                }
+            }
             FloatDialog.add(text, data);
             return;
         }

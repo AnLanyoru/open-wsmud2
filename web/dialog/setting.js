@@ -63,6 +63,13 @@ export default {
                     item.find(".setting-range").val(value);
                     item.find(".range-value").text(value);
                     break;
+                case "float_dialog":
+                    if (value == 1) {
+                        item.find(".switch ").addClass("on");
+                        item.find(".switch-text").html("开");
+                        this.settingElement.find(".setting-item[for=float_archive]").show();
+                    }
+                    break;
                 default:
                     if (value == 1) {
                         item.find(".switch ").addClass("on");
@@ -243,6 +250,14 @@ export default {
                 } else {
                     $("#" + forProp).hide();
                     Setting.save(forProp, 0);
+                }
+                break;
+            case "float_dialog":
+                Setting.save(forProp, value);
+                if (value) {
+                    Dialog.setting.settingElement.find(".setting-item[for=float_archive]").show();
+                } else {
+                    Dialog.setting.settingElement.find(".setting-item[for=float_archive]").hide();
                 }
                 break;
             default:
@@ -456,6 +471,18 @@ const setting_template = `
             <div class="setting-item" for="float_dialog">
                 <span class="title">
                     对话选项显示为浮动窗口
+                </span>
+                <span class="switch">
+                    <span class="switch-button">
+                    </span>
+                    <span class="switch-text">
+                        关
+                    </span>
+                </span>
+            </div>
+            <div class="setting-item" style="display:none" for="float_archive">
+                <span class="title">
+                    浮动窗口同时归档原文字
                 </span>
                 <span class="switch">
                     <span class="switch-button">

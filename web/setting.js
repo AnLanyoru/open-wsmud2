@@ -37,6 +37,7 @@ const Setting = {
     top_safe_distance: 0,
     bottom_safe_distance: 0,
     float_dialog: 0,
+    float_archive: 0,
     theme: "dark",
     no_load: true,
     load: function (data) {
@@ -54,7 +55,7 @@ const Setting = {
         this.loadLocal();
     },
     loadLocal: function () {
-        var localKeys = ["top_safe_distance", "bottom_safe_distance", "theme"];
+        var localKeys = ["top_safe_distance", "bottom_safe_distance", "float_archive", "theme"];
         for (var i = 0; i < localKeys.length; i++) {
             var val = localStorage.getItem("ui_" + localKeys[i]);
             if (val !== null) {
@@ -184,7 +185,7 @@ const Setting = {
         this[key] = value;
 
         this.set_prop(key, value);
-        if (key === "theme") {
+        if (key === "theme" || key === "float_archive") {
             localStorage.setItem("ui_" + key, value);
         } else {
             SendCommand("setting " + key + " " + value);

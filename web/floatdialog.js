@@ -235,6 +235,8 @@ const FloatDialog = {
     currentDialogData: null,
     warnEl: null,
     autoTimer: null,
+    savedLeft: null,
+    savedTop: null,
 
     add(text, cmdsData) {
         if (this.currentFloat) {
@@ -270,18 +272,21 @@ const FloatDialog = {
             el.style.fontSize = getComputedStyle(container).fontSize;
         }
 
-        // Center (estimate before append, re-center after)
-        let ww = window.innerWidth;
-        let wh = window.innerHeight;
-        let fs = parseFloat(getComputedStyle(el).fontSize) || parseFloat(getComputedStyle(document.body).fontSize) || 16;
-        el.style.left = Math.max(0, (ww - 24 * fs) / 2) + 'px';
-        el.style.top = Math.max(0, (wh - 100) / 2) + 'px';
-
+        // Append first so offsetWidth is available
         document.body.appendChild(el);
 
-        // Re-center with actual width
+        let ww = window.innerWidth;
+        let wh = window.innerHeight;
         let ew = el.offsetWidth;
-        el.style.left = Math.max(0, (ww - ew) / 2) + 'px';
+
+        // Position: use saved position if available, otherwise center
+        if (FloatDialog.savedLeft !== null && FloatDialog.savedTop !== null) {
+            el.style.left = Math.max(0, Math.min(FloatDialog.savedLeft, ww - ew)) + 'px';
+            el.style.top = Math.max(0, FloatDialog.savedTop) + 'px';
+        } else {
+            el.style.left = Math.max(0, (ww - ew) / 2) + 'px';
+            el.style.top = Math.max(0, (wh - 100) / 2) + 'px';
+        }
 
         // Command clicks — event delegation on the dialog
         el.addEventListener('click', (e) => {
@@ -335,10 +340,14 @@ const FloatDialog = {
                 el.style.top = (oy + ev.clientY - sy) + 'px';
             };
 
-            let up = () => {
+            let up = (ev) => {
                 header.releasePointerCapture(e.pointerId);
                 header.removeEventListener('pointermove', move);
                 header.removeEventListener('pointerup', up);
+                // Save position for next float dialog
+                let finalRect = el.getBoundingClientRect();
+                FloatDialog.savedLeft = finalRect.left;
+                FloatDialog.savedTop = finalRect.top;
             };
 
             header.addEventListener('pointermove', move);
