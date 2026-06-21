@@ -2378,11 +2378,11 @@ export class CHARACTER extends ITEM {
     /**
      * 增加 / 减少内力
      */
-    add_mp(v: number): number | undefined {
+    add_mp(v: number): number {
         let mp = this.mp + v;
         if (mp > this.max_mp) mp = this.max_mp;
         if (mp < 0) mp = 0;
-        if (mp === this.mp) return;
+        if (mp === this.mp) return 0;
         this.mp = mp;
         this.notify_hp('mp', this.mp);
         return v;
