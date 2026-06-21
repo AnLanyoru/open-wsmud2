@@ -1,8 +1,6 @@
-const db = require('./db');
+import db from './db.js';
 
-
-module.exports = {
-
+export default {
     connect: async function (path) {
         await db.init(path);
     },
@@ -48,7 +46,6 @@ module.exports = {
         user.id = result.lastID;
         return true;
     },
-
 
     getServers: function () {
         let sql = "select id,name, ip,port,istest,isdef,create_time,start_time from servers";
@@ -124,6 +121,4 @@ module.exports = {
         return db.query("update players set userid=? where id=? and userid=?",
             [touserid, id, fromuserid]);
     }
-
 };
-

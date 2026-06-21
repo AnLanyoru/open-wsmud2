@@ -2,8 +2,11 @@
  * 为 server/res/skill/ 下所有 .ts 文件的 import type { CHARACTER } 行追加 DoAttackPar。
  * （跳过已有 DoAttackPar 的文件）
  */
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SKILL_DIR = path.resolve(__dirname, "../server/res/skill");
 

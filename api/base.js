@@ -1,4 +1,4 @@
-﻿const crypto = require('crypto');
+import crypto from 'crypto';
 const desvi = __CONFIG.DESIV;
 const md5add = __CONFIG.MD5;
 const SessionKey = 'u';
@@ -151,4 +151,4 @@ class Apibase {
 
 const idstr = "abcdefghijklmnopqrstuvwxwz0123456789";
 
-module.exports = Apibase;
+export default Apibase;

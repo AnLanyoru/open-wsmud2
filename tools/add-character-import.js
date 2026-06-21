@@ -2,8 +2,11 @@
  * 为 server/res/skill/ 下所有未导入 CHARACTER 的 .ts 文件自动添加 import。
  * 运行: node tools/add-character-import.js
  */
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SKILL_DIR = path.resolve(__dirname, "../server/res/skill");
 const TARGET = path.resolve(__dirname, "../server/core/char/character.js");

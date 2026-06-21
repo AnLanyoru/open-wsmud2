@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WSMud — 三主题配色预览 (暗黑 / Notion / Stripe Press)</title>
+<style>
+/* ========================================
+   CSS Custom Properties — 三套主题
+   ======================================== */
+
+/* --- 暗黑主题 (保持不动) --- */
+:root,
+body[data-theme="dark"] {
+    --bg-body: #000;
+    --bg-surface: #111;
+    --bg-surface2: #222;
+    --bg-input: #000;
+    --text-body: #008000;
+    --text-secondary: #cecece;
+    --text-tertiary: #bdc3c7;
+    --text-muted: gray;
+    --text-muted2: #898989;
+    --text-header: #C0C0C0;
+    --text-title: #ffff00;
+    --border-primary: #343434;
+    --border-secondary: gray;
+    --switch-bg: #222;
+    --switch-on-bg: #008000;
+    --switch-knob: gray;
+    --switch-knob-on: #eee;
+    --switch-text: #898989;
+    --switch-text-on: #eee;
+    --dialog-header-bg: #222;
+    --dialog-footer-bg: #222;
+    --dialog-footer-select: #555;
+    --dialog-confirm-bg: #111;
+    --warn-bg: #111;
+    --scroll-flag-bg: #222;
+    --scroll-flag-color: #555;
+    --state-bar-bg: #111;
+    --chat-input-bg: #bebebe;
+    --chat-input-color: #343434;
+    --chat-btn-bg: #ababab;
+    --btn-bg: #000;
+    --btn-border: gray;
+    --btn-color: gray;
+    --tool-bg: gray;
+    --tool-color: #111;
+    --tool-hover: #666;
+    --font-family: "Microsoft YaHei UI", sans-serif;
+
+    /* MUD 颜色标签 —— 暗黑终端风格 */
+    --mud-nor: #008000;
+    --mud-gre: #008000;
+    --mud-blk: #505050;
+    --mud-red: #800000;
+    --mud-blu: #000080;
+    --mud-cyn: #008080;
+    --mud-mag: #800080;
+    --mud-yel: #808000;
+    --mud-wht: #C0C0C0;
+    --mud-ora: #d26900;
+    --mud-hik: #808080;
+    --mud-hig: #00FF00;
+    --mud-hir: #FF0000;
+    --mud-hib: #0000FF;
+    --mud-hic: #00FFFF;
+    --mud-him: #FF00FF;
+    --mud-hiy: #FFFF00;
+    --mud-hiw: #FFFFFF;
+    --mud-hio: #FFA500;
+    --mud-hij: #FFD700;
+    --mud-hiz: #912CEE;
+    --mud-ord: #FF4500;
+
+    /* 对话框硬编码覆盖 */
+    --exit-color: #FFFF00;
+    --dialog-title-color: #808000;
+    --dialog-icon-color: #808000;
+    --dialog-close-color: gray;
+    --dialog-ok-color: #00FFFF;
+}
+
+/* --- 亮色主题 → Notion-pre-ai 配色 (暖调加深) --- */
+body[data-theme="light"] {
+    --bg-body: #EBE5DB;
+    --bg-surface: #E1DACF;
+    --bg-surface2: #D5CDC0;
+    --bg-input: #EBE5DB;
+    --text-body: #37352F;
+    --text-secondary: #5F5E5A;
+    --text-tertiary: #6E6D69;
+    --text-muted: #878580;
+    --text-muted2: #9D9B95;
+    --text-header: #37352F;
+    --text-title: #37352F;
+    --border-primary: #D5CDC0;
+    --border-secondary: #C8BFB0;
+    --switch-bg: #D5CDC0;
+    --switch-on-bg: #37352F;
+    --switch-knob: #FFFFFF;
+    --switch-knob-on: #FFFFFF;
+    --switch-text: #878580;
+    --switch-text-on: #FFFFFF;
+    --dialog-header-bg: #E1DACF;
+    --dialog-footer-bg: #E1DACF;
+    --dialog-footer-select: #D5CDC0;
+    --dialog-confirm-bg: #E1DACF;
+    --warn-bg: #E1DACF;
+    --scroll-flag-bg: #D5CDC0;
+    --scroll-flag-color: #5F5E5A;
+    --state-bar-bg: #E1DACF;
+    --chat-input-bg: #E1DACF;
+    --chat-input-color: #37352F;
+    --chat-btn-bg: #D5CDC0;
+    --btn-bg: #E1DACF;
+    --btn-border: #C8BFB0;
+    --btn-color: #37352F;
+    --tool-bg: #D5CDC0;
+    --tool-color: #37352F;
+    --tool-hover: #C8BFB0;
+    --font-family: "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+
+    /* MUD 颜色标签 — 深暖降亮 */
+    --mud-nor: #37352F;
+    --mud-gre: #37352F;
+    --mud-blk: #5F5E5A;
+    --mud-red: #9E3024;
+    --mud-blu: #1D4A7A;
+    --mud-cyn: #006B5E;
+    --mud-mag: #654080;
+    --mud-yel: #6E5F20;
+    --mud-wht: #5F5E5A;
+    --mud-ora: #A8551E;
+    --mud-hik: #787670;
+    --mud-hig: #3A8A3A;
+    --mud-hir: #B8403A;
+    --mud-hib: #256A8E;
+    --mud-hic: #007A6E;
+    --mud-him: #7B4A8E;
+    --mud-hiy: #B8930A;
+    --mud-hiw: #2D2B26;
+    --mud-hio: #B8651A;
+    --mud-hij: #C07A0E;
+    --mud-hiz: #6E3A85;
+    --mud-ord: #B85020;
+
+    --exit-color: #7A5A10;
+    --dialog-title-color: #37352F;
+    --dialog-icon-color: #6E6D69;
+    --dialog-close-color: #878580;
+    --dialog-ok-color: #006B5E;
+}
+
+/* --- 书卷主题 → Stripe Press 配色 (暖调加深) --- */
+body[data-theme="book"] {
+    --bg-body: #DBD2B8;
+    --bg-surface: #CFC4A8;
+    --bg-surface2: #C2B698;
+    --bg-input: #E3DCC6;
+    --text-body: #1A1A18;
+    --text-secondary: #5A5545;
+    --text-tertiary: #6E6858;
+    --text-muted: #827C6A;
+    --text-muted2: #948E7C;
+    --text-header: #1A1A18;
+    --text-title: #1A1A18;
+    --border-primary: #C2B698;
+    --border-secondary: #B5A88A;
+    --switch-bg: #C2B698;
+    --switch-on-bg: #1A3F5C;
+    --switch-knob: #DBD2B8;
+    --switch-knob-on: #DBD2B8;
+    --switch-text: #827C6A;
+    --switch-text-on: #DBD2B8;
+    --dialog-header-bg: #CFC4A8;
+    --dialog-footer-bg: #CFC4A8;
+    --dialog-footer-select: #C2B698;
+    --dialog-confirm-bg: #CFC4A8;
+    --warn-bg: #CFC4A8;
+    --scroll-flag-bg: #C2B698;
+    --scroll-flag-color: #6E6858;
+    --state-bar-bg: #CFC4A8;
+    --chat-input-bg: #E3DCC6;
+    --chat-input-color: #1A1A18;
+    --chat-btn-bg: #C2B698;
+    --btn-bg: #DBD2B8;
+    --btn-border: #C2B698;
+    --btn-color: #1A1A18;
+    --tool-bg: #C2B698;
+    --tool-color: #DBD2B8;
+    --tool-hover: #B5A88A;
+    --font-family: "Georgia", "Noto Serif SC", "Source Serif 4", serif;
+
+    /* MUD 颜色标签 — 深暖降亮 */
+    --mud-nor: #1A1A18;
+    --mud-gre: #1A1A18;
+    --mud-blk: #5A5545;
+    --mud-red: #8A3A24;
+    --mud-blu: #153A52;
+    --mud-cyn: #0A6058;
+    --mud-mag: #5A3A68;
+    --mud-yel: #6E5A22;
+    --mud-wht: #5A5545;
+    --mud-ora: #944A20;
+    --mud-hik: #6E6858;
+    --mud-hig: #2E6E2E;
+    --mud-hir: #9A4530;
+    --mud-hib: #154A65;
+    --mud-hic: #0A7568;
+    --mud-him: #704870;
+    --mud-hiy: #9A8028;
+    --mud-hiw: #121210;
+    --mud-hio: #9A5825;
+    --mud-hij: #8E7218;
+    --mud-hiz: #623A7A;
+    --mud-ord: #9A4820;
+
+    --exit-color: #153A52;
+    --dialog-title-color: #1A1A18;
+    --dialog-icon-color: #5A5545;
+    --dialog-close-color: #827C6A;
+    --dialog-ok-color: #0A6058;
+}
+
+/* ========================================
+   全局基础样式
+   ======================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-body);
+    font-family: var(--font-family);
+    color: var(--text-body);
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body[data-theme="book"] {
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(160,140,110,0.04) 3px, rgba(160,140,110,0.04) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 100%, rgba(160,140,110,0.02) 100%);
+    background-attachment: fixed;
+}
+
+pre { font-size: inherit; font-family: inherit; margin: 0; white-space: pre-line; }
+::-webkit-scrollbar { width: 0; height: 0; display: none; }
+* { scrollbar-width: none; }
+
+/* ========================================
+   主题切换栏 (顶部)
+   ======================================== */
+.theme-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-primary);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.theme-bar-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.theme-btn {
+    padding: 6px 18px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--font-family);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.theme-btn:hover {
+    background: var(--tool-hover);
+    color: var(--text-body);
+}
+.theme-btn.active {
+    background: var(--switch-on-bg);
+    color: var(--switch-knob-on);
+    border-color: var(--switch-on-bg);
+    font-weight: 600;
+}
+.theme-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg-surface2);
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+/* ========================================
+   主布局容器
+   ======================================== */
+.app-container {
+    width: 100%;
+    max-width: 768px;
+    height: 100vh;
+    margin: 0 auto;
+    padding-top: 48px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* ========================================
+   房间信息区
+   ======================================== */
+.content-room {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-primary);
+    background: var(--bg-surface);
+    flex-shrink: 0;
+}
+.room-title {
+    color: var(--text-title);
+    line-height: 2em;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.room-title .map-icon {
+    color: var(--text-muted);
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 14px;
+}
+.room-desc {
+    text-indent: 2em;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 4px 0;
+    font-style: italic;
+}
+.room-exits {
+    color: var(--exit-color);
+    line-height: 1.8;
+}
+.room-items {
+    max-height: 6rem;
+    overflow-y: auto;
+    margin-top: 4px;
+}
+.room-item {
+    cursor: pointer;
+    line-height: 1.8;
+    padding: 1px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.room-item .item-icon {
+    opacity: 0.4;
+    width: 2em;
+    text-align: center;
+    font-size: 12px;
+}
+.room-item .item-name { color: var(--mud-hig); }
+body[data-theme="book"] .room-item .item-name { color: var(--mud-hig); }
+body[data-theme="light"] .room-item .item-name { color: var(--text-body); font-weight: 600; }
+.room-item .item-status {
+    margin-left: auto;
+    font-size: 12px;
+    background: var(--mud-hig);
+    color: #fff;
+    padding: 0 6px;
+    border-radius: 3px;
+    line-height: 1.4;
+}
+
+/* ========================================
+   频道消息区
+   ======================================== */
+.channel-bar {
+    max-height: 4em;
+    overflow-y: auto;
+    padding: 4px 12px;
+    border-bottom: 1px solid var(--border-primary);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.channel-bar pre { white-space: pre-line; }
+
+/* ========================================
+   主消息显示区 (核心)
+   ======================================== */
+.content-message {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px;
+    scroll-behavior: smooth;
+}
+.content-message pre {
+    white-space: pre-line;
+    line-height: 1.65;
+}
+
+/* ========================================
+   聊天面板
+   ======================================== */
+.chat-panel {
+    flex-shrink: 0;
+    border-top: 1px solid var(--border-primary);
+    background: var(--bg-body);
+}
+.channel-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+}
+.channel-box span {
+    line-height: 1.8;
+    padding: 2px 10px;
+    border: 1px solid var(--text-header);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    background: var(--bg-body);
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 2px;
+    transition: all 0.15s ease;
+}
+.channel-box span.selected {
+    background: var(--chat-input-bg);
+    color: var(--chat-input-color);
+    font-weight: 600;
+}
+.chat-input-row {
+    display: flex;
+    height: 2.5em;
+    line-height: 2.5em;
+}
+.chat-input-row input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: var(--chat-input-bg);
+    color: var(--chat-input-color);
+    padding: 0 8px;
+    font-family: var(--font-family);
+    font-size: 14px;
+}
+.chat-input-row .send-btn {
+    width: 3.5em;
+    text-align: center;
+    background: var(--chat-btn-bg);
+    color: var(--chat-input-color);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.15s ease;
+}
+.chat-input-row .send-btn:hover { background: var(--tool-hover); }
+
+/* ========================================
+   底部工具栏
+   ======================================== */
+.bottom-bar {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 4px 8px;
+    border-top: 1px solid var(--border-primary);
+    background: var(--bg-body);
+    flex-shrink: 0;
+}
+.state-bar {
+    flex: 1;
+    background: var(--state-bar-bg);
+    border-radius: 6px;
+    border-left: 2px solid var(--border-secondary);
+    padding: 0 10px;
+    height: 2.5em;
+    line-height: 2.5em;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow-x: auto;
+    cursor: pointer;
+}
+.tool-item {
+    width: 2.5em;
+    height: 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--tool-bg);
+    color: var(--tool-color);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid var(--bg-surface2);
+    transition: background 0.15s ease;
+}
+.tool-item:hover { background: var(--tool-hover); }
+.tool-item .tool-icon { font-size: 13px; line-height: 1; }
+.tool-item .tool-text { font-size: 9px; line-height: 1.2; }
+
+/* ========================================
+   对话框面板
+   ======================================== */
+.dialog {
+    margin: 8px 12px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.dialog-header {
+    height: 2.2em;
+    line-height: 2.2em;
+    background: var(--dialog-header-bg);
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.dialog-header .dialog-icon { color: var(--dialog-icon-color); font-size: 13px; }
+.dialog-header .dialog-title {
+    color: var(--dialog-title-color);
+    font-weight: bold;
+    flex: 1;
+    font-size: 13px;
+}
+.dialog-header .dialog-close {
+    color: var(--dialog-close-color);
+    cursor: pointer;
+    font-size: 16px;
+}
+.dialog-content {
+    padding: 10px 12px;
+    background: var(--bg-body);
+    max-height: 10em;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.7;
+}
+.dialog-footer {
+    height: 2.2em;
+    line-height: 2.2em;
+    background: var(--dialog-footer-bg);
+    padding: 0 10px;
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+}
+.dialog-footer .footer-item {
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-weight: 600;
+}
+.dialog-footer .footer-item.select {
+    color: var(--text-body);
+    background: var(--dialog-footer-select);
+    padding: 0 12px;
+    border-radius: 4px;
+}
+
+/* ========================================
+   命令按钮区
+   ======================================== */
+.command-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding: 4px 12px;
+    flex-shrink: 0;
+}
+.cmd-btn {
+    display: inline-block;
+    border: 1px solid var(--btn-border);
+    color: var(--btn-color);
+    background: var(--btn-bg);
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 12px;
+    font-size: 12px;
+    transition: all 0.15s ease;
+    font-family: var(--font-family);
+}
+.cmd-btn:active { background: var(--btn-border); color: var(--btn-bg); }
+
+/* ========================================
+   MUD 颜色标签定义
+   ======================================== */
+.mud-nor, .mud-gre { color: var(--mud-nor); }
+.mud-red { color: var(--mud-red); }
+.mud-blu { color: var(--mud-blu); }
+.mud-cyn { color: var(--mud-cyn); }
+.mud-mag { color: var(--mud-mag); }
+.mud-yel { color: var(--mud-yel); }
+.mud-wht { color: var(--mud-wht); }
+.mud-ora { color: var(--mud-ora); }
+.mud-hik { color: var(--mud-hik); }
+.mud-hig { color: var(--mud-hig); }
+.mud-hir { color: var(--mud-hir); }
+.mud-hib { color: var(--mud-hib); }
+.mud-hic { color: var(--mud-hic); }
+.mud-him { color: var(--mud-him); }
+.mud-hiy { color: var(--mud-hiy); }
+.mud-hiw { color: var(--mud-hiw); }
+.mud-hio { color: var(--mud-hio); }
+.mud-hij { color: var(--mud-hij); }
+.mud-hiz { color: var(--mud-hiz); }
+.mud-ord { color: var(--mud-ord); }
+
+/* 后台色 */
+.bg-bblk { background: #FFF; }
+.bg-bred { background: var(--mud-red); color: #fff; padding: 0 4px; border-radius: 2px; }
+.bg-bblu { background: var(--mud-blu); color: #fff; padding: 0 4px; border-radius: 2px; }
+.bg-byel { background: var(--mud-yel); color: #000; padding: 0 4px; border-radius: 2px; }
+
+/* ========================================
+   可点击命令
+   ======================================== */
+.cmd-link {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: bold;
+    color: var(--mud-cyn);
+}
+body[data-theme="book"] .cmd-link { color: #1B4B5A; }
+body[data-theme="light"] .cmd-link { color: #2E5A88; }
+
+/* ========================================
+   装备部位展示
+   ======================================== */
+.eq-item-demo {
+    display: inline-flex;
+    align-items: stretch;
+    border-radius: 4px;
+    border-left: 2px solid var(--border-secondary);
+    background: var(--bg-surface);
+    overflow: hidden;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.eq-type-demo {
+    background: var(--bg-surface2);
+    color: var(--text-body);
+    padding: 0 8px;
+    line-height: 2em;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+    min-width: 3em;
+    justify-content: center;
+}
+.eq-name-demo {
+    padding: 0 10px;
+    line-height: 2em;
+    white-space: nowrap;
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+@media (max-width: 480px) {
+    .app-container { max-width: 100%; }
+    .theme-btn { padding: 4px 10px; font-size: 11px; }
+    .tool-item { width: 2.2em; height: 2.2em; }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- 主题切换栏 -->
+<div class="theme-bar">
+    <span class="theme-bar-label">🎨 主题预览</span>
+    <button class="theme-btn active" data-theme="dark" onclick="switchTheme('dark')">
+        🌙 暗黑<span class="theme-badge">原始</span>
+    </button>
+    <button class="theme-btn" data-theme="light" onclick="switchTheme('light')">
+        📄 亮色<span class="theme-badge">Notion</span>
+    </button>
+    <button class="theme-btn" data-theme="book" onclick="switchTheme('book')">
+        📖 书卷<span class="theme-badge">Stripe Press</span>
+    </button>
+</div>
+
+<!-- 主布局 -->
+<div class="app-container">
+
+    <!-- ====== 房间信息 ====== -->
+    <div class="content-room">
+        <div class="room-title">
+            🏯 扬州城 · 中央广场
+            <span class="map-icon">🗺️</span>
+        </div>
+        <div class="room-desc">
+            这里是扬州城的中心广场，车水马龙，人来人往。青石板铺就的地面被岁月磨得光滑如镜，
+            四周商铺林立，叫卖声此起彼伏。一座古老的石狮子矗立在广场中央，见证着这座城市的繁华。
+        </div>
+        <div class="room-exits">
+            出口：<span class="cmd-link">[东] 东大街</span> &nbsp;
+            <span class="cmd-link">[西] 西大街</span> &nbsp;
+            <span class="cmd-link">[南] 南门</span> &nbsp;
+            <span class="cmd-link">[北] 北门</span> &nbsp;
+            <span class="cmd-link">[上] 醉仙楼</span>
+        </div>
+        <div class="room-items">
+            <div class="room-item">
+                <span class="item-icon">👤</span>
+                <span class="item-name">王铁匠 (Wang tiejiang)</span>
+                <span class="item-status">Lv.45</span>
+            </div>
+            <div class="room-item">
+                <span class="item-icon">📦</span>
+                <span class="item-name">一把生锈的铁剑 (Rusty sword)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== 频道消息 ====== -->
+    <div class="channel-bar">
+        <pre><span class="mud-hiw">[世界]</span> <span class="mud-hig">慕容无情</span>：今天运气真好，打到了一把<span class="mud-hiy">【碧血剑】</span>！<span class="mud-hik">(3分钟前)</span>
+<span class="mud-hic">[门派]</span> <span class="mud-wht">柳如烟</span>：有人在吗？一起组队去<span class="mud-hir">光明顶</span>刷副本~</pre>
+    </div>
+
+    <!-- ====== 主消息区 — MUD 全色板展示 ====== -->
+    <div class="content-message" id="messageBox">
+        <pre>
+<span class="mud-hiw">══════════════════  ⚔ 武神传说 · 游戏预览  ⚔  ═══════════════════</span>
+
+<span class="mud-hig">✔ 你已成功连接到服务器。</span>
+<span class="mud-nor">系统提示：欢迎回来，大侠！上次登录时间：2024-01-15 20:30:00</span>
+<span class="mud-hik">────────────────────────────────────────────────────────</span>
+
+<span class="mud-hiy">[系统公告]</span> <span class="mud-hiw">新年活动「龙腾盛世」现已开启！参与即可获得限定称号。</span>
+
+<span style="color: var(--text-title); font-weight: 600;">┌── 【全色板测试区域】 ──┐</span>
+
+<span class="mud-nor">● NOR 普通文本 —— 系统消息、场景描述等默认文本颜色</span>
+<span class="mud-gre">● GRE 绿色文本 —— 与 NOR 同色，用于系统提示、状态正常</span>
+<span class="mud-red">● RED 红色 —— 伤害数值、警告信息、敌对目标</span>
+<span class="mud-blu">● BLU 蓝色 —— 内力/魔法相关、水系技能、冷静状态</span>
+<span class="mud-cyn">● CYN 青色 —— 特殊物品、神秘事件、解毒信息</span>
+<span class="mud-mag">● MAG 紫色 —— 稀有装备、门派秘法、内力运转</span>
+<span class="mud-yel">● YEL 黄色 —— 金钱、物品掉落、任务提示</span>
+<span class="mud-wht">● WHT 白色 —— NPC 对话、重要说明文字</span>
+<span class="mud-ora">● ORA 橙色 —— 特殊状态、流血效果、火焰伤害</span>
+<span class="mud-hik">● HIK 灰色 —— 次要注释、过期信息、已读标记</span>
+
+<span style="color: var(--text-title); font-weight: 600;">┌── 【高亮色板】 ──┐</span>
+
+<span class="mud-hig">● HIG 高亮绿 —— 重要提示、成就达成、血量回复</span>
+<span class="mud-hir">● HIR 高亮红 —— 暴击伤害、濒死警告、紧急事件</span>
+<span class="mud-hib">● HIB 高亮蓝 —— 内力爆满、技能冷却完毕、神兵认主</span>
+<span class="mud-hic">● HIC 高亮青 —— 稀世珍宝出现、奇遇触发、天材地宝</span>
+<span class="mud-him">● HIM 高亮紫 —— 传说装备、绝世武功、称号特效</span>
+<span class="mud-hiy">● HIY 高亮黄 —— 极品掉落、世界公告、限时活动</span>
+<span class="mud-hiw">● HIW 高亮白 —— 系统广播、紧急通知、重大事件</span>
+<span class="mud-hio">● HIO 亮橙 —— 持续伤害、Boss 技能警告</span>
+<span class="mud-hij">● HIJ 金色 —— 充值回馈、至尊特权、顶级奖励</span>
+<span class="mud-hiz">● HIZ 亮紫罗兰 —— 隐藏任务、称号奖励、稀有 buff</span>
+<span class="mud-ord">● ORD 橙红 —— 致命一击、绝杀技提示</span>
+
+<span style="color: var(--text-title); font-weight: 600;">┌── 【战斗示例】 ──┐</span>
+
+<span class="mud-hir">▸ 你对「山贼头领」发动了「独孤九剑·破剑式」！</span>
+<span class="mud-hiy">  → 造成了 <span class="mud-hir">2,847</span> 点伤害（<span class="mud-hic">暴击</span>！）</span>
+<span class="mud-wht">「山贼头领」怒吼道：</span><span class="mud-hiw">"好厉害的剑法！但还没完——看我的「黑风刀法」！"</span>
+<span class="mud-hir">▸ 山贼头领对你发动了「黑风刀法」！</span>
+<span class="mud-nor">  → 你受到了 <span class="mud-red">623</span> 点伤害</span>
+<span class="mud-hig">  → 你的「金钟罩」抵消了 <span class="mud-hig">189</span> 点伤害</span>
+<span class="mud-mag">▸ 你运起「九阳神功」，内力恢复了 <span class="mud-hib">1,200</span> 点</span>
+
+<span style="color: var(--text-title); font-weight: 600;">┌── 【物品 & 掉落】 ──┐</span>
+
+<span class="mud-hiy">✦ 你从「山贼头领」的尸体上获得了：</span>
+<span class="mud-hiz">  · [传说] 玄铁重剑 ×1</span>
+<span class="mud-him">  · [稀有] 金丝软甲 ×1</span>
+<span class="mud-hic">  · [精良] 回春丹 ×3</span>
+<span class="mud-yel">  · 金币 ×<span class="mud-hiy">500</span></span>
+<span class="mud-nor">  · 破布 ×2</span>
+
+<span class="mud-hiw">══════════════════  ⚔ 消息结束  ⚔  ═══════════════════</span>
+        </pre>
+    </div>
+
+    <!-- ====== 命令按钮 ====== -->
+    <div class="command-row">
+        <span class="cmd-btn">⚔ 攻击</span>
+        <span class="cmd-btn">🛡 防御</span>
+        <span class="cmd-btn">🏃 逃跑</span>
+        <span class="cmd-btn">📦 拾取</span>
+        <span class="cmd-btn">🔍 查看</span>
+        <span class="cmd-btn">💬 对话</span>
+    </div>
+
+    <!-- ====== 对话框 ====== -->
+    <div class="dialog">
+        <div class="dialog-header">
+            <span class="dialog-icon">◆</span>
+            <span class="dialog-title">角色属性 · 慕容无情</span>
+            <span class="dialog-close">✕</span>
+        </div>
+        <div class="dialog-content">
+            <span class="mud-hig">⚔ 攻击力：</span><span class="mud-wht">12,500</span> &nbsp;&nbsp;
+            <span class="mud-blu">🛡 防御力：</span><span class="mud-wht">8,200</span> &nbsp;&nbsp;
+            <span class="mud-mag">✨ 内力：</span><span class="mud-hib">32,000 / 32,000</span><br>
+            <span class="mud-hir">❤ 气血：</span><span class="mud-hig">45,800 / 45,800</span> &nbsp;&nbsp;
+            <span class="mud-yel">💰 金币：</span><span class="mud-hiy">128,500</span> &nbsp;&nbsp;
+            <span class="mud-hiz">⭐ 经验：</span><span class="mud-wht">2,340,000</span>
+        </div>
+        <div class="dialog-footer">
+            <span class="footer-item select">📋 属性</span>
+            <span class="footer-item">🎒 背包</span>
+            <span class="footer-item">📖 技能</span>
+            <span class="footer-item">📜 任务</span>
+        </div>
+    </div>
+
+    <!-- ====== 装备部位展示 ====== -->
+    <div class="eq-display" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px; flex-shrink: 0;">
+        <div class="eq-item-demo"><span class="eq-type-demo">武器</span><span class="eq-name-demo mud-hig">玄铁重剑</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">衣服</span><span class="eq-name-demo mud-him">金丝软甲</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">头部</span><span class="eq-name-demo mud-hiy">紫金冠</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">鞋</span><span class="eq-name-demo mud-wht">疾风靴</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">披风</span><span class="eq-name-demo mud-blu">寒冰披风</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">戒指</span><span class="eq-name-demo mud-hic">碧水戒</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">项链</span><span class="eq-name-demo mud-mag">紫晶链</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">护腕</span><span class="eq-name-demo mud-wht">精铁护腕</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">腰带</span><span class="eq-name-demo mud-yel">金丝腰带</span></div>
+        <div class="eq-item-demo"><span class="eq-type-demo">暗器</span><span class="eq-name-demo mud-ord">飞蝗石</span></div>
+    </div>
+
+    <!-- ====== 聊天面板 ====== -->
+    <div class="chat-panel">
+        <div class="channel-box">
+            <span class="selected">🌍 世界</span>
+            <span>👥 组队</span>
+            <span>🏯 门派</span>
+            <span>💬 房间</span>
+            <span>📢 全区</span>
+            <span>🏛 帮派</span>
+            <span>😄 表情</span>
+            <span>⌨ 指令</span>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" value="输入聊天内容或游戏指令…" readonly
+                style="color: var(--text-muted); font-style: italic;">
+            <span class="send-btn">发送</span>
+        </div>
+    </div>
+
+    <!-- ====== 底部工具栏 ====== -->
+    <div class="bottom-bar">
+        <div class="state-bar">
+            <span class="mud-hig">❤ 45,800</span> /
+            <span class="mud-hib">💎 32,000</span> &nbsp;|&nbsp;
+            <span class="mud-hiy">Lv.128</span> ·
+            <span class="mud-wht">慕容无情</span> ·
+            <span class="mud-hic">扬州城·中央广场</span>
+        </div>
+        <div class="tool-item"><span class="tool-icon">⏹</span><span class="tool-text">停止</span></div>
+        <div class="tool-item"><span class="tool-icon">💬</span><span class="tool-text">聊天</span></div>
+        <div class="tool-item"><span class="tool-icon">📋</span><span class="tool-text">活动</span></div>
+        <div class="tool-item"><span class="tool-icon">⚡</span><span class="tool-text">动作</span></div>
+        <div class="tool-item"><span class="tool-icon">⋯</span><span class="tool-text">更多</span></div>
+    </div>
+
+</div>
+
+<script>
+function switchTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+}
+</script>
+
+</body>
+</html>

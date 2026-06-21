@@ -1,7 +1,10 @@
-const Database = require("better-sqlite3");
-const path = require("path");
-const fs = require("fs").promises;
-const crypto = require("crypto");
+import Database from "better-sqlite3";
+import path from "path";
+import { promises as fs } from "fs";
+import crypto from "crypto";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const stmtCaches = new Map();
 
@@ -137,7 +140,7 @@ class SqliteDatabase {
 }
 
 // 导出单例
-module.exports = new SqliteDatabase();
+export default new SqliteDatabase();
 
 // ---------- 建表及初始脚本 ----------
 const DEFAULT_TABLE_SCRIPTS = [
@@ -182,7 +185,7 @@ const DEFAULT_TABLE_SCRIPTS = [
       title VARCHAR(30) NOT NULL,
       data TEXT,
       create_time TIMESTAMP,
-      update_time TIMESTAMP 
+      update_time TIMESTAMP
     )`,
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_users_name ON users (name)`,
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_players_id ON players (id)`,

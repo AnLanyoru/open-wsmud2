@@ -1,5 +1,5 @@
-const APIBASE = require('./base');
-const svgCaptcha = require('svg-captcha');
+import APIBASE from './base.js';
+import svgCaptcha from 'svg-captcha';
 const {DB} = __CONFIG;
 const CODEREG = /^[A-Za-z0-9_]{3,20}$/;
 
@@ -174,26 +174,4 @@ class UserAPI extends APIBASE {
     }
 }
 
-module.exports = UserAPI;
-
-
-// this.define = {
-//     Login: { method: "Post", paras: ["code", "pwd"] }
-// }
-// const DB = this.import('/lib/mysql');
-// let servers = null;
-
-// this.Login = async function (code, pwd) {
-
-
-// }
-
-// this.GetUser = async function (cond, pars) {
-
-//     let sql = "select ID,Name,EMAIL,PHone,State,Developer,IsFirst from users";
-//     if (cond) {
-//         sql += " where " + cond;
-//     }
-//     return await DB.query(sql, pars);
-
-// }
+export default UserAPI;

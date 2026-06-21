@@ -1,21 +1,31 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const path = require('path');
-const session = require('express-session');
-const pinoHttp = require('pino-http');
-require('dotenv').config();
-globalThis['__CONFIG'] = require('./config');
+import express from 'express';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import session from 'express-session';
+import pinoHttp from 'pino-http';
+import http from 'http';
+import { fileURLToPath, pathToFileURL } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const __CONFIG = (await import('./config.js')).default;
+globalThis['__CONFIG'] = __CONFIG;
+
+const UserAPI = (await import('./api/user.js')).default;
+const GameAPI = (await import('./api/game.js')).default;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const HOST = __CONFIG.WEB_HOST;
 const PORT = __CONFIG.WEB_PORT;
-const API_PATHS = ['./api/user', './api/game'];
-const APIS = {};
-
-for (let api of API_PATHS) {
-    APIS[api.replace('./api/', "")] = require(api);
-}
+const API_PATHS = ['./api/user.js', './api/game.js'];
+const APIS = {
+    user: UserAPI,
+    game: GameAPI,
+};
 
 
 app.use(express.static(path.join(__dirname, 'www'), {fallthrough: true}));
@@ -105,14 +115,13 @@ app.all('/sse/:className/:methodName', async (req, res) => {
 });
 
 
-function reload_api(req, res) {
+async function reload_api(req, res) {
     try {
         for (let modulePath of API_PATHS) {
-            const resolvedPath = require.resolve(modulePath);
-            if (require.cache[resolvedPath]) {
-                delete require.cache[resolvedPath];
-            }
-            APIS[modulePath.replace('./api/', "")] = require(resolvedPath);
+            const resolvedPath = path.resolve(modulePath);
+            const url = pathToFileURL(resolvedPath).href;
+            const mod = await import(`${url}?update=${Date.now()}`);
+            APIS[modulePath.replace('./api/', "").replace('.js', "")] = mod.default;
         }
         res.json({msg: 'api reload'});
     } catch (error) {
@@ -123,18 +132,15 @@ function reload_api(req, res) {
 
 app.use("/reload", reload_api);
 
-const http = require('http');
 const server = http.createServer(app);
 
 
 // 启动服务器
-(async () => {
-    await __CONFIG.init();
-    server.listen(PORT, HOST, () => {
-        console.log(`Server running on http://${HOST}:${PORT}`);
-        console.log(`Static files served from ${path.join(__dirname, 'www')}`);
-    });
-})();
+await __CONFIG.init();
+server.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
+    console.log(`Static files served from ${path.join(__dirname, 'www')}`);
+});
 
 process.on('uncaughtException', (error) => {
     console.error('未捕获的异常:', error);

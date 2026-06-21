@@ -1,4 +1,4 @@
-const APIBASE = require('./base');
+import APIBASE from './base.js';
 let SERVERS = null;
 const {DB} = __CONFIG;
 
@@ -85,12 +85,4 @@ const ALLOW_TYPES = {
     name: true,
     phone: true
 };
-module.exports = GameAPI;
-
-
-
-
-
-
-
-
+export default GameAPI;

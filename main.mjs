@@ -1,10 +1,14 @@
-import {createRequire} from 'module';
 import fs from 'fs';
 import path from 'path';
-import {fileURLToPath, pathToFileURL} from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const __CONFIG = (await import('./config.js')).default;
+globalThis['__CONFIG'] = __CONFIG;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
 
 globalThis['__PATH'] = {
     BASE: "./os/",
@@ -21,8 +25,6 @@ globalThis['__PATH'] = {
     DATA: "./data/",
     DEF_DATA: "./data/def/"
 };
-
-require('dotenv').config();
 
 async function readdir(basePath) {
     const files = fs.readdirSync(basePath);
@@ -45,14 +47,12 @@ async function readdir(basePath) {
     }
 }
 
-globalThis['__CONFIG'] = require('./config.js');
-
 for (const item in __PATH) {
     __PATH[item] = path.join(__dirname, __PATH[item]);
 }
 
 await readdir(__PATH.BASE);
-const {WORLD} = await import('./os/world.js');
+const { WORLD } = await import('./os/world.js');
 await __CONFIG.init();
 await WORLD.startup(process.argv[2]);
 

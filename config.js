@@ -1,5 +1,7 @@
-module.exports = {
-    DB: require('./data/sql'),
+import db from './data/sql.js';
+
+export default {
+    DB: db,
     init: async function () {
         if (!(this.WEB_PORT > 1000)) throw new Error('缺少环境配置WEB_PORT');
         if (!(parseInt(process.env.WS_PORT) > 1000)) throw new Error('缺少环境配置WS_PORT');
