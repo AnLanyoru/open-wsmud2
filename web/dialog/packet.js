@@ -537,7 +537,7 @@ const packet_css = `
 
 .eq-list>.eq-item>.eq-type {
     background-color: var(--bg-surface2);
-    color: var(--text-body);
+    color: var(--text-muted);
     line-height: 1.875em;
     display: inline-block;
     height: 1.875em;
