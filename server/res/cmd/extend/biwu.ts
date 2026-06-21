@@ -199,35 +199,8 @@ export default class extends COMMAND {
     }
 
     recount(this: CHARACTER) {
-        this.max_hp = parseInt(this.con * 5 + (this.max_mp * this.query_force_rad() + this.query_prop("max_hp") + this.query_prop("con") * this.con) * (100 + this.query_prop("hp_per")) / 100);
-
-        if (this.max_hp < 1) this.max_hp = 1;
-        if (this.hp > this.max_hp) this.hp = this.max_hp;
-
-        this.gjsd = 4000 - this.query_prop("gjsd");
-        if (this.gjsd > 500) {
-            this.gjsd = parseInt(this.gjsd - (this.gjsd * this.query_prop("gjsd_per") / 100));
-        }
-        if (this.gjsd < 500) this.gjsd = 500;
-
-        this.gj = parseInt(this.str + (this.query_prop("gj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("gj_per")) / 100);
-        this.fy = parseInt(((this.str + this.con) / 10 + this.query_prop("fy") + this.query_prop("con") * this.con / 10) * (100 + this.query_prop("fy_per")) / 100);
-        this.mz = parseInt((this.dex / 2 + this.query_prop("mz")) * (100 + this.query_prop("mz_per")) / 100);
-        this.ds = parseInt((this.dex / 2 + this.query_prop("ds") + this.query_prop("dex") * this.dex / 10) * (100 + this.query_prop("ds_per")) / 100);
-        this.zj = parseInt((this.str / 2 + this.query_prop("zj") + this.query_prop("str") * this.str / 10) * (100 + this.query_prop("zj_per")) / 100);
-        this.bj = parseInt(this.dex / 10 + this.query_prop("bj_per"));
-        if (this.parry_skill?.on_recount_parry) {
-            this.zj += this.parry_skill.on_recount_parry(this);
-        }
-        if (this.dodge_skill?.on_recount_dodge) {
-            this.ds += this.dodge_skill.on_recount_dodge(this);
-        }
-        this.diff_sh_per = this.query_prop("diff_sh_per");
-        if (this.diff_sh_per > 80) {
-            this.diff_sh_per = 80 + Math.sqrt((this.diff_sh_per - 80) * 4);
-            if (this.diff_sh_per > 99.9999) this.diff_sh_per = 99.9999;
-        }
-        this.diff_sh_per += this.query_prop("diff_sh_per2");
+        CHARACTER.prototype.recount.call(this);
+        this.recount_max_hp();
     }
 
     check_pfms(this: CHARACTER & { auto_eqs?: EQUIPMENT[] }, target: CHARACTER) {

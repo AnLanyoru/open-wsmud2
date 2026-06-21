@@ -684,7 +684,8 @@ export class FOLLOWER extends CHARACTER {
     }
 
     recount(): void {
-        return USER.prototype.recount.call(this);
+        super.recount();
+        this.recount_max_hp();
     }
 
     items_changed(item: OBJ, drop_count?: number): void {

@@ -1280,62 +1280,8 @@ export class USER extends CHARACTER {
 
     /** 重新计算属性(玩家版本, 含闪避/招架技能加成) */
     recount(): void {
-        this.max_hp = parseInt(
-            (this.con * 5
-                + (this.max_mp * this.query_force_rad()
-                    + this.query_prop('max_hp')
-                    + this.query_prop('con') * this.con)
-                * (100 + this.query_prop('hp_per')) / 100),
-        );
-
-        if (this.hp > this.max_hp) this.hp = this.max_hp;
-
-        this.gjsd = 4000 - this.query_prop('gjsd');
-        if (this.gjsd > 500) {
-            this.gjsd = parseInt(
-                (this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100)),
-            );
-            if (this.gjsd < 500) this.gjsd = 500;
-        } else {
-            this.gjsd = 500;
-        }
-
-        this.gj = parseInt(
-            (this.str
-                + (this.query_prop('gj') + this.query_prop('str') * this.str / 10)
-                * (100 + this.query_prop('gj_per')) / 100),
-        );
-        this.fy = parseInt(
-            (((this.str + this.con) / 10
-                + this.query_prop('fy')
-                + this.query_prop('con') * this.con / 10)
-                * (100 + this.query_prop('fy_per')) / 100),
-        );
-        this.mz = parseInt(
-            ((this.dex / 2 + this.query_prop('mz'))
-                * (100 + this.query_prop('mz_per')) / 100),
-        );
-        this.ds = parseInt(
-            ((this.dex / 2
-                + this.query_prop('ds')
-                + this.query_prop('dex') * this.dex / 10)
-                * (100 + this.query_prop('ds_per')) / 100),
-        );
-        if (this.dodge_skill?.on_recount_dodge) {
-            this.ds += this.dodge_skill.on_recount_dodge(this);
-        }
-        this.zj = parseInt(
-            ((this.str / 2
-                + this.query_prop('zj')
-                + this.query_prop('str') * this.str / 10)
-                * (100 + this.query_prop('zj_per')) / 100),
-        );
-        if (this.parry_skill?.on_recount_parry) {
-            this.zj += this.parry_skill.on_recount_parry(this);
-        }
-        this.bj = parseInt(this.dex / 10 + this.query_prop('bj_per'));
-        this.diff_sh_per = this.query_prop('diff_sh_per');
-        this.diff_fy_per = this.query_prop('diff_fy_per');
+        super.recount();
+        this.recount_max_hp();
     }
 
     /** 境界提升 */
