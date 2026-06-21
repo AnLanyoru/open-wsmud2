@@ -455,7 +455,7 @@ const setting_template = `
             </div>
             <div class="setting-item" for="float_dialog">
                 <span class="title">
-                    NPC对话选项显示为浮动窗口
+                    对话选项显示为浮动窗口
                 </span>
                 <span class="switch">
                     <span class="switch-button">

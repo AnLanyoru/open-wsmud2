@@ -228,19 +228,14 @@ export default class extends USERTASK {
         if (path.length > 0) {
             path.pop();
             me.set_temp("tr_path_cur", this.encodePathCur(path, 0));
-            me.notify(path.length === 0
-                ? "<hic>已返回测试资源主菜单。</hic>"
-                : "<hic>已返回上一层。</hic>");
         } else {
             me.set_temp("tr_path_cur", this.encodePathCur([], 0));
-            me.notify("<hic>测试资源领取菜单已刷新。</hic>");
         }
         this.sendMenuButtons(me);
     }
 
     giveup(me: CHARACTER): void {
         me.set_temp("tr_path_cur", "0");
-        me.notify("<hic>已返回测试资源主菜单。</hic>");
         this.sendMenuButtons(me);
     }
 
@@ -281,8 +276,7 @@ export default class extends USERTASK {
             if (obj) {
                 const pathKeys = this.getPathKeys(path);
                 const fullPath = [...pathKeys, key].join(" → ");
-                me.notify(`<hig>你领取了【${key}】：${obj.unit_name(count)}。</hig>`);
-                me.notify(`<mem>路径：测试资源领取 → ${fullPath}</mem>`);
+                me.notify(`<hig>你领取了：${obj.unit_name(count)}。</hig>`);
             } else {
                 me.notify(`<red>物品【${objPath}】创建失败，请联系管理员。</red>`);
                 return false;

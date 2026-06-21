@@ -16,11 +16,11 @@ const float_css = `
 .float-dialog>.float-dialog-header {
     height: 1.6em;
     line-height: 1.6em;
-    background: #242424;
+    background: var(--dialog-header-bg);
     padding: 0 0.5em;
     cursor: move;
     border-radius: 6px 6px 0 0;
-    color: #9a9a50;
+    color: var(--dialog-title-color);
     font-size: 0.8em;
     font-weight: bold;
     touch-action: none;
@@ -45,7 +45,7 @@ const float_css = `
 .float-dialog .fb-actions>.fb-action>.action-desc {
     flex: 1;
     white-space: pre-wrap;
-    color: #aaa;
+    color: var(--text-muted2);
     overflow-x: auto;
     scrollbar-width: none;
     padding-right: 1em;
@@ -56,8 +56,8 @@ const float_css = `
 }
 .float-dialog .action-desc .float-cmd {
     display: inline-block;
-    border: solid 1px #555;
-    color: #aaa;
+    border: solid 1px var(--border-secondary);
+    color: var(--text-muted2);
     background-color: transparent;
     text-align: center;
     cursor: pointer;
@@ -68,15 +68,15 @@ const float_css = `
     transition: background-color 0.15s, color 0.15s;
 }
 .float-dialog .action-desc .float-cmd:hover {
-    background-color: #333;
-    color: #ddd;
+    background-color: var(--bg-surface2);
+    color: var(--text-secondary);
 }
 .float-dialog .fb-actions>.fb-action>.action-name {
     flex: 0;
-    background-color: #281818;
+    background-color: var(--bg-surface2);
     padding: 0.3em 0.5em;
     cursor: pointer;
-    color: #c55;
+    color: var(--mud-hir);
     text-align: center;
     line-height: 1.6em;
     font-weight: bold;
@@ -84,8 +84,8 @@ const float_css = `
     transition: background-color 0.15s, color 0.15s;
 }
 .float-dialog .fb-actions>.fb-action>.action-name:hover {
-    background-color: #4a2020;
-    color: #e77;
+    background-color: var(--bg-surface);
+    color: var(--mud-hir);
 }
 .float-dialog-overlay {
     position: fixed;
@@ -123,10 +123,10 @@ const float_css = `
     z-index: 1;
     height: 1.8em;
     line-height: 1.8em;
-    background: #242424;
+    background: var(--dialog-header-bg);
     padding: 0 0.5em;
     border-radius: 6px 6px 0 0;
-    color: #9a9a50;
+    color: var(--dialog-title-color);
     font-size: 0.85em;
     font-weight: bold;
     display: flex;
@@ -135,13 +135,13 @@ const float_css = `
     flex: 1;
 }
 .float-dialog-unified>.unified-header>.unified-close {
-    color: #666;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 0 0.3em;
     transition: color 0.15s;
 }
 .float-dialog-unified>.unified-header>.unified-close:hover {
-    color: #c55;
+    color: var(--mud-hir);
 }
 .float-dialog-unified .fb-actions {
     margin-top: 0;
@@ -162,7 +162,7 @@ const float_css = `
 .float-dialog-unified .fb-actions>.fb-action>.action-desc {
     flex: 1;
     white-space: pre-wrap;
-    color: #aaa;
+    color: var(--text-muted2);
     overflow-x: auto;
     scrollbar-width: none;
     padding-right: 1em;
@@ -173,8 +173,8 @@ const float_css = `
 }
 .float-dialog-unified .action-desc .float-cmd {
     display: inline-block;
-    border: solid 1px #555;
-    color: #aaa;
+    border: solid 1px var(--border-secondary);
+    color: var(--text-muted2);
     background-color: transparent;
     text-align: center;
     cursor: pointer;
@@ -185,15 +185,15 @@ const float_css = `
     transition: background-color 0.15s, color 0.15s;
 }
 .float-dialog-unified .action-desc .float-cmd:hover {
-    background-color: #333;
-    color: #ddd;
+    background-color: var(--bg-surface2);
+    color: var(--text-secondary);
 }
 .float-dialog-unified .fb-actions>.fb-action>.action-name {
     flex: 0;
-    background-color: #281818;
+    background-color: var(--bg-surface2);
     padding: 0.3em 0.5em;
     cursor: pointer;
-    color: #c55;
+    color: var(--mud-hir);
     text-align: center;
     line-height: 1.6em;
     font-weight: bold;
@@ -201,19 +201,19 @@ const float_css = `
     transition: background-color 0.15s, color 0.15s;
 }
 .float-dialog-unified .fb-actions>.fb-action>.action-name:hover {
-    background-color: #4a2020;
-    color: #e77;
+    background-color: var(--bg-surface);
+    color: var(--mud-hir);
 }
 .float-warn {
     border-top-color: var(--border-secondary) !important;
 }
 .float-warn .float-view-btn {
-    color: #5a8a5a !important;
-    border-color: #4a6a4a !important;
+    color: var(--mud-hig) !important;
+    border-color: var(--mud-gre) !important;
 }
 .float-warn .float-ignoreall-btn {
-    color: #a55 !important;
-    border-color: #744 !important;
+    color: var(--mud-hir) !important;
+    border-color: var(--mud-red) !important;
 }
 `;
 
@@ -256,7 +256,7 @@ const FloatDialog = {
 
         let inner = '<div class="float-dialog-header">对话</div>' +
             '<div class="fb-actions"><div class="fb-action">' +
-            '<span class="action-desc">' + dialog.text + cmdsHTML + '</span>' +
+            '<span class="action-desc">' + dialog.text + '\n' + cmdsHTML + '</span>' +
             '<span class="action-name float-ignore-btn">忽<br>略</span>' +
             '</div></div>';
 
@@ -459,7 +459,7 @@ const FloatDialog = {
                 ).join('');
             }
             itemsHTML += '<div class="fb-action" data-di="' + di + '">' +
-                '<span class="action-desc">' + d.text + cmdsHTML + '</span>' +
+                '<span class="action-desc">' + d.text + "\n" + cmdsHTML + '</span>' +
                 '<span class="action-name unified-ignore-one">忽<br>略</span>' +
                 '</div>';
         }
