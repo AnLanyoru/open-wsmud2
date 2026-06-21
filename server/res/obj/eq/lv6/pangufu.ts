@@ -21,14 +21,20 @@ export default class extends EQUIPMENT {
         desc: "命中敌人后降低其10%战斗属性，可叠加5层，敌方每10%效果抵抗降低1%效果",
     };
 
-    do_attack(me: CHARACTER, target: CHARACTER, _par: DoAttackPar): number {
+    do_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number {
         // 基础降低效果10%，敌方每10%效果抵抗降低1%效果
+        if (par.no_weapon) return 0;
+
+        // 内置CD 0.5秒，防止高攻速瞬间叠满
+        const cdKey = "pangufu_cd_" + target.id;
+        if (me.query_temp<number>(cdKey)) return 0;
+
         let effPer = 10;
         const diffDownsidePer = target.query_prop('diff_downside_per') || 0;
         effPer = effPer - Math.floor(diffDownsidePer / 10);
         if (effPer <= 0) return 0;
-        me.send_room("$N的$w以开天辟地之势镇压$n")
-        target.add_status({
+        me.send_room("$N的$w以开天辟地之势镇压$n", target);
+        if (target.add_status({
             id: "pangufu",
             name: "镇压",
             desc: "你的战斗属性被盘古斧压制了",
@@ -46,7 +52,9 @@ export default class extends EQUIPMENT {
             no_diff: true,
             override: 1,
             only_combat: true,
-        });
+        })) {
+            me.set_temp(cdKey, 1, 500);
+        }
 
         return 0;
     }

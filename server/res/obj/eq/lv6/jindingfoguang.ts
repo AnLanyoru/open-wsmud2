@@ -28,9 +28,9 @@ export default class extends EQUIPMENT {
     }
     on_heart_beat_jing_ding(this: CHARACTER, dt: number): void {
         const hp = this.do_recover(parseInt(this.max_hp * 0.05));
-        if (hp > 0){
+        if (hp > 0) {
             this.send_room("<hiy>$N的周身阵阵佛光笼罩，看起来脸色好了很多</hiy>")
             this.notify('<hig>你恢复了' + hp + '点气血。</hig>')
-        };
+        }
     }
 }

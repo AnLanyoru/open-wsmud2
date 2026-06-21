@@ -75,7 +75,7 @@ export class BASE {
      */
     add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number): void {
         if (!this[fname]) {
-            this[fname] = this.fire_event.bind(this, fname);
+            this[fname] = (...args: any[]) => this.fire_event(fname, ...args);
         }
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
@@ -112,14 +112,14 @@ export class BASE {
      * @param name - 事件名
      * @returns 返回 false 表示阻止后续执行
      */
-    fire_event(name: string): boolean | undefined {
+    fire_event(name: string, ...args: any[]): boolean | undefined {
         if (!this._events) return;
         const evts = this._events[name];
         if (!evts) return;
         const dt = Date.now();
         for (let i = 0; i < evts.length; i++) {
             if (evts[i].time > dt) {
-                if (!evts[i].func.call(this)) return false;
+                if (evts[i].func.call(this, ...args) === false) return false;
             } else {
                 evts.splice(i, 1);
                 i--;
