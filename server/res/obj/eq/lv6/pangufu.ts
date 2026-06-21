@@ -18,10 +18,11 @@ export default class extends EQUIPMENT {
         diff_fy_per: 20,
         add_bjsh_per: 50,
         gjsd: -1000,
+        desc: "命中敌人后降低其10%战斗属性，可叠加5层，敌方每10%效果抵抗降低1%效果",
     };
 
     do_attack(me: CHARACTER, target: CHARACTER, _par: DoAttackPar): number {
-        // 基础降低效果10%，敌方每10%效果抵抗降低3%效果
+        // 基础降低效果10%，敌方每10%效果抵抗降低1%效果
         let effPer = 10;
         const diffDownsidePer = target.query_prop('diff_downside_per') || 0;
         effPer = effPer - Math.floor(diffDownsidePer / 10);
