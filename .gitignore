@@ -8,6 +8,7 @@ data/100/
 data/def/
 .idea/
 .vscode/
+.claude/
 old/
 os/
 world/
