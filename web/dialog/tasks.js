@@ -23,7 +23,7 @@ const task_css = `
 
 
 .dialog-tasks>.finish {
-    border-left-color: #00ff00
+    border-left-color: var(--dialog-highlight)
 }
 
 .dialog-tasks>.over {
@@ -36,9 +36,9 @@ const task_css = `
 }
 
 .dialog-tasks>.finish>.task-btn {
-    border-left-color: #00ff00;
-    color: #00ff00;
-    background-color: #00ff0033;
+    border-left-color: var(--dialog-highlight);
+    color: var(--dialog-highlight);
+    background-color: var(--dialog-highlight-bg);
 }
 
 .dialog-tasks>.over>.task-btn {
@@ -81,7 +81,7 @@ const task_css = `
 }
 
 .dialog-tasks>.task-item>.finish {
-    color: #00ff00;
+    color: var(--dialog-highlight);
 }
 
 .dialog-tasks>.task-item>.over {

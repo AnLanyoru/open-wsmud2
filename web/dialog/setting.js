@@ -999,8 +999,8 @@ const setting_css = `
 
 
 .dialog-skeys>.selected {
-    border-left-color: #00FF00;
-    color: #00FF00;
+    border-left-color: var(--dialog-highlight);
+    color: var(--dialog-highlight);
 }
 
 

@@ -586,7 +586,7 @@ const packet_css = `
 }
 
 .cleanup>.obj-item>.selected {
-    color: #00FF00;
+    color: var(--dialog-highlight);
 }
 
 
@@ -642,10 +642,10 @@ const list_css = `
 
 .dialog-list>.otype-list>.select {
     background-color: var(--bg-surface2);
-    color: #00ff00;
+    color: var(--dialog-highlight);
     border-left-width: 2px;
     border-left-style: solid;
-    border-left-color: #00ff00;
+    border-left-color: var(--dialog-highlight);
 }
 
 .dialog-list>.trade-list,

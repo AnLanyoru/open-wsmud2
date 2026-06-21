@@ -464,11 +464,11 @@ const jh_css = `
 }
 
 .fb-actions>.finshed {
-    border-left-color: #00FF00;
+    border-left-color: var(--dialog-highlight);
 }
 
 .fb-actions>.finshed>.action-desc {
-    color: #00FF00;
+    color: var(--dialog-highlight);
 }
 
 .dialog-fb>.fb-right>pre {
@@ -528,8 +528,8 @@ const jh_css = `
 
 .dialog-fb>.fb-left>.fb-content .selected,
 .dialog-fb>.fb-left>.selected {
-    border-color: #00ff00;
-    color: #00ff00;
+    border-color: var(--dialog-highlight);
+    color: var(--dialog-highlight);
 }
 
 .dialog-fb>.fb-left>.fb-content>.lock:before {

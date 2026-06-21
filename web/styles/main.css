@@ -649,7 +649,7 @@
     position: relative;
     cursor: pointer;
     margin-right: 0.75em;
-    background-color: #008000;
+    background-color: var(--status-badge-bg);
     border-radius: 0.25em;
     color: white;
     line-height: 1.25em;
@@ -661,7 +661,7 @@
 }
 
 .item-status-bar > .downside {
-    background-color: #800000;
+    background-color: var(--status-badge-down);
 }
 
 .item-status-bar > .status-item > .status-bg {

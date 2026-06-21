@@ -25,7 +25,7 @@ const paimai_css = `
 }
 
 .dialog-pms>.selected {
-    border-left-color: #00ff00;
+    border-left-color: var(--dialog-highlight);
     background-color: var(--bg-surface2);
 }
 

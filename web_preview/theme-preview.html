@@ -189,7 +189,7 @@ body[data-theme="book"] {
     --btn-border: #C2B698;
     --btn-color: #1A1A18;
     --tool-bg: #C2B698;
-    --tool-color: #DBD2B8;
+    --tool-color: #1A1A18;
     --tool-hover: #B5A88A;
     --font-family: "Georgia", "Noto Serif SC", "Source Serif 4", serif;
 
@@ -246,6 +246,11 @@ body[data-theme="book"] {
         repeating-linear-gradient(90deg, transparent, transparent 100%, rgba(160,140,110,0.02) 100%);
     background-attachment: fixed;
 }
+
+/* 选中文字颜色 */
+body[data-theme="dark"] ::selection { background: #343434; color: #cecece; }
+body[data-theme="light"] ::selection { background: #C8BFB0; color: #37352F; }
+body[data-theme="book"] ::selection { background: #B5A88A; color: #1A1A18; }
 
 pre { font-size: inherit; font-family: inherit; margin: 0; white-space: pre-line; }
 ::-webkit-scrollbar { width: 0; height: 0; display: none; }

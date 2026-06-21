@@ -236,7 +236,7 @@ export default {
             html.push('>' + mathch[2] + '</text>');
         } else {
             html.push(' fill="');
-            html.push(this.cssVar(issel ? '--map-current-fill' : '--map-room-fill'));
+            html.push(this.cssVar(issel ? '--map-exit-fill' : '--map-room-fill'));
             html.push('">' + rm_name + '</text>');
         }
     },

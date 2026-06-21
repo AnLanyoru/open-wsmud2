@@ -92,6 +92,11 @@ body[data-theme="dark"] {
     --dialog-close-color: gray;
     --dialog-ok-color: #00FFFF;
     --dialog-highlight: #00FF00;
+    --dialog-highlight-bg: #00FF0022;
+    --status-badge-bg: #008000;
+    --status-badge-down: #800000;
+    --selection-bg: #343434;
+    --selection-color: #cecece;
     --exit-color: #FFFF00;
     --map-room-fill: dimgrey;
     --map-room-stroke: gray;
@@ -186,10 +191,15 @@ body[data-theme="light"] {
     --dialog-close-color: #878580;
     --dialog-ok-color: #006B5E;
     --dialog-highlight: #3A8A3A;
+    --dialog-highlight-bg: #3A8A3A22;
+    --status-badge-bg: #3A8A3A;
+    --status-badge-down: #9E3024;
+    --selection-bg: #C8BFB0;
+    --selection-color: #37352F;
     --exit-color: #7A5A10;
     --map-room-fill: #D5CDC0;
     --map-room-stroke: #C8BFB0;
-    --map-exit-fill: #BFB6A8;
+    --map-exit-fill: #4A4742;
     --map-current-fill: #A89F90;
 }
 
@@ -231,7 +241,7 @@ body[data-theme="book"] {
     --btn-border: #C2B698;
     --btn-color: #1A1A18;
     --tool-bg: #C2B698;
-    --tool-color: #DBD2B8;
+    --tool-color: #1A1A18;
     --tool-hover: #B5A88A;
     --font-family: "Georgia", "Noto Serif SC", "Source Serif 4", "SimSun", "KaiTi", serif;
 
@@ -280,11 +290,21 @@ body[data-theme="book"] {
     --dialog-close-color: #827C6A;
     --dialog-ok-color: #0A6058;
     --dialog-highlight: #2E6E2E;
+    --dialog-highlight-bg: #2E6E2E22;
+    --status-badge-bg: #2E6E2E;
+    --status-badge-down: #8A3A24;
+    --selection-bg: #B5A88A;
+    --selection-color: #1A1A18;
     --exit-color: #153A52;
     --map-room-fill: #C2B698;
     --map-room-stroke: #B5A88A;
-    --map-exit-fill: #A89B80;
+    --map-exit-fill: #3A3530;
     --map-current-fill: #9A8D72;
+}
+
+::selection {
+    background: var(--selection-bg);
+    color: var(--selection-color);
 }
 
 html,
