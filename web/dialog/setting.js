@@ -348,7 +348,7 @@ const setting_template = `
             </div>
             <div class="setting-item" for="show_command">
                 <span class="title">
-                    在房间列出NPC或道具的可用命令
+                    NPC或道具的可用命令显示在消息中
                 </span>
                 <span class="switch">
                     <span class="switch-button">
@@ -373,7 +373,7 @@ const setting_template = `
             </div>
             <div class="setting-item" for="item_firstme">
                 <span class="title">
-                    自己始终显示在房间物品第一列
+                    显示自己在房间物品中的真实位置
                 </span>
                 <span class="switch">
                     <span class="switch-button">
@@ -386,7 +386,7 @@ const setting_template = `
 
             <div class="setting-item" for="keep_msg">
                 <span class="title">
-                    切换房间时不清空上房间信息
+                    切换房间时清空上个房间的信息
                 </span>
                 <span class="switch">
                     <span class="switch-button">

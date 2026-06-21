@@ -213,7 +213,7 @@ const Process = {
             return;
         }
         var item = data, player_item;
-        if (Setting.item_firstme && item.id == Process.player) {
+        if (!Setting.item_firstme && item.id == Process.player) {
 
             player_item = $(Process.create_roomitem(item)).prependTo(Process.itemsElement);
         } else {
@@ -246,7 +246,7 @@ const Process = {
                 continue;
             }
             var player_item;
-            if (Setting.item_firstme && item.id == Process.player) {
+            if (!Setting.item_firstme && item.id == Process.player) {
 
                 player_item = $(Process.create_roomitem(item)).prependTo(Process.itemsElement);
             } else {
@@ -301,9 +301,9 @@ const Process = {
         $(".room-name").html(room.name);
         $(".room_desc").html(room.desc);
         Process.room_name = room.name;
-        if (!Setting.keep_msg) {
+        if (Setting.keep_msg) {
             Process.message.clear();
-        } else if (Setting.keep_msg) {
+        } else if (!Setting.keep_msg) {
             ReceiveMessage("你来到了" + room.name + "。");
         }
         if (Process.room_path == room.path) return;
@@ -394,7 +394,7 @@ const Process = {
             html.push("</span>");
         }
         html.push("</div>");
-        if (Setting.show_command && Combat.STATUS[item.id]) {
+        if (!Setting.show_command && Combat.STATUS[item.id]) {
             Process.itemsElement.find(".item-commands").remove();
             var roomitem = Combat.STATUS[item.id].elem.parent();
             $(html.join("")).insertAfter(roomitem);

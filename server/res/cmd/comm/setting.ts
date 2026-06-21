@@ -105,7 +105,7 @@ const setting_keys = {
     },
     'show_command': {
         type: "Boolean",
-        desc: "列出NPC或道具的可用命令"
+        desc: "NPC或道具的可用命令显示在消息中"
 
     },
     'show_roomitem': {
@@ -114,12 +114,12 @@ const setting_keys = {
 
     }, 'item_firstme': {
         type: "Boolean",
-        desc: "列出NPC自己始终显示在房间物品第一列"
+        desc: "显示自己在房间物品中的真实位置"
 
     },
     'keep_msg': {
         type: "Boolean",
-        desc: "切换房间时不清空上房间信息"
+        desc: "切换房间时清空上个房间的信息"
 
     }, 'off_move': {
         type: "Boolean",

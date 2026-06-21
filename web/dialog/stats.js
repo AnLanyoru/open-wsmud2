@@ -264,7 +264,6 @@ const stats_css = `
 }
 
 .stats-container-left>.stats-silder {
-    overflow-y: auto;
     white-space: nowrap;
     line-height: 2em;
     text-align: center;

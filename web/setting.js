@@ -133,7 +133,7 @@ const Setting = {
                 else $(".room_items").attr("style", "max-height: 8rem; overflow-y: auto;");
                 break;
             case "item_firstme":
-                if (value == 1) {
+                if (value != 1) {
                     var elem = $(".room_items>.room-item[itemid='" + Process.player + "']");
                     $(".room_items").prepend(elem);
                 }
