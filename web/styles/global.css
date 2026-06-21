@@ -557,6 +557,77 @@ ORD {
     color: var(--mud-ord);
 }
 
+/* ========================================
+   森林配色 (fr-) — 自然静谧绿
+   ======================================== */
+FR-NOR, FR-GRE { color: #8FBC8F; }
+FR-BLK { color: #4A6A4A; }
+FR-RED { color: #CD7A6A; }
+FR-BLU { color: #7AA8C0; }
+FR-CYN { color: #6AAA9A; }
+FR-MAG { color: #A090B8; }
+FR-YEL { color: #B0A860; }
+FR-WHT { color: #C0D4C0; }
+FR-ORA { color: #C09060; }
+FR-HIK { color: #5A725A; }
+FR-HIG { color: #80E040; }
+FR-HIR { color: #FF7060; }
+FR-HIB { color: #60A0F0; }
+FR-HIC { color: #50E0C0; }
+FR-HIM { color: #D870D8; }
+FR-HIY { color: #FFE040; }
+FR-HIW { color: #E8FFE8; }
+FR-HIO { color: #FFA040; }
+FR-HIJ { color: #FFD040; }
+FR-HIZ { color: #B870E0; }
+FR-ORD { color: #FF6040; }
+
+/* 深海配色 (ds-) — 冷静深海蓝 */
+DS-NOR, DS-GRE { color: #A0C4D8; }
+DS-BLK { color: #486078; }
+DS-RED { color: #D88080; }
+DS-BLU { color: #5898D0; }
+DS-CYN { color: #50C0B8; }
+DS-MAG { color: #9888B8; }
+DS-YEL { color: #B0A870; }
+DS-WHT { color: #C8D8E4; }
+DS-ORA { color: #D09870; }
+DS-HIK { color: #587088; }
+DS-HIG { color: #50E870; }
+DS-HIR { color: #FF7070; }
+DS-HIB { color: #4898FF; }
+DS-HIC { color: #40E0D0; }
+DS-HIM { color: #E068E0; }
+DS-HIY { color: #FFE848; }
+DS-HIW { color: #F0F4F8; }
+DS-HIO { color: #FFA848; }
+DS-HIJ { color: #FFD848; }
+DS-HIZ { color: #A868E8; }
+DS-ORD { color: #FF6840; }
+
+/* 水墨配色 (wb-) — 东方水墨画风 */
+WB-NOR, WB-GRE { color: #2C2C2C; }
+WB-BLK { color: #444444; }
+WB-RED { color: #9B2828; }
+WB-BLU { color: #3A5070; }
+WB-CYN { color: #3A6860; }
+WB-MAG { color: #5A4070; }
+WB-YEL { color: #7A6830; }
+WB-WHT { color: #444444; }
+WB-ORA { color: #8B4820; }
+WB-HIK { color: #999999; }
+WB-HIG { color: #2D8030; }
+WB-HIR { color: #CC3030; }
+WB-HIB { color: #3050A0; }
+WB-HIC { color: #308070; }
+WB-HIM { color: #703080; }
+WB-HIY { color: #A08020; }
+WB-HIW { color: #1A1A1A; }
+WB-HIO { color: #B85020; }
+WB-HIJ { color: #A07020; }
+WB-HIZ { color: #6030A0; }
+WB-ORD { color: #CC4020; }
+
 FLA {
 }
 

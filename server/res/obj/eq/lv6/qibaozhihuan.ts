@@ -27,9 +27,10 @@ export default class extends EQUIPMENT {
         me.remove_event('on_heart_beat', this.on_heart_beat_qi_bao);
     }
     on_heart_beat_qi_bao(this: CHARACTER, dt: number): void {
+        if (this.hp <= 0) return;
         const mp = this.add_mp(parseInt(String(this.max_hp * 0.05), 10));
         if (mp > 0) {
-            this.send_room("<hiy>$N的七宝指环发散出阵阵柔光，看起来精神了许多</hiy>")
+            this.send_room("<ds-hib>$N的七宝指环发散出阵阵柔光，精神看上去好了许多</ds-hib>")
             this.notify('<hig>你恢复了' + mp + '点内力。</hig>')
         }
     }

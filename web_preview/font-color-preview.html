@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUD 字体颜色预览</title>
+<style>
+/* ========================================
+   CSS Custom Properties — 三套主题
+   与 theme-preview.html 保持完全一致
+   ======================================== */
+
+/* --- 暗黑主题 (原始终端) --- */
+:root,
+body[data-theme="dark"] {
+    --bg-body: #000;
+    --bg-surface: #111;
+    --bg-surface2: #222;
+    --bg-input: #000;
+    --text-body: #008000;
+    --text-secondary: #cecece;
+    --text-tertiary: #bdc3c7;
+    --text-muted: gray;
+    --text-muted2: #898989;
+    --text-header: #C0C0C0;
+    --text-title: #ffff00;
+    --border-primary: #343434;
+    --border-secondary: gray;
+    --switch-bg: #222;
+    --switch-on-bg: #008000;
+    --switch-knob: gray;
+    --switch-knob-on: #eee;
+    --switch-text: #898989;
+    --switch-text-on: #eee;
+    --font-family: "Microsoft YaHei UI", sans-serif;
+
+    --mud-nor: #008000;
+    --mud-gre: #008000;
+    --mud-blk: #505050;
+    --mud-red: #800000;
+    --mud-blu: #000080;
+    --mud-cyn: #008080;
+    --mud-mag: #800080;
+    --mud-yel: #808000;
+    --mud-wht: #C0C0C0;
+    --mud-ora: #d26900;
+    --mud-hik: #808080;
+    --mud-hig: #00FF00;
+    --mud-hir: #FF0000;
+    --mud-hib: #0000FF;
+    --mud-hic: #00FFFF;
+    --mud-him: #FF00FF;
+    --mud-hiy: #FFFF00;
+    --mud-hiw: #FFFFFF;
+    --mud-hio: #FFA500;
+    --mud-hij: #FFD700;
+    --mud-hiz: #912CEE;
+    --mud-ord: #FF4500;
+}
+
+/* --- 亮色主题 → Notion-pre-ai 配色 --- */
+body[data-theme="light"] {
+    --bg-body: #EBE5DB;
+    --bg-surface: #E1DACF;
+    --bg-surface2: #D5CDC0;
+    --bg-input: #EBE5DB;
+    --text-body: #37352F;
+    --text-secondary: #5F5E5A;
+    --text-tertiary: #6E6D69;
+    --text-muted: #878580;
+    --text-muted2: #9D9B95;
+    --text-header: #37352F;
+    --text-title: #37352F;
+    --border-primary: #D5CDC0;
+    --border-secondary: #C8BFB0;
+    --switch-bg: #D5CDC0;
+    --switch-on-bg: #37352F;
+    --switch-knob: #FFFFFF;
+    --switch-knob-on: #FFFFFF;
+    --switch-text: #878580;
+    --switch-text-on: #FFFFFF;
+    --font-family: "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+
+    --mud-nor: #37352F;
+    --mud-gre: #37352F;
+    --mud-blk: #5F5E5A;
+    --mud-red: #9E3024;
+    --mud-blu: #1D4A7A;
+    --mud-cyn: #006B5E;
+    --mud-mag: #654080;
+    --mud-yel: #6E5F20;
+    --mud-wht: #5F5E5A;
+    --mud-ora: #A8551E;
+    --mud-hik: #787670;
+    --mud-hig: #3A8A3A;
+    --mud-hir: #B8403A;
+    --mud-hib: #256A8E;
+    --mud-hic: #007A6E;
+    --mud-him: #7B4A8E;
+    --mud-hiy: #B8930A;
+    --mud-hiw: #2D2B26;
+    --mud-hio: #B8651A;
+    --mud-hij: #C07A0E;
+    --mud-hiz: #6E3A85;
+    --mud-ord: #B85020;
+}
+
+/* --- 书卷主题 → Stripe Press 配色 --- */
+body[data-theme="book"] {
+    --bg-body: #DBD2B8;
+    --bg-surface: #CFC4A8;
+    --bg-surface2: #C2B698;
+    --bg-input: #E3DCC6;
+    --text-body: #1A1A18;
+    --text-secondary: #5A5545;
+    --text-tertiary: #6E6858;
+    --text-muted: #827C6A;
+    --text-muted2: #948E7C;
+    --text-header: #1A1A18;
+    --text-title: #1A1A18;
+    --border-primary: #C2B698;
+    --border-secondary: #B5A88A;
+    --switch-bg: #C2B698;
+    --switch-on-bg: #1A3F5C;
+    --switch-knob: #DBD2B8;
+    --switch-knob-on: #DBD2B8;
+    --switch-text: #827C6A;
+    --switch-text-on: #DBD2B8;
+    --font-family: "Georgia", "Noto Serif SC", "Source Serif 4", serif;
+
+    --mud-nor: #1A1A18;
+    --mud-gre: #1A1A18;
+    --mud-blk: #5A5545;
+    --mud-red: #8A3A24;
+    --mud-blu: #153A52;
+    --mud-cyn: #0A6058;
+    --mud-mag: #5A3A68;
+    --mud-yel: #6E5A22;
+    --mud-wht: #5A5545;
+    --mud-ora: #944A20;
+    --mud-hik: #6E6858;
+    --mud-hig: #2E6E2E;
+    --mud-hir: #9A4530;
+    --mud-hib: #154A65;
+    --mud-hic: #0A7568;
+    --mud-him: #704870;
+    --mud-hiy: #9A8028;
+    --mud-hiw: #121210;
+    --mud-hio: #9A5825;
+    --mud-hij: #8E7218;
+    --mud-hiz: #623A7A;
+    --mud-ord: #9A4820;
+}
+
+/* ========================================
+   全局基础样式
+   ======================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    min-height: 100%;
+    background-color: var(--bg-body);
+    font-family: var(--font-family);
+    color: var(--text-body);
+    font-size: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body[data-theme="book"] {
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(160,140,110,0.04) 3px, rgba(160,140,110,0.04) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 100%, rgba(160,140,110,0.02) 100%);
+    background-attachment: fixed;
+}
+
+body[data-theme="dark"] ::selection { background: #343434; color: #cecece; }
+body[data-theme="light"] ::selection { background: #C8BFB0; color: #37352F; }
+body[data-theme="book"] ::selection { background: #B5A88A; color: #1A1A18; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 3px; }
+* { scrollbar-width: thin; scrollbar-color: var(--border-secondary) transparent; }
+
+/* ========================================
+   主题切换栏
+   ======================================== */
+.theme-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-primary);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.theme-bar-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+.theme-btn {
+    padding: 6px 18px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--font-family);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.theme-btn:hover {
+    background: var(--bg-surface2);
+    color: var(--text-body);
+}
+.theme-btn.active {
+    background: var(--switch-on-bg);
+    color: var(--switch-knob-on);
+    border-color: var(--switch-on-bg);
+    font-weight: 600;
+}
+.theme-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg-surface2);
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+/* ========================================
+   主布局容器
+   ======================================== */
+.page-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 64px 24px 120px;
+}
+
+/* ========================================
+   分区标题
+   ======================================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 36px 0 20px;
+}
+.section-header:first-of-type { margin-top: 8px; }
+.section-header .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-primary);
+}
+.section-header .section-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.section-header .section-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-left: 4px;
+}
+.section-badge.badge-fr { background: #1A2E1A; color: #80E040; }
+.section-badge.badge-ds { background: #0E1A28; color: #4898FF; }
+.section-badge.badge-wb { background: #E8E0D0; color: #2C2C2C; }
+
+/* ========================================
+   颜色卡片网格
+   ======================================== */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.color-card {
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.color-card:hover {
+    border-color: var(--border-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.color-card .card-tag {
+    font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+.color-card .card-sample {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.color-card .card-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted2);
+    padding-top: 8px;
+    border-top: 1px solid var(--border-primary);
+    margin-top: 8px;
+}
+
+.color-card .card-copy-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    text-align: right;
+    letter-spacing: 0.5px;
+}
+.color-card:hover .card-copy-hint { opacity: 0.7; }
+
+.color-card.copied {
+    border-color: var(--mud-hig) !important;
+    box-shadow: 0 0 12px rgba(0,255,0,0.15);
+}
+
+/* 每个颜色标签的具体颜色 —— 通过 CSS 变量驱动 (主题色) */
+.card-sample.nc-nor { color: var(--mud-nor); }
+.card-sample.nc-gre { color: var(--mud-gre); }
+.card-sample.nc-blk { color: var(--mud-blk); }
+.card-sample.nc-red { color: var(--mud-red); }
+.card-sample.nc-blu { color: var(--mud-blu); }
+.card-sample.nc-cyn { color: var(--mud-cyn); }
+.card-sample.nc-mag { color: var(--mud-mag); }
+.card-sample.nc-yel { color: var(--mud-yel); }
+.card-sample.nc-wht { color: var(--mud-wht); }
+.card-sample.nc-ora { color: var(--mud-ora); }
+.card-sample.nc-hik { color: var(--mud-hik); }
+.card-sample.nc-hig { color: var(--mud-hig); }
+.card-sample.nc-hir { color: var(--mud-hir); }
+.card-sample.nc-hib { color: var(--mud-hib); }
+.card-sample.nc-hic { color: var(--mud-hic); }
+.card-sample.nc-him { color: var(--mud-him); }
+.card-sample.nc-hiy { color: var(--mud-hiy); }
+.card-sample.nc-hiw { color: var(--mud-hiw); }
+.card-sample.nc-hio { color: var(--mud-hio); }
+.card-sample.nc-hij { color: var(--mud-hij); }
+.card-sample.nc-hiz { color: var(--mud-hiz); }
+.card-sample.nc-ord { color: var(--mud-ord); }
+
+/* 森林配色 (fr-) — 固定色值，不随主题变化 */
+.card-sample.nc-fr-nor, .card-sample.nc-fr-gre { color: #8FBC8F; }
+.card-sample.nc-fr-blk { color: #4A6A4A; }
+.card-sample.nc-fr-red { color: #CD7A6A; }
+.card-sample.nc-fr-blu { color: #7AA8C0; }
+.card-sample.nc-fr-cyn { color: #6AAA9A; }
+.card-sample.nc-fr-mag { color: #A090B8; }
+.card-sample.nc-fr-yel { color: #B0A860; }
+.card-sample.nc-fr-wht { color: #C0D4C0; }
+.card-sample.nc-fr-ora { color: #C09060; }
+.card-sample.nc-fr-hik { color: #5A725A; }
+.card-sample.nc-fr-hig { color: #80E040; }
+.card-sample.nc-fr-hir { color: #FF7060; }
+.card-sample.nc-fr-hib { color: #60A0F0; }
+.card-sample.nc-fr-hic { color: #50E0C0; }
+.card-sample.nc-fr-him { color: #D870D8; }
+.card-sample.nc-fr-hiy { color: #FFE040; }
+.card-sample.nc-fr-hiw { color: #E8FFE8; }
+.card-sample.nc-fr-hio { color: #FFA040; }
+.card-sample.nc-fr-hij { color: #FFD040; }
+.card-sample.nc-fr-hiz { color: #B870E0; }
+.card-sample.nc-fr-ord { color: #FF6040; }
+
+/* 深海配色 (ds-) — 固定色值，不随主题变化 */
+.card-sample.nc-ds-nor, .card-sample.nc-ds-gre { color: #A0C4D8; }
+.card-sample.nc-ds-blk { color: #486078; }
+.card-sample.nc-ds-red { color: #D88080; }
+.card-sample.nc-ds-blu { color: #5898D0; }
+.card-sample.nc-ds-cyn { color: #50C0B8; }
+.card-sample.nc-ds-mag { color: #9888B8; }
+.card-sample.nc-ds-yel { color: #B0A870; }
+.card-sample.nc-ds-wht { color: #C8D8E4; }
+.card-sample.nc-ds-ora { color: #D09870; }
+.card-sample.nc-ds-hik { color: #587088; }
+.card-sample.nc-ds-hig { color: #50E870; }
+.card-sample.nc-ds-hir { color: #FF7070; }
+.card-sample.nc-ds-hib { color: #4898FF; }
+.card-sample.nc-ds-hic { color: #40E0D0; }
+.card-sample.nc-ds-him { color: #E068E0; }
+.card-sample.nc-ds-hiy { color: #FFE848; }
+.card-sample.nc-ds-hiw { color: #F0F4F8; }
+.card-sample.nc-ds-hio { color: #FFA848; }
+.card-sample.nc-ds-hij { color: #FFD848; }
+.card-sample.nc-ds-hiz { color: #A868E8; }
+.card-sample.nc-ds-ord { color: #FF6840; }
+
+/* 水墨配色 (wb-) — 固定色值，不随主题变化 */
+.card-sample.nc-wb-nor, .card-sample.nc-wb-gre { color: #2C2C2C; }
+.card-sample.nc-wb-blk { color: #444444; }
+.card-sample.nc-wb-red { color: #9B2828; }
+.card-sample.nc-wb-blu { color: #3A5070; }
+.card-sample.nc-wb-cyn { color: #3A6860; }
+.card-sample.nc-wb-mag { color: #5A4070; }
+.card-sample.nc-wb-yel { color: #7A6830; }
+.card-sample.nc-wb-wht { color: #444444; }
+.card-sample.nc-wb-ora { color: #8B4820; }
+.card-sample.nc-wb-hik { color: #999999; }
+.card-sample.nc-wb-hig { color: #2D8030; }
+.card-sample.nc-wb-hir { color: #CC3030; }
+.card-sample.nc-wb-hib { color: #3050A0; }
+.card-sample.nc-wb-hic { color: #308070; }
+.card-sample.nc-wb-him { color: #703080; }
+.card-sample.nc-wb-hiy { color: #A08020; }
+.card-sample.nc-wb-hiw { color: #1A1A1A; }
+.card-sample.nc-wb-hio { color: #B85020; }
+.card-sample.nc-wb-hij { color: #A07020; }
+.card-sample.nc-wb-hiz { color: #6030A0; }
+.card-sample.nc-wb-ord { color: #CC4020; }
+
+/* 颜色指示圆点 */
+.color-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    background: currentColor;
+}
+
+/* ========================================
+   浮动字体预览窗口
+   ======================================== */
+.floating-picker {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 900;
+    width: 100%;
+    max-width: 960px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-primary);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.25);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-picker.collapsed {
+    transform: translateX(-50%) translateY(calc(100% - 42px));
+}
+
+/* 收纳/展开切换条 */
+.picker-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    cursor: pointer;
+    user-select: none;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+}
+.picker-toggle:hover { color: var(--text-secondary); }
+.picker-toggle .toggle-arrow {
+    display: inline-block;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 16px;
+    line-height: 1;
+}
+.floating-picker.collapsed .toggle-arrow {
+    transform: rotate(180deg);
+}
+.picker-toggle .toggle-label {
+    font-weight: 600;
+}
+
+/* 面板主体 */
+.picker-body {
+    padding: 0 24px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    align-items: center;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 300px;
+    opacity: 1;
+}
+.floating-picker.collapsed .picker-body {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.picker-body .picker-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.picker-body .picker-color-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.picker-body .picker-color-wrap input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid var(--border-secondary);
+    cursor: pointer;
+    background: transparent;
+    padding: 0;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.picker-body .picker-color-wrap input[type="color"]:hover {
+    transform: scale(1.1);
+    border-color: var(--text-secondary);
+}
+.picker-body .picker-color-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+.picker-body .picker-color-wrap input[type="color"]::-webkit-color-swatch {
+    border-radius: 50%;
+    border: none;
+}
+.picker-body .picker-color-wrap .hex-display {
+    font-family: "SF Mono", "Cascadia Code", "Consolas", monospace;
+    font-size: 12px;
+    color: var(--text-muted2);
+    letter-spacing: 0.5px;
+}
+
+.picker-body .picker-preview-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.picker-body .picker-preview-area .preview-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.picker-body .picker-preview-area .preview-text {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    padding: 10px 14px;
+    background: var(--bg-body);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    min-height: 42px;
+    word-break: break-all;
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.picker-body .picker-controls-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.picker-body .picker-controls-row input[type="text"] {
+    flex: 1;
+    min-width: 160px;
+    padding: 6px 10px;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    background: var(--bg-input);
+    color: var(--text-body);
+    font-family: var(--font-family);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+.picker-body .picker-controls-row input[type="text"]:focus {
+    border-color: var(--border-secondary);
+}
+
+.picker-body .picker-controls-row label {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.picker-body .picker-controls-row input[type="range"] {
+    width: 70px;
+    accent-color: var(--switch-on-bg);
+}
+
+.picker-body .picker-controls-row .size-val {
+    font-size: 11px;
+    color: var(--text-muted2);
+    min-width: 32px;
+    text-align: right;
+}
+
+/* 预设颜色快捷选择 */
+.picker-body .preset-chips {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.preset-chip {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.preset-chip:hover {
+    transform: scale(1.2);
+    border-color: var(--text-secondary);
+}
+.preset-chip.selected {
+    border-color: var(--text-body);
+    box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--text-body);
+}
+
+/* ========================================
+   响应式
+   ======================================== */
+@media (max-width: 640px) {
+    .page-container { padding: 56px 12px 140px; }
+    .color-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .color-card { padding: 12px; }
+    .color-card .card-sample { font-size: 15px; }
+    .floating-picker { max-width: 100%; border-radius: 10px 10px 0 0; }
+    .picker-body { grid-template-columns: 1fr; padding: 0 14px 14px; gap: 10px; }
+    .picker-body .picker-color-wrap { flex-direction: row; gap: 10px; }
+    .picker-body .picker-controls-row { flex-direction: column; align-items: stretch; }
+    .picker-body .picker-controls-row input[type="text"] { min-width: 0; }
+    .theme-btn { padding: 4px 10px; font-size: 11px; }
+}
+
+@media (max-width: 380px) {
+    .color-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}
+</style>
+</head>
+<body data-theme="dark">
+
+<!-- 主题切换栏 -->
+<div class="theme-bar">
+    <span class="theme-bar-label">🎨 主题</span>
+    <button class="theme-btn active" data-theme="dark" onclick="switchTheme('dark')">
+        🌙 暗黑<span class="theme-badge">原始</span>
+    </button>
+    <button class="theme-btn" data-theme="light" onclick="switchTheme('light')">
+        📄 亮色<span class="theme-badge">Notion</span>
+    </button>
+    <button class="theme-btn" data-theme="book" onclick="switchTheme('book')">
+        📖 书卷<span class="theme-badge">Press</span>
+    </button>
+</div>
+
+<!-- 主内容 -->
+<div class="page-container">
+
+    <!-- ====== 标准色板 (基础) ====== -->
+    <div class="section-header">
+        <span class="section-label">标准色板</span>
+        <span class="section-line"></span>
+    </div>
+    <div class="color-grid" id="basicGrid"></div>
+
+    <!-- ====== 高亮色板 (高亮) ====== -->
+    <div class="section-header">
+        <span class="section-label">高亮 & 特殊色板</span>
+        <span class="section-line"></span>
+    </div>
+    <div class="color-grid" id="highlightGrid"></div>
+
+    <!-- ====== 森林配色 (fr-) ====== -->
+    <div class="section-header">
+        <span class="section-label">森林配色</span>
+        <span class="section-badge badge-fr">FR-</span>
+        <span class="section-line"></span>
+    </div>
+    <div class="color-grid" id="forestGrid"></div>
+
+    <!-- ====== 深海配色 (ds-) ====== -->
+    <div class="section-header">
+        <span class="section-label">深海配色</span>
+        <span class="section-badge badge-ds">DS-</span>
+        <span class="section-line"></span>
+    </div>
+    <div class="color-grid" id="oceanGrid"></div>
+
+    <!-- ====== 水墨配色 (wb-) ====== -->
+    <div class="section-header">
+        <span class="section-label">水墨配色</span>
+        <span class="section-badge badge-wb">WB-</span>
+        <span class="section-line"></span>
+    </div>
+    <div class="color-grid" id="inkGrid"></div>
+
+    <!-- ====== 浮动字体预览窗口 ====== -->
+    <div class="floating-picker" id="floatingPicker">
+        <!-- 收纳/展开切换条 -->
+        <div class="picker-toggle" onclick="togglePicker()" title="点击展开/收起">
+            <span class="toggle-label" id="toggleLabel">字体预览</span>
+            <span class="toggle-arrow">▼</span>
+        </div>
+
+        <!-- 面板主体 -->
+        <div class="picker-body">
+            <div class="picker-header">
+                <span>✦ 自定义颜色预览</span>
+            </div>
+
+            <!-- 颜色选择器 -->
+            <div class="picker-color-wrap">
+                <input type="color" id="customColor" value="#00ff00" oninput="updateCustomPreview()">
+                <span class="hex-display" id="hexDisplay">#00FF00</span>
+            </div>
+
+            <!-- 预览区 -->
+            <div class="picker-preview-area">
+                <span class="preview-label">实时预览</span>
+                <div class="preview-text" id="previewTextEl" style="color:#00ff00;">
+                    这是一段测试文本，用于预览字体颜色效果 —— 风云际会，侠客行天下
+                </div>
+                <div class="picker-controls-row">
+                    <input type="text" id="customText" value="这是一段测试文本，用于预览字体颜色效果 —— 风云际会，侠客行天下"
+                        placeholder="输入自定义文本…" oninput="updateCustomPreview()">
+                    <label>字号
+                        <input type="range" id="fontSizeSlider" min="12" max="48" value="18" oninput="updateCustomPreview()">
+                        <span class="size-val" id="sizeVal">18px</span>
+                    </label>
+                    <label>透明度
+                        <input type="range" id="opacitySlider" min="20" max="100" value="100" oninput="updateCustomPreview()">
+                        <span class="size-val" id="opacityVal">100%</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 预设快捷颜色 -->
+            <div class="preset-chips" id="presetChips"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ========================================
+// 颜色标签数据
+// ========================================
+const BASIC_COLORS = [
+    { tag: '&lt;nor&gt;', cssClass: 'nc-nor', label: 'NOR 普通',   desc: '系统消息、场景描述等默认文本颜色' },
+    { tag: '&lt;gre&gt;', cssClass: 'nc-gre', label: 'GRE 绿色',   desc: '与 NOR 同色，用于系统提示、状态正常' },
+    { tag: '&lt;blk&gt;', cssClass: 'nc-blk', label: 'BLK 暗灰',   desc: '低调文字、暗色标注、阴影效果' },
+    { tag: '&lt;red&gt;', cssClass: 'nc-red', label: 'RED 红色',   desc: '伤害数值、警告信息、敌对目标' },
+    { tag: '&lt;blu&gt;', cssClass: 'nc-blu', label: 'BLU 蓝色',   desc: '内力/魔法相关、水系技能、冷静状态' },
+    { tag: '&lt;cyn&gt;', cssClass: 'nc-cyn', label: 'CYN 青色',   desc: '特殊物品、神秘事件、解毒信息' },
+    { tag: '&lt;mag&gt;', cssClass: 'nc-mag', label: 'MAG 紫色',   desc: '稀有装备、门派秘法、内力运转' },
+    { tag: '&lt;yel&gt;', cssClass: 'nc-yel', label: 'YEL 黄色',   desc: '金钱、物品掉落、任务提示信息' },
+    { tag: '&lt;wht&gt;', cssClass: 'nc-wht', label: 'WHT 白色',   desc: 'NPC 对话、重要说明文字' },
+    { tag: '&lt;ora&gt;', cssClass: 'nc-ora', label: 'ORA 橙色',   desc: '特殊状态、流血效果、火焰伤害' },
+];
+
+const HIGHLIGHT_COLORS = [
+    { tag: '&lt;hik&gt;', cssClass: 'nc-hik', label: 'HIK 灰色',   desc: '次要注释、过期信息、已读标记' },
+    { tag: '&lt;hig&gt;', cssClass: 'nc-hig', label: 'HIG 高亮绿', desc: '重要提示、成就达成、血量回复' },
+    { tag: '&lt;hir&gt;', cssClass: 'nc-hir', label: 'HIR 高亮红', desc: '暴击伤害、濒死警告、紧急事件' },
+    { tag: '&lt;hib&gt;', cssClass: 'nc-hib', label: 'HIB 高亮蓝', desc: '内力爆满、技能冷却完毕、神兵认主' },
+    { tag: '&lt;hic&gt;', cssClass: 'nc-hic', label: 'HIC 高亮青', desc: '稀世珍宝出现、奇遇触发、天材地宝' },
+    { tag: '&lt;him&gt;', cssClass: 'nc-him', label: 'HIM 高亮紫', desc: '传说装备、绝世武功、称号特效' },
+    { tag: '&lt;hiy&gt;', cssClass: 'nc-hiy', label: 'HIY 高亮黄', desc: '极品掉落、世界公告、限时活动' },
+    { tag: '&lt;hiw&gt;', cssClass: 'nc-hiw', label: 'HIW 高亮白', desc: '系统广播、紧急通知、重大事件' },
+    { tag: '&lt;hio&gt;', cssClass: 'nc-hio', label: 'HIO 亮橙',   desc: '持续伤害、Boss 技能警告' },
+    { tag: '&lt;hij&gt;', cssClass: 'nc-hij', label: 'HIJ 金色',   desc: '充值回馈、至尊特权、顶级奖励' },
+    { tag: '&lt;hiz&gt;', cssClass: 'nc-hiz', label: 'HIZ 亮紫罗兰', desc: '隐藏任务、称号奖励、稀有 buff' },
+    { tag: '&lt;ord&gt;', cssClass: 'nc-ord', label: 'ORD 橙红',   desc: '致命一击、绝杀技提示' },
+];
+
+// 森林配色 (fr-)
+const FOREST_COLORS = [
+    { tag: '&lt;fr-nor&gt;', cssClass: 'nc-fr-nor', label: 'FR-NOR 森绿', desc: '森林风格 · 系统消息默认文本色' },
+    { tag: '&lt;fr-blu&gt;', cssClass: 'nc-fr-blu', label: 'FR-BLU 湖蓝', desc: '森林风格 · 内力/水系技能相关' },
+    { tag: '&lt;fr-cyn&gt;', cssClass: 'nc-fr-cyn', label: 'FR-CYN 碧青', desc: '森林风格 · 特殊物品、神秘事件' },
+    { tag: '&lt;fr-red&gt;', cssClass: 'nc-fr-red', label: 'FR-RED 枫红', desc: '森林风格 · 伤害数值、警告信息' },
+    { tag: '&lt;fr-mag&gt;', cssClass: 'nc-fr-mag', label: 'FR-MAG 藤紫', desc: '森林风格 · 稀有装备、门派秘法' },
+    { tag: '&lt;fr-yel&gt;', cssClass: 'nc-fr-yel', label: 'FR-YEL 枯黄', desc: '森林风格 · 金钱、物品掉落' },
+    { tag: '&lt;fr-wht&gt;', cssClass: 'nc-fr-wht', label: 'FR-WHT 雾白', desc: '森林风格 · NPC 对话、重要说明' },
+    { tag: '&lt;fr-ora&gt;', cssClass: 'nc-fr-ora', label: 'FR-ORA 秋橙', desc: '森林风格 · 特殊状态、流血效果' },
+    { tag: '&lt;fr-hik&gt;', cssClass: 'nc-fr-hik', label: 'FR-HIK 苔灰', desc: '森林风格 · 次要注释、已读标记' },
+    { tag: '&lt;fr-hig&gt;', cssClass: 'nc-fr-hig', label: 'FR-HIG 翠绿', desc: '森林风格 · 重要提示、血量回复' },
+    { tag: '&lt;fr-hir&gt;', cssClass: 'nc-fr-hir', label: 'FR-HIR 赤红', desc: '森林风格 · 暴击伤害、濒死警告' },
+    { tag: '&lt;fr-hib&gt;', cssClass: 'nc-fr-hib', label: 'FR-HIB 天蓝', desc: '森林风格 · 内力爆满、技能冷却' },
+    { tag: '&lt;fr-hic&gt;', cssClass: 'nc-fr-hic', label: 'FR-HIC 湖青', desc: '森林风格 · 稀世珍宝、奇遇触发' },
+    { tag: '&lt;fr-him&gt;', cssClass: 'nc-fr-him', label: 'FR-HIM 花紫', desc: '森林风格 · 传说装备、绝世武功' },
+    { tag: '&lt;fr-hiy&gt;', cssClass: 'nc-fr-hiy', label: 'FR-HIY 明黄', desc: '森林风格 · 极品掉落、世界公告' },
+    { tag: '&lt;fr-hiw&gt;', cssClass: 'nc-fr-hiw', label: 'FR-HIW 荧白', desc: '森林风格 · 系统广播、紧急通知' },
+    { tag: '&lt;fr-hio&gt;', cssClass: 'nc-fr-hio', label: 'FR-HIO 焰橙', desc: '森林风格 · 持续伤害、Boss 警告' },
+    { tag: '&lt;fr-hij&gt;', cssClass: 'nc-fr-hij', label: 'FR-HIJ 金辉', desc: '森林风格 · 充值回馈、至尊特权' },
+    { tag: '&lt;fr-hiz&gt;', cssClass: 'nc-fr-hiz', label: 'FR-HIZ 兰紫', desc: '森林风格 · 隐藏任务、稀有 buff' },
+    { tag: '&lt;fr-ord&gt;', cssClass: 'nc-fr-ord', label: 'FR-ORD 烈橙', desc: '森林风格 · 致命一击、绝杀技提示' },
+    { tag: '&lt;fr-blk&gt;', cssClass: 'nc-fr-blk', label: 'FR-BLK 深苔', desc: '森林风格 · 低调文字、暗色标注' },
+    { tag: '&lt;fr-gre&gt;', cssClass: 'nc-fr-gre', label: 'FR-GRE 森绿', desc: '森林风格 · 与 NOR 同色' },
+];
+
+// 深海配色 (ds-)
+const OCEAN_COLORS = [
+    { tag: '&lt;ds-nor&gt;', cssClass: 'nc-ds-nor', label: 'DS-NOR 冰蓝', desc: '深海风格 · 系统消息默认文本色' },
+    { tag: '&lt;ds-blu&gt;', cssClass: 'nc-ds-blu', label: 'DS-BLU 蔚蓝', desc: '深海风格 · 内力/水系技能相关' },
+    { tag: '&lt;ds-cyn&gt;', cssClass: 'nc-ds-cyn', label: 'DS-CYN 碧波', desc: '深海风格 · 特殊物品、神秘事件' },
+    { tag: '&lt;ds-red&gt;', cssClass: 'nc-ds-red', label: 'DS-RED 珊瑚红', desc: '深海风格 · 伤害数值、警告信息' },
+    { tag: '&lt;ds-mag&gt;', cssClass: 'nc-ds-mag', label: 'DS-MAG 海葵紫', desc: '深海风格 · 稀有装备、门派秘法' },
+    { tag: '&lt;ds-yel&gt;', cssClass: 'nc-ds-yel', label: 'DS-YEL 沙金', desc: '深海风格 · 金钱、物品掉落' },
+    { tag: '&lt;ds-wht&gt;', cssClass: 'nc-ds-wht', label: 'DS-WHT 浪白', desc: '深海风格 · NPC 对话、重要说明' },
+    { tag: '&lt;ds-ora&gt;', cssClass: 'nc-ds-ora', label: 'DS-ORA 礁橙', desc: '深海风格 · 特殊状态、流血效果' },
+    { tag: '&lt;ds-hik&gt;', cssClass: 'nc-ds-hik', label: 'DS-HIK 深灰', desc: '深海风格 · 次要注释、已读标记' },
+    { tag: '&lt;ds-hig&gt;', cssClass: 'nc-ds-hig', label: 'DS-HIG 萤绿', desc: '深海风格 · 重要提示、血量回复' },
+    { tag: '&lt;ds-hir&gt;', cssClass: 'nc-ds-hir', label: 'DS-HIR 血红', desc: '深海风格 · 暴击伤害、濒死警告' },
+    { tag: '&lt;ds-hib&gt;', cssClass: 'nc-ds-hib', label: 'DS-HIB 极蓝', desc: '深海风格 · 内力爆满、技能冷却' },
+    { tag: '&lt;ds-hic&gt;', cssClass: 'nc-ds-hic', label: 'DS-HIC 冰青', desc: '深海风格 · 稀世珍宝、奇遇触发' },
+    { tag: '&lt;ds-him&gt;', cssClass: 'nc-ds-him', label: 'DS-HIM 亮紫', desc: '深海风格 · 传说装备、绝世武功' },
+    { tag: '&lt;ds-hiy&gt;', cssClass: 'nc-ds-hiy', label: 'DS-HIY 耀黄', desc: '深海风格 · 极品掉落、世界公告' },
+    { tag: '&lt;ds-hiw&gt;', cssClass: 'nc-ds-hiw', label: 'DS-HIW 极白', desc: '深海风格 · 系统广播、紧急通知' },
+    { tag: '&lt;ds-hio&gt;', cssClass: 'nc-ds-hio', label: 'DS-HIO 暖橙', desc: '深海风格 · 持续伤害、Boss 警告' },
+    { tag: '&lt;ds-hij&gt;', cssClass: 'nc-ds-hij', label: 'DS-HIJ 流金', desc: '深海风格 · 充值回馈、至尊特权' },
+    { tag: '&lt;ds-hiz&gt;', cssClass: 'nc-ds-hiz', label: 'DS-HIZ 水紫', desc: '深海风格 · 隐藏任务、稀有 buff' },
+    { tag: '&lt;ds-ord&gt;', cssClass: 'nc-ds-ord', label: 'DS-ORD 熔橙', desc: '深海风格 · 致命一击、绝杀技提示' },
+    { tag: '&lt;ds-blk&gt;', cssClass: 'nc-ds-blk', label: 'DS-BLK 暗礁', desc: '深海风格 · 低调文字、暗色标注' },
+    { tag: '&lt;ds-gre&gt;', cssClass: 'nc-ds-gre', label: 'DS-GRE 冰蓝', desc: '深海风格 · 与 NOR 同色' },
+];
+
+// 水墨配色 (wb-)
+const INK_COLORS = [
+    { tag: '&lt;wb-nor&gt;', cssClass: 'nc-wb-nor', label: 'WB-NOR 墨色', desc: '水墨风格 · 系统消息默认文本色' },
+    { tag: '&lt;wb-blu&gt;', cssClass: 'nc-wb-blu', label: 'WB-BLU 靛蓝', desc: '水墨风格 · 内力/水系技能相关' },
+    { tag: '&lt;wb-cyn&gt;', cssClass: 'nc-wb-cyn', label: 'WB-CYN 青灰', desc: '水墨风格 · 特殊物品、神秘事件' },
+    { tag: '&lt;wb-red&gt;', cssClass: 'nc-wb-red', label: 'WB-RED 朱砂', desc: '水墨风格 · 伤害数值、警告信息' },
+    { tag: '&lt;wb-mag&gt;', cssClass: 'nc-wb-mag', label: 'WB-MAG 黛紫', desc: '水墨风格 · 稀有装备、门派秘法' },
+    { tag: '&lt;wb-yel&gt;', cssClass: 'nc-wb-yel', label: 'WB-YEL 藤黄', desc: '水墨风格 · 金钱、物品掉落' },
+    { tag: '&lt;wb-wht&gt;', cssClass: 'nc-wb-wht', label: 'WB-WHT 淡墨', desc: '水墨风格 · NPC 对话、重要说明' },
+    { tag: '&lt;wb-ora&gt;', cssClass: 'nc-wb-ora', label: 'WB-ORA 赭石', desc: '水墨风格 · 特殊状态、流血效果' },
+    { tag: '&lt;wb-hik&gt;', cssClass: 'nc-wb-hik', label: 'WB-HIK 淡灰', desc: '水墨风格 · 次要注释、已读标记' },
+    { tag: '&lt;wb-hig&gt;', cssClass: 'nc-wb-hig', label: 'WB-HIG 翠微', desc: '水墨风格 · 重要提示、血量回复' },
+    { tag: '&lt;wb-hir&gt;', cssClass: 'nc-wb-hir', label: 'WB-HIR 朱红', desc: '水墨风格 · 暴击伤害、濒死警告' },
+    { tag: '&lt;wb-hib&gt;', cssClass: 'nc-wb-hib', label: 'WB-HIB 宝蓝', desc: '水墨风格 · 内力爆满、技能冷却' },
+    { tag: '&lt;wb-hic&gt;', cssClass: 'nc-wb-hic', label: 'WB-HIC 碧色', desc: '水墨风格 · 稀世珍宝、奇遇触发' },
+    { tag: '&lt;wb-him&gt;', cssClass: 'nc-wb-him', label: 'WB-HIM 绛紫', desc: '水墨风格 · 传说装备、绝世武功' },
+    { tag: '&lt;wb-hiy&gt;', cssClass: 'nc-wb-hiy', label: 'WB-HIY 泥金', desc: '水墨风格 · 极品掉落、世界公告' },
+    { tag: '&lt;wb-hiw&gt;', cssClass: 'nc-wb-hiw', label: 'WB-HIW 浓墨', desc: '水墨风格 · 系统广播、紧急通知' },
+    { tag: '&lt;wb-hio&gt;', cssClass: 'nc-wb-hio', label: 'WB-HIO 柿橙', desc: '水墨风格 · 持续伤害、Boss 警告' },
+    { tag: '&lt;wb-hij&gt;', cssClass: 'nc-wb-hij', label: 'WB-HIJ 金粉', desc: '水墨风格 · 充值回馈、至尊特权' },
+    { tag: '&lt;wb-hiz&gt;', cssClass: 'nc-wb-hiz', label: 'WB-HIZ 青莲', desc: '水墨风格 · 隐藏任务、稀有 buff' },
+    { tag: '&lt;wb-ord&gt;', cssClass: 'nc-wb-ord', label: 'WB-ORD 胭脂', desc: '水墨风格 · 致命一击、绝杀技提示' },
+    { tag: '&lt;wb-blk&gt;', cssClass: 'nc-wb-blk', label: 'WB-BLK 灰墨', desc: '水墨风格 · 低调文字、暗色标注' },
+    { tag: '&lt;wb-gre&gt;', cssClass: 'nc-wb-gre', label: 'WB-GRE 墨色', desc: '水墨风格 · 与 NOR 同色' },
+];
+
+// 所有预设色
+const ALL_PRESET_COLORS = [
+    ...BASIC_COLORS, ...HIGHLIGHT_COLORS,
+    ...FOREST_COLORS, ...OCEAN_COLORS, ...INK_COLORS
+];
+
+// ========================================
+// 渲染颜色卡片
+// ========================================
+function createColorCard(item) {
+    return `
+        <div class="color-card">
+            <div class="card-tag">${item.tag}</div>
+            <div class="card-sample ${item.cssClass}">
+                <span class="color-dot"></span>${item.label}
+            </div>
+            <div class="card-desc">${item.desc}</div>
+            <div class="card-copy-hint">点击复制标签</div>
+        </div>`;
+}
+
+document.getElementById('basicGrid').innerHTML = BASIC_COLORS.map(createColorCard).join('');
+document.getElementById('highlightGrid').innerHTML = HIGHLIGHT_COLORS.map(createColorCard).join('');
+document.getElementById('forestGrid').innerHTML = FOREST_COLORS.map(createColorCard).join('');
+document.getElementById('oceanGrid').innerHTML = OCEAN_COLORS.map(createColorCard).join('');
+document.getElementById('inkGrid').innerHTML = INK_COLORS.map(createColorCard).join('');
+
+// ========================================
+// 渲染预设色片
+// ========================================
+function renderPresetChips() {
+    const styles = getComputedStyle(document.body);
+    // 主题色用 CSS 变量读取
+    const themeColors = [...BASIC_COLORS, ...HIGHLIGHT_COLORS].map(c => {
+        const varName = '--mud-' + c.cssClass.replace('nc-', '');
+        const hex = styles.getPropertyValue(varName).trim();
+        return { label: c.label, hex, tag: c.tag };
+    });
+    // 固定色从预定义列表中取
+    const fixedColors = [
+        // Forest
+        { hex: '#8FBC8F', label: 'FR-NOR', tag: '<fr-nor>' },
+        { hex: '#80E040', label: 'FR-HIG', tag: '<fr-hig>' },
+        { hex: '#FF7060', label: 'FR-HIR', tag: '<fr-hir>' },
+        { hex: '#60A0F0', label: 'FR-HIB', tag: '<fr-hib>' },
+        { hex: '#B870E0', label: 'FR-HIZ', tag: '<fr-hiz>' },
+        // Deep Sea
+        { hex: '#A0C4D8', label: 'DS-NOR', tag: '<ds-nor>' },
+        { hex: '#50E870', label: 'DS-HIG', tag: '<ds-hig>' },
+        { hex: '#FF7070', label: 'DS-HIR', tag: '<ds-hir>' },
+        { hex: '#4898FF', label: 'DS-HIB', tag: '<ds-hib>' },
+        { hex: '#A868E8', label: 'DS-HIZ', tag: '<ds-hiz>' },
+        // Ink
+        { hex: '#2C2C2C', label: 'WB-NOR', tag: '<wb-nor>' },
+        { hex: '#2D8030', label: 'WB-HIG', tag: '<wb-hig>' },
+        { hex: '#CC3030', label: 'WB-HIR', tag: '<wb-hir>' },
+        { hex: '#6030A0', label: 'WB-HIZ', tag: '<wb-hiz>' },
+    ];
+    const all = [...themeColors, ...fixedColors];
+    const chips = all.map(c =>
+        `<span class="preset-chip" style="background:${c.hex};" title="${c.label} — ${c.hex}" data-hex="${c.hex}" onclick="pickPreset('${c.hex}')"></span>`
+    ).join('');
+    document.getElementById('presetChips').innerHTML = chips;
+}
+
+// 初始渲染
+setTimeout(renderPresetChips, 50);
+
+// ========================================
+// 自定义颜色预览
+// ========================================
+function updateCustomPreview() {
+    const color = document.getElementById('customColor').value;
+    const text = document.getElementById('customText').value || '预览文本';
+    const fontSize = document.getElementById('fontSizeSlider').value;
+    const opacity = document.getElementById('opacitySlider').value;
+
+    const previewEl = document.getElementById('previewTextEl');
+    previewEl.style.color = color;
+    previewEl.textContent = text;
+    previewEl.style.fontSize = fontSize + 'px';
+    previewEl.style.opacity = (opacity / 100).toString();
+
+    document.getElementById('hexDisplay').textContent = color.toUpperCase();
+    document.getElementById('sizeVal').textContent = fontSize + 'px';
+    document.getElementById('opacityVal').textContent = opacity + '%';
+
+    document.querySelectorAll('.preset-chip').forEach(chip => {
+        chip.classList.toggle('selected', chip.dataset.hex.toUpperCase() === color.toUpperCase());
+    });
+}
+
+// ========================================
+// 浮动窗口收纳/展开
+// ========================================
+function togglePicker() {
+    const panel = document.getElementById('floatingPicker');
+    const label = document.getElementById('toggleLabel');
+    panel.classList.toggle('collapsed');
+    if (panel.classList.contains('collapsed')) {
+        label.textContent = '字体预览 ▸';
+    } else {
+        label.textContent = '字体预览';
+    }
+}
+
+function pickPreset(hex) {
+    document.getElementById('customColor').value = hex;
+    updateCustomPreview();
+}
+
+// ========================================
+// 主题切换
+// ========================================
+function switchTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+    setTimeout(renderPresetChips, 100);
+    updateCustomPreview();
+}
+
+// ========================================
+// 点击卡片复制完整颜色标签对
+// ========================================
+document.querySelectorAll('.color-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const tagEl = this.querySelector('.card-tag');
+        if (!tagEl) return;
+        // 从显示文本中提取标签名: 文本如 "<blk>"（已解码）→ 剥离尖括号得 "blk"
+        const displayTag = tagEl.textContent || '';
+        const rawTag = displayTag.replace(/^<|>$/g, '');
+        if (!rawTag) return;
+        const fullTag = `<${rawTag}>`;
+        navigator.clipboard.writeText(fullTag).then(() => {
+            this.classList.add('copied');
+            setTimeout(() => { this.classList.remove('copied'); }, 600);
+        }).catch(() => {});
+    });
+    card.title = '点击复制标签';
+});
+
+// 初始化自定义预览
+updateCustomPreview();
+</script>
+
+</body>
+</html>

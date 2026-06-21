@@ -33,7 +33,7 @@ export default class extends EQUIPMENT {
         const diffDownsidePer = target.query_prop('diff_downside_per') || 0;
         effPer = effPer - Math.floor(diffDownsidePer / 10);
         if (effPer <= 0) return 0;
-        me.send_room("$N的$w以开天辟地之势镇压$n", target);
+        me.send_room("<hir>$N的$w以开天辟地之势镇压$n</hir>", target);
         if (target.add_status({
             id: "pangufu",
             name: "镇压",
