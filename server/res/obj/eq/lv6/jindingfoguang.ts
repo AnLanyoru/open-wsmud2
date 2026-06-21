@@ -9,7 +9,7 @@ export default class extends EQUIPMENT {
     desc = "峨眉至宝，佛光护身";
     value = 5000000;
     grade = 6;
-    eq_type = EQUIP_TYPE.JEWELS;
+    eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         fy: 780,
         con: 200,

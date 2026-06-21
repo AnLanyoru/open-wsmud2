@@ -295,9 +295,9 @@ export class SKILL extends BASE {
      * @param target - 攻击者
      * @param w2 - 攻击者武器
      */
-    query_parry_action(me: CHARACTER, target: CHARACTER, w2?: Record<string, any>): string {
+    query_parry_action(me: CHARACTER, target: CHARACTER, w2?: string): string {
         const w1 = me.query_weapon();
-        w2 = w2 || target.query_weapon();
+        w2 = w2 || target.query_weapon()?.weapon_type;
         let act: string[] | undefined;
         if (w1 && w2) {
             act = this.weapon_vs_weapon_actions.length ? this.weapon_vs_weapon_actions : this.parry_actions;

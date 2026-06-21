@@ -10,7 +10,7 @@ import {OBJ} from './obj.js';
 import {UTIL} from '../util.js';
 import {EQUIP_TYPE, PROPERTIES} from '../const.js';
 import {SKILL} from '../skill/skill.js';
-import type {CHARACTER} from '../char/character.js';
+import type {CHARACTER, DoAttackPar} from '../char/character.js';
 import type {USER} from '../char/user.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -102,6 +102,8 @@ export class EQUIPMENT extends OBJ {
     on_uneq?(me: CHARACTER): void;
     /** 防具防御回调 — 触发时机：damage() 中计算伤害减免时；返回减免后伤害 */
     on_defense?(me: CHARACTER, from: CHARACTER, sh: number): number;
+    /** 武器攻击回调 — 触发时机：do_attack() 中命中且未被招架后；返回额外伤害值 */
+    do_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
 
     /**
      * 应用/移除装备附加属性

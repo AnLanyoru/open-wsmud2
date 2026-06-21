@@ -22,7 +22,10 @@ const need_test_objs: TestResRoot = {
         },
     },
     神器测试: {
-        "崆峒印": ["eq/lv6/kongtongyin", 1]
+        "崆峒印": ["eq/lv6/kongtongyin", 1],
+        "七宝指环": ["eq/lv6/qibaozhihuan", 1],
+        "金顶佛光": ["eq/lv6/jindingfoguang", 1],
+        "盘古斧": ["eq/lv6/pangufu", 1],
     },
     随从礼包: ["sp/npc#shuang", 10],
 };

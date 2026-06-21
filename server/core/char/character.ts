@@ -1851,10 +1851,11 @@ export class CHARACTER extends ITEM {
     /**
      * 获取当前武器
      */
-    query_weapon(): any {
+    query_weapon(): EQUIPMENT | null {
         if (this.equipment) {
             return this.equipment[EQUIP_TYPE.WEAPON];
         }
+        return null
     }
 
     /**
