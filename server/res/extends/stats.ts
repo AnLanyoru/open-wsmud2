@@ -45,7 +45,7 @@ STATS.loadTopUser = function (data, npc) {
     for (let i = 0; i < COPY_PROPS.length; i++) {
         npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
     }
-    npc.skills = SkillsMap.from(data.skills as Record<string, any>);
+    npc.skills = SkillsMap.from(data.skills);
     if (data.eq) {
         npc.equipment = [];
         for (let i = 0; i < data.eq.length; i++) {

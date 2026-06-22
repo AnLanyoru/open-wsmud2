@@ -284,8 +284,7 @@ export class ITEM extends BASE {
         cmd: string,
         name: string | null,
         func?: ((...args: any[]) => any),
-    ): ActionDef<this> | undefined {
-        if (!cmd) return;
+    ): ActionDef<this> {
         if (!this.actions) this.actions = {};
         let act = this.actions[cmd];
         if (act) {

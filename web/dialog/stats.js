@@ -266,6 +266,7 @@ const stats_css = `
 .stats-container-left>.stats-silder {
     white-space: nowrap;
     line-height: 2em;
+    width: 5em;
     text-align: center;
     background-color: var(--bg-surface);
     border-radius: 4px;

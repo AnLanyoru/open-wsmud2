@@ -12,23 +12,14 @@ export default class BiWuLeiTaiRoom extends ROOM {
 
     constructor() {
         super();
-        var act: ReturnType<ROOM['add_action']>;
-        act = this.add_action("fight", "", this.action_fight);
-        if (act) act.allow_fight = true;
-        act = this.add_action("kill", "", this.action_kill);
-        if (act) act.allow_fight = true;
-        act = this.add_action("dazuo", "", this.action_dazuo);
-        if (act) act.allow_fight = true;
-        act = this.add_action("liaoshang", "", this.action_liaoshang);
-        if (act) act.allow_fight = true;
-        act = this.add_action("perform", "", this.action_perform);
-        if (act) act.allow_fight = true;
-        act = this.add_action("unequip", "", this.action_unequip);
-        if (act) act.allow_fight = true;
-        act = this.add_action("enable", "", this.action_enable);
-        if (act) act.allow_fight = true;
-        act = this.add_action("surrender", '投降', this.surrender);
-        if (act) act.allow_fight = true;
+        this.add_action("fight", "", this.action_fight).allow_fight = true;
+        this.add_action("kill", "", this.action_kill).allow_fight = true;
+        this.add_action("dazuo", "", this.action_dazuo).allow_fight = true;
+        this.add_action("liaoshang", "", this.action_liaoshang).allow_fight = true;
+        this.add_action("perform", "", this.action_perform).allow_fight = true;
+        this.add_action("unequip", "", this.action_unequip).allow_fight = true;
+        this.add_action("enable", "", this.action_enable).allow_fight = true;
+        this.add_action("surrender", '投降', this.surrender).allow_fight = true;
     }
 
     action_fight(me: CHARACTER) {
