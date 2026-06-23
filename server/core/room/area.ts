@@ -347,9 +347,9 @@ export class AREA extends BASE {
 
     /** @param me */
     is_unlock(me: USER): boolean {
-        if ((this as { jd_index?: number }).jd_index! >= 0)
+        if (this.jd_index! >= 0)
             return me.isenable_area(this);
-        return ((this as { unlock_index?: number }).unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
+        return (this.unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
     }
 
     /** 快速扫荡回调 */

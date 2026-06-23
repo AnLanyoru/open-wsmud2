@@ -121,7 +121,7 @@ server/res/npc/bj/ao/jiading.ts   →  import {NPC} from "../../../../core/char/
 1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型：
    ```typescript
    // ✅ 正确：标注类型
-   prop: Record<string, number> = {
+   prop: PropMap = {
        gj: 8000,
        fy: 3000,
        mz: 5000,
