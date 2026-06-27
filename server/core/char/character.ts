@@ -1532,7 +1532,7 @@ export class CHARACTER extends ITEM {
     /**
      * 拼接状态数据到 JSON
      */
-    appdend_status(str: string[]): void {
+    append_status(str: string[]): void {
         if (!this.status) return;
         const now = Date.now();
         str.push(',status:[');
