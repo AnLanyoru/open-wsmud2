@@ -19,7 +19,7 @@ import type { NPC } from './npc.js';
 import { FAMILIES } from '../skill/family.js';
 import { ITEM } from '../item.js';
 import { RoleRecord } from '../util/data.js';
-import type { RoleData } from '../db.js';
+import type { RoleData } from '../util/data.js';
 
 // ============================================================
 // 模块级常量
@@ -390,13 +390,13 @@ export class USER extends CHARACTER {
     /** 退出游戏 */
     quit(): void {
         const rm = this.environment;
-        if (this.environment) {
+        if (rm) {
             this.team_out('离开了游戏，自动退出队伍');
-            this.environment.item_changed(this, false, this.name + '离开了游戏。');
+            rm.item_changed(this, false, this.name + '离开了游戏。');
             this.environment = rm;
             this.clear_follow();
-            (this.environment as ROOM).clear_copy(this);
-            (this.environment as ROOM).parent?.on_leaved?.(this);
+            this.environment.clear_copy(this);
+            this.environment.parent?.on_leaved?.(this);
         }
         this.environment = undefined;
         this.clear_status();
@@ -406,7 +406,7 @@ export class USER extends CHARACTER {
 
         this.clear_home();
         if (this.socket) {
-            (this.socket as { user: USER | null }).user = null;
+            this.socket.user = null;
             this.socket = undefined;
         }
     }
@@ -966,8 +966,8 @@ export class USER extends CHARACTER {
      * 查询精力值
      */
     query_jingli(): number {
-        const expend: number = (this.query_temp('ex_jl') as number) || 0;
-        return 200 - expend + ((this.query_temp('ad_jl') as number) || 0);
+        const expend: number = this.query_temp('ex_jl');
+        return 200 - expend + this.query_temp('ad_jl', 0);
     }
 
     /**
@@ -1406,7 +1406,7 @@ export class USER extends CHARACTER {
     query_bool(key: string, index: number): boolean {
         let step = Math.floor(index / 32);
         if (step > 0) key = key.toString() + step.toString();
-        const num: number = (this.query_temp(key, 0) as number) || 0;
+        const num: number = this.query_temp(key, 0);
         if (!num) return false;
         const bit = index % 32;
         return (num & (1 << bit)) !== 0;
@@ -1418,7 +1418,7 @@ export class USER extends CHARACTER {
     set_bool(key: string, index: number, value: any, time?: number): void {
         let step = Math.floor(index / 32);
         if (step > 0) key = key.toString() + step.toString();
-        const num: number = (this.query_temp(key, 0) as number) || 0;
+        const num: number = this.query_temp(key, 0);
         const bit = index % 32;
         if (value) {
             this.set_temp(key, num | (1 << bit), time);
@@ -1431,7 +1431,7 @@ export class USER extends CHARACTER {
      * 清除位标记区域
      */
     clear_bool(key: string, count: number): void {
-        const num: number = (this.query_temp(key, 0) as number) || 0;
+        const num: number = this.query_temp(key, 0);
         if (!num) return;
         for (let i = 0; i < count; i++) {
             if ((num & (1 << i)) !== 0) {
@@ -1448,9 +1448,9 @@ export class USER extends CHARACTER {
      */
     expend_jingli(val: number): boolean {
         if (val > 0 && this.query_jingli() >= val) {
-            const expend: number = (this.query_temp('ex_jl', 0) as number) || 0;
+            const expend: number = this.query_temp('ex_jl', 0);
             if (expend >= 200) {
-                const add: number = (this.query_temp('ad_jl', 0) as number) || 0;
+                const add: number = this.query_temp('ad_jl', 0);
                 if (add < val) return false;
                 this.add_temp('ad_jl', -val);
             } else {

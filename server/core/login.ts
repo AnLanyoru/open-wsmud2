@@ -29,6 +29,7 @@ export interface LoginUserParam {
     loginTime: number;
     ip_address?: string;
     serverid: number;
+    _authing?: boolean;
 }
 
 /** 解密后的会话数据 */
@@ -115,10 +116,10 @@ const USERLOGIN = {
             return this.login_error(user, '参数错误');
         }
         // 防止同一 socket 并发鉴权导致会话数据被覆盖（串号）
-        if ((user as any)._authing) {
+        if (user._authing) {
             return this.login_error(user, '登录验证进行中，请稍后重试。', false);
         }
-        (user as any)._authing = true;
+        user._authing = true;
 
         try {
             const parts = str.split(' ');
@@ -170,7 +171,7 @@ const USERLOGIN = {
                 if (parseInt(parts[3]) !== WORLD.SERVERID) {
                     return this.login_error(user, '参数错误。');
                 }
-                const data = (WORLD as { can_cross(id: string): boolean }).can_cross(parts[2]);
+                const data = WORLD.can_cross(parts[2]);
                 if (!data) {
                     return this.login_error(user, '不允许登录');
                 }
@@ -189,7 +190,7 @@ const USERLOGIN = {
             await this.load_roles(user);
             user.wait_input = this.wait_login;
         } finally {
-            (user as any)._authing = false;
+            user._authing = false;
         }
     },
 

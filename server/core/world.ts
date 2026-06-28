@@ -13,7 +13,7 @@ import fs from 'fs';
 
 import './util.js';
 import {BASE} from './base.js';
-import db from './db.js';
+import db from './util/data.js';
 import {FAMILIES} from './skill/family.js';
 import {RecoverType} from './const.js';
 import WORLD_DATA from './data.js';
@@ -38,7 +38,7 @@ import type {CORPSE} from './item/corpse.js';
 import type {LoginUserParam} from './login.js';
 import type wsServer from './net-ws.js';
 import type {EventItem} from './task/events.js';
-import { DataBaseHandler } from './util/data.js';
+
 import type jh from '../res/cmd/dialog/jh.js';
 import party from '../res/cmd/extend/party.js';
 

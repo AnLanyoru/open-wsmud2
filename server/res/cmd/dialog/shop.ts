@@ -289,7 +289,7 @@ export default class extends COMMAND {
                 item.name = obj.name;
                 item.unit = obj.unit;
                 item.grade = obj.grade;
-                item.id = (Object.getPrototypeOf(obj) as Record<string, string>).id + String(i);
+                item.id = Object.getPrototypeOf(obj).id + String(i);
 
                 this.list.set(item.id!, item);
                 if (item.limit_key) {

@@ -468,7 +468,7 @@ export class FOLLOWER extends CHARACTER {
             return false;
         }
         this.clear_status();
-        this.send_room((DIE_MSG as any as string[]).random());
+        this.send_room(DIE_MSG.random());
         const corpse = new CORPSE();
         corpse.init(this, false);
         this.environment.item_changed(corpse, true);

@@ -534,7 +534,7 @@ export class ITEM extends BASE {
         const id = this.id;
         if (!id) return;
         const time = parseInt(id.slice(4), 16);
-        return new Date(time * 1000 + (UTIL as { begin: number }).begin);
+        return new Date(time * 1000 + UTIL.begin);
     }
 
     /**
