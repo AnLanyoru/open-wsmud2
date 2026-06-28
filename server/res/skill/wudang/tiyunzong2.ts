@@ -71,7 +71,7 @@ export default class extends SKILL {
                     ds: lv,
                     mz: lv,
                 },
-                duration: 5000,
+                duration: 10000,
                 override: 1,
                 max_count: max_count,
             });
