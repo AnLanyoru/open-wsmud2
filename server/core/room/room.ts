@@ -293,7 +293,7 @@ export class ROOM extends ITEM {
                 str.push(String(ch.max_mp));
                 str.push(",max_hp:");
                 str.push(String(ch.max_hp));
-                if (ch.appdend_status) ch.appdend_status(str);
+                if (ch.append_status) ch.append_status(str);
             }
             str.push("}");
         } else {
@@ -327,7 +327,7 @@ export class ROOM extends ITEM {
                     }
                     str.push(item.item_types);
                 }
-                if (item.appdend_status) {
+                if (item.append_status) {
                     str.push(",mp:");
                     str.push(item.mp);
                     str.push(",hp:");
@@ -337,7 +337,7 @@ export class ROOM extends ITEM {
                     str.push(",max_hp:");
                     str.push(item.max_hp);
 
-                    item.appdend_status(str);
+                    item.append_status(str);
                 }
                 str.push("},");
             }
