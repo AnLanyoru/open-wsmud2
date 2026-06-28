@@ -45,54 +45,11 @@ USERTASK（玩家任务）是游戏引擎中为每个玩家独立设计的任务
 
 ---
 
-### 类型标注准则
+### 类型标注与 temp 操作
 
-> **编写玩家任务时，必须遵循以下类型标注规则：**
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。**
 
-1. **重写方法必须显式标注参数类型和返回类型：**
-   ```typescript
-   // ✅ 正确
-   query_title(me: CHARACTER): string | undefined {
-       return `<hic>我的任务</hic>`;
-   }
-   query_desc(me: CHARACTER): string | undefined {
-       return `进度：${me.query_temp("progress", 0)}/10`;
-   }
-   query_state(me: CHARACTER): number | undefined {
-       let progress = me.query_temp("progress", 0);
-       if (progress >= 10) return 2;
-       if (progress > 0) return 1;
-       return 0;
-   }
-   start(me: CHARACTER): boolean | void {
-       me.set_temp("progress", 0);
-       me.notify("<hic>任务开始！</hic>");
-   }
-   on_finish(me: CHARACTER): boolean {
-       let progress = me.query_temp("progress", 0);
-       if (progress < 10) return false;
-       me.set_temp("progress", 0);
-       me.add_exp(10000, 5000);
-       return true;
-   }
-   on_create(): void {
-       const old = USERTASK.GET('my_task');
-       if (old) this.runtimeMap = (old as typeof this).runtimeMap;
-   }
-
-   // ❌ 错误：缺少参数类型和返回类型
-   start(me) { me.set_temp("progress", 0); }
-   on_finish(me) { return true; }
-   query_state(me) { return 1; }
-   ```
-
-2. **类属性为对象时需标注类型：**
-   ```typescript
-   // ✅ 正确
-   stages: StageDef[] = [
-       { id: 0, title: "收集物资", ... },
-   ];
-   ```
+USERTASK 中所有重写方法（`start`、`on_finish`、`query_state`、`query_title`、`query_desc` 等）必须标注参数类型和返回类型，进度数据通过 `me.query_temp`/`me.set_temp` 按玩家隔离存储。
 
 ---
 

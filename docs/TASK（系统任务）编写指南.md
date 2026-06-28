@@ -102,48 +102,11 @@ export default class extends TASK {
 
 ---
 
-### 类型标注准则
+### 类型标注与 temp 操作
 
-> **编写系统任务时，必须遵循以下类型标注规则：**
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。**
 
-1. **对象类型属性必须显式标注类型：**
-   ```typescript
-   // ✅ 正确
-   customer: Record<string, OBJ[] | null> = {};
-   next_time: Date | null = null;
-
-   // ❌ 错误
-   customer = {};
-   ```
-
-2. **重写方法必须显式标注参数类型和返回类型：**
-   ```typescript
-   // ✅ 正确
-   startup(oldtask?: TASK): boolean | void {
-       this.handler = this.call_out(this.run, 60000);
-   }
-   stop(): void {
-       if (this.handler) clearTimeout(this.handler);
-   }
-   run(): void {
-       // 任务逻辑
-   }
-   query_goods(me: CHARACTER): OBJ[] {
-       return this.customer[me.id] || [];
-   }
-
-   // ❌ 错误：缺少返回类型
-   startup(oldtask) { ... }
-   stop() { ... }
-   ```
-
-3. **NPC 回调绑定时的类型处理。** 当将 TASK 方法赋值给 NPC 回调时，注意 `this` 指向变化，使用 `bind` 或闭包，同时保持参数类型：
-   ```typescript
-   // ✅ 正确
-   boss.on_died = (killer: CHARACTER, corpse: CORPSE): void => {
-       this.handleBossDeath(boss, killer, corpse);
-   };
-   ```
+TASK 中需特别注意：类属性如 `customer`、`next_time` 等对象类型须显式标注；NPC 回调绑定时注意 `this` 指向并保持参数类型。
 
 ---
 
@@ -623,67 +586,35 @@ let ms = UTIL.diff_week_time(20);    // 到下周一 20 点
 
 ## 12. 临时数据（temp）操作规范
 
-> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。** 以下仅说明 TASK 中涉及的两种 temp 作用范围。
 
 ### 12.1 玩家临时数据（per-player）
 
-每个玩家独立存储，持久化在玩家角色存档中。通过 `me`（USER 实例）调用：
-
-| 方法 | 签名 | 说明 |
-|------|------|------|
-| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
-| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 有效期（**毫秒**），省略则永久。 |
-| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，不删除键名）。 |
+通过 `me`（USER 实例）调用，每个玩家独立，持久化在角色存档中：
 
 ```typescript
-// ✅ 正确：通过方法操作
-let count = me.query_temp<number>("bcc", 0);        // 必须提供默认值
-let flag = me.query_temp("xy_bm", 0);
-me.set_temp("bcc", 1);                               // 永久
-me.set_temp("bcc", 1, 3600000);                      // 1小时后过期
-let newVal = me.add_temp("bcc", 1);                  // 累加
+let count = me.query_temp<number>("bcc", 0);
+me.set_temp("bcc", 1, 3600000);  // 1小时后过期
+me.add_temp("bcc", 1);
 me.remove_temp("bcc");
-
-// ❌ 错误：直接访问 temp 对象
-me.temp["bcc"] = 1;          // 禁止！
-let val = me.temp["bcc"];    // 禁止！
 ```
 
 ### 12.2 全局临时数据（WORLD.DATA）
 
 全服共享，持久化在 `data.js` 中：
 
-| 方法 | 签名 | 说明 |
-|------|------|------|
-| `query_temp` | `<T>(name: string, def?: T) => T` | 读取全局值。**必须提供默认值**。 |
-| `set_temp` | `(name: string, value: unknown, time?: number) => void` | 写入全局值。 |
-| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加全局数值。 |
-| `remove_temp` | `(name: string) => void` | 移除（设为 `null`）。 |
-
 ```typescript
-// ✅ 正确
-WORLD.DATA.set_temp("xy_status", 1);                      // 不超时
-WORLD.DATA.set_temp("xy_status", 10, 3600000);             // 1小时后过期
-let status = WORLD.DATA.query_temp("xy_status", 0) ?? 0;   // 必须默认值
-let count = WORLD.DATA.add_temp("boss_count", 1);           // 累加
+WORLD.DATA.set_temp("xy_status", 1);
+WORLD.DATA.set_temp("xy_status", 10, 3600000);
+let status = WORLD.DATA.query_temp("xy_status", 0);
+WORLD.DATA.add_temp("boss_count", 1);
 WORLD.DATA.remove_temp("xy_status");
 ```
 
-### 12.3 核心约束
-
-1. **禁止直接访问 `temp` 对象**：无论 `me.temp`、`WORLD.DATA.temp` 还是其他对象的 `.temp`，都不允许直接读写，必须使用上述四个方法。
-2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或类型错误。
-   ```typescript
-   // ❌ 错误
-   let count = me.query_temp("count") + 1;  // key 不存在时为 undefined + 1 = NaN
-   // ✅ 正确
-   let count = me.query_temp("count", 0) + 1;
-   ```
-3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**，不是秒。
-4. **过期机制**：值以 `{v, e}` 格式存储时，`query_temp` 在 `Date.now() > e` 时自动返回默认值。
-5. **`remove_temp` 设为 `null`**：不删除键名，用于 JSON 序列化兼容。
-6. **作用范围区分**：`me.query_temp()` = 单个玩家，`WORLD.DATA.query_temp()` = 全服共享。不要混淆。
+| 对象 | 作用范围 | 持久化位置 | 典型用途 |
+|------|---------|-----------|---------|
+| `me.query_temp()` | 单个玩家 | 该玩家的角色存档 | 玩家 BOSS 次数、报名状态 |
+| `WORLD.DATA.query_temp()` | 全服共享 | `data.js` | BOSS 刷新状态、活动计数器 |
 
 ---
 

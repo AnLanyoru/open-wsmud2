@@ -89,35 +89,9 @@ book/book#sword   → 路径 "book/book#sword"，par 参数为 "#sword"
 
 ---
 
+### 类型标注与 temp 操作
 
-2. **重写方法必须显式标注参数类型和返回类型：**
-   ```typescript
-   // ✅ 正确
-   on_use(me: CHARACTER): boolean | void {
-       let hp = me.add_hp(100);
-       if (hp) me.notify("你恢复了" + hp + "点气血。");
-   }
-   on_create(path: string, par: string): void {
-       if (!par) return;
-       var lv = parseInt(par.slice(1));
-   }
-
-   // ❌ 错误：缺少类型标注
-   on_use(me) {
-       let hp = me.add_hp(100);
-   }
-   on_create(path, par) { ... }
-   ```
-
-3. **`group_prop` 和 `on_defense` 必须标注参数与返回类型：**
-   ```typescript
-   group_prop(count: number): PropMap | void {
-       if (count == 3) return { int: 10 };
-   }
-   on_defense(me: CHARACTER, sh: number, from: CHARACTER): number {
-       return Math.floor(sh * 0.9);
-   }
-   ```
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。** OBJ 编写中需特别注意回调方法（`on_use`、`on_create`、`on_defense`、`group_prop` 等）的参数与返回类型标注。
 
 ---
 

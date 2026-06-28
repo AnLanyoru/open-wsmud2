@@ -47,56 +47,12 @@
 
 ---
 
-### 类型标注准则
+### 类型标注与 temp 操作
 
-> **编写房间时，必须遵循以下类型标注规则：**
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。以下仅列出 ROOM 特有的注意事项。**
 
-1. **对象类型属性必须显式标注类型。** 如 `exits`、`hidden_items` 等对象类属性需标注类型：
-   ```typescript
-   // ✅ 正确
-   exits: Record<string, string> = {
-       east: "yz/beidajie2",
-       west: "yz/wumiao",
-   };
-
-   // ❌ 错误
-   exits = {
-       east: "yz/beidajie2",
-   };
-   ```
-
-2. **重写方法（回调钩子）必须显式标注参数类型和返回类型：**
-   ```typescript
-   // ✅ 正确
-   on_enter(me: CHARACTER): void {
-       me.notify("欢迎来到" + this.name);
-   }
-   on_leave(me: CHARACTER, dir: string): boolean | void {
-       if (dir === "up") return me.notify_fail("必须先打败守卫。");
-   }
-   on_heart_beat(dt: number): void {
-       for (const item of this.items) {
-           if (item.check_character()) {
-               item.add_hp(Math.floor(item.max_hp / 10));
-           }
-       }
-   }
-
-   // ❌ 错误：缺少参数类型和返回类型
-   on_enter(me) { me.notify("欢迎"); }
-   on_leave(me, dir) { return false; }
-   ```
-
-3. **`add_action` / `set_item` 的回调函数必须标注参数类型：**
-   ```typescript
-   // ✅ 正确
-   this.add_action("diao", "钓鱼", (me: CHARACTER): void => {
-       WORLD.COMMANDS['diaoyu'].enter(me);
-   });
-   function climbTree(me: CHARACTER, par?: string): void {
-       me.moveto("yz/tree1");
-   }
-   ```
+- **`exits` 需标注 `Record<string, string>`**，`hidden_items` 需标注 `ITEM[] | null`
+- **ROOM 的 temp 方法有覆写版本**，详见下方 [4.10 临时数据操作规范](#410-临时数据temp操作规范)
 
 ---
 
@@ -233,7 +189,7 @@ import {ROOM} from "../../../core/room/room.js";
 
 ### 4.10 临时数据（temp）操作规范
 
-> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。** 以下仅说明 ROOM 特有的签名差异。
 
 **重要**：ROOM 覆写了 ITEM 的 temp 方法，**签名不同**——需要额外的 `me` 参数来按玩家隔离副本数据：
 
@@ -264,19 +220,7 @@ if (firstRoom) {
     const killed = firstRoom.query_temp("boss_killed", me, false);  // me 是第2个参数
     firstRoom.add_temp("kill_count", 1, me);               // me 是第3个参数
 }
-
-// ❌ 错误：直接访问 temp 对象
-room.temp["boss_killed"] = true;  // 禁止！
 ```
-
-**核心约束：**
-
-1. **禁止直接访问 `temp` 对象**：`room.temp["key"]` 或 `room.temp.key` 是**不允许的**。
-2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
-3. **时间单位为毫秒**：`time` 参数是**毫秒**。例如 1 小时 = `3600000`。
-4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
-5. **`remove_temp` 设为 `null`**：不删除键名。
-6. **副本房间必须传 `me`**：ROOM 覆写的 `query_temp` / `set_temp` / `add_temp` 与 ITEM 签名不同——`me` 参数是**必须的**，用于按玩家隔离副本数据。参数位置：`query_temp(name, me, def?)`、`set_temp(name, value, me, time?)`、`add_temp(name, value, me, time?)`。
 
 ---
 

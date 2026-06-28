@@ -24,52 +24,13 @@
 
 ---
 
-### 类型标注准则
+### 类型标注与 temp 操作
 
-> **编写区域时，必须遵循以下类型标注规则：**
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。**
 
-1. **对象类型属性必须显式标注类型：**
-   ```typescript
-   // ✅ 正确
-   map: MapEntry[] = [
-       {n: "广场", id: "huashan/guangchang", p: [0, 0], exits: ["n", "s"]},
-   ];
-   quick_drops: QuickDropEntry[] = [
-       {obj: "money/silver", min: 1, max: 10},
-   ];
-   rooms: ROOM[] = [];
-   // ❌ 错误
-   map = [{n: "广场", id: "huashan/guangchang", p: [0, 0]}];
-   ```
+AREA 中需特别注意：`map` 标注 `MapEntry[]`、`quick_drops` 标注 `QuickDropEntry[]`；回调方法（`on_enter`、`on_leave` 等）标注参数与返回类型。
 
-2. **重写方法（回调钩子）必须显式标注参数类型和返回类型：**
-   ```typescript
-   // ✅ 正确
-   on_enter(me: CHARACTER): boolean | void {
-       if (!me.query_temp('xy_bm'))
-           return me.notify_fail("需要报名才可进入。");
-   }
-   on_leave(me: CHARACTER): boolean | void {
-       if (me.is_in('yz/leitai/leitai'))
-           return me.notify_fail('结束比武后才可离开。');
-   }
-   on_quick(me: CHARACTER): boolean | void {
-       return true;
-   }
-   query_owner(me: CHARACTER): string {
-       return me.id;
-   }
-
-   // ❌ 错误：缺少参数类型和返回类型
-   on_enter(me) { return true; }
-   on_leave(me) { return false; }
-   ```
-
-3. **`map` 数组中的 `exits` 字段也应标注完整的 `MapEntry` 类型：**
-   ```typescript
-   // ✅ 推荐：定义 map 时使用 MapEntry 接口
-   map: MapEntry[] = [...];
-   ```
+---
 
 ---
 

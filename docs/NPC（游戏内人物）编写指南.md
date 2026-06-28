@@ -114,57 +114,9 @@ server/res/npc/bj/ao/jiading.ts   →  import {NPC} from "../../../../core/char/
 
 ---
 
-### 类型标注准则
+### 类型标注与 temp 操作
 
-> **编写 NPC 时，必须遵循以下类型标注规则：**
-
-1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型：
-   ```typescript
-   // ✅ 正确：标注类型
-   prop: PropMap = {
-       gj: 8000,
-       fy: 3000,
-       mz: 5000,
-   };
-
-   // ❌ 错误：缺少类型标注
-   prop = {
-       gj: 8000,
-       fy: 3000,
-   };
-   ```
-
-2. **重写方法必须显式标注参数类型和返回类型。** 覆写父类（NPC/CHARACTER/ITEM/BASE）的方法时，所有参数和返回值都必须标注类型：
-   ```typescript
-   // ✅ 正确
-   on_enter(me: CHARACTER): void {
-       me.notify("欢迎光临！");
-   }
-   on_accept(me: CHARACTER, obj: string, count: number): boolean {
-       if (obj !== "money") return false;
-       return true;
-   }
-   on_master(me: CHARACTER): boolean | void {
-       if (me.query_skill("force", 0) < 100) return false;
-   }
-
-   // ❌ 错误：缺少参数类型和返回类型
-   on_enter(me) {
-       me.notify("欢迎光临！");
-   }
-   on_accept(me, obj, count) {
-       if (obj !== "money") return false;
-       return true;
-   }
-   ```
-
-3. **回调函数中的 `this` 需特别留意。** `add_action` 中传入普通函数时，如需访问 NPC 实例，使用箭头函数或提前保存引用，同时标注参数类型：
-   ```typescript
-   // ✅ 正确：箭头函数保持 this 指向 + 参数类型标注
-   this.add_action("zhudian", "住店", (me: CHARACTER): void => {
-       this.send_room("$N说道：客官请进。");
-   });
-   ```
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。** NPC 编写中需特别注意：`prop` 对象标注为 `PropMap`，回调参数标注 `me: CHARACTER`，详见下方各章节示例。
 
 ---
 
@@ -529,34 +481,18 @@ me.set_temp("kezhan", 1, 1000 * 3600 * 24);  // 24小时有效
 
 ### 5.3 临时数据（temp）操作规范
 
-> **强制约束**：所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。**
 
-NPC 继承自 CHARACTER → ITEM，因此拥有完整的 temp 操作接口：
+NPC 继承自 CHARACTER → ITEM，拥有完整的 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`），签名与 USER、普通 ROOM 一致。典型用法：
 
-| 方法 | 签名 | 说明 |
-|------|------|------|
-| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动清除并返回默认值。 |
-| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
-| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+```typescript
+// 读写玩家 temp（在 NPC 回调中通过 me 操作）
+const count = me.query_temp("kezhan", 0);
+me.set_temp("kezhan", 1, 1000 * 3600 * 24);  // 24小时有效
 
-**核心约束：**
-
-1. **禁止直接访问 `temp` 对象**：`npc.temp["key"]` 或 `npc.temp.key` 是**不允许**的，必须使用上述四个方法。直接访问会绕过过期检查，且不符合序列化规范。
-2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或运行时错误。
-   ```typescript
-   // ✅ 正确
-   const count = me.query_temp("kezhan", 0);
-   // ❌ 错误：缺少默认值，可能返回 undefined
-   const count = me.query_temp("kezhan");
-   ```
-3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数单位是**毫秒**。例如 24 小时 = `1000 * 3600 * 24`。
-   ```typescript
-   me.set_temp("kezhan", 1, 1000 * 3600 * 24);  // 24小时有效
-   ```
-4. **过期机制**：当值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。设置带过期时间的值时，引擎会自动包装为 `{v: value, e: Date.now() + time}` 格式。
-5. **`remove_temp` 设为 `null`**：不会真正删除键名，这是为了 JSON 序列化时保留键位。
-6. **适用于所有 ITEM 子类**：以上接口同样适用于 `me`（USER）、NPC 自身（`this`）、OBJ 等所有继承自 ITEM 的对象。
+// 读写 NPC 自身 temp
+this.set_temp("talk_count", 1);
+```
 
 ---
 

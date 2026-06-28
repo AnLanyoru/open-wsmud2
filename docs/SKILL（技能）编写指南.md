@@ -207,58 +207,11 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 **注意：** 路径中的扩展名 `.js` 不可省略，即使源文件是 `.ts`。
 
-### 5.1 类型标注准则
+### 5.1 类型标注与 temp 操作
 
-> **编写技能时，必须遵循以下类型标注规则：**
+> **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。**
 
-1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型，即使 TypeScript 能推断。例如：
-   ```typescript
-   // ✅ 正确：标注类型
-   learn_condition: LearnCondition = {
-       max_mp: 700,
-       skill: { unarmed: 50 }
-   };
-   pfm_set: PerformData = {
-       // ...
-   };
-
-   // ❌ 错误：缺少类型标注
-   learn_condition = {
-       max_mp: 700,
-       skill: { unarmed: 50 }
-   };
-   ```
-
-2. **重写方法必须显式标注参数类型和返回类型。** 覆写父类方法时，所有参数和返回值都必须标注类型：
-   ```typescript
-   // ✅ 正确
-   query_prop(lv: number, me?: CHARACTER): PropMap {
-       return { str: Math.floor(lv / 10) };
-   }
-   query_enable_prop(lv: number): EnablePropMap {
-       return { sword: { gj: lv + 10 } };
-   }
-
-   // ❌ 错误：缺少参数类型和返回类型
-   query_prop(lv, me) {
-       return { str: Math.floor(lv / 10) };
-   }
-   ```
-
-3. **回调函数参数必须标注类型。** `pfm_set` 中 `use`、`query_desc`、`check` 等回调的形参和返回值必须标注：
-   ```typescript
-   // ✅ 正确
-   use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-       me.do_attack({ target: target });
-       me.end_attack(target);
-   },
-   query_desc: function (me: CHARACTER, lv: number): string {
-       return "绝招描述";
-   },
-   check: function (me: CHARACTER, lv: number, base_type?: string): boolean {
-       return lv >= 100;
-   }
-   ```
+SKILL 中需特别注意：`learn_condition` 标注 `LearnCondition`、`pfm_set` 标注 `PerformData`；`query_prop`/`query_enable_prop` 覆写方法标注参数和返回类型；`pfm_set` 回调函数标注参数类型。
 
 ---
 
@@ -1649,46 +1602,27 @@ me.add_status({
 
 ## 16. 临时数据（temp）操作规范
 
-> **强制约束**：技能中所有临时数据**必须**通过 temp 操作接口（`query_temp` / `set_temp` / `add_temp` / `remove_temp`）进行读写，**禁止**直接访问 `obj.temp["key"]` 或 `obj.temp.key`。临时数据**必须**储存于 `temp` 中。
+> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。**
 
-技能代码中操作 temp 的主要对象是 `me`（CHARACTER / USER 实例）：
-
-| 方法 | 签名 | 说明 |
-|------|------|------|
-| `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
-| `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
-| `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，**不删除键名**）。 |
+技能代码中操作 temp 的主要对象是 `me`（CHARACTER / USER 实例），通过 `me.query_temp`/`me.set_temp`/`me.add_temp`/`me.remove_temp` 操作。
 
 ### 技能中常见用法
 
 **Buff 绝招中配合 `add_status` 使用：**
 ```typescript
-// ✅ 正确：为 buff 设置临时标记，与 add_status 的 duration 保持一致
 me.add_status({ id: "weapon", name: "无招", duration: time, prop: {...} });
 me.set_temp("weapon", 1, time);  // 设置同有效期标记
 me.reauto_attack();
-
-// ❌ 错误：直接写 temp 对象
-me.temp["weapon"] = 1;  // 禁止！
 ```
 
 **冷却/状态查询：**
 ```typescript
-// ✅ 正确
 if (me.query_temp("weapon", 0)) {
     // 当前处于"无招"状态
 }
 ```
 
-### 核心约束
-
-1. **禁止直接访问 `temp` 对象**：`me.temp["key"]` 或 `me.temp.key` 是**不允许**的，必须使用上述四个方法。
-2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。例如 `me.query_temp("weapon", 0)` 而非 `me.query_temp("weapon")`。
-3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**。例如 `me.set_temp("buff", 1, 15000)` 表示 15 秒有效。
-4. **过期机制**：当值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值。
-5. **`remove_temp` 设为 `null`**：不删除键名，用于 JSON 序列化兼容。
-6. **与 `add_status` 配合**：若使用 temp 标记来追踪 buff 状态，应确保 temp 的有效期与 `add_status` 的 `duration` 一致或稍长，避免状态不同步。
+> **技能特有约束**：若使用 temp 标记来追踪 buff 状态，应确保 temp 的有效期与 `add_status` 的 `duration` 一致或稍长，避免状态不同步。
 
 ---
 
