@@ -1,8 +1,9 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {OBJ} from "../../../core/item/obj.js";
-import {EQUIPMENT} from "../../../core/item/equipment.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import { WORLD } from "../../../core/world.js";
+import {RecoverType} from "../../../core/const.js";
+import { OBJ } from "../../../core/item/obj.js";
+import { EQUIPMENT } from "../../../core/item/equipment.js";
 
 export default class extends COMMAND {
     command = "fenjie";
@@ -43,8 +44,8 @@ export default class extends COMMAND {
 
         player.send("你将" + obj.color_name + "分解为" + item.unit_name(sum_count) + "。");
 
-
-        WORLD.add_recover_obj(player, obj, 2, sum_count);
+        if (player.check_player())
+            WORLD.add_recover_obj(player, obj, RecoverType.FENJIE, sum_count);
 
     }
 
@@ -109,6 +110,7 @@ export default class extends COMMAND {
             rec_items.push(st.path);
         }
 
-        return WORLD.add_recover_obj(player, obj, 2, rec_items);
+        if (player.check_player())
+            return WORLD.add_recover_obj(player, obj, RecoverType.FENJIE, rec_items);
     }
 }

@@ -15,20 +15,22 @@ import './util.js';
 import {BASE} from './base.js';
 import db from './db.js';
 import {FAMILIES} from './skill/family.js';
+import {RecoverType} from './const.js';
 import WORLD_DATA from './data.js';
 
 import USERLOGIN_MODULE from './login.js';
 import LISTENER_MODULE from './ws.js';
 
-import type {Timestamp, UID} from '../types/base.js';
+import type {Timestamp, UID, RecoverSkill, RecoverShop, RecoverEntry} from '../types/base.js';
 import type {USER} from './char/user.js';
-import type {CHARACTER} from './char/character.js';
+import type {CHARACTER, SkillData} from './char/character.js';
 import type {COMMAND} from './command.js';
 import type {SKILL} from './skill/skill.js';
 import type {ROOM} from './room/room.js';
 import type {AREA} from './room/area.js';
 import type {USERTASK} from './task/playertask.js';
 import type {TASK} from './task/task.js';
+import type {ITEM} from './item.js';
 import type {OBJ} from './item/obj.js';
 import type {NPC} from './char/npc.js';
 import type {EQUIPMENT} from './item/equipment.js';
@@ -37,6 +39,8 @@ import type {LoginUserParam} from './login.js';
 import type wsServer from './net-ws.js';
 import type {EventItem} from './task/events.js';
 import { DataBaseHandler } from './util/data.js';
+import type jh from '../res/cmd/dialog/jh.js';
+import party from '../res/cmd/extend/party.js';
 
 // ============================================================
 // 常量
@@ -238,7 +242,7 @@ class World {
     /** 心跳计数（用于定时保存） */
     HEARTBEATCOUNT: number = 0;
     /** 玩家可恢复物品/技能存储 (playerId → entries[]) */
-    RECOVER_OBJS: Map<string, any[]> = new Map();
+    RECOVER_OBJS: Map<string, RecoverEntry[]> = new Map();
 
     // ========== 服务器状态 ==========
 
@@ -1086,14 +1090,16 @@ class World {
         for (const fam in FAMILIES) {
             FAMILIES[fam].init();
         }
-        (this.COMMANDS.jh as Record<string, any>).init();
+        const jh_cmd = this.COMMANDS.jh as jh;
+        jh_cmd.init();
     }
 
     /** 玩家退出时调用 — 触发时机：login_out() 中，用户从 USERS 列表移除前 */
     on_user_quit(user: USER): void {
         if (this.is_server(user)) {
             if (user.query_temp('pt')) {
-                (this.COMMANDS['party'] as Record<string, any>).on_user_login(user, false);
+                const party_cmd = this.COMMANDS['party'] as party;
+                party_cmd.on_user_login(user, false);
             }
             this.on_user_save(user);
         } else {
@@ -1128,10 +1134,10 @@ class World {
      * 记录可恢复的物品/技能
      * @param player - 玩家对象
      * @param obj - 物品对象或数据对象
-     * @param type - 类型: 0=丢弃, 1=出售, 2=分解, 3=遗忘技能, 12=商店回购
+     * @param type - 可恢复记录类型
      * @param extra - 额外数据(如分解数量)
      */
-    add_recover_obj(player: any, obj: any, type: number, extra?: any): void {
+    add_recover_obj(player: USER, obj: ITEM | RecoverSkill | RecoverShop | null, type: RecoverType, extra?: any): void {
         if (!player || !obj) return;
         let list = this.RECOVER_OBJS.get(player.id);
         if (!list) {
@@ -1142,40 +1148,48 @@ class World {
         if (list.length >= 50) {
             list.shift();
         }
-        const entry: Record<string, any> = {
-            type: type,
-            time: Date.now(),
-        };
         // 根据类型保存不同格式的数据
-        if (type === 3) {
-            // 遗忘技能: obj是{id, name, up_count, addin, level, pot}
-            entry.id = obj.id;
-            entry.name = obj.name;
-            entry.up_count = obj.up_count;
-            entry.addin = obj.addin;
-            entry.level = obj.level;
-            entry.pot = obj.pot;
-        } else if (type === 12) {
-            // 商店回购: obj是{name, count, value, limit_key, max_key, id, rcash, path}
-            entry.id = obj.id;
-            entry.name = obj.name;
-            entry.count = obj.count;
-            entry.value = obj.value;
-            entry.limit_key = obj.limit_key;
-            entry.max_key = obj.max_key;
-            entry.rcash = obj.rcash;
-            entry.path = obj.path;
-            if (extra !== undefined) entry.mtype = extra;
+        if (type === RecoverType.FORGET_SKILL) {
+            const o = obj as RecoverSkill;
+            list.push({
+                type,
+                time: Date.now(),
+                id: o.id,
+                name: o.name,
+                up_count: o.up_count,
+                addin: o.addin,
+                level: o.level,
+                pot: o.pot,
+            });
+        } else if (type === RecoverType.SHOP_BUYBACK) {
+            const o = obj as RecoverShop;
+            list.push({
+                type,
+                time: Date.now(),
+                id: o.id,
+                name: o.name,
+                count: o.count,
+                value: o.value,
+                limit_key: o.limit_key,
+                max_key: o.max_key,
+                rcash: o.rcash,
+                path: o.path,
+                ...(extra !== undefined ? { mtype: extra } : {}),
+            });
         } else {
             // 物品类(丢弃/出售/分解): obj是OBJ实例
-            entry.id = obj.id;
-            entry.path = obj.path;
-            entry.name = obj.color_name || obj.name;
-            entry.count = obj.count || 1;
-            entry.value = obj.value;
-            if (extra !== undefined) entry.extra = extra;
+            const o = obj as OBJ;
+            list.push({
+                type,
+                time: Date.now(),
+                id: o.id,
+                path: o.path,
+                name: o.color_name || o.name,
+                count: o.count || 1,
+                value: o.value,
+                ...(extra !== undefined ? { extra } : {}),
+            });
         }
-        list.push(entry);
     }
 
     /**

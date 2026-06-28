@@ -995,7 +995,7 @@ export default class extends NPC {
             mz: 5000,
             ds: 4000,
             bj: 30
-        } as Record<string, number>;
+        } as PropMap;
     }
 }
 ```

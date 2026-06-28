@@ -1,6 +1,7 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
+import {RecoverType} from "../../../core/const.js";
 import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
@@ -43,7 +44,7 @@ export default class extends COMMAND {
         var drop_obj = player.remove_obj(obj, drop_count);
         if (drop_obj) {
             player.send_room("$N丢掉" + UTIL.to_c(drop_count) + obj.unit + obj.color_name + "。");
-            WORLD.add_recover_obj(player, drop_obj, 0);
+            WORLD.add_recover_obj(player, drop_obj, RecoverType.DROP);
         } else {
             player.notify("你什么都没丢掉。");
         }

@@ -554,7 +554,7 @@ export class ROOM extends ITEM {
         obj.commands = [];
         if (this.actions) {
             for (let cmd in this.actions) {
-                const name = (this.actions as Record<string, any>)[cmd].name;
+                const name = this.actions[cmd].name;
                 if (name)
                     obj.commands.push({
                         cmd: cmd,
@@ -715,17 +715,17 @@ export class ROOM extends ITEM {
         const oldroom = WORLD.ROOMS[file];
         this.initBaseRoom(file);
         if (!oldroom) return;
-        if ((oldroom as Record<string, any>).copy_rooms) {
+        if (oldroom.copy_rooms) {
             this.copy_rooms = {};
-            for (let key in (oldroom as Record<string, any>).copy_rooms) {
-                const rm = (oldroom as Record<string, any>).copy_rooms[key];
+            for (let key in oldroom.copy_rooms) {
+                const rm = oldroom.copy_rooms[key];
                 const newRm = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
                 this.replaceRoom(rm, newRm);
                 newRm.owner = key;
                 if (!this.copy_rooms) this.copy_rooms = {};
                 this.copy_rooms[key] = newRm;
             }
-            (oldroom as Record<string, any>).copy_rooms = null;
+            oldroom.copy_rooms = null;
         } else {
             if (ROOM.public_rooms) {
                 for (let i = 0; i < ROOM.public_rooms.length; i++) {

@@ -245,3 +245,20 @@ export const PfmFlag = {
  * 品级颜色标签 — 按 grade 索引: 0=普通(wht) 1=精良(hig) 2=高级(hic) 3=稀有(hiy) 4=绝世(HIZ) 5=传说(hio) 6=神器(ord)
  */
 export const GRADE_COLORS = ["wht", "hig", "hic", "hiy", "HIZ", "hio", "ord"];
+
+/**
+ * 可恢复记录类型 (WORLD.add_recover_obj)
+ */
+export const RecoverType = {
+    /** 丢弃物品 */
+    DROP: 0,
+    /** 出售物品 */
+    SELL: 1,
+    /** 分解物品 */
+    FENJIE: 2,
+    /** 遗忘技能 */
+    FORGET_SKILL: 3,
+    /** 商店回购 */
+    SHOP_BUYBACK: 12,
+} as const;
+export type RecoverType = typeof RecoverType[keyof typeof RecoverType];

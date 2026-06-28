@@ -13,6 +13,7 @@ import {SKILL} from '../skill/skill.js';
 import type {CHARACTER, DoAttackPar} from '../char/character.js';
 import type {USER} from '../char/user.js';
 import type { PropMap } from '../../types/props.js';
+import { EquipCondition } from '../../types/events.js';
 
 /** Enhancement level icon strings */
 const level_desc: string[] = ["", "☆", "★", "★☆", "★★", "★★☆", "★★★",
@@ -27,7 +28,7 @@ export interface StoneEntry {
     /** 宝石显示名称（含颜色和属性描述） */
     name: string;
     /** 宝石属性加成 */
-    prop: Record<string, number>;
+    prop: PropMap;
     /** 宝石品级 */
     grade: number;
 }
@@ -73,13 +74,13 @@ export class EQUIPMENT extends OBJ {
     /** 剩余宝石孔数 */
     hole_count: number = 0;
     /** 装备条件（skill 技能要求、str/con/dex/int 属性要求、gender 性别要求等） */
-    condition: Record<string, any> | null = null;
+    condition: EquipCondition | null = null;
     /** 套装组名（同组名装备可触发套装效果） */
     group_name: string | null = null;
     /** 武器类型（sword/blade/staff/throwing 等，由 WEAPON_TYPE 常量映射） */
     weapon_type: string = "";
     /** 原始属性（资源文件定义的初始 prop，用于强化计算基准） */
-    original_prop: Record<string, any> | null = null;
+    original_prop: PropMap | null = null;
     /** 带颜色标签的显示名称（含强化前缀如 ★☆） */
     color_name: string = "";
 
@@ -101,7 +102,7 @@ export class EQUIPMENT extends OBJ {
     /** 卸下时回调 — 触发时机：uneq() 开头，属性移除之前 */
     on_uneq?(me: CHARACTER): void;
     /** 防具防御回调 — 触发时机：damage() 中计算伤害减免时；返回减免后伤害 */
-    on_defense?(me: CHARACTER, from: CHARACTER, sh: number): number;
+    on_defense?(me: CHARACTER, sh: number, from?: CHARACTER): number;
     /** 武器攻击回调 — 触发时机：do_attack() 中命中且未被招架后；返回额外伤害值 */
     do_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
 
@@ -141,7 +142,7 @@ export class EQUIPMENT extends OBJ {
     check(me: CHARACTER): boolean {
         if (!this.condition) return true;
         for (const key in this.condition) {
-            const val = (this.condition as Record<string, any>)[key];
+            const val = this.condition[key];
             switch (key) {
                 case "skill":
                     for (const sk in val) {
@@ -155,16 +156,16 @@ export class EQUIPMENT extends OBJ {
                 case "con1":
                 case "dex1":
                 case "int1":
-                    if ((me as Record<string, any>)[key.replace("1", "")] < val) {
-                        return me.notify_fail("你的先天" + (PROPERTIES as Record<string, string>)[key] || key + "不够" + val + "，无法装备" + this.color_name + "。");
+                    if (me[key.replace("1", "")] < val) {
+                        return me.notify_fail("你的先天" + PROPERTIES[key] || key + "不够" + val + "，无法装备" + this.color_name + "。");
                     }
                     break;
                 case "str":
                 case "con":
                 case "dex":
                 case "int":
-                    if ((me as Record<string, any>)[key] + me.query_prop(key) < val) {
-                        return me.notify_fail("你的" + (PROPERTIES as Record<string, string>)[key] + "不够" + val + "，无法装备" + this.color_name + "。");
+                    if (me[key] + me.query_prop(key) < val) {
+                        return me.notify_fail("你的" + PROPERTIES[key] + "不够" + val + "，无法装备" + this.color_name + "。");
                     }
                     break;
                 case "gender":
@@ -173,10 +174,10 @@ export class EQUIPMENT extends OBJ {
                 case "desc":
                     break;
                 default:
-                    let me_val: number = (me as Record<string, any>)[key] || 0;
+                    let me_val: number = me[key] || 0;
                     me_val = me_val + me.query_prop(key);
                     if (!me_val || me_val < val) {
-                        return me.notify_fail("你的" + (PROPERTIES as Record<string, string>)[key] + "不够" + val + "，无法装备" + this.color_name + "。");
+                        return me.notify_fail("你的" + PROPERTIES[key] + "不够" + val + "，无法装备" + this.color_name + "。");
                     }
                     break;
             }
@@ -278,7 +279,7 @@ export class EQUIPMENT extends OBJ {
     condition_tostring(str: string[]): void {
         if (!this.condition) return;
         for (const key in this.condition) {
-            const val = (this.condition as Record<string, any>)[key];
+            const val = this.condition[key];
             switch (key) {
                 case "skill":
                     for (const sk in val) {
@@ -293,7 +294,7 @@ export class EQUIPMENT extends OBJ {
                     str.push("性别要求：" + (val == 1 ? "男" : "女"));
                     break;
                 default:
-                    str.push((PROPERTIES as Record<string, string>)[key] + "要求：" + val);
+                    str.push(PROPERTIES[key] + "要求：" + val);
                     break;
             }
             str.push("\n");
@@ -426,7 +427,7 @@ export class EQUIPMENT extends OBJ {
                     break;
 
                 default:
-                    if ((PROPERTIES as Record<string, string>)[key])
+                    if (PROPERTIES[key])
                         this.prop![key] = value + parseInt(String(value * val / 100), 10);
                     else
                         this.prop![key] = value;
@@ -456,7 +457,7 @@ export class EQUIPMENT extends OBJ {
         this.hole_count--;
         const cc = stone.query_grade_color();
         const str: string[] = ["<", cc, ">◆", stone.name, " "];
-        str.push(UTIL.prop_toString(stone.prop as Record<string, number>, " "));
+        str.push(UTIL.prop_toString(stone.prop, " "));
         str.push("</");
         str.push(cc);
         str.push(">");
@@ -466,7 +467,7 @@ export class EQUIPMENT extends OBJ {
             id: stone.id,
             path: stone.path!,
             name: str.join(""),
-            prop: stone.prop as Record<string, number>,
+            prop: stone.prop,
             grade: stone.grade
         });
         return undefined;

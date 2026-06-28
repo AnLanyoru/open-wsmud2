@@ -89,22 +89,6 @@ book/book#sword   → 路径 "book/book#sword"，par 参数为 "#sword"
 
 ---
 
-### 类型标注准则
-
-> **编写物品时，必须遵循以下类型标注规则：**
-
-1. **对象类型属性必须显式标注类型。** 当类属性值为对象字面量（`{...}`）时，必须标注类型：
-   ```typescript
-   // ✅ 正确
-   prop: PropMap = { gj: 10, fy: 5 };
-   condition = {
-       skill: { sword: 100 },
-       str: 30,
-   } as Record<string, unknown>;
-
-   // ❌ 错误：缺少类型标注
-   prop = { gj: 10, fy: 5 };
-   ```
 
 2. **重写方法必须显式标注参数类型和返回类型：**
    ```typescript
@@ -130,7 +114,7 @@ book/book#sword   → 路径 "book/book#sword"，par 参数为 "#sword"
    group_prop(count: number): PropMap | void {
        if (count == 3) return { int: 10 };
    }
-   on_defense(me: CHARACTER, from: CHARACTER, sh: number): number {
+   on_defense(me: CHARACTER, sh: number, from: CHARACTER): number {
        return Math.floor(sh * 0.9);
    }
    ```
@@ -366,12 +350,12 @@ on_eq?(me: CHARACTER): boolean | void;
 on_uneq?(me: CHARACTER): void;
 ```
 
-#### on_defense(me, from, sh)
+#### on_defense(me, sh, from)
 
 **防具防御计算时**调用。
 
 ```typescript
-on_defense?(me: CHARACTER, from: CHARACTER, sh: number): number;
+on_defense?(me: CHARACTER, sh: number, from: CHARACTER): number;
 ```
 
 - `sh`：当前伤害值
@@ -934,7 +918,7 @@ export default class extends EQUIPMENT {
         me.notify("那股神秘的力量消失了。");
     }
 
-    on_defense(me: CHARACTER, from: CHARACTER, sh: number): number {
+    on_defense(me: CHARACTER, sh: number, from: CHARACTER): number {
         // 额外减伤 10%
         return Math.floor(sh * 0.9);
     }

@@ -15,4 +15,8 @@ export default class extends COMMAND {
     enter(me, cmd, par, par2) {
 
     }
+
+    on_user_login(me, is_something){
+
+    }
 }

@@ -185,41 +185,67 @@ export type PfmFlagType = typeof PfmFlag[keyof typeof PfmFlag];
 // SKILL learn condition
 // ============================================================
 
-export interface LearnCondition {
-    [key: string]: number | string | Record<string, number> | undefined;
+/** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
+export interface SkillAndLevel {
+    /** 空手技能 */
+    unarmed?: number;
+    /** 招架技能 */
+    parry?: number;
+    /** 内功技能 */
+    force?: number;
+    /** 轻功技能 */
+    dodge?: number;
+    /** 剑法技能 */
+    sword?: number;
+    /** 刀法技能 */
+    blade?: number;
+    /** 杖法技能 */
+    staff?: number;
+    /** 棍法技能 */
+    club?: number;
+    /** 鞭法技能 */
+    whip?: number;
+    /** 暗器技能 */
+    throwing?: number;
+    /** 噬咬技能(怪物专用) */
+    bite?: number;
 
-    /** 最大内力要求 */
-    max_mp?: number;
-    /** 前置技能及等级要求 { 技能ID: 等级 } */
-    skill?: Record<string, number>;
-    /** 臂力要求 */
+    /** 允许 for...in 动态遍历时的字符串索引 */
+    [key: string]: number | undefined;
+}
+
+export interface Condition {
+    /** 前置技能ID → 等级要求 */
+    skill?: SkillAndLevel;
+    /** 先天臂力(不含装备加成) */
     str1?: number;
-    /** 根骨要求 */
+    /** 先天根骨(不含装备加成) */
     con1?: number;
-    /** 性别要求（0/1 或 "男"/"女"） */
-    gender?: number | string;
-    /** 学习条件描述文本 */
+    /** 先天身法(不含装备加成) */
+    dex1?: number;
+    /** 先天悟性(不含装备加成) */
+    int1?: number;
+    /** 总臂力(含装备加成) */
+    str?: number;
+    /** 总根骨(含装备加成) */
+    con?: number;
+    /** 总身法(含装备加成) */
+    dex?: number;
+    /** 总悟性(含装备加成) */
+    int?: number;
+    /** 性别要求(1男/2女/3无性) */
+    gender?: number;
+    /** 条件描述(仅展示,不做检查) */
     desc?: string;
+    /** 最大内力 */
+    max_mp?: number;
 }
 
 // ============================================================
 // EQUIPMENT condition
 // ============================================================
 
-export interface EquipCondition {
-    /** 动态条件字段（如 max_mp, skill, str1 等），值为对应的要求值 */
-    [key: string]: any;
-
-    /** 最大内力要求 */
-    max_mp?: number;
-    /** 前置技能及等级要求 { 技能ID: 等级 } */
-    skill?: Record<string, number>;
-    /** 臂力要求 */
-    str1?: number;
-    /** 根骨要求 */
-    con1?: number;
-    /** 性别要求（0/1 或 "男"/"女"） */
-    gender?: number | string;
-    /** 学习条件描述文本 */
-    desc?: string;
+export interface LearnCondition extends Condition {
+}
+export interface EquipCondition extends Condition {
 }

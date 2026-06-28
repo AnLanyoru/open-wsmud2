@@ -1433,7 +1433,7 @@ do_force_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number {
 
 ```typescript
 // 受到伤害前 — 返回值为减免后的伤害
-on_damage(me: CHARACTER, from: CHARACTER, sh: number): number {
+on_damage(me: CHARACTER, sh: number, from: CHARACTER): number {
     return Math.floor(sh * 0.8);  // 减免 20% 伤害
 }
 

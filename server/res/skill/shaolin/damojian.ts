@@ -1,7 +1,8 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import type { LearnCondition } from "../../../types/events.js";
 
 export default class extends SKILL {
     name = "达摩剑";
@@ -21,7 +22,7 @@ export default class extends SKILL {
     ];
     desc = "少林寺七十二绝技之达摩剑";
     can_enables = ["sword"];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 2000,
         skill: {
             sword: 200

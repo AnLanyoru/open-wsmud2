@@ -298,7 +298,7 @@ export class NPC extends CHARACTER {
      */
     die(killer?: CHARACTER): boolean | undefined {
         if (!this.environment) return;
-        if (this.on_die && this.on_die(killer!) == false) {
+        if (this.on_die && this.on_die(killer) == false) {
             this.hp = 1;
             return false;
         }
@@ -312,8 +312,8 @@ export class NPC extends CHARACTER {
         this.die_room = this.environment;
         this.environment.item_changed(corpse, true);
         this.environment.item_changed(this, false);
-        if (isinfb && this.score && killer && (killer as Record<string, any>).add_fbscore) {
-            (killer as Record<string, any>).add_fbscore(this.score);
+        if (isinfb && this.score && killer && killer.add_fbscore) {
+            killer.add_fbscore(this.score);
         }
         if (!isinfb && !this.no_refresh && !this.master && !this.die_room.is_shadow) {
             this.call_out(this.relive.bind(this), this.on_master ? 60000 : 300000);

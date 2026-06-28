@@ -2,7 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../core/const.js";
+import {SKILL_TYPES, RecoverType} from "../../../core/const.js";
 
 export default class extends COMMAND {
     command = "fangqi";
@@ -85,7 +85,7 @@ export default class extends COMMAND {
                 addin: skill.addin,
                 level: level,
                 pot: exp
-            }, 3);
+            }, RecoverType.FORGET_SKILL);
         }
     }
 

@@ -1,6 +1,7 @@
 import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
+import {RecoverType} from "../../../core/const.js";
 import { OBJ } from "../../../core/item/obj.js";
 import { UTIL } from "../../../core/util/util.js";
 import type { USER } from "../../../core/char/user.js";
@@ -147,7 +148,7 @@ export default class extends COMMAND {
     /**
      * @param me - 执行命令的角色
      */
-    enter(me: CHARACTER, par?: string, count?: string): void {
+    enter(me: USER, par?: string, count?: string): void {
         if (me.query_temp("new")) return me.notify("你先完成新手指导再说。");
         if (!me.is_player) return me.notify("你不能购买。");
 
@@ -191,7 +192,7 @@ export default class extends COMMAND {
                 if (!(me.cash_money! >= need_money)) {
                     return me.notify("你没有那么多的元宝。");
                 }
-                me.add_cash!(-need_money);
+                me.add_cash(-need_money, "商城购买");
             } else {
                 need_money = item.value * buyCount;
                 if (discount < 1) need_money = need_money * discount;
@@ -201,6 +202,7 @@ export default class extends COMMAND {
                 me.add_temp('my', -need_money);
             }
             const obj = me.add_obj(item.path, buyCount);
+            if (!obj) return me.send("你的购买发生错误，请联系管理员，错误原因：物品："+item.path+"不存在");
             me.notify("你从商店里购买了" + obj.unit_name(buyCount) + "。");
             if (item.limit! > 0) {
                 let val = 0;
@@ -244,7 +246,7 @@ export default class extends COMMAND {
                 id: obj.id,
                 rcash: item.rcash,
                 path: obj.path
-            } as Record<string, unknown>, 12, item.mtype);
+            }, RecoverType.SHOP_BUYBACK, item.mtype);
             return;
         }
         if (par && par === this.idx)

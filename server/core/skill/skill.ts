@@ -10,6 +10,7 @@ import type { CHARACTER, DoAttackPar } from '../char/character.js';
 import { PROPERTIES, SKILL_TYPES } from "../const.js";
 import { SkillsMap } from "../char/skills_map.js";
 import type { PropMap } from "../../types/props.js";
+import { LearnCondition } from "../../types/events.js";
 
 
 export type SkillSet = [skill_name: string, level: number, enable_base?: (string | string[])][];
@@ -45,63 +46,6 @@ export interface EnablePropMap {
     [key: string]: PropMap | undefined;
 }
 
-/** query_enable_prop 返回值：按基本技能类型分组的属性加成字典 */
-export interface SkillAndLevel {
-    /** 空手技能 */
-    unarmed?: number;
-    /** 招架技能 */
-    parry?: number;
-    /** 内功技能 */
-    force?: number;
-    /** 轻功技能 */
-    dodge?: number;
-    /** 剑法技能 */
-    sword?: number;
-    /** 刀法技能 */
-    blade?: number;
-    /** 杖法技能 */
-    staff?: number;
-    /** 棍法技能 */
-    club?: number;
-    /** 鞭法技能 */
-    whip?: number;
-    /** 暗器技能 */
-    throwing?: number;
-    /** 噬咬技能(怪物专用) */
-    bite?: number;
-
-    /** 允许 for...in 动态遍历时的字符串索引 */
-    [key: string]: number | undefined;
-}
-
-/** 技能学习条件 */
-export interface LearnCondition {
-    /** 前置技能ID → 等级要求 */
-    skill?: SkillAndLevel;
-    /** 先天臂力(不含装备加成) */
-    str1?: number;
-    /** 先天根骨(不含装备加成) */
-    con1?: number;
-    /** 先天身法(不含装备加成) */
-    dex1?: number;
-    /** 先天悟性(不含装备加成) */
-    int1?: number;
-    /** 总臂力(含装备加成) */
-    str?: number;
-    /** 总根骨(含装备加成) */
-    con?: number;
-    /** 总身法(含装备加成) */
-    dex?: number;
-    /** 总悟性(含装备加成) */
-    int?: number;
-    /** 性别要求(1男/2女/3无性) */
-    gender?: number;
-    /** 条件描述(仅展示,不做检查) */
-    desc?: string;
-    /** 最大内力 */
-    max_mp?: number;
-    /** 其他角色属性阈值(如门派贡献、等级等) 自己写新的，别乱用any */
-}
 
 /** 品级颜色 */
 const level_color = ["wht", "hig", "hic", "hiy", "hiz", "hio", "ord"];
@@ -244,7 +188,7 @@ export class SKILL extends BASE {
     /** 内功攻击结束回调 */
     on_force_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
     /** 受到伤害回调（返回减免后伤害） */
-    on_damage?(me: CHARACTER, from: CHARACTER, sh: number): number;
+    on_damage?(me: CHARACTER, sh: number, from?: CHARACTER): number;
     /** 闪避回调 */
     on_dodge?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
     /** 闪避结束回调 */
@@ -979,7 +923,7 @@ export class SKILL extends BASE {
                         str.push(item.name);
                         str.push(" ");
                     }
-                    str.push((item.format ? item.format(parseInt(item.value(lv, grdTotal))) : item.value(lv, grdTotal)));
+                    str.push(item.format(parseInt(item.value(lv, grdTotal))));
                     str.push("\n");
                 }
             }
@@ -1018,7 +962,7 @@ export class SKILL extends BASE {
         if (index < 500) {
             return SKILL.PROPERTIES ? SKILL.PROPERTIES[index] : undefined;
         } else {
-            return this.slots ? this.slots[index - 500] : null;
+            return this.slots ? this.slots[index - 500] : undefined;
         }
     }
 

@@ -262,7 +262,7 @@ export const UTIL = {
                         : str.push(PROPERTIES[item] + "：" + (val * count) + "%");
                     break;
                 case "skill": {
-                    let skills = prop[item] as Record<string, number>;
+                    let skills = prop[item];
                     for (let sk in skills) {
                         let sk_base = _SKILL && _SKILL.get(sk);
                         if (sk_base) str.push(sk_base.name + "：+" + skills[sk] + "级");

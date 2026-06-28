@@ -474,7 +474,7 @@ export class USER extends CHARACTER {
         }
         const fam: any = this.query_temp('family');
         if (fam) {
-            this.family = (FAMILIES as Record<string, FAMILY>)[fam] || FAMILIES.NONE;
+            this.family = FAMILIES[fam] || FAMILIES.NONE;
         }
         this.user_level = role.user_level;
     }
@@ -1479,7 +1479,7 @@ export class USER extends CHARACTER {
      * 查询玩家年龄
      */
     query_age(): number {
-        const dt = Date.now() - (this as Record<string, any>).reg_time * 60000;
+        const dt = Date.now() - this.reg_time * 60000;
         return 14 + dt / 86400000 / 12 - this.query_prop('age') - (this.query_temp('age', 0) as number);
     }
 }

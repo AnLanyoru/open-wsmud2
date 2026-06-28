@@ -1,16 +1,18 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
+import {RecoverType} from "../../../core/const.js";
 import {UTIL} from "../../../core/util/util.js";
+import { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "sell";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+to\s+(.+?))?$/;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, count, objid, to) {
+    enter(me: USER, count: number, objid: string, to: string) {
         var target;
         if (to) {
             target = me.find_obj(to, me.environment);
@@ -73,14 +75,14 @@ export default class extends COMMAND {
             return;
         }
         var obj = me.find_obj(objid);
-        if (!obj) {
+        if (!obj?.check_obj()) {
             return me.notify("你没有这件东西。");
         }
         if (obj.is_locked) {
             return me.notify(obj.color_name + "处于锁定状态，无法丢弃，贩卖，分解。");
             //  me.send_commands('lockobj ' + obj.id, '解除锁定');
         }
-        if (obj.is_equipment) {
+        if (obj.check_equipment()) {
             if (obj.level > 3)
                 return me.notify(obj.color_name + "已经精炼，清理精炼后才可以贩卖。");
             if (obj.st_prop && obj.st_prop.length > 0)
@@ -106,7 +108,7 @@ export default class extends COMMAND {
 
         me.send("你卖掉了" + obj.unit_name(sell_count) + "。");
         // me.send('你获得' + UTIL.moneyToStr(sell_money) + "。");
-        WORLD.add_recover_obj(me, sell_obj, 1);
+        WORLD.add_recover_obj(me, sell_obj, RecoverType.SELL);
         if (target && target.on_user_sell) {
             target.on_user_sell(me, obj, sell_count);
         }

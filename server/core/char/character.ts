@@ -2450,9 +2450,7 @@ export class CHARACTER extends ITEM {
     end_attack(target: CHARACTER): boolean | undefined {
         if (!target) return;
         if (!this.fight_type) return;
-        if ((this.attack_skill as Record<string, any>).on_end_attack) {
-            (this.attack_skill as Record<string, any>).on_end_attack(this, target);
-        }
+        this.attack_skill.on_end_attack?.(this, target);
         if (this.fight_type === 1 && target.hp / target.max_hp < 0.3) {
             if (target.hp <= 0) target.hp = 1;
             if (target.is_faint) {
@@ -2461,7 +2459,7 @@ export class CHARACTER extends ITEM {
                 this.send_room(WINNER_MSG[Math.floor(Math.random() * WINNER_MSG.length)], target);
             }
             if (target.on_fight_over) target.on_fight_over(this, false);
-            if (this.on_fight_over) this.on_fight_over(target, true);
+            this.on_fight_over?.(target, true);
             target.end_fight();
             return this.end_fight();
         } else if (target.hp <= 0 && target.die(this) !== false) {
@@ -2817,11 +2815,11 @@ export class CHARACTER extends ITEM {
             sh = (sh / (sh + fy) * sh);
         sh = sh - this.query_prop('diff_sh');
 
-        if (sh > 0 && this.equipment && this.equipment[1] && (this.equipment[1] as Record<string, any>).on_defense) {
-            sh = (this.equipment[1] as Record<string, any>).on_defense(this, from, sh);
+        if (sh > 0 && this.equipment?.[1]?.on_defense) {
+            sh = this.equipment[1].on_defense(this, sh, from);
         }
-        if (sh > 0 && (this.force_skill as Record<string, any>)?.on_damage) {
-            sh = (this.force_skill as Record<string, any>).on_damage(this, from, sh);
+        if (sh > 0 && this.force_skill.on_damage) {
+            sh = this.force_skill.on_damage(this, sh, from);
         }
         if (sh > 0) {
             sh = parseInt(String(sh), 10);
@@ -2847,8 +2845,8 @@ export class CHARACTER extends ITEM {
             const damag = (this.damages[from.id] || 0) + sh;
             this.damages[from.id] = damag;
         }
-        if ((this.force_skill as Record<string, any>)?.on_damage) {
-            sh = (this.force_skill as Record<string, any>).on_damage(this, from, sh);
+        if (this.force_skill?.on_damage) {
+            sh = this.force_skill.on_damage(this, sh, from);
             if (!sh) return 0;
         }
         this.add_hp(-sh);
@@ -2861,9 +2859,7 @@ export class CHARACTER extends ITEM {
     damage3(sh: number, from?: CHARACTER): number | undefined {
         if (!(sh > 0)) return;
         this.add_hp(-sh);
-        if ((this.force_skill as Record<string, any>)?.on_damage) {
-            (this.force_skill as Record<string, any>).on_damage(this, from, 0);
-        }
+        this.force_skill?.on_damage?.(this, 0, from);
         return sh;
     }
 
