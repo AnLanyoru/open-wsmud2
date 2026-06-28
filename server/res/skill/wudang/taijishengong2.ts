@@ -98,7 +98,7 @@ export default class extends SKILL {
                     duration_count: total,
                     override: 0,
                     no_clear: true,
-                    on_interval: sanqing_attack(me),
+                    on_interval: sanqing_attack,
                 });
             },
             query_desc: function (me: CHARACTER, lv: number): string {
@@ -112,8 +112,7 @@ export default class extends SKILL {
 }
 
 /** 一气化三清：status on_interval 回调，每次间隔触发一次攻击 */
-function sanqing_attack(me: CHARACTER): (_me: CHARACTER, _over_count: number) => boolean | void {
-    return function (_me: CHARACTER, _over_count: number): boolean | void {
+function sanqing_attack(me: CHARACTER, _over_count: number): boolean | void {
         const now_target = me.query_enemy();
         if (!now_target) return;
 
@@ -162,7 +161,6 @@ function sanqing_attack(me: CHARACTER): (_me: CHARACTER, _over_count: number) =>
             chosen.pfm.use?.(me, now_target, chosen.level, chosen.sktype);
         }
     };
-}
 
 function query_use_num(lv: number): number {
     return 3 + Math.floor(lv / 1000)

@@ -159,7 +159,7 @@ export interface StatusDef {
     override?: number;
     /** 状态叠加层数 */
     count?: number;
-    /** 定时触发回调（返回 true 则移除状态） */
+    /** 定时触发回调（返回 false 则移除状态） */
     on_interval?: (me: CHARACTER, over_count: number) => boolean | void;
     /** 状态附加时回调 */
     on_attach?: (me: CHARACTER) => void;

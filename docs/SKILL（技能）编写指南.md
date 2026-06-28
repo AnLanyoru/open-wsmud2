@@ -1523,7 +1523,8 @@ if (damage > 0) {
 | `id` | `string` | 状态唯一标识（用于叠加/移除判断） |
 | `name` | `string` | 状态显示名称 |
 | `desc?` | `string` | 状态描述 |
-| `duration` | `number` | 持续时间（毫秒） |
+| `duration` | `number` | 持续时间（毫秒）。配合 `on_interval` 时为每次触发间隔 |
+| `duration_count?` | `number` | 配合 `on_interval` 使用，指定触发次数。客户端显示总时间 = `duration × duration_count` |
 | `prop?` | `PropMap` | 状态附带的属性加成/减益 |
 | `is_busy?` | `boolean` | 是否忙乱状态（不可行动） |
 | `is_faint?` | `boolean` | 是否昏迷状态（无知觉） |
@@ -1541,7 +1542,7 @@ if (damage > 0) {
 | `start_msg?` | `string` | 状态施加时的消息 |
 | `finish_msg?` | `string` | 状态结束时的消息 |
 | `source?` | `string` | 状态来源（技能/物品 ID） |
-| `on_interval?` | `function` | 定时触发回调 `(me, over_count) => boolean` |
+| `on_interval?` | `function` | 定时触发回调 `(me, over_count) => boolean \| void`。配合 `duration`（间隔）和 `duration_count`（次数）使用。返回 `false` 可提前终止；不返回或返回 `undefined` 则由 `duration_count` 控制结束 |
 | `on_attach?` | `function` | 状态附加时回调 `(me) => void` |
 | `on_expire?` | `function` | 状态过期时回调 `(me) => void` |
 
@@ -1596,8 +1597,23 @@ me.add_status({
         gj: 50                 // 每层+50攻击
     }
 });
-```
 
+// 周期触发效果（on_interval + duration_count）
+// duration  = 每次触发间隔
+// duration_count = 触发次数
+// 客户端显示总时间 = duration × duration_count
+me.add_status({
+    id: "dot",
+    name: "中毒",
+    duration: 3000,            // 每 3 秒触发一次
+    duration_count: 5,         // 共触发 5 次，客户端显示 15 秒
+    downside: true,
+    on_interval: function (me: CHARACTER, over_count: number) {
+        // over_count 从 1 开始递增，status 系统自动计数
+        // 返回 false 可提前终止；不返回则由 duration_count 控制结束
+        me.from_attack(100 * over_count, 999999, '', "<hir>$N毒发作了。</hir>");
+    },
+});
 ---
 
 ## 16. 临时数据（temp）操作规范
