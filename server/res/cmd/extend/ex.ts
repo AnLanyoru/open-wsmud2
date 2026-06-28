@@ -1,5 +1,4 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "ex";

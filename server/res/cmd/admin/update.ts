@@ -5,7 +5,7 @@ import {NPC} from "../../../core/char/npc.js";
 import {BASE} from "../../../core/base.js";
 import {TASK} from "../../../core/task/task.js";
 
-export default class extends COMMAND {
+export default class UpdateCmd extends COMMAND {
     command = "update";
     allow_busy = true;
     allow_state = true;
@@ -165,6 +165,7 @@ export default class extends COMMAND {
 }
 
 const __PATH: Record<string, string> = globalThis.__PATH;
-if (WORLD.COMMANDS.update && WORLD.COMMANDS.update.clear_update) {
-    WORLD.COMMANDS.update.clear_update();
+const old_update_cmd = WORLD.COMMANDS.update as UpdateCmd;
+if (old_update_cmd && old_update_cmd.clear_update) {
+    old_update_cmd.clear_update();
 }

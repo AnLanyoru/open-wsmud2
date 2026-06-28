@@ -9,7 +9,7 @@ import { UTIL } from "../../../core/util/util.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
 import type { StatsTopEntry } from "../../../core/world.js";
 
-export default class extends COMMAND {
+export default class BiWuCmd extends COMMAND {
     command = "biwu";
     allow_busy = true;
     allow_state = true;
@@ -99,15 +99,15 @@ export default class extends COMMAND {
         me.send('{type:"dialog",dialog:"stats",close:true}');
     }
 
-    surrender(me: CHARACTER) {
+    surrender(me: USER) {
         const room = me.environment!;
         let npc = room.items[1] as NPC;
-        if (npc.is_player) {
+        if (npc.check_player()) {
             npc = room.items[0] as NPC;
         }
         me.end_fight();
         npc.end_fight();
-        challenge_over(me, 2);
+        challenge_over(me, 2, npc);
         challenge_fail(me);
     }
 
@@ -117,15 +117,15 @@ export default class extends COMMAND {
         if (!this.items.length) {
             return;
         }
-        let me: CHARACTER = this.items[0] as CHARACTER;
+        let me: USER = this.items[0] as USER;
         let npc: CHARACTER | undefined = this.items[1] as CHARACTER;
-        if (npc && npc.is_player) {
+        if (npc && npc.check_player()) {
             me = npc;
             npc = this.items[0] as CHARACTER;
         }
         me.end_fight();
-        npc?.end_fight();
-        challenge_over(me, 2);
+        npc.end_fight();
+        challenge_over(me, 2, npc);
         challenge_fail(me);
         me.notify("<yel>挑战超时，自动离开擂台。</yel>");
     }
@@ -350,20 +350,18 @@ export default class extends COMMAND {
     }
 }
 
-function challenge_end(this: CHARACTER & {
-    on_die?: (killer: CHARACTER) => boolean | void
-}, killer: CHARACTER): boolean | undefined {
+function challenge_end(this: CHARACTER, killer: CHARACTER): boolean | undefined {
     if (this.on_die && this.on_die(killer) === false) {
         this.hp = 1;
         return false;
     }
-    let me: CHARACTER;
+    let me: USER;
     let npc: CHARACTER;
-    if (this.is_player) {
+    if (this.check_player()) {
         npc = killer;
         me = this;
     } else {
-        me = killer;
+        me = killer as USER;
         npc = this;
     }
     if (me.hp <= 0) me.hp = 1;
@@ -378,7 +376,7 @@ function challenge_end(this: CHARACTER & {
     }
 }
 
-function challenge_over(me: CHARACTER, result: number, npc?: CHARACTER) {
+function challenge_over(me: USER, result: number, npc: CHARACTER) {
     const room = me.environment!;
     room.on_heart_beat = undefined;
     me.die = USER.prototype.die;
@@ -390,7 +388,7 @@ function challenge_over(me: CHARACTER, result: number, npc?: CHARACTER) {
 
     const leitai = me.environment!;
     if (result === 0)
-        me.moveto("yz/leitai/ltx", undefined, me.name + "被" + npc!.name + "一脚踢下了擂台。", "fightend");
+        me.moveto("yz/leitai/ltx", undefined, me.name + "被" + npc.name + "一脚踢下了擂台。", "fightend");
     else if (result === 1) {
         me.moveto("yz/leitai/ltx", undefined, me.name + "走了下来。", "fightend");
     } else {
@@ -400,12 +398,12 @@ function challenge_over(me: CHARACTER, result: number, npc?: CHARACTER) {
     me.clear_downside(true);
 }
 
-function challenge_fail(me: CHARACTER, _npc?: CHARACTER) {
+function challenge_fail(me: USER, _npc?: CHARACTER) {
     me.notify("<cyn>挑战失败，擂台积分保持不变。</cyn>");
     me.remove_temp("biwu_fam");
 }
 
-function challenge_success(me: CHARACTER, npc: CHARACTER) {
+function challenge_success(me: USER, npc: CHARACTER) {
     const fam: string | undefined = me.query_temp("biwu_fam");
     const top_key = fam ? "top_fam_sc" : "top_sc";
     let sc: number = me.query_temp(top_key, 0) ?? 0;
@@ -424,8 +422,9 @@ function challenge_success(me: CHARACTER, npc: CHARACTER) {
         me.notify("<hig>挑战成功，当前" + me.family!.name + "榜单积分" + sc + "。</hig>");
     else
         me.notify("<hig>挑战成功，当前总榜积分" + sc + "。</hig>");
-    if (add > 0)
-        WORLD.COMMANDS.biwu?.updatePlayerStats?.(me, sc, fam);
+    if (add > 0){
+        const biwu_cmd = WORLD.COMMANDS.biwu as BiWuCmd;
+        biwu_cmd.updatePlayerStats(me, sc, fam);}
     me.remove_temp("biwu_fam");
 }
 

@@ -6,6 +6,7 @@ import {UTIL} from "../../../core/util/util.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {AREA} from "../../../core/room/area.js";
 import {ROOM} from "../../../core/room/room.js";
+import type ex from "../extend/ex.js";
 
 export default class extends COMMAND {
     command = "cr";
@@ -271,7 +272,8 @@ function fb_start(me, path) {
         }
 
         if (!me.team || me.team[0] === me) {
-            WORLD.COMMANDS['ex']?.on_enter_fb?.(me, next_room);
+            const ex_cmd = WORLD.COMMANDS['ex'] as ex
+            ex_cmd.on_enter_fb(me, next_room);
         }
     }
     me.send('{type:"dialog",dialog:"jh",close:true}');

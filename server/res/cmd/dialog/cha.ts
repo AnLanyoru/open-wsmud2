@@ -2,6 +2,7 @@ import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import type sk_group from "../skill/sk_group.js";
 
 export default class extends COMMAND {
     command = "cha,skills";
@@ -77,7 +78,8 @@ export default class extends COMMAND {
                 str.push("\"");
             }
         } else {
-            str.push(',sk_group:', String(WORLD.COMMANDS.skgroup.cur_eqs?.(me) ?? 0));
+            const skgroup_cmd = WORLD.COMMANDS.skgroup as sk_group
+            str.push(',sk_group:', String(skgroup_cmd.cur_eqs(me) ?? 0));
         }
 
         str.push("}");
