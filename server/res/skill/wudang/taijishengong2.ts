@@ -1,8 +1,9 @@
-import {SKILL, PERFORM} from "../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../core/const.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import { SKILL, PERFORM } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import { WEAPON_TYPE } from "../../../core/const.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { LearnCondition } from "../../../types/events.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "先天太极";
@@ -10,8 +11,17 @@ export default class extends SKILL {
     source_skill = "taijishengong";
     grade = 5;
     family = FAMILIES.WUDANG;
-    desc = "无";
+    force_rad = 1.0;
+    desc = "武当派至高内功心法，源自张三丰真人对太极之道的大彻大悟。以先天之气运转周身，阴阳相济，攻守兼备。";
     can_enables = ["force"];
+
+    learn_condition: LearnCondition = {
+        max_mp: 10000,
+        skill: {
+            force: 500,
+            taijishengong: 400,
+        },
+    };
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
@@ -19,7 +29,7 @@ export default class extends SKILL {
                 max_hp: lv * 20,
                 fy: lv * 2,
                 zj: lv * 2,
-                fy_per: 6,
+                fy_per: 3 + Math.floor(lv / 300),
                 limit_mp: lv * 298,
                 desc: "唯一：将你内力的100%转化为气血",
             },
@@ -27,39 +37,146 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        zhenwu: {
             name: "真武除邪",
             distime: 45000,
             enable_skill: "force",
             mp: 20,
-            release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 真武除邪
-                // 将太极真气运转周身，20秒内增加你32%气血,招架增加32%,受到的伤害减少32%
-                me.send_room("$N使出「真武除邪」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use_type: 2,
+            release_time: 0,
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
+                const diff: number = query_buff_value(lv);
+                const time: number = query_buff_dur(lv);
+                me.send_room(
+                    "<hiy>$N闭目凝神，心随意转，双手抱环划破虚空，周身先天灵气如指引般汇聚在$P周身，"
+                    + "一阴一阳仿若真灵护体。</hiy>",
+                );
+                me.add_status({
+                    id: "force",
+                    name: "真武除邪",
+                    desc: "先天太极之真武除邪，增加你的气血、招架和伤害减免",
+                    duration: time,
+                    prop: {
+                        hp_per: diff,
+                        zj_per: diff,
+                        diff_sh_per2: diff,
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        if (p.hp > p.max_hp) {
+                            p.hp = p.max_hp;
+                            p.notify_hp();
+                        }
+                    },
+                });
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "将太极真气运转周身，20秒内增加你32%气血,招架增加32%,受到的伤害减少32%";
+            query_desc: function (_me: CHARACTER, lv: number): string {
+                const diff: number = query_buff_value(lv);
+                const time: number = query_buff_dur(lv) / 1000;
+                return "将先天太极真气运转周身，"
+                    + time + `秒内增加你${diff}%气血，招架增加${diff}%，受到的伤害减少${diff}%。`;
             },
         },
-        pfm_1: {
+        sanqing: {
             name: "一气化三清",
             distime: 45000,
             enable_skill: "force",
             mp: 20,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 一气化三清
-                // 每隔8秒化为三清之一使用你目前装备的技能绝招攻击对方，持续4次。
-                me.send_room("$N使出「一气化三清」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+                me.send_room(
+                    "<hic>$N一声清啸：道气惟一，一气三分，天地归元！！！</hic>",
+                    target,
+                );
+
+                const interval: number = query_use_gap(me);
+                const total: number = query_use_num(lv);
+                let attack_count: number = 0;
+
+                me.call_interval(
+                    function (_i: number): boolean | void {
+                        const now_target = me.query_enemy();
+                        if (!now_target) {
+                            return false;
+                        }
+
+                        // 收集所有已装备的非内功技能绝招
+                        const available_pfms: Array<{
+                            pfm: PERFORM;
+                            level: number;
+                            sktype: string;
+                        }> = [];
+                        const bases: string[] = ['unarmed', 'dodge', 'parry', 'throwing'];
+                        const weapon: string = me.query_weapon_type();
+                        if (weapon && weapon !== WEAPON_TYPE.NONE) {
+                            bases.unshift(weapon);
+                        }
+
+                        for (const base of bases) {
+                            if (!me.skills) continue;
+                            const base_skill = me.skills.get(base);
+                            if (!base_skill || !base_skill.enable_skill) continue;
+                            const sp_skill = SKILL.get(base_skill.enable_skill);
+                            if (!sp_skill || !sp_skill.pfm) continue;
+                            const sk_level: number = me.query_skill(base_skill.enable_skill, 0);
+                            for (const p in sp_skill.pfm) {
+                                const pfmitem: PERFORM = sp_skill.pfm[p];
+                                // 跳过内功绝招（避免递归调用自身）
+                                if (pfmitem.enable_skill === 'force') continue;
+                                available_pfms.push({
+                                    pfm: pfmitem,
+                                    level: sk_level,
+                                    sktype: base,
+                                });
+                            }
+                        }
+
+                        if (!available_pfms.length) {
+                            return false;
+                        }
+
+                        const chosen = available_pfms[me.random(available_pfms.length)];
+                        if (chosen) {
+                            const sanqing_names: string[] = [
+                                "<MAG>一道人始之气化身为$N，混沌初开，不见其形.....</MAG>",
+                                "<CYN>一道地元之气化身为$N，浩浩荡荡，无量无边.....</CYN>",
+                                "<YEL>一道天玄之气化身为$N，自然空玄，无形无象.....</YEL>",
+                            ];
+                            const name: string = sanqing_names.random();
+                            me.send_room(
+                                name,
+                                now_target,
+                            );
+                            chosen.pfm.use?.(me, now_target, chosen.level, chosen.sktype);
+                        }
+
+                        attack_count++;
+                        if (attack_count >= total) {
+                            return false;
+                        }
+                    },
+                    interval,
+                    total,
+                );
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "每隔8秒化为三清之一使用你目前装备的技能绝招攻击对方，持续4次。";
+            query_desc: function (me: CHARACTER, lv: number): string {
+                return `每隔${query_use_gap(me) / 1000}秒化为三清之一使用你目前装备的技能绝招攻击对方，持续${query_use_num(lv)}次。`;
             },
         },
     };
+}
+
+function query_use_num(lv: number): number {
+    return 3 + Math.floor(lv / 1000)
+}
+
+function query_use_gap(me: CHARACTER): number {
+    return me.gjsd * 2
+}
+
+function query_buff_value(lv: number): number {
+    return 30 + Math.floor(lv / 500)
+}
+
+function query_buff_dur(lv: number): number {
+    return Math.min(10000 + (lv * 10), 30000)
 }
