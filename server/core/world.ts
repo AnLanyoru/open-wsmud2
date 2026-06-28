@@ -41,6 +41,7 @@ import type {EventItem} from './task/events.js';
 
 import type jh from '../res/cmd/dialog/jh.js';
 import party from '../res/cmd/extend/party.js';
+import type biwu from '../res/cmd/extend/biwu.js';
 
 // ============================================================
 // 常量
@@ -522,7 +523,8 @@ class World {
          */
         checkStats(player: any): void {
             this.updateScore(player);
-            WORLD.COMMANDS.biwu.checkStats!(player);
+            const biwu_cmd = WORLD.COMMANDS.biwu as biwu;
+            biwu_cmd.checkStats(player);
         },
 
         /**
@@ -915,7 +917,7 @@ class World {
 
     /** 服务器主心跳 */
     heart_beat(): void {
-        let avtived_obj: any = null;
+        let avtived_obj: USER| ROOM | null = null;
         try {
             const dt = Date.now();
             this.CONNECT_COUNT = 0;

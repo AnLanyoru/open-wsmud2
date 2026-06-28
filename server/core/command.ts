@@ -10,42 +10,6 @@ import type {CommandAccess} from '../types/base.js';
 import type { USER } from './char/user.js';
 
 export class COMMAND extends BASE {
-    /** 进入副本回调（由 world/cmd/extend/ex.js 注入） */
-    on_enter_fb?(me: CHARACTER | null, env: any): void;
-
-    /** 清理邮件（由 checkorg 命令注入） */
-    cmd_clearmail?(): void;
-
-    /** 清理商店（由 checkorg 命令注入） */
-    cmd_clearstore?(): void;
-
-    /** 积分奖励（由 reward 命令注入） */
-    score_reward?(i: number): Record<string, unknown>;
-
-    /** 排行榜奖励（由 reward 命令注入） */
-    top_reward?(i: number): Record<string, unknown>;
-
-    /** 更新玩家排行榜（由 biwu 命令注入） */
-    updatePlayerStats?(player: Record<string, any>, sc: number, fam?: string): void;
-
-    /** 检查排行（由 biwu 命令注入） */
-    checkStats?(player: Record<string, any>): void;
-
-    /** 获取当前技能组索引（由 sk_group 命令注入） */
-    cur_eqs?(me: CHARACTER): number;
-
-    /** 清除延迟更新（由 update 命令注入） */
-    clear_update?(): void;
-
-    /** 锻造命令属性（由 duanzao 命令注入） */
-    PROPS?: Record<string, unknown>;
-
-    /** 锻造材料需求计算（由 duanzao 命令注入） */
-    sum_needs?(prop: unknown, level: number): number;
-
-    /** 默认锻造属性（由 duanzao 命令注入） */
-    DEFAULT_PROPS?: Record<string | number, string | null>;
-
     // ============ 核心方法（由子类重写） ============
 
     /**

@@ -5,6 +5,7 @@ import {WORLD} from "../world.js";
 import {FAMILIES} from "../skill/family.js";
 import {NPC} from "../char/npc.js";
 import type {ROOM} from "./room.js";
+import type {OddsEntry} from "../item/obj.js";
 import type {USER} from "../char/user.js";
 import type {CHARACTER} from "../char/character.js";
 import type {SKILL} from "../skill/skill.js";
@@ -63,9 +64,9 @@ export class AREA extends BASE {
     // ============ 掉落相关 ============
 
     /** 掉落列表缓存 */
-    drop_list?: any[];
+    drop_list?: OddsEntry[][];
     /** 困难模式掉落列表缓存 */
-    diff_drop_list?: any[];
+    diff_drop_list?: OddsEntry[][];
     /** 普通模式 NPC掉落配置(NPC路径列表) */
     drop_npcs0?: string[];
     /** 困难模式 NPC掉落配置(NPC路径列表) */
@@ -232,15 +233,16 @@ export class AREA extends BASE {
      * 查询普通掉落列表
      * @param isdiff
      */
-    query_drops(isdiff?: boolean): any[] | undefined {
+    query_drops(isdiff?: boolean): OddsEntry[][] | undefined {
         if (isdiff) return this.query_diff_drops();
         if (this.drop_list) return this.drop_list;
-        const items: any[] = [];
+        const items: OddsEntry[][] = [];
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if (rm.items[j].drop_list) {
-                    items.push(rm.items[j].drop_list);
+                const dl = rm.items[j].drop_list;
+                if (dl) {
+                    items.push(dl);
                 }
             }
         }
@@ -254,7 +256,7 @@ export class AREA extends BASE {
      * @param npcs
      * @param items
      */
-    query_npc_drops(npcs: string[] | undefined, items: any[]): void {
+    query_npc_drops(npcs: string[] | undefined, items: OddsEntry[][]): void {
         if (!npcs || !npcs.length) return;
         for (let i = 0; i < npcs.length; i++) {
             const npc = NPC.GET_BASE(npcs[i]);
@@ -266,14 +268,15 @@ export class AREA extends BASE {
     /**
      * 查询困难模式掉落
      */
-    query_diff_drops(): any[] | undefined {
+    query_diff_drops(): OddsEntry[][] | undefined {
         if (this.diff_drop_list) return this.diff_drop_list;
-        const items: any[] = [];
+        const items: OddsEntry[][] = [];
         for (let i = 0; i < this.rooms.length; i++) {
             const rm = this.rooms[i];
             for (let j = 0; j < rm.items.length; j++) {
-                if (rm.items[j].drop_list) {
-                    items.push(rm.items[j].drop_list);
+                const dl = rm.items[j].drop_list;
+                if (dl) {
+                    items.push(dl);
                 }
             }
         }

@@ -9,8 +9,8 @@ import {NPC} from './npc.js';
 import {FAMILIES} from '../skill/family.js';
 import {CORPSE} from '../item/corpse.js';
 import type {ROOM} from '../room/room.js';
-import {OBJ} from '../item/obj.js';
-import type {EQUIPMENT} from '../item/equipment.js';
+import {OBJ, type SerializedItemData} from '../item/obj.js';
+import type {EQUIPMENT, SerializedEquipData} from '../item/equipment.js';
 import type {SKILL} from '../skill/skill.js';
 import type {FAMILY} from '../skill/family.js';
 import type {AREA} from '../room/area.js';
@@ -55,9 +55,9 @@ interface FOLLOWER_DATA {
     /** 技能数据 */
     skills?: Record<string, SkillData>;
     /** 背包物品 */
-    items?: any[][];
+    items?: SerializedItemData[];
     /** 装备列表 */
-    eq?: any[][];
+    eq?: SerializedEquipData[];
 
     [key: string]: any;
 }

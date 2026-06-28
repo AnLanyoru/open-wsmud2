@@ -1,16 +1,17 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {UTIL} from "../../../core/util/util.js";
 import {OBJ} from "../../../core/item/obj.js";
+import type { USER } from "../../../core/char/user.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "buy";
     regex = /^(?:(\d+)\s)?(\w+)(?:\s+from\s+(.+?))?$/;
 
-    enter(me: CHARACTER, count: string, objid: string, from: string): void {
-        var target: any;
+    enter(me: USER, count: string, objid: string, from: string): void {
+        var target: CHARACTER | null = null;
         if (from) {
-            target = me.find_obj(from, me.environment!);
+            target = me.find_obj(from, me.environment!) as CHARACTER;
             if (!target) {
                 me.notify("你要从哪买东西？");
                 return;
@@ -23,12 +24,11 @@ export default class extends COMMAND {
         var buy_count = 1;
         if (count) buy_count = parseInt(count);
         if (!(buy_count > 0)) return;
-        if (!target) return;
+        if (!target || !target.check_npc()) return;
         var selllist = target.sell_list;
         if (target.on_sell) {
-            selllist = target.on_sell(me, buy_count, objid);
+            selllist = target.on_sell(me);
         }
-        if (selllist === true) return;
         if (!selllist) {
             me.notify(target.name + "不出售任何东西。");
             return;
@@ -68,7 +68,7 @@ export default class extends COMMAND {
             }
             let money_name = sellitem.currency === "jungong" ? "jungong" : "gongji";
             me.send('{type:"dialog",dialog:"list",id:"' + sellitem.id + '",sell:' + buy_count + ',' + money_name + ':' + me.query_temp(money_name === "jungong" ? 'jg' : 'gongji', 0) + '}');
-            if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
+            if (target.on_sell_item) target.on_sell_item(me, sell_obj, buy_count);
             return;
         }
         if (need_money > (me.money || 0)) {
@@ -87,7 +87,7 @@ export default class extends COMMAND {
             if (sell_obj) {
                 me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
 
-                if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
+                if (target.on_sell_item) target.on_sell_item(me, sell_obj, buy_count);
             }
         } else {
             // 有限库存（含玩家摊位）：需扣减库存并刷新商店界面
@@ -103,7 +103,7 @@ export default class extends COMMAND {
 
                 me.send('{type:"dialog",dialog:"list",id:"' + sellitem.id + '",sell:' + buy_count + '}');
 
-                if (target.on_sell_item) target.on_sell_item(me, sell_obj, count);
+                if (target.on_sell_item) target.on_sell_item(me, sell_obj, buy_count);
             } else {
                 me.notify(target.name + "没有那么多的" + sellitem.color_name + "买给你。");
                 return;

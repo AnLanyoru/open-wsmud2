@@ -4,8 +4,8 @@
 import { CHARACTER } from './character.js';
 import { SkillsMap } from './skills_map.js';
 import { ROOM } from '../room/room.js';
-import { OBJ } from '../item/obj.js';
-import type { EQUIPMENT } from '../item/equipment.js';
+import { OBJ, type SerializedItemData } from '../item/obj.js';
+import type { EQUIPMENT, SerializedEquipData } from '../item/equipment.js';
 import { CORPSE } from '../item/corpse.js';
 import { SKILL } from '../skill/skill.js';
 import type { FAMILY } from '../skill/family.js';
@@ -500,7 +500,7 @@ export class USER extends CHARACTER {
     /**
      * 从数据库数组读取物品列表
      */
-    read_items(items: any[][] | undefined): OBJ[] {
+    read_items(items: SerializedItemData[] | undefined): OBJ[] {
         const objs: OBJ[] = [];
         if (!items) return objs;
         for (let i = 0; i < items.length; i++) {
@@ -516,7 +516,7 @@ export class USER extends CHARACTER {
         return objs;
     }
 
-    read_equipment(items: any[][] | undefined): EQUIPMENT[] {
+    read_equipment(items: SerializedEquipData[] | undefined): EQUIPMENT[] {
         const eqs: EQUIPMENT[] = [];
         if (!items) return eqs;
         for (let i = 0; i < items.length; i++) {
@@ -1193,7 +1193,7 @@ export class USER extends CHARACTER {
      */
     can_follow(npc: NPC): boolean {
         if (!this.follower) this.follower = [];
-        const max: number = (this.query_temp('max_follower') as number) || 3;
+        const max: number = this.query_temp('max_follower', 3);
         if (this.follower.length >= max) return false;
         for (let i = 0; i < this.follower.length; i++) {
             if (this.follower[i].path == npc.path) {

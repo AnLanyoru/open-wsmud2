@@ -33,6 +33,22 @@ export interface StoneEntry {
     grade: number;
 }
 
+/**
+ * EQUIPMENT 序列化格式：[path, id, level, stonePaths?, locked?, temp?]
+ *
+ * - `0` path   — 装备模板路径
+ * - `1` id     — 装备唯一 ID
+ * - `2` level  — 强化等级
+ * - `3`? string[]                   — 镶嵌宝石路径列表
+ * - `4/5`? 1 | Record<string,any> — 锁定标记 / temp 对象
+ */
+export type SerializedEquipData = [
+    path: string,
+    id: string,
+    level: number,
+    ...rest: (string[] | 1 | Record<string, any>)[],
+];
+
 export class EQUIPMENT extends OBJ {
     // ============ 装备标志 ============
 

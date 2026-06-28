@@ -127,7 +127,13 @@ export class NPC extends CHARACTER {
     on_accept?(me: CHARACTER, obj: string, count: number): boolean | void;
 
     /** 查看在售物品回调 — 触发时机：玩家 查看 NPC 出售列表时 */
-    on_sell?(me: CHARACTER, obj?: string, count?: number): OBJ[];
+    on_sell?(me: CHARACTER): OBJ[];
+
+    /** 售前检查回调 — 触发时机：玩家购买物品前；返回 false 阻止交易 */
+    before_sell_item?(me: CHARACTER, sellitem: OBJ, buy_count: number): boolean | void;
+
+    /** 售出物品回调 — 触发时机：玩家成功购买物品后 */
+    on_sell_item?(me: CHARACTER, sell_obj?: OBJ, count?: number): void;
 
     // ================================================================
     // 对话系统

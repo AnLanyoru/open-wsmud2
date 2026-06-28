@@ -13,7 +13,7 @@ import type { USER } from './char/user.js';
 import type { FOLLOWER } from './char/follower.js';
 import type { NPC } from './char/npc.js';
 import type { EQUIPMENT } from './item/equipment.js';
-import type { OBJ } from './item/obj.js';
+import type { OBJ, OddsEntry } from './item/obj.js';
 import type { CHARACTER } from './char/character.js';
 import type { CONTAINER } from './item/container.js';
 
@@ -99,7 +99,7 @@ export class ITEM extends BASE {
     /** 当前所在环境（房间） */
     environment?: ROOM;
     /** 掉落列表 */
-    drop_list?: any[];
+    drop_list?: OddsEntry[];
 
     // ============ 子类共享属性（OBJ / EQUIPMENT 等） ============
 

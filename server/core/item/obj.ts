@@ -36,6 +36,22 @@ export interface OddsEntry {
     max?: number;
 }
 
+/**
+ * OBJ 序列化格式：[path, id, count, locked?, temp?]
+ *
+ * - `0` path  — 物品模板路径
+ * - `1` id    — 物品唯一 ID
+ * - `2` count — 数量
+ * - `3`? 1 | Record<string,any> — 锁定标记 / temp 对象
+ * - `4`? Record<string,any>     — temp 对象（仅当 [3]===1）
+ */
+export type SerializedItemData = [
+    path: string,
+    id: string,
+    count: number,
+    ...rest: (1 | Record<string, any>)[],
+];
+
 // @ts-ignore: static CREATE override incompatible with base
 export class OBJ extends ITEM {
     // ============ 核心属性 ============
@@ -300,6 +316,7 @@ export class OBJ extends ITEM {
 
     /**
      * 序列化物品数据用于数据库存储
+     *
      * @param str - 输出字符串数组
      */
     save_db(str: string[]): void {

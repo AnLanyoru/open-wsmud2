@@ -431,8 +431,6 @@ export class CHARACTER extends ITEM {
     team: TeamData | null = null;
     /** 武器切换冷却时间戳 */
     release_time: number = 0;
-    /** 掉落列表 */
-    drop_list?: any[];
     /** 主人 ID */
     master?: string;
     /** 死亡复活房间 */
@@ -502,10 +500,10 @@ export class CHARACTER extends ITEM {
     on_damage?(attacker: CHARACTER, damage: number): void;
 
     /** 有角色进入房间回调 — 触发时机：其他有 HP 的角色进入本角色所在房间时 */
-    on_enter?(obj: Record<string, any>): void;
+    on_enter?(obj: CHARACTER): void;
 
     /** 有角色离开房间回调 — 触发时机：其他有 HP 的角色从本角色所在房间离开时；返回 false 阻止离开 */
-    on_leave?(obj: Record<string, any>, dir: string): boolean | void;
+    on_leave?(obj: CHARACTER, dir: string): boolean | void;
 
     /** 检查是否可传送（USER 实现，biwu 等系统检查） */
     can_trans?(): boolean;
