@@ -21,7 +21,7 @@ export default class extends SKILL {
                 zj: lv * 2,
                 fy_per: 10,
                 zj_per: 10,
-                desc: "无极招架成功后，召唤三清之一使用你装备的技能攻击",
+                desc: "无极：招架成功后，召唤三清之一使用你装备的技能攻击",
             },
         };
     }

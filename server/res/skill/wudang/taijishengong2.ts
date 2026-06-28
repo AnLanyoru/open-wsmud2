@@ -37,7 +37,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        zhenwu: {
+        chu: {
             name: "真武除邪",
             distime: 45000,
             enable_skill: "force",
@@ -76,7 +76,7 @@ export default class extends SKILL {
                     + time + `秒内增加你${diff}%气血，招架增加${diff}%，受到的伤害减少${diff}%。`;
             },
         },
-        sanqing: {
+        san: {
             name: "一气化三清",
             distime: 45000,
             enable_skill: "force",
