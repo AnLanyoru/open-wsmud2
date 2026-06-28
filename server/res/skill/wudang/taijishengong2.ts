@@ -12,7 +12,7 @@ export default class extends SKILL {
     grade = 5;
     family = FAMILIES.WUDANG;
     force_rad = 1.0;
-    desc = "武当派至高内功心法，源自张三丰真人对太极之道的大彻大悟。以先天之气运转周身，阴阳相济，攻守兼备。";
+    desc = "武当派至高内功心法，源自三丰真人对太极之道的大彻大悟。以先天之气运转周身，阴阳相济，攻守兼备。";
     can_enables = ["force"];
 
     learn_condition: LearnCondition = {
@@ -84,7 +84,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room(
-                    "<hic>$N一声清啸：道气惟一，一气三分，天地归元！！！</hic>",
+                    "<him>$N一声清啸：道气惟一，一气三分，天地归元！！！</him>",
                     target,
                 );
 
@@ -137,9 +137,9 @@ export default class extends SKILL {
                         const chosen = available_pfms[me.random(available_pfms.length)];
                         if (chosen) {
                             const sanqing_names: string[] = [
-                                "<MAG>一道人始之气化身为$N，混沌初开，不见其形.....</MAG>",
-                                "<CYN>一道地元之气化身为$N，浩浩荡荡，无量无边.....</CYN>",
-                                "<YEL>一道天玄之气化身为$N，自然空玄，无形无象.....</YEL>",
+                                "<HIW>一道人始之气化身为$N，混沌初开，不见其形.....</HIW>",
+                                "<HIO>一道地元之气化身为$N，浩浩荡荡，无量无边.....</HIO>",
+                                "<HIJ>一道天玄之气化身为$N，自然空玄，无形无象.....</HIJ>",
                             ];
                             const name: string = sanqing_names.random();
                             me.send_room(
