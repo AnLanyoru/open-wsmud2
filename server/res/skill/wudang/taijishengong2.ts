@@ -86,7 +86,7 @@ export default class extends SKILL {
                 const interval: number = query_use_gap(me);
                 const total: number = query_use_num(lv);
                 const total_dur: number = interval * total;
-
+                const call_back_func = sanqing_attack(me, total)
                 me.send_room(
                     "<him>$N一声清啸：道气惟一，一气三分，天地归元！！！</him>",
                     target,
@@ -99,76 +99,10 @@ export default class extends SKILL {
                     duration: total_dur,
                     override: 0,
                     no_clear: true,
-                    finish_msg: "$N的三清之气消散于天地之间。",
+                    on_interval: call_back_func
                 });
 
-                let attack_count: number = 0;
-
-                me.call_interval(
-                    function (_i: number): boolean | void {
-                        attack_count++;
-                        if (attack_count > total) {
-                            me.remove_status("sanqing");
-                            return false;
-                        }
-                        // 检测外部清buff（如武道塔），状态被移除则提前终止
-                        if (!me.query_status("sanqing")) return false;
-
-                        const now_target = me.query_enemy();
-                        if (!now_target) {
-                            return;
-                        }
-
-                        // 收集所有已装备的非内功技能绝招
-                        const available_pfms: Array<{
-                            pfm: PERFORM;
-                            level: number;
-                            sktype: string;
-                        }> = [];
-                        const bases: string[] = ['unarmed', 'dodge', 'parry', 'throwing'];
-                        const weapon: string = me.query_weapon_type();
-                        if (weapon && weapon !== WEAPON_TYPE.NONE) {
-                            bases.unshift(weapon);
-                        }
-
-                        for (const base of bases) {
-                            if (!me.skills) continue;
-                            const base_skill = me.skills.get(base);
-                            if (!base_skill || !base_skill.enable_skill) continue;
-                            const sp_skill = SKILL.get(base_skill.enable_skill);
-                            if (!sp_skill || !sp_skill.pfm) continue;
-                            const sk_level: number = me.query_skill(base_skill.enable_skill, 0);
-                            for (const key in sp_skill.pfm) {
-                                const pfmitem: PERFORM = sp_skill.pfm[key];
-                                // 跳过内功绝招（避免递归调用自身）
-                                if (pfmitem.enable_skill === 'force') continue;
-                                available_pfms.push({
-                                    pfm: pfmitem,
-                                    level: sk_level,
-                                    sktype: base,
-                                });
-                            }
-                        }
-
-                        if (!available_pfms.length) {
-                            return;
-                        }
-
-                        const chosen = available_pfms[me.random(available_pfms.length)];
-                        if (chosen) {
-                            const sanqing_names: string[] = [
-                                "<HIW>一道人始之气化身为$N，混沌初开，不见其形.....</HIW>",
-                                "<HIO>一道地元之气化身为$N，浩浩荡荡，无量无边.....</HIO>",
-                                "<HIJ>一道天玄之气化身为$N，自然空玄，无形无象.....</HIJ>",
-                            ];
-                            const name: string = sanqing_names.random();
-                            me.send_room(name, now_target);
-                            chosen.pfm.use?.(me, now_target, chosen.level, chosen.sktype);
-                        }
-                    },
-                    interval,
-                    total,
-                );
+                me.call_interval(call_back_func, interval, total);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const interval: number = query_use_gap(me);
@@ -177,6 +111,70 @@ export default class extends SKILL {
                 return `每隔${interval / 1000}秒化为三清之一使用你目前装备的技能绝招攻击对方，持续${total}次（${total_dur}秒）。`;
             },
         },
+    };
+}
+
+/** 一气化三清：生成每次攻击的回调闭包 */
+function sanqing_attack(me: CHARACTER, total: number): (_i: any) => boolean | void {
+    let attack_count = 0;
+    return function (_i: any): boolean | void {
+        if (!me.query_status("sanqing")) return false;
+        attack_count++;
+        if (attack_count > total){
+            me.remove_status("sanqing");
+            return false;}
+
+        const now_target = me.query_enemy();
+        if (!now_target) {
+            return;
+        }
+
+        // 收集所有已装备的非内功技能绝招
+        const available_pfms: Array<{
+            pfm: PERFORM;
+            level: number;
+            sktype: string;
+        }> = [];
+        const bases: string[] = ['unarmed', 'dodge', 'parry', 'throwing'];
+        const weapon: string = me.query_weapon_type();
+        if (weapon && weapon !== WEAPON_TYPE.NONE) {
+            bases.unshift(weapon);
+        }
+
+        for (const base of bases) {
+            if (!me.skills) continue;
+            const base_skill = me.skills.get(base);
+            if (!base_skill || !base_skill.enable_skill) continue;
+            const sp_skill = SKILL.get(base_skill.enable_skill);
+            if (!sp_skill || !sp_skill.pfm) continue;
+            const sk_level: number = me.query_skill(base_skill.enable_skill, 0);
+            for (const key in sp_skill.pfm) {
+                const pfmitem: PERFORM = sp_skill.pfm[key];
+                // 跳过内功绝招（避免递归调用自身）
+                if (pfmitem.enable_skill === 'force') continue;
+                available_pfms.push({
+                    pfm: pfmitem,
+                    level: sk_level,
+                    sktype: base,
+                });
+            }
+        }
+
+        if (!available_pfms.length) {
+            return;
+        }
+
+        const chosen = available_pfms[me.random(available_pfms.length)];
+        if (chosen) {
+            const sanqing_names: string[] = [
+                "<HIW>一道人始之气化身为$N，混沌初开，不见其形.....</HIW>",
+                "<HIO>一道地元之气化身为$N，浩浩荡荡，无量无边.....</HIO>",
+                "<HIJ>一道天玄之气化身为$N，自然空玄，无形无象.....</HIJ>",
+            ];
+            const name: string = sanqing_names.random();
+            me.send_room(name, now_target);
+            chosen.pfm.use?.(me, now_target, chosen.level, chosen.sktype);
+        }
     };
 }
 
