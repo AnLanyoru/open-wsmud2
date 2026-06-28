@@ -4,6 +4,7 @@ import { WORLD } from "../../../core/world.js";
 import {RecoverType} from "../../../core/const.js";
 import { OBJ } from "../../../core/item/obj.js";
 import { EQUIPMENT } from "../../../core/item/equipment.js";
+import type DuanZaoCommand from "./duanzao.js";
 
 export default class extends COMMAND {
     command = "fenjie";
@@ -58,7 +59,7 @@ export default class extends COMMAND {
         }
         let sts: OBJ[] = [];
         let st_names: string[] = [];
-        const duanzao = WORLD.COMMANDS.duanzao;
+        const duanzao = WORLD.COMMANDS.duanzao as DuanZaoCommand;
         if (obj.path.startsWith('eq/cp')
             || obj.path.startsWith('eq/zb')) {
             for (var key in obj.temp) {
