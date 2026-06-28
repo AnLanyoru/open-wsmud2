@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import {TASK} from "../../core/task/task.js";
 import {WORLD} from "../../core/world.js";
 import {COMMAND} from "../../core/command.js";
+import checkorg from "../cmd/admin/checkorg.js";
 
 declare var __PATH: Record<string, string>;
 
@@ -37,8 +38,10 @@ export default class extends TASK {
     }
 
     clearyz() {
-        WORLD.COMMANDS['checkorg']?.cmd_clearmail?.();
-        WORLD.COMMANDS['checkorg']?.cmd_clearstore?.();
+        // 调用邮件和商店清理命令
+        const checkorg_cmd = WORLD.COMMANDS['checkorg'] as checkorg;
+        checkorg_cmd.cmd_clearmail();
+        checkorg_cmd.cmd_clearstore();
     }
 
     check_file() {
