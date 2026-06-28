@@ -85,8 +85,6 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const interval: number = query_use_gap(me);
                 const total: number = query_use_num(lv);
-                const total_dur: number = interval * total;
-                const call_back_func = sanqing_attack(me, total)
                 me.send_room(
                     "<him>$N一声清啸：道气惟一，一气三分，天地归元！！！</him>",
                     target,
@@ -96,13 +94,12 @@ export default class extends SKILL {
                     id: "sanqing",
                     name: "三清",
                     desc: "先天太极之一气化三清，每隔一段时间自动施展已装备技能的绝招",
-                    duration: total_dur,
+                    duration: interval,
+                    duration_count: total,
                     override: 0,
                     no_clear: true,
-                    on_interval: call_back_func
+                    on_interval: sanqing_attack(me),
                 });
-
-                me.call_interval(call_back_func, interval, total);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const interval: number = query_use_gap(me);
@@ -114,20 +111,11 @@ export default class extends SKILL {
     };
 }
 
-/** 一气化三清：生成每次攻击的回调闭包 */
-function sanqing_attack(me: CHARACTER, total: number): (_i: any) => boolean | void {
-    let attack_count = 0;
-    return function (_i: any): boolean | void {
-        if (!me.query_status("sanqing")) return false;
-        attack_count++;
-        if (attack_count > total){
-            me.remove_status("sanqing");
-            return false;}
-
+/** 一气化三清：status on_interval 回调，每次间隔触发一次攻击 */
+function sanqing_attack(me: CHARACTER): (_me: CHARACTER, _over_count: number) => boolean | void {
+    return function (_me: CHARACTER, _over_count: number): boolean | void {
         const now_target = me.query_enemy();
-        if (!now_target) {
-            return;
-        }
+        if (!now_target) return;
 
         // 收集所有已装备的非内功技能绝招
         const available_pfms: Array<{
@@ -160,9 +148,7 @@ function sanqing_attack(me: CHARACTER, total: number): (_i: any) => boolean | vo
             }
         }
 
-        if (!available_pfms.length) {
-            return;
-        }
+        if (!available_pfms.length) return;
 
         const chosen = available_pfms[me.random(available_pfms.length)];
         if (chosen) {
