@@ -16,8 +16,8 @@ export default class extends COMMAND {
     enter(me: CHARACTER, user: string, arg: string | MessageEntry) {
         if (me && me.user_level < 5) return false;
         if (!arg) return me && me.send("没有消息内容。");
-        var msg: any;
-        if (arg && typeof arg == "string") {
+        var msg: MessageEntry;
+        if (typeof arg == "string") {
             if (arg[0] != "{") {
                 msg = { content: arg, time: Date.now() };
             } else {

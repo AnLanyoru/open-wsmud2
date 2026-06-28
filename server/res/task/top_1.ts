@@ -5,6 +5,7 @@ import type {USER} from "../../core/char/user.js";
 import {FAMILIES} from "../../core/skill/family.js";
 import type {FAMILY} from "../../core/skill/family.js";
 import {COMMAND} from "../../core/command.js";
+import type reward from "../cmd/dialog/reward.js";
 
 export default class extends TASK {
     id = "top";
@@ -46,15 +47,16 @@ export default class extends TASK {
                 let user = stats[i];
                 if (i > 19) break;
                 if (!user.id) continue;
-                COMMAND.DO("send", user.id, JSON.stringify({
+                const reward_cmd = WORLD.COMMANDS.reward as reward
+                COMMAND.DO("send", user.id, {
                     from: "score",
                     from_name: "综合榜奖励",
                     content: "你目前在" + topname + "单排名第" +
                         (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                     attach: [
-                        WORLD.COMMANDS.reward.score_reward!(i)
+                        reward_cmd.score_reward(i)
                     ]
-                }));
+                });
             }
         }
     }
@@ -67,14 +69,15 @@ export default class extends TASK {
             for (let i = 0; i < tops.length; i++) {
                 let user = tops[i];
                 if (!user.userid) continue;
-                COMMAND.DO("send", user.userid, JSON.stringify({
+                const reward_cmd = WORLD.COMMANDS.reward as reward
+                COMMAND.DO("send", user.userid, {
                     from: "top",
                     from_name: "高手榜奖励",
                     content: "你目前在" + topname + "排名第" + (i + 1) + "，以下是你的每日奖励，请再接再厉继续保持。",
                     attach: [
-                        WORLD.COMMANDS.reward?.top_reward?.(i)
+                        reward_cmd.top_reward(i)
                     ]
-                }));
+                });
             }
         }
     }

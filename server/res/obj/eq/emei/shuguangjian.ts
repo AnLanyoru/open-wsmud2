@@ -28,24 +28,13 @@ export default class extends EQUIPMENT {
             case 4:
                 this.prop = { gj: 300, con: 25, mz: 320, diff_fy_per: 5 };
                 this.desc = "峨眉执事的佩剑，剑含佛光，斩业护生。";
-                this.group_name = "shuguang4";
                 break;
             case 5:
                 this.prop = { gj: 490, con: 35, mz: 500, mz_per: 10, diff_fy_per: 6 };
                 this.desc = "峨眉长老的佩剑，剑映晨光，如曙光初现，破暗除魔。";
-                this.group_name = "shuguang5";
                 break;
         }
         EQUIPMENT.prototype.on_create.apply(this);
     }
 
-    group_prop(count: number) {
-        if (this.grade == 4) {
-            if (count == 3) return { con: 50 };
-            if (count == 5) return { hp_per: 5, diff_fy_per: 8 };
-        } else if (this.grade == 5) {
-            if (count == 3) return { con: 100 };
-            if (count == 5) return { hp_per: 10, diff_fy_per: 10 };
-        }
-    }
 }

@@ -28,24 +28,12 @@ export default class extends EQUIPMENT {
             case 4:
                 this.prop = { gj: 380, max_hp: 3500, str: 35, zj: 320 };
                 this.desc = "少林首座的戒刀，刀泛佛光，降魔卫道。";
-                this.group_name = "luohan4";
                 break;
             case 5:
                 this.prop = { gj: 560, gj_per: 10, str: 55, zj: 500, zj_per: 10 };
                 this.desc = "少林长老的戒刀，刀刻金刚经文，挥动间佛光隐现，降魔伏妖。";
-                this.group_name = "luohan5";
                 break;
         }
         EQUIPMENT.prototype.on_create.apply(this);
-    }
-
-    group_prop(count: number) {
-        if (this.grade == 4) {
-            if (count == 3) return { hp_per: 5 };
-            if (count == 5) return { fy_per: 8, diff_sh_per: 8 };
-        } else if (this.grade == 5) {
-            if (count == 3) return { hp_per: 10 };
-            if (count == 5) return { fy_per: 10, diff_sh_per: 10 };
-        }
     }
 }

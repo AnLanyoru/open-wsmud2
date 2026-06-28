@@ -106,6 +106,10 @@ export interface AppConfig {
 
 /** 消息条目 */
 export interface MessageEntry {
+    /** 消息来源底层类型，不填默认为system */
+    from?: string
+    /** 消息来源底层名称，不填默认为系统 */
+    from_name?: string
     /** 消息来源类型，不填默认为system */
     id?: string;
     /** 消息来源名称，不填默认为系统 */
