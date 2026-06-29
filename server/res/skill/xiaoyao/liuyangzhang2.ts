@@ -11,7 +11,7 @@ export default class extends SKILL {
     family = FAMILIES.XIAOYAO;
     desc = "逍遥派的天山六阳掌，绝招生死符让人谈虎色变。";
     can_enables = ["unarmed"];
-    attack_actions = SKILL.get("unarmed")?.attack_actions || [];
+    attack_actions = SKILL.get("liuyangzhang")?.attack_actions || [];
 
     slots = [
         {
@@ -32,7 +32,7 @@ export default class extends SKILL {
                 gj: Math.floor(lv * 1.7),
                 mz: Math.floor(lv * 1.3),
                 dex: Math.floor(lv * 0.2),
-                desc: "你对种了生死符的敌人伤害增加50%",
+                desc: "你对种了生死符的敌人伤害增加" + (30 + Math.floor(lv / 50)) + "%",
             },
         };
     }
@@ -46,9 +46,7 @@ export default class extends SKILL {
             release_time: 8000,
             releasetime_key: "lyz_ssf",
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                // 逆运真气将阳刚之气转为阴柔，化水为冰，命中敌人后11秒后爆发，
-                // 如果最大气血大于敌方当前气血，敌人气血将降为1，
-                // 否则将受到当前气血20%的伤害。不可招架
+                // 逆运真气将阳刚之气转为阴柔，化水为冰
                 const sh = me.do_attack({
                     target: target,
                     attack_msg: "<red>$N逆运真气，将阳刚之气转为阴柔，化水为冰，凝于掌中，轻飘飘地拍向$n。</red>",
@@ -57,19 +55,21 @@ export default class extends SKILL {
                     no_weapon: true,
                 });
                 if (sh) {
+                    const duration = Math.max(9000, 12000 - lv);
+                    const fu = 10 + Math.floor(lv / 100);
                     target.add_status({
                         id: "liuyang",
-                        duration: 11000,
+                        duration: duration,
                         downside: true,
                         name: "生死符",
-                        desc: "你被种了生死符，11秒后将爆发",
+                        desc: "你被种了生死符，" + (duration / 1000) + "秒后将爆发",
                         no_clear: true,
                         on_expire: function(p: CHARACTER): void {
                             if (p.hp <= 0) return;
                             if (p.is_fighting(me)) {
                                 p.send_room('<hib>$N的生死符发作了，「哇」的一声，吐出一口殷红的<hir>鲜血</hir>。</hib>');
                                 if (p.hp > me.max_hp) {
-                                    p.damage(Math.floor(me.hp * 20 / 100), me);
+                                    p.damage(Math.floor(me.hp * fu / 100), me);
                                 } else {
                                     p.add_hp(-p.hp + 1);
                                 }
@@ -83,7 +83,9 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number): string {
-                return "逆运真气将阳刚之气转为阴柔，化水为冰，命中敌人后11秒后爆发，如果你的最大气血大于敌方当前气血，敌人气血将降为1，否则将受到你当前气血20%的伤害。不可招架";
+                const duration = Math.max(9000, 12000 - lv);
+                const fu = 10 + Math.floor(lv / 100);
+                return "逆运真气将阳刚之气转为阴柔，化水为冰，命中敌人后" + (duration / 1000) + "秒后爆发，如果你的最大气血大于敌方当前气血，敌人气血将降为1，否则将受到你当前气血" + fu + "%的伤害。不可招架";
             },
         },
         san: {
@@ -93,11 +95,11 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                // 以迅猛的掌力瞬间攻击对方三次，造成伤害后下次增加攻击83%，否则增加83%命中
+                // 以迅猛的掌力瞬间攻击对方三次
                 me.send_room("<hir>$N长笑一声，双掌快如闪电，接连三掌拍向$n，掌力如怒潮狂涌！</hir>", target);
                 let mz = me.mz;
                 let gj = me.gj;
-                const sp = 183; // 183% = 100%基础 + 83%加成
+                const sp = 150 + Math.floor(lv / 30);
                 let before = "";
                 for (let i = 0; i < 3; i++) {
                     if (me.do_attack({
@@ -117,7 +119,8 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number): string {
-                return "以迅猛的掌力瞬间攻击对方三次，造成伤害后下次增加攻击83%，否则增加83%命中";
+                const inc = 50 + Math.floor(lv / 30);
+                return "以迅猛的掌力瞬间攻击对方三次，造成伤害后下次增加攻击" + inc + "%，否则增加" + inc + "%命中";
             },
         },
         po: {
@@ -127,11 +130,12 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                // 提起全身真气对敌人造成攻击力附加最大内力20%(+槽位加成)的伤害
+                // 提起全身真气对敌人造成攻击力附加最大内力伤害
+                const basePer = Math.min(20, 10 + Math.floor(lv / 100));
                 const bh = me.query_prop("lyz_bh");
-                const per = 20 + bh;
+                const per = basePer + bh;
                 me.do_attack({
-                    attack_msg: "<hiy>$N提起全身真气，呼的一掌向$n当头劈落，正是白虹掌力的精要所在。</hiy>",
+                    attack_msg: "<hiy>$N提起全身真气，呼的一掌向$n当头劈落。</hiy>",
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
@@ -142,8 +146,9 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number): string {
+                const basePer = Math.min(20, 10 + Math.floor(lv / 100));
                 const bh = me.query_prop("lyz_bh");
-                const per = 20 + bh;
+                const per = basePer + bh;
                 const gj = Math.floor(me.max_mp * per / 100);
                 return "提起全身真气对敌人造成你攻击力附加你最大内力" + per + "%(" + gj + ")的伤害。";
             },

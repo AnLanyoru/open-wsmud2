@@ -1,6 +1,7 @@
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
+import type {PerformData, EnablePropMap, PERFORM} from "../../../core/skill/skill.js";
 import type {LearnCondition} from "../../../types/events.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
@@ -10,7 +11,6 @@ export default class extends SKILL {
     grade = 6;
     family = FAMILIES.XIAOYAO;
     is_ultimate = true;
-    source_skill = "lingboweibu2";
     desc = "上古逍遥门所传，凌波踏四方，逍遥游天下";
     can_enables = ["dodge"];
 
@@ -54,21 +54,39 @@ export default class extends SKILL {
             const lv: number = me.query_skill("lingboweibu4", 0);
             if (!lv) return;
 
-            const attSkill = attacker.attack_skill;
-            if (attSkill) {
-                const bonusGj: number = lv * 3;
-                me.do_attack({
-                    target: attacker,
-                    gj: me.gj + bonusGj,
-                    mz: me.mz,
-                    attack_msg:
-                        "<him>$N身形一晃，倏入无相之境。$n的「" +
-                        attSkill.name +
-                        "」方至半途，其精要已被$N尽数窥破——随即还施彼身，反制$n！</him>",
-                });
-                me.end_attack(attacker);
-                me.set_temp("sk_lingboweibu4_wx", 1, 7000);
+            // 收集攻击者所有可模仿的绝招（所有已装备特殊技能中可复制的绝招）
+            const imitable: Array<{ pfm: PERFORM; baseType: string }> = [];
+            const seen: Set<string> = new Set();
+            for (const [, skillData] of attacker.skills) {
+                if (!skillData.enable_skill) continue;
+                const sk = SKILL.get(skillData.enable_skill);
+                if (!sk || sk.type !== SKILL_TYPES.SKILL || seen.has(sk.id)) continue;
+                seen.add(sk.id);
+                const baseType: string = skillData.enable_skill;
+                for (const key in sk.pfm) {
+                    const pfm = sk.pfm[key];
+                    if (pfm.no_copy) continue;
+                    imitable.push({ pfm, baseType });
+                }
             }
+
+            if (!imitable.length) return;
+
+            const pick = imitable[Math.floor(Math.random() * imitable.length)];
+            const up: number = Math.min(80 + Math.floor(lv / 40), 100);
+            const pfmLevel: number = Math.floor(up * lv / 100);
+
+            me.send_room(
+                "<him>$N身形一晃，倏入无相之境。$n的「" + pick.pfm.name +
+                "」方至半途，其精要已被$N尽数窥破！</him>",
+                attacker,
+            );
+
+            if (pick.pfm.use) {
+                pick.pfm.use(me, attacker, pfmLevel, pick.baseType);
+            }
+            me.end_attack(attacker);
+            me.set_temp("sk_lingboweibu4_wx", 1, 500);
         }
     }
 

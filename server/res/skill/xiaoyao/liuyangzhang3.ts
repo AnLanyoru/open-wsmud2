@@ -6,7 +6,6 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 export default class extends SKILL {
     name = "天山六阳掌";
     id = "liuyangzhang3";
-    source_skill = "liuyangzhang2";
     grade = 6;
     family = FAMILIES.XIAOYAO;
     is_hidden = true;
@@ -26,19 +25,6 @@ export default class extends SKILL {
     ];
 
     can_enables = ["unarmed"];
-
-    slots = [
-        {
-            prop: "lyz_ssf_time",
-            value: (lv: number) => 10,
-            format: (_val: number) => "生死符释放时间减少1秒",
-        },
-        {
-            prop: "lyz_bhzl_nl",
-            value: (_lv: number) => 10,
-            format: (_val: number) => "白虹掌力额外附加10%内力",
-        },
-    ];
 
     query_enable_prop(lv: number): EnablePropMap {
         const descVal = 30 + Math.floor(lv / 50);
