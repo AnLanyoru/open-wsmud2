@@ -65,6 +65,7 @@ export default class extends SKILL {
                 }
                 me.remove_status("chaoxi", true);
                 const duration = query_cx_duration(lv);
+                me.set_temp("chaoxi_layers", layers, duration);
                 const perGj = query_qi_per(lv, me);
                 const totalGj = perGj * layers;
                 me.send_room("<hic>$N默运潮汐诀，体内潮汐之力骤然澎湃，浪劲层层翻涌，尽数化作凌厉攻势！</hic>", target);
@@ -100,6 +101,7 @@ export default class extends SKILL {
                 }
                 me.remove_status("chaoxi", true);
                 const duration = query_cx_duration(lv);
+                me.set_temp("chaoxi_layers", layers, duration);
                 const perFy = query_luo_per(lv, me);
                 const perHp = perFy * 5;
                 const totalFy = perFy * layers;
