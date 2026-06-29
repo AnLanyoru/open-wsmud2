@@ -1158,7 +1158,7 @@ export class PERFORM {
         let dis = this.distime ?? 0;
         if (!dis) dis = me.gjsd;
         if (isref) dis *= 2;
-        dis = me.query_prop("distime")
+        dis -= me.query_prop("distime")
         if (this.distime_key) {
             dis -= me.query_prop(this.distime_key);
         } 
