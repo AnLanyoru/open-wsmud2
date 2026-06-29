@@ -216,13 +216,35 @@ export default class extends COMMAND {
             }
         }
         const str: string[] = [];
-        if (fb.skills) {
+        if (fb.skills && fb.skills.length) {
             str.push("门派武功：\n");
             for (let i = 0; i < fb.skills.length; i++) {
                 str.push("<span cmd='checkskill ");
                 str.push(fb.skills[i].id!);
                 str.push(" help'>");
                 str.push(fb.skills[i].color_name);
+                str.push("</span>\n");
+            }
+        }
+
+        if (fb.skills2 && fb.skills2.length) {
+            str.push("\n门派进阶武功：\n");
+            for (let i = 0; i < fb.skills2.length; i++) {
+                str.push("<span cmd='checkskill ");
+                str.push(fb.skills2[i].id!);
+                str.push(" help'>");
+                str.push(fb.skills2[i].color_name);
+                str.push("</span>\n");
+            }
+        }
+
+        if (fb.skills4 && fb.skills4.length) {
+            str.push("\n上古传承：\n");
+            for (let i = 0; i < fb.skills4.length; i++) {
+                str.push("<span cmd='checkskill ");
+                str.push(fb.skills4[i].id!);
+                str.push(" help'>");
+                str.push(fb.skills4[i].color_name);
                 str.push("</span>\n");
             }
         }
