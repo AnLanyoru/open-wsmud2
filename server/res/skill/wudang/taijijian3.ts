@@ -36,7 +36,7 @@ export default class extends SKILL {
     pfm_set: PerformData = {
         chan: {
             name: "缠字诀",
-            distime: 19000,
+            distime: 20000,
             enable_skill: "sword",
             mp: 30,
             release_time: 500,
@@ -51,7 +51,7 @@ export default class extends SKILL {
                 }
                 if (!list.length) return;
 
-                const time: number = Math.min(lv * 10 + 3000, 13000);
+                const time: number = Math.min(lv * 10 + 3000, 16000);
 
                 me.send_room("<CYN>$N剑势一展，使出太极剑法「缠字诀」，剑光如织，连绵不绝地卷向周围敌人！</CYN>");
 
@@ -67,16 +67,16 @@ export default class extends SKILL {
                 }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
-                const time: number = Math.min(lv * 10 + 3000, 13000) / 1000;
+                const time: number = Math.min(lv * 10 + 3000, 16000) / 1000;
                 return "以连绵不绝的攻势迷惑附近敌人，使之无法脱身，" + time + "秒内处于忙乱状态。";
             },
         },
         lian: {
             name: "连字诀",
-            distime: 14250,
+            distime: 15000,
             enable_skill: "sword",
             mp: 10,
-            release_time: 3000,
+            release_time: 4000,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 // 快速出剑，瞬间对附近敌人快速攻击3+lv/100次（上限7次），攻击中命中增加100%，初始附加自己3%的内力伤害
                 if (!me.enemy || !me.enemy.length) return;
@@ -115,10 +115,10 @@ export default class extends SKILL {
         },
         sui: {
             name: "随字决",
-            distime: 19000,
+            distime: 20000,
             enable_skill: "sword",
             mp: 10,
-            release_time: 3000,
+            release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 // 造成攻击力百分比伤害，命中后使对方降低战斗属性
                 const gjPer: number = 100 + Math.floor(lv / 5);
