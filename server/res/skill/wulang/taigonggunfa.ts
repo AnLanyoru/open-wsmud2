@@ -40,7 +40,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        diao: {
             name: "缠丝钓",
             distime: 32000,
             enable_skill: "club",
@@ -57,7 +57,7 @@ export default class extends SKILL {
                 return "以缠劲攻击敌人，造成140%攻击力伤害，命中后使敌人忙乱8秒";
             },
         },
-        pfm_1: {
+        gou: {
             name: "愿者上钩",
             distime: 60000,
             enable_skill: "club",
