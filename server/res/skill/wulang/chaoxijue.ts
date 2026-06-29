@@ -70,7 +70,7 @@ export default class extends SKILL {
                 const totalGj = perGj * layers;
                 me.send_room("<hic>$N默运潮汐诀，体内潮汐之力骤然澎湃，浪劲层层翻涌，尽数化作凌厉攻势！</hic>", target);
                 me.add_status({
-                    id: "chaoxi_up",
+                    id: "power",
                     name: "潮起",
                     desc: `潮起之势：攻击+${totalGj}，命中+${totalGj}`,
                     duration: duration,
@@ -108,7 +108,7 @@ export default class extends SKILL {
                 const totalHp = perHp * layers;
                 me.send_room("<hic>$N默运潮汐诀，体内潮汐之力沉凝如渊，暗劲绵绵回流，尽数化作沉稳守势！</hic>", target);
                 me.add_status({
-                    id: "chaoxi_down",
+                    id: "power",
                     name: "潮落",
                     desc: `潮落之势：防御+${totalFy}，气血+${totalHp}`,
                     duration: duration,

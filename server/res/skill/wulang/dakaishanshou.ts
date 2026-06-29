@@ -125,7 +125,7 @@ export default class extends SKILL {
 
                 // 对自身施加增益
                 me.add_status({
-                    id: "dkss_dian_bf",
+                    id: "parry",
                     name: "金石",
                     desc: `汲取了防御之力`,
                     duration: duration,
@@ -146,8 +146,8 @@ export default class extends SKILL {
                     });
                     // 对目标施加减益
                     if (sh) target.add_status({
-                        id: "dkss_dian_db",
-                        name: "破碎",
+                        id: "br",
+                        name: "打碎",
                         desc: `被大开山手重创，防御和免伤降低了`,
                         duration: duration,
                         downside: true,
