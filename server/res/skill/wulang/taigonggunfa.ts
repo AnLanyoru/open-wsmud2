@@ -1,7 +1,7 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "太公棍法";
@@ -45,14 +45,14 @@ export default class extends SKILL {
             enable_skill: "club",
             mp: 30,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 const dmgPct = query_diao_dmg_pct(lv);
                 const gj = Math.floor(me.gj * dmgPct / 100);
                 const sh = me.do_attack({
                     target,
                     gj: gj,
                     mz: me.mz,
-                    attack_msg: "<hic>$N使出「缠丝钓」攻向$n，棍法如丝如缕，缠向$n的$l。</hic>",
+                    attack_msg: "<hic>$N手中$W如长丝缠卷，一式「缠丝钓」锁住$n身形，棍影如丝如缕，罩向$n。</hic>",
                 });
                 if (sh) {
                     target.add_status({
@@ -66,7 +66,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 const dmgPct = query_diao_dmg_pct(lv);
                 return `以缠劲攻击敌人，造成${dmgPct}%攻击力伤害，命中后使敌人忙乱8秒`;
             },
@@ -77,17 +77,17 @@ export default class extends SKILL {
             enable_skill: "club",
             mp: 100,
             release_time: 10000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 const stunDuration = query_gou_stun_duration(lv);
                 const intervalMs = query_gou_interval(lv);
-                const tickCount = Math.floor(stunDuration / intervalMs);
+                const tickCount = Math.max(Math.floor(stunDuration / intervalMs), 1);
                 const casterGj = me.gj;
                 const casterMz = me.mz;
-                const DmgIncrease = (me.query_prop("tggf_sh") / 100 || 0);
-                const hasNoParry = (me.query_prop("tggf_no_zj") || 0) > 0;
+                const DmgIncrease = me.query_prop("tggf_sh") / 100 || 0;
                 const hasNoDodge = (me.query_prop("tggf_no_ds") || 0) > 0;
+                const hasNoParry = (me.query_prop("tggf_no_zj") || 0) > 0;
 
-                me.send_room("<hiy>$N举棍若杆，棍势如沧海垂钓，锁定$n！</hiy>", target);
+                me.send_room("<hiy>$N长笑一声，$W忽抬指向天际，万千潮声聚于棍尖，一道无形潮线锁住$n，棍影如潮直取要害！</hiy>", target);
                 const sh = me.do_attack({
                     target,
                     gj: me.gj,
@@ -96,38 +96,39 @@ export default class extends SKILL {
                 });
 
                 if (sh) {
-                    // 晕眩效果：使敌人无法行动
-                    target.add_status({
-                        id: "busy",
-                        name: "愿者上钩",
-                        duration: stunDuration,
-                        is_busy: hasNoParry || undefined,
-                        is_rash: hasNoDodge || undefined,
-                        downside: true,
-                        desc: "你被愿者上钩所制，无法行动",
-                        finish_msg: "$N从愿者上钩的束缚中挣脱出来。",
-                    }, me);
-
-                    // 持续伤害效果
-                    if (tickCount > 0) {
-                        target.add_status({
-                            id: "taigong_gou_dot",
-                            name: "上钩",
-                            duration: intervalMs,
-                            duration_count: tickCount,
-                            downside: true,
-                            desc: "愿者上钩的暗劲持续伤害着你",
-                            on_interval: function(target: CHARACTER, _over_count: number) {
-                                const baseDmg = Math.floor(casterGj * 0.8);
-                                const dmg = Math.floor(baseDmg * 1 +DmgIncrease);
-                                target.from_attack(dmg, casterMz, '', `<hir>$N被愿者上钩的暗劲所伤。</hir>`);
-                            },
-                        }, me);
+                    // 基础：出招冷却阻止攻击/技能，不影响招架躲闪
+                    target.set_releasetime(stunDuration);
+                    // 进阶 tggf_no_zj：无法招架
+                    if (hasNoParry) {
+                        target.is_busy = stunDuration;
                     }
+                    // 进阶 tggf_no_ds：无法躲闪
+                    if (hasNoDodge) {
+                        target.is_rash = stunDuration;
+                    }
+                    target.call_interval(
+                        function (_i: number) {
+                            if (target.fight_type == 0) return false;
+                            const baseDmg = Math.floor(casterGj * 0.8);
+                            const dmg = Math.floor(baseDmg * (1 + DmgIncrease));
+                            target.from_attack(dmg, casterMz, '', `<hir>$N被愿者上钩的暗劲所伤。</hir>`);
+                        },
+                        intervalMs,
+                        tickCount,
+                        function () {
+                            if (hasNoParry) {
+                                target.is_busy = 0;
+                            }
+                            if (hasNoDodge) {
+                                target.is_rash = 0;
+                            }
+                            target.send_room("$N从愿者上钩的束缚中挣脱出来。", target);
+                        },
+                    );
                 }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function (me: CHARACTER, lv: number) {
                 const stunDuration = query_gou_stun_duration(lv) / 1000;
                 const intervalMs = query_gou_interval(lv) / 1000;
                 return `太公钓鲸棍法绝技，以无上巧劲锁定敌人，命中后使敌人${stunDuration}秒无法行动，每${intervalMs}秒造成伤害`;
