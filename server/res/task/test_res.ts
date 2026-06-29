@@ -301,6 +301,13 @@ const need_test_objs: TestResRoot = {
             "倚天剑法": ["book/fbk#yitianjianfa", 1],
             "诸天剑诀": ["book/fbk#yitianjianfa4", 1],
             "诸天化身步": ["book/fbk#zhutianbu", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "九阴白骨爪进阶": ["book/fbk#jiuyinbaiguzhao2", 1],
+                "临济十二庄进阶": ["book/fbk#linjizhuang2", 1],
+                "倚天剑法进阶一": ["book/fbk#yitianjianfa2", 1],
+                "倚天剑法进阶二": ["book/fbk#yitianjianfa3", 1],
+                "诸天化身步进阶": ["book/fbk#zhutianbu2", 1],
+            },
         },
         "gaibang/ (丐帮)": {
             "太祖长拳": ["book/fbk#taizuchangquan", 1],
@@ -313,6 +320,12 @@ const need_test_objs: TestResRoot = {
             "降龙十八掌": ["book/fbk#xianglongzhang", 1],
             "降龙掌": ["book/fbk#xianglongzhang4", 1],
             "逍遥游": ["book/fbk#xiaoyaoyou", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "打狗棒进阶": ["book/fbk#dagoubang2", 1],
+                "降龙十八掌进阶一": ["book/fbk#xianglongzhang2", 1],
+                "降龙十八掌进阶二": ["book/fbk#xianglongzhang3", 1],
+                "逍遥游进阶": ["book/fbk#xiaoyaoyou2", 1],
+            },
         },
         "huashan/ (华山)": {
             "独孤九剑": ["book/fbk#dugujiujian", 1],
@@ -324,6 +337,13 @@ const need_test_objs: TestResRoot = {
             "狂风快剑": ["book/fbk#kuangfengkuaijian", 1],
             "劈石破玉拳": ["book/fbk#poyuquan", 1],
             "紫霞神功": ["book/fbk#zixiashengong", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "独孤九剑进阶一": ["book/fbk#dugujiujian2", 1],
+                "独孤九剑进阶二": ["book/fbk#dugujiujian3", 1],
+                "狂风快剑进阶": ["book/fbk#kuangfengkuaijian2", 1],
+                "劈石破玉拳进阶": ["book/fbk#poyuquan2", 1],
+                "紫霞神功进阶": ["book/fbk#zixiashengong2", 1],
+            },
         },
         "liushan/ (六扇门)": {
             "飞龙探云手": ["book/fbk#feilongshou", 1],
@@ -346,6 +366,11 @@ const need_test_objs: TestResRoot = {
             "金刚不坏体": ["book/fbk#yijinjing2", 1],
             "金刚不灭体": ["book/fbk#yijinjing4", 1],
             "一指禅": ["book/fbk#yizhichan", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "燃木刀法进阶一": ["book/fbk#ranmudao2", 1],
+                "燃木刀法进阶二": ["book/fbk#ranmudao3", 1],
+                "一指禅进阶": ["book/fbk#yizhichan2", 1],
+            },
         },
         "shashou/ (杀手楼)": {
             "穿心掌": ["book/fbk#chuanxinzhang", 1],
@@ -356,6 +381,12 @@ const need_test_objs: TestResRoot = {
             "杀手步法": ["book/fbk#shashoubufa", 1],
             "杀手心法": ["book/fbk#shashouxinfa", 1],
             "踏雪寻梅": ["book/fbk#taxuexunmei", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "穿心掌进阶": ["book/fbk#chuanxinzhang2", 1],
+                "漫天花雨进阶": ["book/fbk#mantianhuayu2", 1],
+                "杀生决进阶": ["book/fbk#shashengjue2", 1],
+                "踏雪寻梅进阶": ["book/fbk#taxuexunmei2", 1],
+            },
         },
         "wudang/ (武当)": {
             "太极剑法": ["book/fbk#taijijian", 1],
@@ -365,6 +396,14 @@ const need_test_objs: TestResRoot = {
             "武当长拳": ["book/fbk#wudangchangquan", 1],
             "武当剑法": ["book/fbk#wudangjianfa", 1],
             "武当心法": ["book/fbk#wudangxinfa", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "太极剑法进阶一": ["book/fbk#taijijian2", 1],
+                "太极剑法进阶二": ["book/fbk#taijijian3", 1],
+                "太极拳进阶": ["book/fbk#taijiquan2", 1],
+                "先天太极": ["book/fbk#taijishengong2", 1],
+                "太极真义": ["book/fbk#taijishengong4", 1],
+                "梯云纵进阶": ["book/fbk#tiyunzong2", 1],
+            },
         },
         "wulang/ (无浪)": {
             "潮汐诀": ["book/fbk#chaoxijue", 1],
@@ -383,6 +422,13 @@ const need_test_objs: TestResRoot = {
             "小无相功": ["book/fbk#xiaowuxianggong", 1],
             "逍遥心法": ["book/fbk#xiaoyaoxinfa", 1],
             "天山折梅手": ["book/fbk#zhemeishou", 1],
+            "advanced/ <hio>进阶</hio>": {
+                "北冥神功进阶": ["book/fbk#beimingshengong2", 1],
+                "凌波微步进阶": ["book/fbk#lingboweibu2", 1],
+                "天山六阳掌进阶一": ["book/fbk#liuyangzhang2", 1],
+                "天山六阳掌进阶二": ["book/fbk#liuyangzhang3", 1],
+                "小无相功进阶": ["book/fbk#xiaowuxianggong2", 1],
+            },
         },
         "new/ (特殊)": {
             "grade3/ <hiy>三级</hiy>": {
