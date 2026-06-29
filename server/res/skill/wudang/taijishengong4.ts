@@ -62,25 +62,28 @@ export default class extends SKILL {
                 if (sh) {
                     const dur: number = Math.min(3000 + lv * 5, 12000);
                     const spdReduce: number = 20 + Math.floor(lv / 500);
+                    const extendMs: number = Math.min(3000 + lv * 5, 10000);
                     target.add_status({
                         id: "yinyangwuji",
                         name: "逆乱",
-                        desc: "体内阴阳二气紊乱，攻击速度降低，武功冷却时间延长",
+                        desc: "体内阴阳二气紊乱，攻击速度降低",
                         duration: dur,
                         downside: true,
-                        is_busy: true,
                         prop: {
                             gjsd_per: -spdReduce,
+                            gjsd: -spdReduce * 100,
                         },
                     }, me);
-                    target.set_temp("sk_taijishengong4_cd_extend", 1, dur);
+                    // 遍历敌方所有已装备技能，延长其已进入冷却的绝招
+                    extend_enemy_cooldowns(target, extendMs);
                 }
                 me.end_attack(target);
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const dur: number = Math.min(3000 + lv * 5, 12000);
                 const spdReduce: number = 20 + Math.floor(lv / 500);
-                return "万物负阴而抱阳，冲气以为和。扰乱敌人体内阴阳二气，" + (dur / 1000) + "秒内降低其" + spdReduce + "%攻击速度，并延长其已释放武功的冷却时间。";
+                const extendSec: number = Math.min(3000 + lv * 5, 10000) / 1000;
+                return "万物负阴而抱阳，冲气以为和。扰乱敌人体内阴阳二气，" + (dur / 1000) + "秒内降低其" + spdReduce + "%攻击速度，并延长敌人已释放武功的冷却时间" + extendSec + "秒。";
             },
         },
         pfm_1: {
@@ -164,5 +167,21 @@ export default class extends SKILL {
         }
 
         me.set_temp("sk_taijishengong4", 1, 500);
+    }
+}
+
+/** 遍历目标所有已装备技能的绝招，延长其当前冷却时间 */
+function extend_enemy_cooldowns(target: CHARACTER, extendMs: number): void {
+    const bases: string[] = ['unarmed', 'sword', 'blade', 'club', 'staff', 'whip', 'throwing', 'dodge', 'force', 'parry'];
+    for (const base of bases) {
+        if (!target.skills) continue;
+        const base_skill = target.skills.get(base);
+        if (!base_skill || !base_skill.enable_skill) continue;
+        const sp_skill = SKILL.get(base_skill.enable_skill);
+        if (!sp_skill || !sp_skill.pfm) continue;
+        for (const key in sp_skill.pfm) {
+            const pfmitem: PERFORM = sp_skill.pfm[key];
+            pfmitem.change_distime(target, key, extendMs);
+        }
     }
 }

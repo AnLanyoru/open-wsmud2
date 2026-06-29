@@ -38,11 +38,8 @@ export interface PropMap {
     /** 命中 */ mz?: number;
     /** 躲闪 */ ds?: number;
     /** 招架 */ zj?: number;
-    /** 暴击 */ bj?: number;
-    /** 攻击速度 */ gjsd?: number;
-    /** 防御速度 */ fysd?: number;
-    /** 命中速度 */ mzsd?: number;
-    /** 躲闪速度 */ dssd?: number;
+    /** 暴击 % */ bj?: number;
+    /** 攻击速度 ms */ gjsd?: number;
 
     // ===== 百分比属性 =====
     /** 气血百分比加成 */ hp_per?: number;
@@ -58,8 +55,8 @@ export interface PropMap {
     /** 潜能获取百分比加成 */ pot_per?: number;
     /** 内力加力上限 */ limit_mp?: number;
     /** 内功抗性/减免 */ force_rad?: number;
-    /** 绝招释放时间（固定值减少） */ releasetime?: number;
-    /** 绝招冷却时间（固定值减少） */ distime?: number;
+    /** 绝招释放时间 ms */ releasetime?: number;
+    /** 绝招冷却时间 ms */ distime?: number;
     /** 内力消耗（固定值减少） */ expend_mp?: number;
     /** 内力消耗百分比减免 */ expend_mp_per?: number;
     /** 绝招释放时间百分比减免 */ releasetime_per?: number;
@@ -79,7 +76,6 @@ export interface PropMap {
     /** 采药经验 */ caiyao_exp?: number;
     /** 采药潜能 */ caiyao_pot?: number;
     /** 分解获得的玄晶 */ fenjie?: number;
-    /** 负面状态抵抗（数值） */ diff_downside?: number;
 
     // ===== 特殊属性 =====
     /** 抗暴击 */ diff_bj?: number;
@@ -93,6 +89,7 @@ export interface PropMap {
     /** 百分比忙乱减免 */ diff_busy_per?: number;
     /** 数值忙乱加成 */ busy?: number;
     /** 百分比忙乱加成 */ busy_per?: number;
+    /** 负面状态抵抗（数值） */ diff_downside?: number;
     /** 百分比负面状态抵抗 */ diff_downside_per?: number;
 
     /** 忽视防御 */ ignore_fy?: number;
