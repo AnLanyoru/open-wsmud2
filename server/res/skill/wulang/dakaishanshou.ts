@@ -14,18 +14,18 @@ export default class extends SKILL {
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [
         {
-            prop: 'slot_0',
+            prop: 'dkss_max',
             value: (lv: number) => 10,
-            format: (val: number) => '点石成金获取对方的防御和免伤上限增加10%',
+            format: (val: number) => `点石成金获取对方的防御和免伤上限增加${val}%`,
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
+            prop: 'dkss_sh',
+            value: (lv: number) => 1,
             format: (val: number) => '点石成金会同时对敌人造成伤害，命中后减少对方对应防御',
         },
         {
-            prop: 'slot_2',
-            value: (lv: number) => 10,
+            prop: 'dkss_zy',
+            value: (lv: number) => 1,
             format: (val: number) => '点石成金可偷取防御包括对方增益部分',
         },
     ];
@@ -44,7 +44,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        po: {
             name: "破岩击",
             distime: 15000,
             enable_skill: "unarmed",
@@ -61,7 +61,7 @@ export default class extends SKILL {
                 return "凝聚开山之力的重击，造成150%攻击力伤害，无视对方21%防御";
             },
         },
-        pfm_1: {
+        dian: {
             name: "点石成金",
             distime: 60000,
             enable_skill: "unarmed",
@@ -69,7 +69,7 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 点石成金
-                // 大开山手技，获取目标20%防御和免伤7秒内强化自身
+                // 大开山手技，获取目标20%基础防御和基础免伤7秒内强化自身
                 me.send_room("$N使出「点石成金」攻向$n。", target);
                 me.do_attack({ target, gj: me.gj, mz: me.mz });
                 me.end_attack(target);
