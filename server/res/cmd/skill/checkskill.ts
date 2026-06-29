@@ -29,7 +29,7 @@ export default class extends COMMAND {
         var target = player;
         if (from == "help" || num_reg.test(from)) {
             let lv = parseInt(from);
-            return player.send(skill_base.query_desc(player, lv > 0 && lv < 3000 ? lv : 1000));
+            return player.send(skill_base.query_desc(player, lv > 0 && lv < 5000 ? lv : 1000));
         } else if (from) {
             target = player.find_obj(from, player.environment);
             if (!target && player.user_level > 1) {

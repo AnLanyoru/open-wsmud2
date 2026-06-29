@@ -56,8 +56,8 @@ export default class extends SKILL {
     }
 
     on_dodge_over(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): void {
-        if (par.is_dodged && !me.query_temp("tyz2", 0)) {
-            const lv: number = me.query_skill("tyz2", 0);
+        if (par.is_dodged && !me.query_temp("sk_tiyunzong2", 0)) {
+            const lv: number = me.query_skill("sk_tiyunzong2", 0);
             const tyz_dc: number = me.query_prop("tyz_dc");
             const tyz_cd: number = me.query_prop("tyz_cd");
             const max_count: number = 10 + tyz_dc;
@@ -75,7 +75,7 @@ export default class extends SKILL {
                 override: 1,
                 max_count: max_count,
             });
-            me.set_temp("tyz2", 1, me.random(cd_base) + lv);
+            me.set_temp("sk_tiyunzong2", 1, me.random(cd_base) + lv);
         }
     }
 }
