@@ -950,7 +950,7 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 查询属性加值
+     * 查询属性加值，不用担心，保底一定返回0
      */
     query_prop(name: keyof PropMap | string): number {
         if (!name || name === 'desc') return 0;

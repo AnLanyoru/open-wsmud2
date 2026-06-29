@@ -87,8 +87,12 @@ export default class extends SKILL {
                 var nl = 100 + lv * 10;
                 var ts = me.team || [me];
                 for (var i = 0; i < ts.length; i++) {
-                    if (!ts[i].is_here(me)) continue;
-                    ts[i].add_status({
+                    const tg = ts[i]
+                    if (!tg.is_here(me)) continue;
+                    if (tg.query_temp("bmsg_add", 0)){
+                        tg.notify("你已经附加凝神诀的效果了。");
+                    }
+                    tg.add_status({
                         id: "force",
                         name: "北冥",
                         desc: "北冥神功之凝神诀，增加你的最大内力",
