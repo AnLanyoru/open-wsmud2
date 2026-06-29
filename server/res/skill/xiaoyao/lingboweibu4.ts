@@ -135,7 +135,7 @@ export default class extends SKILL {
                     target.mp = Math.floor(myMpRatio * target.max_mp);
 
                     me.send_room(
-                        "<him>$N阖目凝神，神游太虚，恍惚间不知$N之梦为$n欤，$n之梦为$N欤？\n霎时间虚实颠倒，庄周与蝶俱为一体——造化流转，彼我两忘！</him>",
+                        "<him>$N阖目凝神，神游太虚，恍惚间不知$N之梦为$n欤，$n之梦为$N欤？\n霎时间虚实颠倒，$N与$n俱为一体——造化流转，彼我两忘！</him>",
                         target,
                     );
                 } else {
