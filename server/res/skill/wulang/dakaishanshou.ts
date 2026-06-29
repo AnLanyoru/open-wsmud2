@@ -99,7 +99,7 @@ export default class extends SKILL {
         dian: {
             name: "点石成金",
             distime: 60000,
-            enable_skill: "unarmed",
+            enable_skill: "parry",
             mp: 50,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -107,18 +107,27 @@ export default class extends SKILL {
                 const stealPct = Math.min(maxCap, 15 + Math.floor(lv / 100));
                 const duration = Math.min(15, 5 + Math.floor(lv / 200)) * 1000;
 
-                // 获取目标防御和免伤
-                const targetFy = target.fy;
-                const targetDiffSh = target.query_prop("diff_sh_per") || 0;
+                const hasZy = !!me.query_prop("dkss_zy");
+                // 无进阶：按面板公式重算，排除 fy/fy_per/con 三个通道的状态增益
+                const targetFy = hasZy ? target.fy : Math.max(0, Math.floor((() => {
+                    const str = target.str, con = target.con;
+                    const fyNs = (target.query_prop("fy") || 0) - target.query_status_prop("fy");
+                    const conNs = (target.query_prop("con") || 0) - target.query_status_prop("con");
+                    const fyPerNs = (target.query_prop("fy_per") || 0) - target.query_status_prop("fy_per");
+                    return ((str + con) / 10 + fyNs + conNs * con / 10) * (100 + fyPerNs) / 100;
+                })()));
+                const targetSh = hasZy
+                    ? target.diff_sh_per
+                    : Math.max(0, (target.query_prop("diff_sh_per") || 0) - target.query_status_prop("diff_sh_per"));
                 const stolenFy = Math.floor(targetFy * stealPct / 100);
-                const stolenDiffSh = Math.floor(targetDiffSh * stealPct / 100);
+                const stolenDiffSh = Math.floor(targetSh * stealPct / 100);
 
-                me.send_room("<hic>$N使出「点石成金」，一掌探出，竟从$n身上汲取防御之力！</hic>", target);
+                me.send_room("<hio>$N双手结印，掌心泛出金玉光泽，周身筋骨竟发出金石交鸣之声！！</hio>", target);
 
                 // 对自身施加增益
                 me.add_status({
                     id: "dkss_dian_bf",
-                    name: "点石成金",
+                    name: "金石",
                     desc: `汲取了防御之力`,
                     duration: duration,
                     prop: {
@@ -134,12 +143,12 @@ export default class extends SKILL {
                         target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_msg: "<hic>$N趁势追击，掌风呼啸而至！</hic>",
+                        attack_msg: "<hic>紧跟着$N趁势追击，掌风呼啸而至！</hic>",
                     });
                     // 对目标施加减益
                     if (sh) target.add_status({
                         id: "dkss_dian_db",
-                        name: "金散",
+                        name: "破碎",
                         desc: `被大开山手重创，防御和免伤降低了`,
                         duration: duration,
                         downside: true,

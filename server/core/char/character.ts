@@ -959,6 +959,20 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 查询所有 add_status 对某属性的贡献总量（含叠层），用于区分永久属性与状态增益
+     */
+    query_status_prop(name: string): number {
+        if (!this.status) return 0;
+        let sum = 0;
+        for (const s of this.status) {
+            if (s.prop) {
+                sum += ((s.prop as Record<string, number>)[name] || 0) * (s.count || 1);
+            }
+        }
+        return sum;
+    }
+
+    /**
      * 查询内功加成比例
      */
     query_force_rad(): number {
