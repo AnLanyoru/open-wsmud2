@@ -17,7 +17,7 @@ export default class extends SKILL {
         "$N用$W往$n的$l刺去", "$N用$W往$n的$l砍去", "$N挥动$W,斩向$n的$l"
     ];
     desc = "逍遥派的一门奇特武功，其主要特点是不着形相，无迹可寻，可以模仿别人的绝学";
-    can_enables = ["unarmed", "sword"];
+    can_enables = ["unarmed", "sword", "blade"];
     learn_condition = {
         max_mp: 1000,
         skill: {

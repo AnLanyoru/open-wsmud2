@@ -93,7 +93,7 @@ export default class extends OBJ {
         }
 
         const q = QUALITIES[this.grade] ?? "传说";
-        me.notify(`<hiy>${fac.name} · ${UTIL.gradeColor(eq.name, this.grade)}（${q}）</hiy>`);
+        me.notify(`<hiy>${fac.name} · ${UTIL.gradeColor(eq.name, this.grade)}</hiy>`);
         me.notify(preview.get_desc(me));
 
         me.send_commands(

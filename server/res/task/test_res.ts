@@ -26,6 +26,7 @@ const need_test_objs: TestResRoot = {
         "七宝指环": ["eq/lv6/qibaozhihuan", 1],
         "金顶佛光": ["eq/lv6/jindingfoguang", 1],
         "盘古斧": ["eq/lv6/pangufu", 1],
+        "悟道之戒(测试)": ["eq/test/xuexidazuo", 1],
     },
     随从礼包: ["sp/npc#shuang", 10],
     技能传功玉简: {
