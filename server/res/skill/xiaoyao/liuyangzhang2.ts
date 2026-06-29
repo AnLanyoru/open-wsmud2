@@ -16,12 +16,12 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'lyz_ssf',
-            value: (lv: number) => 1000 + Math.floor(lv / 200) * 1000,
+            value: (lv: number) => 1000 + Math.min(Math.floor(lv / 200) * 1000, 4000),
             format: (val: number) => '生死符释放时间减少' + (val / 1000) + '秒',
         },
         {
             prop: 'lyz_bh',
-            value: (lv: number) => 10 + Math.floor(lv / 100),
+            value: (lv: number) => 10,
             format: (val: number) => '白虹掌力额外附加' + val + '%内力',
         },
     ];
