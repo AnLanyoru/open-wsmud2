@@ -67,7 +67,7 @@ export default class extends SKILL {
                 const duration = query_cx_duration(lv);
                 const perGj = query_qi_per(lv, me);
                 const totalGj = perGj * layers;
-                me.send_room("<hic>$N运转潮汐诀，将体内潮汐之力的浪劲尽数转化为攻击之势！</hic>", target);
+                me.send_room("<hic>$N默运潮汐诀，体内潮汐之力骤然澎湃，浪劲层层翻涌，尽数化作凌厉攻势！</hic>", target);
                 me.add_status({
                     id: "chaoxi_up",
                     name: "潮起",
@@ -77,7 +77,7 @@ export default class extends SKILL {
                         gj: totalGj,
                         mz: totalGj,
                     },
-                    finish_msg: "$N的潮起之势如退潮般渐渐消散。",
+                    finish_msg: "$N周身浪劲徐徐退去，潮起之势如落潮般渐归平静。",
                 });
             },
             query_desc: function(me: CHARACTER, lv: number): string {
@@ -104,7 +104,7 @@ export default class extends SKILL {
                 const perHp = perFy * 5;
                 const totalFy = perFy * layers;
                 const totalHp = perHp * layers;
-                me.send_room("<hic>$N运转潮汐诀，将体内潮汐之力的暗劲尽数转化为防御之势！</hic>", target);
+                me.send_room("<hic>$N默运潮汐诀，体内潮汐之力沉凝如渊，暗劲绵绵回流，尽数化作沉稳守势！</hic>", target);
                 me.add_status({
                     id: "chaoxi_down",
                     name: "潮落",
@@ -114,7 +114,7 @@ export default class extends SKILL {
                         fy: totalFy,
                         max_hp: totalHp,
                     },
-                    finish_msg: "$N的潮落之势如退潮般渐渐消散。",
+                    finish_msg: "$N周身暗劲徐徐退去，潮落之势如退潮般渐归平静。",
                 });
             },
             query_desc: function(me: CHARACTER, lv: number): string {

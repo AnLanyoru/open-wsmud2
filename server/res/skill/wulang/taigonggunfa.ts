@@ -65,7 +65,7 @@ export default class extends SKILL {
                     target,
                     gj: gj,
                     mz: me.mz,
-                    attack_msg: "<hic>$N手中$W如长丝缠卷，一式「缠丝钓」锁住$n身形，棍影如丝如缕，罩向$n。</hic>",
+                    attack_msg: "<hic>$N手中$W如长丝缠卷，一式「缠丝钓」封住$n退路，棍影千丝万缕，绵绵密密罩向$n周身。</hic>",
                 });
                 if (sh) {
                     target.add_status({
@@ -74,7 +74,7 @@ export default class extends SKILL {
                         duration: 8000,
                         is_busy: true,
                         downside: true,
-                        desc: "你被缠丝钓所制，忙乱不堪",
+                        desc: "你被缠丝钓所制",
                     }, me);
                 }
                 me.end_attack(target);
@@ -100,12 +100,12 @@ export default class extends SKILL {
                 const hasNoDodge = (me.query_prop("tggf_no_ds") || 0) > 0;
                 const hasNoParry = (me.query_prop("tggf_no_zj") || 0) > 0;
 
-                me.send_room("<hiy>$N长笑一声，$W忽抬指向天际，万千潮声聚于棍尖，一道无形潮线锁住$n，棍影如潮直取要害！</hiy>", target);
+                me.send_room("<hiy>$N朗声长笑，$W倏然指天，万顷潮声尽聚棍尖，一道无形潮线已将$n牢牢锁住，棍影如怒潮奔涌，直取其要害！</hiy>", target);
                 const sh = me.do_attack({
                     target,
                     gj: me.gj,
                     mz: me.mz,
-                    attack_msg: "<hiy>$N手中棍棒划出一道玄妙弧线，如太公垂钓般向$n的$l攻去。</hiy>",
+                    attack_msg: "<hiy>$N手中$W划出一道玄妙弧线，如太公垂纶于渭水，棍尖所向，$n的$l已在笼罩之中。</hiy>",
                 });
 
                 if (sh) {
@@ -124,7 +124,7 @@ export default class extends SKILL {
                             if (target.fight_type == 0) return false;
                             const baseDmg = Math.floor(casterGj * 0.8);
                             const dmg = Math.floor(baseDmg * (1 + DmgIncrease));
-                            target.from_attack(dmg, casterMz, '', `<hir>$N被愿者上钩的暗劲所伤。</hir>`);
+                            target.from_attack(dmg, casterMz, '', `<hir>$N身形一颤，被愿者上钩的暗劲震得气血翻腾。</hir>`);
                         },
                         intervalMs,
                         tickCount,
@@ -135,7 +135,7 @@ export default class extends SKILL {
                             if (hasNoDodge) {
                                 target.is_rash = 0;
                             }
-                            target.send_room("$N从愿者上钩的束缚中挣脱出来。", target);
+                            target.send_room("$N浑身一震，终于从愿者上钩的束缚中挣脱出来。", target);
                         },
                     );
                 }
