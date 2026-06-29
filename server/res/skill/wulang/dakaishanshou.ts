@@ -78,8 +78,8 @@ export default class extends SKILL {
             mp: 29,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                const dmgPct = Math.min(500, 100 + Math.floor(lv / 10));
-                const ignoreDef = 20 + Math.floor(lv / 300);
+                const dmgPct = query_po_dmg_pct(lv);
+                const ignoreDef = query_po_ignore_def(lv);
                 const gj = Math.floor(me.gj * dmgPct / 100);
                 me.send_room("<hic>$N凝聚开山之力，一招「破岩击」重重轰向$n！</hic>", target);
                 me.do_attack({
@@ -91,8 +91,8 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
-                const dmgPct = Math.min(500, 100 + Math.floor(lv / 10));
-                const ignoreDef = 20 + Math.floor(lv / 300);
+                const dmgPct = query_po_dmg_pct(lv);
+                const ignoreDef = query_po_ignore_def(lv);
                 return `凝聚开山之力的重击，造成${dmgPct}%攻击力伤害，无视对方${ignoreDef}%防御`;
             },
         },
@@ -103,9 +103,8 @@ export default class extends SKILL {
             mp: 50,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                const maxCap = 50 + (me.query_prop("dkss_max") || 0);
-                const stealPct = Math.min(maxCap, 15 + Math.floor(lv / 100));
-                const duration = Math.min(15, 5 + Math.floor(lv / 200)) * 1000;
+                const stealPct = query_dian_steal_pct(lv, me);
+                const duration = query_dian_duration(lv);
 
                 const hasZy = !!me.query_prop("dkss_zy");
                 // 无进阶：按面板公式重算，排除 fy/fy_per/con 三个通道的状态增益
@@ -162,11 +161,31 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
-                const maxCap = 50 + (me.query_prop("dkss_max") || 0);
-                const stealPct = Math.min(maxCap, 15 + Math.floor(lv / 100));
-                const duration = Math.min(15, 5 + Math.floor(lv / 200));
+                const stealPct = query_dian_steal_pct(lv, me);
+                const duration = query_dian_duration(lv) / 1000;
                 return `大开山手技，获取目标${stealPct}%防御和免伤${duration}秒内强化自身`;
             },
         },
     };
+}
+
+/** 破岩击 — 伤害百分比 */
+function query_po_dmg_pct(lv: number): number {
+    return Math.min(500, 100 + Math.floor(lv / 10));
+}
+
+/** 破岩击 — 无视防御百分比 */
+function query_po_ignore_def(lv: number): number {
+    return 20 + Math.floor(lv / 300);
+}
+
+/** 点石成金 — 偷取百分比（含进阶上限加成） */
+function query_dian_steal_pct(lv: number, me: CHARACTER): number {
+    const maxCap = 50 + (me.query_prop("dkss_max") || 0);
+    return Math.min(maxCap, 15 + Math.floor(lv / 100));
+}
+
+/** 点石成金 — 持续时间（毫秒） */
+function query_dian_duration(lv: number): number {
+    return Math.min(15, 5 + Math.floor(lv / 200)) * 1000;
 }

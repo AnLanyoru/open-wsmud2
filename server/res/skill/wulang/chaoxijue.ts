@@ -64,10 +64,8 @@ export default class extends SKILL {
                     return;
                 }
                 me.remove_status("chaoxi", true);
-                const duration = Math.min(30, 10 + Math.floor(lv / 100)) * 1000;
-                const base = 10 + Math.floor(lv / 2);
-                const extra = me.query_prop("cxj_gm") || 0;
-                const perGj = base + extra;
+                const duration = query_cx_duration(lv);
+                const perGj = query_qi_per(lv, me);
                 const totalGj = perGj * layers;
                 me.send_room("<hic>$N运转潮汐诀，将体内潮汐之力的浪劲尽数转化为攻击之势！</hic>", target);
                 me.add_status({
@@ -83,10 +81,8 @@ export default class extends SKILL {
                 });
             },
             query_desc: function(me: CHARACTER, lv: number): string {
-                const duration = Math.min(30, 10 + Math.floor(lv / 100));
-                const base = 10 + Math.floor(lv / 2);
-                const extra = me.query_prop("cxj_gm") || 0;
-                const per = base + extra;
+                const duration = query_cx_duration(lv) / 1000;
+                const per = query_qi_per(lv, me);
                 return `消耗所有潮汐层数，${duration}秒内每一层潮汐提升${per}攻击与命中`;
             },
         },
@@ -103,10 +99,8 @@ export default class extends SKILL {
                     return;
                 }
                 me.remove_status("chaoxi", true);
-                const duration = Math.min(30, 10 + Math.floor(lv / 100)) * 1000;
-                const base = 10 + Math.floor(lv / 2);
-                const extra = me.query_prop("cxj_fq") || 0;
-                const perFy = base + extra;
+                const duration = query_cx_duration(lv);
+                const perFy = query_luo_per(lv, me);
                 const perHp = perFy * 5;
                 const totalFy = perFy * layers;
                 const totalHp = perHp * layers;
@@ -124,13 +118,30 @@ export default class extends SKILL {
                 });
             },
             query_desc: function(me: CHARACTER, lv: number): string {
-                const duration = Math.min(30, 10 + Math.floor(lv / 100));
-                const base = 10 + Math.floor(lv / 2);
-                const extra = me.query_prop("cxj_fq") || 0;
-                const perFy = base + extra;
+                const duration = query_cx_duration(lv) / 1000;
+                const perFy = query_luo_per(lv, me);
                 const perHp = perFy * 5;
                 return `消耗所有潮汐层数，${duration}秒内每一层潮汐提升${perFy}防御和${perHp}气血`;
             },
         },
     };
+}
+
+/** 潮起/潮落 — 持续时间（毫秒） */
+function query_cx_duration(lv: number): number {
+    return Math.min(30, 10 + Math.floor(lv / 100)) * 1000;
+}
+
+/** 潮起 — 每层攻击与命中（含进阶加成） */
+function query_qi_per(lv: number, me: CHARACTER): number {
+    const base = 10 + Math.floor(lv / 2);
+    const extra = me.query_prop("cxj_gm") || 0;
+    return base + extra;
+}
+
+/** 潮落 — 每层防御（含进阶加成） */
+function query_luo_per(lv: number, me: CHARACTER): number {
+    const base = 10 + Math.floor(lv / 2);
+    const extra = me.query_prop("cxj_fq") || 0;
+    return base + extra;
 }
