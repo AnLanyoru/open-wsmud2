@@ -2,6 +2,7 @@ import {ROOM} from "../../../../core/room/room.js";
 import {WORLD} from "../../../../core/world.js";
 import type {CHARACTER} from "../../../../core/char/character.js";
 import biwu from "../../../cmd/extend/biwu.js";
+import type { USER } from "../../../../core/char/user.js";
 
 export default class BiWuLeiTaiRoom extends ROOM {
     name = "擂台";
@@ -57,7 +58,7 @@ export default class BiWuLeiTaiRoom extends ROOM {
         return true;
     }
 
-    surrender(me: CHARACTER) {
+    surrender(me: USER) {
         let biwu_cmd = WORLD.COMMANDS.biwu as biwu
         if (biwu_cmd) {
             biwu_cmd.surrender(me);
