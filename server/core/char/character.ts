@@ -381,7 +381,7 @@ export class CHARACTER extends ITEM {
     auto_skills: AutoSkillEntry[] | null = null;
     /** 当前攻击部位 */
     attack_part: AttackPart | null = null;
-    /** 忙乱状态倒计时 */
+    /** 忙乱状态（不可行动，不可招架）倒计时 */
     is_busy: number = 0;
     /** 昏迷状态倒计时 */
     is_faint: number = 0;
@@ -389,7 +389,7 @@ export class CHARACTER extends ITEM {
     ig_control: number = 0;
     /** 闪避状态倒计时 */
     is_miss: number = 0;
-    /** 鲁莽状态倒计时 */
+    /** 无法闪避状态倒计时 */
     is_rash: number = 0;
     /** 分身状态倒计时 */
     is_shadow: number = 0;
