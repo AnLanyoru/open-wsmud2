@@ -34,12 +34,6 @@ export default class extends SKILL {
             no_copy: true,
             allow_busy: true,
             release_time: 3000,
-            query_releasetime(me: CHARACTER, lv: number): number {
-                return this.release_time!;
-            },
-            query_distime(me: CHARACTER, lv: number) {
-                return this.distime!;
-            },
             query_name(me: CHARACTER, type: string) {
                 if (!type) return this.name!;
                 return "无相" + ALLOW_TYPES.get(type);
@@ -60,9 +54,6 @@ export default class extends SKILL {
                 }
                 if (pfm.no_copy) return me.notify_fail("这个绝招不能模仿。");
                 if (me.is_busy && !pfm.allow_busy) return me.notify_fail("你现在正手忙脚乱，无法模仿别人的技能。");
-                //if (pfm.enable_skill && !me.skills["xiaowuxianggong"][pfm.enable_skill]) {
-                //    return me.notify_fail("<cyn>你的小无相功需要装备为" + SKILL.get(pfm.enable_skill).name + "才可以使用【" + pfm.name + "】。</cyn>");
-                //}
                 var isEnable = false;
                 if (pfm.enable_skill) {
                     if (sk === pfm.enable_skill) {
@@ -99,12 +90,14 @@ export default class extends SKILL {
             no_copy: true,
             release_time: 3000,
             query_releasetime(me: CHARACTER, lv: number): number {
-                return this.release_time!;
+                return me.query_temp("wuwo_gcd", this.release_time!);
             },
-            query_distime(me: CHARACTER, lv: number) {
-                return this.distime!;
+            query_distime(me: CHARACTER, lv: number, isref?: boolean) {
+                let dis = me.query_temp("wuwo_cd", this.distime!);
+                if (isref) dis *= SKILL.REF_CD;
+                return dis;
             },
-            query_name(me, type): string {
+            query_name(me: CHARACTER, type: string): string {
                 if (!type) return this.name!;
                 return "无我" + ALLOW_TYPES.get(type);
             },
@@ -140,8 +133,8 @@ export default class extends SKILL {
                 var up = 70 + parseInt(lv / 100);
                 if (up > 100) up = 100;
                 me.use_pfm(target, pfm, parseInt(up * lv / 100), sk);
-                this.distime = pfm.query_distime(me, lv);
-                this.release_time = pfm.query_releasetime(me, lv);
+                me.set_temp("wuwo_cd", pfm.query_distime(me, lv));
+                me.set_temp("wuwo_gcd", pfm.query_releasetime(me, lv));
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 lv = 70 + parseInt(lv / 100);

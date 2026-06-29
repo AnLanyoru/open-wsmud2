@@ -116,6 +116,14 @@ export default class extends SKILL {
                 if (!type) return this.name!;
                 return "无我" + ALLOW_TYPES.get(type);
             },
+            query_releasetime(me: CHARACTER, lv: number): number {
+                return me.query_temp("wuwo_gcd", this.release_time!);
+            },
+            query_distime(me: CHARACTER, lv: number, isref?: boolean) {
+                let dis = me.query_temp("wuwo_cd", this.distime!);
+                if (isref) dis *= SKILL.REF_CD;
+                return dis;
+            },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk: string): void | boolean {
                 const prev: string = me.query_temp("copy_pfm_" + sk, String(''));
                 const baseSkill = SKILL.get(sk);
@@ -149,6 +157,8 @@ export default class extends SKILL {
 
                 const up: number = Math.min(70 + Math.floor(lv / 100), 100);
                 me.use_pfm(target, pfm, Math.floor(up * lv / 100), sk);
+                me.set_temp("wuwo_cd", pfm.query_distime(me, lv));
+                me.set_temp("wuwo_gcd", pfm.query_releasetime(me, lv));
             },
             query_desc(_me: CHARACTER, lv: number): string {
                 const up: number = Math.min(70 + Math.floor(lv / 100), 100);
