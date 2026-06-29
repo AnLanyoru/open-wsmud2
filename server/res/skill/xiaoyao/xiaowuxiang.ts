@@ -196,7 +196,3 @@ const ALLOW_TYPES = {
     sword: "(剑法)",
     unarmed: "(拳脚)"
 };
-const ALLOW_RECORD = {
-    sword: true,
-    unarmed: true
-};
