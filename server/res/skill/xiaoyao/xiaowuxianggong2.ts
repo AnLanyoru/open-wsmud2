@@ -62,7 +62,7 @@ export default class extends SKILL {
             release_time: 4000,
             query_name(_me: CHARACTER, type: string): string {
                 if (!type) return this.name!;
-                return "无相" + ALLOW_TYPES[type];
+                return "无相" + ALLOW_TYPES.get(type);
             },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk: string): void | boolean {
                 const prev: string = target.query_temp("used_pfm", String(''));
@@ -114,7 +114,7 @@ export default class extends SKILL {
             release_time: 4000,
             query_name(_me: CHARACTER, type: string): string {
                 if (!type) return this.name!;
-                return "无我" + ALLOW_TYPES[type];
+                return "无我" + ALLOW_TYPES.get(type);
             },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk: string): void | boolean {
                 const prev: string = me.query_temp("copy_pfm_" + sk, String(''));
@@ -158,8 +158,8 @@ export default class extends SKILL {
     };
 }
 
-const ALLOW_TYPES: Record<string, string> = {
-    force: "(内功)",
-    sword: "(剑法)",
-    unarmed: "(拳脚)",
-};
+const ALLOW_TYPES: Map<string, string> = new Map([
+    ["force", "(内功)"],
+    ["sword", "(剑法)"],
+    ["unarmed", "(拳脚)"],
+]);

@@ -63,7 +63,7 @@ export default class extends SKILL {
                     return me.notify('这里无法逃脱。');
                 var list = Object.keys(me.environment.exits);
                 if (!list.length) return me.notify('这里无法逃脱。');
-                let func = YS_ROOMS[me.environment.path];
+                let func = YS_ROOMS.get(me.environment.path);
                 if (func && func(me, list) === false) return;
                 me.send_room("\n<blk>$N的身形一闪，渐渐模糊不见了。<blk>\n");
                 me.end_fight();
@@ -90,15 +90,15 @@ export default class extends SKILL {
     }
 }
 
-const YS_ROOMS = {
-    "yz/leitai/leitai": function (me) {
+const YS_ROOMS: Map<string, (...args: any[]) => any> = new Map([
+    ["yz/leitai/leitai", function (me) {
         me.send_room("\n<blk>$N的身形一闪，渐渐模糊不见了。<blk>\n");
-    },
-    'wudao/ta': function (me, list) {
+    }],
+    ['wudao/ta', function (me, list) {
         let lv = me.query_temp('wd_level', 0);
         if (lv >= 89) {
             list.length = 1;
             list[0] = 'out';
         }
-    }
-};
+    }],
+]);

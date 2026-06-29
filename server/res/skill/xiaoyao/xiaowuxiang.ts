@@ -42,7 +42,7 @@ export default class extends SKILL {
             },
             query_name(me: CHARACTER, type: string) {
                 if (!type) return this.name!;
-                return "无相" + ALLOW_TYPES[type];
+                return "无相" + ALLOW_TYPES.get(type);
             },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk) {
                 var prev = target.query_temp("used_pfm", String(''));
@@ -68,27 +68,13 @@ export default class extends SKILL {
                     if (sk === pfm.enable_skill) {
                         isEnable = true;
                     } else {
-
                         return me.notify_fail(this.query_name(me, sk) + "不能模仿" + pfm.name + "。");
-                        // return me.notify_fail("<cyn>你的小无相功目前只可以模仿武器和拳脚技能。</cyn>");
                     }
-                    // if (pfm.enable_skill === "force" ||
-                    //     pfm.enable_skill === "parry" || pfm.enable_skill === "dodge") {
-                    //     return me.notify_fail("<cyn>你的小无相功目前只可以模仿武器和拳脚技能。</cyn>");
-                    // }
-                    // isEnable = me.skills["xiaowuxianggong"][pfm.enable_skill];
-                    // if (pfm.enable_skill === "unarmed" && !isEnable) {
-                    //     return me.notify_fail("<cyn>你的小无相功需要装备为拳脚技能才可以模仿拳脚。</cyn>");
-                    // }
-
 
                 }
                 var up = 80 + parseInt(lv / 40);
                 if (up > 100) up = 100;
                 me.use_pfm(target, pfm, parseInt(up * lv / 100), sk);
-
-                this.distime = pfm.query_distime(me, lv);
-                this.release_time = pfm.query_releasetime(me, lv);
 
                 if (sp_skill.grade <= 4 && isEnable && !me.is_in("yz/leitai/leitai") &&
                     sp_skill.family !== FAMILIES.MONSTER) {
@@ -120,7 +106,7 @@ export default class extends SKILL {
             },
             query_name(me, type): string {
                 if (!type) return this.name!;
-                return "无我" + ALLOW_TYPES[type];
+                return "无我" + ALLOW_TYPES.get(type);
             },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk: string) {
                 var prev = me.query_temp("copy_pfm_" + sk, String(''));
@@ -191,8 +177,8 @@ export default class extends SKILL {
     }
 }
 
-const ALLOW_TYPES = {
-    blade: "(刀法)",
-    sword: "(剑法)",
-    unarmed: "(拳脚)"
-};
+const ALLOW_TYPES: Map<string, string> = new Map([
+    ["blade", "(刀法)"],
+    ["sword", "(剑法)"],
+    ["unarmed", "(拳脚)"],
+]);
