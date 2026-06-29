@@ -137,13 +137,13 @@ function query_cx_duration(lv: number): number {
 /** 潮起 — 每层攻击与命中（含进阶加成） */
 function query_qi_per(lv: number, me: CHARACTER): number {
     const base = 10 + Math.floor(lv / 2);
-    const extra = me.query_prop("cxj_gm") || 0;
+    const extra = me.query_prop("cxj_gm");
     return base + extra;
 }
 
 /** 潮落 — 每层防御（含进阶加成） */
 function query_luo_per(lv: number, me: CHARACTER): number {
     const base = 10 + Math.floor(lv / 2);
-    const extra = me.query_prop("cxj_fq") || 0;
+    const extra = me.query_prop("cxj_fq");
     return base + extra;
 }

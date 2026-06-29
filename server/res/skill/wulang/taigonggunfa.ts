@@ -96,9 +96,9 @@ export default class extends SKILL {
                 const tickCount = Math.max(Math.floor(stunDuration / intervalMs), 1);
                 const casterGj = me.gj;
                 const casterMz = me.mz;
-                const DmgIncrease = me.query_prop("tggf_sh") / 100 || 0;
-                const hasNoDodge = (me.query_prop("tggf_no_ds") || 0) > 0;
-                const hasNoParry = (me.query_prop("tggf_no_zj") || 0) > 0;
+                const DmgIncrease = me.query_prop("tggf_sh") / 100;
+                const hasNoDodge = me.query_prop("tggf_no_ds") > 0;
+                const hasNoParry = me.query_prop("tggf_no_zj") > 0;
 
                 me.send_room("<hiy>$N朗声长笑，$W倏然指天，万顷潮声尽聚棍尖，一道无形潮线已将$n牢牢锁住，棍影如怒潮奔涌，直取其要害！</hiy>", target);
                 const sh = me.do_attack({

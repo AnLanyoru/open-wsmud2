@@ -110,14 +110,14 @@ export default class extends SKILL {
                 // 无进阶：按面板公式重算，排除 fy/fy_per/con 三个通道的状态增益
                 const targetFy = hasZy ? target.fy : Math.max(0, Math.floor((() => {
                     const str = target.str, con = target.con;
-                    const fyNs = (target.query_prop("fy") || 0) - target.query_status_prop("fy");
-                    const conNs = (target.query_prop("con") || 0) - target.query_status_prop("con");
-                    const fyPerNs = (target.query_prop("fy_per") || 0) - target.query_status_prop("fy_per");
+                    const fyNs = target.query_prop("fy") - target.query_status_prop("fy");
+                    const conNs = target.query_prop("con") - target.query_status_prop("con");
+                    const fyPerNs = target.query_prop("fy_per") - target.query_status_prop("fy_per");
                     return ((str + con) / 10 + fyNs + conNs * con / 10) * (100 + fyPerNs) / 100;
                 })()));
                 const targetSh = hasZy
                     ? target.diff_sh_per
-                    : Math.max(0, (target.query_prop("diff_sh_per") || 0) - target.query_status_prop("diff_sh_per"));
+                    : Math.max(0, target.query_prop("diff_sh_per") - target.query_status_prop("diff_sh_per"));
                 const stolenFy = Math.floor(targetFy * stealPct / 100);
                 const stolenDiffSh = Math.floor(targetSh * stealPct / 100);
 
@@ -181,7 +181,7 @@ function query_po_ignore_def(lv: number): number {
 
 /** 点石成金 — 偷取百分比（含进阶上限加成） */
 function query_dian_steal_pct(lv: number, me: CHARACTER): number {
-    const maxCap = 50 + (me.query_prop("dkss_max") || 0);
+    const maxCap = 50 + me.query_prop("dkss_max");
     return Math.min(maxCap, 15 + Math.floor(lv / 100));
 }
 

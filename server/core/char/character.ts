@@ -966,7 +966,7 @@ export class CHARACTER extends ITEM {
         let sum = 0;
         for (const s of this.status) {
             if (s.prop) {
-                sum += ((s.prop as Record<string, number>)[name] || 0) * (s.count || 1);
+                sum += (s.prop[name] || 0) * (s.count || 1);
             }
         }
         return sum;

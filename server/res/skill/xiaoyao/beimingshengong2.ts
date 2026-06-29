@@ -125,11 +125,11 @@ export default class extends SKILL {
 
     do_force_attack(me: CHARACTER, target: CHARACTER): number {
         if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
-            let cd = 4000 - (me.query_prop("bmsg_cd") || 0);
+            let cd = 4000 - me.query_prop("bmsg_cd");
             if (cd < 1000) cd = 1000;
             if (!me.query_temp("sk_beiming", 0)) {
                 me.set_temp("sk_beiming", 1, cd);
-                const nl = (me.query_prop("bmsg_nl") || 0);
+                const nl = me.query_prop("bmsg_nl");
                 const gj = Math.round(me.query_skill("beimingshengong2", 0) / 10) + nl;
                 const mp = Math.floor(gj * 120 / 100);
                 if (target.max_mp > mp) {
@@ -149,11 +149,11 @@ export default class extends SKILL {
         if (par.is_parried) {
             if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
                 const lv = me.query_skill("beimingshengong2", 0);
-                let cd = 4000 - (me.query_prop("bmsg_cd") || 0);
+                let cd = 4000 - me.query_prop("bmsg_cd");
                 if (cd < 1000) cd = 1000;
                 if (!me.query_temp("sk_beiming_parry", 0)) {
                     me.set_temp("sk_beiming_parry", 1, cd);
-                    const nl = (me.query_prop("bmsg_nl") || 0);
+                    const nl = me.query_prop("bmsg_nl");
                     const gj = Math.round(lv / 10) + nl;
                     const mp = Math.floor(gj * 120 / 100);
                     if (target.mp > mp) {
