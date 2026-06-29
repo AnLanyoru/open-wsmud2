@@ -1,81 +1,159 @@
-import {SKILL, PERFORM} from "../../../core/skill/skill.js";
-import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import type { PropMap } from "../../../types/props.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "太极剑法";
     id = "taijijian3";
+    source_skill = "taijijian2";
     grade = 6;
     family = FAMILIES.WUDANG;
     is_hidden = true;
     desc = "由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一";
     can_enables = ["sword"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = SKILL.get("taijijian")?.attack_actions || [];
+
+    query_prop(lv: number, _me?: CHARACTER): PropMap {
+        return {
+            int: 10 + Math.floor(lv / 6),
+            zj_per: Math.floor(lv / 300) + 5,
+        };
+    }
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
                 gj: 20 + lv * 2,
-                mz: 6,
+                mz: 20 + lv * 2,
                 zj: 20 + lv * 2,
+                mz_per: Math.floor(lv / 300) + 3,
             },
-            // Global/base properties:
-            // {"int":176,"zj_per":8} 
         };
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        chan: {
             name: "缠字诀",
             distime: 19000,
             enable_skill: "sword",
             mp: 30,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 缠字诀
-                // 以连绵不绝的攻势迷惑附近敌人，使之无法脱身，13秒内处于忙乱状态。
-                me.send_room("$N使出「缠字诀」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
+                // 以连绵不绝的攻势迷惑附近敌人，使之无法脱身，忙乱状态持续(3+lv*0.01)秒，无额外冷却惩罚。
+                if (!me.enemy || !me.enemy.length) return;
+                const list: CHARACTER[] = [];
+                for (const x of me.enemy) {
+                    if (x.check_character()) {
+                        list.push(x);
+                    }
+                }
+                if (!list.length) return;
+
+                const time: number = Math.min(lv * 10 + 3000, 13000);
+
+                me.send_room("<CYN>$N剑势一展，使出太极剑法「缠字诀」，剑光如织，连绵不绝地卷向周围敌人！</CYN>");
+
+                for (const enemy of list) {
+                    enemy.add_status({
+                        id: "busy",
+                        name: "忙乱",
+                        desc: "你被太极剑法的缠字诀困住，无法脱身。",
+                        duration: time,
+                        is_busy: true,
+                        downside: true,
+                    }, me);
+                }
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "以连绵不绝的攻势迷惑附近敌人，使之无法脱身，13秒内处于忙乱状态。";
+            query_desc: function (_me: CHARACTER, lv: number): string {
+                const time: number = Math.min(lv * 10 + 3000, 13000) / 1000;
+                return "以连绵不绝的攻势迷惑附近敌人，使之无法脱身，" + time + "秒内处于忙乱状态。";
             },
         },
-        pfm_1: {
+        lian: {
             name: "连字诀",
             distime: 14250,
             enable_skill: "sword",
             mp: 10,
             release_time: 3000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 连字诀
-                // 快速出剑，瞬间对附近敌人快速攻击7次，攻击中命中增加100%，初始附加自己3%的内力伤害
-                me.send_room("$N使出「连字诀」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
+                // 快速出剑，瞬间对附近敌人快速攻击3+lv/100次（上限7次），攻击中命中增加100%，初始附加自己3%的内力伤害
+                if (!me.enemy || !me.enemy.length) return;
+                const atkCount: number = Math.min(Math.floor(lv / 100) + 3, 7);
+                const mz: number = Math.floor(me.mz * 2);
+                const powerGj: number = Math.floor(me.max_mp * 0.03);
+
+                const list: CHARACTER[] = [];
+                for (const x of me.enemy) {
+                    if (x.check_character()) {
+                        list.push(x);
+                    }
+                }
+                if (!list.length) return;
+
+                me.send_room("<HIY>$N剑法陡然加快，使出了太极剑法「连字诀」，剑光如电，瞬间向周围敌人连刺而出！</HIY>");
+
+                for (const enemy of list) {
+                    for (let i = 0; i < atkCount; i++) {
+                        me.do_attack({
+                            target: enemy,
+                            gj: me.gj,
+                            mz: mz,
+                            attack_before: "紧跟着",
+                            power_gj: powerGj,
+                        });
+                    }
+                    me.end_attack(enemy);
+                }
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "快速出剑，瞬间对附近敌人快速攻击7次，攻击中命中增加100%，初始附加自己3%的内力伤害";
+            query_desc: function (me: CHARACTER, lv: number): string {
+                const atkCount: number = Math.min(Math.floor(lv / 100) + 3, 7);
+                const powerGj: number = Math.floor(me.max_mp * 0.03);
+                return "快速出剑，瞬间对附近敌人快速攻击" + atkCount + "次，攻击中命中增加100%，初始附加自己3%(" + powerGj + ")的内力伤害";
             },
         },
-        pfm_2: {
+        sui: {
             name: "随字决",
             distime: 19000,
             enable_skill: "sword",
             mp: 10,
             release_time: 3000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 随字决
-                // 造成300%攻击力的伤害，命中后使对方在13秒内降低15%战斗属性
-                me.send_room("$N使出「随字决」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+                // 造成攻击力百分比伤害，命中后使对方降低战斗属性
+                const gjPer: number = 100 + Math.floor(lv / 5);
+                const per: number = 10 + Math.floor(lv / 200);
+                const time: number = lv * 10 + 3000;
+
+                if (me.do_attack({
+                    target: target,
+                    gj: Math.floor(me.gj * gjPer / 100),
+                    mz: me.mz,
+                    attack_msg: "<HIM>$N剑随意走，使出太极剑法「随字决」，四周真气涌动化为数个大小太极，向$n刺去！</HIM>",
+                    damage_msg: "<red>只见$n被剑气击中，真气紊乱，感觉眼前的景物似幻似真，几乎要站立不住！</red>",
+                })) {
+                    target.add_status({
+                        id: "sui",
+                        name: "太极",
+                        desc: "你的战斗属性降低了" + per + "%",
+                        duration: time,
+                        downside: true,
+                        prop: {
+                            mz_per: -per,
+                            ds_per: -per,
+                            gj_per: -per,
+                            fy_per: -per,
+                        },
+                        finish_msg: "<CYN>$N从太极剑的影响中恢复过来。</CYN>",
+                    }, me);
+                }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "造成300%攻击力的伤害，命中后使对方在13秒内降低15%战斗属性";
+            query_desc: function (_me: CHARACTER, lv: number): string {
+                const gjPer: number = 100 + Math.floor(lv / 5);
+                const per: number = 10 + Math.floor(lv / 200);
+                const time: number = (lv * 10 + 3000) / 1000;
+                return "造成" + gjPer + "%攻击力的伤害，命中后使对方在" + time + "秒内降低" + per + "%战斗属性";
             },
         },
     };
