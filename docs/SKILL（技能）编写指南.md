@@ -1342,6 +1342,70 @@ somePfm: {
 
 如果定义了 `query_releasetime` 方法，它会完全覆盖默认的出招时间计算逻辑，此时 `release_time` 字段不会被使用。
 
+### 12.10 按位置限制绝招（check + base_type）
+
+当一个技能有多个 `can_enables`（如 `["sword", "unarmed", "force"]`），某些绝招可能只应在部分位置生效。框架提供了两种方式：
+
+#### 方式一：`enable_skill` 白名单（单位置）
+
+`enable_skill` 指定绝招**只能**在哪个基础技能类型下使用。比如技能可装备为 `["force", "parry"]`，但某个绝招只在内功位置生效：
+
+```typescript
+pfm_0: {
+    name: "鲲字诀",
+    enable_skill: "force",   // 只能在 force 位置使用，parry 位置不可用
+    // ...
+}
+```
+
+**效果：** 战斗面板中其他位置不显示该绝招；手动使用会提示"需要装备为XX才可以使用"；自动绝招也会跳过。
+
+**局限：** `enable_skill` 是单值，只能选**一个**位置。无法表达"sword 和 unarmed 可用，force 不可用"。
+
+#### 方式二：`check` 回调黑白名单（多位置）
+
+`check` 回调接收第三个参数 `base_type`，可以按位置做任意判断：
+
+```typescript
+wuwo: {
+    name: "无我",
+    // 允许 sword 和 unarmed，禁止 force
+    check: (_me: CHARACTER, _lv: number, base_type?: string) => base_type !== 'force',
+    // ...
+}
+```
+
+**`check` 在不同场景的行为：**
+
+| 场景 | `check` 返回 `false` | `check` 返回 `true` |
+|------|---------------------|--------------------|
+| 战斗面板 (`on_skillchanged`) | **不显示该绝招** | 正常显示 |
+| 手动使用 (`perform force.wuwo`) | 静默拦截，无法使用 | 正常执行 |
+| 自动绝招 (`add_auto_pfm`) | 不加入自动队列 | 正常加入 |
+| `cha` 查看技能 | 显示为红色不可用（不传 `base_type`，无法按位置判断） | 显示为青色可用 |
+
+**注意：** `cha` 命令展示技能详情时不传 `base_type`，因此 `check` 在 `cha` 中无法做位置判断。位置隐藏只在战斗面板和实际使用时生效。
+
+**完整示例（小无相功的无我绝招）：**
+
+```typescript
+wuwo: {
+    name: "无我",
+    distime: 20000,
+    mp: 40,
+    no_copy: true,
+    allow_busy: true,
+    release_time: 4000,
+    // force 位置不显示、不可用，sword/unarmed 正常
+    check: (_me: CHARACTER, _lv: number, base_type?: string) => base_type !== 'force',
+    use(me: CHARACTER, target: CHARACTER, lv: number, sk: string): void | boolean {
+        // sk 是当前启用位置（"sword" / "unarmed" / "force"）
+        // check 已拦截 force，此处 sk 只会是 sword 或 unarmed
+        // ...
+    },
+}
+```
+
 ---
 
 ## 13. 战斗回调 hook 详解

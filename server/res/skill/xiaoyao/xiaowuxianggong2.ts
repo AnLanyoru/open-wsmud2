@@ -1,7 +1,7 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {WEAPON_TYPE} from "../../../core/const.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { WEAPON_TYPE } from "../../../core/const.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -93,11 +93,13 @@ export default class extends SKILL {
                 const up: number = Math.min(60 + Math.floor(lv / 40), 100);
                 me.use_pfm(target, pfm, Math.floor(up * lv / 100), sk);
 
-                if (spSkill.grade <= 5 && isEnable && !me.is_in("yz/leitai/leitai") &&
-                    spSkill.family !== FAMILIES.MONSTER) {
-                    me.notify("\n<hic>你学会了绝招【" + pfm.name + "】，可以使用【无我】释放。<hic>");
-                    me.remove_temp('copy_pfm');
-                    me.set_temp("copy_pfm_" + pfm.enable_skill, prev);
+                if (sk !== 'force'
+                    && spSkill.grade <= 5
+                    && isEnable
+                    && !me.is_in("yz/leitai/leitai")
+                    && spSkill.family !== FAMILIES.MONSTER) {
+                    me.send(`{type:"warn",content:"你学会了绝招【${pfm.name}】，是否记录到【无我】？",time:60000,cmds:[{cmd:"xwxcopy ${pfm.enable_skill}",name:"记录"},{cmd:"",name:"放弃"}]}`);
+                    me.set_temp('copy_pfm', prev, 60000);
                 }
             },
             query_desc(_me: CHARACTER, lv: number): string {
@@ -112,6 +114,7 @@ export default class extends SKILL {
             no_copy: true,
             allow_busy: true,
             release_time: 4000,
+            check: (_me: CHARACTER, _lv: number, base_type?: string) => base_type !== 'force',
             query_name(_me: CHARACTER, type: string): string {
                 if (!type) return this.name!;
                 return "无我" + ALLOW_TYPES.get(type);
@@ -125,7 +128,7 @@ export default class extends SKILL {
                 return dis;
             },
             use(me: CHARACTER, target: CHARACTER, lv: number, sk: string): void | boolean {
-                const prev: string = me.query_temp("copy_pfm_" + sk, String(''));
+                const prev: string = me.query_temp("cp2_pfm_" + sk, String(''));
                 const baseSkill = SKILL.get(sk);
                 if (!baseSkill) return;
                 if (!prev) {
