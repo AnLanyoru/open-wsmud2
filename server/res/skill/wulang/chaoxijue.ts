@@ -13,14 +13,14 @@ export default class extends SKILL {
     can_enables = ["force"];
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '潮起时每层潮汐额外增加200点攻击和命中',
+            prop: 'cxj_gm',
+            value: (lv: number) => Math.floor(lv/5),
+            format: (val: number) => `潮起时每层潮汐额外增加${val}点攻击和命中`,
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '潮落期间每层潮汐额外增加200防御和1000气血',
+            prop: 'cxj_fq',
+            value: (lv: number) => Math.floor(lv/5),
+            format: (val: number) => `潮落期间每层潮汐额外增加${val}防御和${val*5}气血`,
         },
     ];
 
@@ -30,7 +30,7 @@ export default class extends SKILL {
                 gj: Math.floor(lv * 1.22),
                 fy: Math.floor(lv * 1.22),
                 limit_mp: lv * 105,
-                desc: "潮汐命中后增加自身潮汐层数\n唯一：将你内力的85%转化为气血",
+                desc: "潮汐：命中后增加自身潮汐层数\n唯一：将你内力的85%转化为气血",
             },
         };
     }
