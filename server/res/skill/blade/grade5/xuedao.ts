@@ -46,15 +46,14 @@ export default class extends SKILL {
         if (missingHp <= 0) return 0;
         const bloodPer = query_xd_blood_per(lv);
         const extraPer = missingHp * bloodPer;
-        const baseGj = par.gj ?? me.gj;
-        return Math.floor(baseGj * extraPer / 100);
+        return Math.floor(me.gj * extraPer / 100);
     }
 
     /**
      * 嗜血状态下，每刀反噬自身1%当前气血。
      */
     on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
-        if (me.query_temp("weapon", 0)) {
+        if (me.query_status("weapon")) {
             const hpCost = Math.max(1, Math.floor(me.hp * 0.01));
             me.add_hp(-hpCost);
         }
@@ -75,25 +74,24 @@ export default class extends SKILL {
                 const bonus = query_xd_shixue_bonus(lv);
 
                 me.send_room(
-                    "<hio>$N咬破舌尖，一口精血喷于$W之上——霎时刀身血芒暴涨，$N双目赤红，状若疯魔！</hio>",
+                    "<hio>$N咬破舌尖，一口精血喷于$W之上，霎时刀身血芒暴涨，映得$N须眉皆赤，眼中再无半分理智！</hio>",
                     target,
                 );
 
                 me.add_status({
                     id: "weapon",
                     name: "嗜血",
-                    desc: `攻速、命中、攻击力提升${bonus}%，但每刀反噬自身1%气血`,
+                    desc: `刀饮血而愈利，人失血而愈狂，然每刀劈出，自身亦为刀煞反噬`,
                     duration: duration,
-                    override: 2,
+                    override: 0,
                     prop: {
                         gj_per: bonus,
                         mz_per: bonus,
                         gjsd_per: bonus,
                     },
-                    finish_msg: "$N手中$W血光渐褪，双目恢复清明——「嗜血」之效已尽。",
+                    finish_msg: "$N周身翻涌的血气渐渐沉寂，$W上的血芒一丝丝褪去，终归于鞘。",
                 });
 
-                me.set_temp("weapon", 1, duration);
                 me.reauto_attack();
             },
             query_desc: function (me: CHARACTER, lv: number): string {
@@ -115,7 +113,7 @@ export default class extends SKILL {
                 const count = query_xd_xuehai_count(lv);
 
                 me.send_room(
-                    "<hio>$N眼中血光暴射，狂啸一声，手中$W化作漫天血影，向$n铺天盖地倾泻而去——正是「血海魔刀」！</hio>",
+                    "<hio>$N眼中血光暴射，狂啸一声，手中$W化作漫天血影，向$n铺天盖地倾泻而去！</hio>",
                     target,
                 );
 
@@ -134,7 +132,7 @@ export default class extends SKILL {
                     const actualHeal = me.add_hp(totalDamage);
                     if (actualHeal > 0) {
                         me.send_room(
-                            "<hio>$N刀锋饮血，$n伤口中血雾喷涌而出，血气顺着$W刀锋涌入$N体内，整个人看起来精神了许多！</hio>",
+                            "<hio>$N刀锋饮血，$n伤口处血雾如泉喷涌，血气顺着$W刀锋灌入$N体内，整个人看起来精神了许多。</hio>",
                             target,
                         );
                     }
