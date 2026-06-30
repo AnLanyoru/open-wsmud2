@@ -82,7 +82,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        chunyang: {
+        chun: {
             name: "纯阳气",
             distime: 30000,
             enable_skill: "force",
@@ -110,7 +110,7 @@ export default class extends SKILL {
                 return `将你的纯阳真气附加于武器或拳脚之上，${toSec(duration)}秒内你的伤害都附加你最大内力1%的伤害。`;
             },
         },
-        dingyang: {
+        ding: {
             name: "定阳气",
             distime: 50000,
             enable_skill: "force",

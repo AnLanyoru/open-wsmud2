@@ -82,7 +82,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        hanbing: {
+        bing: {
             name: "寒冰",
             distime: 40000,
             enable_skill: "force",

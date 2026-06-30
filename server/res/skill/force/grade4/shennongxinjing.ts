@@ -57,7 +57,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jinzhen: {
+        du: {
             name: "金针渡穴",
             distime: 15000,
             enable_skill: "force",
@@ -96,7 +96,7 @@ export default class extends SKILL {
                 return `消耗内力以金针刺激穴位，为自己恢复${heal}点气血，清理${clearAll ? '全部' : '1个'}异常状态。`;
             },
         },
-        wanfabuqin: {
+        buqin: {
             name: "万法不侵",
             distime: 60000,
             enable_skill: "force",

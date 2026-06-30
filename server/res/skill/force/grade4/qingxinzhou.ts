@@ -55,7 +55,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        powang: {
+        po: {
             name: "破妄曲",
             distime: 16000,
             enable_skill: "force",
@@ -89,7 +89,7 @@ export default class extends SKILL {
                 return `引气成音，持续期间每次攻击附加${addSh}点伤害。`;
             },
         },
-        anshen: {
+        an: {
             name: "安神曲",
             distime: 16000,
             enable_skill: "force",
@@ -142,7 +142,7 @@ export default class extends SKILL {
                 for (let i = 0; i < tm.length; i++) {
                     if (tm[i].hp > 0 && tm[i].is_here(me)) {
                         tm[i].add_status({
-                            id: "gonming",
+                            id: "gongming",
                             name: "共鸣",
                             duration: dur,
                             prop: {

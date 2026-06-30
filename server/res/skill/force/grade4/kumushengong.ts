@@ -66,7 +66,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        kumufengchun: {
+        hui: {
             name: "枯木逢春",
             distime: 60000,
             enable_skill: "force",
