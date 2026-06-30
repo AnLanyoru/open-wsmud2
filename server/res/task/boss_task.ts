@@ -45,7 +45,7 @@ class BossTask extends TASK {
     stop() {
         if (this.time_handler) clearTimeout(this.time_handler);
         if (this.boss && this.boss.length) {
-            for (var i = 0; i < this.boss.length; i++) {
+            for (let i = 0; i < this.boss.length; i++) {
 
                 this.boss[i].destroy(this.boss[i].name + "离开了。");
             }
@@ -56,12 +56,12 @@ class BossTask extends TASK {
     }
 
     check_time() {
-        var dt = new Date();
-        var week = dt.getDay();
-        var hour = dt.getHours();
+        const dt = new Date();
+        const week = dt.getDay();
+        const hour = dt.getHours();
         if (hour == 21) {
-            var min = dt.getMinutes();
-            this.next_time = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), hour, (parseInt((min + 5) / 5)) * 5, 20);
+            const min_date = dt.getMinutes();
+            this.next_time = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), hour, (parseInt((min_date + 5) / 5)) * 5, 20);
 
         } else if (hour == 20) {
             this.next_time = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 21, 0, 20);
@@ -84,20 +84,20 @@ class BossTask extends TASK {
         this.check_time();
         const list = this.check_users();
         this.boss = [];
-        for (var i = 0; i < list.length; i++) {
+        for (let i = 0; i < list.length; i++) {
             if (!list[i]) continue;
             let level = i + 1;
             let bs = this.create_boss(level);
             if (!bs) return console.log("boss 创建失败");
             this.boss.push(bs);
             bs.event_id = 'boss' + level;
-            var rm = ROOM.RANDOM()!; //WORLD.getRoom("yz/nanmen");
+            const rm = ROOM.RANDOM()!; //WORLD.getRoom("yz/nanmen");
             rm.item_changed(bs, true);
             let desc = '听说' + bs.name + '出现在' + rm.long_name() + '一带';
             let msg = '{"type":"msg","ch":"rumor","content":"' + desc + '。"}';
-            var users = list[i];
+            const users = list[i];
             if (!users) continue;
-            for (var j = 0; j < users.length; j++) {
+            for (let j = 0; j < users.length; j++) {
                 users[j].send(msg);
             }
             EVENTS.add(this.create_event(bs.event_id!, level, desc, rm));
@@ -127,14 +127,14 @@ class BossTask extends TASK {
     }
 
     check_users() {
-        var list: (USER[] | undefined)[] = [];
-        for (var i = 0; i < WORLD.USERS.length; i++) {
-            var user = WORLD.USERS[i];
+        const list: (USER[] | undefined)[] = [];
+        for (let i = 0; i < WORLD.USERS.length; i++) {
+            const user = WORLD.USERS[i];
             if (!user.level) continue;
             if (user.level > 5 && this.create_boss2?.(user)) continue;
             if (!user.socket) continue;
             if ((user.query_temp("bcc", 0) ?? 0) >= 5) continue;
-            var lv = user.level - 1;
+            let lv = user.level - 1;
             if (lv > 4) {
                 lv = 4;
             }
@@ -149,24 +149,24 @@ class BossTask extends TASK {
     create_boss2?(user: USER): boolean;
 
     create_boss(player_level?: number) {
-        var max_level = this.boss_levels[Number(WORLD.DATA.query_temp("fb_index", 0))];
-        var boss_max = 0;
-        var boss_min = 0;
+        let max_level = this.boss_levels[Number(WORLD.DATA.query_temp("fb_index", 0))];
+        let boss_max = 0;
+        let boss_min = 0;
         if (player_level) {
             boss_max = this.level_max[player_level][1];
             boss_min = this.level_max[player_level][0];
             if (max_level > boss_max) max_level = boss_max;
         }
 
-        var level = this.random(max_level - boss_min) + boss_min;
+        const level = this.random(max_level - boss_min) + boss_min;
 
         if (!this.paths[level]) return console.log(level, max_level, " boss 创建失败");
-        var diff_level = this.levels[level];
-        var boss = NPC.CLONE(this.paths[level]);
+        const diff_level = this.levels[level];
+        const boss = NPC.CLONE(this.paths[level]);
         if (!boss) return;
         boss.boss_index = level;
         boss.min_fbindex = this.boss_min_fb[level];
-        var sk_level = (level + 1) * 100;
+        let sk_level = (level + 1) * 100;
         if (diff_level > 300) {
             sk_level = (level + 1) * 130;
         }
@@ -236,9 +236,9 @@ function create_finish_event(boss: NPC) {
 }
 
 function query_damage(this: NPC) {
-    var str: string[] = [];
-    for (var key in this.damages) {
-        var user = WORLD.getUser(key);
+    const str: string[] = [];
+    for (let key in this.damages) {
+        const user = WORLD.getUser(key);
         if (user) {
             str.push(user.name);
             str.push("：");
@@ -260,7 +260,7 @@ const BOSS_DROPS = {
 function query_items(this: NPC, me: USER) {
     if (!this.damages) return;
 
-    var sh = this.damages[me.id];
+    let sh = this.damages[me.id];
     if (!(sh > 1)) return;
     if (!this.user_items) this.user_items = {};
     if (this.user_items[me.id]) return this.user_items[me.id];
@@ -273,10 +273,10 @@ function query_items(this: NPC, me: USER) {
         return this.user_items[me.id];
     }
     if (sh > 100) sh = 80;
-    var lv = this.diff_level! - 20;
+    let lv = this.diff_level! - 20;
     if (lv < 0) lv = 0;
 
-    var drops = [
+    const drops = [
         {
             obj: "st/xuanjing",
             min: 1,
@@ -288,14 +288,14 @@ function query_items(this: NPC, me: USER) {
     ];
 
     me.add_temp("bcc", 1, UTIL.diff_time());
-    var items = OBJ.create_by_odds(drops);
+    const items = OBJ.create_by_odds(drops);
     this.user_items[me.id] = items;
     return items;
 }
 
 function clear_items(this: NPC, me: USER) {
     if (this.user_items) {
-        var items = this.user_items[me.id];
+        const items = this.user_items[me.id];
         if (items) items.length = 0;
     }
 }

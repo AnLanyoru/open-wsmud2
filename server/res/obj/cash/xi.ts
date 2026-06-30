@@ -19,9 +19,9 @@ export default class extends OBJ {
 }
 
 function readnumber(me, cmd) {
-    var count = me.str + me.con + me.dex + me.int;
-    var max = 30 + count - 80;
-    var nitify = "请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20";
+    let count = me.str + me.con + me.dex + me.int;
+    let max = 30 + count - 80;
+    let nitify = "请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20";
     if (!cmd) {
         return me.notify(nitify);
     }
@@ -30,12 +30,12 @@ function readnumber(me, cmd) {
         me.notify('已取消使用洗髓丹。');
         return;
     }
-    var ss = cmd.split(' ');
+    let ss = cmd.split(' ');
     if (ss.length != 5) return me.notify(nitify);
-    var str = parseInt(ss[1]);
-    var con = parseInt(ss[2]);
-    var dex = parseInt(ss[3]);
-    var int = parseInt(ss[4]);
+    let str = parseInt(ss[1]);
+    let con = parseInt(ss[2]);
+    let dex = parseInt(ss[3]);
+    let int = parseInt(ss[4]);
     if (!(str > 14 && str <= max)) return me.notify("臂力需要在15-" + max + "之间。");
     if (!(con > 14 && con <= max)) return me.notify("根骨需要在15-" + max + "之间。");
     if (!(dex > 14 && dex <= max)) return me.notify("身法需要在15-" + max + "之间。");
@@ -57,7 +57,7 @@ function readnumber(me, cmd) {
 
 function checkResult(me, str) {
     if (str == "ok") {
-        var obj = me.find_obj_bypath('cash/xi');
+        const obj = me.find_obj_bypath('cash/xi');
         if (!obj || !obj.count) {
             return me.notify('你身上没有洗髓丹。');
         }
@@ -75,8 +75,8 @@ function checkResult(me, str) {
         me.remove_temp("re_dex");
     } else {
         me.wait_input = readnumber;
-        var count = me.str + me.con + me.dex + me.int;
-        var max = 30 + count - 80;
+        const count = me.str + me.con + me.dex + me.int;
+        const max = 30 + count - 80;
         me.notify("请说出你的先天属性(臂力 根骨 身法 悟性)，每项15-" + max + "，总计" + count + "，比如:20 20 20 20");
         me.send_commands("quxiao", "取消使用");
     }

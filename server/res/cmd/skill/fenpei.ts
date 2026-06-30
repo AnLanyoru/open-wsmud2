@@ -18,14 +18,14 @@ export default class extends COMMAND {
 }
 
 function readnumber(me, cmd) {
-    var fen = me.query_temp("fenpei");
+    let fen = me.query_temp("fenpei");
     if (!cmd) return me.notify("请说出你要增加的先天属性，总计" + fen + "，比如:10 0 0 10");
-    var ss = cmd.split(' ');
+    let ss = cmd.split(' ');
     if (ss.length != 5) return me.notify("请说出你要增加的先天属性，总计" + fen + "，比如:10 0 0 10");
-    var str = parseInt(ss[1]);
-    var con = parseInt(ss[2]);
-    var dex = parseInt(ss[3]);
-    var int = parseInt(ss[4]);
+    let str = parseInt(ss[1]);
+    let con = parseInt(ss[2]);
+    let dex = parseInt(ss[3]);
+    let int = parseInt(ss[4]);
     if (str + con + dex + int != fen) return me.notify("四项总计需要是" + fen + "，请重新调整");
     if (str < 0 || con < 0 || dex < 0 || int < 0) return me.notify("单项的值需要大于0");
     me.set_temp("re_str", str);
