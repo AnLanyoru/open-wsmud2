@@ -12,22 +12,28 @@ export default class extends SKILL {
     can_enables = ["force"];
     slots = [
         {
-            prop: "kmsg_nl_max",
-            value: (lv: number) => 120,
-            format: (val: number) => '内力上限：+120000',
-            desc: "枯木神功内力上限",
+            prop: "limit_mp",
+            value: (lv: number) => 120 * lv,
+            format: (val: number) => "内力上限：+" + val,
+            query_needs: function (_lv: number) {
+                return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
+                    path: "book/bc#kumushengong",
+                    count: 25,
+                }];
+            },
         },
         {
             prop: "kmsg_fc_ms",
             value: (lv: number) => 15,
             format: (val: number) => '枯木逢春使用后8秒内增加自己15%免伤',
-            desc: "枯木逢春后免伤",
         },
         {
             prop: "kmsg_sm_hf",
             value: (lv: number) => 40,
             format: (val: number) => '战斗中首次受到致命伤害时恢复40%气血，冷却10分钟',
-            desc: "枯木神功致命恢复",
         },
     ];
 

@@ -20,9 +20,18 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'hbzq_nl_max',
-            value: (lv: number) => 135,
-            format: (val: number) => '内力上限：+135000',
+            prop: "limit_mp",
+            value: (lv: number) => 135 * lv,
+            format: (val: number) => "内力上限：+" + val,
+            query_needs: function (_lv: number) {
+                return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
+                    path: "book/bc#hanbingzhenqi",
+                    count: 25,
+                }];
+            },
         },
         {
             prop: 'hbzq_hb_sh',

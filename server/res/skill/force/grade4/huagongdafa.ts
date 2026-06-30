@@ -19,11 +19,14 @@ export default class extends SKILL {
     };
     slots = [
         {
-            prop: "hgd_nl_max",
-            value: (lv: number) => 130 + Math.floor(lv / 50),
-            format: (val: number) => "内力上限：+" + (125000 + Math.floor(val * 1000)),
+            prop: "limit_mp",
+            value: (lv: number) => 130 * lv,
+            format: (val: number) => "内力上限：+" + val,
             query_needs: function (_lv: number) {
                 return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
                     path: "book/bc#huagongdafa",
                     count: 25,
                 }];
@@ -31,12 +34,12 @@ export default class extends SKILL {
         },
         {
             prop: "hgd_xn_cd",
-            value: (lv: number) => 4000 + Math.floor(lv / 25) * 100,
-            format: (val: number) => "吸取内力的冷却减少" + Math.floor(val / 1000) + "秒",
+            value: (lv: number) => 4000,
+            format: (val: number) => "吸取内力的冷却减少" + int(val / 1000) + "秒",
         },
         {
             prop: "hgd_hd_xy",
-            value: (lv: number) => 15 + Math.floor(lv / 100),
+            value: (lv: number) => 5 + int(lv / 100),
             format: (val: number) => "化毒的增益效果变为增加自身最终伤害和防御减免" + val + "%",
         },
     ];

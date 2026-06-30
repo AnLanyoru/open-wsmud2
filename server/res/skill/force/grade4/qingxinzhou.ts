@@ -13,28 +13,33 @@ export default class extends SKILL {
     can_enables = ["force"];
     slots = [
         {
-            prop: 'qxz_nl_max',
-            value: (lv: number) => 105,
-            format: (val: number) => `内力上限：+${val * 1000}`,
-            desc: '清心咒内力上限',
+            prop: "limit_mp",
+            value: (lv: number) => 105 * lv,
+            format: (val: number) => "内力上限：+" + val,
+            query_needs: function (_lv: number) {
+                return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
+                    path: "book/bc#qingxinzhou",
+                    count: 25,
+                }];
+            },
         },
         {
             prop: 'qxz_pwq_sh',
             value: (lv: number) => Math.floor(lv * 0.55),
             format: (val: number) => `破妄曲附加自身${val}%攻击力的伤害`,
-            desc: '破妄曲附加攻击力伤害',
         },
         {
             prop: 'qxz_asq_fy',
             value: (lv: number) => Math.floor(lv * 0.55),
             format: (val: number) => `安神曲降低${val}%防御的伤害`,
-            desc: '安神曲减伤',
         },
         {
             prop: 'qxz_gm_time',
             value: (lv: number) => 4000,
             format: (val: number) => `共鸣持续时间增加${val / 1000}秒`,
-            desc: '共鸣延长时间',
         },
     ];
 

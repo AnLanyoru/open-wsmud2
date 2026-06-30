@@ -13,9 +13,18 @@ export default class extends SKILL {
     can_enables = ["force"];
     slots = [
         {
-            prop: 'xtg_nl_max',
-            value: (_lv: number) => 110,
-            format: (val: number) => '内力上限：+110000',
+            prop: "limit_mp",
+            value: (lv: number) => 110 * lv,
+            format: (val: number) => "内力上限：+" + val,
+            query_needs: function (_lv: number) {
+                return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
+                    path: "book/bc#xiantiangong",
+                    count: 25,
+                }];
+            },
         },
         {
             prop: 'xtg_dyq_nl',
@@ -67,8 +76,9 @@ export default class extends SKILL {
                 );
                 me.add_status({
                     id: "force",
-                    name: "纯阳气",
+                    name: "纯阳",
                     duration: duration,
+                    desc: "伤害附加最大内力1%的伤害",
                     prop: {},
                     finish_msg: "<hiy>$N周身的纯阳真气渐渐消散，内力回敛丹田。</hiy>",
                 });
@@ -87,12 +97,13 @@ export default class extends SKILL {
             mp: 22,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const heal = Math.floor(me.mp * query_xtg_dingyang_percent(lv) / 100);
+                const heal = int(me.mp * query_xtg_dingyang_percent(lv) / 100);
                 me.send_room(
                     "<hiz>$N微微阖目，运起先天功，纯阳真气自丹田升起，如旭日初升，温煦经脉，滋养五脏。\n只见$N面色渐转红润，内伤在纯阳真气的流转下缓缓愈合。</hiz>",
                     target
                 );
                 me.add_hp(heal);
+                if (me.query_prop("xtg_dyq_nl")) me.add_mp(heal);
             },
             query_desc: function(_me: CHARACTER, lv: number): string {
                 const pct = query_xtg_dingyang_percent(lv);
