@@ -27,13 +27,13 @@ export default class extends SKILL {
         },
         {
             prop: "kmsg_fc_ms",
-            value: (lv: number) => 15,
+            value: (lv: number) => 5 + int(lv / 100),
             format: (val: number) => '枯木逢春使用后8秒内增加自己15%免伤',
         },
         {
             prop: "kmsg_sm_hf",
-            value: (lv: number) => 40,
-            format: (val: number) => '战斗中首次受到致命伤害时恢复40%气血，冷却10分钟',
+            value: (lv: number) => Math.min(100, 30 + int(lv / 100)),
+            format: (val: number) => `战斗中首次受到致命伤害时恢复${val}%气血，冷却10分钟`,
         },
     ];
 
@@ -47,6 +47,22 @@ export default class extends SKILL {
                 desc: "唯一：将你内力的90%转化为气血",
             },
         };
+    }
+
+    /**
+     * 战斗中首次受到致命伤害时恢复气血（冷却10分钟）
+     */
+    on_damage(me: CHARACTER, sh: number, _from?: CHARACTER): number {
+        const pct = me.query_prop("kmsg_sm_hf");
+        if (pct > 0 && sh >= me.hp && !me.query_temp("kmsg_sm_hf_cd", 0)) {
+            const heal = Math.floor(me.max_hp * pct / 100);
+            me.set_temp("kmsg_sm_hf_cd", 1, 600000);
+            me.send_room(
+                "<hiz>$N体内枯木神功于生死一线间迸发出蓬勃生机，伤势瞬间愈合大半！</hiz>\n",
+            );
+            me.add_hp(heal);
+        }
+        return sh;
     }
 
     pfm_set: PerformData = {
@@ -79,11 +95,31 @@ export default class extends SKILL {
                     "<hiz>青光流转之间，$N所中诸般负面状态如冰雪消融，荡然无存。</hiz>\n",
                     target
                 );
+
+                // 进阶：枯木逢春后附加免伤
+                const msPct = me.query_prop("kmsg_fc_ms");
+                if (msPct > 0) {
+                    me.add_status({
+                        id: "force",
+                        name: "逢春",
+                        duration: 8000,
+                        prop: {
+                            diff_sh_per: msPct,
+                        },
+                        start_msg: "<hiz>枯木逢春之力化作一道青光护住$N周身，免伤大增！</hiz>",
+                        finish_msg: "$N周身青光散去，枯木护体之力已然消退。",
+                    });
+                }
             },
             query_desc: function(me: CHARACTER, lv: number): string {
                 const hpHeal = kumufengchun_heal(me, lv);
                 const pct = 10 + Math.floor(lv / 100);
-                return "<hiz>枯木逢春：</hiz>恢复" + hpHeal + "点气血（" + pct + "%最大气血），移除你自身的负面状态。";
+                let desc = "<hiz>枯木逢春：</hiz>恢复" + hpHeal + "点气血（" + pct + "%最大气血），移除你自身的负面状态";
+                const msPct = me.query_prop("kmsg_fc_ms");
+                if (msPct > 0) {
+                    desc += "，并在8秒内增加" + msPct + "%免伤";
+                }
+                return desc + "。";
             },
         },
     };
