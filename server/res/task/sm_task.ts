@@ -2,6 +2,7 @@ import {USERTASK} from "../../core/task/playertask.js";
 import {OBJ} from "../../core/item/obj.js";
 import type {OddsEntry} from "../../core/item/obj.js";
 import { SkillsMap } from "../../core/char/skills_map.js";
+import type { USER } from "../../core/char/user.js";
 
 export default class ShiMenTask extends USERTASK {
     id = "sm";
@@ -66,7 +67,7 @@ export default class ShiMenTask extends USERTASK {
 
     }
 
-    on_finish(me) {
+    on_finish(me: USER) {
         let sm = this.query_smcount(me);
         if (!(sm > 0)) return false;
         let sm_level = me.query_temp('sm_level', 0);
@@ -113,7 +114,7 @@ export default class ShiMenTask extends USERTASK {
         for (var i = 0; i < createdItems.length; i++) {
             var item = me.add_obj(createdItems[i]);
             if (item) {
-                me.send("你获得了" + item.unit_name() + "。");
+                me.send("你获得了" + item.unit_name(1) + "。");
             }
         }
 
