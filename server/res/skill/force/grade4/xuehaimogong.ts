@@ -95,10 +95,11 @@ export default class extends SKILL {
             mp: 56,
             release_time: 500,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void | boolean {
-                // 血祭消耗25%最大气血（slot 进阶可免消耗）
+                // 血祭消耗气血（基础30%，每200级减1%，最低10%；slot 进阶可免消耗）
                 const noHpCost = me.query_prop("xhmg_xj_hp");
                 if (!noHpCost) {
-                    const hpCost = Math.floor(me.max_hp * 0.25);
+                    const hpPct = Math.max(10, 30 - Math.floor(lv / 200));
+                    const hpCost = Math.floor(me.max_hp * hpPct / 100);
                     if (me.hp < hpCost) return me.notify_fail("你的气血不足，无法使用【血祭】");
                     me.add_hp(-hpCost);
                 }
@@ -144,16 +145,18 @@ export default class extends SKILL {
                     finish_msg: "$N周身的血芒渐渐暗淡，血祭之力消退，只余疲惫感涌上心头。",
                 });
             },
-            query_desc: function (me: CHARACTER, _lv: number): string {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 const noHpCost = me.query_prop("xhmg_xj_hp");
                 const noWeakness = me.query_prop("xhmg_xj_xr");
+                const hpPct = Math.max(10, 30 - Math.floor(lv / 200));
+                const dur = (xueji_dur(lv) / 1000).toFixed(1);
                 let desc = "血祭自身";
                 if (!noHpCost) {
-                    desc += "，消耗25%最大气血";
+                    desc += "，消耗" + hpPct + "%最大气血";
                 }
-                desc += "，9秒内不会死亡且免疫控制";
+                desc += "，" + dur + "秒内不会死亡且免疫控制";
                 if (!noWeakness) {
-                    desc += "，效果结束后9秒内自身减少30%战斗属性";
+                    desc += "，效果结束后" + dur + "秒内自身减少30%战斗属性";
                 }
                 return desc;
             },
@@ -178,9 +181,9 @@ export default class extends SKILL {
 // 血海魔功 — 公共计算函数
 // ═══════════════════════════════════════════
 
-/** 血魔持续时间（毫秒）：基准 30000，每级 +5，确保微末等级差异可感知 */
+/** 血魔持续时间（毫秒）：20000+lv*10，封顶30000 */
 function query_xuemo_duration(lv: number): number {
-    return 30000 + lv * 5;
+    return Math.min(30000, 20000 + lv * 10);
 }
 
 /** 血魔属性百分比 */
@@ -188,7 +191,7 @@ function xuemo_per(lv: number): number {
     return 10 + Math.floor(lv / 100);
 }
 
-/** 血祭持续时间（毫秒） */
+/** 血祭持续时间（毫秒）：4000+lv*5，封顶10000 */
 function xueji_dur(lv: number): number {
-    return 2500 + lv * 6.5;
+    return Math.min(10000, 4000 + lv * 5);
 }

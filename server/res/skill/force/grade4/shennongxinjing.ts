@@ -1,7 +1,8 @@
 import { SKILL } from "../../../../core/skill/skill.js";
 import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type { LearnCondition } from "../../../../types/events.js";
+import { PropMap } from "../../../../types/props.js";
 
 export default class extends SKILL {
     name = "神农心经";
@@ -27,7 +28,7 @@ export default class extends SKILL {
         },
         {
             prop: 'snxj_wf_ms',
-            value: (lv: number) => 35,
+            value: (lv: number) => 30 + int(lv / 200),
             format: (val: number) => `万法不侵期间增加伤害减免${val}%`,
         },
     ];
@@ -45,6 +46,16 @@ export default class extends SKILL {
         };
     }
 
+    /**
+     * 万法不侵：免疫内力伤害
+     */
+    on_force_parry(_target: CHARACTER, me: CHARACTER, sh: number, _par: DoAttackPar): number {
+        if (me.query_temp("wfbq_active", 0) > 0) {
+            return 0;
+        }
+        return sh;
+    }
+
     pfm_set: PerformData = {
         jinzhen: {
             name: "金针渡穴",
@@ -59,7 +70,6 @@ export default class extends SKILL {
                 me.send_room(
                     "<hig>$N指尖银芒一闪，数根金针已刺入自身要穴，真气循经而行，百骸俱暖。</hig>",
                 );
-                me.notify(`<hig>你运起神农心经，金针渡穴，药气流转，恢复了${heal}点气血。</hig>`);
 
                 me.add_hp(heal);
 
@@ -93,34 +103,47 @@ export default class extends SKILL {
             mp: 150,
             release_time: 2000,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
-                const diffSh = snxj_wfbq_diff_sh(lv);
+                const diffSh = me.query_prop("snxj_wf_ms");
+                const total = wfbq_total_dur(lv);
+                const interval = wfbq_interval(lv);
+                const count = Math.round(total / interval);
+                const regenPct = wfbq_regen_pct(lv);
 
                 me.send_room(
                     "<hic>$N抱元守一，气与意合，周身泛起一层青蒙蒙的光晕，仿佛化作一株古木，与天地融为一体。</hic>",
                 );
 
+                const prop: PropMap = {}
+                if (diffSh) prop.diff_sh_per = diffSh;
                 me.add_status({
-                    id: "wfbq",
-                    name: "万法不侵",
-                    desc: "草木之姿融于天地，不受内力所伤，每2秒恢复气血",
-                    duration: 2000,
-                    duration_count: 4,
+                    id: "force",
+                    name: "不侵",
+                    desc: "草木之姿融于天地，不受内力所伤",
+                    duration: interval,
+                    duration_count: count,
                     override: 2,
+                    on_attach: function (p: CHARACTER): void {
+                        p.set_temp("wfbq_active", 1, interval * count);
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        p.remove_temp("wfbq_active");
+                    },
                     on_interval: function (p: CHARACTER, _over_count: number): void {
-                        const hpHeal = Math.floor(p.max_hp * 6 / 100);
+                        const hpHeal = int(p.max_hp * regenPct / 100);
                         p.add_hp(hpHeal);
                         p.notify(`<hig>万法不侵之体引动草木灵气，恢复了${hpHeal}点气血。</hig>`);
                     },
-                    prop: {
-                        diff_sh_per: diffSh,
-                    },
+                    prop,
                     start_msg: "<hic>$N身周一时光华流转，万法不侵，诸邪辟易。</hic>",
                     finish_msg: "$N周身青光缓缓敛去，从天人合一之境中悠悠醒转。",
                 });
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const diffSh = snxj_wfbq_diff_sh(lv);
-                return `以草木之姿融于天地，8秒内增加伤害减免${diffSh}%，每2秒恢复6%气血。`;
+                const total = wfbq_total_dur(lv);
+                const interval = wfbq_interval(lv);
+                const regenPct = wfbq_regen_pct(lv);
+                return `以草木之姿融于天地，${(total / 1000).toFixed(1)}秒内增加伤害减免${diffSh}%，每${interval / 1000}秒恢复${regenPct}%气血。`;
             },
         },
     };
@@ -138,4 +161,19 @@ function snxj_jinzhen_heal(lv: number): number {
 /** 万法不侵：伤害减免百分比 */
 function snxj_wfbq_diff_sh(lv: number): number {
     return 35;
+}
+
+/** 万法不侵总持续时间（毫秒）：8000+lv */
+function wfbq_total_dur(lv: number): number {
+    return 8000 + lv;
+}
+
+/** 万法不侵触发间隔（毫秒）：lv<5000时为2000，lv≥5000时为3000 */
+function wfbq_interval(lv: number): number {
+    return 2000 + Math.floor(lv / 5000) * 1000;
+}
+
+/** 万法不侵每次恢复气血百分比：5+floor(lv/1000) */
+function wfbq_regen_pct(lv: number): number {
+    return 5 + Math.floor(lv / 1000);
 }
