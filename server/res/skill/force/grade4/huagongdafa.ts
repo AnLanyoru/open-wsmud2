@@ -195,8 +195,7 @@ function hd_dur(lv: number): number {
 
 /** 化毒持续时间显示（秒） */
 function hd_dur_str(lv: number): string {
-    const val = hd_dur(lv) / 1000;
-    return val.toFixed(3).replace(/\.0+$/, "");
+    return toSec(hd_dur(lv));
 }
 
 /** 化毒攻击加成 */
@@ -221,8 +220,7 @@ function hg_dur(lv: number): number {
 
 /** 化功持续时间显示（秒） */
 function hg_dur_str(lv: number): string {
-    const val = hg_dur(lv) / 1000;
-    return val.toFixed(3).replace(/\.0+$/, "");
+    return toSec(hg_dur(lv));
 }
 
 /** 化功 debuff 持续时间（毫秒） */

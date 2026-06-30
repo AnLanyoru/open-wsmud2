@@ -87,7 +87,7 @@ export default class extends SKILL {
             },
             query_desc: function(_me: CHARACTER, lv: number): string {
                 const duration = query_xtg_chunyang_duration(lv);
-                return `将你的纯阳真气附加于武器或拳脚之上，${(duration / 1000).toFixed(1)}秒内你的伤害都附加你最大内力1%的伤害。`;
+                return `将你的纯阳真气附加于武器或拳脚之上，${toSec(duration)}秒内你的伤害都附加你最大内力1%的伤害。`;
             },
         },
         dingyang: {

@@ -140,10 +140,10 @@ export default class extends SKILL {
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const diffSh = snxj_wfbq_diff_sh(lv);
-                const total = wfbq_total_dur(lv);
-                const interval = wfbq_interval(lv);
+                const total = toSec(wfbq_total_dur(lv));
+                const interval = toSec(wfbq_interval(lv));
                 const regenPct = wfbq_regen_pct(lv);
-                return `以草木之姿融于天地，${(total / 1000).toFixed(1)}秒内增加伤害减免${diffSh}%，每${interval / 1000}秒恢复${regenPct}%气血。`;
+                return `以草木之姿融于天地，${total}秒内增加伤害减免${diffSh}%，每${interval}秒恢复${regenPct}%气血。`;
             },
         },
     };

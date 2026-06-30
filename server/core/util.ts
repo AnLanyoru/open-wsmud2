@@ -56,6 +56,24 @@ JSON.toObject = function (str: string): any {
 /** int — 全局取整函数，等同 Math.trunc */
 (globalThis as any).int = Math.trunc;
 
+/** toSec — 毫秒转秒，精准格式化（去尾部无用零和小数点） */
+(globalThis as any).toSec = function toSec(ms: number): string {
+  // 非法数值兜底
+  if (!Number.isFinite(ms)) return "0";
+
+  // 转为毫秒整数，保证精度
+  const totalMs = Math.round(ms);
+  const sec = Math.floor(totalMs / 1000);
+  const remainMs = totalMs % 1000;
+
+  // 无小数直接返回秒数字符
+  if (remainMs === 0) return sec.toString();
+
+  // 补3位，一次性去掉末尾多余0
+  const fraction = remainMs.toString().padStart(3, "0").replace(/0+$/, "");
+  return `${sec}.${fraction}`;
+};
+
 // ============================================================
 // UTIL 单例
 // ============================================================

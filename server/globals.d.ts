@@ -8,6 +8,9 @@ declare function parseInt(s: string | number, radix?: number): number;
 /** 全局取整函数，等同 Math.trunc */
 declare function int(n: number): number;
 
+/** 毫秒转秒，精准格式化（去尾部无用零和小数点） */
+declare function toSec(ms: number): string;
+
 // --- 数组原型扩展 (来自 util.ts) ---
 interface Array<T> {
     remove(item: T): boolean;

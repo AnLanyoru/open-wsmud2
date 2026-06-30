@@ -149,7 +149,7 @@ export default class extends SKILL {
                 const noHpCost = me.query_prop("xhmg_xj_hp");
                 const noWeakness = me.query_prop("xhmg_xj_xr");
                 const hpPct = Math.max(10, 30 - Math.floor(lv / 200));
-                const dur = (xueji_dur(lv) / 1000).toFixed(1);
+                const dur = toSec(xueji_dur(lv));
                 let desc = "血祭自身";
                 if (!noHpCost) {
                     desc += "，消耗" + hpPct + "%最大气血";

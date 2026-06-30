@@ -174,8 +174,7 @@ function calc_powang_dur(lv: number): number {
 
 /** 破妄曲持续时间显示（秒） */
 function calc_powang_dur_str(lv: number): string {
-    const val = calc_powang_dur(lv) / 1000;
-    return val.toFixed(1).replace(/\.0$/, '');
+    return toSec(calc_powang_dur(lv));
 }
 
 /** 破妄曲附加伤害 */
@@ -190,8 +189,7 @@ function calc_anshen_dur(lv: number): number {
 
 /** 安神曲持续时间显示（秒） */
 function calc_anshen_dur_str(lv: number): string {
-    const val = calc_anshen_dur(lv) / 1000;
-    return val.toFixed(1).replace(/\.0$/, '');
+    return toSec(calc_anshen_dur(lv));
 }
 
 /** 安神曲减伤值 */
@@ -206,8 +204,7 @@ function calc_gongming_dur(me: CHARACTER, lv: number): number {
 
 /** 共鸣持续时间显示（秒） */
 function calc_gongming_dur_str(me: CHARACTER, lv: number): string {
-    const val = calc_gongming_dur(me, lv) / 1000;
-    return val.toFixed(1).replace(/\.0$/, '');
+    return toSec(calc_gongming_dur(me, lv));
 }
 
 /** 共鸣攻击力加成 */
