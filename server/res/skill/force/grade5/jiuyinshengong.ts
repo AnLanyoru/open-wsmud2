@@ -1,60 +1,8 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
-import type {LearnCondition} from "../../../../types/events.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import { SKILL_TYPES } from "../../../../core/const.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { LearnCondition } from "../../../../types/events.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
-
-// ═══════════════════════════════════════════
-// 九阴神功 — 公共计算函数
-// ═══════════════════════════════════════════
-
-/** 追魂每层伤害系数：0.1 + floor(lv/50)*0.01 */
-function zhuihun_coeff(lv: number): number {
-    return 0.1 + Math.floor(lv / 50) * 0.01;
-}
-
-/** 追魂参考伤害（描述显示用，参考gj=17），返回格式化字符串 */
-function zhuihun_ref_dmg_str(lv: number): string {
-    const val = (170 + Math.floor(lv / 50) * 17) / 100;
-    return val.toFixed(2).replace(/\.?0+$/, "");
-}
-
-/** 追魂昏迷时间（毫秒），层数>5触发，封顶10000ms */
-function zhuihun_stun(lv: number): number {
-    return Math.min(10000, 3000 + lv * 3);
-}
-
-/** 追魂昏迷时间显示（秒） */
-function zhuihun_stun_str(lv: number): string {
-    const val = zhuihun_stun(lv) / 1000;
-    return val.toFixed(1).replace(/\.0+$/, "");
-}
-
-/** 逆转九阴持续时间（毫秒） */
-function nizhuan_dur(lv: number): number {
-    return 5000 + lv * 6;
-}
-
-/** 逆转九阴持续时间显示（秒） */
-function nizhuan_dur_str(lv: number): string {
-    const val = nizhuan_dur(lv) / 1000;
-    return val.toFixed(1).replace(/\.0+$/, "");
-}
-
-/** 逆转九阴攻击/无视防御加成%，封顶100 */
-function nizhuan_gj_per(lv: number): number {
-    return Math.min(100, 20 + Math.floor(lv / 50));
-}
-
-/** 逆转九阴攻速加成%，封顶50 */
-function nizhuan_speed_per(lv: number): number {
-    return Math.min(50, 10 + Math.floor(lv / 100));
-}
-
-/** 逆转九阴防御/减伤惩罚%，最低10 */
-function nizhuan_debuff(lv: number): number {
-    return Math.max(10, 50 - Math.floor(lv / 100));
-}
 
 export default class extends SKILL {
     name = "九阴神功";
@@ -88,8 +36,6 @@ export default class extends SKILL {
     on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
-        // 追魂引爆时不叠加
-        if (me.query_temp("jy_detonating", 0)) return;
 
         const count = target.query_temp("jyjq", 0) + 1;
         target.set_temp("jyjq", count, 1000);
@@ -97,7 +43,7 @@ export default class extends SKILL {
         target.add_status({
             id: "jyjq",
             name: "阴气",
-            desc: "被九阴劲气侵蚀，攻击、躲闪、命中各下降" + count + "%",
+            desc: "九阴劲气侵蚀",
             duration: 10000,
             override: 2,
             downside: true,
@@ -121,24 +67,12 @@ export default class extends SKILL {
                 let count = target.query_temp("jyjq", Number(0));
                 if (count <= 0) count = 1;
 
-                const coeff = zhuihun_coeff(lv);
-                const dmg = Math.floor(me.gj * coeff * count);
-
-                // 标记引爆状态，防止引爆伤害自身叠加九阴劲气
-                me.set_temp("jy_detonating", 1, 1000);
+                const dmgPerStack = zhuihun_dmg(me, lv);
+                const dmg = dmgPerStack * count;
 
                 me.send_room("<hio>$N潜运九阴，神意如刀，$n周身蛰伏的九阴劲气如惊蛰春雷，霎时迸裂！</hio>\n", target);
 
-                me.do_attack({
-                    target,
-                    gj: dmg,
-                    mz: me.mz,
-                    no_dodge: true,
-                    no_parry: true,
-                    no_power: true,
-                    diff_fy: 100,
-                    attack_msg: "<hio>$n经络间阴劲连环炸裂，$p五脏六腑如坠冰窟，气血逆行！</hio>",
-                });
+                target.damage3(dmg, me);
 
                 // 清除劲气叠加
                 target.remove_status("jyjq");
@@ -146,9 +80,9 @@ export default class extends SKILL {
                 if (count > 5) {
                     const stunTime = zhuihun_stun(lv);
                     target.add_status({
-                        id: "busy",
+                        id: "faint",
                         name: "昏迷",
-                        is_busy: true,
+                        is_faint: true,
                         downside: true,
                         duration: stunTime,
                         desc: "你被九阴劲气震得昏迷过去。",
@@ -158,8 +92,8 @@ export default class extends SKILL {
 
                 me.end_attack(target);
             },
-            query_desc: function (_me: CHARACTER, lv: number): string {
-                const dmg = zhuihun_ref_dmg_str(lv);
+            query_desc: function (me: CHARACTER, lv: number): string {
+                const dmg = zhuihun_dmg(me, lv);
                 const stun = zhuihun_stun_str(lv);
                 return "引爆敌人身上的九阴劲气，每层造成" + dmg + "的真实伤害，层数大于5层将使敌方昏迷" + stun + "秒。";
             },
@@ -203,4 +137,52 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+
+// ═══════════════════════════════════════════
+// 九阴神功 — 公共计算函数
+// ═══════════════════════════════════════════
+
+/** 追魂每层真实伤害：gj × (0.1 + floor(lv/50)×0.01) */
+function zhuihun_dmg(me: CHARACTER, lv: number): number {
+    const coeff = 0.1 + Math.floor(lv / 50) * 0.01;
+    return Math.floor(me.gj * coeff);
+}
+
+/** 追魂昏迷时间（毫秒），层数>5触发，封顶10000ms */
+function zhuihun_stun(lv: number): number {
+    return Math.min(10000, 3000 + lv * 3);
+}
+
+/** 追魂昏迷时间显示（秒） */
+function zhuihun_stun_str(lv: number): string {
+    const val = zhuihun_stun(lv) / 1000;
+    return val.toFixed(3).replace(/\.0+$/, "");
+}
+
+/** 逆转九阴持续时间（毫秒） */
+function nizhuan_dur(lv: number): number {
+    return 5000 + lv * 6;
+}
+
+/** 逆转九阴持续时间显示（秒） */
+function nizhuan_dur_str(lv: number): string {
+    const val = nizhuan_dur(lv) / 1000;
+    return val.toFixed(3).replace(/\.0+$/, "");
+}
+
+/** 逆转九阴攻击/无视防御加成%，封顶100 */
+function nizhuan_gj_per(lv: number): number {
+    return Math.min(100, 20 + Math.floor(lv / 50));
+}
+
+/** 逆转九阴攻速加成%，封顶50 */
+function nizhuan_speed_per(lv: number): number {
+    return Math.min(50, 10 + Math.floor(lv / 100));
+}
+
+/** 逆转九阴防御/减伤惩罚%，最低10 */
+function nizhuan_debuff(lv: number): number {
+    return Math.max(10, 50 - Math.floor(lv / 100));
 }
