@@ -137,7 +137,7 @@ export default class extends SKILL {
 // 先天功 — 公共计算函数
 // ═══════════════════════════════════════════
 
-/** 纯阳气持续时间（毫秒）——每级增加50ms，确保个位数等级变化可感知 */
+/** 纯阳气持续时间（毫秒）：4000 + lv*10，与正式服一致 */
 function query_xtg_chunyang_duration(lv: number): number {
     return 4000 + lv * 10;
 }

@@ -60,7 +60,7 @@ export default class extends SKILL {
      * 寒冰真气 — 被动减伤与反伤
      * 当处于「寒冰」状态时，受到的伤害降低，且攻击你的敌人会被冻结，攻击速度大幅降低。
      */
-    on_damage(me: CHARACTER, sh: number, from: CHARACTER): number {
+    on_damage(me: CHARACTER, sh: number, from?: CHARACTER): number {
         if (me.query_temp("hanbing", 0)) {
             const lv = me.query_skill("hanbingzhenqi", 0);
             sh = sh - me.query_prop('hbzq_dy_sh');
