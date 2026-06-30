@@ -35,13 +35,13 @@ export default class extends SKILL {
         },
         {
             prop: 'hbzq_hb_sh',
-            value: (_lv: number) => 4000,
-            format: (val: number) => '附加寒冰真气时，额外造成4000伤害',
+            value: (lv: number) => hanbing_add_sh(lv),
+            format: (val: number) => `附加寒冰真气时，额外造成${val}伤害`,
         },
         {
             prop: 'hbzq_dy_sh',
-            value: (_lv: number) => 4000,
-            format: (val: number) => '附加寒冰真气时，可抵挡4000伤害',
+            value: (lv: number) => hanbing_add_sh(lv),
+            format: (val: number) => `附加寒冰真气时，可抵挡${val}伤害`,
         },
     ];
 
@@ -57,23 +57,26 @@ export default class extends SKILL {
     }
 
     /**
-     * 寒冰真气 — 被动反伤
-     * 当处于「寒冰」状态时，攻击你的敌人会被冻结，攻击速度大幅降低。
+     * 寒冰真气 — 被动减伤与反伤
+     * 当处于「寒冰」状态时，受到的伤害降低，且攻击你的敌人会被冻结，攻击速度大幅降低。
      */
     on_damage(me: CHARACTER, sh: number, from: CHARACTER): number {
-        if (me.query_temp("hanbing", 0) && from && from.hp > 0) {
+        if (me.query_temp("hanbing", 0)) {
             const lv = me.query_skill("hanbingzhenqi", 0);
-            from.add_status({
-                id: "dongjie",
-                name: "冻结",
-                duration: hanbing_dongjie_duration(lv),
-                downside: true,
-                prop: {
-                    gjsd_per: hanbing_dongjie_gjsd_per(lv),
-                },
-                desc: "被寒冰真气冻结，攻击速度减慢",
-                start_msg: "<hib>$n只觉一股彻骨寒气自$N身上涌来，经脉瞬间冰封，动作变得迟滞无比！</hib>",
-            }, me);
+            sh = sh - me.query_prop('hbzq_dy_sh');
+            if (sh < 0) sh = 0;
+            if (from && from.hp > 0)
+                from.add_status({
+                    id: "dongjie",
+                    name: "冻结",
+                    duration: hanbing_dongjie_duration(lv),
+                    downside: true,
+                    prop: {
+                        gjsd_per: hanbing_dongjie_gjsd_per(lv),
+                    },
+                    desc: "被寒冰真气冻结，攻击速度减慢",
+                    start_msg: "<hib>$n只觉一股彻骨寒气自$N身上涌来，经脉瞬间冰封，动作变得迟滞无比！</hib>",
+                }, me);
         }
         return sh;
     }
@@ -87,7 +90,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = hanbing_buff_duration(lv);
-                const addSh = hanbing_add_sh(lv);
+                const addSh = hanbing_add_sh(lv) + me.query_prop('hbzq_hb_sh');
                 me.send_room(
                     "<hib>$N运起寒冰真气，周身寒气大盛，一层冰霜凝结在皮肤之上，散发出刺骨的寒意！</hib>",
                     target,
@@ -104,10 +107,10 @@ export default class extends SKILL {
                 me.set_temp("hanbing", 1, duration);
                 me.reauto_attack();
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
-                const dur = hanbing_buff_duration(lv) / 1000;
-                const addSh = hanbing_add_sh(lv);
-                const dongjieDur = hanbing_dongjie_duration(lv) / 1000;
+            query_desc: function(me: CHARACTER, lv: number): string {
+                const dur = toSec(hanbing_buff_duration(lv));
+                const addSh = hanbing_add_sh(lv) + me.query_prop('hbzq_hb_sh');
+                const dongjieDur = toSec(hanbing_dongjie_duration(lv));
                 const gjsdPer = -hanbing_dongjie_gjsd_per(lv);
                 return `运起全身真气，在${dur}秒内，使自己的伤害附加${addSh}寒冰伤害，并使攻击你的敌人冻结，在${dongjieDur}秒内减慢${gjsdPer}%攻击速度。`;
             },

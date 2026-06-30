@@ -61,7 +61,7 @@ export interface PropMap {
     /** 内力消耗百分比减免 */ expend_mp_per?: number;
     /** 绝招释放时间百分比减免 */ releasetime_per?: number;
     /** 绝招冷却时间百分比减免 */ distime_per?: number;
-    /** 对方受到的伤害增加% */ add_sh?: number;
+    /** 伤害增加 */ add_sh?: number;
     /** 无法防御（值>0生效） */ no_fy?: number;
     /** 禁止绝招（值>0生效） */ no_pfm?: number;
     /** 疗伤效果百分比 */ recover_per?: number;

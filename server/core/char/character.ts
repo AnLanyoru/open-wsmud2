@@ -2708,12 +2708,12 @@ export class CHARACTER extends ITEM {
                 }
                 sh = sh * (this.attack_part ? this.attack_part.hert : 1);
                 if (!par.no_power) {
-                    sh = sh + sh * this.query_prop('add_sh_per') / 100;
-
+                    sh += sh * this.query_prop('add_sh_per') / 100;
+                    sh += this.query_prop('add_sh');
                     par.iscirt = par.cirt ? par.cirt(target, this.attack_part, par.bj) : this.crit(target, this.attack_part, par.bj);
 
                     if (par.iscirt)
-                        sh = sh * (150 + (par.add_bjsh_per ?? this.query_prop('add_bjsh_per'))) / 100;
+                        sh *= (150 + (par.add_bjsh_per ?? this.query_prop('add_bjsh_per'))) / 100;
                 }
             }
             let power_gj = par.power_gj ?? 0;
