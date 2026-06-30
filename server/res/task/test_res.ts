@@ -18,9 +18,9 @@ export default class extends USERTASK {
     }
 
     on_finish(me: CHARACTER, _par?: string): boolean {
-        const obj = me.add_obj("st/yuanjing", 10);
+        const obj = me.add_obj("st/yuanjing", 100);
         if (obj) {
-            me.notify(`<hig>你领取了 10 块元晶。</hig>`);
+            me.notify(`<hig>你领取了 100 块元晶。</hig>`);
             me.send_commands("test_res", "打开测试资源菜单");
         } else {
             me.notify(`<red>元晶创建失败，请联系管理员。</red>`);

@@ -11,6 +11,6 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.RING;
     prop: PropMap = {
         int: 100000,
-        dazuo_per: 10000,
+        dazuo_per: 1000000,
     };
 }

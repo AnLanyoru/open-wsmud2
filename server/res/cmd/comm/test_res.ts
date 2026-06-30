@@ -576,24 +576,6 @@ export default class extends COMMAND {
         }
 
         lines.push(`<hic>共 ${keys.length} 项：</hic>`);
-        lines.push("");
-
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            const value: TestResNode = node[key];
-
-            if (this.isLeaf(value)) {
-                const [, count] = value;
-                lines.push(`  <wht>${i}. ${key}</wht>  <hiy>x${count}</hiy>`);
-            } else if (this.isBranch(value)) {
-                const subCount = Object.keys(value).length;
-                lines.push(`  <hic>${i}. ${key}</hic>  <mem>(${subCount}项)</mem>`);
-            }
-        }
-
-        lines.push("");
-        lines.push("<mem>点击下方按钮或输入指令 test_res 数字</mem>");
-
         me.send(lines.join("<br>"));
 
         // 构建按钮：每项一个按钮，指令为 test_res <完整路径>
