@@ -1,6 +1,7 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
-import type {CHARACTER} from "../../../../core/char/character.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { CHARACTER } from "../../../../core/char/character.js";
+import type { PropMap } from "../../../../types/props.js";
 // ============================================================
 // 狂风快刀
 // ============================================================
@@ -27,19 +28,19 @@ export default class extends SKILL {
         {
             prop: 'kfkd_mz',
             name: "风劲",
-            value: (lv: number) => 5 + Math.floor(lv / 200),
+            value: (lv: number) => 2 + Math.floor(lv / 100),
             format: (val: number) => `狂风二十一式期间命中增加${val}%`,
         },
         {
             prop: 'kfkd_gj',
             name: "刀罡",
-            value: (lv: number) => 5 + Math.floor(lv / 200),
+            value: (lv: number) => 2 + Math.floor(lv / 100),
             format: (val: number) => `狂风二十一式期间攻击力增加${val}%`,
         },
         {
             prop: 'kfkd_hsfy',
             name: "破风",
-            value: (lv: number) => 5 + Math.floor(lv / 100),
+            value: (lv: number) => 5 + Math.floor(lv / 200),
             format: (val: number) => `狂风二十一式期间忽视对方防御${val}%`,
         },
     ];
@@ -63,9 +64,17 @@ export default class extends SKILL {
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const speedBonus = query_kfkd_gjsd_per(lv);
-                const mz_per = me.query_prop("kfkd_mz") || undefined;
-                const gj_per = me.query_prop("kfkd_gj") || undefined;
-                const diff_fy_per = me.query_prop("kfkd_hsfy") || undefined;
+                const mz_per = me.query_prop("kfkd_mz");
+                const gj_per = me.query_prop("kfkd_gj");
+                const diff_fy_per = me.query_prop("kfkd_hsfy");
+                const prop: PropMap = {
+                    gjsd_per: speedBonus
+                };
+
+                // 变量不为0才追加属性
+                if (mz_per !== 0) prop.mz_per = mz_per;
+                if (gj_per !== 0) prop.gj_per = gj_per;
+                if (diff_fy_per !== 0) prop.diff_fy_per = diff_fy_per;
                 const buffDuration = query_kfkd_buff_duration(me, speedBonus);
 
                 me.send_room(
@@ -79,12 +88,7 @@ export default class extends SKILL {
                     desc: "刀出如风，迅捷无伦",
                     duration: buffDuration,
                     override: 0,
-                    prop: {
-                        gjsd_per: speedBonus,
-                        mz_per,
-                        gj_per,
-                        diff_fy_per,
-                    },
+                    prop,
                     finish_msg: "$N刀势渐缓，狂风之势随之消散。",
                 });
                 me.reauto_attack();
