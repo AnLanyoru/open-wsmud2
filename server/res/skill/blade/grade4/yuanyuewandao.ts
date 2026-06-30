@@ -66,15 +66,16 @@ export default class extends SKILL {
      * 被动——「魔刀噬气」：每刀附加最大内力百分比伤害。
      * 魔教刀法以人饲刀，内力越深刀势越烈。
      */
-    on_attack(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar): number {
+    on_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
         const lv = me.query_skill("yuanyuewandao", 0);
         if (lv <= 0) return 0;
         const mp_dmg = query_yywd_mp_extra_damage(me, lv)
         const cost_reduce = me.query_prop("yywd_xh")
         me.add_mp(cost_reduce ? -mp_dmg * 0.4 : -mp_dmg)
         const rm_bouns = me.query_temp("yywd_rm", Number(0))
-        if (rm_bouns) return Math.floor((1 + (rm_bouns / 100)) * mp_dmg)
-        return mp_dmg;
+        if (!par.power_gj) par.power_gj = 0;
+        par.power_gj += Math.floor((1 + (rm_bouns / 100)) * mp_dmg)
+        return 0;
     }
 
     /**
@@ -182,14 +183,17 @@ export default class extends SKILL {
                 // 标记魔刀状态，防止 on_attack_over 触发虚弱
                 me.set_temp("yywd_modao", 1, 2000);
                 me.add_mp(-drainedMp);
-
-                const bonusDamage = query_yywd_modao_bonus_damage(me, lv, drainedMp);
+                let baseDmg = me.gj
+                // 进阶「魔临」：附加攻击力
+                const atk_bonus = me.query_prop("yywd_md")
+                if (atk_bonus > 0) {
+                    baseDmg += me.gj * atk_bonus / 100;
+                }
 
                 me.send_room(
                     "<hio>$N将内力尽数灌注$W之中，霎时刀身魔焰冲天，血光映红半天——$N狂啸一声，$W化作一轮血月向$n斩去！</hio>",
                     target,
                 );
-
                 let totalDamage = 0;
                 // 攻击附近所有敌人
                 const enemies = me.enemy?.length ? [...me.enemy] : [target];
@@ -198,7 +202,8 @@ export default class extends SKILL {
                     if (!enemy) continue;
                     const sh = me.do_attack({
                         target: enemy,
-                        gj: me.gj + bonusDamage,
+                        power_gj: drainedMp,
+                        gj: Math.floor(baseDmg),
                         mz: me.mz,
                         no_power: true,
                         attack_msg: i === 0
@@ -265,11 +270,6 @@ function query_yywd_rumo_bonus(lv: number): number {
 function query_yywd_modao_bonus_damage(me: CHARACTER, _lv: number, drainedMp: number): number {
     // 基础：耗尽内力
     let bonus = drainedMp;
-    // 进阶「魔临」：附加攻击力
-    const atk_bonus = me.query_prop("yywd_md")
-    if (atk_bonus > 0) {
-        bonus += me.gj * atk_bonus / 100;
-    }
     return Math.floor(bonus);
 }
 

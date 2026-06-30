@@ -53,6 +53,9 @@ JSON.toObject = function (str: string): any {
     return JSON5.parse(str);
 };
 
+/** int — 全局取整函数，等同 Math.floor */
+(globalThis as any).int = Math.trunc;
+
 // ============================================================
 // UTIL 单例
 // ============================================================
