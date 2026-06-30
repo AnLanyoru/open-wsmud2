@@ -14,9 +14,8 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'xxdf_nl_max',
-            value: (lv: number) => 125,
-            format: (val: number) => `内力上限：+${val * 1000}`,
-            desc: '吸星大法内力上限',
+            value: (lv: number) => 125 * lv,
+            format: (val: number) => `内力上限：+${val}`,
         },
         {
             prop: 'xxdf_xzj_cs',
@@ -45,7 +44,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        xizijue: {
+        xi: {
             name: "吸字诀",
             distime: 30000,
             enable_skill: "force",
@@ -59,10 +58,27 @@ export default class extends SKILL {
                 const totalHits = baseHits + csBonus;
                 const gjPerHit = Math.floor(me.gj * (baseGjPct + shBonus) / 100);
                 const interval = query_xxdf_xizijue_interval(lv);
-                let totalDamage = 0;
+                const busyDuration = totalHits * interval + 200;
 
                 me.send_room("<him>$N运起吸星大法，双掌翻飞间化出一股诡异吸力，向$n笼罩而去！</him>", target);
 
+                // 首次命中判定
+                const firstSh = me.do_attack({
+                    target,
+                    gj: gjPerHit,
+                    mz: me.mz,
+                });
+
+                me.end_attack(target);
+
+                if (firstSh <= 0) return;
+
+                // 命中后立刻设置释放时间
+                let totalDamage = firstSh;
+                target.add_mp(-Math.floor(firstSh * 0.5));
+                target.set_releasetime(busyDuration);
+
+                // 后续持续伤害
                 me.call_interval(
                     function (i) {
                         const nowTarget = me.query_enemy();
@@ -77,22 +93,13 @@ export default class extends SKILL {
                         if (sh > 0) {
                             totalDamage += sh;
                             nowTarget.add_mp(-Math.floor(sh * 0.5));
-                            nowTarget.add_status({
-                                id: "busy",
-                                is_busy: true,
-                                name: "忙乱",
-                                downside: true,
-                                desc: "你被吸星大法制住，气血倒流，无法行动",
-                                duration: interval + 200,
-                                override: 2,
-                            }, me);
                         }
 
                         me.end_attack(nowTarget);
 
                         if (!me.enemy?.length) return false;
 
-                        if (i >= totalHits - 1) {
+                        if (i >= totalHits - 2) {
                             if (totalDamage > 0) {
                                 me.add_hp(totalDamage);
                                 me.send_room("<hio>$N猛地一收掌力，$n周身气血如潮涌般被吸入$N体内！</hio>", target);
@@ -102,7 +109,7 @@ export default class extends SKILL {
                         return true;
                     },
                     interval,
-                    totalHits,
+                    totalHits - 1,
                 );
             },
             query_desc: function (me: CHARACTER, lv: number): string {
