@@ -29,12 +29,12 @@ export default class extends SKILL {
         {
             prop: 'xtg_dyq_nl',
             value: (_lv: number) => 1,
-            format: (val: number) => '定阳气会同步恢复内力',
+            format: (_val: number) => '定阳气会同步恢复内力',
         },
         {
             prop: 'xtg_cyq_fz',
-            value: (_lv: number) => 40,
-            format: (val: number) => '纯阳气期间对敌人造成40%防御力的反震伤害',
+            value: (lv: number) => 30 + int(lv / 100),
+            format: (val: number) => `纯阳气期间对敌人造成${val}%防御力的反震伤害`,
         },
     ];
 
@@ -53,12 +53,32 @@ export default class extends SKILL {
     /**
      * 纯阳气——每击附加最大内力1%的伤害。
      */
-    on_attack(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar): number {
+    on_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
         if (me.query_temp("xtg_cy", 0)) {
+            if (!par.power_gj) par.power_gj = 0;
             const lv = me.query_skill("xiantiangong", 0);
-            return Math.floor(me.max_mp * (1 + Math.floor(lv / 2000)) / 100);
+            par.power_gj += Math.floor(me.max_mp * (1 + Math.floor(lv / 2000)) / 100);
         }
         return 0;
+    }
+
+    /**
+     * 纯阳气——受到伤害时反震40%防御力的伤害给攻击者。
+     * sh > 0 守卫防止 damage3 递归触发反震（damage3 以 sh=0 调用 on_damage）。
+     */
+    on_damage(me: CHARACTER, sh: number, from?: CHARACTER): number {
+        if (sh > 0 && me.query_temp("xtg_cy", 0) && from && from.hp > 0) {
+            const pct = me.query_prop("xtg_cyq_fz");
+            const recoil = Math.floor(me.fy * pct / 100);
+            if (recoil > 0) {
+                me.send_combat(
+                    "<hib>$N的纯阳真气反震，将" + recoil + "点伤害反弹给$n！</hib>\n",
+                    from,
+                );
+                from.damage3(recoil, me);
+            }
+        }
+        return sh;
     }
 
     pfm_set: PerformData = {

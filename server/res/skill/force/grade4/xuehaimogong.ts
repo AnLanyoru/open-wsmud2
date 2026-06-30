@@ -56,7 +56,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        xuemo: {
+        mo: {
             name: "血魔",
             distime: 60000,
             enable_skill: "force",
@@ -88,7 +88,7 @@ export default class extends SKILL {
                 return "血魔附体，" + (duration / 1000) + "秒内增加你" + per + "%的攻击、防御、命中、躲闪、招架";
             },
         },
-        xueji: {
+        ji: {
             name: "血祭",
             distime: 60000,
             enable_skill: "force",
