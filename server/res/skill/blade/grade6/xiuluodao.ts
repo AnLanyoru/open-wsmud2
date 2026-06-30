@@ -54,7 +54,7 @@ export default class extends SKILL {
             max_count: 6,
             downside: true,
             prop: {
-                diff_sh: -lv,
+                diff_sh: -1000 - parseInt(lv * ((lv / 120) + 1)),
             },
             finish_msg: "$N身上的修罗刀气渐散，伤势愈。",
         }, me);
