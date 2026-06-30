@@ -18,31 +18,37 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'xhmg_nl_max',
-            value: (lv: number) => 140,
-            format: (val: number) => '内力上限：+140000',
-            desc: '血海魔功内力上限',
+            prop: "limit_mp",
+            value: (lv: number) => 140 * lv,
+            format: (val: number) => "内力上限：+" + val,
+            query_needs: function (_lv: number) {
+                return [{
+                    path: "book/wudao",
+                    count:  10
+                },{
+                    path: "book/bc#xuehaimogong",
+                    count: 25,
+                }];
+            },
         },
         {
             prop: 'xhmg_xj_hp',
             value: (lv: number) => 1,
             format: (val: number) => '血祭时不消耗气血',
-            desc: '血祭不耗血',
         },
         {
             prop: 'xhmg_xj_xr',
             value: (lv: number) => 1,
             format: (val: number) => '血祭结束后将不会虚弱',
-            desc: '血祭不虚弱',
         },
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                gj: 2 + Math.floor(lv * 1.61),
-                fy: Math.floor(lv * 1.78),
-                diff_fy_per: 6,
+                gj: 12 + Math.floor(lv * 1.6),
+                fy: 180 + Math.floor(lv * 1.6),
+                diff_fy_per: 1 + Math.floor(lv / 200),
                 limit_mp: lv * 140,
                 desc: "唯一：将你内力的75%转化为气血",
             },
@@ -88,11 +94,12 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 56,
             release_time: 500,
-            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void | boolean {
                 // 血祭消耗25%最大气血（slot 进阶可免消耗）
                 const noHpCost = me.query_prop("xhmg_xj_hp");
                 if (!noHpCost) {
                     const hpCost = Math.floor(me.max_hp * 0.25);
+                    if (me.hp < hpCost) return me.notify_fail("你的气血不足，无法使用【血祭】");
                     me.add_hp(-hpCost);
                 }
 
@@ -103,7 +110,7 @@ export default class extends SKILL {
                 );
 
                 me.add_status({
-                    id: "force",
+                    id: "power",
                     name: "血祭",
                     desc: "血祭中，免疫死亡与控制",
                     duration: dur,
@@ -117,8 +124,8 @@ export default class extends SKILL {
                         const noWeakness = p.query_prop("xhmg_xj_xr");
                         if (!noWeakness) {
                             p.add_status({
-                                id: "xueji_debuff",
-                                name: "血祭反噬",
+                                id: "xj_wk",
+                                name: "虚弱",
                                 desc: "血祭副作用，战斗属性大幅降低",
                                 duration: dur,
                                 downside: true,
