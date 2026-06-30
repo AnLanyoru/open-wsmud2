@@ -5,7 +5,7 @@ import type { USER } from "../../../core/char/user.js";
 export default class extends COMMAND {
     command = "xwxcopy";
     regex = /^(\w+)$/;
-    allow_fight = false;
+    allow_fight = true;
 
     /**
      * 将无相模仿的绝招保存到指定装备部位
