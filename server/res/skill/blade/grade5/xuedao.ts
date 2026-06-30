@@ -36,16 +36,30 @@ export default class extends SKILL {
     }
 
     /**
-     * 血刀被动——「浴血」：气血越低，杀意越盛。
-     * 每降低1%气血，伤害增加 (lv/1000+1)%。
+     * 入战时记录当前气血百分比，作为「浴血」加成的基准。
+     * 入战血量视为 100%，此后每损失1%气血，伤害增加 (lv/1000+1)%。
+     * 被治疗至超过入战百分比时，加成归零——不因回血而产生负收益。
+     */
+    on_beginfight(me: CHARACTER, _target: CHARACTER): void {
+        const entryPercent = Math.floor(me.hp * 100 / me.max_hp);
+        me.set_temp("ef_hp", entryPercent);
+    }
+
+    /**
+     * 血刀被动——「浴血」：入战以来损失越多，杀意越盛。
      */
     on_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number {
         const lv = me.query_skill("xuedao", 0);
         if (lv <= 0) return 0;
-        const missingHp = 100 - Math.floor(me.hp * 100 / me.max_hp);
-        if (missingHp <= 0) return 0;
+        let entryPercent = me.query_temp("ef_hp", Number(100));
+        const curPercent = Math.floor(me.hp * 100 / me.max_hp);
+        if (curPercent > entryPercent) {
+            me.set_temp("ef_hp", curPercent);
+            return 0
+        }
+        const lostPercent = entryPercent - curPercent;
         const bloodPer = query_xd_blood_per(lv);
-        const extraPer = missingHp * bloodPer;
+        const extraPer = lostPercent / entryPercent * bloodPer;
         return Math.floor(me.gj * extraPer / 100);
     }
 
