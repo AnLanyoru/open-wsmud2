@@ -14,7 +14,7 @@ export default class extends COMMAND {
     enter(me: USER, par: string) {
         if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
         let pars = par.split(' ');
-        var name = pars[0], gender = parseInt(pars[1]),
+        let name = pars[0], gender = parseInt(pars[1]),
             str = parseInt(pars[2]), con = parseInt(pars[3]), dex = parseInt(pars[4]), int = parseInt(pars[5]);
 
 
