@@ -37,7 +37,7 @@ export default class extends SKILL {
         {
             prop: 'yywd_xh',
             name: "饮魔",
-            value: (_lv: number) => 60,
+            value: (_lv: number) => 1,
             format: (_val: number) => '入魔与普攻的内力消耗降低60%',
         },
         {
@@ -69,7 +69,10 @@ export default class extends SKILL {
     on_attack(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar): number {
         const lv = me.query_skill("yuanyuewandao", 0);
         if (lv <= 0) return 0;
-        return query_yywd_mp_extra_damage(me, lv);
+        const mp_dmg = query_yywd_mp_extra_damage(me, lv)
+        const cost_reduce = me.query_prop("yywd_xh")
+        me.add_mp(cost_reduce ? -mp_dmg * 0.4 : -mp_dmg)
+        return mp_dmg;
     }
 
     /**
@@ -159,7 +162,7 @@ export default class extends SKILL {
             mp: 0,
             release_time: 4000,
             check: function (me: CHARACTER, _lv: number, _base_type?: string): boolean {
-                // 需进阶至橙色（3阶）解锁
+                // 需进阶至橙色（grade5）解锁
                 const sk = me.skills?.get("yuanyuewandao");
                 if (!sk || !sk.addin || sk.addin.length < 3) return false;
                 return true;
@@ -209,7 +212,7 @@ export default class extends SKILL {
                     if (absorb > 0) {
                         me.add_mp(absorb);
                         me.send_room(
-                            "<hio>$n伤口处血雾喷涌，$N$W饮血而归，血煞之气顺刀身灌入$N经脉，化作内力回流。</hio>",
+                            "<hio>$n伤口处血雾喷涌，$N的$W饮血而归，血煞之气顺刀身灌入$N经脉，化作内力回流。</hio>",
                             target,
                         );
                     }
@@ -269,7 +272,7 @@ function query_yywd_modao_bonus_damage(me: CHARACTER, _lv: number, drainedMp: nu
 
 /** 魔刀：伤害吸收百分比 */
 function query_yywd_modao_absorb_percent(_lv: number): number {
-    return 30;
+    return 100;
 }
 
 /** 魔刀：伤害吸收量 */
