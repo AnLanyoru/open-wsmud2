@@ -59,8 +59,8 @@ export default class extends SKILL {
         }
         const lostPercent = entryPercent - curPercent;
         const bloodPer = query_xd_blood_per(lv);
-        const extraPer = lostPercent / entryPercent * bloodPer;
-        return Math.floor(me.gj * extraPer / 100);
+        const extraRatio = lostPercent / entryPercent * bloodPer;
+        return Math.floor(me.gj * extraRatio);
     }
 
     /**
