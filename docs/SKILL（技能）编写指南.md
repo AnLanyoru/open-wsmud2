@@ -1574,6 +1574,78 @@ if (damage > 0) {
 }
 ```
 
+### 14.1 power_gj —— 内力附加伤害
+
+`power_gj` 是独立于 `gj`（攻击力）的**内力附加伤害专用通道**。凡是"消耗内力造成额外伤害"、"附加最大内力百分比的伤害"等内力驱动的伤害，都应走 `power_gj`，**不要直接加到 `gj` 里**。
+
+**与直接加 `gj` 的区别：**
+
+| 行为 | 加到 `gj` | 用 `power_gj` |
+|------|----------|--------------|
+| 受目标防御力减免 | ✅ 会 | ❌ 不会（直伤） |
+| 受 `add_sh_per` 加成 | ✅ 会 | 仅空手时 |
+| 受暴击加成 | ✅ 会 | 仅空手时 |
+| `no_power: true` 时仍然生效 | ❌ 不生效 | ✅ 仍然生效 |
+| 走 `on_force_parry` 减免 | ❌ 不走 | ✅ 走 |
+
+**伤害管线（character.ts）：**
+
+```
+power_gj（从 DoAttackPar 提取）
+  → + force_skill.do_force_attack()   // 内功技能可追加
+  → if (空手) { × add_sh_per; × 暴击 } // 仅空手享受这些加成
+  → sh += power_gj                      // 无条件加到最终伤害（不受 no_power 限制）
+  → - target.force_skill.on_force_parry() // 目标内功可减免
+```
+
+**关键特性：** `power_gj` 在 `no_power` 判断之外（character.ts:2728），即使 `no_power: true` 也会生效。因此用 `no_power` 禁止暴击的绝招，其内力附加部分仍能正确造成伤害。
+
+**正确 vs 错误写法：**
+
+```typescript
+// ❌ 错误：把内力伤害附加混入 gj
+const bonus = Math.floor(me.max_mp * per / 100);
+me.do_attack({
+    target: target,
+    gj: me.gj + bonus,   // 内力伤害被当作攻击力，走防御减免、暴击等
+    mz: me.mz,
+});
+
+// ✅ 正确：内力伤害附加走 power_gj 通道
+const bonus = Math.floor(me.max_mp * per / 100);
+me.do_attack({
+    target: target,
+    gj: me.gj,            // 攻击力保持原样
+    mz: me.mz,
+    power_gj: bonus,      // 内力附加伤害走专用通道
+});
+```
+
+**实际示例（天山六阳掌·白虹掌力）：**
+
+```typescript
+use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+    const per = Math.min(20, 10 + Math.floor(lv / 100));
+    me.do_attack({
+        attack_msg: "<hiy>$N提起全身真气，呼的一掌向$n当头劈落。</hiy>",
+        target: target,
+        gj: me.gj,
+        mz: me.mz,
+        no_weapon: true,
+        power_gj: Math.floor(me.max_mp * per / 100),  // 内力伤害走 power_gj
+    });
+    me.end_attack(target);
+},
+```
+
+**适用场景判断：**
+
+- "附加你最大内力 X% 的伤害" → `power_gj`
+- "消耗内力造成额外伤害" → `power_gj`
+- "以内力震伤敌人" → `power_gj`
+- "增加 X 点攻击力" → 加到 `gj`（这是实实在在的攻击力提升）
+- "造成 X% 攻击力的伤害" → 加到 `gj`（攻击力百分比加成，非内力驱动）
+
 ---
 
 ## 15. add_status 状态系统
