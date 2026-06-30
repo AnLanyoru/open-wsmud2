@@ -33,8 +33,8 @@ export default class extends SKILL {
         return {
             force: {
                 gj: lv * 2,
-                hp_per: 8,
-                fy_per: 8,
+                hp_per: 3 + Math.floor(lv / 200),
+                fy_per: 3 + Math.floor(lv / 200),
                 limit_mp: lv * 190,
                 desc: "唯一：将你内力的82%转化为气血",
             },
@@ -46,7 +46,8 @@ export default class extends SKILL {
      */
     on_attack(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar): number {
         if (me.query_temp("xtg_cy", 0)) {
-            return Math.floor(me.max_mp * 0.01);
+            const lv = me.query_skill("xiantiangong", 0);
+            return Math.floor(me.max_mp * (1 + Math.floor(lv / 2000)) / 100);
         }
         return 0;
     }
@@ -107,10 +108,10 @@ export default class extends SKILL {
 
 /** 纯阳气持续时间（毫秒）——每级增加50ms，确保个位数等级变化可感知 */
 function query_xtg_chunyang_duration(lv: number): number {
-    return 10000 + lv * 50;
+    return 4000 + lv * 10;
 }
 
 /** 定阳气恢复气血百分比 */
-function query_xtg_dingyang_percent(_lv: number): number {
-    return 20;
+function query_xtg_dingyang_percent(lv: number): number {
+    return 10 + Math.floor(lv / 100);
 }

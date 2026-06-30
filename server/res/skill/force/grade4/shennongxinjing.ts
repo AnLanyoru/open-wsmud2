@@ -37,8 +37,8 @@ export default class extends SKILL {
             force: {
                 max_hp: lv * 30,
                 con: Math.floor(lv * 0.338),
-                fy: Math.floor(lv * 1.95),
-                recover_per: 10,
+                fy: 150 + Math.floor(lv * 1.8),
+                recover_per: 5 + Math.floor(lv / 200),
                 limit_mp: lv * 198,
                 desc: "唯一：将你内力的85%转化为气血",
             },
@@ -132,7 +132,7 @@ export default class extends SKILL {
 
 /** 金针渡穴：基础气血回复量 */
 function snxj_jinzhen_heal(lv: number): number {
-    return 13206;
+    return 20 + Math.floor(lv * 34 / 1000);
 }
 
 /** 万法不侵：伤害减免百分比 */

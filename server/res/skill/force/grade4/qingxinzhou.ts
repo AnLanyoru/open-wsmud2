@@ -126,8 +126,8 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const dur = calc_gongming_dur(me, lv);
-                const gj = calc_gongming_gj();
-                const mz = calc_gongming_mz();
+                const gj = calc_gongming_gj(lv);
+                const mz = calc_gongming_mz(lv);
 
                 me.send_room(
                     "<hiy>$N深吸一口气，一声清啸直冲云霄，音波如水纹般向四周扩散，天地为之共鸣！</hiy>",
@@ -150,8 +150,8 @@ export default class extends SKILL {
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const dur = calc_gongming_dur_str(me, lv);
-                const gj = calc_gongming_gj();
-                const mz = calc_gongming_mz();
+                const gj = calc_gongming_gj(lv);
+                const mz = calc_gongming_mz(lv);
                 return `引音波共鸣，${dur}秒内你和周围队友增加${gj}点攻击力与${mz}点命中。`;
             },
         },
@@ -174,8 +174,8 @@ function calc_powang_dur_str(lv: number): string {
 }
 
 /** 破妄曲附加伤害 */
-function calc_powang_add_sh(me: CHARACTER, _lv: number): number {
-    return 2000 + me.query_prop("qxz_pwq_sh");
+function calc_powang_add_sh(me: CHARACTER, lv: number): number {
+    return lv * 2 + me.query_prop("qxz_pwq_sh");
 }
 
 /** 安神曲持续时间（毫秒），每级增加5ms确保等级提升能感知到持续时间增长 */
@@ -190,13 +190,13 @@ function calc_anshen_dur_str(lv: number): string {
 }
 
 /** 安神曲减伤值 */
-function calc_anshen_diff_sh(me: CHARACTER, _lv: number): number {
-    return 2000 + me.query_prop("qxz_asq_fy");
+function calc_anshen_diff_sh(me: CHARACTER, lv: number): number {
+    return lv * 2 + me.query_prop("qxz_asq_fy");
 }
 
 /** 共鸣持续时间（毫秒） */
-function calc_gongming_dur(me: CHARACTER, _lv: number): number {
-    return 9000 + me.query_prop("qxz_gm_time");
+function calc_gongming_dur(me: CHARACTER, lv: number): number {
+    return (8 + Math.floor(lv / 1000)) * 1000 + me.query_prop("qxz_gm_time");
 }
 
 /** 共鸣持续时间显示（秒） */
@@ -206,11 +206,11 @@ function calc_gongming_dur_str(me: CHARACTER, lv: number): string {
 }
 
 /** 共鸣攻击力加成 */
-function calc_gongming_gj(): number {
-    return 1000;
+function calc_gongming_gj(lv: number): number {
+    return lv;
 }
 
 /** 共鸣命中加成 */
-function calc_gongming_mz(): number {
-    return 1000;
+function calc_gongming_mz(lv: number): number {
+    return lv;
 }

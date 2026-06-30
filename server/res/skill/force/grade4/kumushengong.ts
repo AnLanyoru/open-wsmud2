@@ -76,7 +76,8 @@ export default class extends SKILL {
             },
             query_desc: function(me: CHARACTER, lv: number): string {
                 const hpHeal = kumufengchun_heal(me, lv);
-                return "<hiz>枯木逢春：</hiz>恢复" + hpHeal + "点气血（20%最大气血），移除你自身的负面状态。";
+                const pct = 10 + Math.floor(lv / 100);
+                return "<hiz>枯木逢春：</hiz>恢复" + hpHeal + "点气血（" + pct + "%最大气血），移除你自身的负面状态。";
             },
         },
     };
@@ -89,5 +90,6 @@ export default class extends SKILL {
 
 /** 枯木逢春回血量：20%最大气血 */
 function kumufengchun_heal(me: CHARACTER, lv: number): number {
-    return Math.floor(me.max_hp * 0.2);
+    const pct = 10 + Math.floor(lv / 100);
+    return Math.floor(me.max_hp * pct / 100);
 }

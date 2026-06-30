@@ -67,18 +67,19 @@ export default class extends SKILL {
                     desc: "血魔附体，提升攻击、防御、命中、躲闪、招架",
                     duration: duration,
                     prop: {
-                        gj_per: 20,
-                        fy_per: 20,
-                        mz_per: 20,
-                        ds_per: 20,
-                        zj_per: 20,
+                        gj_per: xuemo_per(lv),
+                        fy_per: xuemo_per(lv),
+                        mz_per: xuemo_per(lv),
+                        ds_per: xuemo_per(lv),
+                        zj_per: xuemo_per(lv),
                     },
                     finish_msg: "$N眼中血芒渐褪，周身那股嗜血魔气缓缓平息，归于丹田。",
                 });
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const duration = query_xuemo_duration(lv);
-                return "血魔附体，" + (duration / 1000) + "秒内增加你20%的攻击、防御、命中、躲闪、招架";
+                const per = xuemo_per(lv);
+                return "血魔附体，" + (duration / 1000) + "秒内增加你" + per + "%的攻击、防御、命中、躲闪、招架";
             },
         },
         xueji: {
@@ -87,13 +88,15 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 56,
             release_time: 500,
-            use: function (me: CHARACTER, _target: CHARACTER, _lv: number): void {
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 // 血祭消耗25%最大气血（slot 进阶可免消耗）
                 const noHpCost = me.query_prop("xhmg_xj_hp");
                 if (!noHpCost) {
                     const hpCost = Math.floor(me.max_hp * 0.25);
                     me.add_hp(-hpCost);
                 }
+
+                const dur = xueji_dur(lv);
 
                 me.send_room(
                     "<hir>$N咬破舌尖，一口精血喷出，全身血气暴涨，散发出令人窒息的恐怖气息！</hir>\n",
@@ -103,10 +106,10 @@ export default class extends SKILL {
                     id: "force",
                     name: "血祭",
                     desc: "血祭中，免疫死亡与控制",
-                    duration: 9000,
+                    duration: dur,
                     ig_control: true,
                     on_attach: function (p: CHARACTER): void {
-                        p.set_temp("xhmg_xj_immune", 1, 9000);
+                        p.set_temp("xhmg_xj_immune", 1, dur);
                     },
                     on_expire: function (p: CHARACTER): void {
                         p.remove_temp("xhmg_xj_immune");
@@ -117,7 +120,7 @@ export default class extends SKILL {
                                 id: "xueji_debuff",
                                 name: "血祭反噬",
                                 desc: "血祭副作用，战斗属性大幅降低",
-                                duration: 9000,
+                                duration: dur,
                                 downside: true,
                                 prop: {
                                     gj_per: -30,
@@ -171,4 +174,14 @@ export default class extends SKILL {
 /** 血魔持续时间（毫秒）：基准 30000，每级 +5，确保微末等级差异可感知 */
 function query_xuemo_duration(lv: number): number {
     return 30000 + lv * 5;
+}
+
+/** 血魔属性百分比 */
+function xuemo_per(lv: number): number {
+    return 10 + Math.floor(lv / 100);
+}
+
+/** 血祭持续时间（毫秒） */
+function xueji_dur(lv: number): number {
+    return 2500 + lv * 6.5;
 }

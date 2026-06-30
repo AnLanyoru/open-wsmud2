@@ -44,8 +44,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: Math.floor(lv * 1.51),
-                gj: Math.floor(lv * 1.51),
+                fy: Math.floor(lv * 1.5) + 10,
+                gj: Math.floor(lv * 1.5) + 10,
                 limit_mp: lv * 155,
                 desc: "当你命中敌人后会吸取对方内力增加自身最大内力\n唯一：将你内力的75%转化为气血",
             },
@@ -100,8 +100,8 @@ export default class extends SKILL {
                 downside: true,
                 no_diff: true,
                 prop: {
-                    gj_per: -20,
-                    mz_per: -20,
+                    gj_per: -hg_debuff_per(lv),
+                    mz_per: -hg_debuff_per(lv),
                 },
             }, me);
         }
@@ -187,7 +187,7 @@ export default class extends SKILL {
 
 /** 化毒持续时间（毫秒） */
 function hd_dur(lv: number): number {
-    return 6000 + Math.floor(lv / 50) * 50;
+    return 3000 + lv * 3;
 }
 
 /** 化毒持续时间显示（秒） */
@@ -198,22 +198,22 @@ function hd_dur_str(lv: number): string {
 
 /** 化毒攻击加成 */
 function hd_gj_add(lv: number): number {
-    return 1500 + Math.floor(lv / 5);
+    return Math.floor(lv * 1.5);
 }
 
 /** 化毒防御加成 */
 function hd_fy_add(lv: number): number {
-    return 1500 + Math.floor(lv / 5);
+    return Math.floor(lv * 1.5);
 }
 
 /** 化毒减少敌方内力量 */
 function hd_mp_drain(lv: number): number {
-    return 10333 + Math.floor(lv / 3);
+    return 5000 + lv * 2 + Math.floor(lv * lv / 300);
 }
 
 /** 化功持续时间（毫秒） */
 function hg_dur(lv: number): number {
-    return 10000 + lv * 5;
+    return 5000 + lv * 5;
 }
 
 /** 化功持续时间显示（秒） */
@@ -224,5 +224,10 @@ function hg_dur_str(lv: number): string {
 
 /** 化功 debuff 持续时间（毫秒） */
 function hg_debuff_dur(lv: number): number {
-    return 10000 + lv * 5;
+    return 5000 + lv * 5;
+}
+
+/** 化功 debuff 百分比 */
+function hg_debuff_per(lv: number): number {
+    return 15 + Math.floor(lv / 200);
 }

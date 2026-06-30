@@ -36,8 +36,8 @@ export default class extends SKILL {
         return {
             force: {
                 max_hp: lv * 30,
-                hp_per: 4,
-                fy_per: 4,
+                hp_per: 1 + Math.floor(lv / 330),
+                fy_per: 1 + Math.floor(lv / 330),
                 limit_mp: lv * 155,
                 desc: "唯一：将你内力的90%转化为气血\n命中后会化掉对方4000当前内力",
             },
@@ -125,12 +125,12 @@ export default class extends SKILL {
 
 /** 吸字诀基础攻击次数（不包含进阶加成） */
 function query_xxdf_xizijue_hits(lv: number): number {
-    return 5;
+    return 3 + Math.floor(lv / 500);
 }
 
 /** 吸字诀基础伤害百分比（不包含进阶加成） */
 function query_xxdf_xizijue_gj_percent(lv: number): number {
-    return 110;
+    return 101 + Math.floor(lv / 110);
 }
 
 /** 吸字诀每段攻击间隔（毫秒），随等级提升而缩短 */
