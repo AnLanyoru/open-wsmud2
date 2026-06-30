@@ -1,7 +1,8 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { LearnCondition } from "../../../../types/events.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import { PropMap } from "../../../../types/props.js";
 
 export default class extends SKILL {
     name = "化功大法";
@@ -25,8 +26,8 @@ export default class extends SKILL {
             query_needs: function (_lv: number) {
                 return [{
                     path: "book/wudao",
-                    count:  10
-                },{
+                    count: 10
+                }, {
                     path: "book/bc#huagongdafa",
                     count: 25,
                 }];
@@ -35,7 +36,7 @@ export default class extends SKILL {
         {
             prop: "hgd_xn_cd",
             value: (lv: number) => 4000,
-            format: (val: number) => "吸取内力的冷却减少" + int(val / 1000) + "秒",
+            format: (val: number) => "吸取内力的冷却减少" + toSec(val) + "秒",
         },
         {
             prop: "hgd_hd_xy",
@@ -56,16 +57,15 @@ export default class extends SKILL {
     }
 
     /**
-     * 化毒状态 -> 被攻击时减少攻击者内力
+     * 化毒状态 -> 被攻击时减少攻击者内力（参考北冥机制）
      */
     on_damage(me: CHARACTER, sh: number, from?: CHARACTER): number {
         if (me.query_temp("hgd_hd", 0) > 0 && from && from.hp > 0) {
             const lv = me.query_skill("huagongdafa", 0);
             const mpDrain = hd_mp_drain(lv);
-            from.mp -= mpDrain;
-            if (from.mp < 0) from.mp = 0;
+            from.add_mp(-mpDrain);
             me.send_room(
-                "<hib>$N周身碧色毒罡如蛇缠身，$n一掌击来，内力竟被化毒吞去三分！</hib>\n",
+                "<hib>$N周身碧色毒罡如蛇缠身，内力竟被化毒吞去三分！</hib>\n",
                 from,
             );
         }
@@ -73,22 +73,29 @@ export default class extends SKILL {
     }
 
     /**
-     * 化功状态 -> 攻击命中时给目标附加 debuff
+     * 化功状态 -> 攻击命中时吸收目标内力并附加 debuff（参考北冥机制）
      */
     on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
+        if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {
+            let cd = 4000 - me.query_prop("hgd_xn_cd");
+            if (cd < 500) cd = 500;
+            if (!me.query_temp("sk_huagong_xn", 0)) {
+                me.set_temp("sk_huagong_xn", 1, cd);
+                const lv = me.query_skill("huagongdafa", 0);
+                const gj = Math.round(lv / 10);
+                const mp = Math.floor(gj * 120 / 100);
+                if (target.mp > mp) {
+                    target.add_mp(-mp);
+                    me.max_mp += gj;
+                    me.send_room(
+                        "<hib>$N掌中碧毒顺势侵入$n经脉，$p内力如江河决堤般被化去！</hib>\n",
+                        target,
+                    );
+                }
+            }
 
-        // 化毒状态 -> 命中后额外减少目标内力
-        if (me.query_temp("hgd_hd", 0) > 0) {
-            const lv = me.query_skill("huagongdafa", 0);
-            const mpDrain = hd_mp_drain(lv);
-            target.mp -= mpDrain;
-            if (target.mp < 0) target.mp = 0;
-            me.send_room(
-                "<hib>$N掌中碧毒顺势侵入$n经脉，$p内力如江河决堤般被化去！</hib>\n",
-                target,
-            );
         }
 
         // 化功状态 -> 给目标附加攻命降低的 debuff
@@ -123,6 +130,17 @@ export default class extends SKILL {
                 const fyAdd = hd_fy_add(lv);
                 const slotBonus = me.query_prop("hgd_hd_xy");
 
+                let prop: PropMap = {
+                    gj: gjAdd,
+                    fy: fyAdd,
+                }
+                if (slotBonus) {
+                    prop = {
+                        diff_sh_per: slotBonus,
+                        diff_fy_per: slotBonus,
+                    }
+                }
+
                 me.send_room(
                     "<hib>$N深吸一口气，双掌翻飞间周身碧光大盛，毒雾缭绕，竟是运起化功大法以身为炉、以内力化毒！</hib>\n",
                 );
@@ -132,17 +150,15 @@ export default class extends SKILL {
                     name: "化毒",
                     desc: "内力化毒布满全身，提升攻击与防御",
                     duration: dur,
-                    prop: {
-                        gj: gjAdd,
-                        fy: fyAdd,
-                        diff_sh_per: slotBonus,
-                        diff_fy_per: slotBonus,
+                    prop,
+                    on_attach: function (p: CHARACTER): void {
+                        p.set_temp("hgd_hd", 1, dur);
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        p.remove_temp("hgd_hd");
                     },
                     finish_msg: "$N周身碧色毒雾渐渐消散，化毒之功收归丹田。",
                 });
-
-                // 设置战斗标记，配合 on_damage / on_attack_over 使用
-                me.set_temp("hgd_hd", 1, dur);
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const dur = hd_dur_str(lv);
@@ -165,20 +181,25 @@ export default class extends SKILL {
                     "<hiy>$N双掌猛然向天一举，浑身上下碧焰冲天，毒气如潮水般向四外席卷而出！四周草木瞬间枯黄凋零！</hiy>\n",
                 );
 
-                // 设置战斗标记，配合 on_attack_over 使用
-                me.set_temp("hgd_hg", 1, dur);
-
                 me.add_status({
                     id: "force",
                     name: "化功",
                     desc: "内力化毒布满四周，攻击命中敌人可令其功力大减",
                     duration: dur,
+                    on_attach: function (p: CHARACTER): void {
+                        p.set_temp("hgd_hg", 1);
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        p.remove_temp("hgd_hg");
+                    },
                     finish_msg: "$N周身汹涌的碧焰毒气缓缓收敛，化功之势已消。",
                 });
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const dur = hg_dur_str(lv);
-                return "在" + dur + "秒内内力化毒布满四周，攻击命中敌人可降低其20%的攻击和命中，持续10秒";
+                const per = hg_debuff_per(lv);
+                const debuffDur = toSec(hg_debuff_dur(lv));
+                return "在" + dur + "秒内内力化毒布满四周，攻击命中敌人可降低其" + per + "%的攻击和命中，持续" + debuffDur + "秒";
             },
         },
     };
