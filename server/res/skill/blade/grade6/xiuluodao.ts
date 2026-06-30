@@ -1,5 +1,5 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -38,10 +38,13 @@ export default class extends SKILL {
      * 修罗刀被动——「修罗印记」：命中敌人后，在其身上叠加一层修罗，
      * 每层降低等同于技能等级的数值伤害减免，最高 6 层。
      */
-    on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
-        if (sh <= 0) return;
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
+        if (par.is_dodged || par.is_parried) return;
         const lv = me.query_skill("xiuluodao", 0);
         if (lv <= 0) return;
+
+        if (target.query_temp("_xl_cd")) return;
+        target.set_temp("_xl_cd", 1, 500);
 
         const dur = query_xld_xl_duration(lv);
         target.add_status({
@@ -56,7 +59,7 @@ export default class extends SKILL {
             prop: {
                 diff_sh: -1000 - parseInt(lv * ((lv / 120) + 1)),
             },
-            finish_msg: "$N身上的修罗刀气渐散，伤势愈。",
+            finish_msg: "$N身上的修罗刀气渐散。",
         }, me);
     }
 
@@ -73,29 +76,24 @@ export default class extends SKILL {
                 const atkCount = 1 + Math.min(stacks, 6);
 
                 me.send_room(
-                    "<hig>$N眼中血光暴射，杀意凝如实质——倏忽间，万千刀光自虚空中迸裂而出，如修罗炼狱降世，将$n生生吞没其中！</hig>",
+                    "<hir>$N眼中血光暴射，杀意凝如实质，倏忽间，万千刀光自虚空中迸裂而出，如修罗炼狱降世，将$n生生吞没其中！</hir>",
                     target,
                 );
 
                 let killed = false;
+                let extraDmg = Math.floor(target.hp * hpRatio / 100);
+                if (extraDmg < 0) extraDmg = 0;
                 for (let i = 0; i < atkCount; i++) {
                     me.do_attack({
                         target: target,
-                        gj: me.gj,
+                        gj: me.gj + extraDmg,
                         mz: me.mz,
                         attack_before: i > 0 ? "<hiw>紧跟着</hiw>" : undefined,
                     });
-                    // 附加当前气血百分比伤害
-                    if (hpRatio > 0 && target.hp > 0) {
-                        const extraDmg = Math.floor(target.hp * hpRatio / 100);
-                        if (extraDmg > 0) {
-                            target.add_hp(-extraDmg);
-                        }
-                    }
                     if (target.hp <= 0) {
                         killed = true;
                         me.send_room(
-                            "<hir>$n在万千刀光中化作齑粉，$N眼中血光一现即隐——敌血方冷，刀意未消，$W嗡鸣不止，似已渴饮下一人之血！</hir>",
+                            "<hir>$n在万千刀光中化作齑粉，$N眼中血光一现即隐，敌血方冷，刀意未消，$W嗡鸣不止，似已渴饮下一人之血！</hir>",
                             target,
                         );
                         break;
@@ -105,7 +103,7 @@ export default class extends SKILL {
                 me.end_attack(target);
 
                 if (killed) {
-                    me.clear_distime("xiuluodao/xiuluo");
+                    me.clear_distime(this.id);
                 }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
@@ -128,25 +126,18 @@ export default class extends SKILL {
                     return;
                 }
 
-                // 重置修罗印记
-                target.remove_status("xiuluo");
-
                 const dmgPer = query_xld_ld_per_layer(lv);
                 const dmgRatio = dmgPer / 100;
 
                 me.send_room(
-                    "<him>$N阖目凝神，$W刀身嗡鸣——六道轮转之力自虚空中灌注而入，$n身上重重修罗印记如琉璃崩碎，化作$N刀下无边业火！</him>",
+                    "<ord>$N阖目凝神，$W刀身嗡鸣——六道轮转之力自虚空中灌注而入，$n身上重重修罗印记如琉璃崩碎，化作$N刀下无边业火！</ord>",
                     target,
                 );
-
-                for (let i = 0; i < stacks; i++) {
-                    me.do_attack({
-                        target: target,
-                        gj: Math.floor(me.gj * dmgRatio),
-                        mz: me.mz,
-                        attack_before: i > 0 ? "<hiw>紧跟着</hiw>" : undefined,
-                    });
-                }
+                me.do_attack({
+                    target: target,
+                    gj: Math.floor(me.gj * (dmgRatio * stacks + 1)),
+                    mz: me.mz,
+                });
 
                 me.end_attack(target);
 
@@ -165,6 +156,7 @@ export default class extends SKILL {
                     finish_msg: "$N身上的轮回之力缓缓消散。",
                 });
                 me.reauto_attack();
+                target.remove_status("xiuluo", true)
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const dmgPer = query_xld_ld_per_layer(lv);

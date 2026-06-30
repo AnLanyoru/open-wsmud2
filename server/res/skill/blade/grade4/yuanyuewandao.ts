@@ -91,7 +91,7 @@ export default class extends SKILL {
         if (me.query_prop("yywd_rm") > 0) return;
 
         // 检查是否处于入魔状态
-        if (me.query_temp("yywd_rumo", 0)) {
+        if (me.query_status("weapon")) {
             me.add_status({
                 id: "busy",
                 name: "昏迷",
@@ -132,16 +132,13 @@ export default class extends SKILL {
                     target,
                 );
 
-                me.set_temp("yywd_rumo", 1, duration);
-
                 me.add_status({
                     id: "weapon",
                     name: "入魔",
-                    desc: "由人驱刀变为刀驱人，内力与命中大增，然内力耗尽将昏迷",
+                    desc: "由人驱刀变为刀驱人，内力附加与命中增加，内力耗尽将昏迷",
                     duration: duration,
                     override: 0,
                     prop: {
-                        gj_per: bonus,
                         mz_per: bonus,
                     },
                     finish_msg: "$N眼中赤芒一寸寸褪去，魔性暂歇，长刀归寂，重拾清明。",
@@ -162,9 +159,9 @@ export default class extends SKILL {
             mp: 0,
             release_time: 4000,
             check: function (me: CHARACTER, _lv: number, _base_type?: string): boolean {
-                // 需进阶至橙色（grade5）解锁
+                // 需进阶至橙色（grade 4→5，即至少 1 次进阶）解锁
                 const sk = me.skills?.get("yuanyuewandao");
-                if (!sk || !sk.addin || sk.addin.length < 3) return false;
+                if (!sk || !sk.addin || sk.addin.length < 1) return false;
                 return true;
             },
             use_condition: "需要将圆月弯刀进阶为橙色",
