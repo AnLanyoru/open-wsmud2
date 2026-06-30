@@ -130,7 +130,7 @@ export default class extends SKILL {
                 const dmgRatio = dmgPer / 100;
 
                 me.send_room(
-                    "<ord>$N阖目凝神，$W刀身嗡鸣——六道轮转之力自虚空中灌注而入，$n身上重重修罗印记如琉璃崩碎，化作$N刀下无边业火！</ord>",
+                    "<ord>$N举刀长啸，$W刀身嗡鸣，六道轮转之力自虚空中灌注而入，$n身上重重修罗印记如琉璃崩碎，化作$N刀下无边业火！</ord>",
                     target,
                 );
                 me.do_attack({

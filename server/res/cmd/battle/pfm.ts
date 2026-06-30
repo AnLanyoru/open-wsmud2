@@ -49,7 +49,7 @@ export default class extends COMMAND {
 
 
         var name = "【" + pfm.name + "】";
-        //0 只能战斗中使用， 1，只能非战斗 2，任何时候
+        //use_type 0 只能战斗中使用， 1，只能非战斗 2，任何时候
         if (me.hp <= 0) return;
         if (!pfm.allow_busy && me.is_busy) return me.notify("你现在手忙脚乱，无法使用" + name + "。");
         if (me.is_faint && !pfm.allow_faint) return me.send("你正在昏迷中。");

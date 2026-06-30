@@ -1048,7 +1048,7 @@ export class PERFORM {
 
     /** 所属基本技能类型(如'sword', 'blade') */
     enable_skill?: string;
-    /** 使用类型 */
+    /** 使用类型 1 仅战斗外可用， 2 随时可用，不设为需要目标且战斗 */
     use_type?: string | number;
     /** 武器类型（资源文件使用） */
     weapon_type?: string;
