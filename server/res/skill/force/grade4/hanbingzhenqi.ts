@@ -1,29 +1,37 @@
 import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { LearnCondition } from "../../../../types/events.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "寒冰真气";
     id = "hanbingzhenqi";
     grade = 4;
-    
+    force_rad = 0.7;
+
     desc = "嵩山派的绝学寒冰真气，至阴至寒，真气散发一股冰入骨髓的寒气。";
     can_enables = ["force"];
+
+    learn_condition: LearnCondition = {
+        skill: { force: 400 },
+        max_mp: 5000,
+    };
+
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
+            prop: 'hbzq_nl_max',
+            value: (lv: number) => 135,
             format: (val: number) => '内力上限：+135000',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
+            prop: 'hbzq_hb_sh',
+            value: (_lv: number) => 4000,
             format: (val: number) => '附加寒冰真气时，额外造成4000伤害',
         },
         {
-            prop: 'slot_2',
-            value: (lv: number) => 10,
+            prop: 'hbzq_dy_sh',
+            value: (_lv: number) => 4000,
             format: (val: number) => '附加寒冰真气时，可抵挡4000伤害',
         },
     ];
@@ -39,23 +47,85 @@ export default class extends SKILL {
         };
     }
 
+    /**
+     * 寒冰真气 — 被动反伤
+     * 当处于「寒冰」状态时，攻击你的敌人会被冻结，攻击速度大幅降低。
+     */
+    on_damage(me: CHARACTER, sh: number, from: CHARACTER): number {
+        if (me.query_temp("hanbing", 0) && from && from.hp > 0) {
+            from.add_status({
+                id: "dongjie",
+                name: "冻结",
+                duration: hanbing_dongjie_duration(),
+                downside: true,
+                prop: {
+                    gjsd_per: hanbing_dongjie_gjsd_per(),
+                },
+                desc: "被寒冰真气冻结，攻击速度减慢35%",
+                start_msg: "<hib>$n只觉一股彻骨寒气自$N身上涌来，经脉瞬间冰封，动作变得迟滞无比！</hib>",
+            }, me);
+        }
+        return sh;
+    }
+
     pfm_set: PerformData = {
-        pfm_0: {
+        hanbing: {
             name: "寒冰",
             distime: 40000,
             enable_skill: "force",
             mp: 20,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 寒冰
-                // 运起全身真气，在20秒内，使自己的伤害附加4000寒冰伤害，并使攻击你的敌人冻结，在15秒内减慢35%攻击速度。
-                me.send_room("$N使出「寒冰」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                const duration = hanbing_buff_duration();
+                const addSh = hanbing_add_sh();
+                me.send_room(
+                    "<hib>$N运起寒冰真气，周身寒气大盛，一层冰霜凝结在皮肤之上，散发出刺骨的寒意！</hib>",
+                    target,
+                );
+                me.add_status({
+                    id: "force",
+                    name: "寒冰",
+                    duration: duration,
+                    prop: {
+                        add_sh: addSh,
+                    },
+                    finish_msg: "<hib>$N周身的寒气渐渐散去，寒冰真气收回丹田。</hib>",
+                });
+                me.set_temp("hanbing", 1, duration);
+                me.reauto_attack();
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "运起全身真气，在20秒内，使自己的伤害附加4000寒冰伤害，并使攻击你的敌人冻结，在15秒内减慢35%攻击速度。";
+            query_desc: function(_me: CHARACTER, _lv: number): string {
+                const dur = hanbing_buff_duration() / 1000;
+                const addSh = hanbing_add_sh();
+                const dongjieDur = hanbing_dongjie_duration() / 1000;
+                const gjsdPer = -hanbing_dongjie_gjsd_per();
+                return `运起全身真气，在${dur}秒内，使自己的伤害附加${addSh}寒冰伤害，并使攻击你的敌人冻结，在${dongjieDur}秒内减慢${gjsdPer}%攻击速度。`;
             },
         },
     };
+}
+
+
+// ═══════════════════════════════════════════
+// 寒冰真气 — 公共计算函数
+// ═══════════════════════════════════════════
+
+/** 寒冰真气buff附加伤害 */
+function hanbing_add_sh(): number {
+    return 4000;
+}
+
+/** 寒冰buff持续时间（毫秒） */
+function hanbing_buff_duration(): number {
+    return 20000;
+}
+
+/** 冻结debuff持续时间（毫秒） */
+function hanbing_dongjie_duration(): number {
+    return 15000;
+}
+
+/** 冻结debuff攻击速度降低百分比 */
+function hanbing_dongjie_gjsd_per(): number {
+    return -35;
 }

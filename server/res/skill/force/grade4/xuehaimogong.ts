@@ -1,34 +1,39 @@
-import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../../core/const.js";
+import {SKILL} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type { CHARACTER } from "../../../../core/char/character.js";
+import type { LearnCondition } from "../../../../types/events.js";
 
 export default class extends SKILL {
     name = "血海魔功";
     id = "xuehaimogong";
     grade = 4;
-    
+    force_rad = 0.75;
+
     desc = "血刀门的内功心法。";
     can_enables = ["force"];
-    learn_condition = {
-      "str1": 30,
-      "con1": 30
+    learn_condition: LearnCondition = {
+        str1: 30,
+        con1: 30,
     };
+
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
+            prop: 'xhmg_nl_max',
+            value: (lv: number) => 140,
             format: (val: number) => '内力上限：+140000',
+            desc: '血海魔功内力上限',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
+            prop: 'xhmg_xj_hp',
+            value: (lv: number) => 1,
             format: (val: number) => '血祭时不消耗气血',
+            desc: '血祭不耗血',
         },
         {
-            prop: 'slot_2',
-            value: (lv: number) => 10,
+            prop: 'xhmg_xj_xr',
+            value: (lv: number) => 1,
             format: (val: number) => '血祭结束后将不会虚弱',
+            desc: '血祭不虚弱',
         },
     ];
 
@@ -45,39 +50,125 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        xuemo: {
             name: "血魔",
             distime: 60000,
             enable_skill: "force",
             mp: 40,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 血魔
-                // 血魔附体，增加你20%的攻击，防御，命中，躲闪，招架，持续30秒
-                me.send_room("$N使出「血魔」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
+                const duration = query_xuemo_duration(lv);
+                me.send_room(
+                    "<hir>$N双眸赤红如血，浑身经脉贲张，一股血腥杀气冲天而起，仿佛血魔临世！</hir>\n",
+                );
+                me.add_status({
+                    id: "force",
+                    name: "血魔",
+                    desc: "血魔附体，提升攻击、防御、命中、躲闪、招架",
+                    duration: duration,
+                    prop: {
+                        gj_per: 20,
+                        fy_per: 20,
+                        mz_per: 20,
+                        ds_per: 20,
+                        zj_per: 20,
+                    },
+                    finish_msg: "$N眼中血芒渐褪，周身那股嗜血魔气缓缓平息，归于丹田。",
+                });
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "血魔附体，增加你20%的攻击，防御，命中，躲闪，招架，持续30秒";
+            query_desc: function (_me: CHARACTER, lv: number): string {
+                const duration = query_xuemo_duration(lv);
+                return "血魔附体，" + (duration / 1000) + "秒内增加你20%的攻击、防御、命中、躲闪、招架";
             },
         },
-        pfm_1: {
+        xueji: {
             name: "血祭",
             distime: 60000,
             enable_skill: "force",
             mp: 56,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 血祭
-                // 血祭自身，消耗你25%的最大气血，在9秒内不会死亡不会被控制，效果结束后9秒内自身减少30%战斗属性。
-                me.send_room("$N使出「血祭」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function (me: CHARACTER, _target: CHARACTER, _lv: number): void {
+                // 血祭消耗25%最大气血（slot 进阶可免消耗）
+                const noHpCost = me.query_prop("xhmg_xj_hp");
+                if (!noHpCost) {
+                    const hpCost = Math.floor(me.max_hp * 0.25);
+                    me.add_hp(-hpCost);
+                }
+
+                me.send_room(
+                    "<hir>$N咬破舌尖，一口精血喷出，全身血气暴涨，散发出令人窒息的恐怖气息！</hir>\n",
+                );
+
+                me.add_status({
+                    id: "force",
+                    name: "血祭",
+                    desc: "血祭中，免疫死亡与控制",
+                    duration: 9000,
+                    ig_control: true,
+                    on_attach: function (p: CHARACTER): void {
+                        p.set_temp("xhmg_xj_immune", 1, 9000);
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        p.remove_temp("xhmg_xj_immune");
+                        // 检查 slot：是否免虚弱
+                        const noWeakness = p.query_prop("xhmg_xj_xr");
+                        if (!noWeakness) {
+                            p.add_status({
+                                id: "xueji_debuff",
+                                name: "血祭反噬",
+                                desc: "血祭副作用，战斗属性大幅降低",
+                                duration: 9000,
+                                downside: true,
+                                prop: {
+                                    gj_per: -30,
+                                    fy_per: -30,
+                                    mz_per: -30,
+                                    ds_per: -30,
+                                    zj_per: -30,
+                                    diff_sh_per: -30,
+                                },
+                                finish_msg: "$N周身的血祭反噬之力渐渐消散，经脉重归通畅。",
+                            }, p);
+                        }
+                    },
+                    finish_msg: "$N周身的血芒渐渐暗淡，血祭之力消退，只余疲惫感涌上心头。",
+                });
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "血祭自身，消耗你25%的最大气血，在9秒内不会死亡不会被控制，效果结束后9秒内自身减少30%战斗属性。";
+            query_desc: function (me: CHARACTER, _lv: number): string {
+                const noHpCost = me.query_prop("xhmg_xj_hp");
+                const noWeakness = me.query_prop("xhmg_xj_xr");
+                let desc = "血祭自身";
+                if (!noHpCost) {
+                    desc += "，消耗25%最大气血";
+                }
+                desc += "，9秒内不会死亡且免疫控制";
+                if (!noWeakness) {
+                    desc += "，效果结束后9秒内自身减少30%战斗属性";
+                }
+                return desc;
             },
         },
     };
+
+    /**
+     * 血祭状态下免疫死亡：当受到致命伤害时，保留至少1点气血。
+     */
+    on_damage(me: CHARACTER, sh: number, _from?: CHARACTER): number {
+        if (me.query_temp("xhmg_xj_immune", 0) > 0) {
+            if (sh >= me.hp) {
+                return Math.max(0, me.hp - 1);
+            }
+        }
+        return sh;
+    }
+}
+
+
+// ═══════════════════════════════════════════
+// 血海魔功 — 公共计算函数
+// ═══════════════════════════════════════════
+
+/** 血魔持续时间（毫秒）：基准 30000，每级 +5，确保微末等级差异可感知 */
+function query_xuemo_duration(lv: number): number {
+    return 30000 + lv * 5;
 }
