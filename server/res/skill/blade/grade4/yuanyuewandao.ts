@@ -1,6 +1,6 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
-import type {CHARACTER, DoAttackPar} from "../../../../core/char/character.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 // ============================================================
 // 圆月弯刀
 // ============================================================
@@ -29,7 +29,7 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'yywd_rm',
+            prop: 'yywd_bx',
             name: "魔心",
             value: (_lv: number) => 1,
             format: (_val: number) => '入魔后内力耗尽不再昏迷或虚弱',
@@ -72,6 +72,8 @@ export default class extends SKILL {
         const mp_dmg = query_yywd_mp_extra_damage(me, lv)
         const cost_reduce = me.query_prop("yywd_xh")
         me.add_mp(cost_reduce ? -mp_dmg * 0.4 : -mp_dmg)
+        const rm_bouns = me.query_temp("yywd_rm", Number(0))
+        if (rm_bouns) return Math.floor((1 + (rm_bouns / 100)) * mp_dmg)
         return mp_dmg;
     }
 
@@ -88,12 +90,12 @@ export default class extends SKILL {
         if (me.query_temp("yywd_modao", 0)) return;
 
         // 进阶「魔心」免除内力耗尽惩罚
-        if (me.query_prop("yywd_rm") > 0) return;
+        if (me.query_prop("yywd_bx")) return;
 
         // 检查是否处于入魔状态
-        if (me.query_status("weapon")) {
+        if (me.query_temp("yywd_rm")) {
             me.add_status({
-                id: "busy",
+                id: "faint",
                 name: "昏迷",
                 is_faint: true,
                 downside: true,
@@ -141,6 +143,10 @@ export default class extends SKILL {
                     prop: {
                         mz_per: bonus,
                     },
+                    on_attach: p => p.set_temp('yywd_rm', bonus, duration),
+                    on_expire: function (p) {
+                        p.remove_temp('yywd_rm');
+                    },
                     finish_msg: "$N眼中赤芒一寸寸褪去，魔性暂歇，长刀归寂，重拾清明。",
                 });
 
@@ -180,7 +186,7 @@ export default class extends SKILL {
                 const bonusDamage = query_yywd_modao_bonus_damage(me, lv, drainedMp);
 
                 me.send_room(
-                    "<hio>$N将毕生内力尽数灌注$W之中，霎时刀身魔焰冲天，血光映红半天——$N狂啸一声，$W化作一轮血月向$n斩去！</hio>",
+                    "<hio>$N将内力尽数灌注$W之中，霎时刀身魔焰冲天，血光映红半天——$N狂啸一声，$W化作一轮血月向$n斩去！</hio>",
                     target,
                 );
 
@@ -242,7 +248,7 @@ function query_yywd_mp_damage_percent(lv: number): number {
 
 /** 被动：每次普攻附加的最大内力伤害 */
 function query_yywd_mp_extra_damage(me: CHARACTER, lv: number): number {
-    return Math.floor(me.max_mp * Math.floor(lv / 1000) /100);
+    return Math.floor(me.max_mp * Math.floor(lv / 1000) / 100);
 }
 
 /** 入魔：持续时间（毫秒） */
@@ -259,7 +265,7 @@ function query_yywd_rumo_bonus(lv: number): number {
 function query_yywd_modao_bonus_damage(me: CHARACTER, _lv: number, drainedMp: number): number {
     // 基础：耗尽内力
     let bonus = drainedMp;
-    // 进阶「魔临」：附加150%攻击力
+    // 进阶「魔临」：附加攻击力
     const atk_bonus = me.query_prop("yywd_md")
     if (atk_bonus > 0) {
         bonus += me.gj * atk_bonus / 100;
