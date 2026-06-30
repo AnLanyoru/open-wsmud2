@@ -66,7 +66,7 @@ export default class extends SKILL {
                 const mz_per = me.query_prop("kfkd_mz") || undefined;
                 const gj_per = me.query_prop("kfkd_gj") || undefined;
                 const diff_fy_per = me.query_prop("kfkd_hsfy") || undefined;
-                const buffDuration = 6000;
+                const buffDuration = query_kfkd_buff_duration(me, speedBonus);
 
                 me.send_room(
                     "<hiy>$N眼中厉芒一闪，狂啸一声，手中$W骤然化作漫天刀影，狂风般向$n连劈二十一式！</hiy>",
@@ -88,16 +88,6 @@ export default class extends SKILL {
                     finish_msg: "$N刀势渐缓，狂风之势随之消散。",
                 });
                 me.reauto_attack();
-
-                for (let i = 0; i < 21; i++) {
-                    me.do_attack({
-                        target: target,
-                        gj: me.gj,
-                        mz: me.mz,
-                        attack_before: i > 0 ? "紧跟着" : undefined,
-                    });
-                }
-                me.end_attack(target);
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const speedBonus = query_kfkd_gjsd_per(lv);
@@ -112,9 +102,29 @@ export default class extends SKILL {
 // 狂风快刀 — 公共计算函数（use 与 query_desc 共用，保证一致）
 // ============================================================
 
-
 /** 狂风二十一式：攻速加成百分比，500级封顶100% */
 function query_kfkd_gjsd_per(lv: number): number {
     const val = 50 + Math.floor(lv / 10);
     return val > 100 ? 100 : val;
+}
+
+/**
+ * 狂风二十一式：buff 持续时间 = 加速后打满 21 刀所需毫秒数。
+ * 按引擎 recount() 的 gjsd 公式推演：
+ *   base = max(500, 4000 - flat_gjsd)
+ *   interval = max(500, base × (1 - gjsd_per/100))
+ */
+function query_kfkd_buff_duration(me: CHARACTER, speedBonus: number): number {
+    const flatGjsd = me.query_prop("gjsd");
+    let baseInterval = 4000 - flatGjsd;
+    if (baseInterval <= 500) baseInterval = 500;
+
+    const totalGjsdPer = me.query_prop("gjsd_per") + speedBonus;
+    let newInterval = baseInterval;
+    if (newInterval > 500) {
+        newInterval = Math.floor(newInterval - (newInterval * totalGjsdPer / 100));
+        if (newInterval < 500) newInterval = 500;
+    }
+
+    return 21 * newInterval;
 }
