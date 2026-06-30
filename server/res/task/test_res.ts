@@ -10,7 +10,7 @@ export default class extends USERTASK {
     }
 
     query_desc(_me: CHARACTER): string {
-        return `<hic>请使用指令 <hiy>test_res</hiy> 打开测试资源菜单。</hic><br><mem>点击下方领取按钮可获得 10 块<hio>元晶</hio>（可无限领取）。</mem>`;
+        return `<hic>请使用指令 <hiy>test_res</hiy> 打开测试资源菜单。</hic><br><mem>点击领取按钮可获得 100 块<hio>元晶</hio>（可无限领取）。</mem>`;
     }
 
     query_state(_me: CHARACTER): number | undefined {

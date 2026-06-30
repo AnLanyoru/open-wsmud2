@@ -36,7 +36,7 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 // TODO: Implement 追魂
-                // 引爆敌人身上的九阴劲气，每层造成169.4的真实伤害，层数大于5层将使敌方昏迷6秒。
+                // 引爆敌人身上的九阴劲气，每层造成${ me.gj*（0.1 + Math.floor(lv/50)*0.01）}的真实伤害，层数大于5层将使敌方昏迷6秒。
                 me.send_room("$N使出「追魂」攻向$n。", target);
                 me.do_attack({ target, gj: me.gj, mz: me.mz });
                 me.end_attack(target);
