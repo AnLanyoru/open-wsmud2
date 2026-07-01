@@ -51,9 +51,24 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const pct = buchang_dmg_pct(lv);
-                const enemies = me.enemy?.length
-                    ? me.enemy.filter((x) => x.check_character())
-                    : [target];
+                const enemies = me.get_nearby_enemies();
+                if (!enemies.length) {
+                    const sh = me.do_attack({
+                        target, gj: me.gj, mz: me.mz,
+                        no_weapon: true,
+                        attack_msg: "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝$n当胸印去！</hio>",
+                    });
+                    if (sh > 0) {
+                        const heal = Math.floor(sh * pct / 100);
+                        me.add_hp(heal);
+                        me.send_combat(
+                            `<hio>$N长春真气流转，化伤为生！</hio>\n`,
+                            target,
+                        );
+                    }
+                    me.end_attack(target);
+                    return;
+                }
 
                 me.send_room(
                     "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝四周涤荡开来！</hio>",
@@ -68,7 +83,7 @@ export default class extends SKILL {
                         mz: me.mz,
                         no_weapon: true,
                         attack_msg: first
-                            ? "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝$n当胸印去！</hio>"
+                            ? "<hio>$N的长春真气如岳如渊，含八荒之势，挟万钧之力朝$n席卷而来！</hio>"
                             : undefined,
                     });
                     if (first) first = false;
@@ -97,7 +112,7 @@ export default class extends SKILL {
             mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const enemies = me.enemy?.filter((x) => x.check_character()) ?? [];
+                const enemies = me.get_nearby_enemies();
                 if (!enemies.length) return;
 
                 const duration = weiwu_duration(lv);

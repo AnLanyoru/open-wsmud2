@@ -2342,6 +2342,21 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 获取附近有效敌人列表
+     */
+    get_nearby_enemies(): CHARACTER[] {
+        const result: CHARACTER[] = [];
+        const enemies = this.enemy;
+        if (!enemies) return result;
+        for (let i = 0; i < enemies.length; i++) {
+            if (enemies[i].check_character()) {
+                result.push(enemies[i]);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 通知房间内玩家 HP / MP 变化
      */
     notify_hp(type?: string, val?: number): void {
