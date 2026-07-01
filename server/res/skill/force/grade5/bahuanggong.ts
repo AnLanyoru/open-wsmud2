@@ -1,66 +1,157 @@
-import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
+import {SKILL} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
+import type {LearnCondition} from "../../../../types/events.js";
+import type {CHARACTER, DoAttackPar} from "../../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "不老长春功";
     id = "bahuanggong";
     grade = 5;
-    
+    force_rad = 0.95;
+
     desc = "天长地久不老长春功，又名八荒六合唯我独尊，是灵鹫宫天山童姥的绝学。";
     can_enables = ["force"];
-    learn_condition = {
-      "con1": 40
+    learn_condition: LearnCondition = {
+        con1: 40,
     };
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                max_hp: Math.floor(lv * 20.1),
-                hp_per: 8,
-                con: Math.floor(lv * 0.338),
-                diff_fy_per: 6,
+                max_hp: lv * 20 + 100,
+                hp_per: 5 + Math.floor(lv / 300),
+                con: 5 + Math.floor(lv / 3),
+                diff_fy_per: 3 + Math.floor(lv / 300),
                 limit_mp: lv * 285,
                 desc: "命中后对敌人造成附加伤害(年龄越大伤害越高)\n唯一：将你内力的95%转化为气血",
             },
         };
     }
 
+    /**
+     * 年龄附加伤害：年龄越大，命中后附加的伤害越高。
+     * 公式：power_gj += Math.floor(me.age * lv / 100)
+     */
+    on_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
+        const lv = me.query_skill("bahuanggong", 0);
+        if (lv > 0) {
+            if (!par.power_gj) par.power_gj = 0;
+            par.power_gj += Math.floor(me.age * lv / 100);
+        }
+        return 0;
+    }
+
     pfm_set: PerformData = {
-        pfm_0: {
+        buchang: {
             name: "不老长春",
             distime: 28000,
             enable_skill: "force",
             mp: 20,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 不老长春
-                // 对附近敌人造成200%的伤害，并且吸收伤害转化为自身气血。
-                me.send_room("$N使出「不老长春」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                const pct = buchang_dmg_pct(lv);
+                const enemies = me.enemy?.length ? [...me.enemy] : [target];
+
+                me.send_room(
+                    "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝四周涤荡开来！</hio>",
+                );
+
+                let totalSh = 0;
+                for (let i = 0; i < enemies.length; i++) {
+                    const enemy = enemies[i];
+                    if (!enemy || !enemy.check_character()) continue;
+                    const sh = me.do_attack({
+                        target: enemy,
+                        gj: me.gj,
+                        mz: me.mz,
+                        no_weapon: true,
+                        attack_msg: i === 0
+                            ? "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝$n当胸印去！</hio>"
+                            : undefined,
+                    });
+                    totalSh += sh;
+                }
+
+                if (totalSh > 0) {
+                    const heal = Math.floor(totalSh * pct / 100);
+                    me.add_hp(heal);
+                    me.send_combat(
+                        `<hio>$N长春真气流转，化伤为生！</hio>\n`,
+                        target,
+                    );
+                }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "对附近敌人造成200%的伤害，并且吸收伤害转化为自身气血。";
+            query_desc: function(_me: CHARACTER, lv: number): string {
+                const pct = buchang_dmg_pct(lv);
+                return `对附近敌人造成${pct}%的伤害，并且吸收伤害转化为自身气血。`;
             },
         },
-        pfm_1: {
+        weiwu: {
             name: "唯我独尊",
             distime: 40000,
             enable_skill: "force",
             mp: 40,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 唯我独尊
-                // 震慑附近敌人，使对方难以释放技能，17秒内技能释放速度和冷却时间减慢3秒。
-                me.send_room("$N使出「唯我独尊」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                if (!me.enemy || !me.enemy.length) return;
+                const list: CHARACTER[] = [];
+                for (const x of me.enemy) {
+                    if (x.check_character()) {
+                        list.push(x);
+                    }
+                }
+                if (!list.length) return;
+
+                const duration = weiwu_duration(lv);
+                const slowAmount = weiwu_slow_amount(lv);
+
+                me.send_room(
+                    "<hir>$N周身真气爆发，气势磅礴，如君临天下！一股睥睨万物的威压笼罩四周！</hir>",
+                );
+
+                for (const enemy of list) {
+                    enemy.add_status({
+                        id: "bahuanggong_weiwu",
+                        name: "震慑",
+                        desc: "被不老长春功震慑，技能释放速度和冷却时间减慢",
+                        duration: duration,
+                        downside: true,
+                        no_diff: true,
+                        prop: {
+                            releasetime: slowAmount,
+                            distime: slowAmount,
+                        },
+                    }, me);
+                }
+
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "震慑附近敌人，使对方难以释放技能，17秒内技能释放速度和冷却时间减慢3秒。";
+            query_desc: function(_me: CHARACTER, lv: number): string {
+                const duration = weiwu_duration(lv);
+                const slowAmount = weiwu_slow_amount(lv);
+                return `震慑附近敌人，使对方难以释放技能，${toSec(duration)}秒内技能释放速度和冷却时间减慢${toSec(slowAmount)}秒。`;
             },
         },
     };
+}
+
+// ═══════════════════════════════════════════
+// 不老长春功 — 公共计算函数
+// ═══════════════════════════════════════════
+
+/** 不老长春伤害百分比：100 + Math.floor(lv / 10) */
+function buchang_dmg_pct(lv: number): number {
+    return 100 + Math.floor(lv / 10);
+}
+
+/** 唯我独尊持续时间（毫秒）：15000 + lv * 2 */
+function weiwu_duration(lv: number): number {
+    return 15000 + lv * 2;
+}
+
+/** 唯我独尊减慢时间（毫秒）：1000 + Math.floor(lv / 500) * 1000 */
+function weiwu_slow_amount(lv: number): number {
+    return 1000 + Math.floor(lv / 500) * 1000;
 }
