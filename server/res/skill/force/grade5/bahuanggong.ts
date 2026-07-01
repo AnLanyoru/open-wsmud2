@@ -51,25 +51,27 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const pct = buchang_dmg_pct(lv);
-                const enemies = me.enemy?.length ? [...me.enemy] : [target];
+                const enemies = me.enemy?.length
+                    ? me.enemy.filter((x) => x.check_character())
+                    : [target];
 
                 me.send_room(
                     "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝四周涤荡开来！</hio>",
                 );
 
                 let totalSh = 0;
-                for (let i = 0; i < enemies.length; i++) {
-                    const enemy = enemies[i];
-                    if (!enemy || !enemy.check_character()) continue;
+                let first = true;
+                for (const enemy of enemies) {
                     const sh = me.do_attack({
                         target: enemy,
                         gj: me.gj,
                         mz: me.mz,
                         no_weapon: true,
-                        attack_msg: i === 0
+                        attack_msg: first
                             ? "<hio>$N默运玄功，长春真气如岳如渊，掌含八荒之势，挟万钧之力朝$n当胸印去！</hio>"
                             : undefined,
                     });
+                    if (first) first = false;
                     totalSh += sh;
                 }
 
@@ -95,14 +97,8 @@ export default class extends SKILL {
             mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                if (!me.enemy || !me.enemy.length) return;
-                const list: CHARACTER[] = [];
-                for (const x of me.enemy) {
-                    if (x.check_character()) {
-                        list.push(x);
-                    }
-                }
-                if (!list.length) return;
+                const enemies = me.enemy?.filter((x) => x.check_character()) ?? [];
+                if (!enemies.length) return;
 
                 const duration = weiwu_duration(lv);
                 const slowAmount = weiwu_slow_amount(lv);
@@ -111,7 +107,7 @@ export default class extends SKILL {
                     "<hir>$N周身真气爆发，气势磅礴，如君临天下！一股睥睨万物的威压笼罩四周！</hir>",
                 );
 
-                for (const enemy of list) {
+                for (const enemy of enemies) {
                     enemy.add_status({
                         id: "bahuanggong_weiwu",
                         name: "震慑",
