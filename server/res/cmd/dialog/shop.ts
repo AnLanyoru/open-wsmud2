@@ -217,7 +217,7 @@ export default class extends COMMAND {
                 }
                 for (const x of this.list_keys!) {
                     if (x.limit_key === item.limit_key) {
-                        me.send(`{"type":"dialog","dialog":"shop",item:["${x.id}",${Math.min(val, x.limit!)},${format_moneys(me)}]}`);
+                        me.send(`{"type":"dialog","dialog":"shop",item:["${x.id}",${Math.min(val, x.limit!)}],${format_moneys(me)}}`);
                     }
                 }
             } else {
