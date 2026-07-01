@@ -147,13 +147,18 @@ export default class extends SKILL {
                     const targetHpRatio = target.max_hp > 0 ? target.hp / target.max_hp : 0;
                     const targetMpRatio = target.max_mp > 0 ? target.mp / target.max_mp : 0;
 
-                    me.hp = Math.floor(targetHpRatio * me.max_hp);
-                    me.mp = Math.floor(targetMpRatio * me.max_mp);
-                    target.hp = Math.floor(myHpRatio * target.max_hp);
-                    target.mp = Math.floor(myMpRatio * target.max_mp);
+                    const meTargetHp = Math.floor(targetHpRatio * me.max_hp);
+                    const meTargetMp = Math.floor(targetMpRatio * me.max_mp);
+                    const targetTargetHp = Math.floor(myHpRatio * target.max_hp);
+                    const targetTargetMp = Math.floor(myMpRatio * target.max_mp);
+
+                    me.add_hp(meTargetHp - me.hp);
+                    me.add_mp(meTargetMp - me.mp);
+                    target.add_hp(targetTargetHp - target.hp);
+                    target.add_mp(targetTargetMp - target.mp);
 
                     me.send_room(
-                        "<him>$N阖目凝神，神游太虚，恍惚间不知$N之梦为$n欤，$n之梦为$N欤？\n霎时间虚实颠倒，$N与$n俱为一体——造化流转，彼我两忘！</him>",
+                        "<him>$N阖目凝神，神游太虚，恍惚间不知$N之梦为$n欤，$n之梦为$N欤？\n霎时间虚实颠倒，$N与$n俱为一体，造化流转，彼我两忘！</him>",
                         target,
                     );
                 } else {

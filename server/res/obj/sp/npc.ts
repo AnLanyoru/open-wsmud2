@@ -42,15 +42,19 @@ export default class extends OBJ {
         if (!this.npc_path) return me.notify("你使用了契约书，可是没有任何反应。");
         var npc = FOLLOWER.CLONE(this.npc_path);
         if (!npc) return me.notify("你使用了契约书，可是没有任何反应。");
+        // 检查是否已经拥有相同随从
+        for (let i = 0; i < me.follower.length; i++) {
+            if (me.follower[i].path == npc.path) {
+                return me.notify_fail("你已经拥有" + npc.name + "了。");
+            }
+        }
+
         var max = me.query_temp("max_follower", 3);
         var is_max = false;
         if (me.follower && me.follower.length >= max) is_max = true;
         if (!par && is_max) {
             var str = ["{type:\"cmds\",items:["];
             for (var i = 0; i < me.follower.length; i++) {
-                if (me.follower[i].path == npc.path) {
-                    return me.notify_fail("你已经拥有" + npc.name + "了。");
-                }
                 var follower = FOLLOWER.GET(me, me.follower[i]);
                 if (!follower) return me.notify_fail("未能读取到你的追随者，请尝试出去住所重新进入。");
                 if (str.length > 1) str.push(",");
@@ -68,11 +72,6 @@ export default class extends OBJ {
             me.send(str.join(""));
             return false;
         } else if (par) {
-            for (var i = 0; i < me.follower.length; i++) {
-                if (me.follower[i].path == npc.path) {
-                    return me.notify_fail("你已经拥有" + npc.name + "了。");
-                }
-            }
             var follower = FOLLOWER.GET(me, {id: par});
             if (!follower) return me.notify_fail("你家没有这个人。");
             // for (let sk in follower.skills) {
