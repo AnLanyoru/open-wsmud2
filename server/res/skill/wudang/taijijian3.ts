@@ -42,13 +42,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 // 以连绵不绝的攻势迷惑附近敌人，使之无法脱身，忙乱状态持续(3+lv*0.01)秒，无额外冷却惩罚。
-                if (!me.enemy || !me.enemy.length) return;
-                const list: CHARACTER[] = [];
-                for (const x of me.enemy) {
-                    if (x.check_character()) {
-                        list.push(x);
-                    }
-                }
+                const list = me.get_nearby_enemies();
                 if (!list.length) return;
 
                 const time: number = Math.min(lv * 10 + 3000, 16000);
@@ -79,18 +73,12 @@ export default class extends SKILL {
             release_time: 4000,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 // 快速出剑，瞬间对附近敌人快速攻击3+lv/100次（上限7次），攻击中命中增加100%，初始附加自己3%的内力伤害
-                if (!me.enemy || !me.enemy.length) return;
+                const list = me.get_nearby_enemies();
+                if (!list.length) return;
+
                 const atkCount: number = Math.min(Math.floor(lv / 100) + 3, 7);
                 const mz: number = Math.floor(me.mz * 2);
                 const powerGj: number = Math.floor(me.max_mp * 0.03);
-
-                const list: CHARACTER[] = [];
-                for (const x of me.enemy) {
-                    if (x.check_character()) {
-                        list.push(x);
-                    }
-                }
-                if (!list.length) return;
 
                 me.send_room("<HIY>$N剑法陡然加快，使出了太极剑法「连字诀」，剑光如电，瞬间向周围敌人连刺而出！</HIY>");
 

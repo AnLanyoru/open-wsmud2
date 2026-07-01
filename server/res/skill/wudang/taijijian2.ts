@@ -42,13 +42,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 // 以连绵不绝的攻势迷惑附近敌人，使之无法脱身，忙乱状态持续(3+lv*0.01)秒，每命中多一人冷却增加(10-lv*0.001)秒。
-                if (!me.enemy || !me.enemy.length) return;
-                const list: CHARACTER[] = [];
-                for (const x of me.enemy) {
-                    if (x.check_character()) {
-                        list.push(x);
-                    }
-                }
+                const list = me.get_nearby_enemies();
                 if (!list.length) return;
 
                 const time: number = Math.min(lv * 10 + 3000, 16000);
