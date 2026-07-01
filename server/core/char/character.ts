@@ -466,6 +466,9 @@ export class CHARACTER extends ITEM {
     /** 接受物品回调 — 触发时机：玩家 give 物品/金钱给本角色时；返回 true 表示接受 */
     on_accept?(me: CHARACTER, obj: string | ITEM, count: number): boolean | void;
 
+    /** 玩家卖物品给本角色回调 — 触发时机：玩家 sell 物品给本角色（商人）时 */
+    on_user_sell?(me: CHARACTER, obj: OBJ, count: number): void;
+
     /** 检查技能/学习回调 — 触发时机：其他角色查看本角色技能时；返回 false 阻止查看 */
     on_checkskill?(me: CHARACTER): boolean | void;
 

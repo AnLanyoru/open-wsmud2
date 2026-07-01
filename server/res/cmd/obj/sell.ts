@@ -13,18 +13,19 @@ export default class extends COMMAND {
      * @param me - 执行命令的角色
      */
     enter(me: USER, count: number, objid: string, to: string) {
-        var target;
+        let target: CHARACTER | undefined;
         if (to) {
-            target = me.find_obj(to, me.environment);
-            if (!target) {
+            const to_target = me.find_obj(to, me.environment);
+            if (!to_target) {
                 return me.notify("你要卖东西给谁？");
             }
-            if (target == me) {
+            if (to_target == me) {
                 return me.notify("东西就在你身上，别折腾了。");
             }
-            if (!target.sell_list) {
-                return me.notify(target.name + "不是商人，不收购任何东西。");
+            if (!to_target.check_npc() || !to_target.sell_list) {
+                return me.notify(to_target.name + "不是商人，不收购任何东西。");
             }
+            target = to_target;
         }
         // else {
         //     var env = me.environment;
@@ -105,13 +106,13 @@ export default class extends COMMAND {
             me.add_money(sell_money);
         }
         var sell_obj = me.remove_obj(obj, sell_count);
-
+        if (!sell_obj) {
+            return me.notify("你身上的" + obj.color_name + "发生了处理错误，请联系管理。");
+        }
         me.send("你卖掉了" + obj.unit_name(sell_count) + "。");
         // me.send('你获得' + UTIL.moneyToStr(sell_money) + "。");
         WORLD.add_recover_obj(me, sell_obj, RecoverType.SELL);
-        if (target && target.on_user_sell) {
-            target.on_user_sell(me, obj, sell_count);
-        }
+        target?.on_user_sell?.(me, obj, sell_count);
     }
 }
 

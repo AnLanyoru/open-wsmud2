@@ -1,8 +1,8 @@
 import {NPC} from "../../../core/char/npc.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {USERTASK} from "../../../core/task/playertask.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import ShiMenTask from "../../task/sm_task.js";
+import type ShiMenTask from "../../task/sm_task.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "门派后勤管理员";
@@ -31,7 +31,7 @@ export default class extends NPC {
         this.add_action("job_up_ok", null, this.job_up_ok);
     }
 
-    job_fam(me: CHARACTER, par: string) {
+    job_fam(me: USER, par: string) {
         var fam = me.family;
         if (fam === FAMILIES.NONE) {
             if (!me.query_temp('wg_sr'))
@@ -49,7 +49,7 @@ export default class extends NPC {
         }
     }
 
-    job_up_ok(me: CHARACTER, par: string) {
+    job_up_ok(me: USER, par: string) {
         var fam = me.family;
         if (fam != this.family) return me.notify(this.name +
             "对你说道：这位" + me.call() + "和本派素无瓜葛，升职从何说起？");

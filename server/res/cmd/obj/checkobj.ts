@@ -14,12 +14,12 @@ export default class extends COMMAND {
      * @param {CHARACTER} player - 执行命令的角色
      */
     enter(player: USER, objid: string, type: string) {
-        var obj: ITEM | null = null;
+        let obj: ITEM | undefined;
         if (type == "item") {
             obj = player.find_obj(objid);
         } else if (type == "eq") {//装备和物品只能检查自己的
             if (player.equipment) {
-                for (var i = 0; i < player.equipment.length; i++) {
+                for (let i = 0; i < player.equipment.length; i++) {
                     let eq = player.equipment[i]
                     if (eq?.id == objid) {
                         obj = eq;
@@ -32,12 +32,12 @@ export default class extends COMMAND {
             obj = player.find_obj_byid(player.stores, objid);
         } else {
 
-            var target = player.find_obj(type, player.environment);
+            let target = player.find_obj(type, player.environment);
             if (!target) return player.notify("你要从谁那里看?");
             if (target.on_checkobj) {
                 obj = target.on_checkobj(player, objid);
             } else if (target.check_npc() && target.sell_list) {
-                var selllist = target.sell_list;
+                let selllist = target.sell_list;
                 if (target.on_sell) {
                     selllist = target.on_sell(player);
                 }

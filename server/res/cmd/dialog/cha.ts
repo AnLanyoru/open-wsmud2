@@ -21,11 +21,11 @@ export default class extends COMMAND {
         if (arg) {
             if (arg == "none") return me.notify('{"type":"dialog","dialog":"skills","limit":' + me.skill_limit() + "}");
 
-            target = me.find_obj(arg, me.environment);
-            if (!target && me.user_level > 1) {
-                target = WORLD.getUser(arg);
+            let other_target = me.find_obj(arg, me.environment);
+            if (!other_target && me.user_level > 1) {
+                other_target = WORLD.getUser(arg);
             }
-            if (!target) {
+            if (!other_target || !other_target.check_character()) {
                 return me.notify("这里没有这个人。");
             }
             if (target.master == me.id) {
@@ -42,9 +42,9 @@ export default class extends COMMAND {
         this.render_skill(me, target, isfollower);
     }
 
-    render_skill(me, target, isfollower) {
+    render_skill(me: USER, target: CHARACTER, isfollower: boolean) {
         var skills = target.skills;
-        var str = ['{"type":"dialog","dialog":"'];
+        var str: string[] = ['{"type":"dialog","dialog":"'];
         str.push(me === target ? 'skills' : 'master');
         str.push('","items":[');
         var skill_count = 0;
@@ -64,11 +64,11 @@ export default class extends COMMAND {
         str.push('"');
         str.push(',limit:');
         if (isfollower)
-            str.push(target.skill_limit());
+            str.push(String(target.skill_limit()));
         else
-            str.push(me.skill_limit());
+            str.push(String(me.skill_limit()));
         str.push(',pot:');
-        str.push(me.pot);
+        str.push(String(me.pot));
         if (target !== me) {
             str.push(isfollower ? ",follower:\"" : ',master:\"');
             str.push(target.id);
