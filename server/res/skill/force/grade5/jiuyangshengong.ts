@@ -134,9 +134,9 @@ function calc_fanzhen_damage(lv: number): number {
     return Math.floor(lv * lv / 300) + lv + 1000;
 }
 
-/** 九阳护体持续时间（毫秒）：Math.min(10000, 4000 + lv * 6) */
+/** 九阳护体持续时间（毫秒）：Math.min(10000, 4000 + lv * 10) */
 function calc_huti_duration(lv: number): number {
-    return Math.min(10000, 4000 + lv * 6);
+    return Math.min(10000, 4000 + lv * 10);
 }
 
 /** 九阳护体伤害减免百分比：Math.min(100, 50 + Math.floor(lv / 100)) */
@@ -144,7 +144,7 @@ function calc_huti_diff_sh(lv: number): number {
     return Math.min(100, 50 + Math.floor(lv / 100));
 }
 
-/** 九阳真焰当前气血伤害百分比：4 + Math.floor(lv / 500) */
+/** 九阳真焰当前气血伤害百分比：5 + Math.floor(lv / 625) */
 function calc_zhenyan_percent(lv: number): number {
-    return 4 + Math.floor(lv / 500);
+    return 5 + Math.floor(lv / 625);
 }

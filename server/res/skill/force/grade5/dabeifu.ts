@@ -1,5 +1,5 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -8,7 +8,9 @@ export default class extends SKILL {
     grade = 5;
     force_rad = 1.0;
 
-    desc = "无";
+    desc = "阴邪诡异的绝学，相传融汇天地间至阴至邪之力，"
+        + "修炼者需断情绝欲，引天地交征之力入体，化阴阳为杀伐。"
+        + "功法之邪，可移穴换位，搜魂夺魄。";
     can_enables = ["force"];
 
     query_enable_prop(lv: number): EnablePropMap {
@@ -31,7 +33,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 20,
             release_time: 3000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room(
                     "<hio>$N五指箕张，指尖萦绕着幽幽青芒，一招「搜魂手」挟带阴风直取$n周身要穴！</hio>\n",
                     target,
@@ -69,7 +71,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number): string {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 const per = souhun_reduce_per(lv);
                 const duration = toSec(souhun_debuff_duration(lv));
                 return "攻击敌人，命中后降低对方" + per + "%的攻击、命中、躲闪，持续" + duration + "，并吸收部分伤害转化为自身气血";
@@ -81,7 +83,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 120,
             release_time: 3000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = yixue_duration(lv);
                 me.send_room(
                     "<hio>$N暗运移穴换位之法，真气逆转，周身穴道若有若无，飘忽不定！</hio>\n",
@@ -97,7 +99,7 @@ export default class extends SKILL {
                 });
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number): string {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 const duration = toSec(yixue_duration(lv));
                 return "移穴换位，" + duration + "内免疫控制";
             },

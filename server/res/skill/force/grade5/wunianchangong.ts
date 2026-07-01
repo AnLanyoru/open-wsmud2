@@ -45,12 +45,6 @@ export default class extends SKILL {
             mp: 50,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                const mp = 50 + Math.floor(lv * 5 / 2);
-                if (me.mp < mp) {
-                    me.notify_fail("内力不足！");
-                    return;
-                }
-                me.mp -= mp;
                 me.send_room("<hic>$N双手合十，口诵禅音，一念清净，万般烦恼尽皆消散。</hic>", target);
                 me.send("<hic>你默诵净念禅咒，心湖澄澈，万般负面尽去。</hic>");
                 // 清除自身所有负面状态
@@ -75,12 +69,6 @@ export default class extends SKILL {
             mp: 40,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                const mp = 40 + lv * 2;
-                if (me.mp < mp) {
-                    me.notify_fail("内力不足！");
-                    return;
-                }
-                me.mp -= mp;
                 const dr = wunian_dr(lv);
                 me.send_room("<hic>$N心入无念之境，神意空明，万法不侵。</hic>", target);
                 me.add_status({
@@ -108,12 +96,6 @@ export default class extends SKILL {
             mp: 80,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                const mp = 80 + lv * 4;
-                if (me.mp < mp) {
-                    me.notify_fail("内力不足！");
-                    return;
-                }
-                me.mp -= mp;
                 if (!target) {
                     me.notify_fail("没有目标！");
                     return;

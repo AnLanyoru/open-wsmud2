@@ -113,7 +113,10 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const enemies = me.get_nearby_enemies();
-                if (!enemies.length) return;
+                if (!enemies.length) {
+                    me.end_attack(target);
+                    return;
+                }
 
                 const duration = weiwu_duration(lv);
                 const slowAmount = weiwu_slow_amount(lv);
