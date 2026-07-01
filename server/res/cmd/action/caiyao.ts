@@ -9,7 +9,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me) {
+    enter(me: USER) {
         if (!me.environment) return false;
         if (!me.environment.can_caiyao)
             return me.notify('这里不能采药、');
@@ -22,7 +22,6 @@ export default class extends COMMAND {
             type: "work",
             title: "采药",
             player: me,
-            attach_level: 0,
             rate: 2,
             on_enter: do_cai,
             stime: Date.now(),

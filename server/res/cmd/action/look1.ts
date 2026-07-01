@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 //只能看排行榜的物品
@@ -12,8 +13,8 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, index, from) {
-        index = parseInt(index);
+    enter(player: USER, index_str: string, from: string) {
+        const index = parseInt(index_str);
         if (from) {
             var paras = from.split('_');
             let tops = WORLD.STATS.TOPS;

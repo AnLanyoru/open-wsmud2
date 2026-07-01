@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "recover";
@@ -13,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, userid, objid) {
+    enter(me: USER, userid: string, objid: string) {
 
     }
 

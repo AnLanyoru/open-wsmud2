@@ -13,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
 
         var str = ['{"type":"dialog","dialog":"relation"'];
         if (me.query_temp("shifu")) {
@@ -40,7 +40,7 @@ export default class extends COMMAND {
                 str.push(me.query_temp("tudi_n"));
             }
             str.push("\",st:");
-            str.push(me.query_temp("st_count", 0));
+            str.push(String(me.query_temp("st_count", 0)));
             if (tudi) {
                 str.push(",tid:\"");
                 str.push(tudi.id);

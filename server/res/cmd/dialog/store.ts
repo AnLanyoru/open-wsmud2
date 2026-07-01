@@ -1,7 +1,10 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
+import type { FOLLOWER } from "../../../core/char/follower.js";
+import { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "store";
@@ -10,30 +13,34 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, count, arg) {
+    enter(me: USER | FOLLOWER, count: string, arg: string) {
         if (arg && arg.length < 2) {
             count = arg;
-            arg = null;
+            arg = '';
         }
         if (arg) {
             me.items = me.items || [];
-            let target = me;
-            if (!me.is_player) {
+            let target: USER;
+            if (!me.check_player()) {
+                if (!me.check_follower()) return;
                 if (!me.master) return;
-                target = WORLD.getUser(me.master);
-                if (!target) return;
+                const my_master = WORLD.getUser(me.master);
+                if (!my_master) return;
+                target = my_master;
+            } else {
+                target = me;
             }
             target.stores = target.stores || [];
             if (arg === 'all') return this.store_all(target, me);
             let move_item = me.find_obj(arg);
-            let store_item: import("../../../core/item.js").ITEM | null = null;
+            let store_item: OBJ | null | undefined;
             if (!move_item) return me.notify("你要存什么东西？");
 
             const st = {items: target.stores, push_item: me.push_item};
             if (target.stores.length >= target.max_store_count) {
                 if (!move_item.combined)
                     return me.notify("你的仓库放不下那么多东西了。");
-                store_item = me.find_obj_bypath(move_item.path, st);
+                store_item = me.find_obj_bypath(move_item.path, st) as OBJ;
                 if (!store_item) return me.notify("你的仓库放不下那么多东西了。");
                 //  old_item.count += move_count;
             }
@@ -44,12 +51,13 @@ export default class extends COMMAND {
             if (!(move_count <= move_item.count)) return me.notify("你要存什么东西？");
 
             move_item = me.remove_item_byid(arg, move_count);
-            if (move_item.combined && store_item) {
+            if (move_item?.combined && store_item) {
                 store_item.count += move_count;
                 move_item = store_item;
             } else {
                 move_item = st.push_item(move_item);
             }
+            if (!move_item) return me.notify("你要存什么东西？");
 
 
             // move_item = null, move_count = 0;
@@ -71,7 +79,7 @@ export default class extends COMMAND {
                 arg + '",storeid:"' + move_item.id + '",store:' +
                 move_count + ',sum:' + target.stores.length + '}');
         }
-        if (!me.is_player) return;
+        if (!me.check_player()) return;
         var items = me.stores || [];
         var str = ['{"type":"dialog","dialog":"list","stores":['];
         if (me.max_store_count > 200) {
@@ -85,9 +93,9 @@ export default class extends COMMAND {
             }
             str.push(']');
             str.push(",max_store_count:");
-            str.push(me.max_store_count);
+            str.push(String(me.max_store_count));
             str.push(",sum:");
-            str.push(items.length);
+            str.push(String(items.length));
         } else {
             for (var i = 0; i < items.length; i++) {
                 if (i > 0) str.push(",");
@@ -95,14 +103,14 @@ export default class extends COMMAND {
             }
             str.push(']');
             str.push(",max_store_count:");
-            str.push(me.max_store_count);
+            str.push(String(me.max_store_count));
         }
         str.push("}");
 
         me.send(str.join(""));
     }
 
-    store_all(target, me) {//target仓库所有人=玩家 me玩家或者随从
+    store_all(target: USER, me: USER | FOLLOWER) {//target仓库所有人=玩家 me玩家或者随从
         // if (me !== notifier) return;
         if (me.query_temp('store_all'))
             return me.send('背包的道具已经自动合并到仓库中。');

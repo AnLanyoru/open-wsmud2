@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
@@ -9,9 +10,9 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid, count) {
+    enter(player: USER, objid: string, count: string) {
         var obj = player.find_obj(objid);
-        if (!obj) {
+        if (!obj || !obj.check_obj()) {
             return player.notify("你要用什么合成？");
         }
         if (!obj.combine_count || !obj.combine_to) return player.send(obj.color_name + "不能合成任何东西。");

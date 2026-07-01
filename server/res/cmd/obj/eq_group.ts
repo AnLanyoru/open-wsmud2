@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "eqgroup";
@@ -8,7 +9,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, par) {
+    enter(me: USER, par: string) {
         let index = parseInt(par);
         if (!(index >= 0 && index < 3)) return;
 
@@ -24,9 +25,10 @@ export default class extends COMMAND {
                 eq.notify_action(me, false);
         }
         for (let i = 0; i < me.equipment.length; i++) {
-            if (!eqs[i]) continue;
-            let obj = me.find_obj(eqs[i]);
-            if (!obj || !obj.is_equipment) continue;
+            const eq = eqs[i];
+            if (!eq) continue;
+            let obj = me.find_obj(eq);
+            if (!obj || !obj.check_equipment()) continue;
             if (me.equip(obj) !== false && obj.on_use) {
                 obj.notify_action(me, true);
             }
@@ -35,7 +37,7 @@ export default class extends COMMAND {
         me.send(`{type:"dialog",dialog:"pack",eq_group:${index}}`);
     }
 
-    save_eqgroup(me) {
+    save_eqgroup(me: USER) {
         let eqs = me.eq_groups[me.eq_group];
         if (!eqs) {
             eqs = new Array(me.equipment.length);

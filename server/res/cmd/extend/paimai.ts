@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "pm";
@@ -12,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, par, par2) {
+    enter(me: USER, type: string, par: string, par2: string) {
         return me.send('未开放');
     }
 }

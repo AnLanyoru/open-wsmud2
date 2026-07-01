@@ -1,8 +1,9 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
-import {ITEM} from "../../../core/item";
+import type { StoneEntry } from "../../../core/item/equipment.js";
 
 export default class extends COMMAND {
     command = "unxiangqian";
@@ -11,12 +12,12 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid, par) {
+    enter(player: USER, objid: string, par: string) {
         if (!objid) {
             var str = ["{type:\"cmds\",items:["];
             for (var i = 0; i < player.items.length; i++) {
                 var item = player.items[i];
-                if (!item.st_prop || !item.st_prop.length) {
+                if (!item.check_equipment() || !item.st_prop || !item.st_prop.length) {
                     continue;
                 }
                 if (str.length > 1) str.push(",");
@@ -35,7 +36,7 @@ export default class extends COMMAND {
             return player.notify(str.join(""));
         }
         var obj = player.find_obj(objid);
-        if (!obj) {
+        if (!obj || !obj.check_equipment()) {
             return player.notify("你身上没有这件装备。");
         }
         if (!obj.st_prop || !obj.st_prop.length) return player.notify(obj.color_name + "没有镶嵌宝石。");
@@ -80,7 +81,7 @@ export default class extends COMMAND {
             player.send('铁匠：取消镶嵌后恢复装备的孔洞数量，宝石等级越高需要的手艺更精细。');
             return player.notify(str.join(""));
         } else {
-            let st: ITEM | null = null, index = 0;
+            let st: StoneEntry | null = null, index = 0;
             for (index = 0; index < obj.st_prop.length; index++) {
                 let item = obj.st_prop[index];
                 if (item.id === par) {

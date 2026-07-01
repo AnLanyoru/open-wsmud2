@@ -1,5 +1,7 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
+import { NPC } from "../../../core/char/npc.js";
 
 export default class extends COMMAND {
     command = "list";
@@ -7,15 +9,21 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
-        var target = me;
-        if (arg) {
-            target = me.find_obj(arg, me.environment);
-            if (!target) {
-                return me.notify("这里没有这个人。");
-            }
+    enter(me: USER, arg: string) {
+        let target: NPC;
+        if (!arg) {
+            return me.notify("你要看谁的货物。");
         }
-        var selllist = target.sell_list;
+        const new_target = me.find_obj(arg, me.environment);
+        if (!new_target || !new_target.check_character()) {
+            return me.notify("这里没有这个人。");
+        }
+        if (!new_target.check_npc()) {
+            return me.notify(new_target.name + "不是商人。");
+        }
+        target = new_target;
+
+        let selllist = target.sell_list;
         if (target.on_sell) {
             selllist = target.on_sell(me);
         }
@@ -23,7 +31,7 @@ export default class extends COMMAND {
             return me.notify(target.name + "不出售任何东西。");
         }
         var str = ['{"type":"dialog","dialog":"list","selllist":['];
-        for (var i = 0; i < selllist.length; i++) {
+        for (let i = 0; i < selllist.length; i++) {
             if (i > 0) str.push(",");
             var item = selllist[i];
 

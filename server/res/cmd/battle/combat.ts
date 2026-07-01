@@ -13,20 +13,8 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type) {
-        if (type == "end") {
-            me.combat_info = false;
-        } else {
-            me.combat_info = true;
-
-            //me.notify(me.query_status());
-            me.notify(me.query_pfms());
-            //if (me.is_fighting()) {
-            //    var target = me.enemy[0];
-            //    if (target)
-            //        me.notify(target.query_status());
-            //}
-        }
+    enter(me: USER, type: string) {
+        return false;
     }
 }
 

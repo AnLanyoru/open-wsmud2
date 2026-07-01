@@ -47,7 +47,7 @@ export default class extends SKILL {
                     const duration = souhun_debuff_duration(lv);
                     const per = souhun_reduce_per(lv);
                     target.add_status({
-                        id: "force",
+                        id: "sou",
                         name: "搜魂",
                         downside: true,
                         duration: duration,

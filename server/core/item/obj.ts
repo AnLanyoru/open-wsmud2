@@ -83,6 +83,8 @@ export class OBJ extends ITEM {
     value: number = 0;
     /** 是否为货币 */
     is_money: boolean = false;
+    /** 是否为宝石（镶嵌材料） */
+    is_stone: boolean = false;
     /** 是否为装备 */
     is_equipment: boolean = false;
     /** 显示快捷操作按钮 */
@@ -98,6 +100,8 @@ export class OBJ extends ITEM {
     temp: Record<string, any> = {};
     /** 是否已锁定 */
     is_locked: boolean = false;
+    /** 是否禁止丢弃 */
+    no_drop: boolean = false;
     /** 是否快捷栏物品 — EQUIPMENT 专用 */
     is_shortcut: boolean = false;
     /** 装备槽位类型 — EQUIPMENT 专用 */
@@ -106,6 +110,18 @@ export class OBJ extends ITEM {
     is_container: boolean = false;
     /** 容器是否已打开 — CONTAINER/CORPSE 专用 */
     is_open: boolean = false;
+    /** 是否允许死亡状态下使用 */
+    allow_die?: boolean;
+    /** 是否允许战斗中使用 */
+    allow_fight?: boolean;
+    /** 是否允许忙乱状态下使用 */
+    allow_busy?: boolean;
+    /** 是否允许昏迷状态下使用 */
+    allow_faint?: boolean;
+    /** 使用后不消耗（默认消耗） */
+    no_consume?: boolean;
+    /** 使用动作描述（如"吃""喝""用"） */
+    action_msg?: string;
 
     // =========== 技能书特有属性 ============
     /** 技能书/残页记录的技能id */

@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -12,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         var nt = {
             content: arg,
             time: Date.now()
@@ -30,7 +31,7 @@ export default class extends COMMAND {
         WORLD.sendAll(str);
     }
 
-    updatelast(me) {
+    updatelast(me: USER) {
         MESSAGE.NOTICES[MESSAGE.NOTICES.length - 1].content = `
    古大陆妖族营地在每周快速完成后，仍可以继续手动击杀，直到每周上限。
    降低营地1刷新速度10秒，其他营地暂时关闭

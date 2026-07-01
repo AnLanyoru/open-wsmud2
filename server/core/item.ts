@@ -18,12 +18,12 @@ import type { CHARACTER } from './char/character.js';
 import type { CONTAINER } from './item/container.js';
 
 
-export interface ValidValue{
+export interface ValidValue {
     e: number,
     v: number | string,
 }
 
-function check_valid_value(value: number | string | ValidValue): value is ValidValue{
+function check_valid_value(value: number | string | ValidValue): value is ValidValue {
     return typeof value === "object" && "e" in value && "v" in value
 }
 
@@ -151,13 +151,14 @@ export class ITEM extends BASE {
     /** 发送消息到客户端（桩方法，玩家/NPC 子类覆写） */
     send?(_msg: string): void;
 
-    /** 查询用户设置（桩方法，玩家子类覆写） */
-    query_setting?(_name: string): boolean | number;
-
     /** 查询介绍 */
     query_desc?(me: CHARACTER, ...args: string[]): string;
 
+    /** 被查看物品回调 — 触发时机：玩家看向非玩家身上物件时 */
     on_checkobj?(player: USER, objid: string): ITEM;
+
+    /** 被查看回调 — 触发时机：玩家看向非玩家时 */
+    on_look?(player: USER): void;
     /**
      * 查看物品可操作列表
      */
@@ -259,9 +260,7 @@ export class ITEM extends BASE {
      * 心跳处理
      * @param dt - 当前时间戳
      */
-    heart_beat(dt: number): void {
-        return undefined;
-    }
+    heart_beat(dt: number): void { };
 
     /**
      * 初始化 — 子类可覆写
@@ -363,10 +362,10 @@ export class ITEM extends BASE {
     /**
      * 根据 ID 查找物品
      * @param id - 物品 ID
-     * @returns 物品对象或 null
+     * @returns 物品对象或 undefined
      */
-    find_obj(id: string): ITEM | null {
-        return null;
+    find_obj(id: string): ITEM | undefined {
+        return undefined;
     }
 
     /**
@@ -374,7 +373,7 @@ export class ITEM extends BASE {
      * @param path - 物品路径
      * @param parent - 父容器，默认 this
      */
-    find_obj_bypath(path: string, parent?: ITEM): ITEM | undefined {
+    find_obj_bypath(path: string, parent?: { items: ITEM[] } | ITEM): ITEM | undefined {
         parent = parent || this;
         if (!parent.items) return;
         for (let i = 0; i < parent.items.length; i++) {
@@ -418,12 +417,12 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 移除的物品
      */
-    remove_item_byid(obj: string, count: number = 0): ITEM | null | undefined {
+    remove_item_byid(obj: string, count: number = 0): ITEM | undefined {
         if (!obj || !this.items) return;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item.id === obj) {
-                if (item.combined && count > 0) {
+                if (item.check_obj() && item.combined && count > 0) {
                     const subitem = item.uncombine(count);
                     if (!subitem) return;
                     if (subitem === item) {
@@ -436,7 +435,7 @@ export class ITEM extends BASE {
                 }
             }
         }
-        return null;
+        return;
     }
 
     /**
@@ -445,25 +444,25 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 移除的物品
      */
-    remove_item<T extends ITEM>(obj: T, count: number = 0): T | null {
-        if (!obj || !this.items) return null;
+    remove_item<T extends ITEM>(obj: T, count: number = 0): T | undefined {
+        if (!obj || !this.items) return;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item === obj) {
-                if (item.combined) {
-                    const subitem = item.uncombine(count) as T;
-                    if (!subitem) return null;
+                if (item.check_obj() && item.combined) {
+                    const subitem = item.uncombine(count);
+                    if (!subitem) return;
                     if (subitem === item) {
                         this.items.splice(i, 1);
                     }
-                    return subitem;
+                    return subitem as T;
                 } else {
                     this.items.splice(i, 1);
                     return item as T;
                 }
             }
         }
-        return null;
+        return;
     }
 
     /**
@@ -490,11 +489,12 @@ export class ITEM extends BASE {
         if (!this.items) this.items = [];
         if (movedObj.is_money && this.money !== undefined) {
             this.money += movedObj.value * movedObj.count;
-        } else if (movedObj.combined) {
+        } else if (movedObj.check_obj() && movedObj.combined) {
             for (let i = 0; i < this.items.length; i++) {
-                if (this.items[i].is(movedObj)) {
-                    this.items[i].combine(movedObj);
-                    return this.items[i];
+                const item = this.items[i];
+                if (item.is(movedObj) && item.check_obj()) {
+                    item.combine(movedObj);
+                    return item;
                 }
             }
             this.items.push(movedObj);
@@ -542,14 +542,14 @@ export class ITEM extends BASE {
      * @param items - 物品数组
      * @param oid - 物品 ID
      */
-    find_obj_byid(items: ITEM[], oid: string): ITEM | null {
-        if (!items) return null;
+    find_obj_byid(items: ITEM[], oid: string): ITEM | undefined {
+        if (!items) return;
         for (let i = 0; i < items.length; i++) {
             if (items[i].id === oid) {
                 return items[i];
             }
         }
-        return null;
+        return;
     }
 
     // ============ 显示名称 ============

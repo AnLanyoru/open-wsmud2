@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {OBJ} from "../../../core/item/obj.js";
 import {UTIL} from "../../../core/util/util.js";
@@ -15,7 +16,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         if (!me.environment) return;
 
         if (!arg) {

@@ -1,6 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
 import {USER} from "../../../core/char/user.js";
+import type { NPC } from "../../../core/char/npc.js";
 
 export default class extends COMMAND {
     command = "answer";
@@ -8,18 +8,18 @@ export default class extends COMMAND {
     allow_busy = true;
 
     /**
-     * @param {CHARACTER} me - 执行命令的角色
+     * @param me - 执行命令的角色
      */
-    enter(me, objid, par) {
+    enter(me: USER, objid: string, par: string) {
         var obj = me.find_obj(objid, me.environment);
 
-        if (!obj || !obj.on_answer) return me.notify("你要回答什么？");
+        if (!obj || !obj.check_npc() || !obj.on_answer) return me.notify("你要回答什么？");
 
         obj.on_answer(me, par);
     }
 }
 
-USER.prototype.send_question = function (npc, list, callbacks) {
+USER.prototype.send_question = function (npc: NPC, list: string[], callbacks: (me: USER, par: string) => void) {
     if (!list || !Array.isArray(list)) return;
 
     let str = ['<div class="sel">'];
@@ -29,5 +29,5 @@ USER.prototype.send_question = function (npc, list, callbacks) {
     }
     str.push('</div>');
     this.send(str.join(''));
-    npc.on_answers = callbacks;
+    npc.on_answer = callbacks;
 }

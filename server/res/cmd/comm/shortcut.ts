@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
 
 export default class extends COMMAND {
@@ -12,14 +13,14 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, arg) {
+    enter(player: USER, arg: string) {
         if (!arg) return;
         var obj = player.find_obj(arg);
-        if (!obj) {
+        if (!obj || !obj.check_obj()) {
             return player.notify("你身上没有这个东西。");
         }
 
-        if (obj.is_equipment) {
+        if (obj.check_equipment()) {
             if (obj.eq_type != EQUIP_TYPE.WEAPON) return player.notify("你目前只能设置武器的快捷操作。");
         } else if (!obj.on_use) {
             return player.notify("这个道具不可以设置快捷操作。");

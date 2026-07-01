@@ -679,7 +679,7 @@ export class FOLLOWER extends CHARACTER {
 
     // ============ USER方法代理 ============
 
-    remove_obj(obj: ITEM | string, count?: number): ITEM | null {
+    remove_obj(obj: ITEM | string, count?: number): ITEM | undefined {
         return USER.prototype.remove_obj.call(this, obj, count);
     }
 

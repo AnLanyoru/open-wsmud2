@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import type {ITEM} from "../../../core/item";
 
@@ -10,19 +11,19 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid, st) {
+    enter(player: USER, objid: string, st: string) {
         var obj = player.find_obj(objid);
         if (!obj) {
             return player.notify("你要镶嵌什么装备？");
         }
-        if (!obj.is_equipment) return player.notify("这个东西没办法镶嵌。");
+        if (!obj.check_equipment()) return player.notify("这个东西没办法镶嵌。");
         if (!obj.hole_count) return player.notify(obj.color_name + "没有能供镶嵌的孔。");
 
         if (st) {
-            var stone = player.find_obj(st);
-            if (!stone)
+            const item = player.find_obj(st);
+            if (!item)
                 return player.notify("你身上没有这种宝石。");
-            stone = player.remove_obj(stone, 1);
+            const stone = player.remove_obj(item, 1);
             if (stone) {
 
                 if (obj.push_stone(stone) == false)

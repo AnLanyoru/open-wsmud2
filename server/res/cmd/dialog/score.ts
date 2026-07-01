@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {NPC} from "../../../core/char/npc.js";
@@ -15,8 +16,8 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg) {
-        var target = me;
+    enter(me: USER, arg: string) {
+        let target: CHARACTER = me;
         if (arg) {
             if (arg === "title") {
                 let str = ['{"type":"dialog","dialog":"score"'];
@@ -39,18 +40,19 @@ export default class extends COMMAND {
                 str.push("]}");
                 return me.send(str.join(""));
             }
-            target = me.find_obj(arg, me.environment);
-            if (!target && me.user_level > 1) {
-                target = WORLD.getUser(arg);
+            let new_target = me.find_obj(arg, me.environment);
+            if (!new_target && me.user_level > 1) {
+                new_target = WORLD.getUser(arg);
             }
-            if (!target) {
+            if (!new_target || !new_target.check_character()) {
                 return me.notify("你要查看谁的属性。");
             }
-            if (target.master != me.id && me.user_level < 4) {
+            if (new_target.master != me.id && me.user_level < 4) {
                 return me.notify("你要查看谁的属性。");
             }
+            target = new_target;
         }
-        let str = ['{"type":"dialog","dialog":"score"'];
+        let str: (string|number)[] = ['{"type":"dialog","dialog":"score"'];
         str.push(',id:"');
         str.push(target.id);
         str.push('","name":"');
@@ -110,9 +112,9 @@ export default class extends COMMAND {
         var limit_mp = target.limit_mp + target.query_prop("limit_mp");
         str.push(',limit_mp:');
         str.push(limit_mp);
-        if (target.query_jingli) {
+        if (target.check_player()) {
 
-            str.push(',jingli:"', String(target.query_temp('ad_jl', 0) ?? 0), '/', String(target.query_jclimit?.() ?? 0), "<hig>(+", String(200 - (target.query_temp('ex_jl', 0) ?? 0)), ')</hig>"');
+            str.push(',jingli:"', String(target.query_temp('ad_jl', 0) ?? 0), '/', String(target.query_jclimit() ?? 0), "<hig>(+", String(200 - target.query_temp('ex_jl', 0)), ')</hig>"');
         } else {
             str.push(',jingli:0');
         }
@@ -131,7 +133,7 @@ export default class extends COMMAND {
         me.send(str.join(""));
     }
 
-    get_level_desc(me) {
+    get_level_desc(me: CHARACTER) {
         if (!me.level) return level_descs[me.level];
         var cc = level_color[me.level];
         if (me.level === 6) {

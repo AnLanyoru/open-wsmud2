@@ -4,7 +4,6 @@
 
 import {CHARACTER} from './character.js';
 import { SkillsMap } from './skills_map.js';
-import {FAMILIES} from '../skill/family.js';
 import type {FAMILY} from '../skill/family.js';
 import {ROOM} from '../room/room.js';
 import {OBJ} from '../item/obj.js';
@@ -13,8 +12,8 @@ import {BASE} from '../base.js';
 import {CORPSE} from '../item/corpse.js';
 import type {EQUIPMENT} from '../item/equipment.js';
 import type {ActionMap} from '../../types/base.js';
+import type { USER } from './user.js';
 
-declare var __PATH: Record<string, string>;
 
 // ============================================================
 // NPC 类
@@ -27,8 +26,6 @@ export class NPC extends CHARACTER {
 
     /** 是否自动释放绝招 */
     auto_pfm: boolean = true;
-    /** 所属门派 */
-    family: FAMILY = FAMILIES.NONE;
     /** NPC 名称 */
     name!: string;
     /** NPC 等级 */
@@ -107,24 +104,21 @@ export class NPC extends CHARACTER {
 
     // ============ 回调字段（由资源文件设置） ============
 
+    /** 拜师前置回调 — 触发时机：玩家执行 bai 命令时，在门派检查之前；返回 false 拒绝拜师 */
+    on_before_master?(me: USER): boolean | void;
     /** 拜师回调 — 触发时机：玩家执行 bai 命令时；返回 CHARACTER 可指定师傅，返回 false 拒绝拜师 */
-    on_master?(me: Record<string, any>): CHARACTER | boolean | void;
+    on_master?(me: USER): CHARACTER | boolean | void;
 
-    /** 检查技能/学习回调 — 触发时机：玩家执行 cha 命令查看可学技能时；返回 false 阻止学习 */
-    on_checkskill?(me: CHARACTER): boolean | void;
     /** 绝招触发回调 — 触发时机：NPC 自动释放绝招之前 */
     on_pfm?(me: CHARACTER, target: CHARACTER): void;
     /** 双修回调 — 触发时机：玩家对 NPC 执行双修命令时 */
-    on_makelove?(me: Record<string, any>): void;
+    on_makelove?(me: USER): void;
 
     /** 主人进入回调 — 触发时机：主人（master）进入 NPC 所在房间时 */
-    on_master_enter?(me: Record<string, any>): void;
+    on_master_enter?(me: CHARACTER): void;
 
-    /** 击杀回调 — 触发时机：BOSS/任务 NPC 被击杀时（由 world/ 资源文件设置） */
-    on_kill?(killer: Record<string, any>): void;
-
-    /** 接受物品回调 — 触发时机：玩家 give 物品给 NPC 时 */
-    on_accept?(me: CHARACTER, obj: string, count: number): boolean | void;
+    /** 回答回调 — 触发时机：玩家 answer NPC 时 */
+    on_answer?(me: USER, par: string): void;
 
     /** 查看在售物品回调 — 触发时机：玩家 查看 NPC 出售列表时 */
     on_sell?(me: CHARACTER): OBJ[];

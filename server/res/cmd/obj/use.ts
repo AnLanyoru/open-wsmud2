@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
 
 export default class extends COMMAND {
@@ -12,14 +13,14 @@ export default class extends COMMAND {
     /**
      * @param player - 执行命令的角色
      */
-    enter(player, objid, par) {
+    enter(player: USER, objid: string, par: string) {
         var obj = player.find_obj(objid);
-
         var iseq = false;
         if (!obj) {
-            for (var i = 0; i < player.equipment.length; i++) {
-                if (player.equipment[i] && player.equipment[i].id == objid) {
-                    obj = player.equipment[i];
+            for (let i = 0; i < player.equipment.length; i++) {
+                const eq = player.equipment[i];
+                if (eq && eq.id == objid) {
+                    obj = eq;
                 }
             }
             if (!obj)
@@ -27,11 +28,12 @@ export default class extends COMMAND {
             iseq = true;
 
         } else {
-            if (obj.is_equipment && !obj.is_shortcut) return player.notify(obj.color_name + "需要装备才可以使用。");
+            if (obj.check_equipment() && !obj.is_shortcut) return player.notify(obj.color_name + "需要装备才可以使用。");
         }
+        if (!obj.check_obj()) return player.notify("这个东西。不能使用");
         if (player.hp <= 0 && !obj.allow_die) return player.notify("你现在是灵魂状态，不能那么做。");
         if (obj.is_shortcut) {
-            if (obj.is_equipment && !iseq) {
+            if (obj.check_equipment() && !iseq) {
                 if (obj.eq_type != EQUIP_TYPE.WEAPON) return player.notify("你目前只能设置武器的快捷操作。");
                 player.do_command("eq", objid);
                 return;

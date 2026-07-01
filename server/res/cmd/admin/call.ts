@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -14,13 +15,14 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, target, arg) {
+    enter(me: USER, target: string, arg: string) {
         try {
             var func = new Function(arg);
             var player = me;
             if (target) {
-                player = WORLD.getUser(target);
-                if (!player) return me.notify("没有这个玩家");
+                const other_player = WORLD.getUser(target)
+                if (!other_player) return me.notify("没有这个玩家");
+                player = other_player;
             }
             func.call(player);
             me.notify("ok");

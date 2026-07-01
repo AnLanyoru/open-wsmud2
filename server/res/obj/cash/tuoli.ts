@@ -15,7 +15,7 @@ export default class extends OBJ {
     on_use(me: USER): boolean | void {
         if (!me.is_player) return me.notify_fail("你不能使用" + this.name + "。");
         if (me.query_temp('tuolicd')) return me.notify_fail("你刚脱离门派没多久，频繁的背叛师门会被武林中人所不齿的。");
-        if (!me.family || me.family == FAMILIES.NONE)
+        if (me.family === FAMILIES.NONE)
             return me.notify_fail("你还没有门派，不需要叛师。");
         var list: SKILL[] = [];
         var up_count = 0;

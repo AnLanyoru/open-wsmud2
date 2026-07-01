@@ -58,8 +58,7 @@ export class FAMILY extends BASE {
     battle_settle?: (...args: any[]) => void;
 
     /** 击杀回调 — 触发时机：门派战中 NPC 被对方门派玩家击杀时（on_npc_die 中，非掌门 NPC 被击杀后） */
-    on_kill(killer: CHARACTER, victim: CHARACTER): void {
-    }
+    on_kill?(killer: CHARACTER, victim: CHARACTER): void;
 
     /** 货物缓存（由 goods 任务设置） */
     customer?: Record<string, any>;
@@ -109,12 +108,12 @@ export class FAMILY extends BASE {
     // ============ 回调（由资源文件覆写为方法） ============
 
     /** 门派称谓回调 — 传入角色，返回该角色在门派的称呼 */
-    call(me: Record<string, any>, isbad?: boolean): string {
+    call(me: CHARACTER, isbad?: boolean): string {
         return '';
     }
 
     /** 自称回调 — 传入角色，返回该角色在门派的自称 */
-    call_me(me: Record<string, any>, isbad?: boolean): string {
+    call_me(me: CHARACTER, isbad?: boolean): string {
         return '';
     }
 

@@ -11,7 +11,7 @@ export default class extends COMMAND {
     enter(me: USER, count: string, objid: string, from: string): void {
         var target: CHARACTER | null = null;
         if (from) {
-            target = me.find_obj(from, me.environment!) as CHARACTER;
+            target = me.find_obj(from, me.environment) as CHARACTER;
             if (!target) {
                 me.notify("你要从哪买东西？");
                 return;

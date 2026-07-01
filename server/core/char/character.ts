@@ -13,7 +13,7 @@ import type { EQUIPMENT } from '../item/equipment.js';
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
 import type { ROOM } from '../room/room.js';
-import type { FAMILY } from '../skill/family.js';
+import { FAMILIES, type FAMILY } from '../skill/family.js';
 import type { NPC } from './npc.js';
 import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
@@ -315,7 +315,7 @@ export class CHARACTER extends ITEM {
     /** 用户权限等级 0=普通 6=管理员 */
     user_level: number = 0;
     /** 所属门派 */
-    family: FAMILY | null = null;
+    family: FAMILY = FAMILIES.NONE;
     /** 是否禁止战斗 */
     no_fight: boolean = false;
     /** 所属服务器 ID（USER 子类设置） */
@@ -341,6 +341,8 @@ export class CHARACTER extends ITEM {
 
     // ============ 环境与交互 ============
 
+    /** 是否能说话 */
+    can_speek: boolean = true;
     /** 当前所在房间 */
     environment?: ROOM;
     /** 当前活动状态 */
@@ -360,6 +362,8 @@ export class CHARACTER extends ITEM {
     temp: Record<string, any> = {};
     /** 战斗属性修饰 */
     combat_props: [keyof PropMap | string, number][] | null = null;
+    /** 子物品列表,生物的通常为物品 */
+    items: OBJ[] | null = null;
 
     // ============ 战斗系统属性 ============
 
@@ -431,7 +435,7 @@ export class CHARACTER extends ITEM {
     team: TeamData | null = null;
     /** 武器切换冷却时间戳 */
     release_time: number = 0;
-    /** 主人 ID */
+    /** 玩家时为 师傅ID 随从时为 主人 ID */
     master?: string;
     /** 死亡复活房间 */
     die_room?: ROOM;
@@ -446,10 +450,6 @@ export class CHARACTER extends ITEM {
     sum_damages?: number;
     /** 自动绝招计数器 */
     attack_count?: number;
-    /** 技能组配置（由 sk_group 命令使用） */
-    sk_groups?: (string[] | null)[];
-    /** 书架存储的秘籍 ID 列表（由 sbook 命令使用） */
-    books?: string[];
     /** 是否拥有忙乱时可用的绝招 */
     busy_pfm?: boolean;
     /** 自动绝招触发频率 */
@@ -463,6 +463,12 @@ export class CHARACTER extends ITEM {
      */
     on_teach?(me: CHARACTER, sk: string): boolean;
 
+    /** 接受物品回调 — 触发时机：玩家 give 物品/金钱给本角色时；返回 true 表示接受 */
+    on_accept?(me: CHARACTER, obj: string | ITEM, count: number): boolean | void;
+
+    /** 检查技能/学习回调 — 触发时机：其他角色查看本角色技能时；返回 false 阻止查看 */
+    on_checkskill?(me: CHARACTER): boolean | void;
+
     /** 对象创建后回调 — 触发时机：create() 方法末尾，资源文件加载/热更新实例化对象时 */
     on_create?(path: string, par?: string): void;
 
@@ -475,6 +481,9 @@ export class CHARACTER extends ITEM {
     /** 死亡后回调 — 触发时机：die() 方法末尾，尸体已生成、状态已清除之后 */
     on_died?(killer: CHARACTER | undefined, corpse: any): void;
 
+    /** 被攻击回调 — 触发时机：玩家对该角色发起 kill 命令时；返回 false 可阻止攻击 */
+    on_kill?(killer: CHARACTER): void | boolean;
+
     /** 复活回调 — 触发时机：角色复活时（NPC relive 方法调用时） */
     on_relive?(): void;
 
@@ -486,6 +495,12 @@ export class CHARACTER extends ITEM {
 
     /** 加入队伍时回调 — 触发时机：加入队伍时 */
     on_teamin?(me: CHARACTER): void;
+
+    /** 切磋前回调 — 触发时机：fight 命令中，非玩家目标同意比试之前；返回 false 可阻止战斗 */
+    on_before_fight?(me: CHARACTER): boolean | void;
+
+    /** 开始被攻击回调 — 触发时机：玩家对该角色发起 kill 命令时 */
+    begin_kill?(killer: CHARACTER): void;
 
     /** 战斗结束回调 — 触发时机：end_attack() 中，一方获胜（比试血量<30%或击杀后），对方 end_fight 之前 */
     on_fight_over?(target: CHARACTER, win: boolean): void;
@@ -605,10 +620,10 @@ export class CHARACTER extends ITEM {
      * @param oid 物品 ID
      * @param parent
      */
-    find_obj(oid: string, parent?: ITEM | ROOM): ITEM | null {
-        let items = this.items;
+    find_obj(oid: string, parent?: ITEM | ROOM): ITEM | undefined {
+        let items: ITEM[] | null = this.items;
         if (parent) items = parent.items;
-        return items ? this.find_obj_byid(items, oid) : null;
+        return items ? this.find_obj_byid(items, oid) : undefined;
     }
 
     /**
@@ -674,7 +689,7 @@ export class CHARACTER extends ITEM {
     /**
      * 查询用户设置（基类返回 0）
      */
-    query_setting(name: string): number {
+    query_setting(name: string): number | string {
         return 0
     };
 
@@ -806,21 +821,21 @@ export class CHARACTER extends ITEM {
         if (this.prop) this.prop = Object.create(this.prop);
         if (this.skills) this.skills = new SkillsMap(this.skills);
         if (this.equipment) {
-            const eqs: any[] = [];
+            const eqs: EQUIPMENT[] = [];
             for (let i = 0; i < this.equipment.length; i++) {
                 const item = this.equipment[i];
                 if (item) {
-                    eqs[i] = OBJ.CREATE(item.path!);
+                    eqs[i] = OBJ.CREATE(item.path) as EQUIPMENT;
                 }
             }
             this.equipment = eqs as (EQUIPMENT | null)[];
         }
         if (this.items) {
-            const items: any[] = [];
+            const items: OBJ[] = [];
             for (let i = 0; i < this.items.length; i++) {
                 items[i] = OBJ.CREATE(this.items[i].path);
             }
-            this.items = items as ITEM[];
+            this.items = items;
         }
         this.create_id();
         this.init();
@@ -1733,11 +1748,11 @@ export class CHARACTER extends ITEM {
             const item = args[i];
             const obj = OBJ.CREATE(item[0], item[1]);
             if (!obj) continue;
-            if (item[2] && obj.is_equipment) {
+            if (item[2] && obj.check_equipment()) {
                 if (!this.equipment) this.equipment = [];
-                this.equipment[obj.eq_type] = obj as EQUIPMENT;
+                this.equipment[obj.eq_type] = obj;
             } else {
-                this.items.push(obj as ITEM);
+                this.items.push(obj);
             }
         }
     }
@@ -1780,7 +1795,7 @@ export class CHARACTER extends ITEM {
         if (equiped) {
             equiped.uneq(this);
             this.equipment[equiped.eq_type] = null;
-            this.items!.push(equiped as ITEM);
+            this.items!.push(equiped);
             if (equiped.eq_type == EQUIP_TYPE.WEAPON) {
                 this.remove_status('weapon', true);
             }
@@ -1833,28 +1848,30 @@ export class CHARACTER extends ITEM {
     /**
      * 添加物品
      */
-    add_obj(obj: any, count?: number): any {
+    add_obj(obj: ITEM | string, count?: number): any {
         if (!obj) return;
+        let after_obj: ITEM | undefined;
         if (typeof obj == 'string') {
-            obj = OBJ.clone_to(obj, this, count);
-            if (!obj) return;
+            after_obj = OBJ.clone_to(obj, this, count);
+            if (!after_obj) return;
         } else {
-            obj = this.push_item(obj);
+            after_obj = this.push_item(obj);
+            if (!after_obj) return;
         }
-        return obj;
+        return after_obj;
     }
 
     /**
      * 移除物品
      */
-    remove_obj(obj: string | ITEM, count?: number): ITEM | null {
-        let item: ITEM | null;
+    remove_obj(obj: string | ITEM, count?: number): ITEM | undefined {
+        let item: ITEM | undefined;
         if (typeof obj == 'string') {
             item = this.find_obj(obj);
         } else {
             item = obj
         }
-        if (!item) return null;
+        if (!item) return;
         count = count || item.count || 1;
         this.remove_item(item, count);
         return item;
@@ -2167,7 +2184,6 @@ export class CHARACTER extends ITEM {
      * 门派称谓
      */
     call(isbad?: boolean): string {
-        if (!this.family) return this.gender == 2 ? '姑娘' : '壮士';
         return this.family.call(this, isbad);
     }
 
@@ -2175,7 +2191,6 @@ export class CHARACTER extends ITEM {
      * 自称
      */
     callme(isbad?: boolean): string {
-        if (!this.family) return this.gender == 2 ? '小女子' : '在下';
         return this.family.call_me(this);
     }
 
@@ -2232,7 +2247,7 @@ export class CHARACTER extends ITEM {
      * 向门派发送消息
      */
     send_fam(str: string): void {
-        if (!this.family) return;
+        if (this.family === FAMILIES.NONE) return;
         this.family.send(str);
     }
 
@@ -2419,7 +2434,7 @@ export class CHARACTER extends ITEM {
     /**
      * 是否在战斗中
      */
-    is_fighting(p?: CHARACTER): boolean {
+    is_fighting(p?: CHARACTER): this is this & {enemy: CHARACTER[]} {
         if (!this.fight_type) return false;
         if (!this.enemy || !this.enemy.length) {
             this.fight_type = 0;

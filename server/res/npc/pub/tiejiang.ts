@@ -4,6 +4,7 @@ import {OBJ} from "../../../core/item/obj.js";
 import {UTIL} from "../../../core/util/util.js";
 import {EQUIP_TYPE, WEAPON_TYPE} from "../../../core/const.js";
 import DuanZaoCommand from "../../cmd/obj/duanzao.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends NPC {
     name = "铁匠";
@@ -35,7 +36,7 @@ export default class extends NPC {
         });
     }
 
-    on_duanzao(me, arg) {
+    on_duanzao(me: USER, arg: string) {
         if (arg == "ok") {
             var item = me.find_obj_bypath("st/yuanjing");
             if (!item || item.count < 10) return me.notify("铁匠说道：材料不够就别来烦我。");

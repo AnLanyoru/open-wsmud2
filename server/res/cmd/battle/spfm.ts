@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "spfm";
@@ -12,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg1, arg2) {
+    enter(me: USER, arg1: string, arg2: string) {
         if (!arg1) return;
         let func = this['set_' + arg1];
         if (func) {

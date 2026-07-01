@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "packitem";
@@ -8,7 +9,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, cmd, objid, par) {
+    enter(player: USER, cmd: string, objid: string, par: string) {
         var obj = player.find_obj(objid);
         if (!obj) return player.notify("你身上没有这个东西。");
 

@@ -2,6 +2,8 @@
 // 基础类型定义 — 用于整个框架的泛型和工具类型
 // ============================================================
 
+import type { USER } from "../core/char/user";
+
 /** temp 存储的值包装: v=value, e=expiry timestamp (可选) */
 export interface TempValue<T = any> {
     v: T;
@@ -64,7 +66,7 @@ export interface ActionDef<TThis = unknown> extends CommandAccessFlags {
     /** 指令名称 */
     name: string | null;
     /** 执行函数 */
-    action?: (this: TThis, ...args: string[]) => any;
+    action?: (this: TThis, me: USER, ...args: string[]) => any;
     /** 允许执行的用户等级 */
     allow_level?: number;
 }
@@ -94,7 +96,7 @@ export interface RecoverSkill {
     /** 提升等级次数 */
     up_count: number;
     /** 技能附加属性列表 */
-    addin: string[];
+    addin: number[];
     /** 遗忘时的技能等级 */
     level: number;
     /** 转化的潜能点数 */

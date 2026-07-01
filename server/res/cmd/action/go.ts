@@ -1,6 +1,8 @@
 import {COMMAND} from "../../../core/command.js";
+import type { USER } from "../../../core/char/user.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
 import {WORLD} from "../../../core/world.js";
+import { CHARACTER } from "../../../core/char/character.js";
 
 export default class extends COMMAND {
     command = "go";
@@ -8,7 +10,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, dir) {
+    enter(me: USER, dir: string) {
         if (me.hp <= 0) return;
         if (!dir) return me.notify("你要往哪里走？");
         dir = OUTER_DOORS[dir];
@@ -63,7 +65,7 @@ for (var i = 0; i < doors.length; i++) {
     OUTER_DOORS[doors[i]] = doors[i];
 }
 
-function sendOutMessage(player, dir) {
+function sendOutMessage(player: CHARACTER, dir: string) {
     dir = dirs[dir] || "";
     if (player.is_fighting()) {
         return player.name + "往" + dir + "落荒而逃了。";
@@ -81,7 +83,7 @@ function sendOutMessage(player, dir) {
     return player.name + "往" + dir + "离开。";
 }
 
-function sendInMessage(player, dir?) {
+function sendInMessage(player: CHARACTER, dir?: string) {
     if (player.fight_type) {
         return player.name + "跌跌撞撞地跑了过来，模样有些狼狈。";
     }
@@ -128,11 +130,11 @@ var dirs = {
     "out": "外面",
 };
 var face1 = ["眉歪眼斜", "贼眉鼠眼", "尖嘴猴腮", "相貌平平", "膀大腰圆", "一表人才",
-    "仪表堂堂", "丰神如玉", "气宇不凡", "玉树临风般"];
+    "仪表堂堂", "丰神如玉", "气宇不凡", "玉树临风", "风度翩翩"];
 var face2 = ["奇丑无比", "獐头鼠目", "身材干瘦", "相貌平平", "体态轻盈", "亭亭玉立",
     "面目姣好", "容色秀丽", "风情万种", "清丽绝俗", "美若天仙"];
 
-function getFace(player) {
+function getFace(player: CHARACTER) {
     var v = parseInt((player.per || 20) / 4);
     if (player.gender == 1) {
         if (v > face1.length - 1) v = face1.length - 1;

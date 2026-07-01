@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {TASK} from "../../../core/task/task.js";
 
 export default class extends COMMAND {
@@ -9,7 +10,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg, par) {
+    enter(me: USER, arg: string, par: string) {
         if (!arg) return false;
         var task = TASK.GET(arg);
         if (!task) return false;

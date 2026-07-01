@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "reward";
@@ -36,26 +37,27 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, par, index) {
+    enter(me: USER, par: string, index_str: string) {
         if (!par) {
             return;
         }
         let rule = this.rules[par];
         if (!rule) return me.notify("你要看什么？");
         let ary = this[par] ?? [];
+        let index = parseInt(index_str) || 1;
         let reward = ary[index - 1] ?? "";
 
         me.notify("<hic>" + rule + reward + "</hic>");
     }
 
-    score_reward(i) {
+    score_reward(i: number) {
         return {
             obj: "money/exp",
             count: (20 - i) * 1000
         };
     }
 
-    top_reward(i) {
+    top_reward(i: number) {
         return {
             obj: "money/gold",
             count: (50 + (10 - i) * 5)

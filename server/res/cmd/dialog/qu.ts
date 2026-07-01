@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {UTIL} from "../../../core/util/util.js";
 import {ITEM} from "../../../core/item.js";
 import {OBJ} from "../../../core/item/obj";
@@ -11,8 +12,8 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, count, arg) {
-        if (!me.environment.allow_store) return me.notify("这里没有仓库。");
+    enter(me: USER, count: string, arg: string) {
+        // if (!me.environment?.allow_store) return me.notify("这里没有仓库。");
 
         if (!arg) return me.notify("你要取什么东西？");
 
@@ -27,6 +28,7 @@ export default class extends COMMAND {
         if (!moved_obj) return me.notify("你的仓库里没有这样东西。");
 
         moved_obj = me.push_item(moved_obj);
+        if (!moved_obj) return me.notify("取出物品中发生错误");
         me.stores = obj.items;
         me.send_room("$N从仓库里取出" + UTIL.to_c(move_count) + moved_obj.unit + moved_obj.color_name + "。");
 

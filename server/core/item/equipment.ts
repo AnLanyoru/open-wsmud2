@@ -389,7 +389,7 @@ export class EQUIPMENT extends OBJ {
      */
     levelchange_prop(): void {
         if (!(this.level >= 0 && this.level < 13)) return;
-        const base_props: Record<string, any> = (this.original_prop ?? Object.getPrototypeOf(this).prop ?? {});
+        const base_props: PropMap = (this.original_prop ?? Object.getPrototypeOf(this).prop ?? {});
         const val = this.levelData[this.level];
         for (const key in base_props) {
             const value = base_props[key];
@@ -466,7 +466,7 @@ export class EQUIPMENT extends OBJ {
      * @param stone - 宝石物品
      */
     push_stone(stone: OBJ): boolean | undefined {
-        if (!stone || !stone.prop) return false;
+        if (!stone || !stone.prop || !stone.is_stone) return false;
         if (!this.hole_count) return false;
 
         if (!this.st_prop) this.st_prop = [];
@@ -481,7 +481,7 @@ export class EQUIPMENT extends OBJ {
         this.json = null;
         this.st_prop.push({
             id: stone.id,
-            path: stone.path!,
+            path: stone.path,
             name: str.join(""),
             prop: stone.prop,
             grade: stone.grade

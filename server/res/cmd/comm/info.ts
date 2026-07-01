@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -11,14 +12,15 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, tid) {
+    enter(me: USER, tid: string) {
         let str: string[] = [];
         let notifier = me;
         if (tid) {
             if (me.user_level > 0) {
-                me = WORLD.getUser(tid);
-                if (!me)
+                const new_target = WORLD.getUser(tid);
+                if (!new_target)
                     return notifier.send('没有这个角色。');
+                me = new_target;
             }
         }
 
@@ -32,8 +34,8 @@ export default class extends COMMAND {
         str.push('衙门职位等级', YMTITLES[me.query_temp('ym_level', 0)],
             '，已累积', String(this.query_ymcount(me)), '份奖励\n');
 
-        str.push('今日副本次数', me.query_temp('fb_count_day', 0), '/20', '\n');
-        str.push('BOSS挑战', me.query_temp('bcc', 0), '/5', '\n');
+        str.push('今日副本次数', String(me.query_temp('fb_count_day', 0)), '/20', '\n');
+        str.push('BOSS挑战', String(me.query_temp('bcc', 0)), '/5', '\n');
         if (me.query_temp('qingan')) {
             str.push('已经门派请安', '\n');
         } else {
@@ -41,34 +43,34 @@ export default class extends COMMAND {
         }
         if (me.level < 5 && me.level > 2) {
 
-            str.push('获取圣元碎片', me.query_temp('mpz', 0), '/1\n');
+            str.push('获取圣元碎片', String(me.query_temp('mpz', 0)), '/1\n');
         }
         if (me.level > 3)
-            str.push('获取帝魄碎片', me.query_temp('mpcd', 0), '/1\n');
+            str.push('获取帝魄碎片', String(me.query_temp('mpcd', 0)), '/1\n');
 
-        str.push('获取额外', me.query_temp('sssc', 0), '/', 500 + me.query_prop('shashou'), '师门功绩\n');
+        str.push('获取额外', String(me.query_temp('sssc', 0)), '/', String(500 + me.query_prop('shashou')), '师门功绩\n');
         str.push('本周已经获取襄阳军功', String(me.query_temp('jg_week', 0)), '/', String(JUNGONG_LIMITS[me.level]), '\n');
 
         str.push('已领取', String(me.query_temp('xy_hd', 0) * REWARDS_LIMIT[me.level]), '/', String(REWARDS_LIMIT[me.level] * 5), '奖励军功\n');
         notifier.send(str.join(""));
     }
 
-    query_wdcount(me) {
-        let tm = me.query_temp("wd_tm", 0);
+    query_wdcount(me: USER) {
+        let tm = me.query_temp("wd_tm", Number(0));
         if (!tm) return 0;
         tm = Math.floor((Date.now() - tm * 100000) / 3600000 / 24);
         return Math.min(tm, 7);
     }
 
-    query_smcount(me) {
-        let sm = me.query_temp("sm_tm", 0);
+    query_smcount(me: USER) {
+        let sm = me.query_temp("sm_tm", Number(0));
         if (!sm) return -1;
         sm = Math.floor((Date.now() - sm * 100000) / 3600000);
         return Math.min(sm, 60);
     }
 
-    query_ymcount(me) {
-        let sm = me.query_temp("ym_tm", 0);
+    query_ymcount(me: USER) {
+        let sm = me.query_temp("ym_tm", Number(0));
         if (!sm) return 0;
         sm = Math.floor((Date.now() - sm * 100000) / 3600000);
         return Math.min(sm, 60);

@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {FOLLOWER} from "../../../core/char/follower.js";
 
 export default class extends COMMAND {
@@ -9,10 +10,10 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, objid, isok) {
+    enter(me: USER, objid: string, isok: string) {
         var npc = me.find_obj(objid, me.environment);
-        if (!npc) return me.notify("你要遣散谁？");
-        if (!npc.master || npc.master != me.id) return me.notify("你不能遣散" + npc.call3() + "。");
+        if (!npc || !npc.check_character()) return me.notify("你要遣散谁？");
+        if (!npc.check_follower() || !npc.master || npc.master != me.id) return me.notify("你不能遣散" + npc.call3() + "。");
         if (npc.team) return me.notify(npc.name + "需要离开队伍才可以遣散。");
         if (isok) {
 

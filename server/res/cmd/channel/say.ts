@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
@@ -10,7 +11,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, msg) {
+    enter(me: USER, msg: string) {
 
         if (!msg) {
             return me.send_room("$N在自言自语的说些什么。");

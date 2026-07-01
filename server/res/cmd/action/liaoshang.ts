@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "liaoshang";
@@ -7,7 +8,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me) {
+    enter(me: USER) {
         if (me.is_fighting()) return me.notify("战斗中疗伤，你找死吗？");
         if (me.hp >= me.max_hp) return me.notify("<hig>你目前气血充沛，没有受到任何伤害。</hig>");
         if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会疗伤。");

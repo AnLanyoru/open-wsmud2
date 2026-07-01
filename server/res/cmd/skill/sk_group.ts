@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -9,7 +10,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, par) {
+    enter(me: USER, par: string) {
         let index = parseInt(par);
         if (!(index >= 0 && index < 3)) return;
         let cur_index = this.cur_eqs(me);

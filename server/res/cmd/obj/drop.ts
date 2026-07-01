@@ -1,19 +1,21 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {RecoverType} from "../../../core/const.js";
 import {UTIL} from "../../../core/util/util.js";
+import type { OBJ } from "../../../core/item/obj.js";
 
 export default class extends COMMAND {
     command = "drop";
     regex = /^(?:(\d+\s))?(.+?)$/;
 
     /**
-     * @param {CHARACTER} player - 执行命令的角色
+     * @param player - 执行命令的角色
      */
-    enter(player, count, objid) {
+    enter(player: USER, count: string, objid: string) {
         var obj = player.find_obj(objid);
-        if (!obj) {
+        if (!obj || !obj.check_obj()) {
             return player.notify("你要丢掉什么东西？");
         }
         if (obj.is_locked) {
@@ -24,7 +26,7 @@ export default class extends COMMAND {
         this.exec(player, obj, count);
     }
 
-    exec(player, obj, count) {
+    exec(player: USER, obj: OBJ, count: string) {
         if (!obj || !player.environment) return;
         var drop_count = 1;
         if (count) drop_count = parseInt(count);

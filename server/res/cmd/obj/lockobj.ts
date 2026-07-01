@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "lockobj";
@@ -9,9 +10,9 @@ export default class extends COMMAND {
     allow_faint = true;
 
 
-    enter(me, objid) {
+    enter(me: USER, objid: string) {
         var obj = me.find_obj(objid);
-        if (!obj) {
+        if (!obj || !obj.check_obj()) {
             return me.notify("你要锁定什么东西？");
         }
         if (obj.is_locked) {

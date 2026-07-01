@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import { SkillsMap } from "../../../core/char/skills_map.js";
@@ -16,8 +17,8 @@ export default class extends COMMAND {
      * @param skid
      * @param from
      */
-    enter(player, skid, from) {
-        var skill_base = SKILL.get(skid);
+    enter(player: USER, skid: string, from: string) {
+        const skill_base = SKILL.get(skid);
         if (!skill_base) {
             return player.send("没有这个技能。");
         }
@@ -26,14 +27,15 @@ export default class extends COMMAND {
         // }
 
 
-        var target = player;
+        let target = player;
         if (from == "help" || num_reg.test(from)) {
             let lv = parseInt(from);
             return player.send(skill_base.query_desc(player, lv > 0 && lv < 5000 ? lv : 1000));
         } else if (from) {
-            target = player.find_obj(from, player.environment);
+            target = player.find_obj(from, player.environment) as USER;
             if (!target && player.user_level > 1) {
-                target = WORLD.getUser(from);
+                const new_target = WORLD.getUser(from);
+                if (new_target) target = new_target;
             }
             if (!target) player.send("没有这个人。");
             if (player.user_level < 1 && !target.is(player.query_temp("master")) && target.master !== player.id) {

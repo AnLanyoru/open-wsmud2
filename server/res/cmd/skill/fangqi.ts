@@ -1,8 +1,9 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
-import {WORLD} from "../../../core/world.js";
-import {SKILL} from "../../../core/skill/skill.js";
-import {SKILL_TYPES, RecoverType} from "../../../core/const.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
+import { WORLD } from "../../../core/world.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { SKILL_TYPES, RecoverType } from "../../../core/const.js";
 
 export default class extends COMMAND {
     command = "fangqi";
@@ -12,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, skillid, sid) {
+    enter(me: USER, skillid: string, sid: string) {
         if (!me.skills) return me.notify("你还不会任何技能。");
         var skill = me.skills.get(skillid);
         if (!skill) return me.notify("你还不会这个技能。");
@@ -75,6 +76,7 @@ export default class extends COMMAND {
             }
             if (up_count > 0) {
                 let obj = me.add_obj('book/up', up_count);
+                if (!obj) return me.notify('<hir>门派进阶残页资源错误。</hir>');
                 me.send('你获得' + obj.unit_name(up_count) + "。")
             }
             if (me.master) return;
@@ -82,7 +84,7 @@ export default class extends COMMAND {
                 id: skillid,
                 name: skill_base.color_name,
                 up_count: up_count,
-                addin: skill.addin,
+                addin: skill.addin ?? [],
                 level: level,
                 pot: exp
             }, RecoverType.FORGET_SKILL);

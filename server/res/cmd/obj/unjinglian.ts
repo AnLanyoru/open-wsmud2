@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 
@@ -9,10 +10,10 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, oid) {
+    enter(me: USER, oid: string) {
         if (oid) {
             var obj = me.find_obj(oid);
-            if (!obj) {
+            if (!obj || !obj.check_equipment()) {
                 return me.notify("你身上没有这件装备。");
             }
             var orglevel = obj.level;
@@ -28,15 +29,16 @@ export default class extends COMMAND {
 
             if (orglevel > 0) {
                 let count = (Math.pow(2, orglevel + 1) - 2) * obj.grade;
-                var item = me.add_obj("st/xuanjing", count);
+                let item = me.add_obj("st/xuanjing", count);
+                if (!item) return me.send("玄晶数据错误。");
                 me.send("你获得" + item.unit_name(count) + "。");
             }
 
         } else {
             var str = ["{type:\"cmds\",items:["];
-            for (var i = 0; i < me.items.length; i++) {
-                var item = me.items[i];
-                if (!item.level || !item.is_equipment) {
+            for (let i = 0; i < me.items.length; i++) {
+                let item = me.items[i];
+                if (!item.check_equipment() || !item.level) {
                     continue;
                 }
                 if (str.length > 1) str.push(",");

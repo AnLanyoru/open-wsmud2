@@ -63,6 +63,8 @@ export interface StudyingBook {
 export interface UserState {
     /** 状态 id */
     id?: string;
+    /** 状态对应的命令名 */
+    cmd?: string;
     /** 状态标题（如 "打坐中"） */
     title: string;
     /** 状态触发频率（心跳次数） */
@@ -77,8 +79,8 @@ export interface UserState {
     start_time?: number;
     /** 状态描述 */
     desc?: string;
-    /** 是否禁止手动停止 */
-    no_stop?: boolean;
+    /** 禁止手动停止提示，truth时阻止手动停止 */
+    no_stop?: string;
     /** 自定义命令 JSON */
     commands?: string;
     /** 是否允许战斗中执行 */
@@ -171,7 +173,7 @@ export class USER extends CHARACTER {
     wait_input?: ((me: CHARACTER, req: string) => void);
 
     /** 向玩家发送选择题（由 world/cmd/action/answer.js 注入 USER.prototype） */
-    send_question?(npc: any, list: any[], callbacks: any[]): void;
+    send_question?(npc: NPC, list: string[], callbacks: (me: USER, par: string) => void): void;
 
     // ============ 权限与状态 ============
 
@@ -201,19 +203,19 @@ export class USER extends CHARACTER {
     /** 当前装备组 */
     eq_group: number = 0;
     /** 装备组定义 */
-    eq_groups: string[][] = [];
+    eq_groups: (string | null)[][] = [];
 
     // ============ 技能 ============
 
     /** 技能组定义 */
-    sk_groups?: (string[] | null)[];
+    sk_groups: (string[] | null)[] = [];
     /** 秘籍列表 */
     books: string[] = [];
 
     // ============ 社交与随从 ============
 
     /** 随从列表 */
-    follower: FollowerDesc[] | null = null;
+    follower: FollowerDesc[] = [];
 
     // ============ 设置与数据 ============
 
@@ -829,7 +831,7 @@ export class USER extends CHARACTER {
     /**
      * 查询用户设置项
      */
-    query_setting(name: string): number {
+    query_setting(name: string): number | string {
         if (!this.settings) return 0;
         return this.settings[name] || 0;
     }
@@ -1000,11 +1002,12 @@ export class USER extends CHARACTER {
     /**
      * 从背包移除物品
      */
-    remove_obj(obj: ITEM | string, count?: number): ITEM | null {
-        if (typeof obj === 'string') {
-            obj = this.find_obj(obj) as OBJ;
+    remove_obj(obj_or_id: ITEM | string, count?: number): OBJ | undefined {
+        let obj: OBJ | undefined;
+        if (typeof obj_or_id === 'string') {
+            obj = this.find_obj(obj_or_id) as OBJ;
         }
-        if (!obj) return null;
+        if (!obj) return;
         count = count || obj.count || 1;
         const newobj = this.remove_item(obj, count);
         if (newobj == obj) {

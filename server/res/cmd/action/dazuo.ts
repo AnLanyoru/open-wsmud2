@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -8,7 +9,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me) {
+    enter(me: USER) {
         if (me.is_fighting()) return me.notify("战斗中打坐，你找死吗？");
         if (me.state) return me.notify("你正在" + me.state.title + "，没有时间打坐。");
         if (me.query_skill("force", 0) == 0) return me.notify("你还没学习任何内功心法，不会打坐。");

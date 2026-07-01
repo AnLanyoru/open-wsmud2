@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
@@ -8,9 +9,9 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid) {
+    enter(player: USER, objid: string) {
         var obj = player.find_obj(objid);
-        if (!obj) return player.notify("你要打开什么？");
+        if (!obj || !obj.check_obj()) return player.notify("你要打开什么？");
         if (!obj.on_open) return player.notify("这个东西打不开。");
         var items = obj.on_open(player);
         if (items == false) return;

@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "eq";
@@ -7,12 +8,12 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, oid) {
+    enter(me: USER, oid: string) {
         var obj = me.find_obj(oid);
         if (!obj) {
             return me.notify("你要装备什么？");
         }
-        if (!obj.is_equipment) {
+        if (!obj.check_equipment()) {
             return me.notify("这个东西不能装备。");
         }
         if (me.fight_type) {

@@ -121,6 +121,8 @@ export class ROOM extends ITEM {
     score?: number;
     /** 是否可钓鱼 */
     can_diaoyu: boolean = false;
+    /** 是否可采药 */
+    can_caiyao: boolean = false;
     /** 比武擂台：计时步数 */
     biwu_step?: number;
     /** 是否禁止战斗 */
@@ -419,16 +421,16 @@ export class ROOM extends ITEM {
      * 根据ID查找物件(含隐藏物品)
      * @param oid
      */
-    find_obj(oid: string): ITEM | null {
+    find_obj(oid: string): ITEM | undefined {
         const items = this.items;
-        if (!items) return null;
+        if (!items) return;
         const item = this.find_obj_byid.call(this, items, oid);
         if (item) return item;
-        if (!this.hidden_items) return null;
+        if (!this.hidden_items) return;
         for (let i = 0; i < this.hidden_items.length; i++) {
             if (this.hidden_items[i].id == oid) return this.hidden_items[i];
         }
-        return null
+        return
     }
 
     /**
@@ -768,8 +770,8 @@ export class ROOM extends ITEM {
      */
     heart_beat(dt: number): void {
         for (let i = 0; i < this.items.length; i++) {
-            if (!this.items[i].is_player)
-                this.items[i].heart_beat(dt);
+            if (!this.items[i].check_player())
+                this.items[i].heart_beat?.(dt);
         }
         this.on_heart_beat?.(dt);
     }

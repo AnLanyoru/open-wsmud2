@@ -1,6 +1,8 @@
 import {COMMAND} from "../../../core/command.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {EQUIP_TYPE} from "../../../core/const.js";
+import type tiejiang from "../../npc/pub/tiejiang.js";
 
 /**
  * 属性每级所需材料数（1级=1, 2级=+2, ...）
@@ -70,12 +72,12 @@ export default class DuanZaoCommand extends COMMAND {
     /**
      * 命令入口 — 路由到房间内铁匠 NPC 的 on_duanzao 方法
      */
-    enter(me, arg) {
+    enter(me: USER, arg: string) {
         const env = me.environment;
         if (env && env.items) {
             for (const item of env.items) {
-                if (item.is_npc && item.on_duanzao) {
-                    item.on_duanzao(me, arg);
+                if (item.check_npc() && (item as tiejiang).on_duanzao) {
+                    (item as tiejiang).on_duanzao(me, arg);
                     return;
                 }
             }

@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {UTIL} from "../../../core/util/util.js";
 
 export default class extends COMMAND {
@@ -13,12 +14,13 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, tid) {
+    enter(me: USER, type: string, tid: string) {
         if (type) {
-            var target = me;
+            let target: CHARACTER = me;
             if (tid) {
-                target = me.find_obj(tid, me.environment);
-                if (!target) return;
+                const target_obj = me.find_obj(tid, me.environment);
+                if (!target_obj || !target_obj.check_character()) return;
+                target = target_obj;
             }
 
             if (!target.status) return me.send("没有这个状态。");
@@ -39,7 +41,7 @@ export default class extends COMMAND {
                 str.push("\n");
             }
             str.push(status.downside ? "<red>" : "<hig>");
-            str.push(UTIL.prop_toString(status.prop ?? null, "\n", status.count));
+            str.push(UTIL.prop_toString(status.prop, "\n", status.count));
             str.push(status.downside ? "</red>\n" : "</hig>\n");
             me.send(str.join(""));
         }

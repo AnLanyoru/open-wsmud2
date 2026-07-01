@@ -1,5 +1,6 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "look,l";
@@ -10,7 +11,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} player - 执行命令的角色
      */
-    enter(player, objid, from) {
+    enter(player: USER, objid: string, from: string) {
         if (!objid) {
 
             //player.notify(parent.items_to_json());
@@ -19,7 +20,7 @@ export default class extends COMMAND {
         }
         if (from) {
             let parent = player.find_obj(from, player.environment);
-            if (!parent) return player.notify("你要看谁的装备？");
+            if (!parent || !parent.check_character()) return player.notify("你要看谁的装备？");
             var eq = parseInt(objid);
             if (!(eq >= 0 && eq < 11)) return player.notify("你要看什么？");
             if (parent.query_setting("hide_equip")) {
@@ -43,11 +44,11 @@ export default class extends COMMAND {
                 player.notify(obj.query_desc(player));
                 if (obj != player)
                     player.send_room(look_str.random(), obj, true);
-                if (obj.hp > 0) {
+                if (obj.check_character()) {
                     this.obs(player, obj);
                 }
             }
-            if (player.is_player && !obj.is_player) {
+            if (player.check_player() && !obj.check_player()) {
                 obj.on_look && obj.on_look(player);
             }
         }

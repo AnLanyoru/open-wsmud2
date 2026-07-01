@@ -145,7 +145,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg, par) {
+    enter(me: USER, arg: string, par: string) {
 
         if (!me.can_trans()) return;
         let action = this.actions[arg];

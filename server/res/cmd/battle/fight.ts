@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
     command = "fight";
@@ -7,9 +8,11 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, argid) {
+    enter(me: USER, argid: string) {
+        const now_room = me.environment;
+        if (!now_room) return me.notify("你不知道在哪。");
         if (argid == "none") {
-            var items = me.environment.items;
+            var items = now_room.items;
             for (var i = 0; i < items.length; i++) {
                 if (items[i].is_player && items[i].query_temp("fight") == me.id) {
                     me.send_room("看起来$N并不想跟$n较量。", items[i], true);
@@ -18,12 +21,12 @@ export default class extends COMMAND {
             }
             return me.notify("这里没有人想要和你比试。");
         }
-        if (me.environment.no_fight) return me.notify("这里不允许战斗。");
-        var target = me.find_obj(argid, me.environment);
-        if (!target) {
+        if (now_room.no_fight) return me.notify("这里不允许战斗。");
+        var target = me.find_obj(argid, now_room);
+        if (!target || !target.check_character()) {
             return me.notify("你要攻击谁？");
         }
-        if (target.can_speek == false) return me.notify("看起来它并不想跟你较量。");
+        if (target.can_speek === false) return me.notify("看起来它并不想跟你较量。");
         if (target == me) return me.notify("你不能和自己比试。");
         if (target.hp < target.max_hp * 0.95) {
             return me.notify(target.name + "的状态不是很好，你想趁人之危吗？");
@@ -48,7 +51,7 @@ export default class extends COMMAND {
         if (target.no_fight || target.query_setting("off_fight")) {
             return me.send_room("看起来$n并不想跟$N较量。", target);
         } else {
-            var ol_fight = me.query_temp("fight");
+            var ol_fight = me.query_temp("fight", String());
             if (ol_fight) {
                 if (ol_fight != target.id) {
                     var ol_target = me.find_obj(ol_fight, me.environment);

@@ -1,6 +1,8 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
+import { FOLLOWER } from "../../../core/char/follower.js";
 
 export default class extends COMMAND {
     command = "makelove";
@@ -9,18 +11,18 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, oid) {
+    enter(me: USER, oid: string) {
 
-        if (me.environment.parent.id != 'home') return me.notify("这里双修可不太好，找个安全点的地方吧！");
+        if (me.environment?.parent?.id != 'home') return me.notify("这里双修可不太好，找个安全点的地方吧！");
 
         let target = me.find_obj(oid, me.environment);
 
-        if (!target) return me.notify("你要和谁双修？");
+        if (!target || !target.check_follower() && !target.check_player()) return me.notify("你要和谁双修？");
         if (target == me) return me.notify("你要和自己双修？");
         //if (me.gender == 1 && target.gender == me.gender) return me.notify("没有这个功能。");
         //  if (hasother && me.is_player) return me.notify("这儿还有别人呢，你好意思双修呀！");
         //  if (me.is_player && target.is_player) return me.notify("你不能和玩家控制的人物双修。");
-        if (!target.is_player && target.master != me.id) return me.notify(target.name + "不愿意和你双修。");
+        if (target.check_follower() && target.master != me.id) return me.notify(target.name + "不愿意和你双修。");
         //if (target.on_makelove && target.on_makelove(me) === false) return;
         if (me.query_temp("mk_request")) {
             this.accept(me, target);
@@ -28,7 +30,7 @@ export default class extends COMMAND {
         } else {
             if (target.query_temp("mk_request")) return;
 
-            if (target.is_player) {
+            if (target.check_player()) {
                 target.notify("<yel>看样子" + me.call3() + "想和你双修...</yel>");
                 target.send_commands("makelove " + me.id, "接受");
                 target.set_temp("mk_request", 1, 10000);
@@ -44,7 +46,7 @@ export default class extends COMMAND {
 
     }
 
-    accept(me, target) {
+    accept(me: USER|FOLLOWER, target: USER|FOLLOWER) {
 
         let name = target.name;
         me.send("<yel>你和" + name + "面对面盘膝坐下，掌心相对，双掌相抵。</yel>");
@@ -72,7 +74,7 @@ export default class extends COMMAND {
     }
 }
 
-function on_check(me) {
+function on_check(me: USER) {
     let speed = parseInt((me.query_skill("force") / 100
         + me.query_prop("shuangxiu")
         + 1 + me.con / 10) * (100 + me.query_prop("dazuo_per")
@@ -99,7 +101,7 @@ function on_check(me) {
     me.send(str.join(""));
 }
 
-function do_dazuo(me) {
+function do_dazuo(me: CHARACTER) {
     var max = me.limit_mp + me.query_prop("limit_mp");
 
     var force_skill = me.force_skill;

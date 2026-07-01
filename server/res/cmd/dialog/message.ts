@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -13,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, arg, arg2) {
+    enter(me: USER, arg: string, arg2: string) {
         if (arg === 'delete') {
             if (!arg2) return this.delete_all(me);
             return this.delete_from(me, arg2);
@@ -49,7 +50,7 @@ export default class extends COMMAND {
         me.send(JSON.stringify(obj));
     }
 
-    delete_from(me, from) {
+    delete_from(me: USER, from: string) {
         let stores = MESSAGE.stores.get(me.id);
         if (!stores) return me.send('你没有消息。');
         let store = stores.get(from);
@@ -61,7 +62,7 @@ export default class extends COMMAND {
         me.send('{type:"dialog",dialog:"message",clear:"' + from + '"}');
     }
 
-    delete_all(me) {
+    delete_all(me: USER) {
         let stores = MESSAGE.stores.get(me.id);
         if (!stores) return;
         stores.forEach((x, y) => {

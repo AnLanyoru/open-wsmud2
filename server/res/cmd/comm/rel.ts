@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {FOLLOWER} from "../../../core/char/follower.js";
 
@@ -13,7 +14,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, cmd) {
+    enter(me: USER, type: string, cmd: string) {
         if (type === 'marry') {
             return me.send('解除夫妻关系，需要到扬州城的衙门找户部主簿办理。');
         } else if (type === 'st') {

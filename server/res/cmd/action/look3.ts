@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
 import { SkillsMap } from "../../../core/char/skills_map.js";
@@ -14,13 +15,14 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, index, userid) {
+    enter(me: USER, index_str: string, userid: string) {
         if (userid.startsWith("fb_")) {
             var area_index = parseInt(userid.slice(3));
             var area = WORLD.AREAS[area_index];
             if (!area) return me.notify("没有这个副本。");
             var drop_items = area.query_drop_items();
             if (!drop_items) return me.notify("没有这件装备。");
+            const index = parseInt(index_str);
             var item = drop_items[index];
             if (!item) return me.notify("没有这件装备。");
             if (item.skill) {
@@ -46,11 +48,11 @@ export default class extends COMMAND {
         if (userid === me.id) return me.send(me.query_desc(me, "look3"));
         var user = WORLD.getUser(userid);
         if (!user) return me.notify("没有这个玩家。");
-        if (index != undefined) {
-            if (index === 'body') {
+        if (index_str != undefined) {
+            if (index_str === 'body') {
                 return me.send(user.query_desc(me, "look3"));
             }
-            index = parseInt(index);
+            const index = parseInt(index_str);
             if (!(index >= 0 && index < 11)) return me.notify("你要看什么？");
             if (user.query_setting("hide_equip")) {
                 return me.send("看样子" + user.call3() + "不想让别人看自己的装备。");

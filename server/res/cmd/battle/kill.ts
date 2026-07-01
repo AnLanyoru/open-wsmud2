@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {NPC} from "../../../core/char/npc.js";
@@ -10,19 +11,19 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, argid) {
+    enter(me: USER, argid: string) {
         if (me.state) {
             return me.notify("你现在正在" + me.state.title + ",没时间杀人。");
         }
-        if (me.environment.no_fight) {
+        if (me.environment?.no_fight) {
             return me.notify("这里不允许战斗。");
         }
         var target = me.find_obj(argid, me.environment);
-        if (!target || !target.do_kill) {
+        if (!target || !target.check_character() || !target.do_kill) {
             return me.notify("你要攻击谁？");
         }
         if (target === me) return me.notify("你要攻击谁？");
-        if (target.is_player) {
+        if (target.check_player()) {
 
             // me.add_temp('k_ss', 1, UTIL.diff_time());
             if (target.query_setting("ban_pk"))
@@ -35,7 +36,7 @@ export default class extends COMMAND {
                 }
                 me.set_temp("pk", 1, 24 * 3600000 * 7);
             }
-        } else if (target.family && target.on_master) {
+        } else if (target.family && target.check_npc() && target.on_master) {
             if (me.query_setting("ban_pk"))
                 return me.notify("你正在开启PK保护，无法击杀拜师NPC。");
         }
@@ -54,7 +55,7 @@ export default class extends COMMAND {
                     ;
                 }
             }
-            if (target.on_kill && target.on_kill(me) == false) return;
+            if (target.on_kill && target.on_kill(me) === false) return;
             target.do_kill(me);
             target.begin_kill && target.begin_kill(me);
             return me.send_room("$N扑向$n！", target);
@@ -69,14 +70,14 @@ export default class extends COMMAND {
         }
         // me.send_room("$N对$n大喊一声：看招！\n", target);
         me.send_room("\n$N对著$n喝道：「"
-            + target.call(me, true) + "！今日不是你死就是我活！」\n", target);
+            + target.call(true) + "！今日不是你死就是我活！」\n", target);
         //me.begin_attack(target, 2);
 
-        if (target.on_kill && target.on_kill(me) == false) return;
+        if (target.on_kill && target.on_kill(me) === false) return;
 
         if (me.team) {
-            for (var i = 0; i < me.team.length; i++) {
-                var item = me.team[i];
+            for (let i = 0; i < me.team.length; i++) {
+                const item = me.team[i];
                 if (item.master == me.id && item.query_setting("auto_kill") == 2 && item.is_here(me)) {
                     item.do_kill(target);
                 }
@@ -85,8 +86,8 @@ export default class extends COMMAND {
         me.do_kill(target);
         target.begin_kill && target.begin_kill(me);
         if (me.team) {
-            for (var i = 0; i < me.team.length; i++) {
-                var item = me.team[i];
+            for (let i = 0; i < me.team.length; i++) {
+                const item = me.team[i];
                 if (item.master == me.id && item.query_setting("auto_kill") == 1 && item.is_here(me)) {
                     item.do_kill(target);
                 }

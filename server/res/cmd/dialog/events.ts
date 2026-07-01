@@ -1,4 +1,5 @@
 import {COMMAND} from "../../../core/command.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 
 export default class extends COMMAND {
@@ -12,7 +13,7 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, type, params) {
+    enter(me: USER, type: string, params: string) {
         let events = WORLD.USER_EVENTS;
         if (type) {
             for (let i = 0; i < events.length; i++) {

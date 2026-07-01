@@ -1,5 +1,6 @@
 import {COMMAND} from "../../../core/command.js";
 import {CHARACTER} from "../../../core/char/character.js";
+import type { USER } from "../../../core/char/user.js";
 import {WORLD} from "../../../core/world.js";
 import {UTIL} from "../../../core/util/util.js";
 import {FAMILIES} from "../../../core/skill/family.js";
@@ -15,8 +16,9 @@ export default class extends COMMAND {
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
-    enter(me, index, diff) {
-        index = parseInt(index);
+    enter(me: USER, index_str: string, diff_str: string) {
+        let index = parseInt(index_str);
+        let diff = parseInt(diff_str);
         let area = AREA.FBS?.[index];
         if (!area || area.not_fb || !area.is_copy || !DIFFS[diff])
             return me.send('你要看哪个副本？');
@@ -38,7 +40,7 @@ export default class extends COMMAND {
 
     }
 
-    set_fb_first(me) {
+    set_fb_first(me: USER) {
 
         const data: { [key: string]: { name?: string } }[] = [];
         for (let item of FB_DATAS) {
