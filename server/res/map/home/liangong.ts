@@ -22,7 +22,7 @@ export default class extends ROOM {
 
     on_enter(me) {
         if (me.master) {
-            me.actions = [
+            me.action_list = [
                 {cmd: "dc " + me.id + " dazuo", name: "让" + me.name + "打坐"},
                 {cmd: "makelove " + me.id, name: "和" + me.name + "双修"}
             ];

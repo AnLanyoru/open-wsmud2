@@ -20,14 +20,14 @@ export default class extends ROOM {
 
     on_leave(me) {
         if (me.master) {
-            me.actions = null;
+            me.action_list = null;
             me.master_json = null;
         }
     }
 
     on_enter(me) {
         if (me.master) {
-            me.actions = [
+            me.action_list = [
                 {cmd: "makelove " + me.id, name: "和" + me.name + "双修"}
             ];
             me.master_json = null;

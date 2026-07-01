@@ -24,7 +24,7 @@ export default class extends ROOM {
 
     on_enter(me) {
         if (me.master) {
-            me.actions = [
+            me.action_list = [
                 {cmd: "dc " + me.id + " diao", name: "让" + me.name + "钓鱼"},
                 {cmd: "dc " + me.id + " cai", name: "让" + me.name + "采药"}
             ];
@@ -38,7 +38,7 @@ export default class extends ROOM {
 
     on_leave(me) {
         if (me.master) {
-            me.actions = null;
+            me.action_list = null;
             me.master_json = null;
         }
     }

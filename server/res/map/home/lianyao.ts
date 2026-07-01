@@ -13,7 +13,7 @@ export default class extends ROOM {
 
     on_leave(me) {
         if (me.master) {
-            me.actions = null;
+            me.action_list = null;
             me.master_json = null;
         }
         me.remove_status("room");
@@ -21,7 +21,7 @@ export default class extends ROOM {
 
     on_enter(me) {
         if (me.master) {
-            me.actions = [
+            me.action_list = [
                 {cmd: "dc " + me.id + " lianyao", name: "让" + me.name + "炼药"}
             ];
             me.master_json = null;
