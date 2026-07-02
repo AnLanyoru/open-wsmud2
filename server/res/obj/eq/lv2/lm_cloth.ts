@@ -7,8 +7,8 @@ export default class extends EQUIPMENT {
     desc = "以黑龙皮鞣制而成的紧身劲装，表面覆盖着细密的黑色鳞片，阳光下泛着暗紫色光泽。";
     unit = "件";
     grade = 2;
-    eq_type = EQUIP_TYPE.CLOTH;
     hole_count = 1;
+    eq_type = EQUIP_TYPE.CLOTH;
     prop: PropMap = {
         fy: 30,
         int: 10,

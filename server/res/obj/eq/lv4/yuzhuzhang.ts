@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一根泛着淡淡青光的竹杖，是历代丐帮帮主的信物。";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.STAFF;
     prop: PropMap = {

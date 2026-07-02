@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "日月神教长老曲洋的琴环";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         gj: 68,

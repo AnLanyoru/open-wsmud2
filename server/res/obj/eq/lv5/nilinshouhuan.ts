@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "龙之逆鳞，触者杀之";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.WRIST;
     prop: PropMap = {
         fy: 200,

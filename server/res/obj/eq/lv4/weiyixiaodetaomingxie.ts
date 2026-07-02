@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "明教青翼蝠王韦一笑的鞋子，不知道穿过没";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.SHOES;
     prop: PropMap = {
         fy: 220,

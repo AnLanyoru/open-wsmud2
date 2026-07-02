@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "武林至尊，宝刀屠龙。号令天下，莫敢不从。倚天不出，谁与争锋！这就是号令天下的倚天剑";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {

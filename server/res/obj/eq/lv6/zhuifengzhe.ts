@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "华山至宝，追风踏月";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.SHOES;
     prop: PropMap = {
         fy: 380,

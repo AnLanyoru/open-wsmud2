@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一件黑乎乎的斗篷，据说是沾染的龙血，有些淡淡的微光，";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.CAPE;
     prop: PropMap = {
         fy: 398,

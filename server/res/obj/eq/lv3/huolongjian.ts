@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "这是一把在火龙王附近找到的宝剑，因为长期在充满火焰的地方，它本身也带了一些火毒";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

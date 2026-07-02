@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一枚蕴含天地灵气的戒指，佩戴后可大幅提升悟性与打坐效率。";
     value = 0;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.RING;
     prop: PropMap = {
         int: 100000,

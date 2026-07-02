@@ -7,9 +7,9 @@ export default class extends EQUIPMENT {
     desc = "黑色不明材质打造，通体龙纹鳞甲";
     unit = "把";
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
-    hole_count = 2;
     prop: PropMap = {
         gj: 80,
         int: 10,

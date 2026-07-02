@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "明教教主张无忌随身携带的峨眉派周芷若的手镯";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WRIST;
     prop: PropMap = {
         fy: 160,

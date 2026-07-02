@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "星宿老仙的独门暗器";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.THROWING;
     weapon_type = WEAPON_TYPE.THROWING;
     prop: PropMap = {

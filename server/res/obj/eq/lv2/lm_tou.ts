@@ -7,8 +7,8 @@ export default class extends EQUIPMENT {
     desc = "用黑龙额骨打磨成型的头饰";
     unit = "顶";
     grade = 2;
-    eq_type = EQUIP_TYPE.HEAD;
     hole_count = 1;
+    eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         fy: 20,
         int: 10,

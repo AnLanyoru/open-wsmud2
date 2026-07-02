@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "天龙套装衣服，传说由飞龙的羽毛做成的，穿上后不但防御惊人，更是身轻如燕";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.CLOTH;
     prop: PropMap = {
         fy: 450,

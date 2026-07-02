@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "剑长一尺七寸的墨绿色短剑，骤看似乎没有什么光泽，但若多看两眼，便会觉得剑气森森，逼人眉睫，连眼睛都难睁开。";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

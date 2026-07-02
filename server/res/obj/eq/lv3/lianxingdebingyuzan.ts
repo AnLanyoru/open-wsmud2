@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "移花宫二宫主的冰玉簪，玲珑剔透毫无瑕疵";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         int: 20,

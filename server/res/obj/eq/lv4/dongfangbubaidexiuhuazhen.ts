@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "只是一根简单的绣花针，却使人感到剑气森森，不寒而栗";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

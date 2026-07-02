@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "传说中女娲补天遗留下来的一块五彩神石";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         lianxi_per: 40,

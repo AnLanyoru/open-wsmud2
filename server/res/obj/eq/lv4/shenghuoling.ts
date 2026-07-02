@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一块非金非木的牌子，坚硬异常";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         fy: 350,

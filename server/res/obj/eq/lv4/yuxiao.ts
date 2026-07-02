@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "东邪黄药师的玉箫";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

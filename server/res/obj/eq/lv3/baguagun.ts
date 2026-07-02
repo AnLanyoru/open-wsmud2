@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "温家老五的独门兵器";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.CLUB;
     prop: PropMap = {

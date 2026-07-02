@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "传说中天龙死亡后遗留的舍利";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         con: 80,

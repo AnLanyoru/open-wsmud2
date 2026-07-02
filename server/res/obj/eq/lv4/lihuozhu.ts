@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "这是一颗在火山里面找到神奇珠子，通体发红，却又带有一丝丝凉意，带在身上使人神清气爽，精气十足";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         gj: 100,

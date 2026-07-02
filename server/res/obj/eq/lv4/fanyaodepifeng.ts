@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "明教光明右使范遥的披风，";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.CAPE;
     prop: PropMap = {
         fy: 198,

@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "使用鳄鱼皮和火龙皮做成的腰带，结实耐用";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WAIST;
     prop: PropMap = {
         fy: 130,

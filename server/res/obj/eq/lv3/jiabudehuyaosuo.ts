@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "青龙堂堂主贾布的护腰锁";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WAIST;
     prop: PropMap = {
         fy: 150,

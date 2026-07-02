@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "移花宫大宫主邀月的手镯";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WRIST;
     prop: PropMap = {
         fy: 60,

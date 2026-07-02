@@ -7,9 +7,9 @@ export default class extends EQUIPMENT {
     desc = "以黑龙皮膜制成，边缘缀着七枚龙鳞甲片，展开时如黑龙展翅。";
     unit = "件";
     grade = 2;
+    hole_count = 1;
     eq_type = EQUIP_TYPE.CAPE;
     value = 20000;
-    hole_count = 1;
     prop: PropMap = {
         limit_mp: 500,
         dazuo_per: 10

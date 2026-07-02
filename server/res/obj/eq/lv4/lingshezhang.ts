@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "这是白驼山的灵蛇杖，一条毒蛇环绕其上，仿若活物";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.STAFF;
     prop: PropMap = {

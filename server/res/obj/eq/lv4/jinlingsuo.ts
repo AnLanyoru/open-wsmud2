@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "这是一条白色的绸带，绸带末端系着一个金色的小球";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.WHIP;
     prop: PropMap = {

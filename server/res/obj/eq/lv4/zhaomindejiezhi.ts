@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "不知道是赵敏给张无忌的，还是张无忌准备给赵敏的";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.RING;
     prop: PropMap = {
         add_sh_per: 3,

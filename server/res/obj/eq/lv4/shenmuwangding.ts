@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一个小小的木鼎，彤琢甚是精细，木质坚润似似玉，木理之中隐隐约约的泛出红丝。";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         lianyao1: 6,

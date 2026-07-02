@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "田伯光作案时候戴的头套";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         ds: 100,

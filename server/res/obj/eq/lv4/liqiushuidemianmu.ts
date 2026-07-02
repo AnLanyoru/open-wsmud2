@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "李秋水被童姥毁容后一直带的面罩";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         gj: 128,

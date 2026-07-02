@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "血刀老祖的武器，刀身暗红，犹有血迹！";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {

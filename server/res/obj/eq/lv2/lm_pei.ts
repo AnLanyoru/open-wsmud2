@@ -7,8 +7,8 @@ export default class extends EQUIPMENT {
     desc = "墨玉质地，表面刻着盘旋的五爪金龙，龙鳞纹路清晰可辨。";
     unit = "块";
     grade = 2;
-    eq_type = EQUIP_TYPE.JEWELS;
     hole_count = 1;
+    eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         study_per: 10,
         int: 12

@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "滉漾明光，三千乐指，仙之至宝";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         str: 80,

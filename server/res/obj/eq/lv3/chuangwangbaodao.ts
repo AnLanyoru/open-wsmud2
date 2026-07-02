@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "这是闯王所使用过的刀，上面刻有几行小字。";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {

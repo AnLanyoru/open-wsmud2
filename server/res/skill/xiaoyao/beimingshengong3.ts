@@ -8,7 +8,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /** 鲲字诀 — 恢复百分比 */
 function kunPer(lv: number): number {
-    return 15 + Math.floor(lv / 200);
+    return 10 + Math.floor(lv / 200);
 }
 
 
@@ -28,7 +28,7 @@ export default class extends SKILL {
     is_hidden = true;
     family = FAMILIES.XIAOYAO;
     source_skill = "beimingshengong2";
-    force_rad = 0.85;
+    force_rad = 0.8;
 
     desc = "逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。";
     can_enables = ["force", "parry"];
@@ -36,13 +36,13 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                con: Math.floor(lv * 0.51),
+                con: 10 + Math.floor(lv * 0.5),
                 dex: 1 + Math.floor(lv * 0.5),
                 limit_mp: lv * 245,
-                desc: "当你命中敌人后，会吸取对方内力增加自身最大内力\n唯一：将你内力的85%转化为气血",
+                desc: "当你命中敌人后，会吸取对方内力增加自身最大内力\n唯一：将你内力的80%转化为气血",
             },
             parry: {
-                zj: Math.floor(lv * 1.82),
+                zj: 20 + Math.floor(lv * 1.8),
                 dex: 2 + Math.floor(lv * 0.25),
                 max_hp: lv * 13,
                 desc: "当你招架成功后会吸取对方内力增加自身最大内力",
@@ -89,7 +89,7 @@ export default class extends SKILL {
     pfm_set: PerformData = {
         huifu: {
             name: "鲲字诀",
-            distime: 28500,
+            distime: 30000,
             enable_skill: "force",
             mp: 0,
             release_time: 500,

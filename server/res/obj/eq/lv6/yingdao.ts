@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "破碎虚空后遗留的神器，里面蕴含着无上的武学至理";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {

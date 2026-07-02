@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "白色的龙骨做成的戒指，坚硬无比";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.RING;
     prop: PropMap = {
         gj: 278,

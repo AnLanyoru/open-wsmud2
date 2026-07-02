@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "天龙套装的靴子，穿上它可以追风逐日";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.SHOES;
     prop: PropMap = {
         fy: 380,

@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "古朴剔透，身似龙形";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.HEAD;
     prop: PropMap = {
         fy: 300,

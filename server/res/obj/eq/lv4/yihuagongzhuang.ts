@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "移花宫女弟子的装束，华丽而优雅";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         fy: 300,

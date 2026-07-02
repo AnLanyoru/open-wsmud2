@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "一颗颗细小的珠子组成的项链，据说是天龙的骨头磨成的，古朴晶莹";
     value = 1000000;
     grade = 5;
+    hole_count = 4;
     eq_type = EQUIP_TYPE.NECKLACE;
     prop: PropMap = {
         fy: 230,

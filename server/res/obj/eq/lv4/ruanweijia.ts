@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "是黄药师送给妻子冯氏的定情之物";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.CLOTH;
     prop: PropMap = {
         fy: 250,

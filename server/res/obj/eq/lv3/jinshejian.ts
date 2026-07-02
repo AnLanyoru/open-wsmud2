@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "此剑金光灿烂形状奇特，剑身犹如是一条蛇盘曲而成。";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

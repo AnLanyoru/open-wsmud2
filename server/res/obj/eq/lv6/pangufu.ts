@@ -9,6 +9,7 @@ export default class extends EQUIPMENT {
     desc = "传说中盘古开天辟地时候使用的一把斧头";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.STAFF;
     prop: PropMap = {

@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "武当至宝，先天太极";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.CLOTH;
     prop: PropMap = {
         fy: 780,

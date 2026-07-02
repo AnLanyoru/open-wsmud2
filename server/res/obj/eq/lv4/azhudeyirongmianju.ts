@@ -7,6 +7,7 @@ export default class extends EQUIPMENT {
     desc = "慕容家的丫鬟阿朱用来易容的面具";
     value = 500000;
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.HEAD;
     // Special effects: 使用后你可以易容成当前房间的某一个人
 }

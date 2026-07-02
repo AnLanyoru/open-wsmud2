@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "风雷堂童百熊的戒指，做工粗犷，材质精良";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.RING;
     prop: PropMap = {
         gj: 98,

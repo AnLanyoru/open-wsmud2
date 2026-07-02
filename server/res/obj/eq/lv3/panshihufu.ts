@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "以泰山神石雕刻而成，护身避灾";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         fy: 250,

@@ -15,6 +15,7 @@ export default class extends EQUIPMENT {
             if (!(lv >= 2 && lv <= 5)) return;
         }
         this.grade = lv;
+        this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
             case 2:
                 this.prop = { fy: 120, str: 5 };

@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "日月神教一人之下万人之上的杨莲亭的神秘项圈，不知道干什么用的";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.JEWELS;
     prop: PropMap = {
         con: 20,

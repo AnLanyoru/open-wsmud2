@@ -7,9 +7,9 @@ export default class extends EQUIPMENT {
     desc = "神龙教管理层的制服帽子";
     unit = "件";
     grade = 2;
+    hole_count = 1;
     eq_type = EQUIP_TYPE.HEAD;
     value = 30000;
-    hole_count = 1;
     prop: PropMap = {
         fy: 30,
         max_hp: 200,

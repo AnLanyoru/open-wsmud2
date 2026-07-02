@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "传说中的神器，由众神采首山之铜为黄帝所铸，以此击杀蚩尤，剑身一面刻日月星辰，一面刻山川草木。";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {

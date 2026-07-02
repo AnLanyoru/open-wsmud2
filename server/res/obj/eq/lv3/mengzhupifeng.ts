@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "五岳盟主左冷禅的披风";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.CAPE;
     prop: PropMap = {
         con: 15,

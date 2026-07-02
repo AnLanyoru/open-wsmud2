@@ -8,6 +8,7 @@ export default class extends EQUIPMENT {
     desc = "田伯光的武器，一柄造型短小精悍的短刀";
     value = 200000;
     grade = 3;
+    hole_count = 2;
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {

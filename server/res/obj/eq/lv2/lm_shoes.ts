@@ -7,8 +7,8 @@ export default class extends EQUIPMENT {
     desc = "鞋面用黑龙筋编织出防滑纹路";
     unit = "件";
     grade = 2;
-    eq_type = EQUIP_TYPE.SHOES;
     hole_count = 1;
+    eq_type = EQUIP_TYPE.SHOES;
     prop: PropMap = {
         fy: 21,
         int: 10

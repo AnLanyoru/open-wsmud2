@@ -6,6 +6,7 @@ export default class extends EQUIPMENT {
     desc = "一件轻若无物的墨色披风，披上后身影便如融入暗影般消散无形。";
     unit = "件";
     grade = 4;
+    hole_count = 3;
     eq_type = EQUIP_TYPE.CAPE;
     value = 100000;
 

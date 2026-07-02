@@ -11,6 +11,7 @@ export default class extends EQUIPMENT {
     desc = "东海氐人国世代守护的上古神器；印身雕刻五方天帝，玉龙盘绕其上";
     value = 5000000;
     grade = 6;
+    hole_count = 5;
     eq_type = EQUIP_TYPE.JEWELS;
     distime = 600000;
     prop: PropMap = {
