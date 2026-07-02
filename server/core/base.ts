@@ -240,17 +240,14 @@ export class BASE {
 
     query_temp<T = unknown>(name: string, def?: T): T {
         if (def === undefined) def = 0 as T;
-        const expiry = this._temp_expiry.get(name);
-        if (expiry !== undefined) {
-            if (Date.now() <= expiry) {
-                return this._temp_values.get(name) as T;
-            }
-            this._temp_values.delete(name);
-            this._temp_expiry.delete(name);
-            return def;
-        }
         const val = this._temp_values.get(name);
-        return val !== undefined ? val : def;
+        if (val === undefined) return def;
+        const expiry = this._temp_expiry.get(name);
+        if (expiry === undefined) return val as T;
+        if (Date.now() <= expiry) return val as T;
+        this._temp_values.delete(name);
+        this._temp_expiry.delete(name);
+        return def;
     }
 
     set_temp(name: string, value: unknown, time?: number): void {
