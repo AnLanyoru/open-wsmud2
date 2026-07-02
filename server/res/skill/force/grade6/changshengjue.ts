@@ -71,7 +71,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        tiandi: {
             name: "天地决",
             distime: 60000,
             enable_skill: "force",
@@ -87,16 +87,7 @@ export default class extends SKILL {
                 me.remove_statuses(function(s: CharacterStatus): boolean {
                     return s.downside === true;
                 });
-
-                // 重置所有技能冷却（不重置内功）
-                if (me.auto_skills) {
-                    for (let i = 0; i < me.auto_skills.length; i++) {
-                        const item = me.auto_skills[i];
-                        if (item.type !== "force") {
-                            item.release_time = 0;
-                        }
-                    }
-                }
+                me.clear_distime();
 
                 me.end_attack(target);
             },
@@ -104,7 +95,7 @@ export default class extends SKILL {
                 return "沟通天地之力，恢复自身全部气血，清除负面状态，并重置所有技能冷却";
             },
         },
-        pfm_1: {
+        hundun: {
             name: "混沌诀",
             distime: 60000,
             enable_skill: "force",
@@ -163,9 +154,4 @@ function hundun_duration(lv: number): number {
 /** 混沌诀——单次伤害上限%：max(3, 15 - Math.floor(lv / 400)) */
 function hundun_cap_pct(lv: number): number {
     return Math.max(3, 15 - Math.floor(lv / 400));
-}
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
 }

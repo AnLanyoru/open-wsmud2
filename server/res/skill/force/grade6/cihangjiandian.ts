@@ -44,7 +44,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        lingxi: {
             name: "心有灵犀",
             distime: 30000,
             enable_skill: "force",
@@ -77,7 +77,7 @@ export default class extends SKILL {
                 return toSec(duration) + "秒内你的攻击命中对方后将触发多次，并且不会被控制";
             },
         },
-        pfm_1: {
+        jianxin: {
             name: "剑心通明",
             distime: 60000,
             enable_skill: "force",
@@ -173,9 +173,4 @@ function jianxin_duration(lv: number): number {
 /** 剑心通明剑伤害加成%：30 + Math.floor(lv / 100) */
 function jianxin_sword_per(lv: number): number {
     return 30 + Math.floor(lv / 100);
-}
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
 }

@@ -46,7 +46,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        lunhui: {
             name: "一念轮回",
             distime: 60000,
             enable_skill: "force",
@@ -86,7 +86,7 @@ export default class extends SKILL {
                 return "将敌人的技能重置冷却，并对附近敌人造成当前气血8%的真实伤害";
             },
         },
-        pfm_1: {
+        jimie: {
             name: "一念寂灭",
             distime: 60000,
             enable_skill: "force",
@@ -170,9 +170,4 @@ function yimie_extra_mp_per(lv: number): number {
 /** 一念寂灭debuff持续时间（毫秒） */
 function yimie_duration(lv: number): number {
     return 5000 + lv * 2;
-}
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
 }

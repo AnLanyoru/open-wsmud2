@@ -49,7 +49,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        zhuanyang: {
             name: "转阴阳",
             distime: 30000,
             enable_skill: "force",
@@ -115,7 +115,7 @@ export default class extends SKILL {
                 return "转换你的阴阳二气：\n九烛：增加你" + hpPer + "%的最大气血和伤害减免(被动)，命中后对敌人造成" + recoil + "点反震伤害。\n九幽：增加你" + gjPer + "%的攻击，" + gjPer + "%的无视防御，" + speedPer + "%的攻击速度";
             },
         },
-        pfm_1: {
+        qiankun: {
             name: "定乾坤",
             distime: 60000,
             enable_skill: "force",
@@ -148,10 +148,10 @@ export default class extends SKILL {
             },
             query_desc: function(_me: CHARACTER, lv: number): string {
                 const duration = dingqiankun_duration(lv);
-                return "压制附近敌人，" + (duration / 1000).toFixed(1).replace(/\.0+$/, "") + "秒内封印敌方技能";
+                return "压制附近敌人，" + toSec(duration) + "秒内封印敌方技能";
             },
         },
-        pfm_2: {
+        zhentd: {
             name: "镇天地",
             distime: 60000,
             enable_skill: "force",
@@ -171,7 +171,7 @@ export default class extends SKILL {
                     return;
                 }
 
-                const duration = zhentiandi_duration(lv);
+                const totalDuration = zhentiandi_duration(lv);
                 const dmgPct = zhentiandi_dmg_pct(lv);
 
                 me.send_room("<hio>$N引动天地之力，周身土石飞旋，一股厚重无比的威压镇向$n！</hio>\n", target);
@@ -180,12 +180,12 @@ export default class extends SKILL {
                 me.add_status({
                     id: "force",
                     name: "镇天地",
-                    duration: duration,
+                    duration: totalDuration,
                     override: 2,
                     prop: {
                         diff_sh_per: 50,
                     },
-                    on_attach: (p: CHARACTER) => p.set_temp("yyjz_zt", 1, duration),
+                    on_attach: (p: CHARACTER) => p.set_temp("yyjz_zt", 1, totalDuration),
                     on_expire: (p: CHARACTER) => p.remove_temp("yyjz_zt"),
                     finish_msg: "<hio>$N周身天地之力散去，镇守状态结束。</hio>",
                 });
@@ -195,8 +195,8 @@ export default class extends SKILL {
                     id: "yyjz_ztd",
                     name: "镇伤",
                     desc: "被天地之力镇压",
-                    duration: duration,
-                    duration_count: Math.floor(duration / 1000),
+                    duration: 1000,
+                    duration_count: Math.floor(totalDuration / 1000),
                     downside: true,
                     on_interval: function(t: CHARACTER, _over_count: number): void {
                         const dmg = me.gj + Math.floor(t.hp * dmgPct / 100);
@@ -264,9 +264,4 @@ function zhentiandi_duration(lv: number): number {
 /** 镇天地——敌方当前气血伤害% */
 function zhentiandi_dmg_pct(_lv: number): number {
     return 1;
-}
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
 }

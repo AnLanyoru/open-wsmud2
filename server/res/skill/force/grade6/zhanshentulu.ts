@@ -14,7 +14,7 @@ export default class extends SKILL {
 
     query_enable_prop(lv: number): EnablePropMap {
         const awePct = 10 + Math.floor(lv / 200);
-        const posuiPct = (lv / 1000).toFixed(1);
+        const posuiPct = posui_dmg_pct(lv).toFixed(1);
         return {
             force: {
                 str: lv * 1,
@@ -34,7 +34,7 @@ export default class extends SKILL {
         const lv = me.query_skill("zhanshentulu", 0);
         if (lv <= 0) return 0;
 
-        let pct = lv / 1000;
+        let pct = posui_dmg_pct(lv);
         const weapon = me.query_weapon();
         if (!weapon) {
             pct *= 2; // 空手时加倍
@@ -55,7 +55,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        zhanshen: {
             name: "战神决",
             distime: 60000,
             enable_skill: "force",
@@ -89,7 +89,7 @@ export default class extends SKILL {
                 return "战神附体，短时间内大幅增加你的战力，免疫控制，持续" + toSec(duration) + "秒";
             },
         },
-        pfm_1: {
+        yanmie: {
             name: "湮灭",
             distime: 45000,
             enable_skill: "force",
@@ -137,7 +137,7 @@ export default class extends SKILL {
                 return "一拳破天地，对敌人造成" + mpPct + "%最大内力的伤害后重置对方的所有附加的持续状态，减少对方的伤害和破防";
             },
         },
-        pfm_2: {
+        posui: {
             name: "破碎九重天",
             distime: 60000,
             enable_skill: "force",
@@ -210,12 +210,12 @@ function yanmie_debuff_duration(lv: number): number {
     return 5000 + lv * 2;
 }
 
+/** 破碎——最大内力附加伤害%：lv / 1000 */
+function posui_dmg_pct(lv: number): number {
+    return lv / 1000;
+}
+
 /** 破碎九重天——消耗当前内力%：20 + Math.floor(lv / 200) */
 function posui9_mp_pct(lv: number): number {
     return 20 + Math.floor(lv / 200);
-}
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
 }
