@@ -180,7 +180,7 @@ function extend_enemy_cooldowns(target: CHARACTER, extendMs: number): void {
         if (!sp_skill || !sp_skill.pfm) continue;
         for (const key in sp_skill.pfm) {
             const pfmitem: PERFORM = sp_skill.pfm[key];
-            pfmitem.change_distime(target, key, extendMs);
+            pfmitem.change_distime(target, base, extendMs);
         }
     }
 }

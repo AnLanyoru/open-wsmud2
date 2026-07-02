@@ -1107,18 +1107,19 @@ export class PERFORM {
         return this.name || "";
     }
 
-    /** 改变绝招冷却时间 */
-    change_distime(me: CHARACTER, id: string, add_time?: number): void {
-        const cur = me.pfm_cd.get(id);
+    /** 改变绝招冷却时间（baseType: 基础技能类型如"sword"，与 pid 拼接为 pfm_cd key） */
+    change_distime(me: CHARACTER, baseType: string, add_time?: number): void {
+        const key = baseType + '/' + this.pid;
+        const cur = me.pfm_cd.get(key);
         if (cur !== undefined) {
             if (add_time) {
-                me.pfm_cd.set(id, cur + add_time);
+                me.pfm_cd.set(key, cur + add_time);
             } else {
                 add_time = -(cur - Date.now());
-                me.pfm_cd.delete(id);
+                me.pfm_cd.delete(key);
             }
             if (me.is_player) {
-                me.notify('{type:"changepfm",id:"' + id + '",time:' + add_time + '}');
+                me.notify('{type:"changepfm",id:"' + key + '",time:' + add_time + '}');
             }
         }
     }
