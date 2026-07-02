@@ -235,14 +235,14 @@ function fb_start(me, path) {
     if (copy_room) {
         next_room = copy_room;
         if (me.team) {
-            if (copy_room.query_temp(me.id, me) == 1) {
+            if (copy_room.fb_query_temp(me.id, me) == 1) {
                 return me.notify("你已经完成副本，必须等其他队员也完成后才可以重新进入。");
             }
             if (me.expend_jingli(fb.expend) == false) {
                 return me.notify("你的精力不够，无法副本。");
             }
             //记录这个玩家进入副本的标志，防止重复进入
-            copy_room.set_temp(me.id, 1, me);
+            copy_room.fb_set_temp(me.id, 1, me);
         } else {
             if (diff_type == 2)
                 return me.notify("你需要组队才可以进入副本。");
@@ -259,9 +259,9 @@ function fb_start(me, path) {
         if (!next_room) {
             return me.notify("副本创建失败。");
         }
-        next_room.set_temp("diff", diff_type, me);
+        next_room.fb_set_temp("diff", diff_type, me);
         if (me.team) {
-            next_room.set_temp(me.id, 1, me);
+            next_room.fb_set_temp(me.id, 1, me);
             for (var i = 0; i < me.team.length; i++) {
                 var tm = me.team[i];
                 if (tm != me && tm.is_player) {
@@ -306,7 +306,7 @@ function fb_over(me) {
     var pot = max_exp * p / 100;
 
     var fb = me.environment;
-    var diff = fb.query_temp("diff", undefined, me) || 0;
+    var diff = fb.fb_query_temp("diff", me) || 0;
     if (me.moveto(me.query_temp("enter_room"), me.name + "离开了副本。", me.name + "走了过来。") != false) {
 
         if (me.team && me.environment.parent.id !== 'home') {
@@ -419,7 +419,7 @@ function fb_first_check(me, fb, area, diff) {
     if (diff === 2) fb_fam_key = fb_key;
     if (WORLD.DATA.query_temp(fb_fam_key)) return;//这个门派已经拿过了
     var fb_key2 = "fb_first_" + fblock;
-    var ss_users = String(WORLD.DATA.query_temp(fb_key2) ?? '');
+    var ss_users = String(WORLD.DATA.query_temp(fb_key2, ''));
     var teams = me.team || [me];
     if (ss_users) {
         for (var i = 0; i < teams.length; i++) {

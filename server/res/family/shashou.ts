@@ -106,7 +106,7 @@ export default class extends FAMILY {
             id: this.id + "_settle",
             name: "门派战争",
             desc: msg,
-            time: this.temp?.["battle"]?.e,
+            time: this.query_temp_expiry("battle"),
             grade: 2,
             command: "领取战利品",
             check: (me) => me.family === this,

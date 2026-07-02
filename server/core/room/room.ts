@@ -115,8 +115,6 @@ export class ROOM extends ITEM {
 
     // ============ 玩法相关 ============
 
-    /** 副本临时数据 */
-    temp: Record<string, any> = {};
     /** 副本分数（由 CHARACTER.add_fbscore 设置） */
     score?: number;
     /** 是否可钓鱼 */
@@ -837,10 +835,12 @@ export class ROOM extends ITEM {
         const id = this.parent?.query_owner(me);
         if (id !== this.owner) return;
         const name = "fb/";
-        for (let key in me.temp) {
-            if (key.startsWith(name)) {
-                me.temp[key] = null;
-            }
+        const toDelete: string[] = [];
+        me.forEach_temp((key) => {
+            if (key.startsWith(name)) toDelete.push(key);
+        });
+        for (const key of toDelete) {
+            me.remove_temp(key);
         }
         if (me.team) {
             for (let i = 0; i < me.team.length; i++) {
@@ -950,60 +950,29 @@ export class ROOM extends ITEM {
     // ============ 静态方法 ============
 
     /**
-     * 查询副本房间的临时数据(按玩家隔离)
-     * @param name
-     * @param def
-     * @param me
+     * 查询副本临时数据(按队伍隔离，委托给队长 USER 实例)
      */
-    // @ts-ignore
-    query_temp<T = unknown>(name: string, me: USER, def?: T): T | undefined {
+    fb_query_temp(name: string, me: USER, def?: any): any {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
-        if (!first.temp) return;
-        const item = first.temp[name];
-        if (item && item.e) {
-            if (Date.now() <= item.e) {
-                return item.v;
-            }
-            first.temp[name] = null;
-            return def;
-        }
-        return item ?? def;
+        return first.query_temp(name, def);
     }
 
     /**
-     * 设置副本临时数据(按玩家隔离)
-     * @param name
-     * @param value
-     * @param time
-     * @param me
+     * 设置副本临时数据(按队伍隔离)
      */
-    // @ts-ignore
-    override set_temp(name: string, value: unknown, me: USER, time?: number): void {
+    fb_set_temp(name: string, value: unknown, me: USER, time?: number): void {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
-        if (!first.temp) first.temp = {};
-        if (time) {
-            first.temp[name] = {
-                v: value,
-                e: Date.now() + time
-            };
-        } else {
-            first.temp[name] = value;
-        }
+        first.set_temp(name, value, time);
     }
 
     /**
-     * 累加副本临时数据(按玩家隔离)
-     * @param name
-     * @param value
-     * @param time
-     * @param me
+     * 累加副本临时数据(按队伍隔离)
      */
-    // @ts-ignore
-    add_temp(name: string, value: number, me: USER, time?: number): number {
-        const val = (this.query_temp(name, me, 0) as number) + value;
-        this.set_temp(name, val, me, time);
+    fb_add_temp(name: string, value: number, me: USER, time?: number): number {
+        const val = (this.fb_query_temp(name, me, 0) as number) + value;
+        this.fb_set_temp(name, val, me, time);
         return val;
     }
 

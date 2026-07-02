@@ -56,7 +56,7 @@ export default class extends COMMAND {
             }
         }
         if (me.query_temp("st_leave")) {
-            var time = (me.temp?.["st_leave"]?.e ?? Date.now()) - Date.now();
+            var time = (me.query_temp_expiry("st_leave") ?? Date.now()) - Date.now();
             str.push(",reward:\"你需要");
             str.push(String(Math.floor(time / 3600000)));
             str.push("小时");

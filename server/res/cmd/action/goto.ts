@@ -96,7 +96,7 @@ export default class extends COMMAND {
             if (!me.query_temp('pt_mp')) {
                 if (count >= 7)
                     return me.notify('你本周内参与帮派战的次数已满。');
-                let time = pt.temp.battle.e - Date.now();
+                let time = pt.query_temp_expiry("battle")! - Date.now();
                 me.set_temp('pt_mp', 1, time);
                 count = me.add_temp('pt_mc', 1, UTIL.diff_week_time());
             }

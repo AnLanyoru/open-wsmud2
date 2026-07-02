@@ -12,7 +12,6 @@ import type {NPC} from '../char/npc.js';
 import type {USER} from '../char/user.js';
 import type {SKILL, SkillSet} from './skill.js';
 import type {AREA} from '../room/area.js';
-import type {TempValue} from '../../types/base.js';
 import type { CHARACTER } from "../char/character.js";
 
 // 懒加载 NPC 避免循环依赖: family.ts → npc.ts → character.ts (TDZ)
@@ -48,8 +47,6 @@ export class FAMILY extends BASE {
 
     /** 门派ID */
     id: string = "";
-    /** 临时数据（带过期时间为 TempValue 包装，否则为原始值） */
-    temp: Record<string, TempValue | any> = {};
     /** 按品级缓存的技能索引 */
     skill_levels: SKILL[][] | null = null;
     /** 门派开始回调 */
@@ -598,7 +595,7 @@ export class FAMILY extends BASE {
             id: this.id + "_settle",
             name: "门派战争",
             desc: "你的门派和" + target_fam.name + "战斗结束了，" + msg,
-            time: (this.temp["battle"] as TempValue).e,
+            time: this.query_temp_expiry("battle"),
             grade: 2,
             command: "领取战利品",
             check: (me: USER) => me.family === this,
@@ -746,6 +743,7 @@ export class FAMILY extends BASE {
 
     /**
      * 序列化所有门派持久数据（排行榜、临时数据等）
+     * @deprecated 未使用 — FAMILY.temp 全为短生命周期数据（最长1h），SAVE/LOAD 从未接入持久化链路
      * @returns JSON 字符串
      */
     static SAVE(): string {
@@ -762,6 +760,7 @@ export class FAMILY extends BASE {
 
     /**
      * 从 JSON 字符串恢复门派持久数据
+     * @deprecated 未使用 — 见 SAVE()
      * @param str - JSON 字符串
      */
     static LOAD(str: string): void {

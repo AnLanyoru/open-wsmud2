@@ -14,8 +14,9 @@ export default class extends COMMAND {
         if (me.master) return;
         if (str.length > 200) return me.notify("你说的太多了。");
         if (me.query_temp("no_chat")) {
-            if (me.temp.no_chat.e) {
-                let time = new Date(me.temp.no_chat.e);
+            const expiry = me.query_temp_expiry("no_chat");
+            if (expiry) {
+                let time = new Date(expiry);
                 return me.notify("你已经被禁言，持续到" + time.getFullYear()
                     + "年" + (time.getMonth() + 1) + "月" +
                     time.getDate() + "日" + time.getHours() + "时" + time.getMinutes() + "分。");

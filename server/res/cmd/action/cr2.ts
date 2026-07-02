@@ -24,14 +24,14 @@ export default class extends COMMAND {
             return me.send('你要看哪个副本？');
         index = area.fb_index;
         let key = "fb_first_" + (index + 1) + "_" + diff;
-        let name = String(WORLD.DATA.query_temp(key) ?? '');
+        let name = String(WORLD.DATA.query_temp(key, ''));
         let fbname = area.name + DIFFS[diff] + "模式";
         if (!name) return me.send(fbname + "尚未完成首杀。");
         let str: string[] = ['<hic>', fbname, '由' + name + "首次通过。</hic>\n"];
         if (diff < 2) {
             for (let fam of FAMS_TATAS) {
                 key = "fb_first_" + fam + "_" + (index + 1) + "_" + diff; //每个门派的
-                name = String(WORLD.DATA.query_temp(key) ?? '');
+                name = String(WORLD.DATA.query_temp(key, ''));
                 if (!name) str.push(FAMILIES[fam].name, '尚未完成门派首杀。\n');
                 else str.push('<hic>', FAMILIES[fam].name, '弟子', name, '完成门派首杀。</hic>\n');
             }

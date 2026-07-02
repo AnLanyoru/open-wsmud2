@@ -48,8 +48,6 @@ interface FOLLOWER_DATA {
     path: string;
     /** 数值属性数组（按 SAVE_NUMPROP 顺序） */
     prop: number[];
-    /** 临时数据 */
-    temp: Record<string, any>;
     /** 用户设置 */
     settings?: Record<string, number>;
     /** 技能数据 */
@@ -411,8 +409,8 @@ export class FOLLOWER extends CHARACTER {
             str.push(',skills:');
             str.push(JSON.stringify(this.skills));
         }
-        if (this.temp) {
-            str.push(',temp:', this.format_temp(this.temp));
+        if (this.has_temp()) {
+            str.push(',temp:', this.format_temp());
         }
         if (this.settings) {
             str.push(',settings:');

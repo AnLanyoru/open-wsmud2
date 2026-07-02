@@ -221,8 +221,6 @@ export class USER extends CHARACTER {
 
     /** 用户设置 */
     settings: Record<string, number> | null = null;
-    /** 临时数据 */
-    temp: Record<string, any> = {};
     /** 称号列表 */
     titles: TitleEntry[] | null = null;
     /** 离线前所在房间路径 */
@@ -631,7 +629,7 @@ export class USER extends CHARACTER {
             str.push(',skills:');
             str.push(JSON.stringify(this.skills));
         }
-        str.push(',temp:', this.format_temp(this.temp));
+        str.push(',temp:', this.format_temp());
         if (this.settings) {
             str.push(',settings:');
             str.push(JSON.stringify(this.settings));

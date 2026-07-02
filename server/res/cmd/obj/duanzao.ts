@@ -62,7 +62,6 @@ export default class DuanZaoCommand extends COMMAND {
         obj.no_fenjie = false;
         obj.grade = 6;
         obj.level = 0;
-        if (!obj.temp) obj.temp = {};
         const def_prop = this.DEFAULT_PROPS[eq_type];
         if (def_prop) {
             obj.set_temp(def_prop, 1);

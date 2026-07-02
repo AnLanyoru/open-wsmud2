@@ -356,8 +356,6 @@ export class CHARACTER extends ITEM {
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
     equipment: (EQUIPMENT | null)[] = [];
-    /** 临时数据 */
-    temp: Record<string, any> = {};
     /** 战斗属性修饰 */
     combat_props: [keyof PropMap | string, number][] | null = null;
     /** 子物品列表,生物的通常为物品 */
@@ -820,7 +818,7 @@ export class CHARACTER extends ITEM {
      * 克隆实例到实际场景中
      */
     clone(): void {
-        if (this.temp) this.temp = Object.create(this.temp);
+        this.copy_temp_to(this);
         if (this.prop) this.prop = Object.create(this.prop);
         if (this.skills) this.skills = new SkillsMap(this.skills);
         if (this.equipment) {

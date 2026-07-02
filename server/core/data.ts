@@ -37,8 +37,35 @@ const DATA = {
     parties: new Map(),
     /** 拍卖数据 */
     PAIMAI: new Map(),
-    /** 运行时临时数据（持久化到 data.js） */
-    temp: {} as Record<string, any>,
+    /** 临时数据值存储 */
+    _temp_values: new Map<string, any>(),
+    /** 临时数据过期时间存储 */
+    _temp_expiry: new Map<string, number>(),
+    /** 运行时临时数据兼容访问器 */
+    get temp(): Record<string, any> {
+        const obj: Record<string, any> = {};
+        const expiry = this._temp_expiry;
+        for (const [k, v] of this._temp_values) {
+            const e = expiry.get(k);
+            obj[k] = e !== undefined ? { v, e } : v;
+        }
+        return obj;
+    },
+    set temp(data: Record<string, any> | null | undefined) {
+        this._temp_values.clear();
+        this._temp_expiry.clear();
+        if (!data) return;
+        for (const key of Object.keys(data)) {
+            const val = data[key];
+            if (val === null || val === undefined) continue;
+            if (typeof val === 'object' && 'e' in val && 'v' in val) {
+                this._temp_values.set(key, val.v);
+                this._temp_expiry.set(key, val.e);
+            } else {
+                this._temp_values.set(key, val);
+            }
+        }
+    },
     /** 经验等级倍率表（按 level 索引） */
     exps: [10, 20, 30, 40, 50, 100, 200, 80, 90, 100, 110, 120, 130],
 
@@ -205,6 +232,7 @@ const DATA = {
 
     /**
      * JSON.stringify 替换函数 — 保留带有过期时间的值不变
+     * @deprecated 未使用 — save_temp 调用 JSON.stringify 时从未传入此 replacer
      */
     temp_replacer(_key: string, value: unknown): unknown {
         if (typeof value === 'object' && value !== null && 'e' in value) {
@@ -236,17 +264,19 @@ const DATA = {
      * @param def - 默认值（键不存在时返回）
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
-    query_temp<T>(name: string, def?: T, _me?: unknown): T {
-        if (def === undefined) def = undefined as T;
-        const item = this.temp[name];
-        if (item && item.e) {
-            if (Date.now() <= item.e) {
-                return item.v;
+    query_temp<T>(name: string, def?: T): T {
+        if (def === undefined) def = 0 as T;
+        const expiry = this._temp_expiry.get(name);
+        if (expiry !== undefined) {
+            if (Date.now() <= expiry) {
+                return this._temp_values.get(name) as T;
             }
-            delete this.temp[name];
+            this._temp_values.delete(name);
+            this._temp_expiry.delete(name);
             return def;
         }
-        return item || def;
+        const val = this._temp_values.get(name);
+        return val !== undefined ? val : def;
     },
 
     /**
@@ -256,25 +286,22 @@ const DATA = {
      * @param time - 过期时间（ms），不传则永不过期
      * @param _me - 玩家对象（兼容 ROOM.set_temp 签名）
      */
-    set_temp(name: string, value: unknown, time?: number, _me?: unknown): void {
-        if (!this.temp) this.temp = {};
+    set_temp(name: string, value: unknown, time?: number): void {
+        this._temp_values.set(name, value);
         if (time) {
-            this.temp[name] = {
-                v: value,
-                e: Date.now() + time,
-            };
+            this._temp_expiry.set(name, Date.now() + time);
         } else {
-            this.temp[name] = value;
+            this._temp_expiry.delete(name);
         }
     },
 
     /**
-     * 移除临时数据（设为 null 而非 delete，保留键位用于 JSON 序列化）
+     * 移除临时数据
      * @param name - 键名
      */
     remove_temp(name: string): void {
-        if (!this.temp) return;
-        this.temp[name] = null;
+        this._temp_values.delete(name);
+        this._temp_expiry.delete(name);
     },
 
     /**
@@ -285,33 +312,30 @@ const DATA = {
      * @param _me - 玩家对象（兼容 ROOM.add_temp 签名）
      * @returns 累加后的值
      */
-    add_temp(name: string, value: number, time?: number, _me?: unknown): number {
-        if (!this.temp) this.temp = {};
-        const old = this.temp[name];
+    add_temp(name: string, value: number, time?: number): number {
+        const oldVal = this._temp_values.get(name);
+        const oldExpiry = this._temp_expiry.get(name);
+        const now = Date.now();
+        const baseVal = (typeof oldVal === 'number' && !oldExpiry) ? oldVal :
+                        (oldExpiry && oldExpiry > now ? oldVal : 0);
+        const v = value + baseVal;
         if (time) {
-            if (old && old.e) {
-                const expiryTime = Date.now() + time;
-                if (old.e < Date.now()) {
-                    old.e = expiryTime;
-                    old.v = value;
-                } else {
-                    if (old.e < expiryTime) old.e = expiryTime;
-                    old.v += value;
-                }
-                return old.v;
-            } else {
-                const v = value + (old || 0);
-                this.temp[name] = {
-                    v: v,
-                    e: Date.now() + time,
-                };
-                return v;
-            }
+            const newExpiry = now + time;
+            const finalExpiry = (oldExpiry && oldExpiry > now && oldExpiry > newExpiry)
+                ? oldExpiry : newExpiry;
+            this._temp_values.set(name, v);
+            this._temp_expiry.set(name, finalExpiry);
         } else {
-            const v = value + (old || 0);
-            this.temp[name] = v;
-            return v;
+            this.set_temp(name, v);
         }
+        return v;
+    },
+
+    /**
+     * 查询临时数据过期时间戳
+     */
+    query_temp_expiry(name: string): number | undefined {
+        return this._temp_expiry.get(name);
     },
 
     /**
