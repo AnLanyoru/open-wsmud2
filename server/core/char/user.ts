@@ -991,6 +991,7 @@ export class USER extends CHARACTER {
             if (!obj) return;
         } else {
             obj = this.push_item(obj) as OBJ;
+            if (!obj) return;
         }
 
         this.items_changed(obj);
@@ -1003,9 +1004,11 @@ export class USER extends CHARACTER {
      * 从背包移除物品
      */
     remove_obj(obj_or_id: ITEM | string, count?: number): OBJ | undefined {
-        let obj: OBJ | undefined;
+        let obj: ITEM | undefined;
         if (typeof obj_or_id === 'string') {
-            obj = this.find_obj(obj_or_id) as OBJ;
+            obj = this.find_obj(obj_or_id);
+        } else {
+            obj = obj_or_id;
         }
         if (!obj) return;
         count = count || obj.count || 1;
@@ -1014,7 +1017,7 @@ export class USER extends CHARACTER {
             if (obj.check_obj()) obj.notify_action(this, false);
         }
         this.items_changed(obj, count);
-        return newobj;
+        return newobj as OBJ;
     }
 
     /**
