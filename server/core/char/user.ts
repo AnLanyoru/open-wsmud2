@@ -1245,16 +1245,11 @@ export class USER extends CHARACTER {
      * 清除技能冷却时间
      */
     clear_distime(pfmid?: string): void {
-        if (!this.temp) return;
         if (pfmid) {
-            this.temp['pfm/' + pfmid] = null;
+            this.pfm_cd.delete(pfmid);
             this.send('{type:"clearDistime",id:"' + pfmid + '"}');
         } else {
-            for (const key in this.temp) {
-                if (key.startsWith('pfm/')) {
-                    this.temp[key] = null;
-                }
-            }
+            this.pfm_cd.clear();
             this.send('{type:"clearDistime"}');
         }
     }
