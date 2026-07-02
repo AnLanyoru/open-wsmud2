@@ -51,7 +51,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        huifu: {
             name: "鲲字诀",
             distime: 30000,
             enable_skill: "force",
@@ -70,7 +70,7 @@ export default class extends SKILL {
                 return "战斗中恢复自己" + per + "%内力。";
             },
         },
-        pfm_1: {
+        power: {
             name: "凝神诀",
             distime: 30000,
             enable_skill: "force",

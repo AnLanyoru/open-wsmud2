@@ -239,7 +239,6 @@ const need_test_objs: TestResRoot = {
                 "无念禅功": ["book/fbk#wunianchangong", 1],
             },
             "grade6/ <ord>六级</ord>": {
-                "北冥神功": ["book/fbk#beimingshengong3", 1],
                 "长生诀": ["book/fbk#changshengjue", 1],
                 "慈航剑典": ["book/fbk#cihangjiandian", 1],
                 "逆天道": ["book/fbk#nitiandao", 1],
@@ -423,6 +422,7 @@ const need_test_objs: TestResRoot = {
             "逍遥心法": ["book/fbk#xiaoyaoxinfa", 1],
             "天山折梅手": ["book/fbk#zhemeishou", 1],
             "advanced/ <hio>进阶</hio>": {
+                "北冥神功(隐藏)": ["book/fbk#beimingshengong3", 1],
                 "北冥神功进阶": ["book/fbk#beimingshengong2", 1],
                 "凌波微步进阶": ["book/fbk#lingboweibu2", 1],
                 "天山六阳掌进阶一": ["book/fbk#liuyangzhang2", 1],
