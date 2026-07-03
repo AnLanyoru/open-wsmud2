@@ -133,7 +133,7 @@ export class ROOM extends ITEM {
      * @param path - 房间路径
      */
     static CREATE(path: string): ROOM {
-        const base = WORLD.ROOM_STORE[path];
+        const base = WORLD.ROOM_STORE.get(path);
         if (!base) {
             throw new Error('room not preloaded: ' + path);
         }
@@ -719,7 +719,7 @@ export class ROOM extends ITEM {
             WORLD.RUN_ROOMS.push(this);
         } else {
             // 首次创建：this是干净原型，保存后用克隆作为实际房间
-            WORLD.ROOM_STORE[file] = this;
+            WORLD.ROOM_STORE.set(file, this);
             const active = Object.create(this) as ROOM;
             active.on_clone();
             active.initBaseRoom(file);
@@ -765,7 +765,7 @@ export class ROOM extends ITEM {
         const oldroom = WORLD.ROOMS[file];
 
         // 保存新原型，创建新的活跃房间
-        WORLD.ROOM_STORE[file] = this;
+        WORLD.ROOM_STORE.set(file, this);
         const active = Object.create(this) as ROOM;
         active.on_clone();
         active.initBaseRoom(file);

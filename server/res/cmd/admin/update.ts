@@ -69,9 +69,9 @@ export default class UpdateCmd extends COMMAND {
         this.do_update(me, "npc/" + path).then(() => {
             // 主路径由NPC.CREATE覆盖，#变体需清除缓存
             let prefix = path + "#";
-            for (let key of Object.keys(WORLD.NPC_STORE)) {
+            for (let key of WORLD.NPC_STORE.keys()) {
                 if (key.startsWith(prefix)) {
-                    WORLD.NPC_STORE[key] = undefined as any;
+                    WORLD.NPC_STORE.delete(key);
                 }
             }
             if (me && me.environment) {
@@ -89,11 +89,11 @@ export default class UpdateCmd extends COMMAND {
 
     update_obj(me: CHARACTER | null, path: string) {
         this.do_update(me, "obj/" + path).then(() => {
-            WORLD.OBJ_STORE[path] = undefined as any;
+            WORLD.OBJ_STORE.delete(path);
             let prefix = path + "#";
-            for (let key of Object.keys(WORLD.OBJ_STORE)) {
+            for (let key of WORLD.OBJ_STORE.keys()) {
                 if (key.startsWith(prefix)) {
-                    WORLD.OBJ_STORE[key] = undefined as any;
+                    WORLD.OBJ_STORE.delete(key);
                 }
             }
         }).catch((e: any) => {

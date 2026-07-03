@@ -804,7 +804,7 @@ export class CHARACTER extends ITEM {
     create(path: string, par?: string): void {
         if (par) this.path = path + par;
         if (this.on_create) this.on_create(path, par);
-        WORLD.NPC_STORE[this.path] = this;
+        WORLD.NPC_STORE.set(this.path, this);
     }
 
     /**
@@ -3137,7 +3137,7 @@ export class CHARACTER extends ITEM {
      * 获取 NPC 模板（带缓存）
      */
     static GET_BASE(path: string): CHARACTER {
-        let base = WORLD.NPC_STORE[path];
+        let base = WORLD.NPC_STORE.get(path);
         if (!base) {
             base = BASE.CREATE(__PATH.NPC, path) as NPC;
             if (!base) throw new Error('没有人物' + path + '的定义。');

@@ -229,7 +229,7 @@ class World {
     /** 房间注册表 (路径 → ROOM 实例) */
     ROOMS: Record<string, ROOM> = {};
     /** 房间原型缓存 (路径 → 干净原型，仅供Object.create克隆) */
-    ROOM_STORE: Record<string, ROOM> = {};
+    ROOM_STORE: Map<string, ROOM> = new Map();
     /** 运行中的房间列表（含心跳） */
     RUN_ROOMS: ROOM[] = [];
     /** 默认技能注册表 */
@@ -243,9 +243,9 @@ class World {
     /** 用户活动事件列表 */
     USER_EVENTS: EventItem[] = [];
     /** 物品原型缓存 (path → OBJ 原型) */
-    OBJ_STORE: Record<string, OBJ> = {};
+    OBJ_STORE: Map<string, OBJ> = new Map();
     /** NPC 原型缓存 (path → NPC 原型) */
-    NPC_STORE: Record<string, CHARACTER> = {};
+    NPC_STORE: Map<string, CHARACTER> = new Map();
     /** 心跳计数（用于定时保存） */
     HEARTBEATCOUNT: number = 0;
     /** 玩家可恢复物品/技能存储 (playerId → entries[]) */
