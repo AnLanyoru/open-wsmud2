@@ -892,7 +892,7 @@ class World {
      */
     getRoom(path?: string): ROOM | undefined {
         if (!path) return;
-        const rm = this.ROOMS[path];
+        const rm = this.ROOMS.get(path);
         if (!rm) {
             console.log("room %s is not exist", path);
             return;
@@ -1106,7 +1106,7 @@ class World {
     on_user_quit(user: USER): void {
         if (this.is_server(user)) {
             if (user.query_temp('pt')) {
-                const party_cmd = this.COMMANDS['party'] as party;
+                const party_cmd = this.COMMANDS.get('party') as party;
                 party_cmd.on_user_login(user, false);
             }
             this.on_user_save(user);
