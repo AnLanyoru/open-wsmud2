@@ -7,7 +7,7 @@ import {ITEM, RoomAction} from "../item.js";
 import {OBJ} from "../item/obj.js";
 import type {AREA} from "./area.js";
 import type {CHARACTER} from "../char/character.js";
-import type {NPC} from "../char/npc.js";
+import {NPC} from "../char/npc.js";
 import type {USER} from "../char/user.js";
 import { ItemCommandsJson } from "../char/follower.js";
 
@@ -15,13 +15,6 @@ import { ItemCommandsJson } from "../char/follower.js";
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
 
-// 懒加载 NPC 避免循环依赖
-let _NPC: {
-    CLONE: (path: string, ...args: any[]) => any;
-} | null = null;
-import("../char/npc.js").then((m: Record<string, any>) => {
-    _NPC = m.NPC as any;
-});
 
 /**
  * 隐藏物品被look时的描述
@@ -112,11 +105,11 @@ export class ROOM extends ITEM {
     shadow_rooms: ROOM[] | null = null;
     /** 副本持有者ID */
     owner: string | null = null;
+    /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
+    _npc_records: [string, number][] = [];
 
     // ============ 玩法相关 ============
 
-    /** 副本临时数据 */
-    temp: Record<string, any> = {};
     /** 副本分数（由 CHARACTER.add_fbscore 设置） */
     score?: number;
     /** 是否可钓鱼 */
@@ -134,6 +127,21 @@ export class ROOM extends ITEM {
 
     /** 公共房间列表(由RANDOM静态方法管理) */
     static public_rooms: ROOM[] | null = null;
+
+    /**
+     * 创建房间实例（从干净原型克隆）
+     * @param path - 房间路径
+     */
+    static CREATE(path: string): ROOM {
+        const base = WORLD.ROOM_STORE.get(path);
+        if (!base) {
+            throw new Error('room not preloaded: ' + path);
+        }
+        const room = Object.create(base) as ROOM;
+        room.on_clone();
+        room.create(path);
+        return room;
+    }
 
     // ============ 回调（由资源文件设置） ============
 
@@ -358,13 +366,7 @@ export class ROOM extends ITEM {
             if (typeof name == "string") name = [name, 1];
             const obj_path = name[0];
             if (!obj_path) continue;
-            for (let j = 0; j < name[1]; j++) {
-                const obj = _NPC!.CLONE(obj_path);
-                if (obj) {
-                    this.items.push(obj);
-                    obj.environment = this;
-                }
-            }
+            this._npc_records.push([obj_path, name[1]]);
         }
     }
 
@@ -652,11 +654,46 @@ export class ROOM extends ITEM {
     }
 
     /**
+     * 原型克隆回调 — Object.create后初始化可变字段，使其独立于原型
+     */
+    on_clone(): void {
+        // —— 可变引用类型，覆盖为独立副本 ——
+        this.items = [];
+        if (this.exits) {
+            this.exits = { ...this.exits };
+        }
+        this._temp_values = new Map();
+        this._temp_expiry = new Map();
+        this._events = undefined;
+
+        // —— 缓存清零 ——
+        this.json = null;
+        this.room_exits_json = null;
+        this.commands_json = null;
+
+        // —— 重放NPC生成（读取原型的_npc_records） ——
+        const records = this._npc_records;
+        this._npc_records = [];
+        if (records) {
+            for (let i = 0; i < records.length; i++) {
+                const [obj_path, count] = records[i];
+                for (let j = 0; j < count; j++) {
+                    const obj = NPC.CLONE(obj_path);
+                    if (obj) {
+                        this.items.push(obj);
+                        obj.environment = this;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 房间创建回调
      * @param file - 文件名
      */
     create(file: string): void {
-        const base_room = WORLD.ROOMS[file];
+        const base_room = WORLD.ROOMS.get(file);
 
         if (base_room) {
             this.parent = base_room.parent;
@@ -674,7 +711,11 @@ export class ROOM extends ITEM {
             }
             WORLD.RUN_ROOMS.push(this);
         } else {
-            this.initBaseRoom(file);
+            // 首次创建：this是干净原型，保存后用克隆作为实际房间
+            WORLD.ROOM_STORE.set(file, this);
+            const active = Object.create(this) as ROOM;
+            active.on_clone();
+            active.initBaseRoom(file);
         }
 
         this.on_create && this.on_create();
@@ -685,7 +726,7 @@ export class ROOM extends ITEM {
      * @param file
      */
     initBaseRoom(file: string): void {
-        WORLD.ROOMS[file] = this;
+        WORLD.ROOMS.set(file, this);
 
         const area = getAreaByPath(this.path);
 
@@ -714,25 +755,35 @@ export class ROOM extends ITEM {
      */
     update(file: string): void {
         this.on_create && this.on_create();
-        const oldroom = WORLD.ROOMS[file];
-        this.initBaseRoom(file);
+        const oldroom = WORLD.ROOMS.get(file);
+
+        // 保存新原型，创建新的活跃房间
+        WORLD.ROOM_STORE.set(file, this);
+        const active = Object.create(this) as ROOM;
+        active.on_clone();
+        active.initBaseRoom(file);
+
+        // 原型的影子标记需从RUN_ROOMS清除（create时被误加入）
+        const idx = WORLD.RUN_ROOMS.indexOf(this);
+        if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
+
         if (!oldroom) return;
         if (oldroom.copy_rooms) {
-            this.copy_rooms = {};
+            active.copy_rooms = {};
             for (let key in oldroom.copy_rooms) {
                 const rm = oldroom.copy_rooms[key];
-                const newRm = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
-                this.replaceRoom(rm, newRm);
+                const newRm = ROOM.CREATE(active.path);
+                active.replaceRoom(rm, newRm);
                 newRm.owner = key;
-                if (!this.copy_rooms) this.copy_rooms = {};
-                this.copy_rooms[key] = newRm;
+                if (!active.copy_rooms) active.copy_rooms = {};
+                active.copy_rooms[key] = newRm;
             }
             oldroom.copy_rooms = null;
         } else {
             if (ROOM.public_rooms) {
                 for (let i = 0; i < ROOM.public_rooms.length; i++) {
                     if (ROOM.public_rooms[i] == oldroom) {
-                        ROOM.public_rooms[i] = this;
+                        ROOM.public_rooms[i] = active;
                         break;
                     }
                 }
@@ -837,10 +888,12 @@ export class ROOM extends ITEM {
         const id = this.parent?.query_owner(me);
         if (id !== this.owner) return;
         const name = "fb/";
-        for (let key in me.temp) {
-            if (key.startsWith(name)) {
-                me.temp[key] = null;
-            }
+        const toDelete: string[] = [];
+        me.forEach_temp((key) => {
+            if (key.startsWith(name)) toDelete.push(key);
+        });
+        for (const key of toDelete) {
+            me.remove_temp(key);
         }
         if (me.team) {
             for (let i = 0; i < me.team.length; i++) {
@@ -886,7 +939,7 @@ export class ROOM extends ITEM {
         if (area.rooms) {
             for (let i = 0; i < area.rooms.length; i++) {
                 const base_room = area.rooms[i];
-                const copy_room = BASE.CREATE(__PATH.MAP, base_room.path) as ROOM;
+                const copy_room = ROOM.CREATE(base_room.path);
                 if (!copy_room) continue;
                 if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
                 if (!base_room.copy_rooms) base_room.copy_rooms = {};
@@ -913,7 +966,7 @@ export class ROOM extends ITEM {
                 return this.shadow_rooms[i];
             }
         }
-        const shadow = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
+        const shadow = ROOM.CREATE(this.path);
         if (shadow) {
             this.shadow_rooms.push(shadow);
         }
@@ -950,60 +1003,29 @@ export class ROOM extends ITEM {
     // ============ 静态方法 ============
 
     /**
-     * 查询副本房间的临时数据(按玩家隔离)
-     * @param name
-     * @param def
-     * @param me
+     * 查询副本临时数据(按队伍隔离，委托给队长 USER 实例)
      */
-    // @ts-ignore
-    query_temp<T = unknown>(name: string, me: USER, def?: T): T | undefined {
+    fb_query_temp(name: string, me: USER, def?: any): any {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
-        if (!first.temp) return;
-        const item = first.temp[name];
-        if (item && item.e) {
-            if (Date.now() <= item.e) {
-                return item.v;
-            }
-            first.temp[name] = null;
-            return def;
-        }
-        return item ?? def;
+        return first.query_temp(name, def);
     }
 
     /**
-     * 设置副本临时数据(按玩家隔离)
-     * @param name
-     * @param value
-     * @param time
-     * @param me
+     * 设置副本临时数据(按队伍隔离)
      */
-    // @ts-ignore
-    override set_temp(name: string, value: unknown, me: USER, time?: number): void {
+    fb_set_temp(name: string, value: unknown, me: USER, time?: number): void {
         const first = this.query_fb_first(me.query_teamid());
         if (!first) return;
-        if (!first.temp) first.temp = {};
-        if (time) {
-            first.temp[name] = {
-                v: value,
-                e: Date.now() + time
-            };
-        } else {
-            first.temp[name] = value;
-        }
+        first.set_temp(name, value, time);
     }
 
     /**
-     * 累加副本临时数据(按玩家隔离)
-     * @param name
-     * @param value
-     * @param time
-     * @param me
+     * 累加副本临时数据(按队伍隔离)
      */
-    // @ts-ignore
-    add_temp(name: string, value: number, me: USER, time?: number): number {
-        const val = (this.query_temp(name, me, 0) as number) + value;
-        this.set_temp(name, val, me, time);
+    fb_add_temp(name: string, value: number, me: USER, time?: number): number {
+        const val = (this.fb_query_temp(name, me, 0) as number) + value;
+        this.fb_set_temp(name, val, me, time);
         return val;
     }
 

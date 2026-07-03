@@ -11,7 +11,7 @@ export default class extends ROOM {
     constructor() {
         super();
         this.add_action("wa", "挖矿", function (me) {
-            WORLD.COMMANDS['wk'].enter(me);
+            WORLD.COMMANDS.get('wk')!.enter(me);
         });
     }
 }

@@ -555,7 +555,7 @@ export default class XiangYangTask extends TASK {
             id: 'xiangyang',
             name: "襄阳守城",
             desc: desc,
-            time: WORLD.DATA.temp.xy_status.e,
+            time: WORLD.DATA.query_temp_expiry("xy_status"),
             grade: 3,
             command: command,
             check: (me) => {

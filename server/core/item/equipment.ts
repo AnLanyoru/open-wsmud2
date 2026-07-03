@@ -495,9 +495,7 @@ export class EQUIPMENT extends OBJ {
      */
     clone(me?: CHARACTER): EQUIPMENT {
         const obj = OBJ.CREATE(this.path!) as EQUIPMENT;
-        if (this.temp) {
-            obj.temp = Object.assign({}, this.temp);
-        }
+        this.copy_temp_to(obj);
         if (me && obj.on_reload) obj.on_reload(me);
         obj.level_up(this.level);
         obj.st_prop = this.st_prop;
@@ -520,8 +518,8 @@ export class EQUIPMENT extends OBJ {
         }
         if (this.is_locked)
             str.push(',1');
-        if (this.temp)
-            str.push(",", this.format_temp(this.temp));
+        if (this.has_temp())
+            str.push(",", this.format_temp());
         str.push("]");
     }
 

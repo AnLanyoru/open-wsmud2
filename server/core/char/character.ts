@@ -161,8 +161,6 @@ interface AutoSkillEntry {
     type: string;
     /** 是否为引用绝招 */
     is_ref: boolean;
-    /** 冷却结束时间戳 */
-    release_time: number;
     /** 是否禁用 */
     ban_use?: boolean;
 }
@@ -358,8 +356,6 @@ export class CHARACTER extends ITEM {
     status: CharacterStatus[] | null = null;
     /** 装备列表（按 EQUIP_TYPE 索引） */
     equipment: (EQUIPMENT | null)[] = [];
-    /** 临时数据 */
-    temp: Record<string, any> = {};
     /** 战斗属性修饰 */
     combat_props: [keyof PropMap | string, number][] | null = null;
     /** 子物品列表,生物的通常为物品 */
@@ -383,6 +379,8 @@ export class CHARACTER extends ITEM {
     force_skill: SKILL;
     /** 自动技能缓存 */
     auto_skills: AutoSkillEntry[] | null = null;
+    /** 技能冷却到期时间戳, key = "baseSkill/pfmid" */
+    pfm_cd: Map<string, number> = new Map();
     /** 当前攻击部位 */
     attack_part: AttackPart | null = null;
     /** 忙乱状态（不可行动，不可招架）倒计时 */
@@ -731,7 +729,7 @@ export class CHARACTER extends ITEM {
      */
     do_command(cmdName: string, str?: string): void {
         str = str || '';
-        let cmd: COMMAND | null = WORLD.COMMANDS[cmdName];
+        let cmd = WORLD.COMMANDS.get(cmdName);
         let pars: [CHARACTER, ...string[]];
         if (cmd && cmd.regex && str) {
             const match = cmd.regex.exec(str);
@@ -742,7 +740,7 @@ export class CHARACTER extends ITEM {
         if (this.do_item_action(this.environment, cmdName, pars)) {
             return;
         }
-        cmd = cmd || WORLD.DEFAULT_COMMAND;
+        cmd = cmd || WORLD.DEFAULT_COMMAND!;
         if (cmd) {
             if (!this.check_command(cmd)) return;
             if (cmd.enter.apply(cmd, pars) !== false) {
@@ -806,7 +804,7 @@ export class CHARACTER extends ITEM {
     create(path: string, par?: string): void {
         if (par) this.path = path + par;
         if (this.on_create) this.on_create(path, par);
-        WORLD.NPC_STROE.set(this.path, this);
+        WORLD.NPC_STORE.set(this.path, this);
     }
 
     /**
@@ -820,7 +818,7 @@ export class CHARACTER extends ITEM {
      * 克隆实例到实际场景中
      */
     clone(): void {
-        if (this.temp) this.temp = Object.create(this.temp);
+        this.copy_temp_to(this);
         if (this.prop) this.prop = Object.create(this.prop);
         if (this.skills) this.skills = new SkillsMap(this.skills);
         if (this.equipment) {
@@ -2539,24 +2537,27 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 检查技能冷却（过期自动清理）
+     * @param key - 技能标识 "baseSkill/pfmid"
+     * @param now - 当前时间戳（外层缓存复用）
+     * @returns true 表示还在冷却中
+     */
+    check_pfm_cd(key: string, now: number): boolean {
+        const expiry = this.pfm_cd.get(key);
+        if (expiry === undefined) return false;
+        if (expiry > now) return true;
+        this.pfm_cd.delete(key);
+        return false;
+    }
+
+    /**
      * 清除技能冷却
      */
     clear_distime(pfmid?: string): void {
-        if (this.auto_skills) {
-            if (!pfmid) {
-                for (let i = 0; i < this.auto_skills.length; i++) {
-                    const item = this.auto_skills[i];
-                    item.release_time = 0;
-                }
-            } else {
-                for (let i = 0; i < this.auto_skills.length; i++) {
-                    const item = this.auto_skills[i];
-                    if (item.pfm.id === pfmid) {
-                        item.release_time = 0;
-                        break;
-                    }
-                }
-            }
+        if (pfmid) {
+            this.pfm_cd.delete(pfmid);
+        } else {
+            this.pfm_cd.clear();
         }
     }
 
@@ -3027,10 +3028,7 @@ export class CHARACTER extends ITEM {
             const item = this.auto_skills[i];
             if (item.ban_use) continue;
             if (this.is_busy && !item.pfm.allow_busy) continue;
-            if (item.release_time) {
-                if (item.release_time > now) continue;
-                item.release_time = 0;
-            }
+            if (this.check_pfm_cd(item.id, now)) continue;
             if (item.pfm.query_mp(this, item.level) <= this.mp)
                 canuser.push(item);
         }
@@ -3047,7 +3045,7 @@ export class CHARACTER extends ITEM {
                 this.release_time = 0;
                 // rtime = 0; // intentionally unused
             }
-            skill.release_time = now + skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0);
+            this.pfm_cd.set(skill.id, now + skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0));
 
             return this.release_time > 0 || target.hp <= 0;
         }
@@ -3105,7 +3103,6 @@ export class CHARACTER extends ITEM {
             id: baseSkill + '/' + pfmitem.pid,
             type: baseSkill,
             is_ref: is_ref,
-            release_time: 0,
         });
     }
 
@@ -3122,8 +3119,9 @@ export class CHARACTER extends ITEM {
         this.release_time = release_time;
         if (!this.auto_skills) return;
         for (const askill of this.auto_skills) {
-            if (!askill.release_time || askill.release_time < release_time) {
-                askill.release_time = release_time;
+            const cur = this.pfm_cd.get(askill.id);
+            if (cur === undefined || cur < release_time) {
+                this.pfm_cd.set(askill.id, release_time);
             }
         }
     }
@@ -3139,7 +3137,7 @@ export class CHARACTER extends ITEM {
      * 获取 NPC 模板（带缓存）
      */
     static GET_BASE(path: string): CHARACTER {
-        let base = WORLD.NPC_STROE.get(path);
+        let base = WORLD.NPC_STORE.get(path);
         if (!base) {
             base = BASE.CREATE(__PATH.NPC, path) as NPC;
             if (!base) throw new Error('没有人物' + path + '的定义。');

@@ -59,18 +59,17 @@ export default class extends COMMAND {
         }
         let sts: OBJ[] = [];
         let st_names: string[] = [];
-        const duanzao = WORLD.COMMANDS.duanzao as DuanZaoCommand;
+        const duanzao = WORLD.COMMANDS.get("duanzao") as DuanZaoCommand;
         if (obj.path.startsWith('eq/cp')
             || obj.path.startsWith('eq/zb')) {
-            for (var key in obj.temp) {
-                let level = obj.temp![key] as number;
-                if (!level) continue;
+            obj.forEach_temp((key, level) => {
+                if (!level || typeof level !== 'number') return;
                 let prop = duanzao.PROPS![key];
-                if (!prop) continue;
+                if (!prop) return;
                 let st = OBJ.CREATE('st/p#' + key, duanzao.sum_needs!(prop, level));
                 sts.push(st);
                 st_names.push(st.unit_name());
-            }
+            });
             count += 8;
             count += obj.query_temp('sc', 0) ?? 0;
         } else {

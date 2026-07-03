@@ -204,6 +204,119 @@ export class BASE {
         return handler;
     }
 
+    // ============ 临时数据存储 ============
+
+    /** 临时数据值存储 */
+    _temp_values: Map<string, any> = new Map();
+    /** 临时数据过期时间存储 */
+    _temp_expiry: Map<string, number> = new Map();
+
+    /** 临时数据兼容访问器（序列化/clone 用，非热路径） */
+    get temp(): Record<string, any> {
+        const obj: Record<string, any> = {};
+        const expiry = this._temp_expiry;
+        for (const [k, v] of this._temp_values) {
+            const e = expiry.get(k);
+            obj[k] = e !== undefined ? { v, e } : v;
+        }
+        return obj;
+    }
+
+    set temp(data: Record<string, any> | null | undefined) {
+        this._temp_values.clear();
+        this._temp_expiry.clear();
+        if (!data) return;
+        for (const key of Object.keys(data)) {
+            const val = data[key];
+            if (val === null || val === undefined) continue;
+            if (typeof val === 'object' && 'e' in val && 'v' in val) {
+                this._temp_values.set(key, val.v);
+                this._temp_expiry.set(key, val.e);
+            } else {
+                this._temp_values.set(key, val);
+            }
+        }
+    }
+
+    query_temp<T = unknown>(name: string, def?: T): T {
+        if (def === undefined) def = 0 as T;
+        const val = this._temp_values.get(name);
+        if (val === undefined) return def;
+        const expiry = this._temp_expiry.get(name);
+        if (expiry === undefined) return val as T;
+        if (Date.now() <= expiry) return val as T;
+        this._temp_values.delete(name);
+        this._temp_expiry.delete(name);
+        return def;
+    }
+
+    set_temp(name: string, value: unknown, time?: number): void {
+        this._temp_values.set(name, value);
+        if (time) {
+            this._temp_expiry.set(name, Date.now() + time);
+        } else {
+            this._temp_expiry.delete(name);
+        }
+    }
+
+    remove_temp(name: string): void {
+        this._temp_values.delete(name);
+        this._temp_expiry.delete(name);
+    }
+
+    add_temp(name: string, value: number, time?: number): number {
+        const oldVal = this._temp_values.get(name);
+        const oldExpiry = this._temp_expiry.get(name);
+        const now = Date.now();
+        const baseVal = (typeof oldVal === 'number' && !oldExpiry) ? oldVal :
+                        (oldExpiry && oldExpiry > now ? oldVal : 0);
+        const v = value + baseVal;
+        if (time) {
+            const newExpiry = now + time;
+            // 旧条目未过期且旧时间更长 → 保留旧时间，防止缩短
+            const finalExpiry = (oldExpiry && oldExpiry > now && oldExpiry > newExpiry)
+                ? oldExpiry : newExpiry;
+            this._temp_values.set(name, v);
+            this._temp_expiry.set(name, finalExpiry);
+        } else {
+            this.set_temp(name, v);
+        }
+        return v;
+    }
+
+    query_temp_expiry(name: string): number | undefined {
+        return this._temp_expiry.get(name);
+    }
+
+    add_temp_expiry(name: string, add_ms: number): boolean {
+        const cur = this._temp_expiry.get(name);
+        if (cur === undefined) return false;
+        this._temp_expiry.set(name, cur + add_ms);
+        return true;
+    }
+
+    /** 浅拷贝 temp 到目标对象 */
+    copy_temp_to(target: BASE): void {
+        target._temp_values = new Map(this._temp_values);
+        target._temp_expiry = new Map(this._temp_expiry);
+    }
+
+    /** 是否有临时数据 */
+    has_temp(): boolean {
+        return this._temp_values.size > 0;
+    }
+
+    /**
+     * 遍历所有 temp 条目
+     * @param fn — 回调(key, value, expiry)，返回 false 可提前终止
+     */
+    forEach_temp(fn: (key: string, value: any, expiry: number | undefined) => boolean | void): void {
+        const expiry = this._temp_expiry;
+        for (const [k, v] of this._temp_values) {
+            if (fn(k, v, expiry.get(k)) === false) break;
+        }
+    }
+
     // ============================================================
     // 静态成员 — 资源加载和对象工厂
     // ============================================================

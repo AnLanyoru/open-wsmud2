@@ -14,7 +14,7 @@ export default class extends ROOM {
         this.add_action("search", "搜索", this.search);
         this.add_action('pushmen', null, this.push_men);
         this.add_action('lkfb', null, function (me, par) {
-            WORLD.COMMANDS['cr'].enter(me, 'over');
+            WORLD.COMMANDS.get('cr')!.enter(me, 'over');
             me.moveto(WORLD.getRoom('yz/hy/tongdao'));
             me.send('你从兵器库钻入一个狭长的甬道。');
             me.enable_area();

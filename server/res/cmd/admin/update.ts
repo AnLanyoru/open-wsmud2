@@ -67,14 +67,11 @@ export default class UpdateCmd extends COMMAND {
     update_npc(me: CHARACTER | null, path?: string) {
         if (!path) return;
         this.do_update(me, "npc/" + path).then(() => {
-            let map = WORLD.NPC_STROE;
-            map.delete(path!);
-            let keys = map.keys();
+            // 主路径由NPC.CREATE覆盖，#变体需清除缓存
             let prefix = path + "#";
-            for (let key of keys) {
+            for (let key of WORLD.NPC_STORE.keys()) {
                 if (key.startsWith(prefix)) {
-                    map.delete(key);
-                    if (me) me.send('delete ' + key);
+                    WORLD.NPC_STORE.delete(key);
                 }
             }
             if (me && me.environment) {
@@ -92,14 +89,11 @@ export default class UpdateCmd extends COMMAND {
 
     update_obj(me: CHARACTER | null, path: string) {
         this.do_update(me, "obj/" + path).then(() => {
-            let map = WORLD.OBJ_STROE;
-            map.delete(path);
-            let keys = map.keys();
+            WORLD.OBJ_STORE.delete(path);
             let prefix = path + "#";
-            for (let key of keys) {
+            for (let key of WORLD.OBJ_STORE.keys()) {
                 if (key.startsWith(prefix)) {
-                    map.delete(key);
-                    if (me) me.send('delete ' + key);
+                    WORLD.OBJ_STORE.delete(key);
                 }
             }
         }).catch((e: any) => {
@@ -165,7 +159,7 @@ export default class UpdateCmd extends COMMAND {
 }
 
 const __PATH: Record<string, string> = globalThis.__PATH;
-const old_update_cmd = WORLD.COMMANDS.update as UpdateCmd;
+const old_update_cmd = WORLD.COMMANDS.get("update") as UpdateCmd;
 if (old_update_cmd && old_update_cmd.clear_update) {
     old_update_cmd.clear_update();
 }

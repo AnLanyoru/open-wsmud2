@@ -22,17 +22,17 @@ export default class extends NPC {
         this.add_action("unxx", "取消镶嵌", function (me, arg) {
 
 
-            WORLD.COMMANDS['unxiangqian'].enter(me);
+            WORLD.COMMANDS.get('unxiangqian')!.enter(me);
         });
         this.add_action("unjl", "取消精炼", function (me, arg) {
-            WORLD.COMMANDS['unjinglian'].enter(me);
+            WORLD.COMMANDS.get('unjinglian')!.enter(me);
         });
         this.add_action("dz", "锻造武器", function (me, arg) {
             // me.send_commands('dz1 ' + this.id, "锻造武器",
             //     'dz2 ' + this.id, "重铸武器",
             //     'dz3 ' + this.id, "武器改名",
             //     'dz4 ' + this.id, "更改武器类型");
-            WORLD.COMMANDS['duanzao'].enter(me);
+            WORLD.COMMANDS.get('duanzao')!.enter(me);
         });
     }
 
@@ -101,7 +101,7 @@ export default class extends NPC {
             var obj = OBJ.CREATE("eq/cp#" + arg);
             obj.set_temp("name", str);
 
-            let duanzao_command = WORLD.COMMANDS.duanzao as DuanZaoCommand | undefined;
+            let duanzao_command = WORLD.COMMANDS.get("duanzao") as DuanZaoCommand | undefined;
             if (!duanzao_command) {
                 me.send("<hir>发生了一个错误，请联系管理员。错误详情：锻造指令未加载</hir>");
                 return;

@@ -82,7 +82,7 @@ export default class extends ROOM {
     }
 
     action_say(me: USER, par?: string) {
-        WORLD.COMMANDS['say'].enter(me, par ?? '');
+        WORLD.COMMANDS.get('say')!.enter(me, par ?? '');
         if (par === '我要回档') {
             for (let item of this.items) {
                 if (item.check_player()) {

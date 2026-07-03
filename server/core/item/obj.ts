@@ -96,8 +96,6 @@ export class OBJ extends ITEM {
 
     /** JSON 描述缓存 */
     json: string | null = null;
-    /** 临时数据 */
-    temp: Record<string, any> = {};
     /** 是否已锁定 */
     is_locked: boolean = false;
     /** 是否禁止丢弃 */
@@ -252,34 +250,13 @@ export class OBJ extends ITEM {
      */
     clone(me?: CHARACTER): OBJ {
         const item = OBJ.CREATE(this.path!);
-        if (this.temp) {
-            item.temp = Object.assign({}, this.temp);
-        }
+        this.copy_temp_to(item);
         return item;
     }
 
     /**
-     * 合并临时属性（取最大值）
-     * @param target - 目标属性集
-     * @param source - 来源属性集
+     * 合并临时属性（取最大值，仅数值）
      */
-    combineTemp(target: Record<string, number>, source: Record<string, number>): Record<string, number> {
-        if (!source) return target;
-        if (!target) return source;
-        for (const key in source) {
-            const val = source[key];
-            if (val && typeof val === "number") {
-                const thisVal = target[key];
-                if (!thisVal) {
-                    target[key] = val;
-                } else if (typeof thisVal === "number") {
-                    target[key] = thisVal > val ? thisVal : val;
-                }
-            }
-        }
-        return target;
-    }
-
     /**
      * 合并另一个物品到当前物品
      * @param obj - 要合并的物品
@@ -287,8 +264,16 @@ export class OBJ extends ITEM {
     combine(obj: ITEM): void {
         if (this.is(obj)) {
             const other = obj as OBJ;
-            if (other.temp || this.temp) {
-                this.temp = this.combineTemp(this.temp, other.temp);
+            if (other.has_temp() || this.has_temp()) {
+                other.forEach_temp((key, val, expiry) => {
+                    if (expiry !== undefined) return; // 跳过临时条目，与旧 {v,e} 行为一致
+                    if (val && typeof val === "number") {
+                        const thisVal = this.query_temp(key);
+                        if (!(typeof thisVal === "number") || thisVal < val) {
+                            this.set_temp(key, val);
+                        }
+                    }
+                });
             }
             this.count += (other.count || 0);
         }
@@ -340,8 +325,8 @@ export class OBJ extends ITEM {
         if (this.is_locked) {
             str.push(',1');
         }
-        if (this.temp)
-            str.push(",", this.format_temp(this.temp));
+        if (this.has_temp())
+            str.push(",", this.format_temp());
         str.push(']');
     }
 
@@ -380,7 +365,7 @@ export class OBJ extends ITEM {
 
     /**
      * 通过原型克隆创建物品实例。
-     * 使用 Object.create(base) 从缓存的模板（_WORLD.OBJ_STROE 或 BASE.CREATE 加载）克隆，
+     * 使用 Object.create(base) 从缓存的模板（_WORLD.OBJ_STORE 或 BASE.CREATE 加载）克隆，
      * 避免每次重新实例化资源类。
      * @param otype - 物品路径
      * @param count - 可选数量（>1 时设置 this.count）
@@ -388,13 +373,16 @@ export class OBJ extends ITEM {
     // @ts-ignore - OBJ.CREATE has different semantics from BASE.CREATE (instance factory vs resource loader)
     static CREATE(otype: string, count?: number): OBJ {
         otype = otype.replace(/\\/g, "/");
-        let base = WORLD.OBJ_STROE.get(otype) as OBJ | undefined;
+        let base = WORLD.OBJ_STORE.get(otype);
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype) as OBJ;
             if (!base) throw new Error('没有物品' + otype + "的定义。");
         }
         // Prototypal clone: create a new object inheriting from the cached prototype
         const item = Object.create(base) as OBJ;
+        // 隔离可变引用类型，防止通过原型链共享污染原型（temp setter 会沿链修改）
+        item._temp_values = new Map();
+        item._temp_expiry = new Map();
         item.create_id();
         item.on_clone();
         if (count && count > 1)
@@ -413,7 +401,7 @@ export class OBJ extends ITEM {
         if (this.on_create) this.on_create(path, par);
         const cc = GRADE_COLORS[this.grade] ?? 'wht';
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
-        WORLD.OBJ_STROE.set(this.path ?? '', this);
+        WORLD.OBJ_STORE.set(this.path ?? '', this);
     }
 
     /**

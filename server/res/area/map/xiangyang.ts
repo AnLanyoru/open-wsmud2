@@ -104,12 +104,9 @@ export default class extends AREA {
             return me.notify_fail("襄阳战事已起，需要报名参与守城才可进入。");
 
         if (status === 1 && !this.is_bm(me)) {
-            var temp = me.temp["xy_hd"];
-            if (temp) {
-                var time = temp.e - Date.now();
-                if (time > 0) {
+            var time = (me.query_temp_expiry("xy_hd") ?? 0) - Date.now();
+            if (time > 0) {
                     return me.notify_fail("你还有" + parseInt(String(time / 3600000)) + "小时" + parseInt(String((time % 3600000) / 60000)) + "分才可以再次进入襄阳城。");
-                }
             }
             var pt2 = WORLD.DATA.query_temp('xy_party');
             if (pt2 && pt2 !== me.query_temp('pt')) {

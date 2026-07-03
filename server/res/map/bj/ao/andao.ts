@@ -13,7 +13,7 @@ export default class extends ROOM {
 
     lkfb(me, par) {
         if (par) {
-            WORLD.COMMANDS['cr'].enter(me, 'over');
+            WORLD.COMMANDS.get('cr')!.enter(me, 'over');
             me.moveto(WORLD.getRoom('bj/hg/jiashan'));
             me.send('你从暗道出来，来到一个假山外面。');
             me.enable_area();

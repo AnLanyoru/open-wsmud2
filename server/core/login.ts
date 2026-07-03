@@ -208,10 +208,10 @@ const USERLOGIN = {
             cmd = str.slice(0, i);
             pars = str.slice(i + 1);
         }
-        const command = WORLD.COMMANDS[cmd];
-        if (command.allow_login) {
+        const command = WORLD.COMMANDS.get(cmd);
+        if (command?.allow_login) {
             // @ts-expect-error
-            WORLD.COMMANDS[cmd].enter(user, pars);
+            command.enter(user, pars);
         }
     },
 

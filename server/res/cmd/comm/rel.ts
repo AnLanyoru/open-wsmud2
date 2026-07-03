@@ -30,7 +30,7 @@ export default class extends COMMAND {
             if (cmd === 'stop') {
                 if (!target.state) return me.send(target.name + "没有正在进行的工作。");
                 target.set_state(null);
-                return WORLD.COMMANDS.relation.enter(me);
+                return WORLD.COMMANDS.get("relation")!.enter(me);
             }
             if (target.state) return me.send(target.name + "正在" + target.state.title + "。");
             let home = me.query_temp('home');
@@ -73,7 +73,7 @@ export default class extends COMMAND {
                 target.do_command(cmd);
                 // me.do_command('dc', target.id + " " + cmd);
                 // target.set_listener(me, null);
-                return WORLD.COMMANDS.relation.enter(me);
+                return WORLD.COMMANDS.get("relation")!.enter(me);
             } else {
                 return me.send('你要让' + target.name + "做什么？");
             }

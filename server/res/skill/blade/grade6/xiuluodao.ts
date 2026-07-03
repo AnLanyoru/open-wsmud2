@@ -70,7 +70,7 @@ export default class extends SKILL {
             enable_skill: "blade",
             mp: 1280,
             release_time: 4000,
-            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number, sktype: string): void {
                 const hpRatio = query_xld_xl_hp_ratio(lv);
                 const stacks = target.query_status("xiuluo");
                 const atkCount = 1 + Math.min(stacks, 6);
@@ -103,7 +103,7 @@ export default class extends SKILL {
                 me.end_attack(target);
 
                 if (killed) {
-                    me.clear_distime(this.id);
+                    me.clear_distime(sktype + "/" + this.pid);
                 }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {

@@ -20,7 +20,7 @@ export default class extends NPC {
             "拍卖师说道：当有人送来拍卖品时，立即开始拍卖。"
         ]);
         this.add_action("spm", "拍卖物品", function (me, par) {
-            WORLD.COMMANDS['pm'].enter(me, 'list');
+            WORLD.COMMANDS.get('pm')!.enter(me, 'list');
         });
     }
 }

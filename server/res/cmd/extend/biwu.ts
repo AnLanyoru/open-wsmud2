@@ -423,7 +423,7 @@ function challenge_success(me: USER, npc: CHARACTER) {
     else
         me.notify("<hig>挑战成功，当前总榜积分" + sc + "。</hig>");
     if (add > 0){
-        const biwu_cmd = WORLD.COMMANDS.biwu as BiWuCmd;
+        const biwu_cmd = WORLD.COMMANDS.get("biwu") as BiWuCmd;
         biwu_cmd.updatePlayerStats(me, sc, fam);}
     me.remove_temp("biwu_fam");
 }

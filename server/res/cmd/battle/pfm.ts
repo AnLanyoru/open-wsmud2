@@ -89,15 +89,15 @@ export default class extends COMMAND {
             return;
         }
         /** 绝招标识 */
-        const key = "pfm/" + sk + "/" + pfmid;
-        if (me.query_temp(key)) {
+        const key = sk + "/" + pfmid;
+        const now = Date.now();
+        if (me.check_pfm_cd(key, now)) {
             return me.notify(pfm.name + "还没准备好，你还不能使用。");
         }
         const target = me.query_enemy();
         if (!pfm.use_type) {
             if (!target) return me.notify("你要用绝招对付谁？");
         }
-        const now = Date.now();
         if (me.release_time && now < me.release_time)//上个技能还没释放完
         {
             return me.notify("你上个技能还没释放完成。");
@@ -113,7 +113,7 @@ export default class extends COMMAND {
             const distime = pfm.query_distime(me, lv, is_ref);
             const rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
-            me.set_temp(key, 1, distime + rtime);
+            me.pfm_cd.set(key, now + distime + rtime);
             me.notify('{type:"dispfm",id:"' + sk + "." + pfmid + '",rtime:'
                 + rtime + ',distime:' + (distime + rtime) + '}');
             if (pfm.is_weapon && sp_skill != me.attack_skill) {

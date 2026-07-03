@@ -223,11 +223,13 @@ class World {
     /** 在线用户列表 */
     USERS: USER[] = [];
     /** 命令注册表 (命令名 → COMMAND 实例) */
-    COMMANDS: Record<string, COMMAND> = {};
+    COMMANDS: Map<string, COMMAND> = new Map();
     /** 技能注册表 (技能 ID → SKILL 实例) */
-    SKILLS: Record<string, SKILL> = {};
+    SKILLS: Map<string, SKILL> = new Map();
     /** 房间注册表 (路径 → ROOM 实例) */
-    ROOMS: Record<string, ROOM> = {};
+    ROOMS: Map<string, ROOM> = new Map();
+    /** 房间原型缓存 (路径 → 干净原型，仅供Object.create克隆) */
+    ROOM_STORE: Map<string, ROOM> = new Map();
     /** 运行中的房间列表（含心跳） */
     RUN_ROOMS: ROOM[] = [];
     /** 默认技能注册表 */
@@ -241,9 +243,9 @@ class World {
     /** 用户活动事件列表 */
     USER_EVENTS: EventItem[] = [];
     /** 物品原型缓存 (path → OBJ 原型) */
-    OBJ_STROE: Map<string, OBJ> = new Map();
+    OBJ_STORE: Map<string, OBJ> = new Map();
     /** NPC 原型缓存 (path → NPC 原型) */
-    NPC_STROE: Map<string, CHARACTER> = new Map();
+    NPC_STORE: Map<string, CHARACTER> = new Map();
     /** 心跳计数（用于定时保存） */
     HEARTBEATCOUNT: number = 0;
     /** 玩家可恢复物品/技能存储 (playerId → entries[]) */
@@ -527,7 +529,7 @@ class World {
          */
         checkStats(player: any): void {
             this.updateScore(player);
-            const biwu_cmd = WORLD.COMMANDS.biwu as biwu;
+            const biwu_cmd = WORLD.COMMANDS.get("biwu") as biwu;
             biwu_cmd.checkStats(player);
         },
 
@@ -1096,7 +1098,7 @@ class World {
         for (const fam in FAMILIES) {
             FAMILIES[fam].init();
         }
-        const jh_cmd = this.COMMANDS.jh as jh;
+        const jh_cmd = this.COMMANDS.get("jh") as jh;
         jh_cmd.init();
     }
 

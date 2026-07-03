@@ -21,14 +21,14 @@ export default class extends NPC {
     }
 
     xufei(this: NPC, me: CHARACTER, par: string) {
-        var kd = me.temp!['kezhan'];
+        var kd = me.query_temp("kezhan");
         if (!kd) return zhudian.call(this, me, par);
-        let money = [0, 1000, 3000, 10000][kd.v];
+        let money = [0, 1000, 3000, 10000][kd as number];
         if (!(money > 0)) return me.send('你还没有住店。');
         if (me.money < money) return me.send('你身上的钱不够。');
         me.money -= money;
-        kd.e += 3600000 * 24;
-        let time = new Date(me.temp!['kezhan'].e);
+        me.add_temp_expiry("kezhan", 3600000 * 24);
+        let time = new Date(me.query_temp_expiry("kezhan")!);
         let str = time.getFullYear() + "年" + (time.getMonth() + 1) + "月" + time.getDate() + "日" + time.getHours() + "时";
         me.send("小二一哈腰，说道：多谢您老，收您" + UTIL.moneyToStr(money) + "，续房一天。<cyn>(持续到" +
             str + ")</cyn>");

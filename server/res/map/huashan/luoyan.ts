@@ -1,5 +1,4 @@
 import {ROOM} from "../../../core/room/room.js";
-import {BASE} from "../../../core/base.js";
 import type { USER } from "../../../core/char/user.js";
 import { WORLD } from "../../../core/world.js";
 
@@ -43,12 +42,10 @@ export default class extends ROOM {
                 return rm.shadow_rooms[i];
             }
         }
-        var shadow = BASE.CREATE(__PATH.MAP, rm.path) as ROOM;
+        var shadow = ROOM.CREATE(rm.path);
         if (shadow) {
             rm.shadow_rooms.push(shadow);
         }
         return shadow;
     }
 }
-
-const __PATH = globalThis.__PATH;

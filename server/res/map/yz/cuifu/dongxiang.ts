@@ -1,3 +1,4 @@
+import type { USER } from "../../../../core/char/user.js";
 import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
@@ -9,23 +10,25 @@ export default class extends ROOM {
         super();
         this.set_npc("yz/cuifu/yahuan");
         this.set_item("gui", "柜子", "一个黑乎乎的柜子，里面不知道放了什么。", [[
-            "search", "搜索", function (me, par) {
-                if (par != "gui") {
-                    return;
-                }
-                if (me.query_temp("fb/cuifu/yahuan") == 3) {
-                    me.send_room("$N仔细翻了翻柜子，从柜子下面找到一个小箱子。");
-                    me.set_temp("fb/cuifu/yahuan", 4);
-                    var obj = me.add_obj("sp/yz/box1", 1);
-                    if (obj) {
-                        me.send_room("$N从得到了一个 " + obj.color_name + "。");
-                    }
-
-                } else {
-                    me.notify("你胡乱在柜子里上面翻了几下，什么都没发现。");
-                }
-                return true;
-            }
+            "search", "搜索", this.gui_do_search
         ]]);
+    }
+
+    gui_do_search(me: USER, par: string) {
+        if (par != "gui") {
+            return;
+        }
+        if (me.query_temp("fb/cuifu/yahuan") == 3) {
+            me.send_room("$N仔细翻了翻柜子，从柜子下面找到一个小箱子。");
+            me.set_temp("fb/cuifu/yahuan", 4);
+            var obj = me.add_obj("sp/yz/box1", 1);
+            if (obj) {
+                me.send_room("$N从得到了一个 " + obj.color_name + "。");
+            }
+
+        } else {
+            me.notify("你胡乱在柜子里上面翻了几下，什么都没发现。");
+        }
+        return true;
     }
 }

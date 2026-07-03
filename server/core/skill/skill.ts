@@ -767,7 +767,7 @@ export class SKILL extends BASE {
      * @param fname
      */
     create(fname: string): void {
-        if (WORLD.SKILLS[this.id]) {
+        if (WORLD.SKILLS.get(this.id)) {
             console.log("%s [%s] is repeated ", this.id, fname);
         }
         this.update(fname);
@@ -792,7 +792,7 @@ export class SKILL extends BASE {
      * @param fname
      */
     update(fname: string): void {
-        WORLD.SKILLS[this.id] = this;
+        WORLD.SKILLS.set(this.id, this);
         const fam = this.family || FAMILIES.NONE;
         if (!fam.skills2) fam.skills2 = [];
         if (!fam.skills) fam.skills = [];
@@ -855,7 +855,7 @@ export class SKILL extends BASE {
      * @param id
      */
     static get(id: string): SKILL | undefined {
-        return WORLD.SKILLS[id];
+        return WORLD.SKILLS.get(id);
     }
 
     // ============ 描述查询 ============
@@ -1107,28 +1107,19 @@ export class PERFORM {
         return this.name || "";
     }
 
-    /** 改变绝招冷却时间 */
-    change_distime(me: CHARACTER, id: string, add_time?: number): void {
-        if (me.is_player) {
-            const dis_time = me.temp ? me.temp["pfm/" + id] : undefined;
-            if (dis_time) {
-                if (add_time)
-                    dis_time.e += add_time;
-                else {
-                    add_time = -(dis_time.time || 0);
-                    dis_time.e = 1;
-                }
-                me.notify('{type:"changepfm",id:"' + id + '",time:' + add_time + '}');
+    /** 改变绝招冷却时间（baseType: 基础技能类型如"sword"，与 pid 拼接为 pfm_cd key） */
+    change_distime(me: CHARACTER, baseType: string, add_time?: number): void {
+        const key = baseType + '/' + this.pid;
+        const cur = me.pfm_cd.get(key);
+        if (cur !== undefined) {
+            if (add_time) {
+                me.pfm_cd.set(key, cur + add_time);
+            } else {
+                add_time = -(cur - Date.now());
+                me.pfm_cd.delete(key);
             }
-        } else if (me.auto_skills) {
-            for (let i = 0; i < me.auto_skills.length; i++) {
-                const item = me.auto_skills[i];
-                if (item.pfm === this) {
-                    if (add_time)
-                        item.release_time += add_time;
-                    else
-                        item.release_time = 0;
-                }
+            if (me.is_player) {
+                me.notify('{type:"changepfm",id:"' + key + '",time:' + add_time + '}');
             }
         }
     }

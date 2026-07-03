@@ -9,7 +9,7 @@ export default class extends ROOM {
     constructor() {
         super();
         this.add_action('wqcy2', '修炼', function (me) {
-            WORLD.COMMANDS.wqcy.enter(me);
+            WORLD.COMMANDS.get("wqcy")!.enter(me);
         });
     }
 }

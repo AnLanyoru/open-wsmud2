@@ -215,7 +215,7 @@ export default class ShouXiCommand extends COMMAND {
             id: "SHASHOU_bat",
             name: "门派战争",
             desc: "你的门派正在进攻" + fam.name + "，击杀对方弟子会获得丰厚奖励。",
-            time: fam.temp.battle.e,
+            time: fam.query_temp_expiry("battle"),
             grade: 2,
             command: "进入战场",
             check: (me) => me.family === FAMILIES.SHASHOU,

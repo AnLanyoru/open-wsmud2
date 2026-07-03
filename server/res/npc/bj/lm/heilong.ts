@@ -56,7 +56,7 @@ export default class extends MONSTER {
     on_kill(me) {
         if (this.is_free) return false;
         if (!this.fight_type) {
-            this.environment?.set_temp('kill_hl', 1, me);
+            this.environment?.fb_set_temp('kill_hl', 1, me);
             me.send(this.name + "轻蔑道：找死！\n");
             this.do_kill(me);
         }
@@ -77,7 +77,7 @@ export default class extends MONSTER {
     on_enter(me: USER) {
         let room = this.environment;
         if (!room) return;
-        if (room.query_temp('kill_hl', me)) {
+        if (room.fb_query_temp('kill_hl', me)) {
             this.do_kill(me);
         } else {
             me.send(this.name + '虚弱的抬起脑袋看着你：人类，你想做什么？');

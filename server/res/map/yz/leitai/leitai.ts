@@ -59,7 +59,7 @@ export default class BiWuLeiTaiRoom extends ROOM {
     }
 
     surrender(me: USER) {
-        let biwu_cmd = WORLD.COMMANDS.biwu as biwu
+        let biwu_cmd = WORLD.COMMANDS.get("biwu") as biwu
         if (biwu_cmd) {
             biwu_cmd.surrender(me);
         }

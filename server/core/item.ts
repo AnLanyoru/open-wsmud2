@@ -18,15 +18,6 @@ import type { CHARACTER } from './char/character.js';
 import type { CONTAINER } from './item/container.js';
 
 
-export interface ValidValue {
-    e: number,
-    v: number | string,
-}
-
-function check_valid_value(value: number | string | ValidValue): value is ValidValue {
-    return typeof value === "object" && "e" in value && "v" in value
-}
-
 /** 房间命令元组 */
 export type RoomAction = [cmd: string, name: string, action: (...args: any[]) => any];
 // ============================================================
@@ -78,8 +69,6 @@ export class ITEM extends BASE {
     desc: string = '';
     /** 带颜色的名称缓存 */
     color_name: string = '';
-    /** 临时数据 */
-    temp: Record<string, any> = {};
     /** 是否为玩家 */
     is_player: boolean = false;
     /** 是否静默消息 */
@@ -190,62 +179,6 @@ export class ITEM extends BASE {
      * @param def - 默认值
      * @param _me - 玩家（ROOM 子类用于按人隔离数据）
      */
-    query_temp<T extends string | number>(name: string, def?: T, _me?: USER): T {
-        if (def === undefined) def = 0 as T;
-        if (!this.temp) return def;
-        const item = this.temp[name];
-        if (item && item.e) {
-            if (Date.now() <= item.e) {
-                return item.v;
-            }
-            this.temp[name] = null;
-            return def;
-        }
-        return item ?? def;
-    }
-
-    /**
-     * 设置临时数据
-     * @param name - 键名
-     * @param value - 值
-     * @param time - 有效期（毫秒）
-     * @param _me - 玩家（ROOM 子类用于按人隔离数据）
-     */
-    set_temp(name: string, value: number | string, time?: number, _me?: USER): void {
-        if (!this.temp) this.temp = {};
-        if (time) {
-            this.temp[name] = {
-                v: value,
-                e: Date.now() + time,
-            };
-        } else {
-            this.temp[name] = value;
-        }
-    }
-
-    /**
-     * 移除临时数据
-     * @param name - 键名
-     */
-    remove_temp(name: string): void {
-        if (!this.temp) return;
-        this.temp[name] = null;
-    }
-
-    /**
-     * 累加临时数据
-     * @param name - 键名
-     * @param value - 累加值
-     * @param time - 有效期
-     * @param _me - 玩家（ROOM 子类用于按人隔离数据）
-     * @returns 累加后的值
-     */
-    add_temp(name: string, value: number, time?: number, _me?: USER): number {
-        const val = (this.query_temp(name, 0, _me) as number) + value;
-        this.set_temp(name, val, time, _me);
-        return val;
-    }
-
     // ============ 生命周期 ============
 
     /**
@@ -582,48 +515,37 @@ export class ITEM extends BASE {
     // ============ 临时数据序列化 ============
 
     /**
-     * 格式化临时数据为 JSON 字符串
-     * @param temp - 临时数据
+     * 格式化临时数据为 JSON 字符串（直接从 Map 构建，输出格式兼容旧存档）
      * @param timeout - 过期时限（毫秒），默认 120000
      * @returns JSON 字符串
      */
-    format_temp(temp: Record<string, number | string | ValidValue> | null | undefined, timeout: number = 120000): string {
-        if (!temp) return '{}';
+    format_temp(timeout: number = 120000): string {
+        if (this._temp_values.size === 0) return '{}';
         const dt = Date.now() + timeout;
         const tmp: (string | number)[] = ['{'];
-        for (const key in temp) {
-            const v = temp[key];
-            if (!v) continue;
-            if (check_valid_value(v)) {
-                if (dt > v.e || !v.v) continue;
+        this._temp_values.forEach((v, key) => {
+            if (v === null || v === undefined) return;
+            const e = this._temp_expiry.get(key);
+            if (e !== undefined) {
+                if (dt > e || !v) return;
                 if (tmp.length > 1) tmp.push(',');
-                tmp.push('"');
-                tmp.push(key);
-                tmp.push('":{e:');
-                tmp.push(v.e);
-                tmp.push(',v:');
-                if (typeof v.v === 'string') {
-                    tmp.push('"');
-                    tmp.push(v.v);
-                    tmp.push('"');
+                tmp.push('"', key, '":{e:', e, ',v:');
+                if (typeof v === 'string') {
+                    tmp.push('"', v, '"');
                 } else {
-                    tmp.push(v.v);
+                    tmp.push(v);
                 }
                 tmp.push('}');
             } else {
                 if (tmp.length > 1) tmp.push(',');
-                tmp.push('"');
-                tmp.push(key);
-                tmp.push('":');
+                tmp.push('"', key, '":');
                 if (typeof v === 'string') {
-                    tmp.push('"');
-                    tmp.push(v);
-                    tmp.push('"');
+                    tmp.push('"', v, '"');
                 } else {
                     tmp.push(v);
                 }
             }
-        }
+        });
         tmp.push('}');
         return tmp.join('');
     }

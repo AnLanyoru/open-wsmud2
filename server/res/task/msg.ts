@@ -39,7 +39,7 @@ export default class extends TASK {
 
     clearyz() {
         // 调用邮件和商店清理命令
-        const checkorg_cmd = WORLD.COMMANDS['checkorg'] as checkorg;
+        const checkorg_cmd = WORLD.COMMANDS.get('checkorg') as checkorg;
         checkorg_cmd.cmd_clearmail();
         checkorg_cmd.cmd_clearstore();
     }

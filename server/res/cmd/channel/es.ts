@@ -24,7 +24,7 @@ export default class extends COMMAND {
         var msg = "", name = me.name;
         if (str[0] == "*") {
             str = str.slice(1);
-            msg = WORLD.COMMANDS["emote"].enter(me, str);
+            msg = WORLD.COMMANDS.get("emote")!.enter(me, str);
             if (!msg) {
                 msg = UTIL.htmlEncode(str);
                 msg = UTIL.replace_word(str);

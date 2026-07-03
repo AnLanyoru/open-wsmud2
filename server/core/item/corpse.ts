@@ -71,7 +71,7 @@ export class CORPSE extends CONTAINER {
                 this.no_drops = [];
                 const team: any[] = player.team;
                 for (let i = 0; i < team.length; i++) {
-                    if (!env.query_temp(team[i].id, player)) {
+                    if (!env.fb_query_temp(team[i].id, player)) {
                         this.no_drops!.push(team[i].id);
                     }
                 }

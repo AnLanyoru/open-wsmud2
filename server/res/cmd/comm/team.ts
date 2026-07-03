@@ -261,7 +261,7 @@ function team_dice(this: CHARACTER[] & { objs?: any[] }, obj: any): void {
 
 function checkTeamfb(me: CHARACTER): void {
     if (me.environment && me.environment.is_fb()) {
-        var crCmd = WORLD.COMMANDS['cr'];
+        var crCmd = WORLD.COMMANDS.get('cr');
         if (crCmd) {
             crCmd.enter(me, 'over');
         }

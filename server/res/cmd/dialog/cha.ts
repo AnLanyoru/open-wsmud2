@@ -79,7 +79,7 @@ export default class extends COMMAND {
                 str.push("\"");
             }
         } else {
-            const skgroup_cmd = WORLD.COMMANDS.skgroup as sk_group
+            const skgroup_cmd = WORLD.COMMANDS.get("skgroup") as sk_group
             str.push(',sk_group:', String(skgroup_cmd.cur_eqs(me) ?? 0));
         }
 
