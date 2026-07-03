@@ -52,7 +52,7 @@ export default class extends NPC {
         });
         this.add_action("sendntc", "发布公告", function (me: CHARACTER, par: string) {
 
-            WORLD.COMMANDS['party'].enter(me, 'notice');
+            WORLD.COMMANDS.get('party')!.enter(me, 'notice');
         });
         this.add_action("levelup2", "设施升级", function (me: CHARACTER, par: string) {
             var pt = me.query_party?.();
@@ -70,7 +70,7 @@ export default class extends NPC {
         });
         this.add_action("jrfb", "进入副本区域", function (me: CHARACTER, par: string) {
 
-            WORLD.COMMANDS['party'].enter(me, 'enter');
+            WORLD.COMMANDS.get('party')!.enter(me, 'enter');
         });
     }
 

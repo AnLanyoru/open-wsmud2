@@ -108,7 +108,7 @@ function getObj(me: USER, item: OBJ, parent) {
 
                 if (!list[i].check_player()) {
                     var dtype = list[i].query_setting("auto_dice");
-                    WORLD.COMMANDS["dice"].enter(list[i], dtype ? (parseInt(dtype) - 1) : 2, item.id);
+                    WORLD.COMMANDS.get("dice")!.enter(list[i], dtype ? (parseInt(dtype) - 1) : 2, item.id);
                 } else {
                     list[i].send(str);
                     item.dice.users.push(list[i].id);

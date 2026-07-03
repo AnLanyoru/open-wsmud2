@@ -729,7 +729,7 @@ export class CHARACTER extends ITEM {
      */
     do_command(cmdName: string, str?: string): void {
         str = str || '';
-        let cmd: COMMAND | null = WORLD.COMMANDS[cmdName];
+        let cmd = WORLD.COMMANDS.get(cmdName);
         let pars: [CHARACTER, ...string[]];
         if (cmd && cmd.regex && str) {
             const match = cmd.regex.exec(str);
@@ -740,7 +740,7 @@ export class CHARACTER extends ITEM {
         if (this.do_item_action(this.environment, cmdName, pars)) {
             return;
         }
-        cmd = cmd || WORLD.DEFAULT_COMMAND;
+        cmd = cmd || WORLD.DEFAULT_COMMAND!;
         if (cmd) {
             if (!this.check_command(cmd)) return;
             if (cmd.enter.apply(cmd, pars) !== false) {

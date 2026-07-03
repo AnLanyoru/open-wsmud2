@@ -75,14 +75,14 @@ export default class DeepMiLinRoom extends ROOM {
             if (!npc || npc.name != '狼王' || WORLD.DATA.query_temp('zq6', 0) || !this.is_time()) {
                 me.notify("这么好吃的月饼你也乱丢？");
             } else {
-                WORLD.COMMANDS['drop'].enter(me, count ?? '', objid ?? '');
+                WORLD.COMMANDS.get('drop')!.enter(me, count ?? '', objid ?? '');
                 this.create_lw(me, npc, 6, "$N看到圆滚滚的月饼，凑上来嗅了嗅，然后一口吞下...\n<wht>一阵烟雾过后，狼王已经消失不见，一只巨大的银色巨狼站在你面前向你咆哮...</wht>");
             }
             return true;
         }
         if (obj.is('res/langpi')) {
             var npc = this.find_obj_bypath('yz/lw/langwang');
-            WORLD.COMMANDS['drop'].enter(me, count ?? '', objid ?? '');
+            WORLD.COMMANDS.get('drop')!.enter(me, count ?? '', objid ?? '');
             if (npc && npc.name == '狼王' && !WORLD.DATA.query_temp('zq3', 0) && this.is_time()) {
                 this.create_lw(me, npc, 3, '$N看到你丢的狼皮，发狂似的朝$p扑了过来....\n<wht>一阵烟雾过后，狼王已经消失不见，一只巨大的银色巨狼站在你面前向你咆哮...</wht>');
             }

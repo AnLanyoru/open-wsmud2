@@ -45,7 +45,7 @@ WORLD.auto_get = function (me: USER, corpse: any, npc: any) {
             var item = npc.die_room.items[i];
             if (item.is_player && item.query_setting("auto_get") && npc.damages[item.id]) {
                 //item.do_command('get', "all from " + corpse.id);
-                WORLD.COMMANDS['get'].enter(item, "", "all", corpse.id);
+                WORLD.COMMANDS.get('get')!.enter(item, "", "all", corpse.id);
 
             }
         }
@@ -53,7 +53,7 @@ WORLD.auto_get = function (me: USER, corpse: any, npc: any) {
         if (!me.is_here(corpse) || !me.query_setting("auto_get") || me.state || !me.hp) return;
 
         //me.do_command('get', "all from " + corpse.id);
-        WORLD.COMMANDS['get'].enter(me, "", "all", corpse.id);
+        WORLD.COMMANDS.get('get')!.enter(me, "", "all", corpse.id);
     }
     //if (me && me.is_player) {
     //    me.add_temp('killed', 1, UTIL.diff_time());
@@ -68,7 +68,7 @@ WORLD.auto_pfm = function (me: USER, target: CHARACTER) {
         for (var i = 0; i < str.length; i++) {
             var ps = str[i].split(".");
 
-            WORLD.COMMANDS["perform"].enter(me, ps[0], ps[1]);
+            WORLD.COMMANDS.get("perform")!.enter(me, ps[0], ps[1]);
         }
     }
 
@@ -76,7 +76,7 @@ WORLD.auto_pfm = function (me: USER, target: CHARACTER) {
         var str = String(target.query_setting("auto_pfm2")).split(",");
         for (var i = 0; i < str.length; i++) {
             var ps = str[i].split(".");
-            WORLD.COMMANDS["perform"].enter(target, ps[0], ps[1]);
+            WORLD.COMMANDS.get("perform")!.enter(target, ps[0], ps[1]);
         }
     }
 }

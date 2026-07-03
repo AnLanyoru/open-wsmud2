@@ -14,7 +14,7 @@ export default class extends ROOM {
 
     lkfb(me: USER, par?: string) {
         if (par) {
-            WORLD.COMMANDS['cr'].enter(me, 'over');
+            WORLD.COMMANDS.get('cr')!.enter(me, 'over');
             me.moveto(WORLD.getRoom('bj/hg/xiaolu'));
             me.send('你从客栈后院出来，来到一个胡同里面。');
         } else {

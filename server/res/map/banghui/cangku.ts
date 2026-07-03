@@ -16,12 +16,12 @@ export default class BanPaiCangKuRoom extends ROOM {
             me.send_room(rollDesc.random() + "，稳稳停在了" + rad + "点。");
         });
         this.add_action("pandian", "仓库盘点", function (me: CHARACTER, per) {
-            WORLD.COMMANDS["party"].enter(me, 'stores');
+            WORLD.COMMANDS.get("party")!.enter(me, 'stores');
 
         });
         this.add_action("alloc", "分配战利品", function (me: CHARACTER, par) {
 
-            WORLD.COMMANDS["party"].enter(me, 'alloc');
+            WORLD.COMMANDS.get("party")!.enter(me, 'alloc');
 
         });
     }

@@ -273,7 +273,7 @@ function fb_start(me, path) {
         }
 
         if (!me.team || me.team[0] === me) {
-            const ex_cmd = WORLD.COMMANDS['ex'] as ex
+            const ex_cmd = WORLD.COMMANDS.get('ex') as ex
             ex_cmd.on_enter_fb(me, next_room);
         }
     }

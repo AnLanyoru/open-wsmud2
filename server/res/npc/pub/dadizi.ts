@@ -74,12 +74,12 @@ export default class extends NPC {
     }
 
     greeting(me: USER) {
-        let sx_cmd = WORLD.COMMANDS.sx as ShouXiCommand
+        let sx_cmd = WORLD.COMMANDS.get("sx") as ShouXiCommand
         sx_cmd.do_greet(me);
     }
 
     manage(me: USER) {
-        let sx_cmd = WORLD.COMMANDS.sx as ShouXiCommand
+        let sx_cmd = WORLD.COMMANDS.get("sx") as ShouXiCommand
         sx_cmd.do_manage(me);
     }
 }

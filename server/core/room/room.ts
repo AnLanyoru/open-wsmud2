@@ -700,7 +700,7 @@ export class ROOM extends ITEM {
      * @param file - 文件名
      */
     create(file: string): void {
-        const base_room = WORLD.ROOMS[file];
+        const base_room = WORLD.ROOMS.get(file);
 
         if (base_room) {
             this.parent = base_room.parent;
@@ -733,7 +733,7 @@ export class ROOM extends ITEM {
      * @param file
      */
     initBaseRoom(file: string): void {
-        WORLD.ROOMS[file] = this;
+        WORLD.ROOMS.set(file, this);
 
         const area = getAreaByPath(this.path);
 
@@ -762,7 +762,7 @@ export class ROOM extends ITEM {
      */
     update(file: string): void {
         this.on_create && this.on_create();
-        const oldroom = WORLD.ROOMS[file];
+        const oldroom = WORLD.ROOMS.get(file);
 
         // 保存新原型，创建新的活跃房间
         WORLD.ROOM_STORE.set(file, this);

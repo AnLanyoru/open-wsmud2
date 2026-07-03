@@ -101,10 +101,10 @@ export class COMMAND extends BASE {
      */
     create(fname: string): void {
         if (this.command) {
-            const str = this.command.split(',');
-            for (let i = 0; i < str.length; i++) {
-                if (WORLD.COMMANDS[str[i]]) console.error("command %s 重复", fname);
-                WORLD.COMMANDS[str[i]] = this;
+            const command_names = this.command.split(',');
+            for (let i = 0; i < command_names.length; i++) {
+                if (WORLD.COMMANDS.get(command_names[i])) console.error("command %s 重复", fname);
+                WORLD.COMMANDS.set(command_names[i], this);
             }
         } else {
             console.error("command %s not have command name", fname);
@@ -116,9 +116,9 @@ export class COMMAND extends BASE {
      */
     update(): void {
         if (this.command) {
-            const str = this.command.split(',');
-            for (let i = 0; i < str.length; i++) {
-                WORLD.COMMANDS[str[i]] = this;
+            const command_names = this.command.split(',');
+            for (let i = 0; i < command_names.length; i++) {
+                WORLD.COMMANDS.set(command_names[i], this);
             }
         } else {
             console.error("command not have command name");
@@ -131,7 +131,7 @@ export class COMMAND extends BASE {
      * @param args - 参数列表
      */
     static DO(cmd: string, ...args: (string | Partial<MessageEntry>)[]): void {
-        const cmdObj = WORLD.COMMANDS[cmd];
+        const cmdObj = WORLD.COMMANDS.get(cmd);
         if (cmdObj) {
             //@ts-expect-error
             cmdObj.enter(null, ...args);

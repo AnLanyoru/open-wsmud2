@@ -19,7 +19,7 @@ export default class extends COMMAND {
         if (!eqs) return me.send('当前正在装备该技能组。');
         me.sk_groups[index] = null;
         this.save_eqgroup(me, cur_index);
-        const enable_command = WORLD.COMMANDS.enable.enter;
+        const enable_command = WORLD.COMMANDS.get("enable")!.enter;
         for (let i = 0; i < SK_TYPES.length; i++) {
             let sk_type = SK_TYPES[i];
             let skill = me.skills.get(sk_type);

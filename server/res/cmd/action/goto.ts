@@ -24,7 +24,7 @@ export default class extends COMMAND {
         },
 
         kuang: function (me: USER) {
-            WORLD.COMMANDS['wakuang'].enter(me);
+            WORLD.COMMANDS.get('wakuang')!.enter(me);
             return true;
         },
 
@@ -53,7 +53,7 @@ export default class extends COMMAND {
             let room_path = find_room(area, master);
             if (!room_path) return me.notify_fail('你的师父现在不在' + area.name + '。');
             me.moveto(room_path, me.name + "离开了。", me.name + "走了进来。");
-            // WORLD.COMMANDS['cha'].render_skill(me,);
+            // WORLD.COMMANDS.get('cha')!.render_skill(me,);
             return true;
         },
 

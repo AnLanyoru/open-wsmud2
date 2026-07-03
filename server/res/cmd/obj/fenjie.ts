@@ -59,7 +59,7 @@ export default class extends COMMAND {
         }
         let sts: OBJ[] = [];
         let st_names: string[] = [];
-        const duanzao = WORLD.COMMANDS.duanzao as DuanZaoCommand;
+        const duanzao = WORLD.COMMANDS.get("duanzao") as DuanZaoCommand;
         if (obj.path.startsWith('eq/cp')
             || obj.path.startsWith('eq/zb')) {
             obj.forEach_temp((key, level) => {

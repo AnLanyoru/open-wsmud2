@@ -12,13 +12,13 @@ export default class extends ROOM {
     constructor() {
         super();
         this.add_action("diao", "钓鱼", function (me) {
-            return WORLD.COMMANDS['diaoyu'].enter(me);
+            return WORLD.COMMANDS.get('diaoyu')!.enter(me);
         });
         this.add_action("xkwk", "挖矿", function (me) {
-            return WORLD.COMMANDS['wk'].enter(me);
+            return WORLD.COMMANDS.get('wk')!.enter(me);
         });
         this.add_action("cai", "采药", function (me) {
-            return WORLD.COMMANDS['caiyao'].enter(me);
+            return WORLD.COMMANDS.get('caiyao')!.enter(me);
         });
     }
 

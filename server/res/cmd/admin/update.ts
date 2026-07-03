@@ -159,7 +159,7 @@ export default class UpdateCmd extends COMMAND {
 }
 
 const __PATH: Record<string, string> = globalThis.__PATH;
-const old_update_cmd = WORLD.COMMANDS.update as UpdateCmd;
+const old_update_cmd = WORLD.COMMANDS.get("update") as UpdateCmd;
 if (old_update_cmd && old_update_cmd.clear_update) {
     old_update_cmd.clear_update();
 }

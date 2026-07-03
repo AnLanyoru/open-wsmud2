@@ -767,7 +767,7 @@ export class SKILL extends BASE {
      * @param fname
      */
     create(fname: string): void {
-        if (WORLD.SKILLS[this.id]) {
+        if (WORLD.SKILLS.get(this.id)) {
             console.log("%s [%s] is repeated ", this.id, fname);
         }
         this.update(fname);
@@ -792,7 +792,7 @@ export class SKILL extends BASE {
      * @param fname
      */
     update(fname: string): void {
-        WORLD.SKILLS[this.id] = this;
+        WORLD.SKILLS.set(this.id, this);
         const fam = this.family || FAMILIES.NONE;
         if (!fam.skills2) fam.skills2 = [];
         if (!fam.skills) fam.skills = [];
@@ -855,7 +855,7 @@ export class SKILL extends BASE {
      * @param id
      */
     static get(id: string): SKILL | undefined {
-        return WORLD.SKILLS[id];
+        return WORLD.SKILLS.get(id);
     }
 
     // ============ 描述查询 ============

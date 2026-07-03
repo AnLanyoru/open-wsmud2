@@ -20,7 +20,7 @@ export default class extends COMMAND {
         var msg = "";
         if (str[0] == "*") {
             str = str.slice(1);
-            msg = WORLD.COMMANDS["emote"].enter(me, str);
+            msg = WORLD.COMMANDS.get("emote")!.enter(me, str);
             if (msg) {
                 return me.send_team(JSON.stringify({type: "msg", ch: "tm", content: msg, uid: me.id}));
             }

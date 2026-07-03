@@ -28,7 +28,7 @@ export default class extends COMMAND {
         var msg = "", name = me.name;
         if (str[0] == "*") {
             str = str.slice(1);
-            let emei_cmd = WORLD.COMMANDS["emote"] as emote
+            let emei_cmd = WORLD.COMMANDS.get("emote") as emote
             msg = emei_cmd.enter(me, str) ?? '';
             if (!msg) {
                 msg = UTIL.htmlEncode(str);

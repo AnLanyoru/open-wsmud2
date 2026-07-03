@@ -23,7 +23,7 @@ export default class extends NPC {
         });
         this.add_action("askbiwu1", "观战", function (me) {
 
-            WORLD.COMMANDS['biwu'].enter(me, 'watch');
+            WORLD.COMMANDS.get('biwu')!.enter(me, 'watch');
         });
     }
 

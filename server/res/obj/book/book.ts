@@ -1,6 +1,7 @@
 import {OBJ} from "../../../core/item/obj.js";
 import {WORLD} from "../../../core/world.js";
 import {SKILL} from "../../../core/skill/skill.js";
+import type sbook from "../../cmd/skill/sbook.js";
 
 export default class extends OBJ {
     unit = "本";
@@ -13,11 +14,12 @@ export default class extends OBJ {
 
     constructor() {
         super();
+        const sbook_cmd = WORLD.COMMANDS.get("sbook") as sbook;
         this.add_action('sbook', '存到技能仓库', (me) => {
-            WORLD.COMMANDS.sbook.enter(me, this.id);
+            sbook_cmd.enter(me, this.id, '');
         });
         this.add_action('split', '拆分', (me) => {
-            WORLD.COMMANDS.sbook.split_book(me, this);
+            sbook_cmd.split_book(me, this);
         });
     }
 

@@ -11,7 +11,7 @@ export default class extends ROOM {
     constructor() {
         super();
         this.add_action("cai", "采药", function (me) {
-            return WORLD.COMMANDS['caiyao'].enter(me);
+            return WORLD.COMMANDS.get('caiyao')!.enter(me);
         });
     }
 }

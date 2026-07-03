@@ -16,7 +16,7 @@ export default class extends ROOM {
         let npc = this.items[0];
         if (npc && npc.is('penglai/wulang/jiangjiu')) {
             if (par) {
-                WORLD.COMMANDS['cr'].enter(me, 'over');
+                WORLD.COMMANDS.get('cr')!.enter(me, 'over');
                 me.moveto('penglai/matou');
                 me.send('你和' + npc.name + '乘坐大船，来到一个偏远神秘的小岛。');
                 me.enable_area();

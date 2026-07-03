@@ -47,7 +47,7 @@ export default class extends TASK {
                 let user = stats[i];
                 if (i > 19) break;
                 if (!user.id) continue;
-                const reward_cmd = WORLD.COMMANDS.reward as reward
+                const reward_cmd = WORLD.COMMANDS.get("reward") as reward
                 COMMAND.DO("send", user.id, {
                     from: "score",
                     from_name: "综合榜奖励",
@@ -69,7 +69,7 @@ export default class extends TASK {
             for (let i = 0; i < tops.length; i++) {
                 let user = tops[i];
                 if (!user.userid) continue;
-                const reward_cmd = WORLD.COMMANDS.reward as reward
+                const reward_cmd = WORLD.COMMANDS.get("reward") as reward
                 COMMAND.DO("send", user.userid, {
                     from: "top",
                     from_name: "高手榜奖励",

@@ -14,7 +14,7 @@ export default class extends ROOM {
 
     lkfb(me: USER, par?: string) {
         if (par) {
-            WORLD.COMMANDS['cr'].enter(me, 'over');
+            WORLD.COMMANDS.get('cr')!.enter(me, 'over');
             let hg_namen = WORLD.getRoom('bj/hg/nanmen')
             if (!hg_namen) return me.notify_fail("<hir>资源加载错误：皇宫-南门 不存在</hir>");
             me.moveto(hg_namen);

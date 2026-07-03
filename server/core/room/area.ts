@@ -290,7 +290,7 @@ export class AREA extends BASE {
      * @param path
      */
     update(path: string): void {
-        WORLD.COMMANDS["jh"].map_json = null;
+        WORLD.COMMANDS.get("jh")!.map_json = null;
         for (let i = 0; i < WORLD.AREAS.length; i++) {
             if (WORLD.AREAS[i].path == path) {
                 const old_area = WORLD.AREAS[i];
