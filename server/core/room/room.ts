@@ -678,18 +678,6 @@ export class ROOM extends ITEM {
         this.room_exits_json = null;
         this.commands_json = null;
 
-        // —— 状态标记重置 ——
-        this.is_copy_room = false;
-        this.is_shadow = false;
-        this.create_time = 0;
-        this.copy_rooms = null;
-        this.shadow_rooms = null;
-        this.owner = null;
-        this.score = undefined;
-        this.biwu_step = undefined;
-        this.move_exits = undefined;
-        this.environment = undefined;
-
         // —— 重放NPC生成（读取原型的_npc_records） ——
         const records = this._npc_records;
         this._npc_records = [];
