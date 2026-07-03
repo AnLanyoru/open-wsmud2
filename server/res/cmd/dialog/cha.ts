@@ -38,6 +38,7 @@ export default class extends COMMAND {
                         return me.notify("你只能查看自己师父的技能。");
                 }
             }
+            target = other_target
         }
         this.render_skill(me, target, isfollower);
     }
