@@ -105,6 +105,8 @@ export class ROOM extends ITEM {
     shadow_rooms: ROOM[] | null = null;
     /** 副本持有者ID */
     owner: string | null = null;
+    /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
+    _npc_records: [string, number][] = [];
 
     // ============ 玩法相关 ============
 
@@ -125,6 +127,21 @@ export class ROOM extends ITEM {
 
     /** 公共房间列表(由RANDOM静态方法管理) */
     static public_rooms: ROOM[] | null = null;
+
+    /**
+     * 创建房间实例（原型克隆）
+     * @param path - 房间路径（与WORLD.ROOMS中的键一致）
+     */
+    static CREATE(path: string): ROOM {
+        const base = WORLD.ROOMS[path];
+        if (!base) {
+            throw new Error('room not preloaded: ' + path);
+        }
+        const room = Object.create(base) as ROOM;
+        room.on_clone();
+        room.create(path);
+        return room;
+    }
 
     // ============ 回调（由资源文件设置） ============
 
@@ -349,6 +366,7 @@ export class ROOM extends ITEM {
             if (typeof name == "string") name = [name, 1];
             const obj_path = name[0];
             if (!obj_path) continue;
+            this._npc_records.push([obj_path, name[1]]);
             for (let j = 0; j < name[1]; j++) {
                 const obj = NPC.CLONE(obj_path);
                 if (obj) {
@@ -643,6 +661,53 @@ export class ROOM extends ITEM {
     }
 
     /**
+     * 原型克隆回调 — Object.create后初始化可变字段，使其独立于原型
+     */
+    on_clone(): void {
+        // —— 可变引用类型，覆盖为独立副本 ——
+        this.items = [];
+        if (this.exits) {
+            this.exits = { ...this.exits };
+        }
+        this._temp_values = new Map();
+        this._temp_expiry = new Map();
+        this._events = undefined;
+
+        // —— 缓存清零 ——
+        this.json = null;
+        this.room_exits_json = null;
+        this.commands_json = null;
+
+        // —— 状态标记重置 ——
+        this.is_copy_room = false;
+        this.is_shadow = false;
+        this.create_time = 0;
+        this.copy_rooms = null;
+        this.shadow_rooms = null;
+        this.owner = null;
+        this.score = undefined;
+        this.biwu_step = undefined;
+        this.move_exits = undefined;
+        this.environment = undefined;
+
+        // —— 重放NPC生成（读取原型的_npc_records） ——
+        const records = this._npc_records;
+        this._npc_records = [];
+        if (records) {
+            for (let i = 0; i < records.length; i++) {
+                const [obj_path, count] = records[i];
+                for (let j = 0; j < count; j++) {
+                    const obj = NPC.CLONE(obj_path);
+                    if (obj) {
+                        this.items.push(obj);
+                        obj.environment = this;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * 房间创建回调
      * @param file - 文件名
      */
@@ -712,7 +777,7 @@ export class ROOM extends ITEM {
             this.copy_rooms = {};
             for (let key in oldroom.copy_rooms) {
                 const rm = oldroom.copy_rooms[key];
-                const newRm = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
+                const newRm = ROOM.CREATE(this.path);
                 this.replaceRoom(rm, newRm);
                 newRm.owner = key;
                 if (!this.copy_rooms) this.copy_rooms = {};
@@ -879,7 +944,7 @@ export class ROOM extends ITEM {
         if (area.rooms) {
             for (let i = 0; i < area.rooms.length; i++) {
                 const base_room = area.rooms[i];
-                const copy_room = BASE.CREATE(__PATH.MAP, base_room.path) as ROOM;
+                const copy_room = ROOM.CREATE(base_room.path);
                 if (!copy_room) continue;
                 if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
                 if (!base_room.copy_rooms) base_room.copy_rooms = {};
@@ -906,7 +971,7 @@ export class ROOM extends ITEM {
                 return this.shadow_rooms[i];
             }
         }
-        const shadow = BASE.CREATE(__PATH.MAP, this.path) as ROOM;
+        const shadow = ROOM.CREATE(this.path);
         if (shadow) {
             this.shadow_rooms.push(shadow);
         }
