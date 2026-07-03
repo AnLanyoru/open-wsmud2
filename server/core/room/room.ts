@@ -7,7 +7,7 @@ import {ITEM, RoomAction} from "../item.js";
 import {OBJ} from "../item/obj.js";
 import type {AREA} from "./area.js";
 import type {CHARACTER} from "../char/character.js";
-import type {NPC} from "../char/npc.js";
+import {NPC} from "../char/npc.js";
 import type {USER} from "../char/user.js";
 import { ItemCommandsJson } from "../char/follower.js";
 
@@ -15,13 +15,6 @@ import { ItemCommandsJson } from "../char/follower.js";
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
 
-// 懒加载 NPC 避免循环依赖
-let _NPC: {
-    CLONE: (path: string, ...args: any[]) => any;
-} | null = null;
-import("../char/npc.js").then((m: Record<string, any>) => {
-    _NPC = m.NPC as any;
-});
 
 /**
  * 隐藏物品被look时的描述
@@ -357,7 +350,7 @@ export class ROOM extends ITEM {
             const obj_path = name[0];
             if (!obj_path) continue;
             for (let j = 0; j < name[1]; j++) {
-                const obj = _NPC!.CLONE(obj_path);
+                const obj = NPC.CLONE(obj_path);
                 if (obj) {
                     this.items.push(obj);
                     obj.environment = this;

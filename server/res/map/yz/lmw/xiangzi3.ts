@@ -11,26 +11,30 @@ export default class extends ROOM {
         super();
         this.set_npc(["yz/lm/liumang", 2]);
         this.set_item("men", "大铁门", "这扇大门紧闭，背后不知道藏了什么东西。", [[
-            "tui", "推", function (me) {
-                me.notify("你推了下大铁门，感觉自己推不开。");
-            }
+            "tui", "推", this.men_do_tui
         ]]);
         this.set_item("shinian", "石撵", "这是一个很重的石撵，把手摸得铮亮。", [[
-            "tui", "推", function (me) {
-                if (me.mp < 10) {
-                    return me.notify_fail("你使足全力推了推石撵，可是内力耗尽使不上多少劲。");
-                }
-                me.notify("你使足全力推了推石撵，石撵缓慢的动了起来。");
-                me.set_state({
-                    id: "tuishi",
-                    title: "推石撵",
-                    player: me,
-                    rate: 2,
-                    on_enter: do_work,
-                    desc: '["你脸憋的通红，卯足了劲推着石撵转动。","你大喝一声，猛的发力，石撵呼的一下转了个圈。"]',
-                });
-            }
+            "tui", "推", this.shinian_do_tui
         ]]);
+    }
+
+    men_do_tui(me: USER) {
+        me.notify("你推了下大铁门，感觉自己推不开。");
+    }
+
+    shinian_do_tui(me: USER) {
+        if (me.mp < 10) {
+            return me.notify_fail("你使足全力推了推石撵，可是内力耗尽使不上多少劲。");
+        }
+        me.notify("你使足全力推了推石撵，石撵缓慢的动了起来。");
+        me.set_state({
+            id: "tuishi",
+            title: "推石撵",
+            player: me,
+            rate: 2,
+            on_enter: do_work,
+            desc: '["你脸憋的通红，卯足了劲推着石撵转动。","你大喝一声，猛的发力，石撵呼的一下转了个圈。"]',
+        });
     }
 
     on_leave(me, dir) {

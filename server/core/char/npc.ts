@@ -5,7 +5,7 @@
 import {CHARACTER} from './character.js';
 import { SkillsMap } from './skills_map.js';
 import type {FAMILY} from '../skill/family.js';
-import {ROOM} from '../room/room.js';
+import type {ROOM} from '../room/room.js';
 import {OBJ} from '../item/obj.js';
 import {WORLD} from '../world.js';
 import {BASE} from '../base.js';
