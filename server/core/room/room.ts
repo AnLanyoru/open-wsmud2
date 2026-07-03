@@ -367,13 +367,6 @@ export class ROOM extends ITEM {
             const obj_path = name[0];
             if (!obj_path) continue;
             this._npc_records.push([obj_path, name[1]]);
-            for (let j = 0; j < name[1]; j++) {
-                const obj = NPC.CLONE(obj_path);
-                if (obj) {
-                    this.items.push(obj);
-                    obj.environment = this;
-                }
-            }
         }
     }
 
