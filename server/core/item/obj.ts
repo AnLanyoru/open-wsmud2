@@ -365,7 +365,7 @@ export class OBJ extends ITEM {
 
     /**
      * 通过原型克隆创建物品实例。
-     * 使用 Object.create(base) 从缓存的模板（_WORLD.OBJ_STROE 或 BASE.CREATE 加载）克隆，
+     * 使用 Object.create(base) 从缓存的模板（_WORLD.OBJ_STORE 或 BASE.CREATE 加载）克隆，
      * 避免每次重新实例化资源类。
      * @param otype - 物品路径
      * @param count - 可选数量（>1 时设置 this.count）
@@ -373,7 +373,7 @@ export class OBJ extends ITEM {
     // @ts-ignore - OBJ.CREATE has different semantics from BASE.CREATE (instance factory vs resource loader)
     static CREATE(otype: string, count?: number): OBJ {
         otype = otype.replace(/\\/g, "/");
-        let base = WORLD.OBJ_STROE.get(otype) as OBJ | undefined;
+        let base = WORLD.OBJ_STORE[otype] as OBJ | undefined;
         if (!base) {
             base = BASE.CREATE(__PATH.OBJ, otype) as OBJ;
             if (!base) throw new Error('没有物品' + otype + "的定义。");
@@ -398,7 +398,7 @@ export class OBJ extends ITEM {
         if (this.on_create) this.on_create(path, par);
         const cc = GRADE_COLORS[this.grade] ?? 'wht';
         this.color_name = "<" + cc + ">" + this.name + "</" + cc + ">";
-        WORLD.OBJ_STROE.set(this.path ?? '', this);
+        WORLD.OBJ_STORE[this.path ?? ''] = this;
     }
 
     /**

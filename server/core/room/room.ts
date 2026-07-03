@@ -129,11 +129,11 @@ export class ROOM extends ITEM {
     static public_rooms: ROOM[] | null = null;
 
     /**
-     * 创建房间实例（原型克隆）
-     * @param path - 房间路径（与WORLD.ROOMS中的键一致）
+     * 创建房间实例（从干净原型克隆）
+     * @param path - 房间路径
      */
     static CREATE(path: string): ROOM {
-        const base = WORLD.ROOMS[path];
+        const base = WORLD.ROOM_STORE[path];
         if (!base) {
             throw new Error('room not preloaded: ' + path);
         }
@@ -718,7 +718,11 @@ export class ROOM extends ITEM {
             }
             WORLD.RUN_ROOMS.push(this);
         } else {
-            this.initBaseRoom(file);
+            // 首次创建：this是干净原型，保存后用克隆作为实际房间
+            WORLD.ROOM_STORE[file] = this;
+            const active = Object.create(this) as ROOM;
+            active.on_clone();
+            active.initBaseRoom(file);
         }
 
         this.on_create && this.on_create();
@@ -759,24 +763,34 @@ export class ROOM extends ITEM {
     update(file: string): void {
         this.on_create && this.on_create();
         const oldroom = WORLD.ROOMS[file];
-        this.initBaseRoom(file);
+
+        // 保存新原型，创建新的活跃房间
+        WORLD.ROOM_STORE[file] = this;
+        const active = Object.create(this) as ROOM;
+        active.on_clone();
+        active.initBaseRoom(file);
+
+        // 原型的影子标记需从RUN_ROOMS清除（create时被误加入）
+        const idx = WORLD.RUN_ROOMS.indexOf(this);
+        if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
+
         if (!oldroom) return;
         if (oldroom.copy_rooms) {
-            this.copy_rooms = {};
+            active.copy_rooms = {};
             for (let key in oldroom.copy_rooms) {
                 const rm = oldroom.copy_rooms[key];
-                const newRm = ROOM.CREATE(this.path);
-                this.replaceRoom(rm, newRm);
+                const newRm = ROOM.CREATE(active.path);
+                active.replaceRoom(rm, newRm);
                 newRm.owner = key;
-                if (!this.copy_rooms) this.copy_rooms = {};
-                this.copy_rooms[key] = newRm;
+                if (!active.copy_rooms) active.copy_rooms = {};
+                active.copy_rooms[key] = newRm;
             }
             oldroom.copy_rooms = null;
         } else {
             if (ROOM.public_rooms) {
                 for (let i = 0; i < ROOM.public_rooms.length; i++) {
                     if (ROOM.public_rooms[i] == oldroom) {
-                        ROOM.public_rooms[i] = this;
+                        ROOM.public_rooms[i] = active;
                         break;
                     }
                 }
