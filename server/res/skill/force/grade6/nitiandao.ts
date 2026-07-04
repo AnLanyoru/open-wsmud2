@@ -3,6 +3,7 @@ import {SKILL_TYPES} from "../../../../core/const.js";
 import type {PERFORM, PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
+/** 监修完毕 */
 export default class extends SKILL {
     name = "逆天道";
     id = "nitiandao";
@@ -15,8 +16,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         const hpPer = 5 + Math.floor(lv / 100);
         const shPer = 5 + Math.floor(lv / 200);
-        const slowPer = 10 + Math.floor(lv / 200);
-        const reversePct = (10 + lv / 300).toFixed(1);
+        const slowPer = zhenshe_slow_per(lv);
+        const reversePct = nizhuan_pct(lv).toFixed(1);
         return {
             force: {
                 hp_per: hpPer,
@@ -26,6 +27,33 @@ export default class extends SKILL {
                 desc: "震慑：减缓附近敌人" + slowPer + "%的时间流速\n逆转：将受到的" + reversePct + "%伤害转为自己的气血和内力\n唯一：将你内力的150%转化为气血",
             },
         };
+    }
+
+    /**
+     * 震慑——战斗开始时减缓附近敌人的时间流速
+     */
+    on_beginfight(me: CHARACTER, target: CHARACTER): void {
+        const lv = me.query_skill("nitiandao", 0);
+        if (lv <= 0) return;
+
+        const slowPer = zhenshe_slow_per(lv);
+
+        target.add_status({
+            id: "ntd_zs",
+            name: "震慑",
+            desc: "被逆天道震慑，时间流速减慢" + slowPer + "%",
+            duration: 0,
+            downside: false,
+            no_diff: true,
+            only_combat: true,
+            prop: {
+                gjsd_per: -slowPer,
+                distime_per: -slowPer,
+                releasetime_per: -slowPer,
+            },
+            start_msg: "<hio>$N周身弥漫亘古气息笼罩$n，$n的时间流速骤然减慢！</hio>",
+            finish_msg: "<hio>$n身上的亘古气息消散，时间流速恢复正常。</hio>",
+        }, me);
     }
 
     /**
@@ -123,6 +151,11 @@ export default class extends SKILL {
 // ═══════════════════════════════════════════
 // 逆天道 — 公共计算函数
 // ═══════════════════════════════════════════
+
+/** 震慑时间流速减缓百分比：10 + Math.floor(lv / 200) */
+function zhenshe_slow_per(lv: number): number {
+    return 10 + Math.floor(lv / 200);
+}
 
 /** 逆转伤害转化百分比：10 + lv / 300 */
 function nizhuan_pct(lv: number): number {
