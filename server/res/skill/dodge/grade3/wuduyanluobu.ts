@@ -26,27 +26,27 @@ export default class extends SKILL {
             prop: "wdylb_ds",
             value: lv => 100,
             format: (val) => {
-                return "金蛇游身判定时的有效等级增加" + val;
+                return "蛛丝缠步判定时的有效等级增加" + val;
             }
         }, {
             prop: "wdylb_tm",
             value: lv => 1000,
             format: (val) => {
-                return "金蛇游身成功后对方的忙乱时间+1秒";
+                return "蛛丝缠步成功后对方的忙乱时间+1秒";
             }
         }
     ];
     pfm_set: PerformData = {
         snake:
             {
-                name: "金蛇游身",
+                name: "蛛丝缠步",
                 distime: 30000,
                 enable_skill: "dodge",
                 mp: 20,
                 use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                     var time = 2000 + lv * 3;
                     if (time > 10000) time = 10000;
-                    var msg = "<HIC>$N身行忽的一变，使出「金蛇游身」的绝技，身法越来越快。\n\n只见$N飞快的绕场游走，瞻之在前，望之在后，一时间到处都是$N的身影。</HIC>\n";
+                    var msg = "<HIC>$N脚尖一旋踏碎漫山毒烟，身形如蛛绕藤斜滑而出，步步踏出螺旋轨迹，淡紫气丝随脚步纷飞织网，团团缠向$n！</HIC>\n";
 
                     if (me.random(lv / 2) + lv
                         + me.query_prop('wdylb_ds') > target.query_skill(target.dodge_skill.id, 0)) {
@@ -66,7 +66,7 @@ export default class extends SKILL {
                 query_desc: function (me: CHARACTER, lv: number) {
                     var time = 2000 + lv * 4;
                     if (time > 10000) time = 10000;
-                    return "金蛇游身，如有万蛇缠身，成功后使敌人忙乱" + (time / 1000) + "秒。";
+                    return "蛛丝缠步，烟萝化影，成功后使敌人忙乱" + (time / 1000) + "秒。";
                 }
             }
     };
