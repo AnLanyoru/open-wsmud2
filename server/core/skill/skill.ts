@@ -1124,6 +1124,23 @@ export class PERFORM {
         }
     }
 
+    /** 设置绝招冷却时间（baseType: 基础技能类型如"sword"。distime_ms: 冷却时长毫秒，≤0 时清除冷却） */
+    set_distime(me: CHARACTER, baseType: string, distime_ms: number): void {
+        const key = baseType + '/' + this.pid;
+        const now = Date.now();
+        if (distime_ms > 0) {
+            me.pfm_cd.set(key, now + distime_ms);
+            if (me.is_player) {
+                me.notify('{type:"changepfm",id:"' + key + '",time:' + distime_ms + '}');
+            }
+        } else {
+            me.pfm_cd.delete(key);
+            if (me.is_player) {
+                me.notify('{type:"changepfm",id:"' + key + '",time:0}');
+            }
+        }
+    }
+
     /** 查询出招时间 */
     query_releasetime(me: CHARACTER, lv: number): number {
         var rtime = this.release_time ?? 0;

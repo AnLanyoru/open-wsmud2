@@ -1,6 +1,6 @@
 import {SKILL} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type {PERFORM, PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -46,42 +46,23 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        lunhui: {
+        lun: {
             name: "一念轮回",
             distime: 60000,
             enable_skill: "force",
             mp: 1720,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const enemies = me.get_nearby_enemies();
-                if (!enemies.length) {
-                    me.send_room("<hio>$N掌心浮现轮回之印，但四周并无敌人可渡。", target);
-                    me.end_attack(target);
-                    return;
-                }
-
-                me.send_room("<hio>$N逆运天道，掌心轮回之印幽光流转，一股苍茫古意笼罩四方！</hio>\n", target);
-
-                const cdDuration = lunhui_cd_duration(lv);
-
-                for (const enemy of enemies) {
-                    // 使敌人全部技能进入冷却
-                    enemy.set_releasetime(cdDuration);
-
-                    // 对敌人造成当前气血8%的真实伤害
-                    const dmg = Math.floor(enemy.hp * 0.08);
-                    if (dmg > 0) {
-                        enemy.damage3(dmg, me);
-                    }
-                }
+                me.send_room("<hio>$N逆运天道，掌心轮回之印幽光流转，一股苍茫古意笼罩$n！</hio>\n", target);
+                reset_enemy_cooldowns(target, lv);
 
                 me.end_attack(target);
             },
             query_desc: function(_me: CHARACTER, _lv: number): string {
-                return "将敌人的技能重置冷却，并对附近敌人造成当前气血8%的真实伤害";
+                return "将敌人的技能重置冷却";
             },
         },
-        jimie: {
+        mie: {
             name: "一念寂灭",
             distime: 60000,
             enable_skill: "force",
@@ -168,7 +149,19 @@ function yimie_duration(lv: number): number {
     return 5000 + lv * 2;
 }
 
-/** 一念轮回——敌人技能冷却时间（毫秒） */
-function lunhui_cd_duration(lv: number): number {
-    return 3000 + lv * 2;
+/** 遍历目标所有已装备技能的绝招，使其进入各自的distime冷却 */
+function reset_enemy_cooldowns(target: CHARACTER, lv: number): void {
+    const bases = ['unarmed', 'sword', 'blade', 'club', 'staff', 'whip', 'throwing', 'dodge', 'force', 'parry'];
+    for (const base of bases) {
+        if (!target.skills) continue;
+        const base_skill = target.skills.get(base);
+        if (!base_skill || !base_skill.enable_skill) continue;
+        const sp_skill = SKILL.get(base_skill.enable_skill);
+        if (!sp_skill || !sp_skill.pfm) continue;
+        for (const key in sp_skill.pfm) {
+            const pfmitem: PERFORM = sp_skill.pfm[key];
+            const distime = pfmitem.query_distime(target, lv);
+            pfmitem.set_distime(target, base, distime);
+        }
+    }
 }
