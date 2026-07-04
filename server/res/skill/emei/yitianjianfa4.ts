@@ -94,7 +94,7 @@ export default class extends SKILL {
                         gj = Math.floor(gj * (100 + per) / 100);
                         mz = Math.floor(mz * (100 + per) / 100);
                         // 若此击毙敌，记录并终止后续攻击
-                        if (nowTarget.hp <= 0) {
+                        if (!nowTarget.is_living()) {
                             slain = true;
                         }
                     }
