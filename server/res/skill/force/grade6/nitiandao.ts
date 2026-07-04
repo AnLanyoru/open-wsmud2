@@ -3,7 +3,7 @@ import {SKILL_TYPES} from "../../../../core/const.js";
 import type {PERFORM, PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 监修完毕 */
+/** 余剩震慑未优化 */
 export default class extends SKILL {
     name = "逆天道";
     id = "nitiandao";
@@ -30,7 +30,7 @@ export default class extends SKILL {
     }
 
     /**
-     * 震慑——战斗开始时减缓附近敌人的时间流速
+     * 震慑——战斗开始时减缓附近敌人的时间流速 todo 需要后面入战的敌人也受到影响
      */
     on_beginfight(me: CHARACTER, target: CHARACTER): void {
         const lv = me.query_skill("nitiandao", 0);

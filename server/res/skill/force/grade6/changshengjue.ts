@@ -78,7 +78,7 @@ export default class extends SKILL {
             mp: 3700,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                me.send_room("<hio>$N沟通天地，长生真气如江河倒灌，周身光华大盛，所有伤势一扫而空！</hio>\n", target);
+                me.send_room("<hiz>$N倒转体内真气，天地相乘，阴阳互生，转瞬间重获新生！</hiz>\n", target);
 
                 // 恢复全部气血
                 me.add_hp(me.max_hp);

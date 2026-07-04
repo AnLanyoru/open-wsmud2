@@ -134,7 +134,7 @@ export default class extends SKILL {
                 target,
                 gj: me.gj,
                 mz: me.mz,
-                attack_msg: "<hic>$N心有灵犀，剑随意动，又是一剑刺向$n！</hic>",
+                attack_msg: "<hic>$N剑随心动，灵犀剑气寻隙而入</hic>",
             });
         }
     }
