@@ -43,7 +43,7 @@ export default class extends SKILL {
                 const msg =
                     "<HIC>$N身形一晃，步法如金蛇游走，倏忽间幻化出万蛇缠身之象，向$n逼去！</HIC>\n";
 
-                if (me.random(lv / 2) + lv > target.query_skill(target.dodge_skill.id, 0)) {
+                if (me.random((lv + me.ds) / 2) + ((lv + me.ds) / 2) > target.mz) {
                     target.add_status({
                         id: "busy",
                         is_busy: true,
