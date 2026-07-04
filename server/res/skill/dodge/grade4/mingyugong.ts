@@ -59,7 +59,7 @@ export default class extends SKILL {
                 const duration = query_myg_mingyu_duration(lv);
 
                 me.send_room(
-                    "<HIM>$N默运明玉功，肌肤若冰雪，绰约若处子，周身清辉流转，凛然不可逼视！</HIM>",
+                    "<HIW>$N微一凝神，运起明玉神功，将全身潜能尽数提起，顿时肌肤透明如玉，宛如被寒雾笼罩着的白冰。！</HIW>",
                     target,
                 );
 
@@ -74,7 +74,7 @@ export default class extends SKILL {
                         ds_per: buffPct,
                         zj_per: buffPct,
                     },
-                    finish_msg: "$N周身冰雪清辉渐敛，真炁归元，复还本真。",
+                    finish_msg: "$N周身寒雾渐渐散去，透明如玉的肌肤缓缓恢复常色。",
                 });
 
                 me.reauto_attack();
@@ -107,7 +107,7 @@ export default class extends SKILL {
                 const noclear = me.query_prop("myg_noclear") > 0;
 
                 me.send_room(
-                    "<HIM>$N双目微阖，面如寒玉，心神已入太上忘情之境，万物不萦于怀，唯余一片冰心！</HIM>",
+                    "<HIM>$N绝世独立，冷若玄霜，周身寒气环绕，无数花瓣无风而起，<HIW>冰肌玉骨</HIW>犹如神仙中人。</HIM>",
                     target,
                 );
 
@@ -121,12 +121,11 @@ export default class extends SKILL {
                         const enemy = caster.query_enemy();
                         if (!enemy) return false;
                         caster.send_room(
-                            "<HIM>$N心如止水，神游太上，$n陡觉一缕无形寒炁透体而至！</HIM>",
+                            "<HIM>狂风大起，无数花瓣夹杂着寒气将$n围起，$n避无可避，只能小心招架。</HIM>",
                             enemy,
                         );
-                        enemy.from_attack(damage, 999999, "", "<hir>$n为真炁所侵，四肢百骸如堕冰渊，霎时间面如霜雪！</hir>");
                     },
-                    finish_msg: "$N缓缓睁开双眼，从太上忘情之境中退了出来。",
+                    finish_msg: "风停花落，$N周身的寒气也敛去无踪。",
                 });
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
