@@ -2562,6 +2562,19 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 设置技能冷却时间
+     * @param key - 技能标识 "baseSkill/pfmid"
+     * @param distime_ms - 冷却时长（毫秒），<=0 则清除冷却
+     */
+    set_distime(key: string, distime_ms: number): void {
+        if (distime_ms > 0) {
+            this.pfm_cd.set(key, Date.now() + distime_ms);
+        } else {
+            this.pfm_cd.delete(key);
+        }
+    }
+
+    /**
      * 执行攻击动作
      */
     do_attacks(par: any): void {

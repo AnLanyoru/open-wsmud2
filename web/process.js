@@ -447,6 +447,8 @@ const Process = {
         Combat.ChangeDistime(data);
     }, clearDistime: function (data) {
         Combat.ClearDistime(data);
+    }, setDistime: function (data) {
+        Combat.SetDistime(data);
     }, pay: function (data) {
         if (data.pay === 3) {//wxqr
             ReceiveMessage('<yel>请打开微信扫描二维码支付：</yel>\n');

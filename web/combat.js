@@ -155,6 +155,15 @@ const Combat = {
             }
 
         }
+    }, SetDistime: function (data) {
+        var pfmid = data.id.replace("/", ".");
+        for (var j = 0; j < Combat.dis_pfms.length; j++) {
+            if (Combat.dis_pfms[j].id == pfmid) {
+                Combat.dis_pfms[j].distime = data.distime;
+                Combat.dis_pfms[j].ani_time = data.distime;
+                break;
+            }
+        }
     }, redisable: function () {
         Combat.dis_pfms = [];
         for (var i = 0; i < Combat.Skills.length; i++) {

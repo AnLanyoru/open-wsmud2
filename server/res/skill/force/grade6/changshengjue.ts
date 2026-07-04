@@ -39,11 +39,11 @@ export default class extends SKILL {
         // 混沌诀：伤害上限检查
         const capPct = me.query_temp("csj_hd", 0);
         if (capPct > 0) {
-            const cap = Math.floor(me.max_hp * capPct / 100);
+            const cap = int(me.max_hp * capPct / 100);
             if (sh > cap) {
                 const excess = sh - cap;
-                me.add_hp(excess);
-                me.add_mp(Math.floor(excess * 0.5));
+                me.add_hp(int(excess));
+                me.add_mp(int(excess));
                 sh = cap;
             }
         }
@@ -58,7 +58,7 @@ export default class extends SKILL {
             const lastTrigger = me.query_temp("csj_bm", 0);
             if (!lastTrigger) {
                 const healPct = bumie_heal_pct(lv);
-                const heal = Math.floor(me.max_hp * healPct / 100);
+                const heal = int(me.max_hp * healPct / 100);
 
                 me.set_temp("csj_bm", 1, 600000); // 10分钟冷却
                 me.set_temp("csj_wd", 1, 10000); // 10秒无敌

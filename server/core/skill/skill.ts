@@ -1119,7 +1119,7 @@ export class PERFORM {
                 me.pfm_cd.delete(key);
             }
             if (me.is_player) {
-                me.notify('{type:"changepfm",id:"' + key + '",time:' + add_time + '}');
+                me.send('{type:"changepfm",id:"' + key + '",time:' + add_time + '}');
             }
         }
     }
@@ -1131,12 +1131,12 @@ export class PERFORM {
         if (distime_ms > 0) {
             me.pfm_cd.set(key, now + distime_ms);
             if (me.is_player) {
-                me.notify('{type:"changepfm",id:"' + key + '",time:' + distime_ms + '}');
+                me.send('{type:"setDistime",id:"' + key + '",distime:' + distime_ms + '}');
             }
         } else {
             me.pfm_cd.delete(key);
             if (me.is_player) {
-                me.notify('{type:"changepfm",id:"' + key + '",time:0}');
+                me.send('{type:"clearDistime",id:"' + key + '"}');
             }
         }
     }
