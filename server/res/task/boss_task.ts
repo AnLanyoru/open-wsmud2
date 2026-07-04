@@ -244,7 +244,7 @@ function query_damage(this: NPC) {
             str.push("：");
             str.push(this.damages[key].toString());
             str.push("==");
-            str.push(parseInt(this.damages[key] * 100 / this.max_hp).toString());
+            str.push(int(this.damages[key] * 100 / this.max_hp).toString());
             str.push("%\n");
         }
     }
@@ -267,7 +267,7 @@ function query_items(this: NPC, me: USER) {
     if (me.query_temp("bcc", 0) >= 5) return;
 
 
-    sh = parseInt(sh * 100 / this.max_hp);
+    sh = int(sh * 100 / this.max_hp);
     if (sh < 1) {
         this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(10))];
         return this.user_items[me.id];

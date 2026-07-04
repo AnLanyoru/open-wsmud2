@@ -299,7 +299,7 @@ function fb_over(me) {
     var score = me.query_fbscore();
     var max_score = area.score || 100;
     var max_exp = area.query_exp();
-    var p = parseInt(score * 100 / max_score);
+    var p = int(score * 100 / max_score);
     if (p <= 0) p = 0;
     if (p > 100) p = 100;
     var exp = max_exp * p / 100;

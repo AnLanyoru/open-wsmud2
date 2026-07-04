@@ -3344,14 +3344,14 @@ const level_color: string[] = ['', 'wht', 'hig', 'hiy', 'hiz', 'hio', 'ord'];
 function get_perdesc(obj: CHARACTER): string {
     const ary = obj.gender === 1 ? boy_pers : girl_pers;
     let per = obj.per + obj.query_prop('per');
-    let index = parseInt(String(per / 2), 10);
+    let index = int(per / 2);
     if (index < 0) index = 0;
     if (index >= ary.length) index = ary.length - 1;
     return ary[index];
 }
 
 function get_agestr(age: number): string {
-    let index = parseInt(String((age || 10) / 10), 10);
+    let index = int((age || 10) / 10);
     if (index >= age_strs.length) index = age_strs.length - 1;
     return age_strs[index];
 }
@@ -3359,14 +3359,14 @@ function get_agestr(age: number): string {
 function get_skill_desc(level: number): string {
     if (!level) return '看上去似乎不会任何武功。';
     if (level < 1000)
-        return '的武功看上去似乎' + skill_levels[parseInt(String(level / 50), 10)];
-    let v = parseInt(String((level - 1000) / 500), 10);
+        return '的武功看上去似乎' + skill_levels[int(level / 50)];
+    let v = int((level - 1000) / 500);
     if (v > 6) v = 6;
     return '的武功看上去似乎' + skill_levels[v + 20];
 }
 
 function get_status(obj: CHARACTER): string {
-    let p = parseInt(String(obj.hp * 10 / obj.max_hp), 10);
+    let p = int(obj.hp * 10 / obj.max_hp);
     if (p < 0) p = 0;
     if (p >= Look_status.length) p = Look_status.length - 1;
     return Look_status[p];
