@@ -59,7 +59,7 @@ export default class extends SKILL {
                 const duration = query_myg_mingyu_duration(lv);
 
                 me.send_room(
-                    "<HIM>$N默运明玉功，周身散发出琉璃般澄澈的清辉，宛如玉人临世，战力大涨！</HIM>",
+                    "<HIM>$N默运明玉功，肌肤若冰雪，绰约若处子，周身清辉流转，凛然不可逼视！</HIM>",
                     target,
                 );
 
@@ -74,7 +74,7 @@ export default class extends SKILL {
                         ds_per: buffPct,
                         zj_per: buffPct,
                     },
-                    finish_msg: "$N周身明玉清辉渐敛，功力恢复如常。",
+                    finish_msg: "$N周身冰雪清辉渐敛，真炁归元，复还本真。",
                 });
 
                 me.reauto_attack();
@@ -107,7 +107,7 @@ export default class extends SKILL {
                 const noclear = me.query_prop("myg_noclear") > 0;
 
                 me.send_room(
-                    "<HIM>$N双目微阖，面如寒玉，心神已入太上忘情之境——万物不萦于怀，唯余一片冰心！</HIM>",
+                    "<HIM>$N双目微阖，面如寒玉，心神已入太上忘情之境，万物不萦于怀，唯余一片冰心！</HIM>",
                     target,
                 );
 
@@ -121,10 +121,10 @@ export default class extends SKILL {
                         const enemy = caster.query_enemy();
                         if (!enemy) return false;
                         caster.send_room(
-                            "<HIM>$N默运太上忘情，一股无形真气向$n袭去！</HIM>",
+                            "<HIM>$N心如止水，神游太上，$n陡觉一缕无形寒炁透体而至！</HIM>",
                             enemy,
                         );
-                        enemy.from_attack(damage, 999999, "", "<hir>$n被太上忘情真气所伤！</hir>");
+                        enemy.from_attack(damage, 999999, "", "<hir>$n为真炁所侵，四肢百骸如堕冰渊，霎时间面如霜雪！</hir>");
                     },
                     finish_msg: "$N缓缓睁开双眼，从太上忘情之境中退了出来。",
                 });
