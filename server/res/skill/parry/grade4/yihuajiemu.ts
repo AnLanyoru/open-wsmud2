@@ -29,7 +29,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        yi: {
             name: "移花",
             distime: 25000,
             enable_skill: "parry",
