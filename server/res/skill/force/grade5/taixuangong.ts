@@ -146,8 +146,3 @@ function baishou_duration(lv: number): number {
 function baishou_recover_pct(lv: number): number {
     return Math.min(50, 30 + Math.floor(lv / 100));
 }
-
-/** 毫秒转秒显示 */
-function toSec(ms: number): string {
-    return (ms / 1000) + "";
-}

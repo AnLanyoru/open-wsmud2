@@ -81,7 +81,7 @@ export default class extends SKILL {
                 const duration = query_tgx_buff_duration(lv);
                 const gjBonus = query_tgx_gj_bonus(lv);
                 const dsBonus = query_tgx_ds_bonus(lv);
-                return `${toSec(duration)}内，提升自身攻击力${gjBonus}点，躲闪${dsBonus}点。`;
+                return `${toSec(duration)}秒内，提升自身攻击力${gjBonus}点，躲闪${dsBonus}点。`;
             },
         },
     };

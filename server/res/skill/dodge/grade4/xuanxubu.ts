@@ -71,7 +71,7 @@ export default class extends SKILL {
                 const duration = query_xxb_duration(lv);
                 const per = query_xxb_per(lv);
                 return (
-                    toSec(duration) +
+                    toSec(duration) + "秒" +
                     "内提高你" +
                     per +
                     "%的躲闪，使用幻影迷惑敌人减少你受到的伤害" +

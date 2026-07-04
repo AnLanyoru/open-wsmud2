@@ -71,7 +71,7 @@ export default class extends SKILL {
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const busyTime = query_jinshe_busy_time(lv);
-                return "金蛇游身，如有万蛇缠身，成功后使敌人忙乱" + toSec(busyTime) + "。";
+                return "金蛇游身，如有万蛇缠身，成功后使敌人忙乱" + toSec(busyTime) + "秒。";
             },
         },
     };

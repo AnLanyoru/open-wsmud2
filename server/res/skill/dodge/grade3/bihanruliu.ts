@@ -75,7 +75,7 @@ export default class extends SKILL {
                 const duration = query_bhrl_duration(lv);
                 const dsBonus = query_bhrl_ds_bonus(lv);
                 return (
-                    toSec(duration) +
+                    toSec(duration) + "秒" +
                     "内你的攻击间隔减少1秒，增加" +
                     dsBonus +
                     "躲闪。"

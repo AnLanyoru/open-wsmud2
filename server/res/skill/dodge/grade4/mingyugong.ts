@@ -86,7 +86,7 @@ export default class extends SKILL {
                     "使用明玉功提升战力，增加你" +
                     buffPct +
                     "%的攻击，防御，命中，躲闪，招架，持续" +
-                    toSec(duration)
+                    toSec(duration) + "秒"
                 );
             },
         },
@@ -118,12 +118,26 @@ export default class extends SKILL {
                     duration_count: totalCount,
                     no_clear: noclear,
                     on_interval: function (caster: CHARACTER, _over_count: number): boolean | void {
-                        const enemy = caster.query_enemy();
-                        if (!enemy) return false;
-                        caster.send_room(
-                            "<HIM>狂风大起，无数花瓣夹杂着寒气将$n围起，$n避无可避，只能小心招架。</HIM>",
-                            enemy,
-                        );
+                        const enemies = caster.enemy;
+                        if (!enemies || !enemies.length) return false;
+                        for (let i = 0; i < enemies.length; i++) {
+                            const enemy = enemies[i];
+                            if (enemy.hp <= 0 || !caster.is_here(enemy)) continue;
+                            caster.send_room(
+                                "<HIM>狂风大起，无数花瓣夹杂着寒气将$n围起，$n避无可避，只能小心招架。</HIM>",
+                                enemy,
+                            );
+                            caster.do_attack({
+                                target: enemy,
+                                gj: damage,
+                                no_dodge: true,
+                                attack_msg: "",
+                                damage_msg: "被夹杂着寒气的花瓣割出无数伤口",
+                                no_append_before: true,
+                                no_append: true,
+                                no_append_target: true,
+                            });
+                        }
                     },
                     finish_msg: "风停花落，$N周身的寒气也敛去无踪。",
                 });

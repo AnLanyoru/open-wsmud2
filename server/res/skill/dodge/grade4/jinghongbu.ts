@@ -27,7 +27,7 @@ export default class extends SKILL {
         {
             prop: "jhb_cd",
             value: (_lv: number) => 5000,
-            format: (val: number) => "掠影冷却时间减少" + toSec(val),
+            format: (val: number) => "掠影冷却时间减少" + toSec(val) + "秒",
         },
         {
             prop: "jhb_count",

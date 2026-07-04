@@ -119,7 +119,7 @@ export default class extends SKILL {
             query_desc: function(me: CHARACTER, lv: number) {
                 const pct = bikou_dmg_pct(lv);
                 const forbidTime = bikou_forbid_time(lv);
-                return "造成内力上限" + pct + "%的内力伤害，并禁止对方绝招" + toSec(forbidTime) + "。";
+                return "造成内力上限" + pct + "%的内力伤害，并禁止对方绝招" + toSec(forbidTime) + "秒。";
             },
         },
     };

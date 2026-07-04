@@ -62,7 +62,7 @@ export default class extends SKILL {
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const duration = query_ayfx_duration(lv);
                 const mzPer = query_ayfx_mz_per(lv);
-                return toSec(duration) + "内增加你" + mzPer + "%命中";
+                return toSec(duration) + "秒内增加你" + mzPer + "%命中";
             },
         },
     };

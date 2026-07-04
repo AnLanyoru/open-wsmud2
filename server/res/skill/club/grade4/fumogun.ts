@@ -77,7 +77,7 @@ export default class extends SKILL {
             query_desc: function(_me: CHARACTER, lv: number): string {
                 const multiplier = query_fmg_damage_multiplier(lv);
                 const busyTime = query_fmg_busy_time(lv);
-                return `金刚伏魔，造成${multiplier}%攻击力的伤害，命中后震慑敌人使敌人忙乱${toSec(busyTime)}。`;
+                return `金刚伏魔，造成${multiplier}%攻击力的伤害，命中后震慑敌人使敌人忙乱${toSec(busyTime)}秒。`;
             },
         },
     };

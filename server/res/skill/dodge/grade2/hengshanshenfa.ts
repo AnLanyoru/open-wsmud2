@@ -80,7 +80,7 @@ export default class extends SKILL {
             query_desc: function(_me: CHARACTER, lv: number): string {
                 const duration = query_hssf_lingxu_duration(lv);
                 const bonus = query_hssf_lingxu_bonus(lv);
-                return `${toSec(duration)}内增加你${bonus}%躲闪，防御提高${bonus}%`;
+                return `${toSec(duration)}秒内增加你${bonus}%躲闪，防御提高${bonus}%`;
             },
         },
     };
