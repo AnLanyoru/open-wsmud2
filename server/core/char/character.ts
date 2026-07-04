@@ -3107,7 +3107,7 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 设置技能冷却时间
+     * 设置出招时间全局冷却
      */
     set_releasetime(rtime: number): void {
         const release_time = Date.now() + rtime;

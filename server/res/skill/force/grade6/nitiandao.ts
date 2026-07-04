@@ -62,16 +62,11 @@ export default class extends SKILL {
 
                 me.send_room("<hio>$N逆运天道，掌心轮回之印幽光流转，一股苍茫古意笼罩四方！</hio>\n", target);
 
+                const cdDuration = lunhui_cd_duration(lv);
+
                 for (const enemy of enemies) {
-                    enemy.add_status({
-                        id: "nitiandao_lunhui",
-                        name: "轮回",
-                        desc: "被逆天道轮回之力影响，技能冷却重置",
-                        duration: 1000,
-                        downside: true,
-                        no_diff: true,
-                        finish_msg: "<hio>$n身上的轮回之力消散。</hio>",
-                    }, me);
+                    // 使敌人全部技能进入冷却
+                    enemy.set_releasetime(cdDuration);
 
                     // 对敌人造成当前气血8%的真实伤害
                     const dmg = Math.floor(enemy.hp * 0.08);
@@ -82,7 +77,7 @@ export default class extends SKILL {
 
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function(_me: CHARACTER, _lv: number): string {
                 return "将敌人的技能重置冷却，并对附近敌人造成当前气血8%的真实伤害";
             },
         },
@@ -116,7 +111,7 @@ export default class extends SKILL {
 
                     // 给对方附加内力消耗增加的debuff
                     enemy.add_status({
-                        id: "nitiandao_jimie",
+                        id: "jimie",
                         name: "寂灭",
                         desc: "被逆天道寂灭之力影响，内力消耗大幅增加",
                         duration: duration,
@@ -124,7 +119,8 @@ export default class extends SKILL {
                         no_diff: true,
                         override: 2,
                         prop: {
-                            distime: extraMp,
+                            expend_mp: -extraMp,
+                            expend_mp_per: -extraMpPer,
                         },
                         finish_msg: "<hio>$n身上的寂灭之力终于消散。</hio>",
                     }, me);
@@ -170,4 +166,9 @@ function yimie_extra_mp_per(lv: number): number {
 /** 一念寂灭debuff持续时间（毫秒） */
 function yimie_duration(lv: number): number {
     return 5000 + lv * 2;
+}
+
+/** 一念轮回——敌人技能冷却时间（毫秒） */
+function lunhui_cd_duration(lv: number): number {
+    return 3000 + lv * 2;
 }
