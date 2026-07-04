@@ -63,8 +63,8 @@ export default class extends SKILL {
                     var time = 3000 + lv * 5;
                     if (time > 10000) time = 10000;
                     target.add_status({
-                        id: "unarmed",
-                        name: "夺魄",
+                        id: "faint",
+                        name: "昏迷",
                         desc: "你陷入了昏迷状态",
                         is_faint: true,
                         duration: time,
