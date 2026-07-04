@@ -141,11 +141,6 @@ function bumie_heal_pct(lv: number): number {
     return Math.min(80, 50 + Math.floor(lv / 100));
 }
 
-/** 不灭——无敌持续时间（毫秒） */
-function bumie_invul_duration(_lv: number): number {
-    return 3000;
-}
-
 /** 混沌诀——持续时间（毫秒）：min(30秒, 3000 + lv * 10) */
 function hundun_duration(lv: number): number {
     return Math.min(30000, 3000 + lv * 10);
