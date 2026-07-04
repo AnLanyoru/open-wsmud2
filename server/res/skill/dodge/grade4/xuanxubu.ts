@@ -1,6 +1,6 @@
 import {SKILL} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
-import type {CHARACTER} from "../../../../core/char/character.js";
+import type {CHARACTER, DoAttackPar} from "../../../../core/char/character.js";
 
 // ============================================================
 // 玄虚步 — 公共绝世武功（侠客岛）
@@ -91,6 +91,28 @@ export default class extends SKILL {
                 desc: "当你躲闪成功后顺势反击敌人",
             },
         };
+    }
+
+    /** 躲闪成功后顺势反击敌人 */
+    on_dodge_over(me: CHARACTER, attacker: CHARACTER, par: DoAttackPar): void {
+        if (par.is_dodged && !me.query_temp("sk_xxb_fj", 0)) {
+            const lv: number = me.query_skill("xuanxubu", 0);
+            if (!lv) return;
+            const fjPer: number = me.query_prop("xxb_fj");
+            me.send_room(
+                "<HIC>$N足踏玄虚，身形一晃，借着$n招数落空之势反手一击！</HIC>",
+                attacker,
+            );
+            me.do_attack({
+                target: attacker,
+                gj: Math.floor(me.gj * (100 + fjPer) / 100),
+                mz: me.mz,
+                no_append: true,
+                no_append_target: true,
+            });
+            me.end_attack(attacker);
+            me.set_temp("sk_xxb_fj", 1, 7000);
+        }
     }
 }
 
