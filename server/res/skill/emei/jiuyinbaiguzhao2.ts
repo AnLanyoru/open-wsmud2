@@ -11,7 +11,14 @@ export default class extends SKILL {
     family = FAMILIES.EMEI;
     desc = "九阴真经里记载的外门功夫，阴狠毒辣";
     can_enables = ["unarmed", "parry"];
-    attack_actions = SKILL.get("unarmed")?.attack_actions || [];
+    attack_actions = [
+        "$N阴恻恻一声冷笑，五指成爪，指尖泛起幽幽青芒，疾向$n的$l抓去",
+        "$N身形如鬼魅般欺近，双爪划破空气发出嗤嗤异响，直取$n的$l",
+        "$N十指箕张，指节咯咯作响，漫天爪影将$n的$l笼罩其中",
+        "$N眼中杀机一闪，一爪探出快如闪电，五指如铁钩般扣向$n的$l",
+        "$N厉啸声中，双爪连环抓出，每一爪都带着阴寒劲风，招招不离$n的$l要害",
+        "$N身形一转，反手一爪自不可思议的角度抓向$n的$l，狠辣诡异",
+    ];
 
     slots = [
         {

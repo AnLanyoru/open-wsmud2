@@ -12,7 +12,14 @@ export default class extends SKILL {
     source_skill = "yitianjianfa";
     desc = "峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。";
     can_enables = ["sword"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = [
+        "$N倚天剑出鞘，一道青光划破长空，剑锋直指$n的$l",
+        "$N长啸一声，$W带起凛冽剑气，如长虹贯日般刺向$n的$l",
+        "$N手中$W一抖，剑光化作漫天星雨，铺天盖地洒向$n的$l",
+        "$N身形如电，$W划出一道完美弧线，挟着破空之声斩向$n的$l",
+        "$N剑招忽变，$W化作一道惊鸿，自不可思议的角度刺向$n的$l",
+        "$N手腕轻转，$W挽出七朵剑花，虚实莫辨，齐齐点向$n的$l",
+    ];
 
     query_prop(lv: number, _me?: CHARACTER): PropMap {
         return {

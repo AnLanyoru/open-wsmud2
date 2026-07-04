@@ -12,7 +12,14 @@ export default class extends SKILL {
     is_hidden = true;
     desc = "峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。";
     can_enables = ["sword"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = [
+        "$N倚天剑出鞘，天地为之变色，一道璀璨剑芒直贯$n的$l",
+        "$N引剑长啸，$W上剑气纵横，如九天惊雷般劈向$n的$l",
+        "$N手中$W光华大盛，剑锋过处空气撕裂，势不可挡地斩向$n的$l",
+        "$N身形凌空，$W洒下万道剑光，如天罗地网般将$n的$l笼罩",
+        "$N剑随意动，$W化作一道流光，快得令人目眩，直取$n的$l",
+        "$N手腕一震，$W发出龙吟之声，一道弧形剑气破空斩向$n的$l",
+    ];
 
     query_prop(lv: number, _me?: CHARACTER): PropMap {
         return {
