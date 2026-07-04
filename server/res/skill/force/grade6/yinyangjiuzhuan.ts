@@ -71,7 +71,7 @@ export default class extends SKILL {
 
                     me.add_status({
                         id: "force",
-                        name: "转阴阳·九幽",
+                        name: "九幽",
                         duration: duration,
                         override: 2,
                         prop: {
@@ -92,7 +92,7 @@ export default class extends SKILL {
 
                     me.add_status({
                         id: "force",
-                        name: "转阴阳·九烛",
+                        name: "九烛",
                         duration: duration,
                         override: 2,
                         prop: {
