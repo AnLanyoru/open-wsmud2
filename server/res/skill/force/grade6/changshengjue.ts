@@ -36,7 +36,7 @@ export default class extends SKILL {
         const awePct = zhenshe_awe_pct(lv);
         const enemies = me.get_nearby_enemies();
         if (!enemies.length) return;
-        me.send_room("<hio>$N体内长生真气激荡，一股浩瀚威压笼罩四周！</hio>");
+        me.send_room("<hio>$N长生真气沛然流转，一股苍茫古意弥漫四野，周遭之敌无不心神震荡！</hio>");
         for (const enemy of enemies) {
             enemy.add_status({
                 id: "csj_zs",
@@ -87,7 +87,7 @@ export default class extends SKILL {
                 me.set_temp("csj_bm", 1, 600000); // 10分钟冷却
                 me.set_temp("csj_wd", 1, 10000); // 10秒无敌
 
-                me.send_room("<hio>$N体内长生真气应激而发，一股生生不息的力量自丹田涌出，伤势迅速愈合！</hio>\n");
+                me.send_room("<hio>$N体内长生真气应激而发，一股生生不息之力自丹田奔涌而出，刹那肌骨重生，伤势尽复！</hio>\n");
                 me.add_hp(me.max_hp);
             }
         }
@@ -142,7 +142,7 @@ export default class extends SKILL {
                 const duration = hundun_duration(lv);
                 const capPct = hundun_cap_pct(lv);
 
-                me.send_room("<hio>$N运转混沌诀，周身被混沌之气包裹，任何伤害皆不得超越界限！</hio>\n", target);
+                me.send_room("<hio>$N双眸微阖，混沌真气自奇经八脉奔涌而出，万法不侵！</hio>\n", target);
 
                 me.add_status({
                     id: "force",
@@ -152,7 +152,7 @@ export default class extends SKILL {
                     prop: {},
                     on_attach: (p: CHARACTER) => p.set_temp("csj_hd", capPct, duration),
                     on_expire: (p: CHARACTER) => p.remove_temp("csj_hd"),
-                    finish_msg: "<hio>$N周身混沌之气消散。</hio>",
+                    finish_msg: "<hio>$N周身混沌之气如潮退去。</hio>",
                 });
 
                 me.reauto_attack();
