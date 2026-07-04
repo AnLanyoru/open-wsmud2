@@ -87,7 +87,20 @@ export default class extends SKILL {
                 me.remove_statuses(function(s: CharacterStatus): boolean {
                     return s.downside === true;
                 });
+
+                // 保存内功技能冷却，清除后恢复（天地决不重置内功CD）
+                const now = Date.now();
+                const forceCDs: [string, number][] = [];
+                for (const [key, expiry] of me.pfm_cd) {
+                    const remaining = expiry - now;
+                    if (remaining > 0 && key.startsWith("force/")) {
+                        forceCDs.push([key, remaining]);
+                    }
+                }
                 me.clear_distime();
+                for (const [key, remaining] of forceCDs) {
+                    me.set_distime(key, remaining);
+                }
 
                 me.end_attack(target);
             },
