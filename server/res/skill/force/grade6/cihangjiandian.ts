@@ -16,7 +16,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         const gjMz = Math.floor(lv * 3) + 100;
         const pct = 5 + Math.floor(lv / 200);
-        const awePct = 10 + Math.floor(lv / 200);
+        const awePct = awe_pct(lv);
         return {
             force: {
                 gj: gjMz,
@@ -32,8 +32,10 @@ export default class extends SKILL {
 
     /**
      * 灵动——战斗开始5秒内免疫控制
+     * 震慑——使附近敌人躲闪和招架降低
      */
     on_beginfight(me: CHARACTER, _target: CHARACTER): void {
+        // 灵动
         me.add_status({
             id: "cihang_lingdong",
             name: "灵动",
@@ -42,6 +44,29 @@ export default class extends SKILL {
             ig_control: true,
             finish_msg: "<hic>$N的灵动剑气收敛，恢复常态。</hic>",
         });
+
+        // 震慑
+        const lv = me.query_skill("cihangjiandian", 0);
+        if (lv <= 0) return;
+        const awePct = awe_pct(lv);
+        const enemies = me.get_nearby_enemies();
+        if (!enemies.length) return;
+        me.send_room("<hio>$N慈航剑气凌然，一股无形的威压笼罩四野，周遭之敌无不心神震颤！</hio>");
+        for (const enemy of enemies) {
+            enemy.add_status({
+                id: "cihang_zs",
+                name: "震慑",
+                desc: "被慈航剑典震慑，躲闪和招架降低",
+                duration: 0,
+                downside: true,
+                no_diff: true,
+                only_combat: true,
+                prop: {
+                    ds_per: -awePct,
+                    zj_per: -awePct,
+                },
+            }, me);
+        }
     }
 
     pfm_set: PerformData = {
@@ -172,4 +197,9 @@ function jianxin_sword_per(lv: number): number {
 /** 心有灵犀额外攻击次数上限：1 + lv / 1000 */
 function lingxi_extra_max(lv: number): number {
     return 1 + int(lv / 1000);
+}
+
+/** 震慑——降低躲闪/招架%：10 + Math.floor(lv / 200) */
+function awe_pct(lv: number): number {
+    return 10 + Math.floor(lv / 200);
 }
