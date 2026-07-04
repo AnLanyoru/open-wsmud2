@@ -43,14 +43,25 @@ export default class extends SKILL {
             mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 万佛化身
-                // 增加自己25%的负面抵抗，持续15秒。
-                me.send_room("$N使出「万佛化身」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+                var res = 20 + Math.floor(lv / 200);
+                var time = 10000 + lv * 5;
+                if (time > 20000) time = 20000;
+                me.send_room("<hiz>$N身形一晃，无数化身纷至沓来，如万佛降临！</hiz>");
+                me.add_status({
+                    id: "dodge",
+                    name: "万佛化身",
+                    duration: time,
+                    prop: {
+                        diff_downside_per: res
+                    },
+                    finish_msg: "$N的万佛化身渐渐消散。",
+                });
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "增加自己25%的负面抵抗，持续15秒。";
+                var res = 20 + Math.floor(lv / 200);
+                var time = 10000 + lv * 5;
+                if (time > 20000) time = 20000;
+                return "增加自己" + res + "%的负面抵抗，持续" + (time / 1000) + "秒。";
             },
         },
     };

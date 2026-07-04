@@ -31,7 +31,8 @@ export default class extends SKILL {
             unarmed: {
                 gj: 20 + lv * 2,
                 mz: 20 + lv * 2,
-                diff_fy_per: 6,
+                diff_fy_per: 3 + Math.floor(lv / 300),
+                desc: "对方气血每降低1%，你的九阴白骨爪伤害和命中增加" + (lv >= 1000 ? "2%" : "1%"),
             },
             parry: {
                 zj: 20 + lv * 2,
@@ -49,14 +50,34 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 夺魄
-                // 快速狠辣的攻击，命中后对敌人造成你攻击力300%的伤害，并使敌方昏迷8秒。
-                me.send_room("$N使出「夺魄」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+                var gj = me.gj * (200 + lv / 10) / 100;
+                var sh = me.do_attack({
+                    target: target,
+                    gj: gj,
+                    mz: me.mz,
+                    no_weapon: true,
+                    attack_msg: "<hiy>$N冷笑数声，手指微微弯曲成爪，身形疾转，飞向$n头顶抓下</hiy>",
+                    damage_msg: "<hir>$n哪里料到$N竟有如此变招，不及躲闪，被$P抓了个鲜血淋漓，头痛欲裂。</hir>"
+                });
+                if (sh) {
+                    var time = 3000 + lv * 5;
+                    if (time > 10000) time = 10000;
+                    target.add_status({
+                        id: "unarmed",
+                        name: "夺魄",
+                        desc: "你陷入了昏迷状态",
+                        is_faint: true,
+                        duration: time,
+                        downside: true
+                    }, me);
+                }
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "快速狠辣的攻击，命中后对敌人造成你攻击力300%的伤害，并使敌方昏迷8秒。";
+                var gj = 200 + Math.floor(lv / 10);
+                var time = 3000 + lv * 5;
+                if (time > 10000) time = 10000;
+                return "快速狠辣的攻击，命中后对敌人造成你攻击力" + gj + "%的伤害，并使敌方昏迷" + (time / 1000) + "秒。";
             },
         },
         pfm_1: {
@@ -66,14 +87,24 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 风卷残云
-                // 对敌人进行快速攻击，对方的气血每降低20%，你的攻击次数增加1次
-                me.send_room("$N使出「风卷残云」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+                var threshold = 30 - Math.floor(lv / 100);
+                if (threshold < 10) threshold = 10;
+                var count = Math.floor((100 - target.hp * 100 / target.max_hp) / threshold) + 3;
+                me.send_room("<hir>$N一声厉啸，手指弯曲成爪，身形疾转，双爪化为一片残影，飞向$n抓去</hir>\n", target);
+                for (var i = 0; i < count; i++) {
+                    me.do_attack({
+                        target: target,
+                        gj: me.gj,
+                        mz: me.mz,
+                        no_weapon: true
+                    });
+                }
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "对敌人进行快速攻击，对方的气血每降低20%，你的攻击次数增加1次";
+                var threshold = 30 - Math.floor(lv / 100);
+                if (threshold < 10) threshold = 10;
+                return "对敌人进行快速攻击，对方的气血每降低" + threshold + "%，你的攻击次数增加1次";
             },
         },
     };

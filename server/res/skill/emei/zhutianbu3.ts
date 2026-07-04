@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "诸天化身步";
     id = "zhutianbu3";
     source_skill = "zhutianbu2";
-    grade = 5;
+    grade = 6;
     family = FAMILIES.EMEI;
     is_hidden = true;
 
@@ -45,14 +45,19 @@ export default class extends SKILL {
             mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 万佛化身
-                // 增加自己1000%的负面抵抗，持续10秒。
-                me.send_room("$N使出「万佛化身」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+                me.send_room("<hio>$N身形一晃，无数化身纷至沓来，如万佛降临！</hio>");
+                me.add_status({
+                    id: "dodge",
+                    name: "万佛化身",
+                    duration: 10000,
+                    prop: {
+                        diff_downside_per: lv
+                    },
+                    finish_msg: "$N的万佛化身渐渐消散。",
+                });
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "增加自己1000%的负面抵抗，持续10秒。";
+                return "增加自己" + lv + "%的负面抵抗，持续10秒。";
             },
         },
     };
