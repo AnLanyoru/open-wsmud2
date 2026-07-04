@@ -1,6 +1,6 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import { SKILL_TYPES } from "../../../../core/const.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar, CharacterStatus } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -13,7 +13,7 @@ export default class extends SKILL {
     can_enables = ["force"];
 
     query_enable_prop(lv: number): EnablePropMap {
-        const awePct = 10 + Math.floor(lv / 200);
+        const awePct = zhenshe_awe_pct(lv);
         const posuiPct = posui_dmg_pct(lv).toFixed(1);
         return {
             force: {
@@ -25,6 +25,33 @@ export default class extends SKILL {
                 desc: "震慑：降低附近敌人" + awePct + "%的防御和免伤\n破碎：每次的攻击都附加最大内力" + posuiPct + "%的伤害，当你空手时附加的内力加倍，并吸收部分伤害\n唯一：将你内力的140%转化为气血",
             },
         };
+    }
+
+    /**
+     * 震慑——降低附近敌人的防御和免伤
+     */
+    on_beginfight(me: CHARACTER, _target: CHARACTER): void {
+        const lv = me.query_skill("zhanshentulu", 0);
+        if (lv <= 0) return;
+        const awePct = zhenshe_awe_pct(lv);
+        const enemies = me.get_nearby_enemies();
+        if (!enemies.length) return;
+        me.send_room("<hio>$N战神真气汹涌而出，一股睥睨天下的磅礴威压笼罩四野，周遭之敌无不心生畏惧！</hio>");
+        for (const enemy of enemies) {
+            enemy.add_status({
+                id: "zstl_zs",
+                name: "震慑",
+                desc: "被战神图录震慑，防御和免伤降低",
+                duration: 0,
+                downside: true,
+                no_diff: true,
+                only_combat: true,
+                prop: {
+                    fy_per: -awePct,
+                    diff_sh_per: -awePct,
+                },
+            }, me);
+        }
     }
 
     /**
@@ -48,10 +75,17 @@ export default class extends SKILL {
             // 吸收部分伤害为气血
             const absorb = Math.floor(bonusDmg * 0.3);
             if (absorb > 0) {
-                me.add_hp(absorb);
             }
         }
         return 0;
+    }
+
+    on_attack_over(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar, sh: number): void {
+        if (sh <= 0) return;
+        const weapon = me.query_weapon();
+        if (!weapon) {
+            me.add_hp(sh);
+        }
     }
 
     pfm_set: PerformData = {
@@ -61,7 +95,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 920,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = zhanshenjue_duration(lv);
 
                 me.send_room("<hio>$N仰天长啸，战神附体！一股睥睨天下的磅礴战意冲天而起！</hio>\n", target);
@@ -84,18 +118,18 @@ export default class extends SKILL {
                 me.reauto_attack();
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function (_me: CHARACTER, lv: number): string {
                 const duration = zhanshenjue_duration(lv);
                 return "战神附体，短时间内大幅增加你的战力，免疫控制，持续" + toSec(duration) + "秒";
             },
         },
-        yanmie: {
+        mie: {
             name: "湮灭",
             distime: 45000,
             enable_skill: "force",
             mp: 1270,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 if (!target || target.hp <= 0) {
                     me.notify_fail("没有目标！");
                     return;
@@ -110,14 +144,16 @@ export default class extends SKILL {
                 target.damage3(dmg, me);
 
                 // 清除目标所有持续状态
-                target.remove_statuses(function(s: CharacterStatus): boolean {
+                target.remove_statuses(function (s: CharacterStatus): boolean {
+                    if (s.duration <= 0) return false; // 永久状态不清除
+                    if (s.no_clear) return false;
                     return true;
                 });
 
                 // 减少对方伤害和破防
                 const duration = yanmie_debuff_duration(lv);
                 target.add_status({
-                    id: "zhanshentulu_ym",
+                    id: "mie",
                     name: "湮灭",
                     desc: "被战神图录湮灭之力压制",
                     duration: duration,
@@ -132,7 +168,7 @@ export default class extends SKILL {
 
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function (_me: CHARACTER, lv: number): string {
                 const mpPct = yanmie_mp_pct(lv);
                 return "一拳破天地，对敌人造成" + mpPct + "%最大内力的伤害后重置对方的所有附加的持续状态，减少对方的伤害和破防";
             },
@@ -143,7 +179,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 0,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const enemies = me.get_nearby_enemies();
                 if (!enemies.length) {
                     me.send_room("<hio>$N拳势凝聚，但四周并无敌人可破。", target);
@@ -163,7 +199,7 @@ export default class extends SKILL {
                 // 消耗当前内力
                 me.add_mp(-consumeMp);
 
-                me.send_room("<hio>$N怒喝一声，一拳轰出——破碎九重天！苍穹为之震颤，霸绝天地的拳劲横扫四方！</hio>\n", target);
+                me.send_room("<hio>$N怒喝一声，一拳轰出破碎九重天！苍穹为之震颤，霸绝天地的拳劲横扫四方！</hio>\n", target);
 
                 for (const enemy of enemies) {
                     // 造成同等伤害
@@ -182,7 +218,7 @@ export default class extends SKILL {
 
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function (_me: CHARACTER, lv: number): string {
                 const mpPct = posui9_mp_pct(lv);
                 return "消耗你" + mpPct + "%的当前内力，对附近敌人造成同等伤害，并使他们昏迷7秒。";
             },
@@ -194,6 +230,11 @@ export default class extends SKILL {
 // ═══════════════════════════════════════════
 // 战神图录 — 公共计算函数
 // ═══════════════════════════════════════════
+
+/** 震慑——降低防御/免伤%：10 + Math.floor(lv / 200) */
+function zhenshe_awe_pct(lv: number): number {
+    return 10 + Math.floor(lv / 200);
+}
 
 /** 战神决持续时间（毫秒） */
 function zhanshenjue_duration(_lv: number): number {

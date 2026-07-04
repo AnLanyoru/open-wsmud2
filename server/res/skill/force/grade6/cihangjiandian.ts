@@ -2,6 +2,7 @@ import {SKILL} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import { PropMap } from "../../../../types/props.js";
 
 export default class extends SKILL {
     name = "慈航剑典";
@@ -64,7 +65,7 @@ export default class extends SKILL {
                     prop: {
                         gjsd_per: -30,
                     },
-                    on_attach: (p: CHARACTER) => p.set_temp("cihang_lx", 1, duration),
+                    on_attach: (p: CHARACTER) => p.set_temp("cihang_lx", lingxi_extra_max(lv), duration),
                     on_expire: (p: CHARACTER) => p.remove_temp("cihang_lx"),
                     finish_msg: "<hic>$N从心有灵犀之境中退出。</hic>",
                 });
@@ -89,19 +90,22 @@ export default class extends SKILL {
 
                 me.send_room("<hio>$N双眸微阖，周身剑气冲霄，踏入「剑心通明」之境！万物破绽尽收眼底！</hio>\n", target);
 
+                const prop: PropMap = {
+                        distime_per: 100,
+                        releasetime_per: 100,
+                    };
+                const weapon = me.query_weapon();
+                if (weapon && weapon.weapon_type === "sword") {
+                    prop.diff_fy_per = swordPer;
+                }
                 me.add_status({
                     id: "force",
-                    name: "剑心通明",
+                    name: "剑心",
                     duration: duration,
                     override: 2,
-                    prop: {
-                        gjsd_per: -80,
-                        distime_per: -80,
-                        mz_per: 100,
-                        fy_per: 100,
-                    },
+                    prop,
                     on_attach: (p: CHARACTER) => {
-                        p.set_temp("cihang_jx", swordPer, duration);
+                        p.set_temp("cihang_jx", 1, duration);
                     },
                     on_expire: (p: CHARACTER) => p.remove_temp("cihang_jx"),
                     finish_msg: "<hio>$N剑心收敛，通明之境如潮退去。</hio>",
@@ -118,16 +122,21 @@ export default class extends SKILL {
         },
     };
 
+    on_before_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (me.query_temp("cihang_jx", 0)) {
+            par.no_dodge = true;
+            par.no_parry = true;
+        }
+    }
     /**
      * 心有灵犀——命中后触发多次攻击
      */
     on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
-        if (!me.query_temp("cihang_lx", 0)) return;
-
-        // 心有灵犀：额外触发1-2次攻击
-        const extraHits = 1 + Math.floor(Math.random() * 2);
+        const extra_hit = me.query_temp("cihang_lx", 0)
+        if (!extra_hit) return;
+        const extraHits = 1 + Math.floor(Math.random() * extra_hit);
         for (let i = 0; i < extraHits; i++) {
             if (target.hp <= 0) break;
             me.do_attack({
@@ -137,21 +146,6 @@ export default class extends SKILL {
                 attack_msg: "<hic>$N剑随心动，灵犀剑气寻隙而入</hic>",
             });
         }
-    }
-
-    /**
-     * 剑心通明——装备剑时增加伤害
-     */
-    on_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
-        const swordPer = me.query_temp("cihang_jx", 0);
-        if (swordPer > 0) {
-            const weapon = me.query_weapon();
-            if (weapon && weapon.weapon_type === "sword") {
-                if (!par.power_gj) par.power_gj = 0;
-                par.power_gj += Math.floor(me.gj * swordPer / 100);
-            }
-        }
-        return 0;
     }
 }
 
@@ -173,4 +167,9 @@ function jianxin_duration(lv: number): number {
 /** 剑心通明剑伤害加成%：30 + Math.floor(lv / 100) */
 function jianxin_sword_per(lv: number): number {
     return 30 + Math.floor(lv / 100);
+}
+
+/** 心有灵犀额外攻击次数上限：1 + lv / 1000 */
+function lingxi_extra_max(lv: number): number {
+    return 1 + int(lv / 1000);
 }

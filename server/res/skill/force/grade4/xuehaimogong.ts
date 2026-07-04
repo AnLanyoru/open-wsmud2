@@ -1,5 +1,5 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER } from "../../../../core/char/character.js";
 import type { LearnCondition } from "../../../../types/events.js";
 
@@ -24,8 +24,8 @@ export default class extends SKILL {
             query_needs: function (_lv: number) {
                 return [{
                     path: "book/wudao",
-                    count:  10
-                },{
+                    count: 10
+                }, {
                     path: "book/bc#xuehaimogong",
                     count: 25,
                 }];
@@ -117,10 +117,10 @@ export default class extends SKILL {
                     duration: dur,
                     ig_control: true,
                     on_attach: function (p: CHARACTER): void {
-                        p.set_temp("xhmg_xj_immune", 1, dur);
+                        p.add_event("on_die", si_bu_liao, dur);
                     },
                     on_expire: function (p: CHARACTER): void {
-                        p.remove_temp("xhmg_xj_immune");
+                        p.remove_event("on_die", si_bu_liao);
                         // 检查 slot：是否免虚弱
                         const noWeakness = p.query_prop("xhmg_xj_xr");
                         if (!noWeakness) {
@@ -162,18 +162,6 @@ export default class extends SKILL {
             },
         },
     };
-
-    /**
-     * 血祭状态下免疫死亡：当受到致命伤害时，保留至少1点气血。
-     */
-    on_damage(me: CHARACTER, sh: number, _from?: CHARACTER): number {
-        if (me.query_temp("xhmg_xj_immune", 0) > 0) {
-            if (sh >= me.hp) {
-                return Math.max(0, me.hp - 1);
-            }
-        }
-        return sh;
-    }
 }
 
 
@@ -194,4 +182,9 @@ function xuemo_per(lv: number): number {
 /** 血祭持续时间（毫秒）：4000+lv*5，封顶10000 */
 function xueji_dur(lv: number): number {
     return Math.min(10000, 4000 + lv * 5);
+}
+
+function si_bu_liao(me: CHARACTER): boolean {
+    me.hp = 2;
+    return false;
 }
