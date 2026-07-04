@@ -150,7 +150,7 @@ export default class extends SKILL {
                             demon.clone();
 
                             // 清除从目标继承的运行时状态
-                            demon.environment = undefined as unknown as typeof demon.environment;
+                            demon.environment = undefined;
                             demon.enemy = null;
                             demon.fight_type = 0;
                             demon.attack_handler = null;
