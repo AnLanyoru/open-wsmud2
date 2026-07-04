@@ -137,6 +137,7 @@ export default class extends SKILL {
                                 no_append: true,
                                 no_append_target: true,
                             });
+                            if (caster.end_attack(enemy)) break;
                         }
                     },
                     finish_msg: "风停花落，$N周身的寒气也敛去无踪。",

@@ -1750,7 +1750,27 @@ me.add_status({
         me.from_attack(100 * over_count, 999999, '', "<hir>$N毒发作了。</hir>");
     },
 });
+```
+
+> **⚠️ 重要：造成伤害后必须处理死亡/胜负判定。**
+>
+> - `from_attack` 内部自带 `die()` + `end_fight()` 判定，无需额外调用。
+> - `do_attack` / `damage` / `damage2` / `damage3` **没有**死亡判定——必须在调用后紧跟 `caster.end_attack(target)`，否则目标会带着负血量存活到下一轮普通攻击才死。
+> - 若有意非致命，应在伤害后手动 `if (p.hp < 0) p.hp = 1` 防止意外死亡。
+>
+> ```typescript
+> // ✅ 正确：damage/damage2/damage3/do_attack 后跟 end_attack
+>     caster.do_attack({ target: enemy, ... });
+>     caster.end_attack(enemy)
+>
+> // ✅ 也可用 from_attack（内部已处理死亡）
+> on_interval: function (me, over_count) {
+>     me.from_attack(damage, 999999, '', '<hir>...</hir>');
+> },
+> ```
+
 ---
+
 
 ## 16. 临时数据（temp）操作规范
 
@@ -2358,6 +2378,7 @@ console.log("debug:", lv, me.gj);            // 打印日志
 □ 绝招设置了 enable_skill、name、distime、mp
 □ 绝招的 use 函数签名正确
 □ 绝招中调用了 end_attack
+□ on_interval 内 do_attack/damage/damage2/damage3 后调用了 end_attack（from_attack 除外）
 □ 绝招对象用 PERFORM.fromPlain() 包装
 □ 学习条件中的技能 ID 存在
 □ family 引用了正确的门派常量

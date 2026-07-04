@@ -42,6 +42,7 @@ export default class extends SKILL {
                         from,
                     );
                     from.damage3(recoil, me);
+                    me.end_attack(from);
                 }
             }
         }
@@ -205,6 +206,7 @@ export default class extends SKILL {
                             "<hio>天地之力镇压，" + t.name + "受到" + dmg + "点伤害。</hio>\n",
                             t,
                         );
+                        me.end_attack(t);
                     },
                     start_msg: "<hio>$n被天地之力镇压，动弹不得！</hio>",
                     finish_msg: "<hio>$n终于挣脱了天地之力的镇压。</hio>",

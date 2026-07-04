@@ -43,6 +43,7 @@ export default class extends SKILL {
                     from,
                 );
                 from.damage3(recoil, me);
+                me.end_attack(from);
             }
         }
         return sh;
@@ -110,6 +111,7 @@ export default class extends SKILL {
                         on_interval: function(t: CHARACTER, _over_count: number): void {
                             const dmg = int(me.hp * pct / 400);
                             t.damage(dmg, me);
+                            me.end_attack(t);
                         },
                         start_msg: "<hir>$n被九阳真焰附体，浑身灼痛难当！</hir>",
                         finish_msg: "<hiy>$n身上的九阳真焰终于缓缓熄灭。</hiy>",

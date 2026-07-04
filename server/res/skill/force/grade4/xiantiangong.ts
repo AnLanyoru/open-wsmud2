@@ -76,6 +76,7 @@ export default class extends SKILL {
                     from,
                 );
                 from.damage3(recoil, me);
+                me.end_attack(from);
             }
         }
         return sh;

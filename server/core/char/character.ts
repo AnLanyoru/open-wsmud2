@@ -2507,8 +2507,8 @@ export class CHARACTER extends ITEM {
             return this.end_fight();
         } else if (target.hp <= 0 && target.die(this) !== false) {
             target.end_fight();
-            this.enemy!.remove(target);
-            if (!this.enemy!.length) {
+            this.enemy?.remove(target);
+            if (!this.enemy?.length) {
                 if (this.hp <= 0) {
                     this.hp = 1;
                 }
@@ -2567,9 +2567,9 @@ export class CHARACTER extends ITEM {
     do_attacks(par: any): void {
         let targets = par.targets;
         if (!targets) {
-            targets = new Array(this.enemy!.length);
-            for (let i = 0; i < this.enemy!.length; i++) {
-                targets[i] = this.enemy![i];
+            targets = new Array(this.enemy?.length || 0);
+            for (let i = 0; i < (this.enemy?.length || 0); i++) {
+                targets[i] = this.enemy?.[i];
             }
         }
         if (!targets.length) return;
