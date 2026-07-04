@@ -57,14 +57,12 @@ export default class extends SKILL {
             // 检查冷却（10分钟 = 600000ms）
             const lastTrigger = me.query_temp("csj_bm", 0);
             if (!lastTrigger) {
-                const healPct = bumie_heal_pct(lv);
-                const heal = int(me.max_hp * healPct / 100);
 
                 me.set_temp("csj_bm", 1, 600000); // 10分钟冷却
                 me.set_temp("csj_wd", 1, 10000); // 10秒无敌
 
                 me.send_room("<hio>$N体内长生真气应激而发，一股生生不息的力量自丹田涌出，伤势迅速愈合！</hio>\n");
-                me.add_hp(heal);
+                me.add_hp(me.max_hp);
             }
         }
         return sh;
@@ -148,11 +146,6 @@ export default class extends SKILL {
 // ═══════════════════════════════════════════
 // 长生诀 — 公共计算函数
 // ═══════════════════════════════════════════
-
-/** 不灭——恢复气血%：50 + Math.floor(lv / 100)，封顶80 */
-function bumie_heal_pct(lv: number): number {
-    return Math.min(80, 50 + Math.floor(lv / 100));
-}
 
 /** 混沌诀——持续时间（毫秒）：min(30秒, 3000 + lv * 10) */
 function hundun_duration(lv: number): number {
