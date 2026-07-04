@@ -1,14 +1,17 @@
-import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import {SKILL, PERFORM} from "../../../core/skill/skill.js";
+import {SKILL_TYPES} from "../../../core/const.js";
+import {FAMILIES} from "../../../core/skill/family.js";
+import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
     name = "诸天化身步";
     id = "zhutianbu3";
+    source_skill = "zhutianbu2";
     grade = 5;
+    family = FAMILIES.EMEI;
     is_hidden = true;
-    
+
     desc = "峨眉派轻功身法，如有千万化身。";
     can_enables = ["dodge"];
     slots = [
