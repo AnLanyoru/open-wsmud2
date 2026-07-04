@@ -2,6 +2,7 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
+import {NPC} from "../../../core/char/npc.js";
 
 export default class extends SKILL {
     name = "诸天剑诀";
@@ -142,8 +143,51 @@ export default class extends SKILL {
                         mz: me.mz,
                     })
                 ) {
-                    // TODO: 唤出心魔 — 对NPC造成伤害后召唤具有敌人大部分属性和技能的心魔
-                    // 心魔使用玩家 ratio 比例的气血内力上限，持续30秒，每分钟可召唤一个
+                    // 唤出心魔 — 对NPC造成伤害后召唤具有敌人大部分属性和技能的心魔
+                    if (!target.is_player && me.environment) {
+                        try {
+                            const demon = Object.create(target) as NPC;
+                            demon.clone();
+
+                            // 清除从目标继承的运行时状态
+                            demon.environment = undefined as unknown as typeof demon.environment;
+                            demon.enemy = null;
+                            demon.fight_type = 0;
+                            demon.attack_handler = null;
+                            demon.follow_target = null;
+                            demon.follow_targets = null;
+                            demon.team = null;
+
+                            // 使用玩家 ratio 比例的气血内力上限
+                            demon.max_hp = Math.floor(me.max_hp * ratio);
+                            demon.max_mp = Math.floor(me.max_mp * ratio);
+                            demon.hp = demon.max_hp;
+                            demon.mp = demon.max_mp;
+                            demon.name = target.name + "「<hir>心魔</hir>」";
+                            demon.recount();
+
+                            // 加入房间
+                            me.environment!.item_changed(demon, true,
+                                "<ord>$n的心魔被$N的佛光剥离而出，化作$N的护法！</ord>");
+
+                            // 攻击召唤者的当前敌人
+                            const enemy = me.query_enemy() || target;
+                            if (enemy && enemy.is_living()) {
+                                demon.do_kill(enemy);
+                            }
+
+                            // 30秒后消散
+                            me.call_out(() => {
+                                if (demon.environment) {
+                                    demon.destroy(
+                                        "<ord>" + demon.name + "发出一声不甘的嘶吼，消散于天地之间。</ord>",
+                                    );
+                                }
+                            }, 30000);
+                        } catch (_e) {
+                            // 克隆失败时静默处理
+                        }
+                    }
                 }
                 me.end_attack(target);
             },

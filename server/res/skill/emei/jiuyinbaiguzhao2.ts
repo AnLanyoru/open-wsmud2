@@ -52,7 +52,7 @@ export default class extends SKILL {
     }
 
     /**
-     * 九阴白骨爪 — 对方气血越低，伤害和命中越高
+     * 九阴白骨爪 — 对方气血越低，伤害和命中越高（仅拳脚攻击）
      * 每降低1%气血，伤害和命中 +1%（lv≥2000 时为 +2%）
      */
     on_before_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
