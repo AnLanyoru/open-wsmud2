@@ -29,15 +29,13 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'tgx_gj',
-            name: "踏歌·击",
-            value: (_lv: number) => 1000,
-            format: (_val: number) => '踏歌行额外提升自身攻击1000点',
+            value: (lv: number) => lv,
+            format: (val: number) => `踏歌行额外提升自身攻击${val}点`,
         },
         {
             prop: 'tgx_ds',
-            name: "踏歌·闪",
-            value: (_lv: number) => 1000,
-            format: (_val: number) => '踏歌行额外提升自身躲闪1000点',
+            value: (lv: number) => lv,
+            format: (val: number) => `踏歌行额外提升自身躲闪${val}点`,
         },
     ];
 
@@ -63,7 +61,7 @@ export default class extends SKILL {
                 const dsBonus = query_tgx_ds_bonus(lv) + me.query_prop("tgx_ds");
 
                 me.send_room(
-                    "<hiy>$N仰天大笑，解剑入鞘，竟于刀光剑影中纵声长歌——「</hiy><HIC>我歌月徘徊，我舞影零乱</HIC><hiy>」！霎时身形如太白醉月，步履踏歌，风雷隐隐，$N整个人与诗意融为一体，剑影刀光中独行如入无人之境！</hiy>",
+                    "<hiy>$N仰天大笑，解剑入鞘，竟于刀光剑影中纵声长歌——「<HIC>我歌月徘徊，我舞影零乱</HIC>」！霎时身形如太白醉月，步履踏歌，风雷隐隐，$N整个人与诗意融为一体，剑影刀光中独行如入无人之境！</hiy>",
                     target,
                 );
 

@@ -28,15 +28,13 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'hssf_ds',
-            name: "灵虚·闪",
-            value: (_lv: number) => 5,
-            format: (_val: number) => '灵虚额外增加5%躲闪',
+            value: (lv: number) => int(lv/200),
+            format: (val: number) => `灵虚额外增加${val}%躲闪`,
         },
         {
             prop: 'hssf_fy',
-            name: "灵虚·御",
-            value: (_lv: number) => 5,
-            format: (_val: number) => '灵虚额外增加5%防御',
+            value: (lv: number) => int(lv/200),
+            format: (val: number) => `灵虚额外增加${val}%防御`,
         },
     ];
 
