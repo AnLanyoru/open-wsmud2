@@ -132,7 +132,7 @@ export default class extends SKILL {
                                 gj: damage,
                                 no_dodge: true,
                                 attack_msg: "",
-                                damage_msg: "被夹杂着寒气的花瓣割出无数伤口",
+                                damage_msg: "<HIM>寒气刮过，$n被花瓣割出无数伤口</HIM>",
                                 no_append_before: true,
                                 no_append: true,
                                 no_append_target: true,

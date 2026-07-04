@@ -57,19 +57,19 @@ export default class extends SKILL {
                     let per = me.query_prop('dsy_sh1');
                     if (per > 0) {
                         if (per > 2) per = 2;
-                        gj = gj + me.gj * lv * per / 1000;
+                        gj += me.gj * lv * per / 1000;
                     }
                     per = me.query_prop('dsy_sh2');
                     if (per > 0) {
                         if (per > 2) per = 2;
-                        gj = gj + me.gj * lv2 * per / 1000;
+                        gj += me.gj * lv2 * per / 1000;
                     }
 
                     me.do_attack({
                         target: target,
                         gj: me.gj + gj,
                         mz: me.mz,
-                        attack_msg: "<HIY>面容庄重，单手携着劲风朝$n猛然拍出，正是密宗绝学「金刚印」</hiy>",
+                        attack_msg: "<HIY>$N面容庄重，单手携着劲风朝$n猛然拍出，正是密宗绝学「金刚印」</hiy>",
                         damage_msg: "<HIR>结果$p招架不及，被$P这一下打得七窍生烟，吐血连连。</hir>",
                         miss_msg: "<cyn>可是$p不慌不忙，一闪身躲开了$P的金刚印。</cyn>",
                         parry_msg: "<cyn>可是$p不慌不忙，巧妙的架开了$P的金刚印。</cyn>",
