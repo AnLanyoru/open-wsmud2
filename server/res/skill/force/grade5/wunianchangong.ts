@@ -138,7 +138,3 @@ function bikou_dmg_pct(lv: number): number {
 function bikou_forbid_time(lv: number): number {
     return Math.min(17000, 2000 + lv * 10);
 }
-
-function toSec(ms: number): string {
-    return (ms / 1000) + "秒";
-}
