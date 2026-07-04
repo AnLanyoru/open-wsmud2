@@ -15,7 +15,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         const fyHpPer = 5 + Math.floor(lv / 100);
         const shPer = 5 + Math.floor(lv / 200);
-        const awePct = 10 + Math.floor(lv / 200);
+        const awePct = zhenshe_awe_pct(lv);
         return {
             force: {
                 fy_per: fyHpPer,
@@ -25,6 +25,32 @@ export default class extends SKILL {
                 desc: "震慑：降低附近敌人" + awePct + "%的伤害\n不灭：当你的气血降低到10%时候会恢复大量气血，并短时间无视伤害，冷却10分钟\n唯一：将你内力的150%转化为气血",
             },
         };
+    }
+
+    /**
+     * 震慑——降低附近敌人的伤害
+     */
+    on_beginfight(me: CHARACTER, target: CHARACTER): void {
+        const lv = me.query_skill("changshengjue", 0);
+        if (lv <= 0) return;
+        const awePct = zhenshe_awe_pct(lv);
+        const enemies = me.get_nearby_enemies();
+        if (!enemies.length) return;
+        me.send_room("<hio>$N体内长生真气激荡，一股浩瀚威压笼罩四周！</hio>");
+        for (const enemy of enemies) {
+            enemy.add_status({
+                id: "csj_zs",
+                name: "震慑",
+                desc: "被长生诀震慑",
+                duration: 0,
+                downside: true,
+                no_diff: true,
+                only_combat: true,
+                prop: {
+                    add_sh_per: -awePct,
+                }
+            }, me);
+        }
     }
 
     /**
@@ -150,6 +176,11 @@ export default class extends SKILL {
 /** 混沌诀——持续时间（毫秒）：min(30秒, 3000 + lv * 10) */
 function hundun_duration(lv: number): number {
     return Math.min(30000, 3000 + lv * 10);
+}
+
+/** 震慑——降低伤害%：10 + Math.floor(lv / 200) */
+function zhenshe_awe_pct(lv: number): number {
+    return 10 + Math.floor(lv / 200);
 }
 
 /** 混沌诀——单次伤害上限%：max(3, 15 - Math.floor(lv / 400)) */
