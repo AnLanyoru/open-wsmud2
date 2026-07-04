@@ -16,7 +16,7 @@ export default class extends COMMAND {
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me: USER, arg: string) {
-        var target = me;
+        var target: CHARACTER = me;
         var isfollower = false;
         if (arg) {
             if (arg == "none") return me.notify('{"type":"dialog","dialog":"skills","limit":' + me.skill_limit() + "}");
