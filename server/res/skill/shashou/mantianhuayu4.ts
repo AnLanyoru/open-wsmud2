@@ -60,7 +60,7 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
-                return `代天行法，发起审判，使敌人${toSec(shenpan_time(lv))}秒内无法移动`;
+                return `代天行法，发起审判，使敌人无法移动`;
             },
         },
         fa: {
@@ -79,7 +79,7 @@ export default class extends SKILL {
                 }
                 const par: DoAttackPar = {
                     target: target,
-                    gj: me.gj + extra_gj,
+                    gj: Math.floor(me.gj * extra_gj / 100),
                     mz: me.mz,
                     attack_msg: is_shenpan
                         ? "<ord>$N周身雷光如狱，引九天紫雷贯顶而下，直劈$n！</ord>"
@@ -92,14 +92,14 @@ export default class extends SKILL {
                 };
                 if (is_shenpan) {
                     par.no_dodge = true;
-                    par.bj = 100;
+                    par.cirt = () => true;
                 }
                 me.do_attack(par);
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const extra: number = tianfa_extra_gj(lv, true);
-                return `使用暗器引天雷攻击敌人，对审判中的敌人附加${extra}攻击力并无法抵抗暴击`;
+                return `使用暗器引天雷攻击敌人，对审判中的敌人造成额外伤害并无法抵抗暴击`;
             },
         },
     };
@@ -113,8 +113,9 @@ export function shenpan_time(lv: number): number {
     return t > 15000 ? 15000 : t;
 }
 
-/** 天罚额外攻击力（对审判目标） */
+/** 天罚额外攻击倍率（对审判目标），倍率 + 额外倍率 */
 export function tianfa_extra_gj(lv: number, is_shenpan: boolean): number {
-    if (!is_shenpan) return 0;
-    return lv + 100;
+    const base: number = int(100 + lv / 20);
+    if (!is_shenpan) return base;
+    return base * 2;
 }
