@@ -48,7 +48,7 @@ export default class extends SKILL {
                     is_throwing: true,
                 });
                 target.add_status({
-                    id: "rash",
+                    id: "shenpan",
                     name: "审判",
                     desc: "被天谕法印镇压，无法移动",
                     duration: time,
@@ -56,12 +56,6 @@ export default class extends SKILL {
                     downside: true,
                     finish_msg: "<ord>$N周身金光碎裂，审判法印终于消散。</ord>\n",
                     start_msg: "<ord>$N周身金光大盛，已被天谕法印镇压！</ord>\n",
-                    on_attach: function (p: CHARACTER): void {
-                        p.set_temp("sk_shenpan", 1, time);
-                    },
-                    on_expire: function (p: CHARACTER): void {
-                        p.remove_temp("sk_shenpan");
-                    },
                 }, me);
                 me.end_attack(target);
             },
@@ -76,7 +70,7 @@ export default class extends SKILL {
             mp: 1910,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                const is_shenpan: boolean = !!target.query_temp("sk_shenpan", 0);
+                const is_shenpan: boolean = !!target.query_status("shenpan");
                 const extra_gj: number = tianfa_extra_gj(lv, is_shenpan);
                 if (is_shenpan) {
                     me.send_room("<ord>$N仰天长啸，双手指天——「天谕既出，天罚当至！」</ord>\n<ord>九天之上雷云骤聚，万道紫雷如怒龙般狂啸而下！</ord>\n", target);
