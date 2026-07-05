@@ -100,7 +100,7 @@ export default class extends SKILL {
 }
 
 function calcJianmangBj(lv: number): number {
-    return 2 + int(lv / 200);
+    return 3 + int(lv / 200);
 }
 
 function calcJianmangDuration(lv: number): number {

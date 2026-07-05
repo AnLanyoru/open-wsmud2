@@ -131,9 +131,7 @@ export default class extends SKILL {
 }
 
 function wuxingFaintTime(lv: number): number {
-    var time = 2500 + lv * 4.5;
-    if (time > 7000) time = 7000;
-    return time;
+    return 2000 + lv * 5;
 }
 
 function liumaiMzReduce(lv: number): number {
