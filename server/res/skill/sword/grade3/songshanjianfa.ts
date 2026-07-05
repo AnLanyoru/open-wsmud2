@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "songshanjianfa";
     grade = 3;
     
-    desc = "嵩山派绝学，剑法气象森严，端严雄伟。";
+    desc = "嵩山派绝学，剑法气象森严，端严雄伟。(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

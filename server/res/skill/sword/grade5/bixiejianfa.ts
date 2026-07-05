@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "bixiejianfa";
     grade = 5;
     
-    desc = "渡元禅师从葵花宝典残本中领悟出来的一套剑法，迅捷诡异";
+    desc = "渡元禅师从葵花宝典残本中领悟出来的一套剑法，迅捷诡异(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     learn_condition = {

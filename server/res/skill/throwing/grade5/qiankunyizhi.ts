@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "qiankunyizhi  ";
     grade = 5;
     
-    desc = "消耗自身金钱催动真气，金钱越多伤害越高。";
+    desc = "消耗自身金钱催动真气，金钱越多伤害越高。(未完善)";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];
 

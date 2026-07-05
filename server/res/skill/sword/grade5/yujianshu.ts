@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "yujianshu ";
     grade = 5;
     
-    desc = "蜀山立派之本，以气驭剑，人剑合一";
+    desc = "蜀山立派之本，以气驭剑，人剑合一(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
 

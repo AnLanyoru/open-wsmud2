@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "yunvsuxinjian";
     grade = 3;
     
-    desc = "古墓派武学，玉女剑法与全真剑法合璧而成";
+    desc = "古墓派武学，玉女剑法与全真剑法合璧而成(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

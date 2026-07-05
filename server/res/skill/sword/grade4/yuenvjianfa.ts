@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "yuenvjianfa";
     grade = 4;
     
-    desc = "传说是古代一位女子所创，剑势轻盈灵动如猿猱穿林，迅捷中暗藏杀机。";
+    desc = "传说是古代一位女子所创，剑势轻盈灵动如猿猱穿林，迅捷中暗藏杀机。(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

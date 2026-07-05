@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "qixianwuxingjian";
     grade = 4;
     
-    desc = "梅庄大庄主黄钟公所创绝技，以琴音为剑，无形无质却暗藏杀机，可伤人于无形之中";
+    desc = "梅庄大庄主黄钟公所创绝技，以琴音为剑，无形无质却暗藏杀机，可伤人于无形之中(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

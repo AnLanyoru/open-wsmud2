@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "wudugoufa";
     grade = 3;
     
-    desc = "五毒教的高级剑法，阴狠毒辣";
+    desc = "五毒教的高级剑法，阴狠毒辣(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

@@ -9,7 +9,7 @@ export default class extends SKILL {
     grade = 5;
     is_hidden = true;
     
-    desc = "无";
+    desc = "无(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

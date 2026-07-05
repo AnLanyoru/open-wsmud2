@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "cuixinzhang";
     grade = 3;
     
-    desc = "催心掌乃是青城绝学，中此掌者，外在并无任何伤痕，但内里的五脏六腑已然碎裂";
+    desc = "催心掌乃是青城绝学，中此掌者，外在并无任何伤痕，但内里的五脏六腑已然碎裂(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

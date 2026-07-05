@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "hengshanwushenjian";
     grade = 3;
     
-    desc = "衡山派的绝技，因紫盖、芙蓉、石廪、祝融、天柱五峰而得名";
+    desc = "衡山派的绝技，因紫盖、芙蓉、石廪、祝融、天柱五峰而得名(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

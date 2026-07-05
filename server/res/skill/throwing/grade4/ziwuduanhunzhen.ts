@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "ziwuduanhunzhen";
     grade = 4;
     
-    desc = "药王谷秘传暗器手法，专打周身大穴，中者经脉受损。";
+    desc = "药王谷秘传暗器手法，专打周身大穴，中者经脉受损。(未完善)";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];
     slots = [

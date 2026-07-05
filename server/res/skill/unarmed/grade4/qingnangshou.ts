@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "qingnangshou";
     grade = 4;
     
-    desc = "药王谷独门拳脚功夫，糅合医术点穴之法，刚柔并济暗藏玄机。";
+    desc = "药王谷独门拳脚功夫，糅合医术点穴之法，刚柔并济暗藏玄机。(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "tanzhishengong";
     grade = 4;
     
-    desc = "桃花岛的绝技，弹指神通";
+    desc = "桃花岛的绝技，弹指神通(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

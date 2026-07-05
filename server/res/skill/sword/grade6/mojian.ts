@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "mojian";
     grade = 6;
     
-    desc = "剑魔独孤求败以剑入魔后使用的剑法";
+    desc = "剑魔独孤求败以剑入魔后使用的剑法(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
 

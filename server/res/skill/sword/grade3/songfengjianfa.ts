@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "songfengjianfa";
     grade = 3;
     
-    desc = "青城派绝学：如松之劲，如风之迅。剑法讲究快且劲，走的是灵巧一脉的剑法。";
+    desc = "青城派绝学：如松之劲，如风之迅。剑法讲究快且劲，走的是灵巧一脉的剑法。(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

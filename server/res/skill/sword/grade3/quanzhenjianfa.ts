@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "quanzhenjianfa";
     grade = 3;
     
-    desc = "全真教的镇派剑法";
+    desc = "全真教的镇派剑法(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

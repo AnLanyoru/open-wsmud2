@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "hamagong";
     grade = 4;
     
-    desc = "白驼山的内功心法";
+    desc = "白驼山的内功心法(未完善)";
     can_enables = ["unarmed","force"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     learn_condition = {

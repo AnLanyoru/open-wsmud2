@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "qishangquan";
     grade = 3;
     
-    desc = "金毛狮王谢逊习自崆峒派的绝技，伤敌一百自损八十";
+    desc = "金毛狮王谢逊习自崆峒派的绝技，伤敌一百自损八十(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

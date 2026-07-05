@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "dasongyangshenzhang";
     grade = 3;
     
-    desc = "大嵩阳神掌乃是嵩山派绝学，以变化繁复，出手迅捷见称。";
+    desc = "大嵩阳神掌乃是嵩山派绝学，以变化繁复，出手迅捷见称。(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "anranxiaohun";
     grade = 5;
     
-    desc = "神雕大侠杨过和小龙女分开后，因为刻骨思念之情而创出的一路掌法，黯然销魂者，唯别而已矣";
+    desc = "神雕大侠杨过和小龙女分开后，因为刻骨思念之情而创出的一路掌法，黯然销魂者，唯别而已矣(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

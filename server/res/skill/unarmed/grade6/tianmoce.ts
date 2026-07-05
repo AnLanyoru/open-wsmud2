@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "tianmoce";
     grade = 6;
     
-    desc = "魔门一系最高深的功法";
+    desc = "魔门一系最高深的功法(未完善)";
     can_enables = ["unarmed","dodge","force","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "daidaokuilei ";
     grade = 3;
     
-    desc = "带刀傀儡";
+    desc = "带刀傀儡(未完善)";
     can_enables = [];
 
     query_enable_prop(lv: number): EnablePropMap {

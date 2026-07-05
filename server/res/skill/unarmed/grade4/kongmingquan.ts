@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "kongmingquan";
     grade = 4;
     
-    desc = "周伯通在桃花岛自创的一套拳法";
+    desc = "周伯通在桃花岛自创的一套拳法(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     learn_condition = {

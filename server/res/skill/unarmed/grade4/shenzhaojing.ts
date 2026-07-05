@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "shenzhaojing";
     grade = 4;
     
-    desc = "无";
+    desc = "无(未完善)";
     can_enables = ["unarmed","force"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     learn_condition = {

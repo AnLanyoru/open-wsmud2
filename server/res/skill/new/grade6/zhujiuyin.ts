@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "zhujiuyin";
     grade = 6;
     
-    desc = "烛九阴的功法";
+    desc = "烛九阴的功法(未完善)";
     can_enables = [];
 
     query_enable_prop(lv: number): EnablePropMap {

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "shenjianjue";
     grade = 2;
     
-    desc = "卓不凡在长白山得到剑谱,苦练二十年，自觉天下无敌,自称剑神";
+    desc = "卓不凡在长白山得到剑谱,苦练二十年，自觉天下无敌,自称剑神(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

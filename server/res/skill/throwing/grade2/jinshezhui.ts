@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "jinshezhui";
     grade = 2;
     
-    desc = "金蛇郎君创造的一门暗器功法";
+    desc = "金蛇郎君创造的一门暗器功法(未完善)";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];
     slots = [

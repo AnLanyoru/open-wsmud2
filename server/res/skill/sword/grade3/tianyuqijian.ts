@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "tianyuqijian";
     grade = 3;
     
-    desc = "飘渺峰灵鹫宫的剑法绝技";
+    desc = "飘渺峰灵鹫宫的剑法绝技(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

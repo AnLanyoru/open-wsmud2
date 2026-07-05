@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "zhenyanshouyin";
     grade = 5;
     
-    desc = "九字真言手印含天地之秘，通过人体而与宇宙沟通，达致天人合一之境，明心见性，即身成佛。";
+    desc = "九字真言手印含天地之秘，通过人体而与宇宙沟通，达致天人合一之境，明心见性，即身成佛。(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

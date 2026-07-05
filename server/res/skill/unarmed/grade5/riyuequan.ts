@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "riyuequan";
     grade = 5;
     
-    desc = "日月神教NPC使用的拳脚";
+    desc = "日月神教NPC使用的拳脚(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

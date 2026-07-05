@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "hengshanjianfa";
     grade = 3;
     
-    desc = "绵密严谨，长于守御，而往往是在最令人出其不意之处突出杀招，剑法绵密有余，凌厉不足，正是适于女子所使用的武功。";
+    desc = "绵密严谨，长于守御，而往往是在最令人出其不意之处突出杀招，剑法绵密有余，凌厉不足，正是适于女子所使用的武功。(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
     slots = [

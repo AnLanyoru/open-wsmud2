@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "feixingshu";
     grade = 2;
     
-    desc = "星宿派的暗器手法";
+    desc = "星宿派的暗器手法(未完善)";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];
     slots = [

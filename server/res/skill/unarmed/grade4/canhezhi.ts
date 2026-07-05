@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "canhezhi";
     grade = 4;
     
-    desc = "慕容世家的一式家传指法";
+    desc = "慕容世家的一式家传指法(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

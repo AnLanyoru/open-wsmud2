@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "xuanmingshenzhang ";
     grade = 4;
     
-    desc = "玄冥二老鹿杖客、鹤笔翁的独门绝学，掌力阴寒歹毒，中者经脉尽冻，血肉凝冰";
+    desc = "玄冥二老鹿杖客、鹤笔翁的独门绝学，掌力阴寒歹毒，中者经脉尽冻，血肉凝冰(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

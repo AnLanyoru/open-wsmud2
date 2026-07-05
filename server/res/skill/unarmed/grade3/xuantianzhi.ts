@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "xuantianzhi";
     grade = 3;
     
-    desc = "梅庄二庄主黑白子的得意绝技，指力阴寒强劲，可隔空点穴，伤人于丈许之外";
+    desc = "梅庄二庄主黑白子的得意绝技，指力阴寒强劲，可隔空点穴，伤人于丈许之外(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "sanyinzhua";
     grade = 3;
     
-    desc = "星宿派的拳脚功夫，阴狠毒辣";
+    desc = "星宿派的拳脚功夫，阴狠毒辣(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

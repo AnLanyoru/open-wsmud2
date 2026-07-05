@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "sanjiuxuangong ";
     grade = 5;
     
-    desc = "玄门正宗内功，融炼气、护体、降妖于一体，真气护体可御万邪。";
+    desc = "玄门正宗内功，融炼气、护体、降妖于一体，真气护体可御万邪。(未完善)";
     can_enables = ["unarmed","force"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 

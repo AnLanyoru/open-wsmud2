@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "taishanquanfa";
     grade = 2;
     
-    desc = "泰山派的拳法功夫";
+    desc = "泰山派的拳法功夫(未完善)";
     can_enables = ["unarmed","parry"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
     slots = [

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "leitingfufa";
     grade = 2;
     
-    desc = "传说中已经消失的开山门绝学，招式大开大合，刚猛无匹";
+    desc = "传说中已经消失的开山门绝学，招式大开大合，刚猛无匹(未完善)";
     can_enables = ["staff"];
     attack_actions = SKILL.get("staff")?.attack_actions || [];
     learn_condition = {

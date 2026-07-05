@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "fuyujianfa";
     grade = 6;
     
-    desc = "浪翻云依据洞庭湖水性而自创的剑法，如行云流水，惊涛骇浪";
+    desc = "浪翻云依据洞庭湖水性而自创的剑法，如行云流水，惊涛骇浪(未完善)";
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
 

@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "shenghuojianfa";
     grade = 2;
     
-    desc = "明教的一门记载在圣火令上的剑法";
+    desc = "明教的一门记载在圣火令上的剑法(未完善)";
     can_enables = ["sword"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
 

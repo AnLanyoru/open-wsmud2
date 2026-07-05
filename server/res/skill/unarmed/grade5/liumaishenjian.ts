@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = "liumaishenjian";
     grade = 5;
     
-    desc = "大理段氏所藏有的超强剑气绝学，能够以指尖激荡出破体剑气伤人于无形";
+    desc = "大理段氏所藏有的超强剑气绝学，能够以指尖激荡出破体剑气伤人于无形(未完善)";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
 
