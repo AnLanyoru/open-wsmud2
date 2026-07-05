@@ -9,30 +9,6 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
  *
  * 数据来源：正式服 checkskill xianglongzhang3
  */
-
-// 共享计算函数 — 保证 query_desc 与实际效果一致性
-
-/** 降龙：无法防御/躲闪时间 (ms) */
-function qiBusyTime3(lv: number): number {
-    const t = 2000 + lv * 5;
-    if (t > 8000) return 8000;
-    return t;
-}
-
-/** 十八掌：总释放时间 (ms) */
-function shibaDuration3(lv: number): number {
-    const t = 12000 - lv * 2;
-    if (t < 8000) return 8000;
-    return t;
-}
-
-/** 十八掌：每掌伤害递增百分比（用于乘法因子） */
-function shibaFactor3(lv: number): number {
-    const f = 105 + int(lv / 500);
-    if (f > 115) return 115;
-    return f;
-}
-
 export default class extends SKILL {
     name = "降龙十八掌";
     id = "xianglongzhang3";
@@ -203,4 +179,27 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+// 共享计算函数 — 保证 query_desc 与实际效果一致性
+
+/** 降龙：无法防御/躲闪时间 (ms) */
+function qiBusyTime3(lv: number): number {
+    const t = 2000 + lv * 5;
+    if (t > 8000) return 8000;
+    return t;
+}
+
+/** 十八掌：总释放时间 (ms) */
+function shibaDuration3(lv: number): number {
+    const t = 12000 - lv * 2;
+    if (t < 8000) return 8000;
+    return t;
+}
+
+/** 十八掌：每掌伤害递增百分比（用于乘法因子） */
+function shibaFactor3(lv: number): number {
+    const f = 105 + int(lv / 500);
+    if (f > 115) return 115;
+    return f;
 }

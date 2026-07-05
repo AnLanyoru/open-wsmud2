@@ -8,49 +8,6 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
  *
  * 数据来源：正式服 checkskill xianglongzhang4
  */
-
-// 共享计算函数 — 保证 query_desc 与实际效果一致性
-
-/** 降龙：debuff 持续时间 (ms) */
-function qiDebuffTime(_lv: number): number {
-    return 5000; // 短时间 = 5秒
-}
-
-/** 破灭：消耗内力百分比 */
-function poMpPercent(lv: number): number {
-    return Math.min(30, 10 + int(lv / 100));
-}
-
-/** 摧毁层数阈值 */
-const DESTROY_THRESHOLD = 3;
-
-/** 获取目标身上的摧毁层数 */
-function getDestroyCount(target: CHARACTER): number {
-    return target.query_temp("xlz4_ch", 0);
-}
-
-/** 对目标施加一层摧毁 */
-function addDestroyStack(target: CHARACTER, from: CHARACTER): void {
-    const count = getDestroyCount(target) + 1;
-    const duration = 30000; // 30秒持续时间
-    target.set_temp("xlz4_ch", count, duration);
-    // 每层摧毁降低防御
-    target.add_status({
-        id: "pofang",
-        name: "瓦解",
-        duration: duration,
-        downside: true,
-        override: 1,
-        count: count,
-        max_count: 10,
-        prop: {
-            fy_per: -2 * count,
-            diff_sh_per: -2 * count,
-        },
-        desc: "降龙掌劲正逐步瓦解你的防御，防御降低",
-    }, from);
-}
-
 export default class extends SKILL {
     name = "降龙掌";
     id = "xianglongzhang4";
@@ -88,7 +45,7 @@ export default class extends SKILL {
                 str: lv * 1,
                 con: lv * 1,
                 gj_per: 5 + int(lv / 200),
-                desc: "摧毁命中敌人后逐步瓦解敌方防御",
+                desc: "摧毁：命中敌人后逐步瓦解敌方防御",
             },
         };
     }
@@ -219,4 +176,45 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+// 共享计算函数 — 保证 query_desc 与实际效果一致性
+
+/** 降龙：debuff 持续时间 (ms) */
+function qiDebuffTime(_lv: number): number {
+    return 5000;
+}
+
+/** 破灭：消耗内力百分比 */
+function poMpPercent(lv: number): number {
+    return Math.min(30, 10 + int(lv / 100));
+}
+
+/** 摧毁层数阈值 */
+const DESTROY_THRESHOLD = 3;
+
+/** 获取目标身上的摧毁层数 */
+function getDestroyCount(target: CHARACTER): number {
+    return target.query_temp("xlz4_ch", 0);
+}
+
+/** 对目标施加一层摧毁 */
+function addDestroyStack(target: CHARACTER, from: CHARACTER): void {
+    const count = getDestroyCount(target) + 1;
+    const duration = 30000;
+    target.set_temp("xlz4_ch", count, duration);
+    target.add_status({
+        id: "pofang",
+        name: "瓦解",
+        duration: duration,
+        downside: true,
+        override: 1,
+        count: count,
+        max_count: 10,
+        prop: {
+            fy_per: -2 * count,
+            diff_sh_per: -2 * count,
+        },
+        desc: "降龙掌劲正逐步瓦解你的防御，防御降低",
+    }, from);
 }

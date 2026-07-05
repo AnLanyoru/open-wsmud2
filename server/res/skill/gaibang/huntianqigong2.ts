@@ -8,23 +8,6 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
  *
  * 数据来源：正式服 checkskill huntianqigong2
  */
-
-// 共享计算函数 — 保证 query_desc 与实际效果一致性
-
-/** 天罡：持续时间 (ms) */
-function tianDuration(lv: number): number {
-    const t = 10000 + lv * 10;
-    if (t > 15000) return 15000;
-    return t;
-}
-
-/** 天罡：攻击免伤百分比（基础值，未计算进阶加成） */
-function tianBaseProp(lv: number): number {
-    const p = 10 + int(lv / 100);
-    if (p > 40) return 40;
-    return p;
-}
-
 export default class extends SKILL {
     name = "混元天罡";
     id = "huntianqigong2";
@@ -98,4 +81,20 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+// 共享计算函数 — 保证 query_desc 与实际效果一致性
+
+/** 天罡：持续时间 (ms) */
+function tianDuration(lv: number): number {
+    const t = 10000 + lv * 10;
+    if (t > 15000) return 15000;
+    return t;
+}
+
+/** 天罡：攻击免伤百分比（基础值，未计算进阶加成） */
+function tianBaseProp(lv: number): number {
+    const p = 10 + int(lv / 100);
+    if (p > 40) return 40;
+    return p;
 }

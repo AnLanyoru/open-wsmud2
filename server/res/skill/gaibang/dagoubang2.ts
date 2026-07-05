@@ -8,28 +8,6 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
  *
  * 数据来源：正式服 checkskill dagoubang2
  */
-
-// 共享计算函数 — 保证 query_desc 与实际效果一致性
-
-/** 绊字诀：忙乱时间 (ms) */
-function chanBusyTime(lv: number): number {
-    const t = 3000 + lv * 5;
-    if (t > 13000) return 13000;
-    return t;
-}
-
-/** 绊字诀：躲闪降低百分比 */
-function chanDsReduce(lv: number): number {
-    return 10 + int(lv / 100);
-}
-
-/** 天下无狗：攻击次数 */
-function wuCount(lv: number): number {
-    const c = 3 + int(lv / 300);
-    if (c > 10) return 10;
-    return c;
-}
-
 export default class extends SKILL {
     name = "打狗棒";
     id = "dagoubang2";
@@ -125,4 +103,25 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+// 共享计算函数 — 保证 query_desc 与实际效果一致性
+
+/** 绊字诀：忙乱时间 (ms) */
+function chanBusyTime(lv: number): number {
+    const t = 3000 + lv * 5;
+    if (t > 13000) return 13000;
+    return t;
+}
+
+/** 绊字诀：躲闪降低百分比 */
+function chanDsReduce(lv: number): number {
+    return 10 + int(lv / 100);
+}
+
+/** 天下无狗：攻击次数 */
+function wuCount(lv: number): number {
+    const c = 3 + int(lv / 300);
+    if (c > 10) return 10;
+    return c;
 }

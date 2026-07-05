@@ -8,19 +8,6 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
  *
  * 数据来源：正式服 checkskill xiaoyaoyou2
  */
-
-// 共享计算函数 — 保证 query_desc 与实际效果一致性
-
-/** 仙游：持续时间 (ms) */
-function xianDuration(lv: number): number {
-    return 10000 + lv * 10;
-}
-
-/** 仙游：命中增加百分比 */
-function xianMzPer(lv: number): number {
-    return 20 + int(lv / 100);
-}
-
 export default class extends SKILL {
     name = "逍遥游";
     id = "xiaoyaoyou2";
@@ -100,4 +87,16 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+// 共享计算函数 — 保证 query_desc 与实际效果一致性
+
+/** 仙游：持续时间 (ms) */
+function xianDuration(lv: number): number {
+    return 10000 + lv * 10;
+}
+
+/** 仙游：命中增加百分比 */
+function xianMzPer(lv: number): number {
+    return 20 + int(lv / 100);
 }
