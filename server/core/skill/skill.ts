@@ -168,45 +168,90 @@ export class SKILL extends BASE {
     on_enemy_die?(me: CHARACTER, target: CHARACTER): void;
 
     // ============ 战斗回调（由资源文件设置） ============
+    //
+    // 每个回调注释标注了：
+    //   所属槽位 — 该方法注册在哪种技能上才会被框架调用
+    //   触发时机 — 在 do_attack() 流程的哪个阶段触发
+    //   触发条件 — 什么情况下会/不会触发
+    //
+    // ====== 攻击方回调 ======
 
-    /** 战斗开始回调 */
+    /** [攻击技能] 战斗开始回调
+     *  触发时机：begin_fight() 初次进入战斗
+     *  触发条件：this.force_skill 存在时也会被调用，即内功也可注册此回调 */
     on_beginfight?(me: CHARACTER, target: CHARACTER): void;
-    /** 攻击前回调（每轮） */
+    /** [攻击技能] 攻击前回调（每轮出招前）
+     *  触发时机：do_attack() 最开始，伤害计算之前
+     *  触发条件：throw 攻击不触发；par.no_append_before 时跳过。
+     *  内功也可注册此回调（force_skill.on_before_attack 同样会被调用）。 */
     on_before_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void;
-    /** 攻击回调（返回额外伤害） */
+    /** [攻击技能] 攻击回调（返回额外伤害）
+     *  触发时机：do_attack() 伤害计算阶段，命中且未招架时
+     *  触发条件：throw 攻击不触发；仅在攻击技能（attack_skill / noweapon_skill）上注册有效，内功不会触发此回调 */
     on_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
-    /** 攻击结束回调（一轮后） */
+    /** [攻击技能] 攻击结束回调（一轮伤害结算后）
+     *  触发时机：do_attack() 末尾，伤害已造成之后
+     *  触发条件：par.no_append 时跳过；仅在攻击技能上注册有效，内功请使用 on_force_over */
     on_attack_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
-    /** 一轮攻击完全结束回调 */
+    /** [攻击技能] 一轮攻击完全结束回调
+     *  触发时机：回合收尾阶段，在 end_attack() 中调用
+     *  触发条件：仅在攻击方有 fight_type 时，调用 attack_skill.on_end_attack */
     on_end_attack?(me: CHARACTER, target: CHARACTER): void;
-    /** 内功攻击回调（返回内功伤害） */
+
+    // ====== 内功回调 ======
+
+    /** [内功] 内功攻击回调（返回内功附加伤害）
+     *  触发时机：do_attack() 伤害计算阶段，在攻击技能 on_attack 之后
+     *  触发条件：仅内功（force_skill）注册有效 */
     do_force_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
-
-    /** 内功招架回调（返回减免伤害） */
+    /** [内功] 内功招架回调（返回减免伤害值）
+     *  触发时机：do_attack() 伤害计算阶段，对方内功附加伤害之后
+     *  触发条件：仅受击方的 force_skill 注册有效 */
     on_force_parry?(target: CHARACTER, me: CHARACTER, sh: number, par: DoAttackPar): number;
-
-    /** 内功攻击结束回调 */
+    /** [内功] 内功攻击结束回调（一轮伤害结算后）
+     *  触发时机：do_attack() 末尾，攻击技能 on_attack_over 之后
+     *  触发条件：par.no_append 时跳过；仅内功（force_skill）注册有效 */
     on_force_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
-    /** 受到伤害回调（返回减免后伤害） */
+    /** [内功] 受到伤害回调（返回减免后伤害值）
+     *  触发时机：damage() 计算免伤时
+     *  触发条件：sh > 0 时触发；仅受击方的 force_skill 注册有效 */
     on_damage?(me: CHARACTER, sh: number, from?: CHARACTER): number;
-    /** 闪避回调 */
-    on_dodge?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
-    /** 闪避结束回调 */
-    on_dodge_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
-    /** 招架回调 */
-    on_parry?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
-    /** 招架结束回调 */
-    on_parry_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
-    /** 绝招招架回调（返回是否招架成功）
-     * @param sk 基础技能 sid
-     */
-    on_parry_pfm?(target: CHARACTER, me: CHARACTER, pfm: PERFORM, level: number, sk?: string): boolean;
-    /** 重算闪避回调（由资源文件动态注入） */
-    on_recount_dodge?(me: CHARACTER): number;
-    /** 重算招架回调（由资源文件动态注入） */
-    on_recount_parry?(me: CHARACTER): number;
-    /** 内功转血比例 */
+    /** [内功] 内功气血转化比例
+     *  取值 0~1，表示将内力的该比例转化为额外气血
+     *  仅内功注册有效 */
     force_rad?: number;
+
+    // ====== 受击方回调（闪避/招架） ======
+
+    /** [轻功] 闪避回调
+     *  触发时机：do_attack() 中判定闪避成功时
+     *  触发条件：仅受击方的 dodge_skill 注册有效；闪避失败不触发 */
+    on_dodge?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
+    /** [轻功] 闪避结束回调（无论是否闪避成功）
+     *  触发时机：do_attack() 末尾，伤害结算之后
+     *  触发条件：par.no_append_target 时跳过；受击方无 fight_type 时跳过；仅 dodge_skill 注册有效 */
+    on_dodge_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
+    /** [招架] 招架回调
+     *  触发时机：do_attack() 中攻击未闪避且受击方未忙碌/眩晕时
+     *  触发条件：par.no_parry 时跳过；仅受击方的 parry_skill 注册有效 */
+    on_parry?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
+    /** [招架] 招架结束回调
+     *  触发时机：do_attack() 末尾，攻击未被闪避时
+     *  触发条件：par.no_append_target 时跳过；受击方无 fight_type 时跳过；仅 parry_skill 注册有效 */
+    on_parry_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
+    /** [招架] 绝招招架回调（返回是否招架成功）
+     *  触发时机：perform 判定招架时
+     *  触发条件：仅 parry_skill 注册有效
+     *  @param sk 基础技能 sid */
+    on_parry_pfm?(target: CHARACTER, me: CHARACTER, pfm: PERFORM, level: number, sk?: string): boolean;
+    /** [轻功] 重算闪避回调
+     *  触发时机：闪避值重新计算时
+     *  仅 dodge_skill 注册有效（由资源文件动态注入） */
+    on_recount_dodge?(me: CHARACTER): number;
+    /** [招架] 重算招架回调
+     *  触发时机：招架值重新计算时
+     *  仅 parry_skill 注册有效（由资源文件动态注入） */
+    on_recount_parry?(me: CHARACTER): number;
     /** 复活回调（由 biwu 等系统动态注入） */
     on_relive?: (me: CHARACTER) => void;
 
