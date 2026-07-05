@@ -75,7 +75,7 @@ export default class extends SKILL {
     /**
      * 化功状态 -> 攻击命中时吸收目标内力并附加 debuff（参考北冥机制）
      */
-    on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
+    on_force_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
         if (me.max_mp < me.limit_mp + me.query_prop("limit_mp")) {

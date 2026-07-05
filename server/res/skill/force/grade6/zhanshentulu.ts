@@ -80,7 +80,7 @@ export default class extends SKILL {
         return 0;
     }
 
-    on_attack_over(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar, sh: number): void {
+    on_force_over(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         const weapon = me.query_weapon();
         if (!weapon) {

@@ -45,7 +45,7 @@ export default class extends SKILL {
     /**
      * 白首太玄——命中后恢复气血
      */
-    on_attack_over(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar, sh: number): void {
+    on_force_over(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (me.query_temp("tx_bs", 0)) {
             const lv = me.query_skill("taixuangong", 0);

@@ -33,7 +33,7 @@ export default class extends SKILL {
      * 命中后给目标附加「九阴劲气」，每层降低攻击/躲闪/命中1%
      * 持续时间12秒，每次命中刷新
      */
-    on_attack_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
+    on_force_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
 

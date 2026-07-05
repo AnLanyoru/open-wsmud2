@@ -36,7 +36,7 @@ export default class extends SKILL {
         };
     }
 
-    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+    on_force_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
         if (!par.is_dodged && !par.is_parried) {
             me.add_status({
                 id: "chaoxi",
