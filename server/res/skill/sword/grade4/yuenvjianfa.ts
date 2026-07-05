@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -21,7 +22,7 @@ export default class extends SKILL {
         "$N一声清啸，$w直进中宫，使出「<HIY>白虹贯日</HIY>」，剑光如练直贯$n",
         "$N身剑合一，如灵猿跃涧，一招「<HIC>越女击剑</HIC>」，剑光快如闪电刺向$n的$l"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 15000,
         skill: {
             sword: 300

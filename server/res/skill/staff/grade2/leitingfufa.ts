@@ -1,5 +1,6 @@
 import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type {LearnCondition} from "../../../../types/events.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
 /** 完成度 50 */
@@ -19,7 +20,7 @@ export default class extends SKILL {
         "$N踏步上前，$W自下而上撩起，劲风呼啸直取$n",
         "$N怒喝一声，$W化作一道乌光，当头向$n砸下",
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
       "skill": {
         "guanshanjue:10": 0
       }
@@ -41,7 +42,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             staff: {
-                gj: Math.floor(lv * 1.21),
+                gj: 10 + Math.floor(lv * 1.2),
                 str: 2 + Math.floor(lv * 0.1),
             },
         };
@@ -55,7 +56,7 @@ export default class extends SKILL {
             mp: 20,
             release_time: 7000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                var dmgMulti = 4 + Math.floor(me.str / 500);
+                var dmgMulti = 3 + lv / 1000;
                 var strBonus = Math.floor(me.str * 2);
 
                 me.send_room("<HIW>$N仰天怒吼，$W高高抡起，以开山之势猛劈向$n！罡风呼啸，天地为之变色！</HIW>", target);
@@ -63,7 +64,7 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "使出全体气力劈向敌人，造成400%伤害，臂力加成越高伤害越高";
+                return "使出全身气力劈向敌人，造成" + (300 + Math.floor(lv * 0.1)) + "%伤害，臂力加成越高伤害越高";
             },
         },
     };

@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -28,7 +29,7 @@ export default class extends SKILL {
         "$n周身魔气缭绕，$w以诡异的角度反撩$P的$l",
         "$n狞笑一声，$w不退反进，与$P以命换命"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 60000,
         skill: {
             sword: 500

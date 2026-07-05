@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -22,7 +23,7 @@ export default class extends SKILL {
         "$N双手按住琴弦，骤然一放，使出「<RED>弦断惊雷</RED>」，霹雳般的音波炸向$n",
         "$N微微一笑，指法轻柔，一曲「<HIG>阳春白雪</HIG>」，音波剑意如春风化雨笼罩$n"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 15000,
         skill: {
             sword: 300

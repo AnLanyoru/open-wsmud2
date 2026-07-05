@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -28,7 +29,7 @@ export default class extends SKILL {
         "$n剑势连绵如雨，以柔克刚，$P只觉剑招如陷入泥沼之中",
         "$n$w一圈一引，如洞庭湖面泛起涟漪，将$P的劲力层层化去"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 60000,
         skill: {
             sword: 500

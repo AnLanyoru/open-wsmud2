@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -27,7 +28,7 @@ export default class extends SKILL {
         "$N御剑成盾，$w在身前急速旋转，正是「<HIW>剑屏护体</HIW>」，$P的攻势如泥牛入海",
         "$N以气御剑，$w以一个不可思议的角度回刺$P，迫其收招"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 30000,
         skill: {
             sword: 400

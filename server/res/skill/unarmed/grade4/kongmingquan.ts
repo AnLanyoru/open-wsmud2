@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -20,7 +21,7 @@ export default class extends SKILL {
         "$N双拳齐出，一虚一实，「空谷回音」般轰向$n",
         "$N身形滴溜一转，拳法大开大合却又空若无物，$n完全无法捉摸",
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
       "int1": 40
     };
 

@@ -59,7 +59,7 @@ export default class extends SKILL {
             mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                var stacks: number = me.query_temp("songfeng") || 0;
+                var stacks: number = me.query_temp("songfeng", 0);
                 var count = 1 + stacks;
                 me.send_room("<HIG>$N深吸一口气，$W倏然刺出，剑影如松间明月，<HIG>无声无息</HIG>却又迅疾无伦！</HIG>", target);
                 for (var i = 0; i < count; i++) {

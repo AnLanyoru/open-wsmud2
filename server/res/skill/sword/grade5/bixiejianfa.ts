@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -28,7 +29,7 @@ export default class extends SKILL {
         "$n身形忽然后仰，$w自下而上撩出，以一个不可能的角度反攻$P的$l",
         "$n如鬼魅般一晃，竟在间不容发之际避过$P的杀招，$w顺势反击"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         dex1: 50,
         max_mp: 30000,
         skill: {

@@ -219,7 +219,7 @@ export default class extends SKILL {
                 if (time > 25000) time = 25000;
                 var zj_bonus = Math.floor(lv * 0.8);
                 me.send_room("<mag>$N双手结出玄奥法印，魔气与天地元气共鸣，施展出天魔策至高秘术——「<MAG>补天道</MAG>」！一道无形的天道法则环绕周身！</mag>", target);
-                if (!me.query_temp("tianmo_butian")) {
+                if (!me.query_temp("tianmo_butian", 0)) {
                     me.set_temp("tianmo_butian", 1, time);
                 }
                 me.add_status({
@@ -241,8 +241,8 @@ export default class extends SKILL {
         },
     };
 
-    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
-        if (par.is_parried && me.query_temp("tianmo_butian")) {
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (par.is_parried && me.query_temp("tianmo_butian", 0)) {
             var heal = Math.floor(target.gj * 0.3);
             if (heal > 0) {
                 me.add_hp(heal);

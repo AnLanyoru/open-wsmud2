@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -22,7 +23,7 @@ export default class extends SKILL {
         "$N身形一缩一放，骤然发力，双掌挟风雷之势拍向$n的$l",
         "$N鼓气一吸，周围草木皆动，随即一口浊气化做利箭射向$n",
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
       "str1": 30,
       "con1": 30
     };

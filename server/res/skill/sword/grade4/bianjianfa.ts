@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
+import type {LearnCondition} from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -28,7 +29,7 @@ export default class extends SKILL {
         "$n$w轻点，一式「<HIG>拈花一笑</HIG>」，竟在间不容发之际将$P的攻势化解于无形",
         "$n身形不动，$w缓缓画弧，正是「<HIY>不滞于物</HIY>」，将$P的凌厉攻势尽数引开"
     ];
-    learn_condition = {
+    learn_condition: LearnCondition = {
         max_mp: 15000,
         skill: {
             sword: 300
