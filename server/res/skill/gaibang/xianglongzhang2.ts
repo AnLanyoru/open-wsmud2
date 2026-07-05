@@ -41,7 +41,7 @@ export default class extends SKILL {
     family = FAMILIES.GAIBANG;
     desc = "丐帮的降龙十八掌，至刚至猛，威震天下";
     can_enables = ["unarmed", "parry"];
-    attack_actions = SKILL.get("unarmed")?.attack_actions || [];
+    attack_actions = SKILL.get("xianglongzhang")?.attack_actions || [];
 
     slots = [
         {

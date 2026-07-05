@@ -38,7 +38,7 @@ export default class extends SKILL {
     family = FAMILIES.GAIBANG;
     desc = "丐帮的打狗棒法，变化精微，招术奇妙，乃丐帮镇帮之宝";
     can_enables = ["club"];
-    attack_actions = SKILL.get("club")?.attack_actions || [];
+    attack_actions = SKILL.get("dagoubang")?.attack_actions || [];
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
