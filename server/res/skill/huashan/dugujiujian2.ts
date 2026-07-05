@@ -1,9 +1,13 @@
-import {SKILL, PERFORM} from "../../../core/skill/skill.js";
-import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
+import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
+import type { PropMap } from "../../../types/props.js";
 import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
+/**
+ * 独孤九剑进阶 (品级5)
+ * 完善度50
+ */
 export default class extends SKILL {
     name = "独孤九剑";
     id = "dugujiujian2";
@@ -14,75 +18,186 @@ export default class extends SKILL {
     can_enables = ["sword","parry"];
     attack_actions = SKILL.get("sword")?.attack_actions || [];
 
+    // 招架反击消息
+    parry_msg2: string[] = [
+        "<hir>$N趁机向前一剑刺向$n的$l，端的是神妙无伦，不可思议</hir>",
+        "<hir>$n见招式被破，一时慌乱被$N趁虚欺上随手一剑刺向$p</hir>",
+        "<hir>$N以攻为守，以进为退，挺剑一招象是「白云出岫」回刺$p的$l</hir>"
+    ];
+
+    query_prop(lv: number, me?: CHARACTER): PropMap {
+        return {
+            add_sh_per: 5 + int(lv / 300),
+        };
+    }
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
                 gj: 10 + lv * 2,
-                gjsd: 250,
-                bj_per: 4,
                 mz: 10 + lv * 2,
+                mz_per: 5 + int(lv / 300),
+                gjsd: 250,
+                bj_per: 2 + int(lv / 400),
             },
             parry: {
                 zj: 10 + lv * 2,
-                str: 4 + Math.floor(lv * 0.33),
-                dex: 4 + Math.floor(lv * 0.33),
+                str: 1 + int(lv / 3),
+                dex: 1 + int(lv / 3),
+                desc: "招架敌人招式后立刻反击敌人",
             },
-            // Global/base properties:
-            // {"add_sh_per":8} 
         };
     }
 
     pfm_set: PerformData = {
-        pfm_0: {
+        wu: {
             name: "无招",
             distime: 30000,
             enable_skill: "sword",
             mp: 20,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 无招
-                // 独孤九剑之无招胜有招，15秒内你的招式无迹可寻使敌人难以破解，出招速度加快到极限，增加40%攻击，20%命中。
-                me.send_room("$N使出「无招」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                const time: number = 5000 + lv * 10;
+                const gj: number = 30 + int(lv / 100);
+                const mz: number = 15 + int(lv / 200);
+                me.send_room("<him>$N凝神聚气，手中$W挥洒自如，剑招似有似无，已然踏入无招胜有招之境！</him>\n", target);
+                me.add_status({
+                    id: "weapon",
+                    name: "无招",
+                    desc: "招式无迹可寻，出招如电",
+                    duration: time,
+                    prop: {
+                        gjsd_per: 100,
+                        gj_per: gj,
+                        mz_per: mz,
+                    },
+                    finish_msg: "$N无招之意渐散，剑势缓缓归于平常。",
+                });
+                me.set_temp("weapon", 1, time);
+                me.reauto_attack();
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "独孤九剑之无招胜有招，15秒内你的招式无迹可寻使敌人难以破解，出招速度加快到极限，增加40%攻击，20%命中。";
+            query_desc: function(me: CHARACTER, lv: number): string {
+                const time: number = 5000 + lv * 10;
+                const gj: number = 30 + int(lv / 100);
+                const mz: number = 15 + int(lv / 200);
+                return "独孤九剑之无招胜有招，" + toSec(time) + "秒内你的招式无迹可寻使敌人难以破解，出招速度加快到极限，增加" + gj + "%攻击，" + mz + "%命中。";
             },
         },
-        pfm_1: {
+        pojian: {
             name: "破字诀",
             distime: 30000,
             enable_skill: "sword",
             mp: 20,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 破字诀
-                // 天下武功，无招不破，使用后你在8秒内大幅增加你的招架几率，招架成功后立即强力反击
-                me.send_room("$N使出「破字诀」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
-                me.end_attack(target);
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                let time: number = 3000 + lv * 5;
+                if (time > 10000) time = 10000;
+                const zj: number = lv + 30;
+                me.send_room("<HIC>$N持剑凝立，默运独孤九剑「破字诀」，剑意弥天盖地，天下武功，无招不破！</HIC>\n", target);
+                me.add_status({
+                    id: "weapon",
+                    name: "破字诀",
+                    desc: "大幅提升招架几率，招架成功时反击威力大增",
+                    duration: time,
+                    prop: {
+                        zj_per: zj,
+                    },
+                    finish_msg: "$N的破字诀剑意渐渐消散。",
+                });
+                me.set_temp("sk_dugu_pozijue", 1, time);
+                me.reauto_attack();
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "天下武功，无招不破，使用后你在8秒内大幅增加你的招架几率，招架成功后立即强力反击";
+            query_desc: function(me: CHARACTER, lv: number): string {
+                let time: number = 3000 + lv * 5;
+                if (time > 10000) time = 10000;
+                return "天下武功，无招不破，使用后你在" + toSec(time) + "秒内大幅增加你的招架几率，招架成功后立即强力反击";
             },
         },
-        pfm_2: {
+        poqi: {
             name: "破气诀",
             distime: 20000,
             enable_skill: "sword",
             mp: 20,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                // TODO: Implement 破气诀
-                // 独孤九剑之破气式，精准攻击敌方气海要穴，无法招架，命中后减少敌人847内力，并使敌人忙乱10秒。
-                me.send_room("$N使出「破气诀」攻向$n。", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                const sh: number = me.do_attack({
+                    target: target,
+                    attack_msg: "<hib>$N施出独孤九剑「破气式」，手中$W中攻直进，剑尖遥指$n气海要穴！</hib>",
+                    miss_msg: "<CYN>可$n深知$N这招的厉害，当即向后横移数尺，险险避开。</CYN>",
+                    no_parry: true,
+                    damage_msg: "<hir>$n被$N一剑划过气门，顿感真气溃散，全身内力源源而泻！</hir>",
+                });
+                if (sh) {
+                    target.add_mp(-int(lv / 6));
+                    let time: number = 3000 + lv * 10;
+                    if (time > 10000) time = 10000;
+                    target.add_status({
+                        id: "busy",
+                        is_busy: true,
+                        name: "忙乱",
+                        downside: true,
+                        desc: "你处于忙乱状态，无法攻击、招架",
+                        duration: time,
+                    }, me);
+                }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "独孤九剑之破气式，精准攻击敌方气海要穴，无法招架，命中后减少敌人847内力，并使敌人忙乱10秒。";
+            query_desc: function(me: CHARACTER, lv: number): string {
+                let time: number = 3000 + lv * 10;
+                if (time > 10000) time = 10000;
+                return "独孤九剑之破气式，精准攻击敌方气海要穴，无法招架，命中后减少敌人" + int(lv / 6) + "内力，并使敌人忙乱" + toSec(time) + "秒。";
             },
         },
     };
+
+    // 招架反击
+    on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (par.is_parried) {
+            if (!me.query_temp("sk_dugu_parry", 0)) {
+                const isPozi: boolean = !!me.query_temp("sk_dugu_pozijue", 0);
+                const base_gj: number = me.gj / 3 + me.random(me.gj / 3);
+                const gj: number = isPozi ? base_gj * 2 : base_gj;
+                const msg: string = isPozi
+                    ? "<hir>$N身随「破字诀」剑意而动，$W化作一道惊鸿，反刺$n破绽！</hir>"
+                    : this.parry_msg2.random();
+                me.do_attack({
+                    target: target,
+                    attack_msg: msg,
+                    gj: gj,
+                    mz: me.mz,
+                });
+                me.end_attack(target);
+                me.set_temp("sk_dugu_parry", 1, 7000);
+            }
+        }
+    }
+}
+
+// ========== 公共计算函数 ==========
+
+/** 无招持续时间 */
+export function wu_time(lv: number): number {
+    return 5000 + lv * 10;
+}
+
+/** 无招攻击百分比 */
+export function wu_gj(lv: number): number {
+    return 30 + int(lv / 100);
+}
+
+/** 无招命中百分比 */
+export function wu_mz(lv: number): number {
+    return 15 + int(lv / 200);
+}
+
+/** 破字诀持续时间 */
+export function pozi_time(lv: number): number {
+    const t: number = 3000 + lv * 5;
+    return t > 10000 ? 10000 : t;
+}
+
+/** 破气诀忙乱时间 */
+export function poqi_busy(lv: number): number {
+    const t: number = 3000 + lv * 10;
+    return t > 10000 ? 10000 : t;
 }
