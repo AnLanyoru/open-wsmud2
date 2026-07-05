@@ -1,7 +1,8 @@
 import { SKILL } from "../../../core/skill/skill.js";
 import { FAMILIES } from "../../../core/skill/family.js";
 import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
-import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
+import { CHARACTER } from "../../../core/char/character.js";
+import type { DoAttackPar } from "../../../core/char/character.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -13,6 +14,18 @@ export default class extends SKILL {
     desc = "上古法家不传之秘，替天行法";
     can_enables = ["throwing"];
     attack_actions = SKILL.get("throwing")?.attack_actions || [];
+
+    on_enable = (me: CHARACTER, type: string): void => {
+        if (type === 'throwing' && !me.can_throwing()) {
+            me.can_throwing = () => true;
+        }
+    };
+
+    on_disenable(me: CHARACTER, type: string): void {
+        if (type === 'throwing') {
+            me.can_throwing = CHARACTER.prototype.can_throwing;
+        }
+    }
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
