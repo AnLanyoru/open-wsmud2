@@ -175,27 +175,33 @@ export class SKILL extends BASE {
     //   触发条件 — 什么情况下会/不会触发
     //
     // ====== 攻击方回调 ======
+    //
+    // 攻击技能由 do_attack() 按 par.no_weapon 决定：
+    //   no_weapon=false（持武器）→ this.attack_skill（刀/剑/杖等兵器技能）
+    //   no_weapon=true （空手）  → this.noweapon_skill（拳脚/空手技能）
+    // 以下标注「attackskill」的回调即按此规则选取；标注「attack_skill」的则固定取兵器技能。
+    // 部分回调内功（force_skill）也会被额外调用，已标注。
 
-    /** [攻击技能] 战斗开始回调
+    /** [attackskill + force_skill] 战斗开始回调
      *  触发时机：begin_fight() 初次进入战斗
-     *  触发条件：this.force_skill 存在时也会被调用，即内功也可注册此回调 */
+     *  触发条件：force_skill 和 attack_skill 各自独立调用；noweapon_skill 不会被调用 */
     on_beginfight?(me: CHARACTER, target: CHARACTER): void;
-    /** [攻击技能] 攻击前回调（每轮出招前）
+    /** [attackskill + force_skill] 攻击前回调（每轮出招前）
      *  触发时机：do_attack() 最开始，伤害计算之前
-     *  触发条件：throw 攻击不触发；par.no_append_before 时跳过。
-     *  内功也可注册此回调（force_skill.on_before_attack 同样会被调用）。 */
+     *  触发条件：throw 攻击不触发 attackskill；par.no_append_before 时两者均跳过；
+     *  持武器→attack_skill、空手→noweapon_skill；内功由 force_skill 额外调用 */
     on_before_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void;
-    /** [攻击技能] 攻击回调（返回额外伤害）
+    /** [attackskill] 攻击回调（返回额外伤害）
      *  触发时机：do_attack() 伤害计算阶段，命中且未招架时
-     *  触发条件：throw 攻击不触发；仅在攻击技能（attack_skill / noweapon_skill）上注册有效，内功不会触发此回调 */
+     *  触发条件：throw 攻击不触发；持武器→attack_skill、空手→noweapon_skill；内功不会触发 */
     on_attack?(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number;
-    /** [攻击技能] 攻击结束回调（一轮伤害结算后）
+    /** [attackskill] 攻击结束回调（一轮伤害结算后）
      *  触发时机：do_attack() 末尾，伤害已造成之后
-     *  触发条件：par.no_append 时跳过；仅在攻击技能上注册有效，内功请使用 on_force_over */
+     *  触发条件：par.no_append 时跳过；持武器→attack_skill、空手→noweapon_skill；内功请使用 on_force_over */
     on_attack_over?(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void;
-    /** [攻击技能] 一轮攻击完全结束回调
+    /** [attack_skill] 一轮攻击完全结束回调
      *  触发时机：回合收尾阶段，在 end_attack() 中调用
-     *  触发条件：仅在攻击方有 fight_type 时，调用 attack_skill.on_end_attack */
+     *  触发条件：固定取 attack_skill（兵器技能），空手 noweapon_skill 不会触发 */
     on_end_attack?(me: CHARACTER, target: CHARACTER): void;
 
     // ====== 内功回调 ======
@@ -217,7 +223,7 @@ export class SKILL extends BASE {
      *  触发条件：sh > 0 时触发；仅受击方的 force_skill 注册有效 */
     on_damage?(me: CHARACTER, sh: number, from?: CHARACTER): number;
     /** [内功] 内功气血转化比例
-     *  取值 0~1，表示将内力的该比例转化为额外气血
+     *  取值 0~n 为 0%~n*100%内力转换，表示将内力的该比例转化为额外气血
      *  仅内功注册有效 */
     force_rad?: number;
 
