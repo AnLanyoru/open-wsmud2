@@ -40,8 +40,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 20 + Math.floor(lv * 3 / 2),
-                mz: 20 + Math.floor(lv * 3 / 2),
+                gj: 20 + Math.floor(lv * 1.5),
+                mz: 20 + Math.floor(lv * 1.5),
                 bj_per: 4,
                 int: 3 + Math.floor(lv / 6),
                 desc: "命中后使敌人受到的伤害增加1001可叠加10层",

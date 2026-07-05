@@ -46,7 +46,7 @@ export default class extends SKILL {
         return {
             sword: {
                 gj: 20 + Math.floor(lv * 1.3),
-                mz: 20 + Math.floor(lv * 8 / 5),
+                mz: 20 + Math.floor(lv * 1.6),
                 dex: 8 + Math.floor(lv / 10),
                 desc: "唯一：攻击时有概率打出音波伤人",
             },

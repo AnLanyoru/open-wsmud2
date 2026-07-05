@@ -42,7 +42,7 @@ export default class extends SKILL {
                 desc: "你的攻击会使敌人受到3356点蛇毒伤害",
             },
             parry: {
-                zj: 5 + Math.floor(lv * 8 / 5),
+                zj: 5 + Math.floor(lv * 1.6),
                 fy: 10 + lv * 2,
             },
         };

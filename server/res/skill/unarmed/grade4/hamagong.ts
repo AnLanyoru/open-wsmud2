@@ -45,7 +45,7 @@ export default class extends SKILL {
         return {
             force: {
                 fy: 100 + Math.floor(lv * 2),
-                gj: 35 + Math.floor(lv * 8 / 5),
+                gj: 35 + Math.floor(lv * 1.6),
                 limit_mp: lv * 150,
                 desc: "唯一：将你内力的70%转化为气血",
             },
