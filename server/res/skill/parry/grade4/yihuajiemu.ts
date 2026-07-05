@@ -11,7 +11,7 @@ export default class extends SKILL {
     can_enables = ["parry"];
     slots = [
         {
-            prop: 'yihua_cd',
+            prop: 'yh_cd',
             value: (_lv: number, _grd: number) => 1,
             format: (_val: number) => '移花期间未能阻止对方绝招时冷却将立即结束',
         },
@@ -36,6 +36,7 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+                const this_pfm_id = this.id;
                 const time = get_yihua_duration(lv);
                 const buff_value = get_yihua_buff_value(lv);
                 me.send_room("<mag>$N默运移花接木神功，你感觉周围真气似乎被$N牵引，犹如陷入泥潭寸步难行。</mag>", target);
@@ -55,11 +56,9 @@ export default class extends SKILL {
                     name: "移花",
                     duration: time,
                     desc: "抵挡敌人的下一个绝招",
-                    on_attach: function(p: CHARACTER): void {
-                        p.set_temp("yihua", 1, time);
-                    },
                     on_expire: function(p: CHARACTER): void {
-                        p.remove_temp("yihua");
+                        if (p.query_temp("yh_cd", 0)) 
+                            p.set_distime("parry/" + this_pfm_id, 0);
                     },
                 });
             },
@@ -72,7 +71,6 @@ export default class extends SKILL {
 
     on_parry_pfm(me: CHARACTER, target: CHARACTER, pfm: PERFORM, level: number, sk?: string): boolean {
         if (!me.query_temp("yihua", 0)) return false;
-        me.remove_temp("yihua");
         me.remove_status("yihua", true);
         me.send_room(`<mag>$N真气牵引，使出移花接木大法，$n的${pfm.name}犹如石沉大海，再无声息。</mag>`, target);
         return true;
