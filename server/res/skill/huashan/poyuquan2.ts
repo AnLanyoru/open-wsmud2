@@ -15,7 +15,7 @@ export default class extends SKILL {
     family = FAMILIES.HUASHAN;
     desc = "华山派拳脚功夫，原为劈石及破玉两路拳法绝学";
     can_enables = ["unarmed","parry"];
-    attack_actions = SKILL.get("unarmed")?.attack_actions || [];
+    attack_actions = SKILL.get("poyuquan")?.attack_actions || [];
 
     slots: Array<{ prop: string; value: (lv: number) => number; format: (val: number) => string }> = [
         {

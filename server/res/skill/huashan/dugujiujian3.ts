@@ -16,14 +16,17 @@ export default class extends SKILL {
     is_hidden = true;
     desc = "为独孤求败所创，以无招胜有招的宗旨胜破天下武功。";
     can_enables = ["sword","parry"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = SKILL.get("dugujiujian")?.attack_actions || [];
+    parry_actions = SKILL.get("dugujiujian")?.parry_actions || [];
+    attack_actions2 = (SKILL.get("dugujiujian") as any)?.attack_actions2 || [];
+    parry_msg2 = (SKILL.get("dugujiujian") as any)?.parry_msg2 || [];
 
-    // 招架反击消息
-    parry_msg2: string[] = [
-        "<hir>$N身随意动，剑出无痕，反手一剑刺向$n破绽！</hir>",
-        "<hir>$n招式方破，$N已窥得先机，$W如影随形反击$p！</hir>",
-        "<hir>$N顺势而为，$W化作一道寒光，直取$n要害！</hir>"
-    ];
+    query_attack_action(me: CHARACTER): string {
+        if (me.query_temp("weapon", 0)) {
+            return (this.attack_actions2 as string[]).random();
+        }
+        return (this.attack_actions as string[]).random();
+    }
 
     query_prop(lv: number, me?: CHARACTER): PropMap {
         return {

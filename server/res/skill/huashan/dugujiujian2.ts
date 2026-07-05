@@ -16,14 +16,17 @@ export default class extends SKILL {
     family = FAMILIES.HUASHAN;
     desc = "为独孤求败所创，以无招胜有招的宗旨胜破天下武功。";
     can_enables = ["sword","parry"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = SKILL.get("dugujiujian")?.attack_actions || [];
+    parry_actions = SKILL.get("dugujiujian")?.parry_actions || [];
+    attack_actions2 = (SKILL.get("dugujiujian") as any)?.attack_actions2 || [];
+    parry_msg2 = (SKILL.get("dugujiujian") as any)?.parry_msg2 || [];
 
-    // 招架反击消息
-    parry_msg2: string[] = [
-        "<hir>$N趁机向前一剑刺向$n的$l，端的是神妙无伦，不可思议</hir>",
-        "<hir>$n见招式被破，一时慌乱被$N趁虚欺上随手一剑刺向$p</hir>",
-        "<hir>$N以攻为守，以进为退，挺剑一招象是「白云出岫」回刺$p的$l</hir>"
-    ];
+    query_attack_action(me: CHARACTER): string {
+        if (me.query_temp("weapon", 0)) {
+            return (this.attack_actions2 as string[]).random();
+        }
+        return (this.attack_actions as string[]).random();
+    }
 
     query_prop(lv: number, me?: CHARACTER): PropMap {
         return {

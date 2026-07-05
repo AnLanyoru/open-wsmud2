@@ -15,7 +15,8 @@ export default class extends SKILL {
     family = FAMILIES.HUASHAN;
     desc = "华山派的剑宗的立宗剑法，以快闻名";
     can_enables = ["sword","dodge"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = SKILL.get("kuangfengkuaijian")?.attack_actions || [];
+    dodge_actions = SKILL.get("kuangfengkuaijian")?.dodge_actions || [];
 
     query_enable_prop(lv: number): EnablePropMap {
         return {

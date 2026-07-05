@@ -16,7 +16,15 @@ export default class extends SKILL {
     is_ultimate = true;
     desc = "上古剑门镇派之术，无剑无我，手持天地";
     can_enables = ["sword"];
-    attack_actions = SKILL.get("sword")?.attack_actions || [];
+    attack_actions = SKILL.get("dugujiujian")?.attack_actions || [];
+    attack_actions2 = (SKILL.get("dugujiujian") as any)?.attack_actions2 || [];
+
+    query_attack_action(me: CHARACTER): string {
+        if (me.query_temp("weapon", 0) || me.query_temp("jianyi", 0)) {
+            return (this.attack_actions2 as string[]).random();
+        }
+        return (this.attack_actions as string[]).random();
+    }
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
