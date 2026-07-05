@@ -23,7 +23,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        huti: {
+        hu: {
             name: "护体",
             distime: 40000,
             enable_skill: "force",
@@ -47,7 +47,7 @@ export default class extends SKILL {
                 return "守护";
             },
         },
-        xuanzhuan: {
+        zhuan: {
             name: "旋转",
             distime: 27000,
             enable_skill: "force",

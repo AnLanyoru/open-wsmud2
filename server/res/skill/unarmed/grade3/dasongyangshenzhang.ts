@@ -49,7 +49,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wuying:
+        ying:
             {
                 name: "无影掌",
                 distime: 20000,

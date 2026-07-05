@@ -57,7 +57,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        taisheng:
+        sheng:
             {
                 name: "泰山压顶",
                 distime: 20000,

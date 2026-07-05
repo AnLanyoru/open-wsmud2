@@ -58,7 +58,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        zhenzijue: {
+        zhen: {
             name: "震字决",
             distime: 20000,
             enable_skill: "unarmed",

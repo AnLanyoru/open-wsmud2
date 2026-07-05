@@ -43,7 +43,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        qianshechudong: {
+        she: {
             name: "千蛇出洞",
             distime: 10000,
             enable_skill: "throwing",

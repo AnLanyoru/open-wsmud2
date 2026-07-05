@@ -48,7 +48,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        cuixin:
+        cui:
             {
                 name: "催心",
                 distime: 20000,

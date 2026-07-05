@@ -58,7 +58,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        yuanyue: {
+        yuan: {
             name: "猿跃式",
             distime: 30000,
             enable_skill: "sword",
@@ -91,7 +91,7 @@ export default class extends SKILL {
                 return "灵猿纵跃般发动" + count + "段突袭，身法越高攻击次数越多。";
             },
         },
-        pozhu: {
+        po: {
             name: "破竹式",
             distime: 10000,
             enable_skill: "sword",

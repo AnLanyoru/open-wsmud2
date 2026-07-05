@@ -42,7 +42,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        xiantishu: {
+        shu: {
             name: "仙体术",
             distime: 55000,
             enable_skill: "unarmed",
@@ -72,7 +72,7 @@ export default class extends SKILL {
                 return "传闻出自仙人体术，" + toSec(time) + "秒内进入仙体状态，获得" + dr + "%伤害减免，免疫负面状态";
             },
         },
-        jiushenzhou: {
+        zhou: {
             name: "酒神咒",
             distime: 28000,
             enable_skill: "unarmed",

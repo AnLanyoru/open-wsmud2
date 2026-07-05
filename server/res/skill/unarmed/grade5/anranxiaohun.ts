@@ -37,7 +37,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wuzhongshengyou: {
+        wu: {
             name: "无中生有",
             distime: 20000,
             enable_skill: "unarmed",
@@ -76,7 +76,7 @@ export default class extends SKILL {
                 return "对敌人造成200%的伤害，命中后会偷取敌人的一个正面状态附加自身";
             },
         },
-        dairuomuji: {
+        dai: {
             name: "呆若木鸡",
             distime: 36000,
             enable_skill: "unarmed",

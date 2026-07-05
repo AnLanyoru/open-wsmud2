@@ -42,7 +42,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        ly: {
+        lian: {
             name: "流云七剑",
             distime: 20000,
             enable_skill: "sword",
@@ -66,7 +66,7 @@ export default class extends SKILL {
                 return "行云流水般连出七招，每招造成你攻击力" + per + "%的伤害";
             },
         },
-        mz: {
+        mo: {
             name: "绵里藏针",
             distime: 15000,
             enable_skill: "sword",

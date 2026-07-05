@@ -42,7 +42,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wuxingjianqi: {
+        qi: {
             name: "无形剑气",
             distime: 30000,
             enable_skill: "unarmed",
@@ -80,7 +80,7 @@ export default class extends SKILL {
                 return "以强劲的内力贯于指尖，将内力化为无形剑气伤敌。如果敌方招架成功只受到伤害，否则使敌人昏迷" + toSec(time) + "秒。";
             },
         },
-        liumaimzongheng: {
+        mai: {
             name: "六脉纵横",
             distime: 20000,
             enable_skill: "unarmed",

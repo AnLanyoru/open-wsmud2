@@ -46,7 +46,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        yizhiqiankun: {
+        kun: {
             name: "一指乾坤",
             distime: 20000,
             enable_skill: "unarmed",
@@ -61,7 +61,7 @@ export default class extends SKILL {
                 return "对敌人造成150%攻击力的伤害，无法防御";
             },
         },
-        dianxue: {
+        xue: {
             name: "点穴",
             distime: 30000,
             enable_skill: "unarmed",

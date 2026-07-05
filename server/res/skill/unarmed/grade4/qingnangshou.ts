@@ -58,7 +58,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        songjin:
+        jin:
             {
                 name: "松筋",
                 distime: 12000,
@@ -95,7 +95,7 @@ export default class extends SKILL {
                     return "施展秘传的松筋活脉，命中后造成" + per + "%攻击力的伤害并且解除对方的武器或拳脚强化。";
                 },
             },
-        tigu:
+        ti:
             {
                 name: "剔骨",
                 distime: 25000,

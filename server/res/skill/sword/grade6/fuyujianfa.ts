@@ -54,7 +54,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jianyu: {
+        yu: {
             name: "剑雨",
             distime: 28500,
             enable_skill: "sword",
@@ -76,7 +76,7 @@ export default class extends SKILL {
                 return "化剑为雨，攻击变为" + count + "次，增加穿透防御的几率";
             },
         },
-        jiangang: {
+        gang: {
             name: "剑罡",
             distime: 19000,
             enable_skill: "sword",

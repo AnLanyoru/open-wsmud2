@@ -54,7 +54,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        fengmo: {
+        feng: {
             name: "疯魔",
             distime: 28500,
             enable_skill: "sword",
@@ -80,7 +80,7 @@ export default class extends SKILL {
                 return "10秒内攻速翻倍，每次攻击附加并消耗你当前内力的" + mpPer + "%，暴击后吸取伤害恢复自身";
             },
         },
-        fumo: {
+        fu: {
             name: "附魔",
             distime: 19000,
             enable_skill: "sword",

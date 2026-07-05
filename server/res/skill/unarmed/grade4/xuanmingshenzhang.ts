@@ -54,7 +54,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        handu:
+        du:
             {
                 name: "寒毒",
                 distime: 5000,

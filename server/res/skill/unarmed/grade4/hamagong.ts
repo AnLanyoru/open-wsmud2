@@ -57,7 +57,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        hamaxiqie: {
+        xi: {
             name: "蛤蟆吸气",
             distime: 20000,
             enable_skill: "unarmed",
@@ -88,7 +88,7 @@ export default class extends SKILL {
                 return "趴在地上蓄力运功，可最多蓄力9秒，蓄力期间增加25%伤害减免，无法躲闪，招架。";
             },
         },
-        hamachongji: {
+        chong: {
             name: "蛤蟆冲击",
             distime: 5000,
             enable_skill: "unarmed",

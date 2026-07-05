@@ -54,7 +54,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        haichao: {
+        chao: {
             name: "海潮汹涌",
             distime: 30000,
             enable_skill: "sword",
@@ -84,7 +84,7 @@ export default class extends SKILL {
                 return "快速对附近敌人攻击" + count + "次，每次攻击附加并消耗你当前内力的" + mpPer + "%";
             },
         },
-        zhongjian: {
+        zhong: {
             name: "重剑无锋",
             distime: 30000,
             enable_skill: "sword",

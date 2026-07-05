@@ -53,7 +53,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        bajiu: {
+        ba: {
             name: "彼岸九式",
             distime: 35000,
             enable_skill: "sword",

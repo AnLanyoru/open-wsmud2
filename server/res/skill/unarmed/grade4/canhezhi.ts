@@ -51,7 +51,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        canhe:
+        can:
             {
                 name: "参合之殇",
                 distime: 20000,

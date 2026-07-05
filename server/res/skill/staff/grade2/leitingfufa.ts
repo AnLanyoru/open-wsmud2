@@ -49,7 +49,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        leitingkaishan: {
+        kai: {
             name: "雷霆开山",
             distime: 4000,
             enable_skill: "staff",

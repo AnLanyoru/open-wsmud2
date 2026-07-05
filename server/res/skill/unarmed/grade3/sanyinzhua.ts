@@ -57,7 +57,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        sandu:
+        du:
             {
                 name: "三阴毒爪",
                 distime: 18000,
@@ -98,7 +98,7 @@ export default class extends SKILL {
                     return "快速攻击敌人三爪，每爪附加你7%的毒质内力。";
                 },
             },
-        zhuihun:
+        hun:
             {
                 name: "追魂爪",
                 distime: 18000,

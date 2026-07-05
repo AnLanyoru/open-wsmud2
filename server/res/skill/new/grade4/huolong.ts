@@ -23,7 +23,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        huodu: {
+        du: {
             name: "火毒攻击",
             distime: 60000,
             enable_skill: "force",
@@ -56,7 +56,7 @@ export default class extends SKILL {
                 return "每三秒减少气血";
             },
         },
-        siyao: {
+        yao: {
             name: "撕咬",
             distime: 7000,
             enable_skill: "force",
@@ -73,7 +73,7 @@ export default class extends SKILL {
                 return "快速攻击5次";
             },
         },
-        weishe: {
+        she: {
             name: "威慑",
             distime: 20000,
             enable_skill: "force",

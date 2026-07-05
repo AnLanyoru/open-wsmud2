@@ -59,7 +59,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        shenzhao: {
+        zhao: {
             name: "神照",
             distime: 60000,
             enable_skill: "unarmed",
@@ -88,7 +88,7 @@ export default class extends SKILL {
                 return "神照护体，在30秒内增加你" + attrBonus + "点根骨，臂力，身法";
             },
         },
-        quanjing: {
+        jing: {
             name: "拳经",
             distime: 20000,
             enable_skill: "unarmed",

@@ -53,7 +53,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        sywx: {
+        ying: {
             name: "松月无影",
             distime: 20000,
             enable_skill: "sword",

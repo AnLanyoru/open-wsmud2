@@ -43,7 +43,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        tnsf: {
+        tian: {
             name: "天女散花",
             distime: 20000,
             enable_skill: "sword",
@@ -71,7 +71,7 @@ export default class extends SKILL {
                 return "进行数次攻击，敌人的防御越低抵挡的数量越少，基础攻击" + baseCount + "次";
             },
         },
-        tyj: {
+        yu: {
             name: "天羽诀",
             distime: 15000,
             enable_skill: "sword",

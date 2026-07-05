@@ -30,7 +30,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        shfs: {
+        sheng: {
             name: "圣火焚烧",
             distime: 20000,
             enable_skill: "sword",

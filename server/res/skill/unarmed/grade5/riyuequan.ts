@@ -45,7 +45,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jipo: {
+        po: {
             name: "击破",
             distime: 16000,
             enable_skill: "unarmed",
@@ -68,7 +68,7 @@ export default class extends SKILL {
                 return "造成300%攻击力的伤害，等级越高命中越高。";
             },
         },
-        riyuelianhuan: {
+        lian: {
             name: "日月连环",
             distime: 28000,
             enable_skill: "unarmed",

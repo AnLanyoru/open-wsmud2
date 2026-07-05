@@ -49,7 +49,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        hanyin:
+        han:
             {
                 name: "寒阴指劲",
                 distime: 20000,

@@ -35,7 +35,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wanfochaozong: {
+        fo: {
             name: "万佛朝宗",
             distime: 25000,
             enable_skill: "unarmed",
@@ -70,7 +70,7 @@ export default class extends SKILL {
                 return "对附近敌人造成内力伤害，将造成的伤害转化为你的气血";
             },
         },
-        miemo: {
+        mie: {
             name: "灭魔",
             distime: 48000,
             enable_skill: "unarmed",

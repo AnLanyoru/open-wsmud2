@@ -49,7 +49,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        luanquan: {
+        luan: {
             name: "乱拳",
             distime: 20000,
             enable_skill: "unarmed",
@@ -75,7 +75,7 @@ export default class extends SKILL {
                 return "瞬间对敌人攻击6拳，如果全部命中，最后一拳无视对方30%防御";
             },
         },
-        zuoyouhubo: {
+        bo: {
             name: "左右互搏",
             distime: 30000,
             enable_skill: "unarmed",

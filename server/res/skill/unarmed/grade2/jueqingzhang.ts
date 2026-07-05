@@ -48,7 +48,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        mihun:
+        mi:
             {
                 name: "迷魂",
                 distime: 25000,

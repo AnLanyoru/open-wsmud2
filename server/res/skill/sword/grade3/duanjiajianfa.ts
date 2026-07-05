@@ -42,7 +42,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        yy: {
+        yi: {
             name: "一阳剑气",
             distime: 35000,
             enable_skill: "sword",
@@ -71,7 +71,7 @@ export default class extends SKILL {
                 return "将内力贯入武器，" + toSec(int(duration)) + "秒内增加伤害" + per + "%";
             },
         },
-        wx: {
+        wu: {
             name: "无形剑气",
             distime: 35000,
             enable_skill: "sword",

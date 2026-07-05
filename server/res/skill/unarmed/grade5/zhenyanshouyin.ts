@@ -35,7 +35,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jiuzizhenyan: {
+        zi: {
             name: "九字真言",
             distime: 15000,
             enable_skill: "unarmed",
@@ -60,7 +60,7 @@ export default class extends SKILL {
                 return "真言伤人，随机从九字真言中诵出一字，威力随字序递增";
             },
         },
-        busifayin: {
+        fo: {
             name: "不死法印",
             distime: 60000,
             enable_skill: "unarmed",

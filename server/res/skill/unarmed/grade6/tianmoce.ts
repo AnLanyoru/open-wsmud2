@@ -66,7 +66,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        zhongmo: {
+        zhong: {
             name: "种魔",
             distime: 45000,
             enable_skill: "unarmed",
@@ -109,7 +109,7 @@ export default class extends SKILL {
                 return "消除对方的内功，压制敌方使对方降低" + reduce_pct + "%的伤害和免伤";
             },
         },
-        daoxin: {
+        dao: {
             name: "道心",
             distime: 45000,
             enable_skill: "force",
@@ -143,7 +143,7 @@ export default class extends SKILL {
                 return "大幅提升战斗力";
             },
         },
-        guiying: {
+        ying: {
             name: "鬼影",
             distime: 40000,
             enable_skill: "dodge",
@@ -166,7 +166,7 @@ export default class extends SKILL {
                 return "5秒内鬼影相随，攻击必中";
             },
         },
-        quangang: {
+        gang: {
             name: "拳罡",
             distime: 10000,
             enable_skill: "unarmed",
@@ -208,7 +208,7 @@ export default class extends SKILL {
                 return "刚猛威烈的一拳，命中后会增加自己的伤害和破防，可叠加";
             },
         },
-        butiandao: {
+        tian: {
             name: "补天道",
             distime: 45000,
             enable_skill: "parry",

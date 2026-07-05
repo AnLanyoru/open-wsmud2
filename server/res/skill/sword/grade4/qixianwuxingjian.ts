@@ -54,7 +54,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        qijue: {
+        qi: {
             name: "七绝音",
             distime: 36000,
             enable_skill: "sword",
@@ -85,7 +85,7 @@ export default class extends SKILL {
                 return "发出七道弦音攻击目标心脉，七音齐鸣，摧心裂肺。";
             },
         },
-        moyin: {
+        mo: {
             name: "魔音贯耳",
             distime: 47000,
             enable_skill: "sword",

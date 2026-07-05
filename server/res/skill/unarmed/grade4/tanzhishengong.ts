@@ -46,7 +46,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        tanzhijinglei: {
+        lei: {
             name: "弹指惊雷",
             distime: 20000,
             enable_skill: "unarmed",
@@ -69,7 +69,7 @@ export default class extends SKILL {
                 return "对敌人造成200%攻击力的伤害，命中后减少对方15%的内力";
             },
         },
-        dianxue: {
+        xue: {
             name: "点穴",
             distime: 30000,
             enable_skill: "unarmed",

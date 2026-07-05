@@ -23,7 +23,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        lieyan: {
+        yan: {
             name: "烈焰",
             distime: 30000,
             enable_skill: "force",
@@ -56,7 +56,7 @@ export default class extends SKILL {
                 return "灼烧敌人";
             },
         },
-        nouhou: {
+        hou: {
             name: "怒吼",
             distime: 7000,
             enable_skill: "force",

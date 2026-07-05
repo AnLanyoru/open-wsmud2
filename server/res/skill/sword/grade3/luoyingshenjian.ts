@@ -43,7 +43,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        lybf: {
+        bin: {
             name: "落英缤纷",
             distime: 10000,
             enable_skill: "sword",

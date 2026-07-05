@@ -43,7 +43,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jskw: {
+        kuang: {
             name: "金蛇狂舞",
             distime: 20000,
             enable_skill: "sword",
@@ -78,7 +78,7 @@ export default class extends SKILL {
                 return "对敌人造成" + per + "%攻击力的伤害，命中后使敌人忙乱" + toSec(int(busy)) + "秒";
             },
         },
-        jszh: {
+        zhu: {
             name: "金蛇追魂",
             distime: 30000,
             enable_skill: "sword",

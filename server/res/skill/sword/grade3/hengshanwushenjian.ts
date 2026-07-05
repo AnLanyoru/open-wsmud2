@@ -85,7 +85,7 @@ export default class extends SKILL {
                 return "瞬间对敌人攻击5次，每次造成" + per + "%伤害。";
             },
         },
-        wsf: {
+        jian: {
             name: "五神赋",
             distime: 30000,
             enable_skill: "sword",

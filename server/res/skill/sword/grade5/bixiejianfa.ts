@@ -55,7 +55,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        cimu: {
+        ci: {
             name: "刺目",
             distime: 45000,
             enable_skill: "sword",

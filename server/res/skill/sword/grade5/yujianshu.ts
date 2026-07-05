@@ -53,7 +53,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wanjian: {
+        wan: {
             name: "万剑诀",
             distime: 18000,
             enable_skill: "sword",
@@ -89,7 +89,7 @@ export default class extends SKILL {
                 return "召唤" + maxSwords + "道剑气攻击当前敌人，消耗积累的剑气增加攻击次数，剩余剑气每道增加2%的伤害和命中。";
             },
         },
-        tianjian: {
+        tian: {
             name: "天剑诀",
             distime: 25000,
             enable_skill: "sword",

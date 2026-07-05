@@ -48,7 +48,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        jghs: {
+        she: {
             name: "金钩锁魂",
             distime: 25000,
             enable_skill: "sword",

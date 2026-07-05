@@ -23,7 +23,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        zhulong: {
+        long: {
             name: "烛龙之眼",
             distime: 28500,
             enable_skill: "force",
@@ -51,7 +51,7 @@ export default class extends SKILL {
                 return "闪瞎敌人";
             },
         },
-        zhaoji: {
+        zhao: {
             name: "爪击",
             distime: 28500,
             enable_skill: "force",
@@ -66,7 +66,7 @@ export default class extends SKILL {
                 return "用利爪攻击敌人";
             },
         },
-        nouhou: {
+        hou: {
             name: "怒吼",
             distime: 6650,
             enable_skill: "force",

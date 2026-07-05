@@ -38,7 +38,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        slh: {
+        huan: {
             name: "三连环",
             distime: 15000,
             enable_skill: "sword",
