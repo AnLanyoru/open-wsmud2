@@ -2,7 +2,7 @@ import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 80 */
 export default class extends SKILL {
     name = "金蛇锥法";
     id = "jinshezhui";
@@ -22,14 +22,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
+            prop: 'jszh_she_mz',
             value: (lv: number) => 10,
-            format: (val: number) => '千蛇出洞命中增加10%',
+            format: (val: number) => '千蛇出洞命中增加' + val + '%',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '千蛇出洞最大次数增加1次',
+            prop: 'jszh_she_cs',
+            value: (lv: number) => 1,
+            format: (val: number) => '千蛇出洞最大次数增加' + val + '次',
         },
     ];
 
@@ -49,8 +49,10 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                var count = 3 + Math.floor(lv / 500);
-                var extraMZ = 10;
+                const sheCs = me.query_prop("jszh_she_cs");
+                const sheMz = me.query_prop("jszh_she_mz");
+                var count = 3 + Math.floor(lv / 500) + sheCs;
+                var extraMZ = 10 + sheMz;
 
                 me.send_room("<HIY>$N双掌齐扬，$T化作漫天金蛇，铺天盖地地罩向$n！</HIY>", target);
                 for (var i = 0; i < count; i++) {
@@ -58,7 +60,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function(_me: CHARACTER, _lv: number) {
                 return "使用暗器对敌人发动攻击";
             },
         },

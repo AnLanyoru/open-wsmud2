@@ -3,7 +3,7 @@ import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 60 */
 export default class extends SKILL {
     name = "一阳指";
     id = "yiyangzhi";
@@ -23,14 +23,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '一指乾坤的伤害额外增加60%',
+            prop: 'yyz_kun_sh',
+            value: (lv: number) => 60,
+            format: (val: number) => '一指乾坤的伤害额外增加' + val + '%',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '点穴将使敌人昏迷最多10秒',
+            prop: 'yyz_xue_hm',
+            value: (lv: number) => 10000,
+            format: (val: number) => '点穴命中后将使敌人昏迷' + toSec(val) + '秒',
         },
     ];
 
@@ -52,12 +52,16 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+                const kunSh = me.query_prop("yyz_kun_sh");
+                const dmgMulti = 1.5 + kunSh / 100;
+
                 me.send_room("<HIC>$N神色凛然，一指点出，正是大理段氏不传之秘——一指乾坤！指力所及，乾坤倒转！</HIC>", target);
-                me.do_attack({ target, gj: Math.floor(me.gj * 1.5), mz: me.mz, no_parry: true });
+                me.do_attack({ target, gj: Math.floor(me.gj * dmgMulti), mz: me.mz, no_parry: true });
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "对敌人造成150%攻击力的伤害，无法防御";
+                const kunSh = me.query_prop("yyz_kun_sh");
+                return "对敌人造成" + (150 + kunSh) + "%攻击力的伤害，无法防御";
             },
         },
         xue: {
@@ -68,6 +72,7 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var busyDuration = dianxueBusy(lv);
+                const hmDuration = me.query_prop("yyz_xue_hm");
 
                 me.send_room("<HIC>$N运起一阳指神功，食指疾出，精准地点向$n的穴道！</HIC>", target);
                 me.do_attack({ target, gj: me.gj, mz: me.mz });
@@ -79,11 +84,23 @@ export default class extends SKILL {
                         duration: busyDuration,
                         downside: true,
                     }, me);
+
+                    if (hmDuration > 0) {
+                        target.add_status({
+                            id: "faint",
+                            is_faint: true,
+                            name: "昏迷",
+                            duration: hmDuration,
+                            downside: true,
+                            finish_msg: "<hiy>慢慢的$N又恢复了知觉……</hiy>\n",
+                            start_msg: "<hir>$N只觉得眼前一黑，接着什么都不知道了……</hir>\n",
+                        }, me);
+                    }
                 }
 
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function(_me: CHARACTER, lv: number) {
                 var busyDuration = dianxueBusy(lv);
                 return "一阳指之点穴大法，命中后造成伤害，并使敌人忙乱" + toSec(busyDuration) + "秒。";
             },

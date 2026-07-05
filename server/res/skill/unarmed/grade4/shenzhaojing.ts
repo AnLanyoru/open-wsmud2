@@ -1,10 +1,11 @@
 import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { PropMap } from "../../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type {LearnCondition} from "../../../../types/events.js";
 
-/** 完成度 50 */
+/** 完成度 30 */
 export default class extends SKILL {
     name = "神照经";
     id = "shenzhaojing";
@@ -29,14 +30,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '额外增加210点悟性',
+            prop: 'int',
+            value: (lv: number) => 210,
+            format: (val: number) => '额外增加' + val + '点悟性',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '拳经附加的额外气血增加30%',
+            prop: 'szj_jing_qx',
+            value: (lv: number) => 30,
+            format: (val: number) => '拳经附加的额外气血增加' + val + '%',
         },
     ];
 
@@ -98,18 +99,31 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var strDmg = Math.floor(me.str * 5);
                 var shieldHp = Math.floor(1512 + lv * 1.5);
+                const qxSh = me.query_prop("szj_jing_qx");
+                shieldHp = Math.floor(shieldHp * (1 + qxSh / 100));
 
                 me.send_room("<HIC>$N沉腰坐马，一式直拳缓缓推出，看似平淡无奇，实则蕴含神照经无上内力！</HIC>", target);
                 me.do_attack({ target, gj: Math.floor(me.gj * 0.01) + strDmg, mz: me.mz });
 
                 if (target.hp > 0) {
-                    me.send_room("<HIW>$N拳经真气透体而出，在周身形成一道无形护盾！</HIW>", target);
+                    me.add_status({
+                        id: "weapon",
+                        name: "拳经",
+                        duration: 15000,
+                        prop: {
+                            shield: shieldHp,
+                        },
+                        finish_msg: "<HIW>$N周身的拳经护盾渐渐消散。</HIW>",
+                    });
                 }
 
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "一式直拳对敌人造成伤害，造成1%攻击力的伤害，你臂力越高造成的伤害越大，命中后给自己增加一个吸收1512伤害的护盾，护盾期间拳经冷却减少。";
+                const qxSh = me.query_prop("szj_jing_qx");
+                var shieldHp = Math.floor(1512 + lv * 1.5);
+                shieldHp = Math.floor(shieldHp * (1 + qxSh / 100));
+                return "一式直拳对敌人造成伤害，你臂力越高造成的伤害越大，命中后给自己增加一个吸收" + shieldHp + "伤害的护盾。";
             },
         },
     };

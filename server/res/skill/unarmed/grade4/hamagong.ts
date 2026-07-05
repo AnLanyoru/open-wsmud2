@@ -4,7 +4,7 @@ import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js"
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type {LearnCondition} from "../../../../types/events.js";
 
-/** 完成度 50 */
+/** 完成度 20 */
 export default class extends SKILL {
     name = "蛤蟆功";
     id = "hamagong";
@@ -30,14 +30,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '蛤蟆冲击最少次数增加2次',
+            prop: 'hmg_chong_cs',
+            value: (lv: number) => 2,
+            format: (val: number) => '蛤蟆冲击最少次数增加' + val + '次',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '蛤蟆吸气期间额外增加8%免伤',
+            prop: 'hmg_xi_ms',
+            value: (lv: number) => 8,
+            format: (val: number) => '蛤蟆吸气期间额外增加' + val + '%免伤',
         },
     ];
 
@@ -68,6 +68,8 @@ export default class extends SKILL {
                 var maxCharge = 4.5 + Math.floor(lv / 200) * 1.5;
                 var chargeTime = Math.min(maxCharge * 1000, 9000);
                 var mianShang = 20 + Math.floor(lv / 100);
+                const xiMs = me.query_prop("hmg_xi_ms");
+                mianShang += xiMs;
 
                 me.send_room("<HIY>$N趴在地上，双腮鼓起如鼓，腹腔中传出沉闷的咕咕声，正在蓄力运功！</HIY>", target);
                 me.add_status({
@@ -100,7 +102,8 @@ export default class extends SKILL {
                 var chargeDuration = chargeStart ? Date.now() - chargeStart : 0;
                 var chargeSeconds = Math.max(0, Math.min(9, chargeDuration / 1000));
                 var baseCount = 1;
-                var extraCount = Math.floor(chargeSeconds);
+                const chongCs = me.query_prop("hmg_chong_cs");
+                var extraCount = Math.floor(chargeSeconds) + chongCs;
                 var hitCount = baseCount + extraCount;
                 var dmgBonus = 1 + chargeSeconds * 0.15;
                 var mzBonus = chargeSeconds * 0.15;

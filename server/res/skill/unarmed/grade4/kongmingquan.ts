@@ -27,13 +27,13 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
+            prop: 'kmq_bo_cd',
+            value: (lv: number) => 1,
             format: (val: number) => '左右互搏使用的绝招会继承冷却时间',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
+            prop: 'kmq_bo_lv',
+            value: (lv: number) => 1,
             format: (val: number) => '左右互搏使用的绝招会继承技能等级',
         },
     ];
@@ -82,10 +82,36 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+                const boCd = me.query_prop("kmq_bo_cd");
+                const boLv = me.query_prop("kmq_bo_lv");
+
                 me.send_room("<HIC>$N左手画方，右手画圆，使出左右互搏之术，双拳齐出攻向$n！</HIC>", target);
-                for (var i = 0; i < 2; i++) {
+
+                // 第一次攻击使用当前技能
+                me.do_attack({ target, gj: me.gj, mz: me.mz, no_weapon: true });
+
+                // 第二次攻击：尝试使用其他技能的绝招
+                const otherPfm = kmq_find_pfm(me, lv, boLv);
+                if (otherPfm) {
+                    const otherSkill = otherPfm.skill;
+                    const otherPerform = otherPfm.pfm;
+                    const otherLv = boLv ? me.query_skill(otherSkill.id) : lv;
+
+                    me.send_room("<HIC>$N心分二用，左手「" + otherPerform.name + "」凌空击出！</HIC>", target);
+
+                    if (otherPerform.use) {
+                        otherPerform.use.call(otherPerform, me, target, otherLv, otherSkill.can_enables[0] || "unarmed");
+                    }
+
+                    // 继承冷却时间
+                    if (boCd && otherPerform.pid) {
+                        const baseType = otherSkill.can_enables[0] || "unarmed";
+                        otherPerform.set_distime(me, baseType, otherPerform.query_distime(me, otherLv));
+                    }
+                } else {
                     me.do_attack({ target, gj: me.gj, mz: me.mz, no_weapon: true });
                 }
+
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
@@ -93,4 +119,22 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+/** 左右互搏寻找可用的其他武功绝招 */
+function kmq_find_pfm(me: CHARACTER, lv: number, boLv: number): { skill: SKILL, pfm: PERFORM } | null {
+    // 查找当前装备的unarmed技能的绝招
+    for (const sid of me.skills?.keys() || []) {
+        if (sid === "kongmingquan" || sid === "kongmingquan2") continue;
+        const sk = SKILL.get(sid);
+        if (!sk || !sk.can_enables?.includes("unarmed")) continue;
+        if (!me.is_enable_skill(sid, "unarmed")) continue;
+        for (const pid in sk.pfm) {
+            const pfm = sk.pfm[pid];
+            if (pfm.enable_skill === "unarmed" && pfm.use) {
+                return { skill: sk, pfm: pfm };
+            }
+        }
+    }
+    return null;
 }

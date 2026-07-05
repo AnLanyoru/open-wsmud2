@@ -1,9 +1,10 @@
 import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { PropMap } from "../../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 70 */
 export default class extends SKILL {
     name = "弹指神通";
     id = "tanzhishengong";
@@ -23,14 +24,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '点穴将附加13%内力伤害，并减少对方内力',
+            prop: 'tzsg_xue_nl',
+            value: (lv: number) => 13,
+            format: (val: number) => '点穴将附加' + val + '%内力伤害，并减少对方内力',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '敌人的内力每降低1%弹指神通造成的伤害增加2%',
+            prop: 'tzsg_nl_sh',
+            value: (lv: number) => 2,
+            format: (val: number) => '敌人内力每降低1%弹指神通造成的伤害增加' + val + '%',
         },
     ];
 
@@ -55,8 +56,13 @@ export default class extends SKILL {
                 var neiliDrain = Math.floor(target.mp * 0.15);
                 target.add_mp(-neiliDrain);
 
+                const nlSh = me.query_prop("tzsg_nl_sh");
+                const mpMissingRatio = target.max_mp > 0 ? (1 - target.mp / target.max_mp) * 100 : 0;
+                const nlBonus = 1 + mpMissingRatio * nlSh / 100;
+                const dmgMulti = 2 * nlBonus;
+
                 me.send_room("<HIW>$N食指扣在拇指之下，猛地弹出，只听一声尖锐破空，一道惊雷般的指风直射$n！</HIW>", target);
-                me.do_attack({ target, gj: Math.floor(me.gj * 2), mz: me.mz });
+                me.do_attack({ target, gj: Math.floor(me.gj * dmgMulti), mz: me.mz });
 
                 if (target.hp > 0 && neiliDrain > 0) {
                     target.send_room("<HIR>$n的内力被弹指神通的真气打散，流失了一部分！</HIR>", me);
@@ -64,7 +70,7 @@ export default class extends SKILL {
 
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function(_me: CHARACTER, _lv: number) {
                 return "对敌人造成200%攻击力的伤害，命中后减少对方15%的内力";
             },
         },
@@ -76,9 +82,15 @@ export default class extends SKILL {
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var busyDuration = dianxueBusy(lv);
+                const xueNl = me.query_prop("tzsg_xue_nl");
+
+                const par: DoAttackPar = { target, gj: me.gj, mz: me.mz };
+                if (xueNl > 0) {
+                    par.gj = me.gj + Math.floor(me.mp * xueNl / 100);
+                }
 
                 me.send_room("<HIW>$N运指如风，一缕指劲精准地射向$n的要穴！</HIW>", target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+                me.do_attack(par);
 
                 if (target.hp > 0) {
                     target.add_status({
@@ -87,11 +99,16 @@ export default class extends SKILL {
                         duration: busyDuration,
                         downside: true,
                     }, me);
+
+                    if (xueNl > 0) {
+                        const neiliDrain = Math.floor(target.mp * xueNl / 100);
+                        target.add_mp(-neiliDrain);
+                    }
                 }
 
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function(_me: CHARACTER, lv: number) {
                 var busyDuration = dianxueBusy(lv);
                 return "弹指神通之点穴大法，命中后造成伤害，并使敌人忙乱" + toSec(busyDuration) + "秒。";
             },

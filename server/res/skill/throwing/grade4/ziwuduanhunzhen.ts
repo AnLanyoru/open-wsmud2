@@ -1,8 +1,9 @@
 import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import type { PropMap } from "../../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 60 */
 export default class extends SKILL {
     name = "子午断魂针";
     id = "ziwuduanhunzhen";
@@ -22,14 +23,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
+            prop: 'zwdhz_wxfy',
             value: (lv: number) => 10,
-            format: (val: number) => '子午断魂针忽视对方10%防御',
+            format: (val: number) => '断魂忽视对方' + val + '%防御',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '子午断魂针降低对方伤害的效果额外增加12',
+            prop: 'zwdhz_jsh',
+            value: (lv: number) => 12,
+            format: (val: number) => '断魂降低对方伤害的效果额外增加' + val + '%',
         },
     ];
 
@@ -52,12 +53,19 @@ export default class extends SKILL {
             mp: 60,
             release_time: 1800,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+                const wxfy = me.query_prop("zwdhz_wxfy");
+                const jsh = me.query_prop("zwdhz_jsh");
+
                 me.send_room("<HIR>$N面罩寒霜，扬手间两道乌光破空而出，直取$n胸前大穴！</HIR>", target);
                 for (var i = 0; i < 2; i++) {
-                    me.do_attack({ target, gj: me.gj, mz: me.mz });
+                    const par: DoAttackPar = { target, gj: me.gj, mz: me.mz };
+                    if (wxfy) par.diff_fy = wxfy;
+                    me.do_attack(par);
                 }
 
                 if (target.hp > 0) {
+                    const prop: PropMap = {};
+                    prop.add_sh_per = -25 - jsh;
                     target.add_status({
                         id: "duanhun_jiangshang",
                         name: "断魂",
@@ -65,9 +73,7 @@ export default class extends SKILL {
                         duration: 15000,
                         downside: true,
                         no_diff: true,
-                        prop: {
-                            add_sh_per: -25,
-                        },
+                        prop: prop,
                         finish_msg: "<HIG>$n经脉中的断魂针劲渐渐消散。</HIG>",
                     }, me);
                 }

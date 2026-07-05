@@ -3,7 +3,7 @@ import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js"
 import type {LearnCondition} from "../../../../types/events.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 80 */
 export default class extends SKILL {
     name = "雷霆斧法";
     id = "leitingfufa";
@@ -28,14 +28,14 @@ export default class extends SKILL {
 
     slots = [
         {
-            prop: 'slot_0',
-            value: (lv: number) => 10,
-            format: (val: number) => '雷霆开山的释放时间减少1秒',
+            prop: 'ltff_kai_sd',
+            value: (lv: number) => 1000,
+            format: (val: number) => '雷霆开山的释放时间减少' + toSec(val) + '秒',
         },
         {
-            prop: 'slot_1',
-            value: (lv: number) => 10,
-            format: (val: number) => '雷霆开山的伤害增加40%',
+            prop: 'ltff_kai_sh',
+            value: (lv: number) => 40,
+            format: (val: number) => '雷霆开山的伤害增加' + val + '%',
         },
     ];
 
@@ -55,15 +55,17 @@ export default class extends SKILL {
             enable_skill: "staff",
             mp: 20,
             release_time: 7000,
+            releasetime_key: "ltff_kai_sd",
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                var dmgMulti = 3 + lv / 1000;
+                const kaiSh = me.query_prop("ltff_kai_sh");
+                var dmgMulti = 3 + lv / 1000 + kaiSh / 100;
                 var strBonus = Math.floor(me.str * 2);
 
                 me.send_room("<HIW>$N仰天怒吼，$W高高抡起，以开山之势猛劈向$n！罡风呼啸，天地为之变色！</HIW>", target);
                 me.do_attack({ target, gj: Math.floor(me.gj * dmgMulti) + strBonus, mz: me.mz });
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
+            query_desc: function(_me: CHARACTER, lv: number) {
                 return "使出全身气力劈向敌人，造成" + (300 + lv / 10) + "%伤害，臂力加成越高伤害越高";
             },
         },
