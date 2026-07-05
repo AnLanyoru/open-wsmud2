@@ -1064,7 +1064,7 @@ export class PERFORM {
     allow_busy?: boolean;
     /** 允许昏迷时使用 */
     allow_faint?: boolean;
-    /** 允许在安全区御使用 */
+    /** 允许在安全区域使用 */
     allow_safe?: boolean;
 
     /** 是否禁止复制 */
