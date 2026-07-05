@@ -45,7 +45,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        zhen: {
+        duan: {
             name: "断魂",
             distime: 25000,
             enable_skill: "throwing",

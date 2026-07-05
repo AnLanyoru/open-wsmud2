@@ -42,7 +42,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        ming: {
+        mang: {
             name: "剑芒",
             distime: 30000,
             enable_skill: "sword",
@@ -71,7 +71,7 @@ export default class extends SKILL {
                 return "催动内力使你的剑锋芒毕露，" + toSec(int(duration)) + "秒内增加" + bj + "%的暴击率";
             },
         },
-        jue: {
+        qi: {
             name: "剑气",
             distime: 20000,
             enable_skill: "sword",
@@ -87,7 +87,7 @@ export default class extends SKILL {
                 };
                 me.do_attack(par);
                 if (par.iscirt) {
-                    me.clear_distime("sword/jq");
+                    me.clear_distime("sword/qi");
                 }
                 me.end_attack(target);
             },

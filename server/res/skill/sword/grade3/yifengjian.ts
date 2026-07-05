@@ -41,7 +41,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        qian: {
+        yi: {
             name: "移风起栖",
             distime: 20000,
             enable_skill: "sword",

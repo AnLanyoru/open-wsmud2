@@ -52,7 +52,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wu: {
+        yue: {
             name: "万岳朝宗",
             distime: 10000,
             enable_skill: "sword",

@@ -59,7 +59,7 @@ export default class extends SKILL {
                 return "真言伤人，随机从九字真言中诵出一字，威力随字序递增";
             },
         },
-        fo: {
+        fa: {
             name: "不死法印",
             distime: 60000,
             enable_skill: "unarmed",

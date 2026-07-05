@@ -52,7 +52,7 @@ export default class extends SKILL {
     }
 
     pfm_set: PerformData = {
-        wsj: {
+        wu: {
             name: "五神剑",
             distime: 13000,
             enable_skill: "sword",
@@ -84,7 +84,7 @@ export default class extends SKILL {
                 return "瞬间对敌人攻击5次，每次造成" + per + "%伤害。";
             },
         },
-        jian: {
+        fu: {
             name: "五神赋",
             distime: 30000,
             enable_skill: "sword",

@@ -77,7 +77,7 @@ export default class extends SKILL {
                 return "对敌人造成" + per + "%攻击力的伤害，命中后使敌人忙乱" + toSec(int(busy)) + "秒";
             },
         },
-        zhu: {
+        zhui: {
             name: "金蛇追魂",
             distime: 30000,
             enable_skill: "sword",
