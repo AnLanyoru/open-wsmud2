@@ -75,7 +75,6 @@ export default class extends SKILL {
                         mz: me.mz,
                         attack_msg: "<hiy>$N手中青光冒出，一瞬间$T已飞向$n化作点点星光笼罩$p周身大穴！</hiy>"
                     })
-                    var ds = 10 + parseInt(lv / 100);
                     target.add_status({
                         id: "rash",
                         name: "定影",

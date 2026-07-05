@@ -1,6 +1,6 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /** 完成度 50 */
@@ -38,7 +38,7 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = shenpan_time(lv);
                 me.send_room("<ord>$N双目微阖，双手结印，朗声道：「天谕在上，代天行法——审判！」</ord>\n<ord>霎时间，九天之上雷云翻涌，一道金光破空而下，将$n笼罩其中！</ord>\n", target);
-                const sh: number = me.do_attack({
+                me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
@@ -47,24 +47,22 @@ export default class extends SKILL {
                     miss_msg: "<cyn>$n见势不妙，拼命翻滚躲避，堪堪避过金光笼罩。</cyn>",
                     is_throwing: true,
                 });
-                if (sh) {
-                    target.add_status({
-                        id: "shenpan",
-                        name: "审判",
-                        desc: "被天谕法印镇压，无法移动",
-                        duration: time,
-                        is_rash: true,
-                        downside: true,
-                        finish_msg: "<ord>$N周身金光碎裂，审判法印终于消散。</ord>\n",
-                        start_msg: "<ord>$N周身金光大盛，已被天谕法印镇压！</ord>\n",
-                        on_attach: function(p: CHARACTER): void {
-                            p.set_temp("sk_shenpan", 1, time);
-                        },
-                        on_expire: function(p: CHARACTER): void {
-                            p.remove_temp("sk_shenpan");
-                        },
-                    }, me);
-                }
+                target.add_status({
+                    id: "rash",
+                    name: "审判",
+                    desc: "被天谕法印镇压，无法移动",
+                    duration: time,
+                    is_rash: true,
+                    downside: true,
+                    finish_msg: "<ord>$N周身金光碎裂，审判法印终于消散。</ord>\n",
+                    start_msg: "<ord>$N周身金光大盛，已被天谕法印镇压！</ord>\n",
+                    on_attach: function (p: CHARACTER): void {
+                        p.set_temp("sk_shenpan", 1, time);
+                    },
+                    on_expire: function (p: CHARACTER): void {
+                        p.remove_temp("sk_shenpan");
+                    },
+                }, me);
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {

@@ -1,7 +1,7 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /** 完成度 50 */
@@ -73,21 +73,19 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = dingying_time(lv);
-                const sh: number = me.do_attack({
+                me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
                     attack_msg: "<hiy>$N手中青光冒出，一瞬间$W已飞向$n化作点点星光笼罩$p周身大穴！</hiy>",
                 });
-                if (sh) {
-                    target.add_status({
-                        id: "rash",
-                        name: "定影",
-                        duration: time,
-                        is_rash: true,
-                        downside: true,
-                    }, me);
-                }
+                target.add_status({
+                    id: "rash",
+                    name: "定影",
+                    duration: time,
+                    is_rash: true,
+                    downside: true,
+                }, me);
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
