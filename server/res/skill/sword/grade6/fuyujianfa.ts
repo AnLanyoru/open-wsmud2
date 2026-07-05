@@ -41,7 +41,7 @@ export default class extends SKILL {
             sword: {
                 gj: 10 + lv * 3,
                 mz: 20 + lv * 3,
-                dex: 2 + Math.floor(lv * 0.5),
+                dex: 2 + Math.floor(lv / 2),
                 mz_per: 8,
                 gjsd_per: 10,
             },

@@ -44,12 +44,12 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {
-                gj: 10 + Math.floor(lv * 1.6),
+                gj: 10 + Math.floor(lv * 8 / 5),
                 str: Math.floor(lv / 8),
                 max_hp: lv * 10,
             },
             parry: {
-                zj: 10 + Math.floor(lv * 1.6),
+                zj: 10 + Math.floor(lv * 8 / 5),
                 fy: 200 + lv,
             },
         };

@@ -45,8 +45,8 @@ export default class extends SKILL {
             unarmed: {
                 gj: 5 + Math.floor(lv * 2.6),
                 mz: 5 + Math.floor(lv * 2.6),
-                str: Math.floor(lv * 0.5),
-                con: Math.floor(lv * 0.5),
+                str: Math.floor(lv / 2),
+                con: Math.floor(lv / 2),
             },
             parry: {
                 zj: 20 + lv * 2,

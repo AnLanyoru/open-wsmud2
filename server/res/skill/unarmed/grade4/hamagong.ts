@@ -45,14 +45,14 @@ export default class extends SKILL {
         return {
             force: {
                 fy: 100 + Math.floor(lv * 2),
-                gj: 35 + Math.floor(lv * 1.6),
+                gj: 35 + Math.floor(lv * 8 / 5),
                 limit_mp: lv * 150,
                 desc: "唯一：将你内力的70%转化为气血",
             },
             unarmed: {
                 gj: 11 + Math.floor(lv * 1.4),
                 mz: 11 + Math.floor(lv * 1.4),
-                str: Math.floor(lv * 0.2),
+                str: Math.floor(lv / 5),
             },
         };
     }

@@ -42,7 +42,7 @@ export default class extends SKILL {
         return {
             unarmed: {
                 gj: 20 + Math.floor(lv * 1.7),
-                str: 1 + Math.floor(lv * 0.166),
+                str: 1 + Math.floor(lv / 6),
                 mz: 20 + Math.floor(lv * 1.7),
             },
         };

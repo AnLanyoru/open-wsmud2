@@ -41,7 +41,7 @@ export default class extends SKILL {
         return {
             sword: {
                 gj: 10 + lv * 2,
-                mz: 20 + Math.floor(lv * 1.5),
+                mz: 20 + Math.floor(lv * 3 / 2),
                 dex: Math.floor(lv * 0.127),
                 bj_per: 8,
                 desc: "你的攻击会快速攻击多次",

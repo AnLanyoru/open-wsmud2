@@ -43,18 +43,18 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                str: 10 + Math.floor(lv * 0.166),
-                con: 10 + Math.floor(lv * 0.166),
-                dex: 10 + Math.floor(lv * 0.166),
-                int: 10 + Math.floor(lv * 0.166),
+                str: 10 + Math.floor(lv / 6),
+                con: 10 + Math.floor(lv / 6),
+                dex: 10 + Math.floor(lv / 6),
+                int: 10 + Math.floor(lv / 6),
                 limit_mp: lv * 150,
                 desc: "唯一：将你内力的80%转化为气血",
             },
             unarmed: {
-                gj: 100 + Math.floor(lv * 1.6),
-                mz: 100 + Math.floor(lv * 1.6),
-                str: 10 + Math.floor(lv * 0.2),
-                con: 10 + Math.floor(lv * 0.2),
+                gj: 100 + Math.floor(lv * 8 / 5),
+                mz: 100 + Math.floor(lv * 8 / 5),
+                str: 10 + Math.floor(lv / 5),
+                con: 10 + Math.floor(lv / 5),
             },
         };
     }
@@ -97,7 +97,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var strDmg = Math.floor(me.str * 5);
-                var shieldHp = Math.floor(1512 + lv * 1.5);
+                var shieldHp = Math.floor(1512 + lv * 3 / 2);
 
                 me.send_room("<HIC>$N沉腰坐马，一式直拳缓缓推出，看似平淡无奇，实则蕴含神照经无上内力！</HIC>", target);
                 me.do_attack({ target, gj: Math.floor(me.gj * 0.01) + strDmg, mz: me.mz });

@@ -43,7 +43,7 @@ export default class extends SKILL {
         return {
             staff: {
                 gj: 10 + Math.floor(lv * 1.2),
-                str: 2 + Math.floor(lv * 0.1),
+                str: 2 + Math.floor(lv / 10),
             },
         };
     }
@@ -64,7 +64,7 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "使出全身气力劈向敌人，造成" + (300 + lv * 0.1) + "%伤害，臂力加成越高伤害越高";
+                return "使出全身气力劈向敌人，造成" + (300 + lv / 10) + "%伤害，臂力加成越高伤害越高";
             },
         },
     };

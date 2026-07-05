@@ -28,8 +28,8 @@ export default class extends SKILL {
             unarmed: {
                 gj: 20 + Math.floor(lv * 2.3),
                 mz: 20 + Math.floor(lv * 1.7),
-                int: 12 + Math.floor(lv * 0.25),
-                con: 12 + Math.floor(lv * 0.25),
+                int: 12 + Math.floor(lv / 4),
+                con: 12 + Math.floor(lv / 4),
                 diff_downside_per: 10,
             },
         };

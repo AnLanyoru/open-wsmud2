@@ -36,8 +36,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
-                gj: 4 + Math.floor(lv * 1.8),
-                mz: 4 + Math.floor(lv * 1.8),
+                gj: 4 + Math.floor(lv * 9 / 5),
+                mz: 4 + Math.floor(lv * 9 / 5),
                 mz_per: 1 + int(lv / 500),
                 add_sh_per: 1 + int(lv / 500),
             },

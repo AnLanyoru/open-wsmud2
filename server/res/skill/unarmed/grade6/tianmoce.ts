@@ -46,21 +46,21 @@ export default class extends SKILL {
             },
             dodge: {
                 ds: lv * 3,
-                dex: 100 + Math.floor(lv * 0.5),
+                dex: 100 + Math.floor(lv / 2),
                 ds_per: 4,
                 mz_per: 4,
             },
             parry: {
                 zj: lv * 3,
                 hp_per: 6,
-                con: 100 + Math.floor(lv * 0.5),
-                str: 100 + Math.floor(lv * 0.5),
+                con: 100 + Math.floor(lv / 2),
+                str: 100 + Math.floor(lv / 2),
             },
             unarmed: {
                 gj: lv * 3,
                 mz: lv * 3,
-                con: 100 + Math.floor(lv * 0.5),
-                str: 100 + Math.floor(lv * 0.5),
+                con: 100 + Math.floor(lv / 2),
+                str: 100 + Math.floor(lv / 2),
             },
         };
     }
@@ -118,8 +118,8 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = 8000 + lv * 4;
                 if (time > 15000) time = 15000;
-                var gj_bonus = Math.floor(lv * 0.5);
-                var mz_bonus = Math.floor(lv * 0.5);
+                var gj_bonus = Math.floor(lv / 2);
+                var mz_bonus = Math.floor(lv / 2);
                 var add_sh = 3 + Math.floor(lv / 300);
                 me.send_room("<mag>$N双目微阖，体内魔功逆转，竟在无边魔气中悟得一丝「<MAG>道心</MAG>」，魔道相济，战力暴涨！</mag>", target);
                 me.add_status({

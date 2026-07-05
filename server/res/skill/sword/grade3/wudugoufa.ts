@@ -39,7 +39,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                str: 1 + Math.floor(lv * 0.2),
+                str: 1 + Math.floor(lv / 5),
                 mz: 10 + Math.floor(lv * 1.4),
                 desc: "当你命中敌人后对敌人造成毒素伤害",
             },

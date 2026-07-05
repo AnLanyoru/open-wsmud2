@@ -37,12 +37,12 @@ export default class extends SKILL {
             staff: {
                 gj: 10 + Math.floor(lv * 1.2),
                 mz: lv * 1,
-                dex: Math.floor(lv * 0.1),
+                dex: Math.floor(lv / 10),
                 zj: lv * 1,
                 desc: "你的攻击会使敌人受到3356点蛇毒伤害",
             },
             parry: {
-                zj: 5 + Math.floor(lv * 1.6),
+                zj: 5 + Math.floor(lv * 8 / 5),
                 fy: 10 + lv * 2,
             },
         };
