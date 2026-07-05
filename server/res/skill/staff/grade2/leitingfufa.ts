@@ -26,6 +26,19 @@ export default class extends SKILL {
       }
     };
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '雷霆开山的释放时间减少1秒',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '雷霆开山的伤害增加40%',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             staff: {

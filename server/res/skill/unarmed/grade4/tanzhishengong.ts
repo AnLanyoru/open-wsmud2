@@ -22,6 +22,19 @@ export default class extends SKILL {
         "$N淡然一笑，手指轻轻一弹，一道劲气已破空而至",
     ];
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '点穴将附加13%内力伤害，并减少对方内力',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '敌人的内力每降低1%弹指神通造成的伤害增加2%',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {

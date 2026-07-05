@@ -26,6 +26,19 @@ export default class extends SKILL {
       "con1": 30
     };
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '额外增加210点悟性',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '拳经附加的额外气血增加30%',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {

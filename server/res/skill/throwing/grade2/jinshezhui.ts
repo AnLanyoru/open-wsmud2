@@ -21,6 +21,19 @@ export default class extends SKILL {
         "$N袖袍鼓风，$T自袖中飞出，真假难辨地罩向$n",
     ];
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '千蛇出洞命中增加10%',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '千蛇出洞最大次数增加1次',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {

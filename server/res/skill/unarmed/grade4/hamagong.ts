@@ -27,6 +27,19 @@ export default class extends SKILL {
       "con1": 30
     };
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '蛤蟆冲击最少次数增加2次',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '蛤蟆吸气期间额外增加8%免伤',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {

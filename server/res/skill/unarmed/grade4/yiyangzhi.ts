@@ -22,6 +22,19 @@ export default class extends SKILL {
         "$N朗声长笑，食指凌空一点，一道纯阳指力直刺$n的$l",
     ];
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '一指乾坤的伤害额外增加60%',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '点穴将使敌人昏迷最多10秒',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {

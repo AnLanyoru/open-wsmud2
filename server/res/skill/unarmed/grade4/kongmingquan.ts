@@ -25,6 +25,19 @@ export default class extends SKILL {
       "int1": 40
     };
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '左右互搏使用的绝招会继承冷却时间',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '左右互搏使用的绝招会继承技能等级',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             unarmed: {

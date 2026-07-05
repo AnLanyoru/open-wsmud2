@@ -21,6 +21,19 @@ export default class extends SKILL {
         "$N冷哼一声，$T后发先至，瞬间已到$n面前",
     ];
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '子午断魂针忽视对方10%防御',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '子午断魂针降低对方伤害的效果额外增加12',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {

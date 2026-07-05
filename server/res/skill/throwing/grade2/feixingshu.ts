@@ -21,6 +21,19 @@ export default class extends SKILL {
         "$N足尖一点，凌空翻身，$T自指间激射而出",
     ];
 
+    slots = [
+        {
+            prop: 'slot_0',
+            value: (lv: number) => 10,
+            format: (val: number) => '星雨最高命中数量：+1',
+        },
+        {
+            prop: 'slot_1',
+            value: (lv: number) => 10,
+            format: (val: number) => '星雨最低命中数量：+1',
+        },
+    ];
+
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
