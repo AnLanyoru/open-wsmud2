@@ -28,7 +28,7 @@ function shibaDuration3(lv: number): number {
 
 /** 十八掌：每掌伤害递增百分比（用于乘法因子） */
 function shibaFactor3(lv: number): number {
-    const f = 105 + Math.floor(lv / 500);
+    const f = 105 + int(lv / 500);
     if (f > 115) return 115;
     return f;
 }
@@ -53,7 +53,7 @@ export default class extends SKILL {
 
     query_prop(lv: number, me?: CHARACTER): PropMap {
         return {
-            gj_per: 5 + Math.floor(lv / 300),
+            gj_per: 5 + int(lv / 300),
         };
     }
 
@@ -63,12 +63,12 @@ export default class extends SKILL {
                 gj: 5 + lv * 3,
                 fy: 5 + lv * 3,
                 mz: 20 + lv * 3,
-                str: 3 + Math.floor(lv * 0.5),
+                str: 3 + int(lv * 0.5),
             },
             parry: {
                 zj: 5 + lv * 3,
                 fy: 100 + lv * 3,
-                diff_sh_per: 1 + Math.floor(lv / 300),
+                diff_sh_per: 1 + int(lv / 300),
             },
         };
     }
@@ -150,7 +150,7 @@ export default class extends SKILL {
             },
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const totalTime = shibaDuration3(lv);
-                const perTime = Math.floor(totalTime / 18);
+                const perTime = int(totalTime / 18);
                 const factor = shibaFactor3(lv);
                 const slotExtra = me.query_prop("xlz3_sb");
                 const enhancedFactor = Math.min(115, factor + slotExtra);
@@ -181,10 +181,10 @@ export default class extends SKILL {
                             diff_fy: hasXlz ? 100 : 0,
                         });
                         if (hit) {
-                            gj = Math.floor(gj * enhancedFactor / 100);
+                            gj = int(gj * enhancedFactor / 100);
                         }
                         // 每击命中递增（不论命中与否）
-                        mz = Math.floor(mz * mzFactor / 100);
+                        mz = int(mz * mzFactor / 100);
                         me.end_attack(nowTarget);
                         if (!me.enemy?.length) {
                             me.is_rash = 0;

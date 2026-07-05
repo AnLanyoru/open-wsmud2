@@ -20,12 +20,12 @@ function chanBusyTime(lv: number): number {
 
 /** 绊字诀：躲闪降低百分比 */
 function chanDsReduce(lv: number): number {
-    return 10 + Math.floor(lv / 100);
+    return 10 + int(lv / 100);
 }
 
 /** 天下无狗：攻击次数 */
 function wuCount(lv: number): number {
-    const c = 3 + Math.floor(lv / 300);
+    const c = 3 + int(lv / 300);
     if (c > 10) return 10;
     return c;
 }
@@ -40,21 +40,13 @@ export default class extends SKILL {
     can_enables = ["club"];
     attack_actions = SKILL.get("club")?.attack_actions || [];
 
-    slots = [
-        {
-            prop: "dgb_cd",
-            value: (lv: number) => 10,
-            format: (val: number) => "天下无狗每命中一次额外减少冷却" + val / 10 + "秒",
-        },
-    ];
-
     query_enable_prop(lv: number): EnablePropMap {
         return {
             club: {
                 gj: 100 + lv * 2,
                 mz: lv * 2,
-                con: Math.floor(lv * 0.2),
-                str: Math.floor(lv * 0.2),
+                con: int(lv * 0.2),
+                str: int(lv * 0.2),
             },
         };
     }
@@ -103,16 +95,15 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             attack_msgs: [
-                "<hiw>$N使出一招「棒打双犬」，手中$W快如流星，化作两道青光砸向$n的$l。</hiw>",
-                "<hiw>$N手腕急抖，一式「拨草寻蛇」，$W从不可思议的角度斜挑$n的$l。</hiw>",
-                "<hiw>$N纵身跃起，居高临下使出「打草惊蛇」，$W带着破空之声劈向$n的$l。</hiw>",
-                "<hiw>$N身子一矮，反手施出「拨狗朝天」，$W自下而上疾撩$n的$l。</hiw>",
+                "<hiw>$N使出一招「棒打双犬」，手中$w化作两道青光砸向$n的$l</hiw>",
+                "<hiw>$N手中$w左右晃动，一招「拨草寻蛇」向$n的$l攻去</hiw>",
+                "<hiw>$N举起$w，居高临下使一招「打草惊蛇」敲向$n的$l</hiw>",
+                "<hiw>$N施出「拨狗朝天」，$w由下往上向$n撩去</hiw>"
             ],
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const count = wuCount(lv);
                 const self = this as PERFORM;
-                me.send_room("<hiw>$N手中$W青光一闪，霎时间棒影重重，四面八方尽是棒风，宛如" + count + "根打狗棒同时攻至，将$n笼罩在一片碧光之中。</hiw>\n", target);
-                const cdReduce = me.query_prop("dgb_cd") / 10;
+                me.send_room("<hiw>$N手中青光一闪，响起阵阵风声，手中$W犹若千百根相似，层层叠叠将$n笼罩。</hiw>\n", target);
                 let hits = 0;
                 for (let i = 0; i < count; i++) {
                     const hit = me.do_attack({
@@ -124,14 +115,13 @@ export default class extends SKILL {
                     if (hit) hits++;
                 }
                 me.end_attack(target);
-                // 每命中一次减少冷却时间
-                if (hits > 0 && cdReduce > 0) {
-                    self.change_distime(me, "club", -(hits * cdReduce * 1000));
+                if (hits > 0) {
+                    self.change_distime(me, "club", -(hits * 1000));
                 }
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const count = wuCount(lv);
-                return "快速对敌人攻击" + count + "次，每命中一次减少天下无狗的冷却时间。";
+                return "快速对敌人攻击" + count + "次，每命中一次减少天下无狗的冷却时间 1 秒。";
             },
         },
     };

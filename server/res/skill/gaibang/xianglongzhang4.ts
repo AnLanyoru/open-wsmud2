@@ -18,7 +18,7 @@ function qiDebuffTime(_lv: number): number {
 
 /** 破灭：消耗内力百分比 */
 function poMpPercent(lv: number): number {
-    return Math.min(30, 10 + Math.floor(lv / 100));
+    return Math.min(30, 10 + int(lv / 100));
 }
 
 /** 摧毁层数阈值 */
@@ -76,7 +76,7 @@ export default class extends SKILL {
                 mz: lv * 3,
                 str: lv * 1,
                 con: lv * 1,
-                gj_per: 5 + Math.floor(lv / 200),
+                gj_per: 5 + int(lv / 200),
                 desc: "摧毁命中敌人后逐步瓦解敌方防御",
             },
         };
@@ -153,7 +153,7 @@ export default class extends SKILL {
                 const mpPercent = poMpPercent(lv);
                 const slotExtra = me.query_prop("xlz4_po");
                 const totalMpPercent = mpPercent + slotExtra;
-                const powerGj = Math.floor(me.max_mp * totalMpPercent / 100);
+                const powerGj = int(me.max_mp * totalMpPercent / 100);
 
                 me.send_room("<ored>$N面容肃穆，双掌缓缓合拢，周身真气如百川归海般向掌心汇聚。刹那间，数十式掌法合为一体——$N猛地双掌齐出，一道毁天灭地的掌劲轰然爆发！</ored>", target);
 
@@ -171,7 +171,7 @@ export default class extends SKILL {
 
                 if (sh) {
                     // 降低对方气血上限
-                    const hpReduce = Math.floor(target.max_hp * 0.15);
+                    const hpReduce = int(target.max_hp * 0.15);
                     target.add_status({
                         id: "pomie",
                         name: "破灭",

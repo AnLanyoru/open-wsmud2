@@ -28,7 +28,7 @@ function shibaDuration(lv: number): number {
 
 /** 十八掌：每掌伤害递增百分比（用于乘法因子） */
 function shibaFactor(lv: number): number {
-    const f = 105 + Math.floor(lv / 500);
+    const f = 105 + int(lv / 500);
     if (f > 115) return 115;
     return f;
 }
@@ -53,7 +53,7 @@ export default class extends SKILL {
 
     query_prop(lv: number, me?: CHARACTER): PropMap {
         return {
-            gj_per: 5 + Math.floor(lv / 300),
+            gj_per: 5 + int(lv / 300),
         };
     }
 
@@ -63,12 +63,12 @@ export default class extends SKILL {
                 gj: 5 + lv * 2,
                 fy: 5 + lv * 2,
                 mz: 20 + lv * 2,
-                str: 3 + Math.floor(lv * 0.25),
+                str: 3 + int(lv * 0.25),
             },
             parry: {
                 zj: 5 + lv * 2,
                 fy: 100 + lv * 2,
-                diff_sh_per: 1 + Math.floor(lv / 300),
+                diff_sh_per: 1 + int(lv / 300),
             },
         };
     }
@@ -149,7 +149,7 @@ export default class extends SKILL {
             },
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const totalTime = shibaDuration(lv);
-                const perTime = Math.floor(totalTime / 18);
+                const perTime = int(totalTime / 18);
                 const factor = shibaFactor(lv);
                 let gj = me.gj;
                 let mz = me.mz;
@@ -179,10 +179,10 @@ export default class extends SKILL {
                         });
                         if (hit) {
                             // 命中后掌力递增
-                            gj = Math.floor(gj * factor / 100);
+                            gj = int(gj * factor / 100);
                         }
                         // 每击命中递增（不论命中与否）
-                        mz = Math.floor(mz * mzFactor / 100);
+                        mz = int(mz * mzFactor / 100);
                         me.end_attack(nowTarget);
                         if (!me.enemy?.length) {
                             me.is_rash = 0;

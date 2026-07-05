@@ -18,7 +18,7 @@ function xianDuration(lv: number): number {
 
 /** 仙游：命中增加百分比 */
 function xianMzPer(lv: number): number {
-    return 20 + Math.floor(lv / 100);
+    return 20 + int(lv / 100);
 }
 
 export default class extends SKILL {
@@ -53,9 +53,9 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             dodge: {
-                ds: 30 + Math.floor(lv * 9 / 5),
-                mz: 30 + Math.floor(lv * 8 / 5),
-                str: 3 + Math.floor(lv * 0.25),
+                ds: 30 + int(lv * 9 / 5),
+                mz: 30 + int(lv * 8 / 5),
+                str: 3 + int(lv * 0.25),
             },
         };
     }

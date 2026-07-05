@@ -20,7 +20,7 @@ function tianDuration(lv: number): number {
 
 /** 天罡：攻击免伤百分比（基础值，未计算进阶加成） */
 function tianBaseProp(lv: number): number {
-    const p = 10 + Math.floor(lv / 100);
+    const p = 10 + int(lv / 100);
     if (p > 40) return 40;
     return p;
 }
@@ -52,7 +52,7 @@ export default class extends SKILL {
         return {
             force: {
                 gj: 20 + lv * 2,
-                con: 4 + Math.floor(lv * 0.25),
+                con: 4 + int(lv * 0.25),
                 fy: 30 + lv * 2,
                 limit_mp: lv * 158,
                 desc: "唯一：将你内力的70%转化为气血",
@@ -72,7 +72,7 @@ export default class extends SKILL {
                 const duration = tianDuration(lv);
                 const baseProp = tianBaseProp(lv);
                 const enhance = 1 + me.query_prop("htqg_tg") / 100;
-                const prop = Math.floor(baseProp * enhance);
+                const prop = int(baseProp * enhance);
 
                 me.send_room("<HIY>$N深吸一口气，将混元真气催至极致，周身真气翻涌鼓荡，衣衫猎猎作响，一道无形罡气笼罩全身，赫然已是混元天罡护体之境！</HIY>");
                 me.add_status({
@@ -82,19 +82,18 @@ export default class extends SKILL {
                     duration: duration,
                     prop: {
                         gj_per: prop,
-                        diff_sh_per: prop,
+                        diff_sh_per2: prop,
                     },
                     start_msg: "<HIY>$N周身罡气流转，如金刚怒目，凛然不可侵犯。</HIY>",
                     finish_msg: "<hiw>$N周身罡气渐渐消散，混元天罡之势已收。</hiw>",
                 });
-                me.set_temp("htqg_tg_buff", 1, duration);
                 me.reauto_attack();
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const duration = tianDuration(lv);
                 const baseProp = tianBaseProp(lv);
                 const enhance = 1 + me.query_prop("htqg_tg") / 100;
-                const prop = Math.floor(baseProp * enhance);
+                const prop = int(baseProp * enhance);
                 return toSec(duration) + "秒内提升自身攻击免伤" + prop + "%。";
             },
         },
