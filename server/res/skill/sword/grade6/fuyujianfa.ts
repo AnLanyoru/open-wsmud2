@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "覆雨剑法";
     id = "fuyujianfa";
     grade = 6;
-    is_public = true;
-    
+
     // 原始描述：浪翻云依据洞庭湖水性而自创的剑法，如行云流水，惊涛骇浪，剑势如绵绵春雨，细密无间。
     desc = "浪翻云依据洞庭湖水性而自创的剑法，如行云流水，惊涛骇浪";
     can_enables = ["sword","parry"];

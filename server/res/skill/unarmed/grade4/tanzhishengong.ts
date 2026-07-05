@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "弹指神通";
     id = "tanzhishengong";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：桃花岛黄药师的绝技，以指弹物，劲力穿空，伤人于百步之外，弹指间取人性命
     desc = "桃花岛的绝技，弹指神通";
     can_enables = ["unarmed"];

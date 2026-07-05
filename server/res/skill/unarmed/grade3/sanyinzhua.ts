@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "三阴蜈蚣爪";
     id = "sanyinzhua";
     grade = 3;
-    is_public = true;
-    
+
     // 原始描述：星宿派的拳脚功夫，阴狠毒辣。以三阴之力淬炼指爪，爪中带毒，中者经脉溃烂，毒气攻心，端的歹毒无比。
     desc = "星宿派的拳脚功夫，阴狠毒辣";
     can_enables = ["unarmed","parry"];

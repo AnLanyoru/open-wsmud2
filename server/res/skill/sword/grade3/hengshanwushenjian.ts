@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "衡山五神剑";
     id = "hengshanwushenjian";
     grade = 3;
-    is_public = true;
-    
+
     desc = "衡山派的绝技，因紫盖、芙蓉、石廪、祝融、天柱五峰而得名";
     can_enables = ["sword","parry"];
     attack_actions = [

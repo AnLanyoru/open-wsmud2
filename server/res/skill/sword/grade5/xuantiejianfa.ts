@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "玄铁剑法";
     id = "xuantiejianfa";
     grade = 5;
-    is_public = true;
-    
+
     // 原始描述：玄铁剑法，重剑无锋，大巧不工，越是平平无奇的剑招，对方越难抗御。如挺剑直刺，只要劲力强猛，威力远比变幻奇妙的剑招威力更大。
     desc = "玄铁剑法，重剑无锋，大巧不工，越是平平无奇的剑招，对方越难抗御。如挺剑直刺，只要劲力强猛，威力远比变幻奇妙的剑招威力更大";
     can_enables = ["sword","parry"];

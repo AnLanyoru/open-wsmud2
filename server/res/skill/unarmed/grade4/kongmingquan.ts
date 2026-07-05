@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "空明拳";
     id = "kongmingquan";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：周伯通在桃花岛自创的一套拳法，以空明为特点，拳法空灵飘忽，似有似无，令人防不胜防
     desc = "周伯通在桃花岛自创的一套拳法";
     can_enables = ["unarmed"];

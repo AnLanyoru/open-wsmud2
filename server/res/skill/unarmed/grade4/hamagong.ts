@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "蛤蟆功";
     id = "hamagong";
     grade = 4;
-    is_public = true;
+
     force_rad = 0.7;
     
     // 原始描述：白驼山欧阳锋的独门内功，蓄势而发，如蛤蟆鼓气，一击毙敌，江湖谈之色变

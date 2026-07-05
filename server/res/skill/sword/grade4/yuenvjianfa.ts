@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "越女剑法";
     id = "yuenvjianfa";
     grade = 4;
-    is_public = true;
-    
+
     desc = "传说是古代一位女子所创，剑势轻盈灵动如猿猱穿林，迅捷中暗藏杀机。";
     can_enables = ["sword"];
     attack_actions = [

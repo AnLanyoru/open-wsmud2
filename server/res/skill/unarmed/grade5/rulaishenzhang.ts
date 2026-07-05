@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "如来神掌";
     id = "rulaishenzhang";
     grade = 5;
-    is_public = true;
-    
+
     desc = "佛门至高无上的掌法绝学，相传为佛祖释迦牟尼所创，一掌出而万法随，有降妖伏魔、普渡众生之无量神通";
     can_enables = ["unarmed"];
     attack_actions = [

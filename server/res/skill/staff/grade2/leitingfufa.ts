@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "雷霆斧法";
     id = "leitingfufa";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：传说中已经消失的开山门绝学，招式大开大合，刚猛无匹，一斧开天，雷霆万钧
     desc = "传说中已经消失的开山门绝学，招式大开大合，刚猛无匹";
     can_enables = ["staff"];

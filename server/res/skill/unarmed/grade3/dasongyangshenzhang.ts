@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "大嵩阳神掌";
     id = "dasongyangshenzhang";
     grade = 3;
-    is_public = true;
-    
+
     // 原始描述：大嵩阳神掌乃是嵩山派绝学，以变化繁复，出手迅捷见称。掌出如风，势若奔雷。
     desc = "大嵩阳神掌乃是嵩山派绝学，以变化繁复，出手迅捷见称。";
     can_enables = ["unarmed"];

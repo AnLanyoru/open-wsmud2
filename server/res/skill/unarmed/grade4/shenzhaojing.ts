@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "神照经";
     id = "shenzhaojing";
     grade = 4;
-    is_public = true;
+
     force_rad = 0.8;
     
     desc = "连城诀中记载的绝世内功心法，乃是武林中至高无上的玄门正宗，神照所至，气血盈贯";

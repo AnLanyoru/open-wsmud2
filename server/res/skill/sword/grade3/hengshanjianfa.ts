@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "恒山剑法";
     id = "hengshanjianfa";
     grade = 3;
-    is_public = true;
-    
+
     desc = "绵密严谨，长于守御，而往往是在最令人出其不意之处突出杀招，剑法绵密有余，凌厉不足，正是适于女子所使用的武功。";
     can_enables = ["sword"];
     attack_actions = [

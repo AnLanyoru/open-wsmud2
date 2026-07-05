@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "玉女素心剑";
     id = "yunvsuxinjian";
     grade = 3;
-    is_public = true;
-    
+
     desc = "古墓派武学，玉女剑法与全真剑法合璧而成";
     can_enables = ["sword"];
     attack_actions = [

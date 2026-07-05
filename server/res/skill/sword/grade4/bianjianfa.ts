@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "彼岸剑法";
     id = "bianjianfa";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：慈航静斋镇派剑法，剑意超然物外，渡尽世间一切苦厄，直指彼岸。
     desc = "慈航静斋的剑法";
     can_enables = ["sword","parry"];

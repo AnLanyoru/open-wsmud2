@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "天魔策";
     id = "tianmoce";
     grade = 6;
-    is_public = true;
+
     force_rad = 1.35;
     
     // 原始描述：魔门一系最高深的功法，乃魔门历代圣君集百家魔功之大成，融天魔妙相、道心种魔、补天道心法于一炉，修至化境可窥破天道，逆转生死

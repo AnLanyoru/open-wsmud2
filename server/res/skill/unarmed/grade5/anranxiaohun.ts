@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "黯然销魂掌";
     id = "anranxiaohun";
     grade = 5;
-    is_public = true;
-    
+
     desc = "神雕大侠杨过和小龙女分开后，因为刻骨思念之情而创出的一路掌法，黯然销魂者，唯别而已矣";
     can_enables = ["unarmed"];
     attack_actions = [

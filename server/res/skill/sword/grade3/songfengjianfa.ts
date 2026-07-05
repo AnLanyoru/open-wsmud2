@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "松风剑法";
     id = "songfengjianfa";
     grade = 3;
-    is_public = true;
-    
+
     desc = "青城派绝学：如松之劲，如风之迅。剑法讲究快且劲，走的是灵巧一脉的剑法。";
     can_enables = ["sword","parry"];
     attack_actions = [

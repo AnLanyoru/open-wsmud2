@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "三九玄功";
     id = "sanjiuxuangong";
     grade = 5;
-    is_public = true;
+
     force_rad = 0.95;
     
     // 原始描述：玄门正宗内功，融炼气、护体、降妖于一体，真气护体可御万邪

@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "七弦无形剑";
     id = "qixianwuxingjian";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：梅庄大庄主黄钟公所创绝技，以琴音为剑，无形无质却暗藏杀机，可伤人于无形之中。
     desc = "梅庄大庄主黄钟公所创绝技，以琴音为剑，无形无质却暗藏杀机，可伤人于无形之中";
     can_enables = ["sword"];

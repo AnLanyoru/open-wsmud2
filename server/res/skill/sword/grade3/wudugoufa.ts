@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "五毒钩法";
     id = "wudugoufa";
     grade = 3;
-    is_public = true;
-    
+
     desc = "五毒教的高级剑法，阴狠毒辣";
     can_enables = ["sword"];
     attack_actions = [

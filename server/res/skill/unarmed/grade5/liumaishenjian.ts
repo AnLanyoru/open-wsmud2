@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "六脉神剑";
     id = "liumaishenjian";
     grade = 5;
-    is_public = true;
-    
+
     desc = "大理段氏所藏有的超强剑气绝学，能够以指尖激荡出破体剑气伤人于无形";
     can_enables = ["unarmed"];
     attack_actions = [

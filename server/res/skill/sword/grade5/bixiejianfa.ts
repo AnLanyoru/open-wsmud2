@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "辟邪剑法";
     id = "bixiejianfa";
     grade = 5;
-    is_public = true;
-    
+
     // 原始描述：渡元禅师从葵花宝典残本中领悟出来的一套剑法，迅捷诡异，剑出如电，令人防不胜防。
     desc = "渡元禅师从葵花宝典残本中领悟出来的一套剑法，迅捷诡异";
     can_enables = ["sword","parry"];

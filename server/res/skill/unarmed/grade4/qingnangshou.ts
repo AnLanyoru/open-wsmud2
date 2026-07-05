@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "青囊手";
     id = "qingnangshou";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：药王谷独门拳脚功夫，糅合医术点穴之法，刚柔并济暗藏玄机。青囊妙手，既可活人性命，亦可取人性命。
     desc = "药王谷独门拳脚功夫，糅合医术点穴之法，刚柔并济暗藏玄机。";
     can_enables = ["unarmed","parry"];

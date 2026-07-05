@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "灵蛇杖法";
     id = "lingshezhangfa";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：白驼山的杖法绝学，杖法中暗藏蛇形，灵动诡谲，中者如遭蛇噬
     desc = "白驼山的杖法";
     can_enables = ["staff","parry"];

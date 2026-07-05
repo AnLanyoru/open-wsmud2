@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "摧心掌";
     id = "cuixinzhang";
     grade = 3;
-    is_public = true;
-    
+
     // 原始描述：催心掌乃是青城绝学，中此掌者，外在并无任何伤痕，但内里的五脏六腑已然碎裂。掌力阴毒，专破内家罡气。
     desc = "催心掌乃是青城绝学，中此掌者，外在并无任何伤痕，但内里的五脏六腑已然碎裂";
     can_enables = ["unarmed"];

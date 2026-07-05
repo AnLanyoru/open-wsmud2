@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "御剑术";
     id = "yujianshu";
     grade = 5;
-    is_public = true;
-    
+
     // 原始描述：蜀山立派之本，以气驭剑，人剑合一，剑气纵横三万里，一剑光寒十九洲。
     desc = "蜀山立派之本，以气驭剑，人剑合一";
     can_enables = ["sword","parry"];

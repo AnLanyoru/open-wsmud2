@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "神剑诀";
     id = "shenjianjue";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：卓不凡在长白山得到剑谱，苦练二十年，自觉天下无敌，自称剑神
     desc = "卓不凡在长白山得到剑谱,苦练二十年，自觉天下无敌,自称剑神";
     can_enables = ["sword"];

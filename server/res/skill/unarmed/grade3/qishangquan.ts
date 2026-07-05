@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "七伤拳";
     id = "qishangquan";
     grade = 3;
-    is_public = true;
-    
+
     // 原始描述：崆峒派镇派绝学，金毛狮王谢逊习自崆峒派的绝技，伤敌一百自损八十。一拳七伤，七者皆伤，损心伤肺摧肝肠。
     desc = "金毛狮王谢逊习自崆峒派的绝技，伤敌一百自损八十";
     can_enables = ["unarmed","parry"];

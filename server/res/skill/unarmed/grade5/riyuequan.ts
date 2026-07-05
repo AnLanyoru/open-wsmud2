@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "日月拳法";
     id = "riyuequan";
     grade = 5;
-    is_public = true;
-    
+
     // 原始描述：日月神教镇教拳法，融日之刚猛与月之阴柔于一体，拳出如日月同辉，威不可挡
     desc = "日月神教NPC使用的拳脚";
     can_enables = ["unarmed","parry"];

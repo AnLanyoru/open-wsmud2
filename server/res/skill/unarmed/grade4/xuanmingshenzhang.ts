@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "玄冥神掌";
     id = "xuanmingshenzhang";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：玄冥二老鹿杖客、鹤笔翁的独门绝学，掌力阴寒歹毒，中者经脉尽冻，血肉凝冰。掌出寒风起，百丈之内如坠冰窟。
     desc = "玄冥二老鹿杖客、鹤笔翁的独门绝学，掌力阴寒歹毒，中者经脉尽冻，血肉凝冰";
     can_enables = ["unarmed"];

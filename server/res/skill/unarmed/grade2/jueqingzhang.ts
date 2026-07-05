@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "绝情掌";
     id = "jueqingzhang";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：移花宫拳脚功夫，掌势飘忽若云，看似柔情万种，实则暗藏杀机，一招一式中尽显绝情之意。
     desc = "移花宫拳脚功夫";
     can_enables = ["unarmed"];

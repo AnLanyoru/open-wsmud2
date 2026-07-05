@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "泰山拳法";
     id = "taishanquanfa";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：泰山派的拳法功夫，拳势凝重如山，沉稳厚重，如泰山之巍峨，有万钧之势。
     desc = "泰山派的拳法功夫";
     can_enables = ["unarmed","parry"];

@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "参合指";
     id = "canhezhi";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：慕容世家的一式家传指法，参合之名取自慕容世家祖宅参合陂。以彼之道，还施彼身，指力阴阳并济，变化无穷。
     desc = "慕容世家的一式家传指法";
     can_enables = ["unarmed"];

@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "子午断魂针";
     id = "ziwuduanhunzhen";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：药王谷秘传暗器手法，专打周身大穴，中者经脉受损，功力难复
     desc = "药王谷秘传暗器手法，专打周身大穴，中者经脉受损。";
     can_enables = ["throwing"];

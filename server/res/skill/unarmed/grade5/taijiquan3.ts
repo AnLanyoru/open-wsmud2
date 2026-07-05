@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = "太极拳";
     id = "taijiquan3";
     grade = 5;
-    is_public = true;
+
     is_hidden = true;
     
     desc = "武当派镇派绝学，以柔克刚、以静制动，后发先至，四两拨千斤，乃道家武学之巅";

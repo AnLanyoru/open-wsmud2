@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "真言手印";
     id = "zhenyanshouyin";
     grade = 5;
-    is_public = true;
-    
+
     desc = "九字真言手印含天地之秘，通过人体而与宇宙沟通，达致天人合一之境，明心见性，即身成佛。";
     can_enables = ["unarmed"];
     attack_actions = [

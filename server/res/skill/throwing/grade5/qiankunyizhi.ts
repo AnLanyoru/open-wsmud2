@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "乾坤一掷";
     id = "qiankunyizhi";
     grade = 5;
-    is_public = true;
-    
+
     // 原始描述：消耗大量内力化作暗器攻击敌人，造成高额伤害
     desc = "消耗自身金钱催动真气，金钱越多伤害越高。";
     can_enables = ["throwing"];

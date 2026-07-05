@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "一阳指";
     id = "yiyangzhi";
     grade = 4;
-    is_public = true;
-    
+
     // 原始描述：大理段氏绝学，以指代剑，一阳初动，万物生发，指力所及，无坚不摧，乃天下一等一的指法
     desc = "大理段家的绝技一阳指";
     can_enables = ["unarmed"];

@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "金蛇锥法";
     id = "jinshezhui";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：金蛇郎君创造的一门暗器功法，以金蛇锥催动，如群蛇出洞，噬人于无形
     desc = "金蛇郎君创造的一门暗器功法";
     can_enables = ["throwing"];

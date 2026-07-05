@@ -7,8 +7,7 @@ export default class extends SKILL {
     name = "飞星术";
     id = "feixingshu";
     grade = 2;
-    is_public = true;
-    
+
     // 原始描述：星宿派的暗器手法，以漫天星雨之势撒出暗器，令人防不胜防
     desc = "星宿派的暗器手法";
     can_enables = ["throwing"];

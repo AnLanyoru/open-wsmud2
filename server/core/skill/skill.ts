@@ -117,6 +117,8 @@ export class SKILL extends BASE {
 
     /** 可装备的基本技能类型列表 */
     can_enables: string[] = [];
+    /** 是否可公共获取 — 门派技能专用标记，表示该门派技能非本门玩家也能学到 */
+    is_public?: boolean;
     /** 所属门派 */
     family?: FAMILY;
     /** 源技能(进阶来源) */

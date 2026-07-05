@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "圣火令法";
     id = "shenghuojianfa";
     grade = 2;
-    is_public = true;
-    
+
     desc = "明教的一门记载在圣火令上的剑法";
     can_enables = ["sword"];
     attack_actions = [

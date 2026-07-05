@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "移风剑法";
     id = "yifengjian";
     grade = 3;
-    is_public = true;
-    
+
     desc = "移花宫剑法绝技";
     can_enables = ["sword"];
     attack_actions = [

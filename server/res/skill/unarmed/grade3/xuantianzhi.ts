@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "玄天指";
     id = "xuantianzhi";
     grade = 3;
-    is_public = true;
-    
+
     // 原始描述：梅庄二庄主黑白子的得意绝技，指力阴寒强劲，可隔空点穴，伤人于丈许之外。一指既出，冰封百里。
     desc = "梅庄二庄主黑白子的得意绝技，指力阴寒强劲，可隔空点穴，伤人于丈许之外";
     can_enables = ["unarmed"];

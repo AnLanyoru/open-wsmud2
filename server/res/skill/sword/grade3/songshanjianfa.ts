@@ -8,8 +8,7 @@ export default class extends SKILL {
     name = "嵩山剑法";
     id = "songshanjianfa";
     grade = 3;
-    is_public = true;
-    
+
     desc = "嵩山派绝学，剑法气象森严，端严雄伟。";
     can_enables = ["sword","parry"];
     attack_actions = [
