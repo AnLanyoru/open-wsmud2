@@ -22,10 +22,10 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
-                gj: Math.floor(lv * 2.51),
+                gj: 10 + Math.floor(lv * 2.5),
                 mz: 8 + lv * 2,
-                str: Math.floor(lv * 0.258),
-                int: Math.floor(lv * 0.258),
+                str: 8 + Math.floor(lv * 0.25),
+                int: 8 + Math.floor(lv * 0.25),
             },
         };
     }

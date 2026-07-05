@@ -41,13 +41,13 @@ export default class extends SKILL {
         return {
             sword: {
                 gj: 10 + lv * 2,
-                mz: Math.floor(lv * 1.52),
+                mz: 20 + Math.floor(lv * 1.5),
                 dex: Math.floor(lv * 0.127),
                 bj_per: 8,
                 desc: "你的攻击会快速攻击多次",
             },
             parry: {
-                zj: Math.floor(lv * 2.31),
+                zj: 10 + Math.floor(lv * 2.3),
                 diff_sh_per: 4,
                 dex: Math.floor(lv * 0.127),
             },

@@ -45,13 +45,13 @@ export default class extends SKILL {
         return {
             unarmed: {
                 gj: 8 + Math.floor(lv * 1.8),
-                mz: 5 + Math.floor(lv * 2.21),
+                mz: 15 + Math.floor(lv * 2.2),
                 add_sh_per: 8,
             },
             parry: {
-                fy: Math.floor(lv * 1.55),
-                mz: Math.floor(lv * 1.61),
-                con: Math.floor(lv * 0.119),
+                fy: 50 + Math.floor(lv * 1.5),
+                mz: 10 + Math.floor(lv * 1.6),
+                con: 8 + Math.floor(lv * 0.111),
             },
         };
     }

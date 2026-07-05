@@ -44,14 +44,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: Math.floor(lv * 2.1),
-                gj: 5 + Math.floor(lv * 1.63),
+                fy: 100 + Math.floor(lv * 2),
+                gj: 35 + Math.floor(lv * 1.6),
                 limit_mp: lv * 150,
                 desc: "唯一：将你内力的70%转化为气血",
             },
             unarmed: {
-                gj: 2 + Math.floor(lv * 1.41),
-                mz: 2 + Math.floor(lv * 1.41),
+                gj: 11 + Math.floor(lv * 1.4),
+                mz: 11 + Math.floor(lv * 1.4),
                 str: Math.floor(lv * 0.2),
             },
         };

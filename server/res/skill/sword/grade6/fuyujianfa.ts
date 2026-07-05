@@ -46,7 +46,7 @@ export default class extends SKILL {
                 gjsd_per: 10,
             },
             parry: {
-                zj: Math.floor(lv * 2.31),
+                zj: 10 + Math.floor(lv * 2.3),
                 diff_sh_per: 4,
                 zj_per: 8,
             },

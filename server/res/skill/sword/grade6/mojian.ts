@@ -46,7 +46,7 @@ export default class extends SKILL {
             },
             parry: {
                 zj: 10 + lv * 2,
-                fy: Math.floor(lv * 2.31),
+                fy: 10 + Math.floor(lv * 2.3),
                 fy_per: 13,
                 max_hp: lv * 20,
             },

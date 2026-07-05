@@ -39,14 +39,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: Math.floor(lv * 1.51),
-                str: Math.floor(lv * 0.168),
-                mz: Math.floor(lv * 1.51),
+                gj: 10 + Math.floor(lv * 1.5),
+                str: Math.floor(lv / 6),
+                mz: 10 + Math.floor(lv * 1.5),
             },
             parry: {
-                zj: Math.floor(lv * 1.51),
-                str: Math.floor(lv * 0.168),
-                fy: Math.floor(lv * 1.51),
+                zj: 10 + Math.floor(lv * 1.5),
+                str: Math.floor(lv / 6),
+                fy: 10 + Math.floor(lv * 1.5),
             },
         };
     }

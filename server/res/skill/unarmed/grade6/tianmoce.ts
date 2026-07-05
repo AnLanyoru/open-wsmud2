@@ -46,21 +46,21 @@ export default class extends SKILL {
             },
             dodge: {
                 ds: lv * 3,
-                dex: Math.floor(lv * 0.6),
+                dex: 100 + Math.floor(lv * 0.5),
                 ds_per: 4,
                 mz_per: 4,
             },
             parry: {
                 zj: lv * 3,
                 hp_per: 6,
-                con: Math.floor(lv * 0.6),
-                str: Math.floor(lv * 0.6),
+                con: 100 + Math.floor(lv * 0.5),
+                str: 100 + Math.floor(lv * 0.5),
             },
             unarmed: {
                 gj: lv * 3,
                 mz: lv * 3,
-                con: Math.floor(lv * 0.6),
-                str: Math.floor(lv * 0.6),
+                con: 100 + Math.floor(lv * 0.5),
+                str: 100 + Math.floor(lv * 0.5),
             },
         };
     }

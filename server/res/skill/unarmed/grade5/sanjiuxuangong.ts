@@ -25,7 +25,7 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             force: {
-                fy: Math.floor(lv * 3.32),
+                fy: 120 + Math.floor(lv * 3.2),
                 fy_per: 12,
                 diff_sh_per: 7,
                 hp_per: 10,
@@ -33,8 +33,8 @@ export default class extends SKILL {
                 desc: "进入战斗后减少55%伤害，被命中后降低\n唯一：将你内力的95%转化为气血",
             },
             unarmed: {
-                gj: Math.floor(lv * 3.32),
-                mz: Math.floor(lv * 2.32),
+                gj: 120 + Math.floor(lv * 3.2),
+                mz: 120 + Math.floor(lv * 2.2),
                 gj_per: 9,
                 mz_per: 8,
             },

@@ -38,8 +38,8 @@ export default class extends SKILL {
             throwing: {
                 gj: 4 + Math.floor(lv * 1.8),
                 mz: 4 + Math.floor(lv * 1.8),
-                mz_per: 3,
-                add_sh_per: 3,
+                mz_per: 1 + int(lv / 500),
+                add_sh_per: 1 + int(lv / 500),
             },
         };
     }

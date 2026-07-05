@@ -44,8 +44,8 @@ export default class extends SKILL {
                 str: Math.floor(lv * 0.127),
             },
             parry: {
-                zj: Math.floor(lv * 2.31),
-                max_hp: lv * 7,
+                zj: 10 + Math.floor(lv * 2.3),
+                max_hp: 1000 + lv * 6,
                 con: Math.floor(lv * 0.127),
             },
         };

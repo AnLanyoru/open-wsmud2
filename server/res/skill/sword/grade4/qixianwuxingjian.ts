@@ -45,8 +45,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: Math.floor(lv * 1.32),
-                mz: Math.floor(lv * 1.62),
+                gj: 20 + Math.floor(lv * 1.3),
+                mz: 20 + Math.floor(lv * 1.6),
                 dex: 8 + Math.floor(lv * 0.1),
                 desc: "唯一：攻击时有概率打出音波伤人",
             },

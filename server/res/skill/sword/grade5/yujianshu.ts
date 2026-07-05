@@ -38,14 +38,14 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             sword: {
-                gj: 5 + Math.floor(lv * 2.21),
+                gj: 15 + Math.floor(lv * 2.2),
                 mz: 15 + lv * 2,
                 bj_per: 5,
                 add_bjsh_per: 12,
                 desc: "命中敌人后积累一道剑气",
             },
             parry: {
-                zj: 2 + Math.floor(lv * 2.11),
+                zj: 12 + Math.floor(lv * 2.1),
                 fy: Math.floor(lv * 1.1),
                 diff_bj: 5,
             },

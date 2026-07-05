@@ -37,7 +37,7 @@ export default class extends SKILL {
             parry: {
                 gj: 5 + lv * 2,
                 mz: 10 + lv * 2,
-                con: 5 + Math.floor(lv * 0.13),
+                con: 10 + Math.floor(lv / 8),
                 diff_sh_per: 4,
             },
         };
