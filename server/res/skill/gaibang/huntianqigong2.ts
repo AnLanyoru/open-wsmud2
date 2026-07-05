@@ -4,7 +4,7 @@ import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
 /**
- * 混元天罡 — 尝试完善的未完善技能
+ * 混元天罡 — 完善度90
  *
  * 数据来源：正式服 checkskill huntianqigong2
  */

@@ -4,7 +4,7 @@ import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
 /**
- * 打狗棒法进阶 — 尝试完善的未完善技能
+ * 打狗棒法进阶 — 完善度90
  *
  * 数据来源：正式服 checkskill dagoubang2
  */

@@ -2,9 +2,10 @@ import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
+import type { PropMap } from "../../../types/props.js";
 
 /**
- * 逍遥游进阶 — 尝试完善的未完善技能
+ * 逍遥游进阶 — 完善度90
  *
  * 数据来源：正式服 checkskill xiaoyaoyou2
  */
@@ -61,7 +62,7 @@ export default class extends SKILL {
                 const fyBonus = me.query_prop("xyy_fy");
                 const gjBonus = me.query_prop("xyy_gj");
 
-                const prop: Record<string, number> = {
+                const prop: PropMap = {
                     mz_per: mzPer,
                 };
                 if (fyBonus) prop.fy_per = fyBonus;
