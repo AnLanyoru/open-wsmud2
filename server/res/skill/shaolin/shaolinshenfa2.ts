@@ -4,24 +4,25 @@ import {FAMILIES} from "../../../core/skill/family.js";
 import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
+/** 完成度 50 */
 export default class extends SKILL {
     name = "一苇渡江";
     id = "shaolinshenfa2";
     source_skill = "shaolinshenfa";
     grade = 4;
     family = FAMILIES.SHAOLIN;
-    desc = "无";
+    desc = "少林派至高轻功身法，相传为达摩祖师一苇渡江所创，身形灵动飘忽，瞬息千里";
     can_enables = ["dodge"];
     slots = [
         {
-            prop: 'slot_0',
+            prop: "ywdj_ds",
             value: (lv: number) => 10,
-            format: (val: number) => '一苇渡江最大可叠加层数+2',
+            format: (val: number) => "一苇渡江最大可叠加层数：+" + val,
         },
         {
-            prop: 'slot_1',
+            prop: "ywdj_cd",
             value: (lv: number) => 10,
-            format: (val: number) => '一苇渡江的内置冷却减少1秒',
+            format: (val: number) => "一苇渡江的内置冷却减少" + toSec(val) + "秒",
         },
     ];
 
