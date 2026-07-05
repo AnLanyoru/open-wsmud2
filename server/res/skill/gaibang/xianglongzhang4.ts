@@ -1,6 +1,6 @@
 import {SKILL, PERFORM} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PropMap, PerformData, EnablePropMap} from "../../../core/skill/skill.js";
+import type {PerformData, EnablePropMap} from "../../../core/skill/skill.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
 /**
@@ -36,7 +36,7 @@ function addDestroyStack(target: CHARACTER, from: CHARACTER): void {
     target.set_temp("xlz4_ch", count, duration);
     // 每层摧毁降低防御
     target.add_status({
-        id: "xlz4_destroy",
+        id: "pofang",
         name: "瓦解",
         duration: duration,
         downside: true,
@@ -47,7 +47,7 @@ function addDestroyStack(target: CHARACTER, from: CHARACTER): void {
             fy_per: -2 * count,
             diff_sh_per: -2 * count,
         },
-        desc: "降龙掌劲正逐步瓦解你的防御，防御降低" + (2 * count) + "%。",
+        desc: "降龙掌劲正逐步瓦解你的防御，防御降低",
     }, from);
 }
 
@@ -98,11 +98,13 @@ export default class extends SKILL {
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const destroyCount = getDestroyCount(target);
+                const hasXlz = target.query_status("xlz") > 0;
                 const sh = me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
                     no_weapon: true,
+                    diff_fy: hasXlz ? 100 : 0,
                     attack_msg: "<ord>$N龙行虎步，掌随身走，周身真气如烈焰翻腾，猛然一掌拍出——掌风中隐现龙形，昂首怒啸，直贯$n而去！</ord>",
                     damage_msg: "<ored>只听一声惊天动地的龙吟，$N掌力已印在$n身上，劲力如怒潮般一浪接一浪涌入$n体内！</ored>",
                     miss_msg: "<cyn>$n眼见$N掌力来势不可挡，身形急闪，以毫厘之差堪堪避过这惊天一掌。</cyn>",
@@ -111,20 +113,19 @@ export default class extends SKILL {
                     const debuffTime = qiDebuffTime(lv);
                     // 施加无法移动（busy）和无法防御（busy已包含）
                     target.add_status({
-                        id: "xlz4_qi",
-                        name: "降龙镇",
+                        id: "xlz",
+                        name: "降龙",
                         duration: debuffTime,
                         downside: true,
-                        is_busy: true,
                         is_rash: true,
                         desc: "被降龙掌镇住，无法移动，无法防御与躲闪。",
                     }, me);
                     // 摧毁级别大于3则昏迷
                     if (destroyCount >= DESTROY_THRESHOLD) {
                         target.add_status({
-                            id: "xlz4_faint",
+                            id: "faint",
                             name: "昏迷",
-                            duration: 3000,
+                            duration: 10000,
                             downside: true,
                             is_faint: true,
                             desc: "降龙掌劲摧毁了你的防御，你陷入了昏迷。",
@@ -148,6 +149,7 @@ export default class extends SKILL {
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const destroyCount = getDestroyCount(target);
+                const hasXlz = target.query_status("xlz") > 0;
                 const mpPercent = poMpPercent(lv);
                 const slotExtra = me.query_prop("xlz4_po");
                 const totalMpPercent = mpPercent + slotExtra;
@@ -160,6 +162,7 @@ export default class extends SKILL {
                     gj: me.gj,
                     mz: me.mz,
                     no_weapon: true,
+                    diff_fy: hasXlz ? 100 : 0,
                     power_gj: powerGj,
                     attack_msg: "<ored>$N将毕生功力聚于一掌，掌劲如山崩海啸般向$n席卷而去！</ored>",
                     damage_msg: "<ored>「破灭」！$N毁天灭地的一掌正中$n，劲力贯体而过，$n身后的地面被余劲震出数丈宽的深坑！</ored>",
@@ -170,8 +173,8 @@ export default class extends SKILL {
                     // 降低对方气血上限
                     const hpReduce = Math.floor(target.max_hp * 0.15);
                     target.add_status({
-                        id: "xlz4_po_hp",
-                        name: "气衰",
+                        id: "pomie",
+                        name: "破灭",
                         duration: 30000,
                         downside: true,
                         prop: {
@@ -188,8 +191,8 @@ export default class extends SKILL {
                             duration: 10000,
                             downside: true,
                             prop: {
-                                diff_fy_per: 100,
-                                fy_per: -50,
+                                diff_fy_per2: -100,
+                                fy_per: -100,
                             },
                             desc: "防御被完全瓦解，无法抵御任何攻击。",
                         }, me);

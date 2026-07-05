@@ -81,9 +81,9 @@ export interface PropMap {
     /** 抗暴击 */ diff_bj?: number;
     /** 固定数值免伤 */ diff_sh?: number;
     /** 免伤百分比 */ diff_sh_per?: number;
-    /** 破防百分比 */ diff_fy_per?: number;
-    /** 免伤百分比 - 版本2 */ diff_sh_per2?: number;
-    /** 破防百分比 - 版本2 */ diff_fy_per2?: number;
+    /** 无视敌方防御百分比 */ diff_fy_per?: number;
+    /** 免伤百分比 - 不衰减部分 */ diff_sh_per2?: number;
+    /** 无视敌方防御百分比 - 不衰减部分 */ diff_fy_per2?: number;
 
     /** 数值忙乱减免 */ diff_busy?: number;
     /** 百分比忙乱减免 */ diff_busy_per?: number;
