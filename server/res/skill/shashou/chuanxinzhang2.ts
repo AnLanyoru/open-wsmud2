@@ -18,13 +18,13 @@ export default class extends SKILL {
     slots = [
         {
             prop: "chuanxin_gj",
-            value: (lv: number) => 10,
-            format: (val: number) => "掌心雷附加的攻击力增加" + val + "%",
+            value: (lv: number) => 50 + int(lv / 100),
+            format: (val: number) => `掌心雷附加的攻击力增加${val}%`,
         },
         {
             prop: "chuanxin_stun",
-            value: (lv: number) => 10,
-            format: (val: number) => "掌心雷造成昏迷的时间增加1秒",
+            value: (lv: number) => 1000,
+            format: (val: number) => `掌心雷造成昏迷的时间增加${toSec(val)}秒`,
         },
     ];
 
@@ -54,29 +54,29 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const p: number = chuanxin_dmg_per(lv);
                 const t: number = chuanxin_stun_time(lv);
-                me.do_attack({
+                const sh: number = me.do_attack({
                     target: target,
                     gj: me.gj * p / 100,
                     attack_msg: "<hir>$N暗藏真气于掌心，一招「掌心雷」闪烁着雷光直贯$n</hir>",
                     mz: me.mz,
                     no_weapon: true,
                 });
-                // 命中后昏迷（不再需要暴击条件）
-                target.add_status({
-                    id: "faint",
-                    is_faint: true,
-                    duration: t,
-                    name: "昏迷",
-                    downside: true,
-                    finish_msg: "<hiy>慢慢的$N又恢复了知觉...</hiy>\n",
-                    start_msg: "<hir>$N只觉得眼前一黑，接着什么都不知道了。</hir>\n",
-                }, me);
+                if (sh) {
+                    target.add_status({
+                        id: "faint",
+                        is_faint: true,
+                        duration: t,
+                        name: "昏迷",
+                        downside: true,
+                        finish_msg: "<hiy>慢慢的$N又恢复了知觉...</hiy>\n",
+                        start_msg: "<hir>$N只觉得眼前一黑，接着什么都不知道了。</hir>\n",
+                    }, me);
+                }
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const p: number = chuanxin_dmg_per(lv);
-                const t: number = chuanxin_stun_display(lv);
-                return "对敌人造成" + p + "%攻击力的伤害，命中后昏迷对方" + t + "秒";
+                return `对敌人造成${p}%攻击力的伤害，命中后昏迷对方${toSec(chuanxin_stun_time(lv))}秒`;
             },
         },
     };
@@ -93,10 +93,4 @@ export function chuanxin_dmg_per(lv: number): number {
 export function chuanxin_stun_time(lv: number): number {
     const t: number = 6000 + int(lv / 1000) * 1000;
     return t > 10000 ? 10000 : t;
-}
-
-/** 掌心雷昏迷时间（显示，秒） */
-export function chuanxin_stun_display(lv: number): number {
-    const t: number = 6 + int(lv / 1000);
-    return t > 10 ? 10 : t;
 }

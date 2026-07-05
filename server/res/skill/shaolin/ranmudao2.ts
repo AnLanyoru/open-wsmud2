@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { SkillSlotDef } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /** 完成度 50 */
@@ -15,7 +16,7 @@ export default class extends SKILL {
     can_enables = ["blade","parry"];
     attack_actions = SKILL.get("blade")?.attack_actions || [];
 
-    slots = [
+    slots: SkillSlotDef[] = [
         {
             prop: "ranmu_fy",
             value: (lv: number) => 10 + int(lv / 100),

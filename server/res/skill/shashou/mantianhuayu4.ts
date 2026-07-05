@@ -38,7 +38,7 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = shenpan_time(lv);
                 me.send_room("<ord>$N双目微阖，双手结印，朗声道：「天谕在上，代天行法——审判！」</ord>\n<ord>霎时间，九天之上雷云翻涌，一道金光破空而下，将$n笼罩其中！</ord>\n", target);
-                me.do_attack({
+                const sh: number = me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
@@ -47,22 +47,28 @@ export default class extends SKILL {
                     miss_msg: "<cyn>$n见势不妙，拼命翻滚躲避，堪堪避过金光笼罩。</cyn>",
                     is_throwing: true,
                 });
-                target.add_status({
-                    id: "shenpan",
-                    name: "审判",
-                    desc: "被天谕法印镇压，无法移动",
-                    duration: time,
-                    is_rash: true,
-                    downside: true,
-                    finish_msg: "<ord>$N周身金光碎裂，审判法印终于消散。</ord>\n",
-                    start_msg: "<ord>$N周身金光大盛，已被天谕法印镇压！</ord>\n",
-                }, me);
-                target.set_temp("sk_shenpan", 1, time);
+                if (sh) {
+                    target.add_status({
+                        id: "shenpan",
+                        name: "审判",
+                        desc: "被天谕法印镇压，无法移动",
+                        duration: time,
+                        is_rash: true,
+                        downside: true,
+                        finish_msg: "<ord>$N周身金光碎裂，审判法印终于消散。</ord>\n",
+                        start_msg: "<ord>$N周身金光大盛，已被天谕法印镇压！</ord>\n",
+                        on_attach: function(p: CHARACTER): void {
+                            p.set_temp("sk_shenpan", 1, time);
+                        },
+                        on_expire: function(p: CHARACTER): void {
+                            p.remove_temp("sk_shenpan");
+                        },
+                    }, me);
+                }
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
-                const t: number = shenpan_display(lv);
-                return "代天行法，发起审判，使敌人" + t + "秒内无法移动";
+                return `代天行法，发起审判，使敌人${toSec(shenpan_time(lv))}秒内无法移动`;
             },
         },
         fa: {
@@ -101,7 +107,7 @@ export default class extends SKILL {
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const extra: number = tianfa_extra_gj(lv, true);
-                return "使用暗器引天雷攻击敌人，对审判中的敌人附加" + extra + "攻击力并无法抵抗暴击";
+                return `使用暗器引天雷攻击敌人，对审判中的敌人附加${extra}攻击力并无法抵抗暴击`;
             },
         },
     };
@@ -113,12 +119,6 @@ export default class extends SKILL {
 export function shenpan_time(lv: number): number {
     const t: number = 5000 + lv * 5;
     return t > 15000 ? 15000 : t;
-}
-
-/** 审判持续时间（显示，秒） */
-export function shenpan_display(lv: number): number {
-    const t: number = 5 + int(lv / 200);
-    return t > 15 ? 15 : t;
 }
 
 /** 天罚额外攻击力（对审判目标） */

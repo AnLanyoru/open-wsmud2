@@ -2,6 +2,7 @@ import {SKILL, PERFORM} from "../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { SkillSlotDef } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /** 完成度 50 */
@@ -14,7 +15,7 @@ export default class extends SKILL {
     desc = "少林寺七十二绝技之一指禅";
     can_enables = ["unarmed"];
     attack_actions = SKILL.get("unarmed")?.attack_actions || [];
-    slots = [
+    slots: SkillSlotDef[] = [
         {
             prop: "yizhi_mz",
             value: (lv: number) => 1000,

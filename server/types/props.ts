@@ -140,8 +140,14 @@ export interface SkillEnableProp {
 /** 技能 slot 定义 */
 export interface SkillSlotDef {
     prop: string;
-    value: number | ((lv: number) => number);
+    value: (lv: number, grade: number) => number;
     format?: (val: number) => string;
+    /** 槽位显示名称 */
+    name?: string;
+    /** 可分配点数 */
+    count?: number;
+    /** 进阶条件（返回所需物品列表） */
+    query_needs?: (grade: number) => Array<{ path: string; count: number }>;
 }
 
 /** 战斗属性元组 [name, val] */

@@ -14,8 +14,8 @@ export default class extends SKILL {
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: Math.floor(lv * 2.7),
-                fy: Math.floor(lv * 1.6),
+                zj: int(lv * 2.7),
+                fy: int(lv * 1.6),
                 hp_per: 3 + int(lv / 500),
                 fy_per: 3 + int(lv / 500),
                 desc: `当你招架会积蓄力量，最高${get_max_layers(lv)}层，每层增加${lv}防御，招架成功积蓄两层，失败积蓄一层`,
@@ -31,14 +31,17 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const layers = me.query_temp("sk/qk/layer", 0);
-                const dmgBonus = Math.floor(layers / 2 * me.gj);
+                const layers: number = me.query_temp("sk/qk/layer", 0);
+                const dmgBonus: number = int(layers / 2) * me.gj;
                 me.send_room("<HIO>$N双臂一震，乾坤大挪移心法运转，将积蓄的层层劲力汇于一击，如天塌地陷般朝$n轰去！</HIO>", target);
                 me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
                     power_gj: dmgBonus,
+                    attack_msg: "<HIO>$N牵引乾坤之力，将层层叠叠的澎湃劲力汇于掌心，一掌推出，势若崩雷！</HIO>",
+                    damage_msg: "<hir>乾坤劲力透体而入，$n全身骨骼咯咯作响，已被这积蓄已久的巨力震得五脏移位！</hir>",
+                    miss_msg: "<cyn>$n见$N掌力汹涌，不敢硬接，急忙侧身闪避。</cyn>",
                 });
                 me.end_attack(target);
             },
@@ -56,14 +59,14 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const layers = me.query_temp("sk/qk/layer", 0);
                 const healPer = get_daozhuan_heal_per(lv);
-                const healHp = Math.floor(me.max_hp * healPer * layers / 100);
+                const healHp = int(me.max_hp * healPer * layers / 100);
                 me.add_hp(healHp);
                 me.send_room(`<HIO>$N逆转乾坤，将积蓄的${layers}层劲力化为生气，周身真气澎湃如潮！</HIO>`, target);
 
                 // 将一个负面状态转移给敌人
                 const downsides = me.status?.filter((s: CharacterStatus) => s.downside && s.id !== "busy" && s.id !== "faint") || [];
                 if (downsides.length > 0) {
-                    const chosen = downsides[Math.floor(Math.random() * downsides.length)];
+                    const chosen = downsides[int(Math.random() * downsides.length)];
                     const remaining = chosen.duration || 5000;
                     me.remove_status(chosen.id, true);
                     target.add_status({
@@ -96,11 +99,11 @@ export default class extends SKILL {
 
 // ========== 公共计算函数 ==========
 
-function get_max_layers(lv: number): number {
+export function get_max_layers(lv: number): number {
     return 10 + int(lv / 400);
 }
 
-function get_daozhuan_heal_per(lv: number): number {
+export function get_daozhuan_heal_per(lv: number): number {
     return 3 + int(lv / 1000);
 }
 
@@ -113,14 +116,16 @@ function add_layers(me: CHARACTER, lv: number, amount: number): void {
     // 更新层数状态
     me.remove_status("qk_layer", true);
     if (newLayers > 0) {
-        const prop: Record<string, number> = { fy: newLayers * lv };
         me.add_status({
             id: "qk_layer",
             name: "乾坤",
             duration: 60000,
             override: 2,
             desc: `积蓄了${newLayers}层乾坤劲力，每层增加${lv}点防御`,
-            prop: prop,
+            prop: { fy: newLayers * lv },
+            on_attach: function(p: CHARACTER): void {
+                p.set_temp("sk/qk/layer", newLayers);
+            },
             on_expire: function(p: CHARACTER): void {
                 p.remove_temp("sk/qk/layer");
             },

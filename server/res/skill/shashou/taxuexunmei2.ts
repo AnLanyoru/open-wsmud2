@@ -50,9 +50,8 @@ export default class extends SKILL {
                 });
             },
             query_desc: function (me: CHARACTER, lv: number): string {
-                const t: number = wuhen_display(lv);
                 const ds: number = wuhen_ds(lv);
-                return t + "秒内免疫控制，并增加" + ds + "%躲闪";
+                return `${toSec(wuhen_time(lv))}秒内免疫控制，并增加${ds}%躲闪`;
             },
         },
     };
@@ -69,10 +68,4 @@ export function wuhen_time(lv: number): number {
 /** 无痕躲闪百分比 */
 export function wuhen_ds(lv: number): number {
     return 30 + int(lv / 100);
-}
-
-/** 无痕持续时间（显示，秒） */
-export function wuhen_display(lv: number): number {
-    const t: number = 3 + int(lv / 200);
-    return t > 10 ? 10 : t;
 }

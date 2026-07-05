@@ -73,24 +73,25 @@ export default class extends SKILL {
             release_time: 500,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = dingying_time(lv);
-                me.do_attack({
+                const sh: number = me.do_attack({
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
                     attack_msg: "<hiy>$N手中青光冒出，一瞬间$W已飞向$n化作点点星光笼罩$p周身大穴！</hiy>",
                 });
-                target.add_status({
-                    id: "rash",
-                    name: "定影",
-                    duration: time,
-                    is_rash: true,
-                    downside: true,
-                }, me);
+                if (sh) {
+                    target.add_status({
+                        id: "rash",
+                        name: "定影",
+                        duration: time,
+                        is_rash: true,
+                        downside: true,
+                    }, me);
+                }
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
-                const t: number = dingying_display(lv);
-                return "使用暗器攻击敌人，如果命中则使敌人定身" + t + "秒";
+                return `使用暗器攻击敌人，如果命中则使敌人定身${toSec(dingying_time(lv))}秒`;
             },
         },
     };
@@ -102,10 +103,4 @@ export default class extends SKILL {
 export function dingying_time(lv: number): number {
     const t: number = 5000 + lv * 3;
     return t > 15000 ? 15000 : t;
-}
-
-/** 定影定身时间（显示，秒） */
-export function dingying_display(lv: number): number {
-    const t: number = 5 + int(lv / 300);
-    return t > 15 ? 15 : t;
 }

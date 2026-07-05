@@ -17,13 +17,13 @@ export default class extends SKILL {
     slots = [
         {
             prop: "shasheng_mp",
-            value: (lv: number) => 10,
-            format: (val: number) => "内力上限：+120000",
+            value: (lv: number) => 120000,
+            format: (val: number) => `内力上限：+${val}`,
         },
         {
             prop: "shasheng_zhan",
-            value: (lv: number) => 10,
-            format: (val: number) => "斩杀持续时间增加2秒",
+            value: (lv: number) => 2000,
+            format: (val: number) => `斩杀持续时间增加${toSec(val)}秒`,
         },
     ];
 
@@ -67,7 +67,7 @@ export default class extends SKILL {
                 const time: number = zhansha_time(lv);
                 const gj: number = zhansha_gj(lv);
                 const bj: number = zhansha_bj(lv);
-                return "全力战斗，" + toSec(time) + "秒内增加自己" + gj + "%攻击力，" + bj + "%暴击几率";
+                return `全力战斗，${toSec(time)}秒内增加自己${gj}%攻击力，${bj}%暴击几率`;
             },
         },
         tuoli: {

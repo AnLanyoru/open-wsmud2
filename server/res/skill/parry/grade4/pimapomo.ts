@@ -13,22 +13,22 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'pmfs_sc',
-            value: (_lv: number) => 10,
-            format: (_val: number) => '反势可累计的伤害延长2秒',
+            value: (lv: number) => int(lv / 500) + 1,
+            format: (val: number) => '反势可累计的伤害延长' + val + '秒',
         },
         {
             prop: 'pmcs_mz',
-            value: (_lv: number) => 10,
-            format: (_val: number) => '缠势的判定成功的命中有效值增加20%',
+            value: (lv: number) => 10 + int(lv / 100),
+            format: (val: number) => '缠势的判定成功的命中有效值增加' + val + '%',
         },
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
             parry: {
-                zj: Math.floor(lv * 1.83),
-                fy: Math.floor(lv * 1.82),
-                diff_bj: Math.min(10, 2 + Math.floor((lv - 1) / 500)),
+                zj: int(lv * 1.83),
+                fy: int(lv * 1.82),
+                diff_bj: Math.min(10, 2 + int((lv - 1) / 500)),
             },
         };
     }
@@ -50,6 +50,9 @@ export default class extends SKILL {
                     target: target,
                     gj: gj,
                     mz: me.mz,
+                    attack_msg: "<HIM>$N笔走龙蛇，披麻皴法层层叠叠，每一笔墨痕皆化作凌厉攻势，向$n周身席卷！</HIM>",
+                    damage_msg: "<hir>墨意入体，$n只觉浑身经脉如被千针攒刺，方才所受的劲力竟加倍奉还！</hir>",
+                    miss_msg: "<cyn>$n见墨势汹涌，急忙错步旋身，堪堪避过了这笔意洪流。</cyn>",
                 });
                 me.end_attack(target);
             },
@@ -80,6 +83,8 @@ export default class extends SKILL {
                         gjsd_per: -sdReduce,
                         fy: -fyReduce,
                     },
+                    start_msg: "<HIG>$N顿觉周身一滞，已被层层墨意般的剑势缠住，举手投足间倍觉沉重。</HIG>",
+                    finish_msg: "<HIG>$N周身缠绕的墨意剑势终于消散，行动恢复自如。</HIG>",
                 }, me);
             },
             query_desc: function(me: CHARACTER, lv: number): string {
@@ -101,22 +106,22 @@ export default class extends SKILL {
 
 // ========== 公共计算函数 ==========
 
-function get_fanshi_window(lv: number): number {
+export function get_fanshi_window(lv: number): number {
     return 2 + int(lv / 1000);
 }
 
-function get_fanshi_max_pct(lv: number): number {
+export function get_fanshi_max_pct(lv: number): number {
     return 1000 + int(lv / 10);
 }
 
-function get_chanshi_duration(lv: number): number {
+export function get_chanshi_duration(lv: number): number {
     return 8000 + int(lv / 1000) * 1000;
 }
 
-function get_chanshi_sd_reduce(lv: number): number {
+export function get_chanshi_sd_reduce(lv: number): number {
     return 20 + int(lv / 500);
 }
 
-function get_chanshi_fy_reduce(lv: number): number {
+export function get_chanshi_fy_reduce(lv: number): number {
     return lv * 2;
 }
