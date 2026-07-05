@@ -13,7 +13,14 @@ export default class extends SKILL {
     is_ultimate = true;
     desc = "上古法家不传之秘，替天行法";
     can_enables = ["throwing"];
-    attack_actions = SKILL.get("throwing")?.attack_actions || [];
+    attack_actions = [
+        "$N指尖一捻，一道金光乍现，化作天谕法印直取$n的$l",
+        "$N双手结印，九天之上雷云翻涌，一道紫雷应召而落劈向$n的$l",
+        "$N扬手间金光如练，凝为无形法印，压向$n的$l",
+        "$N掌心雷光闪烁，紫电如龙而出，直贯$n的$l",
+        "$N双目微阖掐诀念咒，金光化作天罚之力笼罩$n的$l",
+        "$N手捏法印凌空一指，金光破空而至，直射$n的$l",
+    ];
 
     on_enable = (me: CHARACTER, type: string): void => {
         if (type === 'throwing' && !me.can_throwing()) {
