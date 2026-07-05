@@ -56,7 +56,7 @@ export default class extends SKILL {
                         mz: me.mz, no_weapon: true,
                         attack_msg: "<hiy>$N大喝一声，双掌齐出，如怒潮般汹涌般向$p当胸猛击过去。</hiy>",
                         damage_msg: "<hir>只听砰的一声，$N已经重重打中$p胸口，跟着喀喇喇几声，肋骨好像断了几根！</hir>",
-                        on_parry: function (t, ispa) {
+                        on_parry: function (_t, ispa) {
                             is_parried = ispa;
                             if (ispa)
                                 this.damage_msg = "<hir>$n慌乱中匆忙招架，后续掌力却如怒潮狂涌而至，$p心口一甜，喷出一口鲜血。</hir>";
@@ -66,7 +66,7 @@ export default class extends SKILL {
                     });
                     if (sh && !is_parried) {
                         target.add_status({
-                            id: "unarmed",
+                            id: "xlz_l",
                             duration: time,
                             name: "降龙",
                             downside: true,

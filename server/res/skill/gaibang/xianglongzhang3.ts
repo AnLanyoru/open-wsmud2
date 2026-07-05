@@ -5,7 +5,7 @@ import type {PropMap} from "../../../types/props.js";
 import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 
 /**
- * 降龙十八掌无上神武 — 尝试完善的未完善技能
+ * 降龙十八掌无上神武 — 完善度85
  *
  * 数据来源：正式服 checkskill xianglongzhang3
  */
@@ -155,6 +155,8 @@ export default class extends SKILL {
                             attack_msg: self.msgs![i],
                             no_weapon: true,
                             diff_fy: hasXlz ? 100 : 0,
+                            no_dodge: hasXlz ? true : false,
+                            no_parry: hasXlz ? true : false,
                         });
                         if (hit) {
                             gj = int(gj * enhancedFactor / 100);
@@ -193,7 +195,7 @@ function qiBusyTime3(lv: number): number {
 /** 十八掌：总释放时间 (ms) */
 function shibaDuration3(lv: number): number {
     const t = 12000 - lv * 2;
-    if (t < 8000) return 8000;
+    if (t < 0) return 0;
     return t;
 }
 

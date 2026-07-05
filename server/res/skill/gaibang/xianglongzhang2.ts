@@ -5,7 +5,7 @@ import type {CHARACTER, DoAttackPar} from "../../../core/char/character.js";
 import type {PropMap} from "../../../types/props.js";
 
 /**
- * 降龙十八掌进阶 — 尝试完善的未完善技能
+ * 降龙十八掌进阶 — 完善度90
  *
  * 数据来源：正式服 checkskill xianglongzhang2
  */
@@ -152,6 +152,8 @@ export default class extends SKILL {
                             attack_msg: self.msgs![i],
                             no_weapon: true,
                             diff_fy: hasXlz ? 100 : 0,
+                            no_dodge: hasXlz ? true : false,
+                            no_parry: hasXlz ? true : false,
                         });
                         if (hit) {
                             // 命中后掌力递增
