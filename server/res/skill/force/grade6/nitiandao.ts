@@ -51,8 +51,8 @@ export default class extends SKILL {
                 distime_per: -slowPer,
                 releasetime_per: -slowPer,
             },
-            start_msg: "<hio>$N周身弥漫亘古气息笼罩$n，$n的时间流速骤然减慢！</hio>",
-            finish_msg: "<hio>$n身上的亘古气息消散，时间流速恢复正常。</hio>",
+            start_msg: "<hio>$N被亘古气息笼罩，时间流速骤然减慢！</hio>",
+            finish_msg: "<hio>$N身上的亘古气息消散，时间流速恢复正常。</hio>",
         }, me);
     }
 

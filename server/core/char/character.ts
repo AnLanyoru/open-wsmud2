@@ -3181,13 +3181,23 @@ function splitmessage(me: CHARACTER, text: string, type: number, target: any): s
                     str.push(type === 1 ? '你' : me.name);
                     break;
                 case 'n':
-                    str.push(type === 2 ? '你' : target.name);
+                    if (target) {
+                        str.push(type === 2 ? '你' : target.name);
+                    } else {
+                        str.push('<hir>未知存在</hir>');
+                        console.warn('[splitmessage] $n 占位符缺少 target，消息文本:', text);
+                    }
                     break;
                 case 'P':
                     str.push(type === 1 ? '你' : me.call3());
                     break;
                 case 'p':
-                    str.push(type === 2 ? '你' : target.call3());
+                    if (target) {
+                        str.push(type === 2 ? '你' : target.call3());
+                    } else {
+                        str.push('<hir>未知存在</hir>');
+                        console.warn('[splitmessage] $p 占位符缺少 target，消息文本:', text);
+                    }
                     break;
                 case 'l':
                     str.push(me.attack_part ? me.attack_part.name : '');
@@ -3197,7 +3207,12 @@ function splitmessage(me: CHARACTER, text: string, type: number, target: any): s
                     str.push(me.weapon_name() || '手');
                     break;
                 case 'i':
-                    str.push(target.weapon_name() || '手');
+                    if (target) {
+                        str.push(target.weapon_name() || '手');
+                    } else {
+                        str.push('<hir>未知兵刃</hir>');
+                        console.warn('[splitmessage] $i 占位符缺少 target，消息文本:', text);
+                    }
                     break;
                 case 'T':
                     str.push(me.throwing_name());
