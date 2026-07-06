@@ -2565,15 +2565,13 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 执行攻击动作
+     * 对多个目标执行同一攻击
+     * @param par - 攻击参数（target 字段会被逐个覆盖，无需设置）
+     * @param targets - 目标列表，缺省取当前所有敌人
      */
-    do_attacks(par: any): void {
-        let targets = par.targets;
+    do_attacks(par: DoAttackPar, targets?: CHARACTER[]): void {
         if (!targets) {
-            targets = new Array(this.enemy?.length || 0);
-            for (let i = 0; i < (this.enemy?.length || 0); i++) {
-                targets[i] = this.enemy?.[i];
-            }
+            targets = this.enemy?.filter(Boolean) ?? [];
         }
         if (!targets.length) return;
         let attack_msg = par.attack_msg;
@@ -2582,10 +2580,10 @@ export class CHARACTER extends ITEM {
         }
         if (attack_msg !== '') this.send_combat(attack_msg, targets[0]);
         par.attack_msg = '';
-        for (let i = 0; i < targets.length; i++) {
-            par.target = targets[i];
-            this.do_attack(par);
-            this.end_attack(targets[i]);
+        const _power_gj = par.power_gj;
+        for (const target of targets) {
+            this.do_attack({ ...par, target, power_gj: _power_gj });
+            this.end_attack(target);
         }
     }
 
