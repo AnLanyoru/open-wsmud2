@@ -3,7 +3,7 @@ import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 10 */
 export default class extends SKILL {
     name = "三九玄功";
     id = "sanjiuxuangong";
@@ -23,14 +23,16 @@ export default class extends SKILL {
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
+        var dr = 50 + Math.floor(lv / 200);
+        if (dr > 75) dr = 75;
         return {
             force: {
                 fy: 120 + Math.floor(lv * 3.2),
                 fy_per: 12,
-                diff_sh_per: 7,
+                diff_sh_per: dr,
                 hp_per: 10,
                 limit_mp: lv * 300,
-                desc: "进入战斗后减少55%伤害，被命中后降低\n唯一：将你内力的95%转化为气血",
+                desc: "进入战斗后减少" + dr + "%伤害，被命中后降低\n唯一：将你内力的95%转化为气血",
             },
             unarmed: {
                 gj: 120 + Math.floor(lv * 3.2),
@@ -39,6 +41,28 @@ export default class extends SKILL {
                 mz_per: 8,
             },
         };
+    }
+
+    // 三九玄功被动：进入战斗后获得减伤，被命中后降低
+    on_beginfight(me: CHARACTER): void {
+        var lv = me.query_skill("sanjiuxuangong", 0);
+        var dr = 50 + Math.floor(lv / 200);
+        if (dr > 75) dr = 75;
+        me.add_status({
+            id: "sanjiu_dr",
+            name: "玄功护体",
+            duration: -1,
+            prop: {
+                diff_sh_per: dr,
+            },
+            desc: "三九玄功护体，减少" + dr + "%伤害",
+        });
+    }
+
+    on_damage(me: CHARACTER, sh: number, target: CHARACTER): number {
+        // 被命中后降低减伤效果
+        
+        return sh;
     }
 
     pfm_set: PerformData = {
@@ -51,18 +75,18 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = xiantiTime(lv);
                 var dr = xiantiDr(lv);
-                me.send_room("<hiy>$N深吸一口气，三九玄功运转周身，真气如泉涌般自丹田蔓延至四肢百骸，进入了「<HIC>仙体</HIC>」状态！</hiy>", target);
+                me.send_room("<hiy>$N深吸一口气，三九玄功运转周身，真气如泉涌般自丹田蔓延至四肢百骸，浑身灵光闪烁恍若<HIC>仙体</HIC>！</hiy>", target);
                 me.add_status({
                     id: "sanjiu_xian",
                     name: "仙体",
                     duration: time,
                     prop: {
-                        diff_sh_per: dr,
+                        diff_sh_per2: dr,
                     },
                     ig_control: true,
                     desc: "仙体状态，获得" + dr + "%伤害减免，免疫负面状态",
                     start_msg: "<hiz>$N周身笼上一层氤氲仙气，万法不侵！</hiz>",
-                    finish_msg: "<cyn>$N周身仙气缓缓散去，仙体状态结束。</cyn>",
+                    finish_msg: "<cyn>$N周身仙气缓缓散去。</cyn>",
                 });
                 me.reauto_attack();
             },
@@ -100,7 +124,7 @@ export default class extends SKILL {
                     });
                     if (sh > 0 && enemy.hp / enemy.max_hp < 0.15) {
                         enemy.add_status({
-                            id: "sanjiu_faint",
+                            id: "faint",
                             name: "昏迷",
                             duration: 6000,
                             is_faint: true,

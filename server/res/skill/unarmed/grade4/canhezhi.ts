@@ -3,7 +3,7 @@ import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 70 */
 export default class extends SKILL {
     name = "参合指";
     id = "canhezhi";
@@ -38,15 +38,37 @@ export default class extends SKILL {
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
+        var addSh = 1 + lv;
         return {
             unarmed: {
                 gj: 20 + Math.floor(lv * 1.5),
                 mz: 20 + Math.floor(lv * 1.5),
                 bj_per: 4,
                 int: 3 + Math.floor(lv / 6),
-                desc: "命中后使敌人受到的伤害增加1001可叠加10层",
+                desc: "命中后使敌人受到的伤害增加" + addSh + "可叠加10层",
             },
         };
+    }
+
+    // 参合指被动：命中后增加敌人受到的伤害
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (par.is_dodged || par.is_parried) return;
+        var lv = me.query_skill("canhezhi", 0);
+        var addSh = 1 + lv;
+        var max_chz = me.query_prop('chz_max') || 10;
+        target.add_status({
+            id: "canhezhi",
+            name: "参合",
+            duration: 30000,
+            count: 1,
+            downside: true,
+            override: 2,
+            max_count: max_chz,
+            prop: {
+                add_sh: addSh,
+            },
+            desc: "你被参合指力标记，受到的伤害增加" + addSh,
+        }, me);
     }
 
     pfm_set: PerformData = {

@@ -5,7 +5,7 @@ import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { SkillSlotDef } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 70 */
 export default class extends SKILL {
     name = "燃木刀法";
     id = "ranmudao3";
@@ -30,13 +30,14 @@ export default class extends SKILL {
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
+        const burnDmg = ranmuBurnDmg(lv);
         return {
             blade: {
                 gj: 10 + lv * 2,
                 str: 10 + lv * 1,
                 mz_per: 10,
                 fy_per: 10,
-                desc: "燃木真焰：攻击命中后对敌人造成3512点灼烧伤害",
+                desc: "燃木真焰：攻击命中后对敌人造成" + burnDmg + "点灼烧伤害",
             },
             parry: {
                 zj: Math.floor(lv * 2.1),
@@ -49,8 +50,10 @@ export default class extends SKILL {
 
     // 燃木真焰：攻击命中后附加灼烧伤害
     on_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number {
+        const lv = me.query_skill("ranmudao3", 0);
+        const dmg = ranmuBurnDmg(lv);
         me.send_combat("<red>$n被烈焰划过，身上一道焦黑</red>", target);
-        return 3512;
+        return dmg;
     }
 
     // 护体真焰：被命中后灼伤敌人，招架成功伤害翻倍
@@ -75,7 +78,8 @@ export default class extends SKILL {
                 const time: number = 8000 + lv * 5;
                 const dur: number = time > 200000 ? 200000 : time;
                 const bonusFyPer: number = me.query_prop("ranmu_fy");
-                const recoilDmg: number = 4300;
+                const fyPer: number = 20 + Math.floor(lv / 100) + bonusFyPer;
+                const recoilDmg: number = ranmuRecoilDmg(lv);
                 me.send_room("<HIR>$N仰天怒吼，全身登时腾起滔天烈焰，真焰护体，万邪不侵！</HIR>\n", target);
                 me.set_temp("sk_ranmu", recoilDmg, dur);
                 me.add_status({
@@ -84,7 +88,7 @@ export default class extends SKILL {
                     desc: "真焰护体，增加你的防御，被命中时灼伤敌人",
                     duration: dur,
                     prop: {
-                        fy_per: 30 + bonusFyPer,
+                        fy_per: fyPer,
                     },
                     finish_msg: "$N周身的护体真焰渐渐熄灭。",
                 });
@@ -92,7 +96,10 @@ export default class extends SKILL {
             query_desc: function(me: CHARACTER, lv: number): string {
                 const time: number = 8000 + lv * 5;
                 const dur: number = time > 200000 ? 200000 : time;
-                return "真焰护体，持续" + toSec(dur) + "秒，增加你30%的防御，被敌人命中后对敌人造成4300的真实伤害，招架成功伤害翻倍。";
+                const recoilDmg: number = ranmuRecoilDmg(lv);
+                const bonusFyPer: number = me.query_prop("ranmu_fy");
+                const fyPer: number = 20 + Math.floor(lv / 100) + bonusFyPer;
+                return "真焰护体，持续" + toSec(dur) + "秒，增加你" + fyPer + "%的防御，被敌人命中后对敌人造成" + recoilDmg + "的真实伤害，招架成功伤害翻倍。";
             },
         },
         fen: {
@@ -120,4 +127,14 @@ export default class extends SKILL {
             },
         },
     };
+}
+
+/** 燃木真焰灼烧伤害（被动 on_attack 使用） */
+function ranmuBurnDmg(lv: number): number {
+    return 512 + lv + Math.floor(lv * lv / 500);
+}
+
+/** 护体真焰反弹伤害（绝招使用） */
+function ranmuRecoilDmg(lv: number): number {
+    return 800 + lv + Math.floor(lv * lv / 400);
 }

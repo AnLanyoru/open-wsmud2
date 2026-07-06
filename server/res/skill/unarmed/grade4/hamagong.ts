@@ -4,7 +4,7 @@ import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js"
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type {LearnCondition} from "../../../../types/events.js";
 
-/** 完成度 20 */
+/** 完成度 50 */
 export default class extends SKILL {
     name = "蛤蟆功";
     id = "hamagong";
@@ -88,7 +88,12 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "趴在地上蓄力运功，可最多蓄力9秒，蓄力期间增加25%伤害减免，无法躲闪，招架。";
+                var maxCharge = 4.5 + Math.floor(lv / 200) * 1.5;
+                var maxSec = Math.min(maxCharge, 9);
+                var mianShang = 20 + Math.floor(lv / 100);
+                const xiMs = me.query_prop("hmg_xi_ms");
+                mianShang += xiMs;
+                return "趴在地上蓄力运功，可最多蓄力" + maxSec + "秒，蓄力期间增加" + mianShang + "%伤害减免，无法躲闪，招架。";
             },
         },
         chong: {
@@ -105,8 +110,10 @@ export default class extends SKILL {
                 const chongCs = me.query_prop("hmg_chong_cs");
                 var extraCount = Math.floor(chargeSeconds) + chongCs;
                 var hitCount = baseCount + extraCount;
-                var dmgBonus = 1 + chargeSeconds * 0.15;
-                var mzBonus = chargeSeconds * 0.15;
+                var perPerSec = 5 + Math.floor(lv / 100);
+                if (perPerSec > 30) perPerSec = 30;
+                var dmgBonus = 1 + chargeSeconds * perPerSec / 100;
+                var mzBonus = chargeSeconds * perPerSec / 100;
 
                 me.remove_temp("hamagong_charge_start");
                 me.remove_status("xq");
@@ -118,7 +125,9 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "蓄力后可冲击敌人，每蓄力多１秒，增加你15％的伤害，15%命中，增加一次攻击";
+                var perPerSec = 5 + Math.floor(lv / 100);
+                if (perPerSec > 30) perPerSec = 30;
+                return "蓄力后可冲击敌人，每蓄力多１秒，增加你" + perPerSec + "%的伤害，" + perPerSec + "%命中，增加一次攻击";
             },
         },
     };

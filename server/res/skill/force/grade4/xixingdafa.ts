@@ -1,7 +1,8 @@
 import {SKILL} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap} from "../../../../core/skill/skill.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
+import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
+/**完成度 70 */
 export default class extends SKILL {
     name = "吸星大法";
     id = "xixingdafa";
@@ -32,15 +33,24 @@ export default class extends SKILL {
     ];
 
     query_enable_prop(lv: number): EnablePropMap {
+        var mpDmg = 2000 + Math.floor(lv * lv / 500);
         return {
             force: {
                 max_hp: lv * 30,
                 hp_per: 1 + Math.floor(lv / 300),
                 fy_per: 1 + Math.floor(lv / 300),
                 limit_mp: lv * 155,
-                desc: "唯一：将你内力的90%转化为气血\n命中后会化掉对方4000当前内力",
+                desc: "唯一：将你内力的90%转化为气血\n命中后会化掉对方" + mpDmg + "内力",
             },
         };
+    }
+
+    // 吸星大法被动：命中后化掉对方内力
+    on_force_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (par.is_dodged || par.is_parried) return;
+        var lv = me.query_skill("xixingdafa", 0);
+        var mpDmg = 2000 + Math.floor(lv * lv / 500);
+        target.add_mp(-mpDmg);
     }
 
     pfm_set: PerformData = {

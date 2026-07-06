@@ -147,7 +147,7 @@ export interface StatusDef {
     name: string;
     /** 状态描述 */
     desc?: string;
-    /** 持续时间（秒） */
+    /** 持续时间（毫秒） */
     duration: number;
     /** 状态附带的属性加成/减益 */
     prop?: PropMap;

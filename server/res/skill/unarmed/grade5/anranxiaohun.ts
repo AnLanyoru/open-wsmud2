@@ -3,7 +3,7 @@ import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar, CharacterStatus } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 70 */
 export default class extends SKILL {
     name = "黯然销魂掌";
     id = "anranxiaohun";
@@ -43,9 +43,10 @@ export default class extends SKILL {
             mp: 34,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+                var dmgPer = 100 + Math.floor(lv / 10);
                 var sh = me.do_attack({
                     target: target,
-                    gj: me.gj * 2,
+                    gj: Math.floor(me.gj * dmgPer / 100),
                     mz: me.mz,
                     attack_msg: "<hiy>$N黯然长叹，双掌似有似无地缓缓推出，正是黯然销魂掌中最诡异的「<HIC>无中生有</HIC>」！</hiy>",
                     miss_msg: "<cyn>$n心头一凛，于千钧一发之际堪堪避过这无形无迹的一掌。</cyn>",
@@ -59,9 +60,10 @@ export default class extends SKILL {
                             var stolen_name = buff.name;
                             me.send_room("<hiz>$N掌力一吐，竟从$n身上生生剥离出一道「" + stolen_name + "」气劲，化为己用！</hiz>", target);
                             me.add_status({
-                                id: "anran_steal_" + buff.id,
+                                id: buff.id,
                                 name: stolen_name,
                                 duration: buff.duration,
+                                only_combat: true,
                                 prop: stolen_prop,
                             });
                             target.remove_status(buff.id);
@@ -72,7 +74,8 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "对敌人造成200%的伤害，命中后会偷取敌人的一个正面状态附加自身";
+                var dmgPer = 100 + Math.floor(lv / 10);
+                return "对敌人造成" + dmgPer + "%的伤害，命中后会偷取敌人的一个正面状态附加自身";
             },
         },
         dai: {
@@ -84,9 +87,12 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = 3000 + lv * 3;
                 if (time > 8000) time = 8000;
+                var dmgPer = 100 + Math.floor(lv / 6);
+                var sdReduce = 50 + Math.floor(lv / 100);
+                if (sdReduce > 100) sdReduce = 100;
                 var sh = me.do_attack({
                     target: target,
-                    gj: Math.floor(me.gj * 2.66),
+                    gj: Math.floor(me.gj * dmgPer / 100),
                     mz: me.mz * 2,
                     attack_msg: "<hiy>$N双目无神，神情呆滞，却于一瞬间拍出惊天动地的一掌——黯然销魂掌之「<HIC>呆若木鸡</HIC>」！</hiy>",
                     miss_msg: "<cyn>$n被$N这一掌的气势所慑，于间不容发之际拼命闪开！</cyn>",
@@ -99,15 +105,20 @@ export default class extends SKILL {
                         duration: time,
                         downside: true,
                         prop: {
-                            gjsd_per: -60,
+                            gjsd_per: -sdReduce,
                         },
-                        desc: "攻击速度和技能释放速度降低60%",
+                        desc: "攻击速度和技能释放速度降低" + sdReduce + "%",
                     }, me);
                 }
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                return "超高命中的一击，对敌人造成266%的伤害，命中减少对方60%攻击速度和技能释放速度";
+                var time = 3000 + lv * 3;
+                if (time > 8000) time = 8000;
+                var dmgPer = 100 + Math.floor(lv / 6);
+                var sdReduce = 50 + Math.floor(lv / 100);
+                if (sdReduce > 100) sdReduce = 100;
+                return "超高命中的一击，对敌人造成" + dmgPer + "%的伤害，命中减少对方" + sdReduce + "%攻击速度和技能释放速度，持续" + toSec(time) + "秒";
             },
         },
     };

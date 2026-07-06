@@ -89,9 +89,10 @@ export default class extends SKILL {
                         target.send_room("<hir>$n的内功被魔种侵蚀，气息陡然紊乱！</hir>", target);
                     }
                     target.add_status({
-                        id: "tianmo_zhong",
+                        id: "force",
                         name: "种魔",
                         duration: 15000,
+                        override: 2,
                         downside: true,
                         prop: {
                             gj_per: -reduce_pct,
@@ -123,7 +124,7 @@ export default class extends SKILL {
                 var add_sh = 3 + Math.floor(lv / 300);
                 me.send_room("<mag>$N双目微阖，体内魔功逆转，竟在无边魔气中悟得一丝「<MAG>道心</MAG>」，魔道相济，战力暴涨！</mag>", target);
                 me.add_status({
-                    id: "tianmo_dao",
+                    id: "force",
                     name: "道心",
                     duration: time,
                     prop: {
@@ -153,7 +154,7 @@ export default class extends SKILL {
                 var time = 5000;
                 me.send_room("<mag>$N身形一散，化作无数道鬼影在空间中穿梭不定，真身与残影已无从分辨——「<MAG>鬼影</MAG>」！</mag>", target);
                 me.add_status({
-                    id: "tianmo_gui",
+                    id: "gui",
                     name: "鬼影",
                     duration: time,
                     desc: "鬼影相随，攻击必中",
