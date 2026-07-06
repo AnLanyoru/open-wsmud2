@@ -5,6 +5,7 @@ data/database.db
 .env
 www/
 data/100/
+data/1/
 data/def/
 .idea/
 .vscode/
@@ -13,3 +14,4 @@ old/
 os/
 world/
 server/dist/
+bench/
