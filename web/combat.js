@@ -162,6 +162,9 @@ const Combat = {
             if (Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].distime = data.distime;
                 Combat.dis_pfms[j].ani_time = data.distime;
+                if (!Combat.time_handler) {
+                    Combat.ANI_PFM();
+                }
                 return;
             }
         }
@@ -170,6 +173,9 @@ const Combat = {
             distime: data.distime,
             ani_time: data.distime
         });
+        if (!Combat.time_handler) {
+            Combat.ANI_PFM();
+        }
     }, redisable: function () {
         Combat.dis_pfms = [];
         for (var i = 0; i < Combat.Skills.length; i++) {
@@ -199,7 +205,6 @@ const Combat = {
             }
             if (this.dis_pfms[i].ani_time < data.rtime) {
                 this.dis_pfms[i].ani_time = data.rtime;
-                this.dis_pfms[i].distime = data.rtime;
             }
         }
         if (data.id) {
@@ -219,6 +224,10 @@ const Combat = {
         }
     }, PFM_INTERVAL: 300
     , ANI_PFM: function () {
+        if (!Combat.Skills) {
+            Combat.time_handler = null;
+            return;
+        }
         var p = 0;
         if (Combat.distime > 0)
             p = Combat.ani_time * 100 / Combat.distime;
@@ -237,7 +246,6 @@ const Combat = {
                 }
             }
             if (cur_per > 0) {
-                if (cur_per < 0) cur_per = 0;
                 skill.elem.css("backgroundSize", cur_per + "% 100%");
             } else {
                 skill.elem.css("backgroundSize", "0% 100%");
