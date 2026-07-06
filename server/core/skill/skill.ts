@@ -1169,23 +1169,28 @@ export class PERFORM {
      */
     change_distime(me: CHARACTER, baseType: string, add_time?: number, force_cd?: boolean, show_ui: boolean = true): void {
         const key = baseType + '.' + this.pid;
-        const cur = me.pfm_cd.get(key);
+        const curCdEnd = me.pfm_cd.get(key);
         const now = Date.now();
-        if (cur !== undefined && cur > now) {
+        let uiTime = 0;
+        let changed = false;
+
+        if (curCdEnd !== undefined && curCdEnd > now) {
             if (add_time) {
-                me.pfm_cd.set(key, cur + add_time);
+                me.pfm_cd.set(key, curCdEnd + add_time);
+                uiTime = add_time;
             } else {
-                add_time = -(cur - now);
                 me.pfm_cd.delete(key);
+                uiTime = -(curCdEnd - now);
             }
-            if (me.is_player && show_ui) {
-                me.send('{type:"changepfm",id:"' + baseType + '.' + this.pid + '",time:' + add_time + '}');
-            }
-        } else if (force_cd && add_time) {
+            changed = true;
+        } else if (add_time && force_cd) {
             me.pfm_cd.set(key, now + add_time);
-            if (me.is_player && show_ui) {
-                me.send('{type:"changepfm",id:"' + baseType + '.' + this.pid + '",time:' + add_time + '}');
-            }
+            uiTime = add_time;
+            changed = true;
+        }
+
+        if (changed && me.is_player && show_ui) {
+            me.send(`{type:"changepfm",id:"${key}",time:${uiTime}}`);
         }
     }
 
