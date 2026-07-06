@@ -5,7 +5,7 @@ import type { PropMap } from "../../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type {LearnCondition} from "../../../../types/events.js";
 
-/** 完成度 30 */
+/** 完成度 50 */
 export default class extends SKILL {
     name = "神照经";
     id = "shenzhaojing";
@@ -31,7 +31,7 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'int',
-            value: (lv: number) => 210,
+            value: (lv: number) => 10 + int(lv / 5),
             format: (val: number) => '额外增加' + val + '点悟性',
         },
         {
@@ -69,7 +69,7 @@ export default class extends SKILL {
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var duration = 21000 + lv * 9;
-                var attrBonus = Math.floor(30 + lv * 0.18);
+                var attrBonus = int(10 + lv / 5);
 
                 me.send_room("<HIC>$N一声长啸，神照经真气透体而出，周身霞光万道，气势暴涨！</HIC>", target);
                 me.add_status({
@@ -86,8 +86,9 @@ export default class extends SKILL {
                 me.end_attack(target);
             },
             query_desc: function(me: CHARACTER, lv: number) {
-                var attrBonus = Math.floor(30 + lv * 0.18);
-                return "神照护体，在30秒内增加你" + attrBonus + "点根骨，臂力，身法";
+                var duration = 21000 + lv * 9;
+                var attrBonus = int(10 + lv / 5);
+                return "神照护体，在" + toSec(duration) + "秒内增加你" + attrBonus + "点根骨，臂力，身法";
             },
         },
         jing: {
@@ -107,7 +108,7 @@ export default class extends SKILL {
 
                 if (target.hp > 0) {
                     me.add_status({
-                        id: "weapon",
+                        id: "unarmed",
                         name: "拳经",
                         duration: 15000,
                         prop: {
