@@ -117,7 +117,7 @@ export default class extends SKILL {
                 const forceCDs: [string, number][] = [];
                 for (const [key, expiry] of me.pfm_cd) {
                     const remaining = expiry - now;
-                    if (remaining > 0 && key.startsWith("force/")) {
+                    if (remaining > 0 && key.startsWith("force.")) {
                         forceCDs.push([key, remaining]);
                     }
                 }

@@ -58,7 +58,7 @@ export default class extends SKILL {
                     desc: "抵挡敌人的下一个绝招",
                     on_expire: function(p: CHARACTER): void {
                         if (p.query_temp("yh_cd", 0)) 
-                            p.set_distime("parry/" + this_pfm_id, 0);
+                            p.set_distime("parry." + this_pfm_id, 0);
                     },
                 });
             },

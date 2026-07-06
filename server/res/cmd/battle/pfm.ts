@@ -89,7 +89,7 @@ export default class extends COMMAND {
             return;
         }
         /** 绝招标识 */
-        const key = sk + "/" + pfmid;
+        const key = sk + "." + pfmid;
         const now = Date.now();
         if (me.check_pfm_cd(key, now)) {
             return me.notify(pfm.name + "还没准备好，你还不能使用。");

@@ -76,6 +76,28 @@ interface AttackPart {
     crit: number;
 }
 
+// ================================================================
+// DoAttackPar 位标记 — 将 11 个布尔字段合并为 1 个 number
+// ================================================================
+export const PARF = {
+    NO_WEAPON: 1 << 0,          // 1
+    IS_THROWING: 1 << 1,        // 2
+    NO_APPEND: 1 << 2,          // 4
+    NO_APPEND_TARGET: 1 << 3,   // 8
+    NO_APPEND_BEFORE: 1 << 4,   // 16
+    NO_DODGE: 1 << 5,           // 32
+    NO_PARRY: 1 << 6,           // 64
+    NO_POWER: 1 << 7,           // 128
+    IS_DODGED: 1 << 8,          // 256
+    IS_PARRIED: 1 << 9,         // 512
+    ISCIRT: 1 << 10,            // 1024
+} as const;
+
+/** 检查 par.flags 中是否置位 */
+export function hasParFlag(flags: number | undefined, flag: number): boolean {
+    return ((flags ?? 0) & flag) !== 0;
+}
+
 /** do_attack() 的参数对象 — 双向通信：输入字段由调用方设置，输出字段由 do_attack 写入 */
 export interface DoAttackPar {
     // === 输入：基础 ===
@@ -147,6 +169,9 @@ export interface DoAttackPar {
     is_parried?: boolean;
     /** 本次攻击是否暴击 */
     iscirt?: boolean;
+    // === 位标记（替代以上全部布尔字段，V8 隐藏类优化） ===
+    /** 位标记：按位组合 PARF 常量，替代所有 boolean 字段 */
+    flags?: number;
 }
 
 
@@ -2690,6 +2715,11 @@ export class CHARACTER extends ITEM {
             : (weapon ? weapon.weapon_type : WEAPON_TYPE.NONE);
         if (attack_msg) this.send_combat(attack_msg, target);
 
+        // 入口归一化：确保输出属性在此初始化，后续只做覆盖（V8 隐藏类稳定）
+        par.flags = par.flags ?? 0;
+        par.bj = par.bj ?? this.bj;
+        par.power_gj = 0;
+
         let sh = par.gj ?? this.gj;
         const mz = par.mz ?? this.mz;
         par.is_dodged = false;
@@ -2728,7 +2758,6 @@ export class CHARACTER extends ITEM {
             if (par.on_parry) {
                 par.on_parry(target, par.is_parried);
             }
-            par.bj = par.bj ?? this.bj;
             if (par.is_parried) {
                 sh = 0;
             } else {
@@ -3101,7 +3130,7 @@ export class CHARACTER extends ITEM {
         this.auto_skills!.push({
             pfm: pfmitem,
             level: level,
-            id: baseSkill + '/' + pfmitem.pid,
+            id: baseSkill + '.' + pfmitem.pid,
             type: baseSkill,
             is_ref: is_ref,
         });

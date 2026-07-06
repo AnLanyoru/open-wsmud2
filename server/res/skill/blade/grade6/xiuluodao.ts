@@ -103,7 +103,7 @@ export default class extends SKILL {
                 me.end_attack(target);
 
                 if (killed) {
-                    me.clear_distime(sktype + "/" + this.pid);
+                    me.clear_distime(sktype + "." + this.pid);
                 }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
