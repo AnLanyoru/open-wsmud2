@@ -157,6 +157,14 @@ const Combat = {
         }
     }, SetDistime: function (data) {
         var pfmid = data.id;
+        // 过滤未装备技能：Skills 已加载时，忽略不在其中的技能 CD
+        if (Combat.Skills) {
+            var found = false;
+            for (var si = 0; si < Combat.Skills.length; si++) {
+                if (Combat.Skills[si].id == pfmid) { found = true; break; }
+            }
+            if (!found) return;
+        }
         if (!Combat.dis_pfms) Combat.dis_pfms = [];
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (Combat.dis_pfms[j].id == pfmid) {
