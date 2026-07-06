@@ -1253,20 +1253,6 @@ export class USER extends CHARACTER {
     }
 
     /**
-     * 设置技能冷却时间（玩家覆写，增加客户端通知）
-     * @param key - 技能标识 "baseSkill/pfmid"
-     * @param distime_ms - 冷却时长（毫秒），<=0 则清除冷却
-     */
-    set_distime(key: string, distime_ms: number): void {
-        super.set_distime(key, distime_ms);
-        if (distime_ms > 0) {
-            this.send('{type:"setDistime",id:"' + key + '",distime:' + distime_ms + '}');
-        } else {
-            this.send('{type:"clearDistime",id:"' + key + '"}');
-        }
-    }
-
-    /**
      * 添加战斗属性(临时)
      */
     add_combat_prop(name: string, val: number): void {

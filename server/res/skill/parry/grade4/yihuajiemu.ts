@@ -51,6 +51,7 @@ export default class extends SKILL {
                         zj_per: -buff_value,
                     },
                 }, me);
+                const self = this;
                 me.add_status({
                     id: "yihua",
                     name: "移花",
@@ -58,7 +59,7 @@ export default class extends SKILL {
                     desc: "抵挡敌人的下一个绝招",
                     on_expire: function(p: CHARACTER): void {
                         if (p.query_temp("yh_cd", 0)) 
-                            p.set_distime("parry." + this_pfm_id, 0);
+                            self.set_distime(p, "parry", 0);
                     },
                 });
             },
