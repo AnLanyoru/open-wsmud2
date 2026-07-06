@@ -376,10 +376,10 @@ export class NPC extends CHARACTER {
     heart_beat(dt: number): void {
         if (!this.fight_type) {
             if (this.hp < this.max_hp) {
-                this.add_hp(parseInt(String(this.max_hp / 2), 10));
+                this.add_hp(int(this.max_hp / 2));
             }
             if (this.mp < this.max_mp) {
-                this.add_mp(parseInt(String(this.max_mp / 2), 10));
+                this.add_mp(int(this.max_mp / 2));
             }
             if (this.chat_msg) {
                 if (this.random(10) > 8)

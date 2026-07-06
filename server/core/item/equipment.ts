@@ -419,7 +419,7 @@ export class EQUIPMENT extends OBJ {
                 case "lianyao1":
                 case "diff_sh":
                 case "expend_mp":
-                    this.prop![key] = value + parseInt(String(value * val / 1000), 10);
+                    this.prop![key] = value + int(value * val / 1000);
                     break;
 
                 case "diff_downside_per":
@@ -444,7 +444,7 @@ export class EQUIPMENT extends OBJ {
 
                 default:
                     if (PROPERTIES[key])
-                        this.prop![key] = value + parseInt(String(value * val / 100), 10);
+                        this.prop![key] = value + int(value * val / 100);
                     else
                         this.prop![key] = value;
                     break;

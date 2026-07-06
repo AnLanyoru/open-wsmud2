@@ -1,8 +1,9 @@
 import {NPC} from "../../../core/char/npc.js";
+import { USER } from "../../../core/char/user.js";
 import type { SkillItem } from "../../../core/skill/skill.js";
 import {UTIL} from "../../../core/util/util.js";
 
-export default class extends NPC {
+export default class WuDaoShouHu extends NPC {
     name = "";
     desc = "他是武道塔的神秘守护者";
     title = "武道塔守护者";
@@ -73,8 +74,7 @@ export default class extends NPC {
         ]
     ];
 
-    init_from(player, level) {
-        this.con = this.dex = this.int = this.str = 20 + parseInt(level / 3);
+    init_from(this: WuDaoShouHu ,player: USER, level: number) {
         if (level > 100) level = 100;
         const grade1 = Math.floor(level / 10);
         this.name = UTIL.random_name(this.gender);
@@ -85,6 +85,7 @@ export default class extends NPC {
 
         this.hp = this.max_hp = 1000 + level * level * 150;
         this.mp = this.max_mp = parseInt(this.hp / 2);
+        this.con = this.dex = this.int = this.str = 20 + parseInt(level / 3);
         this.init();
         this.recount();
 

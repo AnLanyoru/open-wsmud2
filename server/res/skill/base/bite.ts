@@ -17,7 +17,7 @@ export default class extends SKILL {
     ];
 
     query_prop(lv: number): PropMap {
-        return {gj: parseInt(String(lv / 5)), mz: parseInt(String(lv / 5))};
+        return {gj: int(lv / 5), mz: int(lv / 5)};
     }
 
     constructor() {

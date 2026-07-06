@@ -332,9 +332,9 @@ export default class XiangYangTask extends TASK {
 
     create_mgname() {
         var str = ["完颜", "纥石烈", "兀颜", "纳兰", "阿迭"].random();
-        str += UTIL.name2[parseInt(String(Math.random() * UTIL.name2.length))];
+        str += UTIL.name2[int(Math.random() * UTIL.name2.length)];
         if (this.random(4) == 1) {
-            str += UTIL.name2[parseInt(String(Math.random() * UTIL.name2.length))];
+            str += UTIL.name2[int(Math.random() * UTIL.name2.length)];
         }
         return str;
     }
@@ -706,7 +706,7 @@ function query_items(this: NPC, me: USER) {
     if (!this.user_items) this.user_items = {};
     if (this.user_items[me.id]) return this.user_items[me.id];
     if (!is_bm(me)) return;
-    sh = parseInt(String(sh * 100 / this.max_hp));
+    sh = int(sh * 100 / this.max_hp);
     if (sh < 3) {
         this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(3))];
         return this.user_items[me.id];
@@ -739,8 +739,8 @@ function query_items(this: NPC, me: USER) {
     if (diff_level < 1) {
         add_jungong(me, 1);
     } else {
-        add_jungong(me, parseInt(String(JUNGONGS[diff_level]
-            * Math.max(sh, 50) / 50)));
+        add_jungong(me, int(JUNGONGS[diff_level]
+            * Math.max(sh, 50) / 50));
     }
 
     return items;

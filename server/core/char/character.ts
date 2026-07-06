@@ -2609,24 +2609,24 @@ export class CHARACTER extends ITEM {
     recount(): void {
         this.gjsd = 4000 - this.query_prop('gjsd');
         if (this.gjsd > 500) {
-            this.gjsd = parseInt(String(this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100)), 10);
+            this.gjsd = int(this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100));
             if (this.gjsd < 500) this.gjsd = 500;
         } else {
             this.gjsd = 500;
         }
 
-        this.gj = parseInt(String(this.str + (this.query_prop('gj') + this.query_prop('str') * this.str / 10) * (100 + this.query_prop('gj_per')) / 100), 10);
-        this.fy = parseInt(String(((this.str + this.con) / 10 + this.query_prop('fy') + this.query_prop('con') * this.con / 10) * (100 + this.query_prop('fy_per')) / 100), 10);
-        this.mz = parseInt(String((this.dex / 2 + this.query_prop('mz')) * (100 + this.query_prop('mz_per')) / 100), 10);
-        this.ds = parseInt(String((this.dex / 2 + this.query_prop('ds') + this.query_prop('dex') * this.dex / 10) * (100 + this.query_prop('ds_per')) / 100), 10);
+        this.gj = int(this.str + (this.query_prop('gj') + this.query_prop('str') * this.str / 10) * (100 + this.query_prop('gj_per')) / 100);
+        this.fy = int(((this.str + this.con) / 10 + this.query_prop('fy') + this.query_prop('con') * this.con / 10) * (100 + this.query_prop('fy_per')) / 100);
+        this.mz = int((this.dex / 2 + this.query_prop('mz')) * (100 + this.query_prop('mz_per')) / 100);
+        this.ds = int((this.dex / 2 + this.query_prop('ds') + this.query_prop('dex') * this.dex / 10) * (100 + this.query_prop('ds_per')) / 100);
         if (this.dodge_skill?.on_recount_dodge) {
             this.ds += this.dodge_skill.on_recount_dodge(this);
         }
-        this.zj = parseInt(String((this.str / 2 + this.query_prop('zj') + this.query_prop('str') * this.str / 10) * (100 + this.query_prop('zj_per')) / 100), 10);
+        this.zj = int((this.str / 2 + this.query_prop('zj') + this.query_prop('str') * this.str / 10) * (100 + this.query_prop('zj_per')) / 100);
         if (this.parry_skill?.on_recount_parry) {
             this.zj += this.parry_skill.on_recount_parry(this);
         }
-        this.bj = parseInt(String(this.dex / 10 + this.query_prop('bj_per')), 10);
+        this.bj = int(this.dex / 10 + this.query_prop('bj_per'));
 
         this.diff_sh_per = this.query_prop('diff_sh_per');
         this.diff_fy_per = this.query_prop('diff_fy_per');
@@ -2648,13 +2648,13 @@ export class CHARACTER extends ITEM {
      * 重新计算最大气血（独立可选方法，不会在 recount 中自动调用）
      */
     recount_max_hp(): void {
-        this.max_hp = parseInt(String(
+        this.max_hp = int(
             this.con * 5
             + (this.max_mp * this.query_force_rad()
                 + this.query_prop('max_hp')
                 + this.query_prop('con') * this.con)
             * (100 + this.query_prop('hp_per')) / 100,
-        ), 10);
+        );
         if (this.max_hp < 1) this.max_hp = 1;
         if (this.hp > this.max_hp) this.hp = this.max_hp;
     }
@@ -2847,7 +2847,7 @@ export class CHARACTER extends ITEM {
     do_recover(hp: number): number {
         hp = hp + hp * this.query_prop('recover_per') / 100;
         if (!(hp > 0)) return 0;
-        return this.add_hp(parseInt(String(hp), 10));
+        return this.add_hp(int(hp));
     }
 
     /**
@@ -2885,7 +2885,7 @@ export class CHARACTER extends ITEM {
             sh = this.force_skill.on_damage(this, sh, from);
         }
         if (sh > 0) {
-            sh = parseInt(String(sh), 10);
+            sh = int(sh);
             if (this.record_damage && from) {
                 if (!this.damages) this.damages = {};
                 const damag = (this.damages[from.id] || 0) + sh;
@@ -3235,7 +3235,7 @@ function splitmessage(me: CHARACTER, text: string, type: number, target: any): s
  * 查询血量状态消息
  */
 function query_status_msg(hp: number, maxhp: number): string {
-    const ratio = parseInt(String(hp * 10 / maxhp), 10);
+    const ratio = int(hp * 10 / maxhp);
     const idx = Math.max(0, Math.min(9, ratio));
     return status_msg[9 - idx];
 }

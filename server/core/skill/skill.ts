@@ -652,7 +652,7 @@ export class SKILL extends BASE {
         str.push(me.query_skill(this.id).toString());
         str.push(',"exp":');
         skill_item.exp = skill_item.exp || 0;
-        str.push(String(parseInt(String(skill_item.exp * 100 / this.level_exp(skill_item.level, me)))));
+        str.push(String(int(skill_item.exp * 100 / this.level_exp(skill_item.level, me))));
         if (this.can_enables && this.can_enables.length) {
             str.push(',"can_enables":[');
             for (let i = 0; i < this.can_enables.length; i++) {
@@ -714,12 +714,12 @@ export class SKILL extends BASE {
             }
             const lv = me.query_skill(this.id);
             this.attach_prop(me, lv);
-            me.notify('{type:"dialog",dialog:"skills",id:"' + this.id + '",level:' + lv + ',exp:' + parseInt(String(skill.exp * 100 / need_exp)) + '}');
+            me.notify('{type:"dialog",dialog:"skills",id:"' + this.id + '",level:' + lv + ',exp:' + int(skill.exp * 100 / need_exp) + '}');
             me.recount();
             me.add_score(sum_score);
             return true;
         } else {
-            me.notify('{type:"dialog",dialog:"skills",id:"' + this.id + '",exp:' + parseInt(String(skill.exp * 100 / need_exp)) + '}');
+            me.notify('{type:"dialog",dialog:"skills",id:"' + this.id + '",exp:' + int(skill.exp * 100 / need_exp) + '}');
         }
     }
 

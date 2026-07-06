@@ -1164,7 +1164,7 @@ export class USER extends CHARACTER {
      * @returns 是否成功
      */
     add_money(val: number): boolean {
-        const money = parseInt(String(this.money + val));
+        const money = int(this.money + val);
         if (!(money >= 0)) return false;
         this.money = money;
         return true;

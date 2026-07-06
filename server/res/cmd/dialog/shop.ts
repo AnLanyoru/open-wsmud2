@@ -179,7 +179,7 @@ export default class extends COMMAND {
             if (item.mtype === 0) {
                 need_money = item.value * buyCount * 10000;
                 if (discount < 1) need_money = need_money * discount;
-                need_money = parseInt(String(need_money));
+                need_money = int(need_money);
                 if (!(me.money >= need_money)) {
                     return me.notify("你没有那么多的银两。");
                 }
@@ -188,7 +188,7 @@ export default class extends COMMAND {
                 need_money = item.value * buyCount;
 
                 if (discount < 1) need_money = need_money * discount;
-                need_money = parseInt(String(need_money));
+                need_money = int(need_money);
                 if (!(me.cash_money! >= need_money)) {
                     return me.notify("你没有那么多的元宝。");
                 }
@@ -196,7 +196,7 @@ export default class extends COMMAND {
             } else {
                 need_money = item.value * buyCount;
                 if (discount < 1) need_money = need_money * discount;
-                need_money = parseInt(String(need_money));
+                need_money = int(need_money);
                 if (!((me.query_temp('my', 0) ?? 0) >= need_money))
                     return me.notify("你没有那么多的古币。");
                 me.add_temp('my', -need_money);

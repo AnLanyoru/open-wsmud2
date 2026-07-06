@@ -48,9 +48,9 @@ export default class YaMenLevelUpTask extends USERTASK {
                 this.clear(player);
                 return "你的任务失败了。";
             }
-            str.push(String(parseInt(String(time / 60000))));
+            str.push(String(int(time / 60000)));
             str.push("分");
-            str.push(String(parseInt(String((time % 60000) / 1000))));
+            str.push(String(int((time % 60000) / 1000)));
             str.push("秒去寻找他。\n");
             let level = player.query_temp('ym_level', 0) ?? 0;
             let level2 = player.query_temp('ym_lv2', 0) ?? 0;

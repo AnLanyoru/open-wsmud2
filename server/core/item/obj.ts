@@ -190,7 +190,7 @@ export class OBJ extends ITEM {
      * 物品 JSON 序列化
      */
     item_to_json(): string {
-        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${parseInt(String(this.value / 10), 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0}]`;
+        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${int(this.value / 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0}]`;
     }
 
     /**

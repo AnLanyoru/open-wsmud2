@@ -106,7 +106,7 @@ export default class extends AREA {
         if (status === 1 && !this.is_bm(me)) {
             var time = (me.query_temp_expiry("xy_hd") ?? 0) - Date.now();
             if (time > 0) {
-                    return me.notify_fail("你还有" + parseInt(String(time / 3600000)) + "小时" + parseInt(String((time % 3600000) / 60000)) + "分才可以再次进入襄阳城。");
+                    return me.notify_fail("你还有" + int(time / 3600000) + "小时" + int((time % 3600000) / 60000) + "分才可以再次进入襄阳城。");
             }
             var pt2 = WORLD.DATA.query_temp('xy_party');
             if (pt2 && pt2 !== me.query_temp('pt')) {

@@ -68,8 +68,8 @@ export default class WuMiaoRoom extends ROOM {
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i];
             if (item.check_character()) {
-                item.add_hp(parseInt(String(item.max_hp / 10)));
-                item.add_mp(parseInt(String(item.max_mp / 10)));
+                item.add_hp(int(item.max_hp / 10));
+                item.add_mp(int(item.max_mp / 10));
             }
         }
     }
