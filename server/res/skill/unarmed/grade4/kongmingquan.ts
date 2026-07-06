@@ -3,7 +3,7 @@ import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 import type { LearnCondition } from "../../../../types/events.js";
 
-/** 完成度 50 */
+/** 完成度 80 */
 export default class extends SKILL {
     name = "空明拳";
     id = "kongmingquan";
@@ -55,22 +55,33 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                const hitCount = 6;
                 let allHit = true;
                 const diffFyPer = Math.min(80, 10 + int(lv / 50));
 
+                const dirMsgs = [
+                    "<hir>$N跳起来从上往下抡了一拳</hir>",
+                    "<hir>$N蹲下去由下往上撩了一拳</hir>",
+                     "<hir>$N左面劈头盖脸一拳抡向$n</hir>",
+                    "<hir>$N右面又是一拳砸了过来</hir>",
+                     "<hir>$N正面直直地一拳捣向$n面门</hir>",
+                     "<hir>$N绕到背后偷了一拳</hir>",
+                ];
+                const finalMsg = "<HIR>$N五路拳势倏然一收，化作至简至空的一拳「<HIW>空碗盛雪</HIW>」！拳到中途劲力陡增，$n避无可避！</HIR>";
+
                 me.send_room("<HIC>$N哈哈大笑，双拳乱舞，拳影漫天，如狂风暴雨般罩向$n！</HIC>", target);
-                for (let i = 0; i < hitCount; i++) {
-                    const isLastHit = (i === hitCount - 1 && allHit);
-                    const par: DoAttackPar = { target, gj: me.gj, mz: me.mz };
-                    if (isLastHit) {
-                        par.diff_fy = diffFyPer;
-                    }
+                for (let i = 0; i < 5; i++) {
+                    const par: DoAttackPar = { target, gj: me.gj, mz: me.mz, attack_msg: dirMsgs[i] };
                     me.do_attack(par);
                     if (par.is_dodged || par.is_parried) {
                         allHit = false;
                     }
                 }
+                // 最后一拳
+                const lastPar: DoAttackPar = { target, gj: me.gj, mz: me.mz, attack_msg: finalMsg };
+                if (allHit) {
+                    lastPar.diff_fy = diffFyPer;
+                }
+                me.do_attack(lastPar);
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
@@ -99,19 +110,17 @@ export default class extends SKILL {
                 const otherSkill = SKILL.get(skillId);
                 if (!otherSkill) return false;
                 const otherPerform = otherSkill.pfm[pfmKey];
-                if (!otherPerform?.use) return false;
+                if (!otherPerform?.use || otherPerform.no_copy) return false;
 
                 const effectLv = int(lv * boPer / 100);
 
                 // 复用之前使用的绝招
-                me.send_room("<HIC>$N心分二用，左手「" + otherPerform.name + "」凌空击出！</HIC>", target);
-                otherPerform.use.call(otherPerform, me, target, effectLv, otherPerform.enable_skill || "unarmed");
+                otherPerform.use(me, target, effectLv, otherPerform.enable_skill || "unarmed");
 
                 // 继承冷却时间
                 if (boCd && otherPerform.pid) {
                     otherPerform.set_distime(me, otherPerform.enable_skill || "unarmed", otherPerform.query_distime(me, effectLv));
                 }
-
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
