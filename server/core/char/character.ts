@@ -3132,7 +3132,7 @@ export class CHARACTER extends ITEM {
     set_releasetime(rtime: number): void {
         const release_time = Date.now() + rtime;
         if (this.is_player) {
-            this.notify('{type:"dispfm",id:"all",rtime:' + rtime + ',distime:0}');
+            this.notify('{type:"dispfm",rtime:' + rtime + '}');
         } else {
             if (!this.auto_skills) this.init_pfms();
         }
