@@ -114,7 +114,7 @@ export default class extends COMMAND {
             const rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
             pfm.change_distime(me, sk, distime + rtime, true);
-            me.notify('{type:"dispfm",rtime:' + rtime + '}');
+            me.send(`{type:"dispfm",id:"all",rtime:${rtime},distime:0}`);
             if (pfm.is_weapon && sp_skill != me.attack_skill) {
                 me.attack_skill = sp_skill;
                 me.remove_status('weapon', true);
