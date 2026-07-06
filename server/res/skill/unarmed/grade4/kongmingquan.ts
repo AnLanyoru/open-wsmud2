@@ -1,8 +1,7 @@
-import {SKILL, PERFORM} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
-import type {LearnCondition} from "../../../../types/events.js";
+import type { LearnCondition } from "../../../../types/events.js";
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -22,7 +21,7 @@ export default class extends SKILL {
         "$N身形滴溜一转，拳法大开大合却又空若无物，$n完全无法捉摸",
     ];
     learn_condition: LearnCondition = {
-      "int1": 40
+        "int1": 40
     };
 
     slots = [
@@ -55,15 +54,18 @@ export default class extends SKILL {
             enable_skill: "unarmed",
             mp: 20,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
-                var hitCount = 6;
-                var allHit = true;
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+                const hitCount = 6;
+                let allHit = true;
+                const diffFyPer = Math.min(80, 10 + int(lv / 50));
 
                 me.send_room("<HIC>$N哈哈大笑，双拳乱舞，拳影漫天，如狂风暴雨般罩向$n！</HIC>", target);
-                for (var i = 0; i < hitCount; i++) {
-                    var lastGj = (i === hitCount - 1 && allHit) ? Math.floor(me.gj * 1.3) : me.gj;
-                    var isLastHit = (i === hitCount - 1 && allHit);
-                    var par: DoAttackPar = { target, gj: lastGj, mz: me.mz };
+                for (let i = 0; i < hitCount; i++) {
+                    const isLastHit = (i === hitCount - 1 && allHit);
+                    const par: DoAttackPar = { target, gj: me.gj, mz: me.mz };
+                    if (isLastHit) {
+                        par.diff_fy = diffFyPer;
+                    }
                     me.do_attack(par);
                     if (par.is_dodged || par.is_parried) {
                         allHit = false;
@@ -71,8 +73,9 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "瞬间对敌人攻击6拳，如果全部命中，最后一拳无视对方30%防御";
+            query_desc: function (me: CHARACTER, lv: number) {
+                const diffFyPer = Math.min(80, 10 + int(lv / 50));
+                return "瞬间对敌人攻击6拳，如果全部命中，最后一拳无视对方" + diffFyPer + "%防御";
             },
         },
         bo: {
@@ -81,60 +84,40 @@ export default class extends SKILL {
             enable_skill: "unarmed",
             mp: 20,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number) {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number) {
+                // used_pfm 存的是 pfm.id（格式："skillId/pfmKey"），在 use_pfm 中由引擎自动设置
+                const lastPfmId = me.query_temp("used_pfm", "") as string;
+                if (!lastPfmId) return false;
+
+                const boPer = Math.min(100, 50 + int(lv / 40));
                 const boCd = me.query_prop("kmq_bo_cd");
-                const boLv = me.query_prop("kmq_bo_lv");
+                const slashIdx = lastPfmId.indexOf("/");
+                if (slashIdx <= 0) return false;
 
-                me.send_room("<HIC>$N左手画方，右手画圆，使出左右互搏之术，双拳齐出攻向$n！</HIC>", target);
+                const skillId = lastPfmId.slice(0, slashIdx);
+                const pfmKey = lastPfmId.slice(slashIdx + 1);
+                const otherSkill = SKILL.get(skillId);
+                if (!otherSkill) return false;
+                const otherPerform = otherSkill.pfm[pfmKey];
+                if (!otherPerform?.use) return false;
 
-                // 第一次攻击使用当前技能
-                me.do_attack({ target, gj: me.gj, mz: me.mz, no_weapon: true });
+                const effectLv = int(lv * boPer / 100);
 
-                // 第二次攻击：尝试使用其他技能的绝招
-                const otherPfm = kmq_find_pfm(me, lv, boLv);
-                if (otherPfm) {
-                    const otherSkill = otherPfm.skill;
-                    const otherPerform = otherPfm.pfm;
-                    const otherLv = boLv ? me.query_skill(otherSkill.id) : lv;
+                // 复用之前使用的绝招
+                me.send_room("<HIC>$N心分二用，左手「" + otherPerform.name + "」凌空击出！</HIC>", target);
+                otherPerform.use.call(otherPerform, me, target, effectLv, otherPerform.enable_skill || "unarmed");
 
-                    me.send_room("<HIC>$N心分二用，左手「" + otherPerform.name + "」凌空击出！</HIC>", target);
-
-                    if (otherPerform.use) {
-                        otherPerform.use.call(otherPerform, me, target, otherLv, otherSkill.can_enables[0] || "unarmed");
-                    }
-
-                    // 继承冷却时间
-                    if (boCd && otherPerform.pid) {
-                        const baseType = otherSkill.can_enables[0] || "unarmed";
-                        otherPerform.set_distime(me, baseType, otherPerform.query_distime(me, otherLv));
-                    }
-                } else {
-                    me.do_attack({ target, gj: me.gj, mz: me.mz, no_weapon: true });
+                // 继承冷却时间
+                if (boCd && otherPerform.pid) {
+                    otherPerform.set_distime(me, otherPerform.enable_skill || "unarmed", otherPerform.query_distime(me, effectLv));
                 }
 
                 me.end_attack(target);
             },
-            query_desc: function(me: CHARACTER, lv: number) {
-                return "使用左右互搏之术同时攻击敌人两次。";
+            query_desc: function (me: CHARACTER, lv: number) {
+                const boPer = Math.min(100, 50 + int(lv / 40));
+                return "使用左右互搏之术，再次使用你之前使用的绝招攻击敌人，效果是自身等级的" + boPer + "%。";
             },
         },
     };
-}
-
-/** 左右互搏寻找可用的其他武功绝招 */
-function kmq_find_pfm(me: CHARACTER, lv: number, boLv: number): { skill: SKILL, pfm: PERFORM } | null {
-    // 查找当前装备的unarmed技能的绝招
-    for (const sid of me.skills?.keys() || []) {
-        if (sid === "kongmingquan" || sid === "kongmingquan2") continue;
-        const sk = SKILL.get(sid);
-        if (!sk || !sk.can_enables?.includes("unarmed")) continue;
-        if (!me.is_enable_skill(sid, "unarmed")) continue;
-        for (const pid in sk.pfm) {
-            const pfm = sk.pfm[pid];
-            if (pfm.enable_skill === "unarmed" && pfm.use) {
-                return { skill: sk, pfm: pfm };
-            }
-        }
-    }
-    return null;
 }
