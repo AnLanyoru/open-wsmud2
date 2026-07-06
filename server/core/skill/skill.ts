@@ -1160,8 +1160,14 @@ export class PERFORM {
         return this.name || "";
     }
 
-    /** 改变绝招冷却时间（baseType: 基础技能类型如"sword"，与 pid 拼接为 pfm_cd key） */
-    change_distime(me: CHARACTER, baseType: string, add_time?: number): void {
+    /** 改变绝招冷却时间（baseType: 基础技能类型如"sword"，与 pid 拼接为 pfm_cd key）
+     * @param me - 角色对象
+     * @param baseType - 基础技能类型
+     * @param add_time - 增加的冷却时间（毫秒），不传或为0时清除冷却
+     * @param force_cd - 是否强制设置冷却时间（无论是否在cd中）
+     * @param show_ui - 是否显示UI更新
+     */
+    change_distime(me: CHARACTER, baseType: string, add_time?: number, force_cd?: boolean, show_ui: boolean = true): void {
         const key = baseType + '.' + this.pid;
         const cur = me.pfm_cd.get(key);
         if (cur !== undefined) {
@@ -1171,7 +1177,12 @@ export class PERFORM {
                 add_time = -(cur - Date.now());
                 me.pfm_cd.delete(key);
             }
-            if (me.is_player) {
+            if (me.is_player && show_ui) {
+                me.send('{type:"changepfm",id:"' + baseType + '.' + this.pid + '",time:' + add_time + '}');
+            }
+        } else if (force_cd && add_time) {
+            me.pfm_cd.set(key, Date.now() + add_time);
+            if (me.is_player && show_ui) {
                 me.send('{type:"changepfm",id:"' + baseType + '.' + this.pid + '",time:' + add_time + '}');
             }
         }

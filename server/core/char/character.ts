@@ -2450,7 +2450,7 @@ export class CHARACTER extends ITEM {
     /**
      * 是否在战斗中
      */
-    is_fighting(p?: CHARACTER): this is this & {enemy: CHARACTER[]} {
+    is_fighting(p?: CHARACTER): this is this & { enemy: CHARACTER[] } {
         if (!this.fight_type) return false;
         if (!this.enemy || !this.enemy.length) {
             this.fight_type = 0;
@@ -2573,19 +2573,6 @@ export class CHARACTER extends ITEM {
             this.pfm_cd.delete(pfmid);
         } else {
             this.pfm_cd.clear();
-        }
-    }
-
-    /**
-     * 设置技能冷却时间
-     * @param key - 技能标识 "baseSkill/pfmid"
-     * @param distime_ms - 冷却时长（毫秒），<=0 则清除冷却
-     */
-    set_distime(key: string, distime_ms: number): void {
-        if (distime_ms > 0) {
-            this.pfm_cd.set(key, Date.now() + distime_ms);
-        } else {
-            this.pfm_cd.delete(key);
         }
     }
 
@@ -3075,7 +3062,11 @@ export class CHARACTER extends ITEM {
                 this.release_time = 0;
                 // rtime = 0; // intentionally unused
             }
-            this.pfm_cd.set(skill.id, now + skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0));
+            skill.pfm.change_distime(this,
+                skill.type,
+                skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0),
+                true,
+                false);
 
             return this.release_time > 0 || target.hp <= 0;
         }

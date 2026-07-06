@@ -113,7 +113,7 @@ export default class extends COMMAND {
             const distime = pfm.query_distime(me, lv, is_ref);
             const rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
-            me.pfm_cd.set(key, now + distime + rtime);
+            pfm.change_distime(me, sk, distime + rtime, true, false);
             me.notify('{type:"dispfm",id:"' + sk + "." + pfmid + '",rtime:'
                 + rtime + ',distime:' + (distime + rtime) + '}');
             if (pfm.is_weapon && sp_skill != me.attack_skill) {
