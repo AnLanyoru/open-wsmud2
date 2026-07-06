@@ -1172,7 +1172,6 @@ export class PERFORM {
         const curCdEnd = me.pfm_cd.get(key);
         const now = Date.now();
         let uiTime = 0;
-        let changed = false;
 
         if (curCdEnd !== undefined && curCdEnd > now) {
             if (add_time) {
@@ -1182,16 +1181,17 @@ export class PERFORM {
                 me.pfm_cd.delete(key);
                 uiTime = -(curCdEnd - now);
             }
-            changed = true;
+        if (me.is_player && show_ui) {
+            me.send(`{type:"changepfm",id:"${key}",time:${uiTime}}`);
+        }
         } else if (add_time && force_cd) {
             me.pfm_cd.set(key, now + add_time);
             uiTime = add_time;
-            changed = true;
+        if (me.is_player && show_ui) {
+            me.send(`{type:"setDistime",id:"${key}",distime:${uiTime}}`);
+        }
         }
 
-        if (changed && me.is_player && show_ui) {
-            me.send(`{type:"changepfm",id:"${key}",time:${uiTime}}`);
-        }
     }
 
     /** 设置绝招冷却时间（baseType: 基础技能类型如"sword"。distime_ms: 冷却时长毫秒，≤0 时清除冷却） */
