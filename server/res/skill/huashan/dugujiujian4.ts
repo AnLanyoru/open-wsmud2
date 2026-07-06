@@ -50,11 +50,11 @@ export default class extends SKILL {
                 let time: number = 5000 + lv * 2;
                 if (time > 15000) time = 15000;
                 const per: number = 50 + int(lv / 50);
-                me.send_room("<him>$N闭目凝神，周身剑气凛然——独孤剑诀·剑意！刹那间剑心通明，天地万物皆可为剑。</him>\n", target);
+                me.send_room("<him>$N闭目凝神，周身剑气凛然，剑意入微！刹那间剑心通明，天地万物皆可为剑。</him>\n", target);
                 me.add_status({
                     id: "weapon",
                     name: "剑意",
-                    desc: "剑心通明，无坚不摧",
+                    desc: "剑心通明",
                     duration: time,
                     prop: {
                         gjsd_per: 100,
@@ -108,7 +108,7 @@ export default class extends SKILL {
             if (sh_per > 100) sh_per = 100;
             const real_dmg = int(me.gj * sh_per / 100);
             target.damage3(real_dmg, me);
-            me.send_room("<WB-HIC>一道剑影划过，$n的身上多出一道莫名伤口，受到" + real_dmg + "点真实伤害！</WB-HIC>", target);
+            me.send_room("<WB-HIZ>一道剑影划过，$n的身上多出一道莫名伤口，受到" + real_dmg + "点真实伤害！</WB-HIZ>", target);
         }
         return 0;
     }

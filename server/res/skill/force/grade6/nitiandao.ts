@@ -131,7 +131,7 @@ export default class extends SKILL {
                             expend_mp: -extraMp,
                             expend_mp_per: -extraMpPer,
                         },
-                        finish_msg: "<hio>$n身上的寂灭之力终于消散。</hio>",
+                        finish_msg: "<hio>$N身上的寂灭之力终于消散。</hio>",
                     }, me);
                 }
 
