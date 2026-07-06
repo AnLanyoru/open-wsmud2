@@ -29,4 +29,25 @@ export default class extends NPC {
         mz: 150000,
         mz_per: 100
     };
+    constructor() {
+        super();
+        this.skill_map(
+            // 全基础技能
+            ["force", 5000],
+            ["dodge", 5000],
+            ["parry", 5000],
+            ["unarmed", 5000],
+            ["sword", 5000],
+            ["blade", 5000],
+            ["staff", 5000],
+            ["club", 5000],
+            ["whip", 5000],
+            ["throwing", 5000],
+            // 特殊技能
+            ["jiuyangshengong", 5000, "force"],
+            ["xuanxubu", 5000, "dodge"],
+            ["qiankundanuoyi", 5000, "parry"],
+            ["xianglongzhang2", 5000, "unarmed"],
+            ["xuantiejianfa", 5000, "sword"],
+        );}
 }
