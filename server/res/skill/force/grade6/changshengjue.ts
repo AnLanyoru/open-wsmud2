@@ -1,6 +1,6 @@
-import {SKILL} from "../../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../../core/const.js";
-import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
+import { SKILL_TYPES } from "../../../../core/const.js";
+import type { PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar, CharacterStatus } from "../../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -101,34 +101,38 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 3700,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room("<hiz>$N倒转体内真气，天地相乘，阴阳互生，转瞬间重获新生！</hiz>\n", target);
 
                 // 恢复全部气血
                 me.add_hp(me.max_hp);
 
                 // 清除负面状态
-                me.remove_statuses(function(s: CharacterStatus): boolean {
+                me.remove_statuses(function (s: CharacterStatus): boolean {
                     return s.downside === true;
                 });
 
                 // 保存内功技能冷却，清除后恢复（天地决不重置内功CD）
-                const now = Date.now();
                 const forceCDs: [string, number][] = [];
                 for (const [key, expiry] of me.pfm_cd) {
-                    const remaining = expiry - now;
-                    if (remaining > 0 && key.startsWith("force.")) {
-                        forceCDs.push([key, remaining]);
+                    if (key.startsWith("force.")) {
+                        forceCDs.push([key, expiry]);
                     }
                 }
                 me.clear_distime();
-                for (const [key, remaining] of forceCDs) {
-                    me.set_distime(key, remaining);
+                const now = Date.now();
+                for (const [key, expiry] of forceCDs) {
+                    if (expiry < now) continue;
+                    me.pfm_cd.set(key, expiry);
+                    if (me.is_player) {
+                        me.send('{type:"setDistime",id:"' + key + '",distime:' + (expiry - now) + '}');
+                    }
+
                 }
 
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function (_me: CHARACTER, lv: number): string {
                 return "沟通天地之力，恢复自身全部气血，清除负面状态，并重置所有技能冷却";
             },
         },
@@ -138,7 +142,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 2320,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = hundun_duration(lv);
                 const capPct = hundun_cap_pct(lv);
 
@@ -158,7 +162,7 @@ export default class extends SKILL {
                 me.reauto_attack();
                 me.end_attack(target);
             },
-            query_desc: function(_me: CHARACTER, lv: number): string {
+            query_desc: function (_me: CHARACTER, lv: number): string {
                 const duration = hundun_duration(lv);
                 const capPct = hundun_cap_pct(lv);
                 return toSec(duration) + "秒内，你单次受到的伤害不会超过你气血的" + capPct + "%，超过的伤害将转化为你的气血，内力";
