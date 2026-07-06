@@ -79,7 +79,7 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = lingxi_duration(lv);
 
-                me.send_room("<hic>$N心神澄澈，剑意通明，进入「心有灵犀」之境，每招每式皆如天授！</hic>\n", target);
+                me.send_room("<hic>$N心神澄澈，剑意通明，举手投足恍若「心有灵犀」，每招每式皆如天授！</hic>\n", target);
 
                 me.add_status({
                     id: "lingxi",
@@ -109,7 +109,7 @@ export default class extends SKILL {
                 const duration = jianxin_duration(lv);
                 const swordPer = jianxin_sword_per(lv);
 
-                me.send_room("<hio>$N剑心通明，周身剑气冲霄，踏入「剑心通明」之境！</hio>\n", target);
+                me.send_room("<hio>$N紫府仙光闪烁不定，周身剑气冲霄，心若明镜止水，映照大千而不动！</hio>\n", target);
 
                 const prop: PropMap = {
                         distime_per: 100,
@@ -119,6 +119,8 @@ export default class extends SKILL {
                 if (weapon && weapon.weapon_type === "sword") {
                     prop.diff_fy_per = swordPer;
                 }
+                const beforeBuffCd = this.query_distime(me, lv) - 3;
+                this.change_distime(me, "force", beforeBuffCd);
                 me.add_status({
                     id: "force",
                     name: "剑心",
