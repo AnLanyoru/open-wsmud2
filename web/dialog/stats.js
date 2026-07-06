@@ -204,6 +204,7 @@ export default {
         }
         let str = "stats " + type;
         if (fam) str = str + " " + fam;
+        if (type === 'top') this.top = undefined;
         SendCommand(str);
     }, create_footer: function () {
         var html = [];
