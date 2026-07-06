@@ -71,7 +71,7 @@ export default class extends SKILL {
                     name: "追风",
                     duration: duration,
                     prop: {
-                        gjsd: -gjsdReduce,
+                        gjsd: gjsdReduce,
                     },
                     finish_msg: "$N足下劲风渐息，身形恢复如常。",
                 });

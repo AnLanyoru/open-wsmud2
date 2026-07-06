@@ -109,7 +109,7 @@ export default class extends SKILL {
                     prop: {
                         gj_per: 50,
                         mz_per: 50,
-                        gjsd_per: -30,
+                        gjsd_per: 30,
                         diff_sh_per: 30,
                     },
                     finish_msg: "<hio>$N周身战神之气渐散，恢复常态。</hio>",

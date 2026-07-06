@@ -111,6 +111,8 @@ export default class extends SKILL {
                             fy_per: -reducePer,
                             ds_per: -reducePer,
                             gjsd_per: -reducePer,
+                            diff_fy_per: -reducePer,
+                            diff_sh_per: -reducePer,
                         },
                         desc: "被重剑所伤，筋骨受损，战斗能力大幅下降",
                     }, me);

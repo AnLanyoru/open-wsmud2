@@ -64,7 +64,7 @@ export default class extends SKILL {
                     duration: duration,
                     prop: {
                         ds: dsBonus,
-                        gjsd: -gjsdReduce,
+                        gjsd: gjsdReduce,
                     },
                     finish_msg: "$N行云流水之势渐收，步法恢复如常。",
                 });

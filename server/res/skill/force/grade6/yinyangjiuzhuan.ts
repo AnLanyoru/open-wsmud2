@@ -77,7 +77,7 @@ export default class extends SKILL {
                         prop: {
                             gj_per: gjPer,
                             diff_fy_per: gjPer,
-                            gjsd_per: -speedPer,
+                            gjsd_per: speedPer,
                         },
                         on_attach: (p: CHARACTER) => p.set_temp("yyjz_jy", 1, duration),
                         on_expire: (p: CHARACTER) => p.remove_temp("yyjz_jy"),

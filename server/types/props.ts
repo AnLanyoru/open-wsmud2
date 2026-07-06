@@ -39,7 +39,7 @@ export interface PropMap {
     /** 躲闪 */ ds?: number;
     /** 招架 */ zj?: number;
     /** 暴击 % */ bj?: number;
-    /** 攻击速度 ms */ gjsd?: number;
+    /** 攻击速度加快 ms */ gjsd?: number;
 
     // ===== 百分比属性 =====
     /** 气血百分比加成 */ hp_per?: number;
@@ -50,7 +50,7 @@ export interface PropMap {
     /** 躲闪百分比加成 */ ds_per?: number;
     /** 招架百分比加成 */ zj_per?: number;
     /** 暴击百分比加成 */ bj_per?: number;
-    /** 攻击速度百分比加成 */ gjsd_per?: number;
+    /** 攻击速度百分比加快 */ gjsd_per?: number;
     /** 经验获取百分比加成 */ exp_per?: number;
     /** 潜能获取百分比加成 */ pot_per?: number;
     /** 内力加力上限 */ limit_mp?: number;

@@ -1,7 +1,7 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type { PerformData, EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 /**
@@ -46,7 +46,7 @@ export default class extends SKILL {
             enable_skill: "sword",
             mp: 1890,
             release_time: 500,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 let time: number = 5000 + lv * 2;
                 if (time > 15000) time = 15000;
                 const per: number = 50 + int(lv / 50);
@@ -67,7 +67,7 @@ export default class extends SKILL {
                 me.set_temp("jianyi", 1, time);
                 me.reauto_attack();
             },
-            query_desc: function(me: CHARACTER, lv: number): string {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 let time: number = 5000 + lv * 2;
                 if (time > 15000) time = 15000;
                 const per: number = 50 + int(lv / 50);
@@ -80,26 +80,19 @@ export default class extends SKILL {
             enable_skill: "sword",
             mp: 2150,
             release_time: 4000,
-            use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration: number = 8000 + int(lv / 1000) * 1000;
-                let sh_per: number = 50 + int(lv / 100);
-                if (sh_per > 100) sh_per = 100;
-                me.send_room("<HIM>$N举剑向天，沉声喝道：「剑——来！」霎时间万剑齐鸣，一柄无形剑气破空而至，环绕$N周身！</HIM>\n", target);
+                me.send_room("<HIM>$N举剑向天，沉声喝道：「剑来！」霎时间万剑齐鸣，天地大道凝兵而至，环绕$N周身！</HIM>\n", target);
                 // 飞剑每轮攻击附带真实伤害
                 me.add_status({
-                    id: "weapon",
+                    id: "jianlai",
                     name: "剑来",
                     desc: "飞剑环绕，攻击附带真实伤害",
                     duration: duration,
-                    override: 2,
-                    prop: {
-                        add_sh_per: sh_per,
-                    },
                     finish_msg: "$N周身剑气散去，飞剑化作流光没入虚空。",
                 });
-                me.set_temp("jianlai", 1, duration);
             },
-            query_desc: function(me: CHARACTER, lv: number): string {
+            query_desc: function (me: CHARACTER, lv: number): string {
                 const duration: number = 8000 + int(lv / 1000) * 1000;
                 let sh_per: number = 50 + int(lv / 100);
                 if (sh_per > 100) sh_per = 100;
@@ -110,10 +103,12 @@ export default class extends SKILL {
 
     // 攻击时附带剑来伤害
     on_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): number {
-        if (me.query_temp("jianlai", 0)) {
+        if (me.query_status("jianlai")) {
             let sh_per: number = 50 + int(me.query_skill("dugujiujian4", 0) / 100);
             if (sh_per > 100) sh_per = 100;
-            return int(me.gj * sh_per / 100);
+            const real_dmg = int(me.gj * sh_per / 100);
+            target.damage3(real_dmg, me);
+            me.send_room("<WB-HIC>一道剑影划过，$n的身上多出一道莫名伤口，受到" + real_dmg + "点真实伤害！</WB-HIC>", target);
         }
         return 0;
     }

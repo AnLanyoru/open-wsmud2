@@ -96,7 +96,7 @@ export default class extends SKILL {
                 );
 
                 const prop: PropMap = {
-                    gjsd_per: -gjsdPer,
+                    gjsd_per: gjsdPer,
                 };
                 if (damagePer > 0) {
                     prop.add_sh_per = damagePer;
