@@ -3065,8 +3065,7 @@ export class CHARACTER extends ITEM {
             skill.pfm.change_distime(this,
                 skill.type,
                 skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0),
-                true,
-                false);
+                true);
 
             return this.release_time > 0 || target.hp <= 0;
         }
