@@ -58,7 +58,7 @@ export default class extends SKILL {
                 name: "震慑",
                 desc: "被慈航剑典震慑，躲闪和招架降低",
                 duration: 0,
-                downside: true,
+                downside: false,
                 no_diff: true,
                 only_combat: true,
                 prop: {
@@ -82,14 +82,10 @@ export default class extends SKILL {
                 me.send_room("<hic>$N心神澄澈，剑意通明，进入「心有灵犀」之境，每招每式皆如天授！</hic>\n", target);
 
                 me.add_status({
-                    id: "force",
-                    name: "心有灵犀",
+                    id: "lingxi",
+                    name: "灵犀",
                     duration: duration,
                     ig_control: true,
-                    override: 2,
-                    prop: {
-                        gjsd_per: -30,
-                    },
                     on_attach: (p: CHARACTER) => p.set_temp("cihang_lx", lingxi_extra_max(lv), duration),
                     on_expire: (p: CHARACTER) => p.remove_temp("cihang_lx"),
                     finish_msg: "<hic>$N从心有灵犀之境中退出。</hic>",
@@ -113,7 +109,7 @@ export default class extends SKILL {
                 const duration = jianxin_duration(lv);
                 const swordPer = jianxin_sword_per(lv);
 
-                me.send_room("<hio>$N双眸微阖，周身剑气冲霄，踏入「剑心通明」之境！万物破绽尽收眼底！</hio>\n", target);
+                me.send_room("<hio>$N剑心通明，周身剑气冲霄，踏入「剑心通明」之境！</hio>\n", target);
 
                 const prop: PropMap = {
                         distime_per: 100,
@@ -127,13 +123,12 @@ export default class extends SKILL {
                     id: "force",
                     name: "剑心",
                     duration: duration,
-                    override: 2,
                     prop,
                     on_attach: (p: CHARACTER) => {
                         p.set_temp("cihang_jx", 1, duration);
                     },
                     on_expire: (p: CHARACTER) => p.remove_temp("cihang_jx"),
-                    finish_msg: "<hio>$N剑心收敛，通明之境如潮退去。</hio>",
+                    finish_msg: "<hio>$N剑心收敛，周遭景象复归如常。</hio>",
                 });
 
                 me.reauto_attack();
@@ -168,6 +163,7 @@ export default class extends SKILL {
                 target,
                 gj: me.gj,
                 mz: me.mz,
+                no_append: true,
                 attack_msg: "<hic>$N剑随心动，灵犀剑气寻隙而入</hic>",
             });
         }

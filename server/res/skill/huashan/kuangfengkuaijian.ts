@@ -45,7 +45,7 @@ export default class extends SKILL {
                     if (me.query_temp('kuangfeng')) return me.notify("你的夺命连环还没释放完。");
 
                     me.send_room("<hir>$N一声清啸，手中$W犹如狂风般劈头向$n刺去。</hir>\n", target);
-                    var isMIss = false;
+                    var isMiss = false;
                     for (var i = 0; i < 3; i++) {
                         if (!me.do_attack({
                             target: target,
@@ -53,10 +53,10 @@ export default class extends SKILL {
                             mz: me.mz,
                             no_append: true
                         })) {
-                            isMIss = true;
+                            isMiss = true;
                         }
                     }
-                    if (isMIss) {
+                    if (isMiss) {
                         me.send_room("<hic>$N一击未能奏效，收招后退</hic>");
                     } else {
                         me.set_temp("kuangfeng", 1, 5000);
@@ -87,7 +87,7 @@ export default class extends SKILL {
         let kf_count = me.query_temp("kuangfeng", 0);
         if (kf_count) {
             me.send_room("<hir>$N一击奏效，手中快剑如狂风般继续攻来</hir>\n");
-            var isMIss = false;
+            var isMiss = false;
 
             var per = 10 - parseInt(me.query_skill('kuangfengkuaijian', 0) / 100);
             if (per < 3) per = 3;
@@ -95,7 +95,6 @@ export default class extends SKILL {
             let mz = me.mz;
             mz = parseInt(mz - mz * (kf_count - 1) * per / 100);
             if (mz < 0) mz = 0;
-
             for (var i = 0; i < 3; i++) {
                 if (!me.do_attack({
                     target: target,
@@ -103,10 +102,10 @@ export default class extends SKILL {
                     mz: mz,
                     no_append: true
                 })) {
-                    isMIss = true;
+                    isMiss = true;
                 }
             }
-            if (isMIss) {
+            if (isMiss) {
                 me.send_room("<hic>$N一击未能奏效，收招后退</hic>");
                 me.remove_temp("kuangfeng");
             } else {
