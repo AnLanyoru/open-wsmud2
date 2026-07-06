@@ -9,9 +9,10 @@ export default class extends AREA {
     first = "yz/by/damen";
     is_copy = true;
     expend = 10;
+    is_diffi = false;
     is_multi = false;
-    exp = 3000;
-    pot = 3000;
+    exp = 1400;
+    pot = 1400;
     room_path = "yz/by/";
     ss_title = "扬州守备";
     map = [
@@ -19,7 +20,15 @@ export default class extends AREA {
         {n: "兵营", id: "yz/lcy/erlou", p: [0, 1], exits: ["n", "s"]},
         {n: "兵器库", id: "yz/lcy/fang1", p: [0, 2]}
     ];
-    drops = ["book/book#blade", "book/book#sword", "eq/lv2/jiangjunjian", "eq/lv1/jundao", "eq/lv1/junfu", "eq/lv1/qimeigun", "eq/lv1/guanfu"];
+    drops = [
+        "book/book#blade",
+        "book/book#sword",
+        "eq/lv2/jiangjunjian",
+        "eq/lv1/jundao",
+        "eq/lv1/junfu",
+        "eq/lv1/qimeigun",
+        "eq/lv1/guanfu",
+    ];
     quick_drops = [
         {
             obj: "money/silver",

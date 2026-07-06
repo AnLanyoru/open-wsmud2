@@ -9,9 +9,10 @@ export default class extends AREA {
     first = "yz/lcy/dating";
     is_copy = true;
     expend = 10;
+    is_diffi = false;
     is_multi = false;
-    exp = 3000;
-    pot = 3000;
+    exp = 1300;
+    pot = 1300;
     room_path = "yz/lcy/";
     ss_title = "丽春院护院";
     map = [
@@ -21,7 +22,17 @@ export default class extends AREA {
         {n: "东厢房", id: "yz/lcy/fang2", p: [1, -1]},
         {n: "密室", id: "yz/lcy/mishi", p: [-2, -1]}
     ];
-    drops = ["book/book#blade", "book/book#wuhuduanmendao", "book/bc#wuhuduanmendao", "book/book#whip", "book/bc#yunlongbian", "eq/lv2/hl_bian", "eq/lv1/dandao", "eq/lv1/guanfu", "eq/lv1/wei_neck"];
+    drops = [
+        "book/book#blade",
+        "book/book#wuhuduanmendao",
+        "book/bc#wuhuduanmendao",
+        "book/book#whip",
+        "book/bc#yunlongbian",
+        "eq/lv2/hl_bian",
+        "eq/lv1/dandao",
+        "eq/lv1/guanfu",
+        "eq/lv1/wei_neck",
+    ];
     quick_drops = [
         {
             obj: "money/silver",

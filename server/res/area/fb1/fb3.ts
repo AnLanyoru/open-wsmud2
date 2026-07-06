@@ -9,9 +9,10 @@ export default class extends AREA {
     first = "yz/lmw/xiangzi1";
     is_copy = true;
     expend = 10;
+    is_diffi = false;
     is_multi = true;
-    exp = 900;
-    pot = 900;
+    exp = 1200;
+    pot = 1200;
     room_path = "yz/lmw/";
     ss_title = "流氓头";
     map = [{n: "小巷子", id: "yz/lmw/xiangzi1", p: [0, 0], exits: ["e"]},
@@ -21,8 +22,20 @@ export default class extends AREA {
         {n: "头目房间", id: "yz/lmw/fang", p: [3, 0]},
         {n: "仓库", id: "yz/lmw/cangku", p: [2, -1]}
     ];
-    drops = ["eq/lv1/lm_head", "eq/lv1/lm_cloth", "eq/lv1/lm_shoes", "eq/lv1/lm_shou",
-        "eq/lv1/lm_jian", "eq/lv1/lm_gun", "eq/lv1/qianjinquan", "book/book#force", "book/book#unarmed", "book/bc#taizuchangquan", "book/book#parry", "book/book#dodge"];
+    drops = [
+        "eq/lv1/lm_head",
+        "eq/lv1/lm_cloth",
+        "eq/lv1/lm_shoes",
+        "eq/lv1/lm_shou",
+        "eq/lv1/lm_jian",
+        "eq/lv1/lm_gun",
+        "eq/lv1/qianjinquan",
+        "book/book#force",
+        "book/book#unarmed",
+        "book/bc#taizuchangquan",
+        "book/book#parry",
+        "book/book#dodge",
+    ];
     quick_drops = [
         {
             obj: "money/silver",

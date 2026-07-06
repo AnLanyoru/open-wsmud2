@@ -9,8 +9,9 @@ export default class extends AREA {
     first = "bj/ao/damen";
     is_copy = true;
     expend = 10;
-    exp = 5000;
-    pot = 4000;
+    is_diffi = false;
+    exp = 1600;
+    pot = 1600;
     is_multi = false;
     room_path = "bj/ao/";
     ss_title = "大内总管";
@@ -24,7 +25,13 @@ export default class extends AREA {
         {n: "牢房", id: "bj/ao", p: [0, -2]}
     ];
     drops = [
-        "eq/lv2/ao_jia", "eq/lv2/ao_bishou", "book/bc#hunyuanyiqi", "book/bc#feiyanzoubi", "book/bc#fuhuquan",
-        "book/bc#juemengun", "sp/bj/laofangkey", "sp/bj/jing"
+        "eq/lv2/ao_jia",
+        "eq/lv2/ao_bishou",
+        "book/bc#hunyuanyiqi",
+        "book/bc#feiyanzoubi",
+        "book/bc#fuhuquan",
+        "book/bc#juemengun",
+        "sp/bj/laofangkey",
+        "sp/bj/jing",
     ];
 }

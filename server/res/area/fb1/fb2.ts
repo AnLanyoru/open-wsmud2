@@ -9,8 +9,8 @@ export default class extends AREA {
     first = "yz/cuifu/caizhu";
     is_copy = true;
     expend = 10;
-    exp = 700;
-    pot = 700;
+    exp = 1100;
+    pot = 1100;
     is_multi = false;
     is_diffi = true;
     room_path = "yz/cuifu/";
@@ -21,7 +21,17 @@ export default class extends AREA {
         {n: "东厢", id: "yz/cuifu/dongxiang", p: [1, 0]},
         {n: "西厢", id: "yz/cuifu/xixiang", p: [-1, 0]}
     ];
-    drops = ["eq/lv0/jd_cloth", "eq/lv0/jd_shoes", "sp/yz/yaoshi", "eq/lv1/cui_sz", "eq/lv1/gold_ring", "sp/yz/box1", "book/book#unarmed", "book/book#parry", "book/book#dodge"];
+    drops = [
+        "eq/lv0/jd_cloth",
+        "eq/lv0/jd_shoes",
+        "sp/yz/yaoshi",
+        "eq/lv1/cui_sz",
+        "eq/lv1/gold_ring",
+        "sp/yz/box1",
+        "book/book#unarmed",
+        "book/book#parry",
+        "book/book#dodge",
+    ];
     quick_drops = [
         {
             obj: "money/silver",

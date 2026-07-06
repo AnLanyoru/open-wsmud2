@@ -9,8 +9,9 @@ export default class extends AREA {
     first = "bj/tdh/hct";
     is_copy = true;
     expend = 10;
-    exp = 6000;
-    pot = 4000;
+    is_diffi = false;
+    exp = 1700;
+    pot = 1700;
     is_multi = false;
     room_path = "bj/tdh/";
     ss_title = "青木堂香主";
@@ -26,7 +27,14 @@ export default class extends AREA {
         {n: "东客房", id: "bj/tdh/kedian3", p: [-1, -1], exits: ["w"]}
     ];
     drops = [
-        "book/bc#mizongxinfa", "book/bc#dashouyin", "book/bc#houquan", "book/bc#yunlongjian", "book/bc#yunlongshenfa", "book/bc#yunlongxinfa",
-        "book/bc#shenxingbaibian", "book/bc#qiufengfuchen", "eq/lv2/yunlongjian"
+        "book/bc#mizongxinfa",
+        "book/bc#dashouyin",
+        "book/bc#houquan",
+        "book/bc#yunlongjian",
+        "book/bc#yunlongshenfa",
+        "book/bc#yunlongxinfa",
+        "book/bc#shenxingbaibian",
+        "book/bc#qiufengfuchen",
+        "eq/lv2/yunlongjian",
     ];
 }

@@ -9,8 +9,9 @@ export default class extends AREA {
     first = "bj/zhuang/xiaolu";
     is_copy = true;
     expend = 10;
-    exp = 10000;
-    pot = 6000;
+    is_diffi = false;
+    exp = 1500;
+    pot = 1500;
     is_multi = false;
     room_path = "bj/zhuang/";
     ss_title = "天下无双";
@@ -26,7 +27,9 @@ export default class extends AREA {
         {n: "小屋", id: "bj/zhuang/xiaowu", p: [0, -3], exits: ["s"]}
     ];
     drops = [
-        "book/bc#shenlongxinfa", "book/bc#yixingbufa", "book/bc#shenlongjian"
+        "book/bc#shenlongxinfa",
+        "book/bc#yixingbufa",
+        "book/bc#shenlongjian",
     ];
     quick_drops = [
         {
