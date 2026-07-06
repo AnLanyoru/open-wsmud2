@@ -1755,7 +1755,7 @@ export class CHARACTER extends ITEM {
     // ================================================================
 
     /**
-     * 设置初始佩戴物品
+     * 设置初始携带物品["物品路径", 数量, 是否装备]
      */
     set_objects(...args: [string, number, (1 | 0)?][]): void {
         if (!args.length) return;

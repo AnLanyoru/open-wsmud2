@@ -31,6 +31,15 @@ export default class extends NPC {
     };
     constructor() {
         super();
+        // 装备 ["物品路径", 数量, 是否装备]
+        this.set_objects(
+            ["eq/lv6/xuanyuanjian", 1, 1],
+            ["eq/lv6/xiantiantaijitu", 1, 1],
+            ["eq/lv6/zhuifengzhe", 1, 1],
+            ["eq/lv6/jindingfoguang", 1, 1],
+            ["eq/lv6/jinlanjiasha", 1, 1],
+            ["eq/lv6/qibaozhihuan", 1, 1],
+        );
         this.skill_map(
             // 全基础技能
             ["force", 5000],

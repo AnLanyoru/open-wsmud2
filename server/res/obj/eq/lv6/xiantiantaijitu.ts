@@ -9,7 +9,7 @@ export default class extends EQUIPMENT {
     value = 5000000;
     grade = 6;
     hole_count = 5;
-    eq_type = EQUIP_TYPE.CLOTH;
+    eq_type = EQUIP_TYPE.CAPE;
     prop: PropMap = {
         fy: 780,
         con: 150,
