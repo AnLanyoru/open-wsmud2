@@ -23,6 +23,17 @@ export default class extends AREA {
         "eq/lv5/panlongzan",
         "eq/lv5/longguhuan",
     ];
-    room_path = "fb/official/gumu/";
-    map = [];
+    first = "fb/gumu/gumukou";
+    room_path = "fb/gumu/";
+    map = [
+        {n: "古墓入口", id: "fb/gumu/gumukou", p: [0,0], exits: ["e"]},
+        {n: "前厅", id: "fb/gumu/qianting", p: [1,0]},
+        {n: "后堂", id: "fb/gumu/houtang", p: [2,0], exits: ["w","n","e"]},
+        {n: "卧室", id: "fb/gumu/woshi", p: [2,-1]},
+        {n: "琴室", id: "fb/gumu/qinshi", p: [3,0]},
+        {n: "暗河", id: "fb/gumu/anhe", p: [4,0]},
+        {n: "峭壁", id: "fb/gumu/qiaobi", p: [4,-1]},
+        {n: "平台", id: "fb/gumu/pingtai", p: [4,-2]},
+        {n: "剑冢", id: "fb/gumu/jianzhong", p: [5,-2]}
+    ];
 }

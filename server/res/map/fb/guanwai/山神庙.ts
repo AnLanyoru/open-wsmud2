@@ -1,0 +1,6 @@
+import {ROOM} from "../../../../core/room/room.js";
+
+export default class extends ROOM {
+    name = "山神庙";
+    desc = "这是山神庙。";
+}

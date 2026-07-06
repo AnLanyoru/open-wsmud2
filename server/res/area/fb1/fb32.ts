@@ -19,6 +19,16 @@ export default class extends AREA {
         "eq/lv5/tianlongzhurixue",
         "eq/lv5/nilinshouhuan",
     ];
-    room_path = "fb/official/xiake/";
-    map = [];
+    first = "fb/xiake/shimen";
+    room_path = "fb/xiake/";
+    map = [
+        {n: "石壁", id: "fb/xiake/shibi", p: [0,0], exits: ["e","s"]},
+        {n: "石门", id: "fb/xiake/shimen", p: [1,0]},
+        {n: "内厅", id: "fb/xiake/neiting", p: [0,1]},
+        {n: "石洞", id: "fb/xiake/hole", p: [2,2], exits: ["e","s","n","w","nw2"]},
+        {n: "石室", id: "fb/xiake/room_1", p: [3,2]},
+        {n: "石室", id: "fb/xiake/room_2", p: [2,3]},
+        {n: "石室", id: "fb/xiake/room_3", p: [1,2]},
+        {n: "石室", id: "fb/xiake/room_4", p: [2,1]}
+    ];
 }

@@ -21,6 +21,15 @@ export default class extends AREA {
         "book/bc#huagongdafa",
         "eq/lv4/shenmuwangding",
     ];
-    room_path = "fb/official/xingxiu/";
-    map = [];
+    first = "fb/xingxiu/xxh6";
+    room_path = "fb/xingxiu/";
+    map = [
+        {n: "星宿海", id: "fb/xingxiu/xxh6", p: [0,0]},
+        {n: "星宿海", id: "fb/xingxiu/xxh5", p: [1,-1], exits: ["n","sw"]},
+        {n: "星宿海", id: "fb/xingxiu/xxh4", p: [-1,-1], exits: ["n","se"]},
+        {n: "星宿海", id: "fb/xingxiu/xxh3", p: [1,-2]},
+        {n: "星宿海", id: "fb/xingxiu/xxh2", p: [-1,-2]},
+        {n: "星宿海", id: "fb/xingxiu/xxh1", p: [0,-3], exits: ["sw","se","n"]},
+        {n: "日月洞", id: "fb/xingxiu/riyuedong", p: [0,-4]}
+    ];
 }

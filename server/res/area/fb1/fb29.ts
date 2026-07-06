@@ -21,6 +21,14 @@ export default class extends AREA {
         "eq/lv5/xiedao",
         "eq/lv5/longxiedoupeng",
     ];
-    room_path = "fb/official/xuedao/";
-    map = [];
+    first = "fb/xuedao/shankou";
+    room_path = "fb/xuedao/";
+    map = [
+        {n: "山口", id: "fb/xuedao/shankou", p: [0,0]},
+        {n: "山谷", id: "fb/xuedao/shangu", p: [0,1], exits: ["n","e1d","s"]},
+        {n: "山洞", id: "fb/xuedao/shandong", p: [1,1]},
+        {n: "忘忧谷", id: "fb/xuedao/wangyou", p: [0,2]},
+        {n: "洞口", id: "fb/xuedao/dongkou", p: [1,2], exits: ["w1d","e"]},
+        {n: "山洞", id: "fb/xuedao/xuedao", p: [2,2]}
+    ];
 }

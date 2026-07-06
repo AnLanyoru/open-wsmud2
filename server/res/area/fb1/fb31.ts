@@ -33,6 +33,14 @@ export default class extends AREA {
         "book/bc#jiuyinshengong",
         "eq/lv5/tianlongpan",
     ];
-    room_path = "fb/official/huashan_lunjian/";
-    map = [];
+    first = "fb/huashan_lunjian/论剑台";
+    room_path = "fb/huashan_lunjian/";
+    map = [
+        {n: "论剑台", id: "fb/huashan_lunjian/论剑台", p: [0,0], exits: ["n","w","e","s"]},
+        {n: "东峰", id: "fb/huashan_lunjian/东峰", p: [1,0]},
+        {n: "西峰", id: "fb/huashan_lunjian/西峰", p: [-1,0]},
+        {n: "北峰", id: "fb/huashan_lunjian/北峰", p: [0,-1]},
+        {n: "南峰", id: "fb/huashan_lunjian/南峰", p: [0,1]},
+        {n: "华山绝顶", id: "fb/huashan_lunjian/华山绝顶", p: [1,-1]}
+    ];
 }

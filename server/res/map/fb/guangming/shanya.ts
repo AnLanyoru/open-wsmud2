@@ -1,0 +1,9 @@
+import {ROOM} from "../../../../core/room/room.js";
+
+export default class extends ROOM {
+    name = "山崖";
+    desc = "这是山崖。";
+    exits = {
+        "west": "fb/guangming/qi_hongshui",
+    };
+}

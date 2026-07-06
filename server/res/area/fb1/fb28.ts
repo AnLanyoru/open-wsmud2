@@ -20,6 +20,18 @@ export default class extends AREA {
         "book/bc#liumaishenjian",
         "eq/lv5/longgusheli",
     ];
-    room_path = "fb/official/tianlong/";
-    map = [];
+    first = "fb/tianlong/damen";
+    room_path = "fb/tianlong/";
+    map = [
+        {n: "大门", id: "fb/tianlong/damen", p: [0,0], exits: ["s"]},
+        {n: "塔林", id: "fb/tianlong/talin", p: [0,1]},
+        {n: "舍利塔", id: "fb/tianlong/ta", p: [0,2], exits: ["sw","se","n","s"]},
+        {n: "崇圣宝殿", id: "fb/tianlong/baodian", p: [0,3]},
+        {n: "无乐阁", id: "fb/tianlong/wule", p: [1,3]},
+        {n: "无我阁", id: "fb/tianlong/wuwo", p: [-1,3]},
+        {n: "无常阁", id: "fb/tianlong/wuchang", p: [-1,4], exits: ["n","e"]},
+        {n: "无净阁", id: "fb/tianlong/wujing", p: [1,4], exits: ["n","w"]},
+        {n: "般若台", id: "fb/tianlong/banruo", p: [0,4]},
+        {n: "牟尼堂", id: "fb/tianlong/munitang", p: [0,5], exits: ["n"]}
+    ];
 }

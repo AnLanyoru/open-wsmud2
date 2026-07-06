@@ -22,6 +22,21 @@ export default class extends AREA {
         "book/bc#zhenyuejue",
         "book/bc#hengshanwushenjian",
     ];
-    room_path = "fb/official/hengshan2/";
-    map = [];
+    first = "fb/hengshan2/衡阳城";
+    room_path = "fb/hengshan2/";
+    map = [
+        {n: "衡阳城", id: "fb/hengshan2/衡阳城", p: [0,0], exits: ["w"]},
+        {n: "衡阳西街", id: "fb/hengshan2/衡阳西街", p: [-1,0]},
+        {n: "刘府大门", id: "fb/hengshan2/刘府大门", p: [-1,-1], exits: ["s","n"]},
+        {n: "刘府大院", id: "fb/hengshan2/刘府大院", p: [-1,-2]},
+        {n: "刘府大厅", id: "fb/hengshan2/刘府大厅", p: [-1,-3], exits: ["e","s","w"]},
+        {n: "东厢房", id: "fb/hengshan2/东厢房", p: [0,-3]},
+        {n: "西厢房", id: "fb/hengshan2/西厢房", p: [-2,-3]},
+        {n: "山路", id: "fb/hengshan2/山路", p: [1,0], exits: ["w","se"]},
+        {n: "南天门", id: "fb/hengshan2/南天门", p: [2,1]},
+        {n: "狮子岩", id: "fb/hengshan2/狮子岩", p: [2,2]},
+        {n: "望日台", id: "fb/hengshan2/望日台", p: [3,2], exits: ["w","s"]},
+        {n: "祝融殿", id: "fb/hengshan2/祝融殿", p: [3,3]},
+        {n: "祝融峰", id: "fb/hengshan2/祝融峰", p: [3,4], exits: ["n"]}
+    ];
 }
