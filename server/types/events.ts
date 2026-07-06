@@ -169,7 +169,7 @@ export interface StatusDef {
     on_pfm?: (me: CHARACTER, target: CHARACTER, pfm: PERFORM, level: number, enable_skill: string) => PfmFlagType;
     /** 状态开始时间戳 */
     start_time?: number;
-    /** 状态结束时的提示消息 */
+    /** 状态结束时的提示消息（仅限第一人称占位符：$N/$P/$W/$w/$l/$T，禁用 $n/$p/$i） */
     finish_msg?: string;
     /** 状态来源（技能/物品 ID） */
     source?: string;

@@ -181,10 +181,8 @@ export interface CharacterStatus extends StatusDef {
     only_combat?: boolean;
     /** 是否不可被清除 */
     no_clear?: boolean;
-    /** 状态施加时的消息 */
+    /** 状态施加时的消息（仅限第一人称占位符：$N/$P/$W/$w/$l/$T，禁用 $n/$p/$i） */
     start_msg?: string;
-    /** 状态结束时的消息 */
-    finish_msg?: string;
     /** 是否为闪避状态 */
     is_miss?: boolean;
     /** 是否为鲁莽状态 */
@@ -193,18 +191,10 @@ export interface CharacterStatus extends StatusDef {
     is_shadow?: boolean;
     /** 是否免疫控制 */
     ig_control?: boolean;
-    /** 是否是昏迷类型状态，无知觉 */
-    is_faint?: boolean;
     /** 间隔触发次数上限 */
     duration_count?: number;
     /** 已触发的间隔次数 */
     over_count?: number;
-    /** 叠加模式：0=不可叠加 1=叠加层数 2=刷新持续时间 */
-    override?: number;
-    /** 状态开始时间戳 */
-    start_time?: number;
-    /** 当前叠加层数 */
-    count?: number;
 }
 
 /** 将单个状态序列化为客户端 JSON 字符串 */
