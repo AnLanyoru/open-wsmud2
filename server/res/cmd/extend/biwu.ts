@@ -154,6 +154,22 @@ export default class BiWuCmd extends COMMAND {
             for (const [sk, item] of player.skills) {
                 if (typeof item === "number") {
                     npc.skills.set(sk, { level: item, exp: 0, enable_skill: null });
+                } else if (item && typeof item === "object") {
+                    // 完整拷贝 SkillData 对象，保留 enable 标记和进阶槽位
+                    const sd: typeof item = {
+                        level: item.level || 0,
+                        exp: item.exp || 0,
+                        enable_skill: item.enable_skill || null,
+                    };
+                    // 拷贝所有装备标记（force/dodge/parry/sword/...）
+                    for (const k of ["force", "dodge", "parry", "sword", "blade", "staff", "club", "whip", "throwing", "unarmed", "bite"] as const) {
+                        if (item[k] !== undefined) (sd as unknown as Record<string, unknown>)[k] = item[k];
+                    }
+                    // 拷贝进阶槽位
+                    if (item.addin) sd.addin = [...item.addin];
+                    if (item.disable !== undefined) sd.disable = item.disable;
+                    if (item.ref) sd.ref = item.ref;
+                    npc.skills.set(sk, sd);
                 }
             }
         }
