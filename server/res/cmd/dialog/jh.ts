@@ -426,7 +426,14 @@ const AREAS: Record<string, number> = {
 };
 const FBS: Record<string, number | AREA> = {
     "lw": 0, "cuifu": 1, "lmw": 2, "lcy": 3,
-    "by": 4, "zhuang": 5, "ao": 6, "tdh": 7
+    "by": 4, "zhuang": 5, "ao": 6, "tdh": 7,
+    "shenlong": 8, "guanwai": 9, "wenfu": 10, "wudu": 11,
+    "hengshan": 12, "qingcheng": 13, "hengshan2": 14, "taishan": 15,
+    "songshan": 16, "yunmeng": 17, "taohua": 18, "baituo": 19,
+    "xingxiu": 20, "binghuo": 21, "yihua": 22, "yanzi": 23,
+    "heimu": 24, "piaomiao": 25, "guangming": 26, "tianlong": 27,
+    "xuedao": 28, "gumu": 29, "huashan_lunjian": 30, "xiake": 31,
+    "jingnian": 32, "cihang": 33, "yinyang": 34, "zhanshen": 35
 };
 const JDS: Record<string, number> = {
     heiying: 0,
