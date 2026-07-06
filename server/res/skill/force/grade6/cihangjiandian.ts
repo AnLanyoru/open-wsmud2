@@ -122,6 +122,7 @@ export default class extends SKILL {
                 me.add_status({
                     id: "force",
                     name: "剑心",
+                    desc: "心若明镜止水，映照大千而不动。剑非剑，我非我，万法皆空，般若自生。",
                     duration: duration,
                     prop,
                     on_attach: (p: CHARACTER) => {
@@ -147,6 +148,13 @@ export default class extends SKILL {
             par.no_dodge = true;
             par.no_parry = true;
         }
+    }
+    on_force_parry(me: CHARACTER, target: CHARACTER,sh: number, par: DoAttackPar): number {
+        if (me.query_temp("cihang_jx", 0)) {
+            me.send_room("<hio>$N心如明镜，剑意无形，$n一招未至，已被洞悉</hio>", target);
+            par.is_parried = true;
+        }
+        return sh;
     }
     /**
      * 心有灵犀——命中后触发多次攻击
