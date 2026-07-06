@@ -139,7 +139,7 @@ const Combat = {
             items[i].elem = $(html.join("")).appendTo(elem);
         }
     }, ChangeDistime: function (data) {
-        var pfmid = data.id.replace("/", ".");
+        var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].ani_time += data.time;
@@ -148,7 +148,7 @@ const Combat = {
         }
     }, ClearDistime: function (data) {
         if (!Combat.dis_pfms) return;
-        var pfmid = data.id ? data.id.replace("/", ".") : data.id;
+        var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (!pfmid || Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].ani_time = 0;
@@ -156,14 +156,20 @@ const Combat = {
 
         }
     }, SetDistime: function (data) {
-        var pfmid = data.id.replace("/", ".");
+        var pfmid = data.id;
+        if (!Combat.dis_pfms) Combat.dis_pfms = [];
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].distime = data.distime;
                 Combat.dis_pfms[j].ani_time = data.distime;
-                break;
+                return;
             }
         }
+        Combat.dis_pfms.push({
+            id: pfmid,
+            distime: data.distime,
+            ani_time: data.distime
+        });
     }, redisable: function () {
         Combat.dis_pfms = [];
         for (var i = 0; i < Combat.Skills.length; i++) {
@@ -180,8 +186,6 @@ const Combat = {
     }, On_Perform: function (data) {
         if (!this.Skills) return;
         if (data.id === 'all' && !data.rtime) return this.redisable();
-        if (data.id)
-            data.id = data.id.replace('/', '.');
         data.rtime = data.rtime || 0;
         data.distime = data.distime || 0;
         if (!this.dis_pfms) this.dis_pfms = [];
