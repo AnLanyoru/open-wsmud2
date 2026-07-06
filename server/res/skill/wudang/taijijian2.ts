@@ -63,7 +63,7 @@ export default class extends SKILL {
                 }
                 // 每命中多一人冷却增加，每额外命中一人增加 max(10000-lv, 5000)ms 冷却
                 if (hitCount > 1) {
-                    this.change_distime(me, sktype, (hitCount - 1) * Math.max(10000 - lv, 5000));
+                    this.change_distime(me, sktype, (hitCount - 1) * Math.max(10000 - lv, 5000), true);
                 }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {

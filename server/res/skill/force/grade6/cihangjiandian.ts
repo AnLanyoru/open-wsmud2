@@ -120,7 +120,7 @@ export default class extends SKILL {
                     prop.diff_fy_per = swordPer;
                 }
                 const beforeBuffCd = this.query_distime(me, lv) - 3;
-                this.change_distime(me, "force", beforeBuffCd);
+                this.change_distime(me, "force", beforeBuffCd, true);
                 me.add_status({
                     id: "force",
                     name: "剑心",

@@ -94,7 +94,7 @@ export default class extends SKILL {
                 }
                 me.end_attack(target);
                 if (hits > 0) {
-                    self.change_distime(me, "club", -(hits * 1000));
+                    this.change_distime(me, "club", -(hits * 1000));
                 }
             },
             query_desc: function (me: CHARACTER, lv: number): string {
