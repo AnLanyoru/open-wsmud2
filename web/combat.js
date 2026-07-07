@@ -73,10 +73,11 @@ const Combat = {
         if (!items) return;
         for (let item of items) {
             item.elem =
-                $(`<span class='act-item' cmd='${item.cmd}'>${item.name}</span>`)
+                $(`<span class='act-item' cmd='${item.cmd}'>${item.name}<span class='cd-overlay'></span></span>`)
                     .appendTo(parent);
+            item._overlay = item.elem.find(".cd-overlay");
             if (item.disper > 0) {
-                item.elem.css("backgroundSize", item.disper + "% 100%");
+                item._overlay.css("transform", "scaleX(" + (item.disper / 100) + ")");
             }
         }
     }, create_actions: function (items) {
@@ -117,17 +118,18 @@ const Combat = {
         var end = Date.now() + time;
         if (obj._animId) Combat._animUnregister(obj._animId);
         obj._animId = Combat._animRegister(function (now) {
-            var elem = obj.elem;
-            if (!elem) { obj._animId = null; return false; }
+            var overlay = obj._overlay;
+            if (!overlay) { obj._animId = null; return false; }
             var remaining = end - now;
             var cur_per = remaining > 0 ? remaining * 100 / time : 0;
+            var ratio = cur_per / 100;
             if (cur_per > (obj.disper || 0)) {
-                elem.css("transition", "none");
-                elem.css("backgroundSize", cur_per + "% 100%");
-                elem[0].offsetHeight;
-                elem.css("transition", "");
+                overlay.css("transition", "none");
+                overlay.css("transform", "scaleX(" + ratio + ")");
+                overlay[0].offsetHeight;
+                overlay.css("transition", "");
             } else {
-                elem.css("backgroundSize", cur_per + "% 100%");
+                overlay.css("transform", "scaleX(" + ratio + ")");
             }
             obj.disper = cur_per;
             if (remaining <= 0) obj._animId = null;
@@ -141,10 +143,10 @@ const Combat = {
             var html = [];
             html.push("<span class='pfm-item' pid='" + items[i].id + "'>");
             html.push(items[i].name);
-            // html.push("<span class='shadow'></span>");
+            html.push("<span class='cd-overlay'></span>");
             html.push("</span>");
-            // items[i].shadow = $(html.join("")).appendTo(elem).find(".shadow")[0];
             items[i].elem = $(html.join("")).appendTo(elem);
+            items[i]._overlay = items[i].elem.find(".cd-overlay");
         }
     }, ChangeDistime: function (data) {
         var pfmid = data.id;
@@ -310,16 +312,17 @@ const Combat = {
                             }
                         }
                         if (cur_per > 0) {
+                            var ratio = cur_per / 100;
                             if (cur_per > (skill._prevPer || 0)) {
-                                skill.elem.css("transition", "none");
-                                skill.elem.css("backgroundSize", cur_per + "% 100%");
-                                skill.elem[0].offsetHeight;
-                                skill.elem.css("transition", "");
+                                skill._overlay.css("transition", "none");
+                                skill._overlay.css("transform", "scaleX(" + ratio + ")");
+                                skill._overlay[0].offsetHeight;
+                                skill._overlay.css("transition", "");
                             } else {
-                                skill.elem.css("backgroundSize", cur_per + "% 100%");
+                                skill._overlay.css("transform", "scaleX(" + ratio + ")");
                             }
                         } else {
-                            skill.elem.css("backgroundSize", "0% 100%");
+                            skill._overlay.css("transform", "scaleX(0)");
                         }
                         skill._prevPer = cur_per;
                     }
@@ -480,13 +483,14 @@ const Combat = {
             var remaining = item.end - now;
             if (remaining < 0) remaining = 0;
             var p = remaining * 100 / item.duration;
+            var ratio = (100 - p) / 100;
             if (p > (item._prevP || 0)) {
                 shadow.style.transition = "none";
-                shadow.style.right = p + "%";
+                shadow.style.transform = "scaleX(" + ratio + ")";
                 shadow.offsetHeight;
                 shadow.style.transition = "";
             } else {
-                shadow.style.right = p + "%";
+                shadow.style.transform = "scaleX(" + ratio + ")";
             }
             item._prevP = p;
             if (remaining <= 0) {
