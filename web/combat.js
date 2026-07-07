@@ -117,7 +117,8 @@ const Combat = {
     , ANI_OBJ: function (obj, time) {
         var end = Date.now() + time;
         if (obj._animId) Combat._animUnregister(obj._animId);
-        obj._animId = Combat._animRegister(function (now) {
+        obj._animId = null;
+        var aid = Combat._animRegister(function (now) {
             var overlay = obj._overlay;
             if (!overlay) { obj._animId = null; return false; }
             var remaining = end - now;
@@ -135,6 +136,9 @@ const Combat = {
             if (remaining <= 0) obj._animId = null;
             return remaining > 0;
         }, 1000);
+        if (Combat._animItems[aid]) {
+            obj._animId = aid;
+        }
     }
     , create_skillItems: function (items) {
         var elem = $(".combat-commands").empty();
@@ -257,6 +261,10 @@ const Combat = {
         var id = ++Combat._animNextId;
         Combat._animItems[id] = { update: update, interval: interval, lastRun: 0 };
         if (!Combat._animTimer) Combat._animTick();
+        // 立即执行首帧，避免短冷却动画因 tick 延迟错过初始全遮罩状态
+        if (update(Date.now()) === false) {
+            delete Combat._animItems[id];
+        }
         return id;
     },
     _animUnregister: function (id) {
@@ -287,8 +295,11 @@ const Combat = {
     PFM_INTERVAL: 500,
     // CD 冷却动画（注册至统一动画循环，按 PFM_INTERVAL tick）
     ANI_PFM: function () {
-        if (!Combat._pfmAnimId) {
-            Combat._pfmAnimId = Combat._animRegister(function (now) {
+        if (Combat._pfmAnimId && Combat._animItems[Combat._pfmAnimId]) {
+            return;
+        }
+        Combat._pfmAnimId = null;
+        var animId = Combat._animRegister(function (now) {
                 // 清理过期条目（end 已过期的独立 CD）
                 for (var j = Combat.dis_pfms.length - 1; j >= 0; j--) {
                     if (Combat.dis_pfms[j].end <= now) {
@@ -332,6 +343,8 @@ const Combat = {
                 if (!hasActive) Combat._pfmAnimId = null;
                 return hasActive;
             }, Combat.PFM_INTERVAL);
+        if (Combat._animItems[animId]) {
+            Combat._pfmAnimId = animId;
         }
     },
     StatusChanged: function (data) {
@@ -479,7 +492,8 @@ const Combat = {
     StatusItemANI: function (item) {
         var shadow = item.elem.lastChild;
         if (item._animId) Combat._animUnregister(item._animId);
-        item._animId = Combat._animRegister(function (now) {
+        item._animId = null;
+        var aid = Combat._animRegister(function (now) {
             var remaining = item.end - now;
             if (remaining < 0) remaining = 0;
             var p = remaining * 100 / item.duration;
@@ -499,6 +513,9 @@ const Combat = {
             }
             return true;
         }, 1000);
+        if (Combat._animItems[aid]) {
+            item._animId = aid;
+        }
     }
 
 };
