@@ -36,10 +36,6 @@ export default class extends SKILL {
     on_force_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
         if (sh <= 0) return;
         if (!target || target.hp <= 0) return;
-
-        const count = target.query_temp("jyjq", 0) + 1;
-        target.set_temp("jyjq", count, 1000);
-
         target.add_status({
             id: "jyjq",
             name: "阴气",
@@ -51,9 +47,9 @@ export default class extends SKILL {
             downside: true,
             no_diff: true,
             prop: {
-                gj_per: -count,
-                ds_per: -count,
-                mz_per: -count,
+                gj_per: -1,
+                ds_per: -1,
+                mz_per: -1,
             },
         }, me);
     }
@@ -66,7 +62,7 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                let count = target.query_temp("jyjq", Number(0));
+                let count = target.query_status("jyjq");
                 if (count <= 0) count = 1;
 
                 const dmgPerStack = zhuihun_dmg(me, lv);

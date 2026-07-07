@@ -2,7 +2,7 @@ import {SKILL} from "../../../../core/skill/skill.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar, CharacterStatus } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 80 */
 export default class extends SKILL {
     name = "乾坤大挪移";
     id = "qiankundanuoyi";
@@ -57,11 +57,11 @@ export default class extends SKILL {
             release_time: 4000,
             allow_busy: true,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const layers = me.query_temp("sk/qk/layer", 0);
+                const layers = me.query_status("qiankun");
                 const healPer = get_daozhuan_heal_per(lv);
                 const healHp = int(me.max_hp * healPer * layers / 100);
                 me.add_hp(healHp);
-                me.send_room(`<HIO>$N逆转乾坤，将积蓄的${layers}层劲力化为生气，周身真气澎湃如潮！</HIO>`, target);
+                me.send_room(`<HIO>$N颠倒体内阴阳二气，长舒出一口浊气，精神为之一振。</HIO>`, target);
 
                 // 将一个负面状态转移给敌人
                 const downsides = me.status?.filter((s: CharacterStatus) => s.downside && s.id !== "busy" && s.id !== "faint") || [];
@@ -74,10 +74,9 @@ export default class extends SKILL {
                         name: chosen.name || "转移",
                         downside: true,
                         duration: remaining,
-                        desc: `被乾坤大挪移转移而来的${chosen.name || "负面"}状态`,
+                        desc: chosen.desc,
                         prop: chosen.prop || {},
                     }, me);
-                    me.send_room(`<HIO>说时迟那时快，$N以倒转乾坤之法，将身上的「${chosen.name}」劲力挪移到了$n身上！</HIO>`, target);
                 }
             },
             query_desc: function(me: CHARACTER, lv: number): string {
@@ -109,26 +108,14 @@ export function get_daozhuan_heal_per(lv: number): number {
 
 function add_layers(me: CHARACTER, lv: number, amount: number): void {
     const maxLayers = get_max_layers(lv);
-    const current = me.query_temp("sk/qk/layer", 0);
-    const newLayers = Math.min(maxLayers, current + amount);
-    me.set_temp("sk/qk/layer", newLayers);
-
-    // 更新层数状态
-    me.remove_status("qk_layer", true);
-    if (newLayers > 0) {
         me.add_status({
-            id: "qk_layer",
+            id: "qiankun",
             name: "乾坤",
-            duration: 60000,
-            override: 2,
-            desc: `积蓄了${newLayers}层乾坤劲力，每层增加${lv}点防御`,
-            prop: { fy: newLayers * lv },
-            on_attach: function(p: CHARACTER): void {
-                p.set_temp("sk/qk/layer", newLayers);
-            },
-            on_expire: function(p: CHARACTER): void {
-                p.remove_temp("sk/qk/layer");
-            },
+            duration: 10000,
+            override: 1,
+            count: amount,
+            max_count: maxLayers,
+            desc: `乾坤劲力积累，增加你的防御`,
+            prop: { fy: lv },
         });
-    }
 }
