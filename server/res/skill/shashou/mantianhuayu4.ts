@@ -22,7 +22,7 @@ export default class extends SKILL {
         "$N手捏法印凌空一指，金光破空而至，直射$n的$l",
     ];
 
-    on_enable = (me: CHARACTER, type: string): void => {
+    on_enable(me: CHARACTER, type: string): void {
         if (type === 'throwing' && !me.can_throwing()) {
             me.can_throwing = () => true;
         }
