@@ -152,10 +152,11 @@ export default class extends SKILL {
         }
     }
 
-    on_force_parry(me: CHARACTER, target: CHARACTER, _sh: number, par: DoAttackPar): number {
+    on_force_parry(me: CHARACTER, target: CHARACTER, sh: number, par: DoAttackPar): number {
         if (me.query_temp("cihang_jx", 0)) {
             me.send_room("<hio>$N心如明镜，剑意无形，$n一招未至，已被洞悉</hio>", target);
             par.is_parried = true;
+            return sh;
         }
         return 0;
     }
