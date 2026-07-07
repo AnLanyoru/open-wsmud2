@@ -185,17 +185,8 @@ const Combat = {
             Combat.ANI_PFM();
         }
     }, redisable: function () {
+        // 重置：清空独立 CD，让所有技能走全局（初始为 0%，即就绪态）
         Combat.dis_pfms = [];
-        if (Combat.Skills) {
-            for (var i = 0; i < Combat.Skills.length; i++) {
-                var skill = Combat.Skills[i];
-                Combat.dis_pfms.push({
-                    id: skill.id,
-                    distime: skill.distime,
-                    ani_time: skill.distime
-                });
-            }
-        }
         if (!Combat.time_handler) {
             Combat.ANI_PFM();
         }
@@ -203,19 +194,14 @@ const Combat = {
         // 无 id 或 id="all"：全局冷却，只读 rtime
         if (!data.id || data.id === 'all') {
             if (data.rtime) {
-                if (!this.dis_pfms) this.dis_pfms = [];
-                // 只保留正在冷却且剩余时间 > rtime 的条目（来自 setDistime 的长 CD）
-                // 其余移除，让这些技能走全局 distime/ani_time，统一显示 rtime 倒计时
-                var saved = [];
-                for (var i = 0; i < this.dis_pfms.length; i++) {
-                    var entry = this.dis_pfms[i];
-                    if (entry.ani_time < entry.distime && entry.ani_time > data.rtime) {
-                        saved.push(entry);
-                    }
+                // 只设置全局时间作为冷却下限，不修改 dis_pfms
+                // ANI_PFM 里有独立条目的技能优先用自己，没条目的用全局
+                // setDistime 创建的条目不受影响
+                Combat.ani_time = Combat.ani_time ?? 0;
+                if (data.rtime > Combat.ani_time) {
+                    Combat.distime = data.rtime;
+                    Combat.ani_time = data.rtime;
                 }
-                Combat.dis_pfms = saved;
-                Combat.distime = data.rtime;
-                Combat.ani_time = data.rtime;
             } else {
                 return this.redisable();
             }
