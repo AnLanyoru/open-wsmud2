@@ -2,7 +2,6 @@ import {ROOM} from "../../../../core/room/room.js";
 
 export default class extends ROOM {
     name = "南院";
-    desc = "这是南院。";
     exits = {
         "west": "fb/wudu/xiangfang",
         "east": "fb/wudu/yaoshi",

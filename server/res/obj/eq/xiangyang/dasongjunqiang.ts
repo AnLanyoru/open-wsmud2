@@ -6,7 +6,7 @@ export default class extends EQUIPMENT {
     desc = "大宋禁军统帅的配枪，枪尖寒光凛冽，一枪出则破敌胆。";
     unit = "杆";
     eq_type = EQUIP_TYPE.WEAPON;
-    weapon_type = WEAPON_TYPE.STAFF;
+    weapon_type = WEAPON_TYPE.CLUB;
 
     on_create(path, par) {
         let lv = 5;

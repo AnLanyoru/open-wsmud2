@@ -6,7 +6,7 @@ export default class extends EQUIPMENT {
     desc = "蒙古铁骑的制式长枪，枪身粗犷，一枪刺出势不可挡。";
     unit = "杆";
     eq_type = EQUIP_TYPE.WEAPON;
-    weapon_type = WEAPON_TYPE.STAFF;
+    weapon_type = WEAPON_TYPE.CLUB;
 
     on_create(path, par) {
         let lv = 5;
