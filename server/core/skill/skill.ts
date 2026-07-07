@@ -139,7 +139,7 @@ export class SKILL extends BASE {
     // ============ 回调（由资源文件设置） ============
 
     /** 激活技能回调 — 触发时机：enable() 开头，技能装备到基本技能类型时；返回 false 阻止激活 */
-    on_enable?: (me: CHARACTER, type: string) => boolean | void;
+    on_enable?(me: CHARACTER, type: string): boolean | void;
 
     /** 取消激活回调 — 触发时机：disenable() 开头，技能从基本技能类型卸下时 */
     on_disenable(me: CHARACTER, type: string): void {
