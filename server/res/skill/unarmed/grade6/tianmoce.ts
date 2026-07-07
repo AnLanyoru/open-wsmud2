@@ -188,7 +188,7 @@ export default class extends SKILL {
                     me.add_status({
                         id: "quan",
                         name: "拳罡",
-                        duration: 30000,
+                        duration: 10000,
                         override: 1,
                         prop: {
                             add_sh_per: diff_fy_per_stack,
