@@ -75,7 +75,7 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var reduce_pct = 11 + Math.floor(lv / 100);
                 if (reduce_pct > 20) reduce_pct = 20;
-                me.send_room("<mag>$N双眸转为深黑，周身魔气翻腾，施展出道心种魔大法之「<MAG>种魔</MAG>」，一股无形魔种悄然没入$n体内！</mag>", target);
+                me.send_room("<mag>$N双眸转为深黑，周身魔气翻腾，一道无形魔气悄然没入$n体内！</mag>", target);
                 var sh = me.do_attack({
                     target: target,
                     gj: me.gj,
@@ -99,7 +99,7 @@ export default class extends SKILL {
                             add_sh_per: -reduce_pct,
                         },
                         desc: "伤害和免伤降低" + reduce_pct + "%",
-                        start_msg: "<mag>$n丹田处浮现出一道诡异的黑色魔纹，魔种已悄然种下！</mag>",
+                        start_msg: "<mag>$N丹田处浮现出一道诡异的黑色魔纹！</mag>",
                     }, me);
                 }
                 me.end_attack(target);
