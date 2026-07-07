@@ -61,14 +61,14 @@ export default class extends SKILL {
      * 当处于「寒冰」状态时，受到的伤害降低，且攻击你的敌人会被冻结，攻击速度大幅降低。
      */
     on_damage(me: CHARACTER, sh: number, from?: CHARACTER): number {
-        if (me.query_temp("hanbing", 0)) {
+        if (me.query_temp("sk_hb", 0)) {
             const lv = me.query_skill("hanbingzhenqi", 0);
             sh = sh - me.query_prop('hbzq_dy_sh');
             if (sh < 0) sh = 0;
             if (from && from.hp > 0)
                 from.add_status({
-                    id: "dongjie",
-                    name: "冻结",
+                    id: "slow",
+                    name: "寒气",
                     duration: hanbing_dongjie_duration(lv),
                     downside: true,
                     prop: {
@@ -102,9 +102,10 @@ export default class extends SKILL {
                     prop: {
                         add_sh: addSh,
                     },
+                    on_attach: (p: CHARACTER) => p.set_temp("sk_hb", 1, duration),
+                    on_expire: (p: CHARACTER) => p.remove_temp("sk_hb"),
                     finish_msg: "<hib>$N周身的寒气渐渐散去，寒冰真气收回丹田。</hib>",
                 });
-                me.set_temp("hanbing", 1, duration);
                 me.reauto_attack();
             },
             query_desc: function(me: CHARACTER, lv: number): string {

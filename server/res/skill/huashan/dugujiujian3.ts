@@ -22,7 +22,7 @@ export default class extends SKILL {
     parry_msg2 = (SKILL.get("dugujiujian") as any)?.parry_msg2 || [];
 
     query_attack_action(me: CHARACTER): string {
-        if (me.query_temp("weapon", 0)) {
+        if (me.query_temp("sk_dg_wz", 0)) {
             return (this.attack_actions2 as string[]).random();
         }
         return (this.attack_actions as string[]).random();
@@ -73,9 +73,10 @@ export default class extends SKILL {
                         gj_per: gj,
                         mz_per: mz,
                     },
+                    on_attach: (p: CHARACTER) => p.set_temp("sk_dg_wz", 1, time),
+                    on_expire: (p: CHARACTER) => p.remove_temp("sk_dg_wz"),
                     finish_msg: "$N剑意缓缓收敛，从无招之境退了出来。",
                 });
-                me.set_temp("weapon", 1, time);
                 me.reauto_attack();
             },
             query_desc: function(me: CHARACTER, lv: number): string {
@@ -95,17 +96,19 @@ export default class extends SKILL {
                 let time: number = 3000 + lv * 5;
                 if (time > 10000) time = 10000;
                 const zj: number = 100;
-                me.send_room("<HIC>$N剑尖斜指，默运独孤九剑「破字诀」心法，周身剑气森然——天下武功，无招不破！</HIC>\n", target);
+                me.send_room("<HIW>$N剑尖斜指，随意挥洒，招招从出其不意的方位直指$n招式中的破绽！</HIW>\n", target);
                 me.add_status({
                     id: "parry",
-                    name: "破",
+                    name: "破招",
                     desc: "独孤九剑之破字诀，大幅提升招架几率，招架成功时反击威力大增",
                     duration: time,
                     prop: {
                         zj_per: zj,
                     },
+                    on_attach: (p: CHARACTER) => p.set_temp("sk_dg_pz", 1, time),
+                    on_expire: (p: CHARACTER) => p.remove_temp("sk_dg_pz"),
+                    finish_msg: "$N破字诀剑意渐散，剑势复归平常。",
                 });
-                me.set_temp("sk_dugu_pozijue", 1, time);
                 me.reauto_attack();
             },
             query_desc: function(me: CHARACTER, lv: number): string {
@@ -154,8 +157,8 @@ export default class extends SKILL {
     // 招架反击
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
         if (par.is_parried) {
-            if (!me.query_temp("sk_dugu_parry", 0)) {
-                const isPozi: boolean = !!me.query_temp("sk_dugu_pozijue", 0);
+            if (!me.query_temp("sk_dg_pr", 0)) {
+                const isPozi: boolean = !!me.query_temp("sk_dg_pz", 0);
                 const base_gj: number = me.gj / 2 + me.random(me.gj / 2);
                 const gj: number = isPozi ? base_gj * 2 : base_gj;
                 const msg: string = isPozi
@@ -168,7 +171,7 @@ export default class extends SKILL {
                     mz: me.mz,
                 });
                 me.end_attack(target);
-                me.set_temp("sk_dugu_parry", 1, 5000);
+                me.set_temp("sk_dg_pr", 1, 5000);
             }
         }
     }

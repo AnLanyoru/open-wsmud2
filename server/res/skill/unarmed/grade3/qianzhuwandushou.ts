@@ -96,11 +96,12 @@ export default class extends SKILL {
                 var msg = "<red>$N仰天一声长啸，强催内劲，全身竟浮现出隐隐碧绿之色。喝道：“万蛊噬天”。毒气弥漫，瞬间笼罩$P全身！</red>\n";
                 me.send_room(msg);
                 var time = 10000 + lv * 10;
-                me.set_temp("wangu", 1, time);
                 me.add_status({
                     id: "wangu",
                     name: "万蛊噬天",
-                    duration: time
+                    duration: time,
+                    on_attach: (p: CHARACTER) => p.set_temp("sk_wg", 1, time),
+                    on_expire: (p: CHARACTER) => p.remove_temp("sk_wg"),
                 });
             },
             query_desc: function (me: CHARACTER, lv: number) {
@@ -133,7 +134,7 @@ export default class extends SKILL {
         };
     }
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
-        if (me.query_temp("wangu")) {
+        if (me.query_temp("sk_wg", 0)) {
             var lv = me.query_skill("wudushengong", 0) + me.query_skill("qianzhuwandushou", 0);
             var gj = 200 + parseInt(lv * (lv / 1000 + 1));
             if (par.is_parried) {

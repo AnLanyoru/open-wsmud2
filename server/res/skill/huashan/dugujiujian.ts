@@ -86,10 +86,12 @@ export default class extends SKILL {
                         prop: {
                             gjsd_per: 100,
                             gj: lv,
-                            mz: lv
-                        }
+                            mz: lv,
+                        },
+                        on_attach: (p: CHARACTER) => p.set_temp("sk_dg_wz", 1, time),
+                        on_expire: (p: CHARACTER) => p.remove_temp("sk_dg_wz"),
+                        finish_msg: "$N无招之意渐散，剑势缓缓归于平常。",
                     });
-                    me.set_temp("weapon", 1, time);
                     me.reauto_attack();
 
                 },
@@ -158,8 +160,8 @@ export default class extends SKILL {
             }
     };
 
-    query_attack_action(me) {
-        if (me.query_temp("weapon")) {
+    query_attack_action(me: CHARACTER): string {
+        if (me.query_temp("sk_dg_wz", 0)) {
             return this.attack_actions2.random();
         }
         return this.attack_actions.random();
@@ -189,7 +191,7 @@ export default class extends SKILL {
 
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar) {
         if (par.is_parried) {
-            if (!me.query_temp("sk_dugu_parry")) {
+            if (!me.query_temp("sk_dg_pr", 0)) {
                 me.do_attack({
                     target: target,
                     attack_msg: this.parry_msg2.random(),
@@ -197,7 +199,7 @@ export default class extends SKILL {
                     mz: me.mz
                 });
                 me.end_attack(target);
-                me.set_temp("sk_dugu_parry", 1, 7000);
+                me.set_temp("sk_dg_pr", 1, 7000);
             }
         }
     }

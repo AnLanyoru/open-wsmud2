@@ -20,7 +20,7 @@ export default class extends SKILL {
     attack_actions2 = (SKILL.get("dugujiujian") as any)?.attack_actions2 || [];
 
     query_attack_action(me: CHARACTER): string {
-        if (me.query_temp("weapon", 0) || me.query_temp("jianyi", 0)) {
+        if (me.query_temp("sk_dg_wz", 0) || me.query_temp("sk_dg_jy", 0)) {
             return (this.attack_actions2 as string[]).random();
         }
         return (this.attack_actions as string[]).random();
@@ -62,9 +62,10 @@ export default class extends SKILL {
                         mz_per: per,
                         zj_per: per,
                     },
+                    on_attach: (p: CHARACTER) => p.set_temp("sk_dg_jy", 1, time),
+                    on_expire: (p: CHARACTER) => p.remove_temp("sk_dg_jy"),
                     finish_msg: "$N剑意渐散，缓缓归于平静。",
                 });
-                me.set_temp("jianyi", 1, time);
                 me.reauto_attack();
             },
             query_desc: function (me: CHARACTER, lv: number): string {
