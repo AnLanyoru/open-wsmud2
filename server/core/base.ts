@@ -22,6 +22,7 @@ type CtorFunc = new (par?: string) => ResourceObj;
 interface EventRecord {
     func: (...args: any[]) => any;
     time: number;
+    priority: number;
 }
 
 /** 事件存储映射 */
@@ -72,17 +73,29 @@ export class BASE {
      * @param fname - 事件名（即要覆盖的方法名）
      * @param func - 替换的函数
      * @param time - 有效期（毫秒），不传则永久有效
+     * @param priority - 优先级，数值越大越先执行（默认 0）
      */
-    add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number): void {
+    add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number, priority?: number): void {
         if (!this[fname]) {
             this[fname] = (...args: any[]) => this.fire_event(fname, ...args);
         }
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
-        this._events[fname].push({
-            func: func,
-            time: time ? (Date.now() + time) : Number.MAX_SAFE_INTEGER,
-        });
+
+        const p = priority ?? 0;
+        const t = time ? (Date.now() + time) : Number.MAX_SAFE_INTEGER;
+        const record: EventRecord = { func: func, time: t, priority: p };
+        const evts = this._events[fname];
+
+        // 按优先级降序插入，同等优先级保持插入顺序（稳定排序）
+        let insertIdx = evts.length;
+        for (let i = 0; i < evts.length; i++) {
+            if (evts[i].priority < p) {
+                insertIdx = i;
+                break;
+            }
+        }
+        evts.splice(insertIdx, 0, record);
     }
 
     /**
