@@ -357,7 +357,7 @@
     padding-left: 0.4em;
     padding-right: 0.4em;
     margin-bottom: 2px;
-    /* transition: background-size 0.2s linear; */
+    transition: background-size 0.5s linear;
     background: linear-gradient(to top, rgba(128, 128, 128, 0.5) 0%, rgba(128, 128, 128, 0.5) 100%);
     background-size: 0% 100%;
     background-position: 100% 100%;
@@ -683,7 +683,7 @@
     opacity: 0.5;
     height: 100%;
     border-radius: 0.25em;
-    border-radius: 0.25em;
+    transition: right 0.5s linear;
 }
 
 @media (min-width: 768px) {

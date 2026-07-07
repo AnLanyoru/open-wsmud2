@@ -92,10 +92,11 @@ const Combat = {
             var item = this.object_actions[i];
             if (item.cmd === cmd) {
                 if (data.remove) {
+                    if (item._animId) Combat._animUnregister(item._animId);
                     this.object_actions.splice(i, 1);
                     return item.elem.remove();
                 } else {
-                    this.ANI_OBJ(item, data.time, data.time);
+                    this.ANI_OBJ(item, data.time);
                 }
             }
         }
@@ -112,19 +113,26 @@ const Combat = {
         });
         this.create_actions();
     }
-    , ANI_OBJ: function (obj, time, ani_time) {
-
-        let elem = obj.elem;
-        if (!elem) return;
-        var cur_per = ani_time * 100 / time;
-        if (cur_per > 0) {
-            elem.css("backgroundSize", cur_per + "% 100%");
-        } else {
-            if (cur_per < 0) cur_per = 0;
-            elem.css("backgroundSize", "0% 100%");
-        }
-        obj.disper = cur_per;
-        setTimeout(Combat.ANI_OBJ, 1000, obj, time, ani_time - 1000);
+    , ANI_OBJ: function (obj, time) {
+        var end = Date.now() + time;
+        if (obj._animId) Combat._animUnregister(obj._animId);
+        obj._animId = Combat._animRegister(function (now) {
+            var elem = obj.elem;
+            if (!elem) { obj._animId = null; return false; }
+            var remaining = end - now;
+            var cur_per = remaining > 0 ? remaining * 100 / time : 0;
+            if (cur_per > (obj.disper || 0)) {
+                elem.css("transition", "none");
+                elem.css("backgroundSize", cur_per + "% 100%");
+                elem[0].offsetHeight;
+                elem.css("transition", "");
+            } else {
+                elem.css("backgroundSize", cur_per + "% 100%");
+            }
+            obj.disper = cur_per;
+            if (remaining <= 0) obj._animId = null;
+            return remaining > 0;
+        }, 1000);
     }
     , create_skillItems: function (items) {
         var elem = $(".combat-commands").empty();
@@ -171,9 +179,7 @@ const Combat = {
             if (Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].distime = data.distime;
                 Combat.dis_pfms[j].end = now + data.distime;
-                if (!Combat.time_handler) {
-                    Combat.ANI_PFM();
-                }
+                Combat.ANI_PFM();
                 return;
             }
         }
@@ -182,16 +188,12 @@ const Combat = {
             distime: data.distime,
             end: now + data.distime
         });
-        if (!Combat.time_handler) {
-            Combat.ANI_PFM();
-        }
+        Combat.ANI_PFM();
     }, redisable: function () {
         // 重置：清空独立 CD 和全局冷却
         Combat.dis_pfms = [];
         Combat.end = 0;
-        if (!Combat.time_handler) {
-            Combat.ANI_PFM();
-        }
+        Combat.ANI_PFM();
     }, On_Perform: function (data) {
         // 无 id 或 id="all"：全局冷却，只读 rtime
         if (!data.id || data.id === 'all') {
@@ -211,9 +213,7 @@ const Combat = {
                 Combat.end = newEnd;
             }
             // rtime 为 0 时：无全局冷却，保留已有独立 CD，仅确保动画在跑
-            if (!this.time_handler) {
-                Combat.ANI_PFM();
-            }
+            Combat.ANI_PFM();
             return;
         }
         // 指定 id：单技能冷却（兼容旧协议，实际单技能 CD 已由 setDistime 处理）
@@ -245,55 +245,90 @@ const Combat = {
             Combat.distime = data.rtime;
             Combat.end = now2 + data.rtime;
         }
-        if (!this.time_handler) {
-            Combat.ANI_PFM();
-        }
-    }, PFM_INTERVAL: 300
-    // 每 300ms tick：用 Date.now() 与 end 时间戳差值计算剩余冷却
-    //   cur_per = 剩余ms / 总时间(distime) * 100
-    //   100% → 冷却刚开始（遮罩全覆盖，不可出招）
-    //   → 0% → 冷却完毕（遮罩消失，技能就绪）
-    , ANI_PFM: function () {
+        Combat.ANI_PFM();
+    },
+    // 统一动画循环：合并 ANI_PFM、ANI_OBJ、StatusItemANI 的独立 setTimeout 链
+    _animItems: {},
+    _animTimer: null,
+    _animNextId: 0,
+    _animRegister: function (update, interval) {
+        var id = ++Combat._animNextId;
+        Combat._animItems[id] = { update: update, interval: interval, lastRun: 0 };
+        if (!Combat._animTimer) Combat._animTick();
+        return id;
+    },
+    _animUnregister: function (id) {
+        delete Combat._animItems[id];
+    },
+    _animTick: function () {
         var now = Date.now();
-
-        // 清理过期条目（end 已过期的独立 CD）
-        for (var j = Combat.dis_pfms.length - 1; j >= 0; j--) {
-            if (Combat.dis_pfms[j].end <= now) {
-                Combat.dis_pfms.splice(j, 1);
+        var hasActive = false;
+        for (var id in Combat._animItems) {
+            var item = Combat._animItems[id];
+            if (now - item.lastRun >= item.interval) {
+                item.lastRun = now;
+                if (item.update(now) === false) {
+                    delete Combat._animItems[id];
+                } else {
+                    hasActive = true;
+                }
+            } else {
+                hasActive = true;
             }
         }
-
-        // 全局进度
-        var p = 0;
-        if (Combat.end > now && Combat.distime > 0) {
-            p = (Combat.end - now) * 100 / Combat.distime;
+        if (hasActive) {
+            Combat._animTimer = setTimeout(Combat._animTick, Combat.PFM_INTERVAL);
+        } else {
+            Combat._animTimer = null;
         }
-
-        // 每技能渲染
-        if (Combat.Skills) {
-            for (var i = 0; i < Combat.Skills.length; i++) {
-                var skill = Combat.Skills[i];
-                var cur_per = p;
-                for (var j = 0; j < Combat.dis_pfms.length; j++) {
-                    if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                        cur_per = (Combat.dis_pfms[j].end - now) * 100 / Combat.dis_pfms[j].distime;
-                        break;
+    },
+    PFM_INTERVAL: 500,
+    // CD 冷却动画（注册至统一动画循环，按 PFM_INTERVAL tick）
+    ANI_PFM: function () {
+        if (!Combat._pfmAnimId) {
+            Combat._pfmAnimId = Combat._animRegister(function (now) {
+                // 清理过期条目（end 已过期的独立 CD）
+                for (var j = Combat.dis_pfms.length - 1; j >= 0; j--) {
+                    if (Combat.dis_pfms[j].end <= now) {
+                        Combat.dis_pfms.splice(j, 1);
                     }
                 }
-                if (cur_per > 0) {
-                    skill.elem.css("backgroundSize", cur_per + "% 100%");
-                } else {
-                    skill.elem.css("backgroundSize", "0% 100%");
+                // 全局进度
+                var p = 0;
+                if (Combat.end > now && Combat.distime > 0) {
+                    p = (Combat.end - now) * 100 / Combat.distime;
                 }
-            }
-        }
-
-        // 有活动冷却则继续循环
-        var hasActive = Combat.end > now || Combat.dis_pfms.length > 0;
-        if (hasActive) {
-            Combat.time_handler = setTimeout(Combat.ANI_PFM, Combat.PFM_INTERVAL);
-        } else {
-            Combat.time_handler = null;
+                // 每技能渲染
+                if (Combat.Skills) {
+                    for (var i = 0; i < Combat.Skills.length; i++) {
+                        var skill = Combat.Skills[i];
+                        var cur_per = p;
+                        for (var j = 0; j < Combat.dis_pfms.length; j++) {
+                            if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
+                                cur_per = (Combat.dis_pfms[j].end - now) * 100 / Combat.dis_pfms[j].distime;
+                                break;
+                            }
+                        }
+                        if (cur_per > 0) {
+                            if (cur_per > (skill._prevPer || 0)) {
+                                skill.elem.css("transition", "none");
+                                skill.elem.css("backgroundSize", cur_per + "% 100%");
+                                skill.elem[0].offsetHeight;
+                                skill.elem.css("transition", "");
+                            } else {
+                                skill.elem.css("backgroundSize", cur_per + "% 100%");
+                            }
+                        } else {
+                            skill.elem.css("backgroundSize", "0% 100%");
+                        }
+                        skill._prevPer = cur_per;
+                    }
+                }
+                // 有活动冷却则继续循环，否则置空 ID 等待下次注册
+                var hasActive = Combat.end > now || Combat.dis_pfms.length > 0;
+                if (!hasActive) Combat._pfmAnimId = null;
+                return hasActive;
+            }, Combat.PFM_INTERVAL);
         }
     },
     StatusChanged: function (data) {
@@ -401,7 +436,7 @@ const Combat = {
             var item = player_status.items[ids[i]];
             if (item) {
                 $(item.elem).remove();
-                item.handler && clearTimeout(item.handler);
+                if (item._animId) Combat._animUnregister(item._animId);
                 delete player_status.items[ids[i]];
             }
         }
@@ -415,14 +450,14 @@ const Combat = {
         var shadow = item.elem.lastChild;
         item.count = data.count;
         item.elem.innerHTML = item.name + "x" + item.count + shadow.outerHTML;
-        item.handler && clearTimeout(item.handler);
+        if (item._animId) Combat._animUnregister(item._animId);
         item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     }, StatusItem_override: function (player_status, data) {
 
         var item = player_status.items[data.sid];
         if (!item) return;
-        item.handler && clearTimeout(item.handler);
+        if (item._animId) Combat._animUnregister(item._animId);
         item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     },
@@ -432,25 +467,34 @@ const Combat = {
             var item = player_status.items[sid];
             if (item) {
                 $(item.elem).remove();
-                clearTimeout(item.handler);
+                if (item._animId) Combat._animUnregister(item._animId);
             }
         }
         player_status.items = {};
     },
-    // 状态倒计时：用 Date.now() 与 item.end 差值计算进度，后台回来也精确
+    // 状态倒计时：统一动画循环驱动，用 Date.now() 与 item.end 差值计算进度
     StatusItemANI: function (item) {
         var shadow = item.elem.lastChild;
-        var remaining = item.end - Date.now();
-        if (remaining < 0) remaining = 0;
-        var p = remaining * 100 / item.duration;
-        shadow.style.right = p + "%";
-        if (remaining > 0) {
-            item.handler = setTimeout(Combat.StatusItemANI, 1000, item);
-        } else {
-            //elem.parent().remove();
-            item.handler = 0;
-        }
-
+        if (item._animId) Combat._animUnregister(item._animId);
+        item._animId = Combat._animRegister(function (now) {
+            var remaining = item.end - now;
+            if (remaining < 0) remaining = 0;
+            var p = remaining * 100 / item.duration;
+            if (p > (item._prevP || 0)) {
+                shadow.style.transition = "none";
+                shadow.style.right = p + "%";
+                shadow.offsetHeight;
+                shadow.style.transition = "";
+            } else {
+                shadow.style.right = p + "%";
+            }
+            item._prevP = p;
+            if (remaining <= 0) {
+                item._animId = null;
+                return false;
+            }
+            return true;
+        }, 1000);
     }
 
 };
