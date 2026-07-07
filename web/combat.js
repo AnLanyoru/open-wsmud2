@@ -78,6 +78,7 @@ const Combat = {
             item._overlay = item.elem.find(".cd-overlay");
             if (item.disper > 0) {
                 item._overlay.css("transform", "scaleX(" + (item.disper / 100) + ")");
+                item._hadCD = true;
             }
         }
     }, create_actions: function (items) {
@@ -122,17 +123,19 @@ const Combat = {
             var overlay = obj._overlay;
             if (!overlay) { obj._animId = null; return false; }
             var remaining = end - now;
-            var cur_per = remaining > 0 ? remaining * 100 / time : 0;
-            var ratio = cur_per / 100;
-            if (cur_per > (obj.disper || 0)) {
-                overlay.css("transition", "none");
-                overlay.css("transform", "scaleX(" + ratio + ")");
-                overlay[0].offsetHeight;
-                overlay.css("transition", "");
+            if (remaining > 0) {
+                if (!obj._hadCD) {
+                    overlay.css("transition", "none");
+                    overlay.css("transform", "scaleX(1)");
+                    overlay[0].offsetHeight;
+                }
+                overlay.css("transition", "transform " + remaining + "ms linear");
+                overlay.css("transform", "scaleX(0)");
+                obj._hadCD = true;
             } else {
-                overlay.css("transform", "scaleX(" + ratio + ")");
+                overlay.css("transform", "scaleX(0)");
+                obj._hadCD = false;
             }
-            obj.disper = cur_per;
             if (remaining <= 0) obj._animId = null;
             return remaining > 0;
         }, 1000);
@@ -306,36 +309,37 @@ const Combat = {
                         Combat.dis_pfms.splice(j, 1);
                     }
                 }
-                // 全局进度
-                var p = 0;
-                if (Combat.end > now && Combat.distime > 0) {
-                    p = (Combat.end - now) * 100 / Combat.distime;
-                }
-                // 每技能渲染
+                // 每技能渲染：线性时间驱动 CSS transition，500ms tick 仅做校准
                 if (Combat.Skills) {
                     for (var i = 0; i < Combat.Skills.length; i++) {
                         var skill = Combat.Skills[i];
-                        var cur_per = p;
+                        // 计算技能独立 CD 剩余时间（ms）
+                        var remaining = 0;
                         for (var j = 0; j < Combat.dis_pfms.length; j++) {
                             if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                                cur_per = (Combat.dis_pfms[j].end - now) * 100 / Combat.dis_pfms[j].distime;
+                                remaining = Combat.dis_pfms[j].end - now;
                                 break;
                             }
                         }
-                        if (cur_per > 0) {
-                            var ratio = cur_per / 100;
-                            if (cur_per > (skill._prevPer || 0)) {
+                        // 无独立 CD 则走全局冷却
+                        if (remaining <= 0) {
+                            remaining = Combat.end > now ? Combat.end - now : 0;
+                        }
+                        if (remaining > 0) {
+                            if (!skill._hadCD) {
+                                // 新冷却：瞬间跳到全覆盖
                                 skill._overlay.css("transition", "none");
-                                skill._overlay.css("transform", "scaleX(" + ratio + ")");
+                                skill._overlay.css("transform", "scaleX(1)");
                                 skill._overlay[0].offsetHeight;
-                                skill._overlay.css("transition", "");
-                            } else {
-                                skill._overlay.css("transform", "scaleX(" + ratio + ")");
                             }
+                            // 过渡时长 = 剩余 ms，CSS 自行跑完全程，tick 只负责校准
+                            skill._overlay.css("transition", "transform " + remaining + "ms linear");
+                            skill._overlay.css("transform", "scaleX(0)");
+                            skill._hadCD = true;
                         } else {
                             skill._overlay.css("transform", "scaleX(0)");
+                            skill._hadCD = false;
                         }
-                        skill._prevPer = cur_per;
                     }
                 }
                 // 有活动冷却则继续循环，否则置空 ID 等待下次注册
@@ -496,17 +500,19 @@ const Combat = {
         var aid = Combat._animRegister(function (now) {
             var remaining = item.end - now;
             if (remaining < 0) remaining = 0;
-            var p = remaining * 100 / item.duration;
-            var ratio = (100 - p) / 100;
-            if (p > (item._prevP || 0)) {
-                shadow.style.transition = "none";
-                shadow.style.transform = "scaleX(" + ratio + ")";
-                shadow.offsetHeight;
-                shadow.style.transition = "";
+            if (remaining > 0) {
+                if (!item._hadStatus) {
+                    shadow.style.transition = "none";
+                    shadow.style.transform = "scaleX(0)";
+                    shadow.offsetHeight;
+                }
+                shadow.style.transition = "transform " + remaining + "ms linear";
+                shadow.style.transform = "scaleX(1)";
+                item._hadStatus = true;
             } else {
-                shadow.style.transform = "scaleX(" + ratio + ")";
+                shadow.style.transform = "scaleX(1)";
+                item._hadStatus = false;
             }
-            item._prevP = p;
             if (remaining <= 0) {
                 item._animId = null;
                 return false;
