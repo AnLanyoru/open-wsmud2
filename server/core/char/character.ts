@@ -1839,7 +1839,7 @@ export class CHARACTER extends ITEM {
         if (obj.eq_type == EQUIP_TYPE.WEAPON) {
             if (this.fight_type) {
                 this.release_time = 3000 + Date.now();
-            this.send(`{type:"dispfm",id:"all",rtime:3000,distime:0}`);
+            this.send(`{type:"dispfm",rtime:3000}`);
             }
             if (this.query_temp('jxtm')) {
                 this.remove_status('force');
@@ -3132,7 +3132,7 @@ export class CHARACTER extends ITEM {
     set_releasetime(rtime: number): void {
         const release_time = Date.now() + rtime;
         if (this.is_player) {
-            this.send(`{type:"dispfm",id:"all",rtime:${rtime},distime:0}`);
+            this.send(`{type:"dispfm",rtime:${rtime}}`);
         } else {
             if (!this.auto_skills) this.init_pfms();
         }

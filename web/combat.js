@@ -158,7 +158,7 @@ const Combat = {
     }, SetDistime: function (data) {
         var pfmid = data.id;
         // 过滤未装备技能：Skills 已加载时，忽略不在其中的技能 CD
-        if (Combat.Skills) {
+        if (Combat.Skills && Combat.Skills.length > 0) {
             var found = false;
             for (var si = 0; si < Combat.Skills.length; si++) {
                 if (Combat.Skills[si].id == pfmid) { found = true; break; }
@@ -186,20 +186,45 @@ const Combat = {
         }
     }, redisable: function () {
         Combat.dis_pfms = [];
-        for (var i = 0; i < Combat.Skills.length; i++) {
-            var skill = Combat.Skills[i];
-            Combat.dis_pfms.push({
-                id: skill.id,
-                distime: skill.distime,
-                ani_time: skill.distime
-            });
+        if (Combat.Skills) {
+            for (var i = 0; i < Combat.Skills.length; i++) {
+                var skill = Combat.Skills[i];
+                Combat.dis_pfms.push({
+                    id: skill.id,
+                    distime: skill.distime,
+                    ani_time: skill.distime
+                });
+            }
         }
         if (!Combat.time_handler) {
             Combat.ANI_PFM();
         }
     }, On_Perform: function (data) {
-        if (!this.Skills) return;
-        if (data.id === 'all' && !data.rtime) return this.redisable();
+        // 无 id 或 id="all"：全局冷却，只读 rtime
+        if (!data.id || data.id === 'all') {
+            if (data.rtime) {
+                if (!this.dis_pfms) this.dis_pfms = [];
+                // 只保留正在冷却且剩余时间 > rtime 的条目（来自 setDistime 的长 CD）
+                // 其余移除，让这些技能走全局 distime/ani_time，统一显示 rtime 倒计时
+                var saved = [];
+                for (var i = 0; i < this.dis_pfms.length; i++) {
+                    var entry = this.dis_pfms[i];
+                    if (entry.ani_time < entry.distime && entry.ani_time > data.rtime) {
+                        saved.push(entry);
+                    }
+                }
+                Combat.dis_pfms = saved;
+                Combat.distime = data.rtime;
+                Combat.ani_time = data.rtime;
+            } else {
+                return this.redisable();
+            }
+            if (!this.time_handler) {
+                Combat.ANI_PFM();
+            }
+            return;
+        }
+        // 指定 id：单技能冷却（兼容旧协议，实际单技能 CD 已由 setDistime 处理）
         data.rtime = data.rtime || 0;
         data.distime = data.distime || 0;
         if (!this.dis_pfms) this.dis_pfms = [];
@@ -232,35 +257,33 @@ const Combat = {
         }
     }, PFM_INTERVAL: 300
     , ANI_PFM: function () {
-        if (!Combat.Skills) {
-            Combat.time_handler = null;
-            return;
-        }
         var p = 0;
         if (Combat.distime > 0)
             p = Combat.ani_time * 100 / Combat.distime;
-        for (var i = 0; i < Combat.Skills.length; i++) {
-            var skill = Combat.Skills[i];
-            var cur_per = p;
-            for (var j = 0; j < Combat.dis_pfms.length; j++) {
-                if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                    cur_per = Combat.dis_pfms[j].ani_time * 100 / Combat.dis_pfms[j].distime;
-                    if (cur_per < 0) {
-                        Combat.dis_pfms.splice(j, 1);
-                    } else {
-                        Combat.dis_pfms[j].ani_time -= Combat.PFM_INTERVAL;
+        if (Combat.Skills) {
+            for (var i = 0; i < Combat.Skills.length; i++) {
+                var skill = Combat.Skills[i];
+                var cur_per = p;
+                for (var j = 0; j < Combat.dis_pfms.length; j++) {
+                    if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
+                        cur_per = Combat.dis_pfms[j].ani_time * 100 / Combat.dis_pfms[j].distime;
+                        if (cur_per < 0) {
+                            Combat.dis_pfms.splice(j, 1);
+                        } else {
+                            Combat.dis_pfms[j].ani_time -= Combat.PFM_INTERVAL;
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-            if (cur_per > 0) {
-                skill.elem.css("backgroundSize", cur_per + "% 100%");
-            } else {
-                skill.elem.css("backgroundSize", "0% 100%");
+                if (cur_per > 0) {
+                    skill.elem.css("backgroundSize", cur_per + "% 100%");
+                } else {
+                    skill.elem.css("backgroundSize", "0% 100%");
+                }
             }
         }
 
-        if (Combat.ani_time > 0 || Combat.dis_pfms.length) {
+        if (Combat.ani_time > 0 || (Combat.dis_pfms && Combat.dis_pfms.length)) {
             Combat.time_handler = setTimeout(Combat.ANI_PFM, Combat.PFM_INTERVAL);
         } else {
             Combat.time_handler = null;

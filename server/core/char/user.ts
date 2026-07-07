@@ -1085,7 +1085,7 @@ export class USER extends CHARACTER {
                         const sk_level = this.query_skill(base_skill.enable_skill || base_type, 0);
                         for (const p in sp_skill.pfm) {
                             const pfmitem = sp_skill.pfm[p];
-                            if (pfmitem.check && !pfmitem.check(this, sk_level, base_type)) continue;
+                            if (pfmitem.check && !pfmitem.no_check && !pfmitem.check(this, sk_level, base_type)) continue;
                             if (pfmitem.enable_skill && pfmitem.enable_skill !== base_type) continue;
                             if (str.length > 1) str.push(',');
                             str.push('{id:"');

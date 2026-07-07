@@ -46,7 +46,7 @@ body[data-theme="dark"] {
     --tool-bg: gray;
     --tool-color: #111;
     --tool-hover: #666;
-    --font-family: "Microsoft YaHei UI";
+    --font-family: system-ui, "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
 
     /* MUD 颜色标签 — 暗黑终端风格 (保持原色) */
     --mud-nor: #008000;

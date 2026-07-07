@@ -635,6 +635,7 @@ const setting_template = `
                 </span>
                 <span class="color-list">
                     <span class="color-item">默</span>
+                    <span class="color-item" style="font-family:Microsoft YaHei UI;">黑</span>
                     <span class="color-item" style="font-family:宋体;">宋</span>
                     <span class="color-item" style="font-family:楷体;">楷</span>
                     <span class="color-item" style="font-family:隶书;">隶</span>
