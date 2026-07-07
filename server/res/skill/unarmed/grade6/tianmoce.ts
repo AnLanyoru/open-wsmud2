@@ -3,7 +3,7 @@ import {SKILL_TYPES, WEAPON_TYPE} from "../../../../core/const.js";
 import type {PerformData, EnablePropMap } from "../../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../../core/char/character.js";
 
-/** 完成度 50 */
+/** 完成度 70 */
 export default class extends SKILL {
     name = "天魔策";
     id = "tianmoce";
@@ -119,20 +119,16 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = 8000 + lv * 4;
                 if (time > 15000) time = 15000;
-                var gj_bonus = Math.floor(lv / 2);
-                var mz_bonus = Math.floor(lv / 2);
-                var add_sh = 3 + Math.floor(lv / 300);
+                var add_sh = 20 + Math.floor(lv / 100);
                 me.send_room("<mag>$N双目微阖，体内魔功逆转，竟在无边魔气中悟得一丝「<MAG>道心</MAG>」，魔道相济，战力暴涨！</mag>", target);
                 me.add_status({
                     id: "force",
                     name: "道心",
                     duration: time,
                     prop: {
-                        gj: gj_bonus,
-                        mz: mz_bonus,
                         add_sh_per: add_sh,
-                        gj_per: 10,
-                        mz_per: 10,
+                        gj_per: add_sh,
+                        mz_per: add_sh,
                     },
                     desc: "大幅提升战斗力",
                     start_msg: "<mag>$N周身魔气与道意交织，气势陡然攀升至巅峰！</mag>",
@@ -179,7 +175,7 @@ export default class extends SKILL {
                 if (gj_per_stack > 15) gj_per_stack = 15;
                 var diff_fy_per_stack = 3 + Math.floor(lv / 500);
                 if (diff_fy_per_stack > 8) diff_fy_per_stack = 8;
-                me.send_room("<mag>$N沉声怒喝，右拳凝聚滔天魔气，一拳轰出——「<MAG>拳罡</MAG>」！这一拳刚猛无铸，仿佛能粉碎虚空！</mag>", target);
+                me.send_room("<mag>$N沉声怒喝，右拳凝聚滔天魔气，一拳轰向$n！刚猛无铸，仿若能粉碎虚空！</mag>", target);
                 var sh = me.do_attack({
                     target: target,
                     gj: Math.floor(me.gj * (100 + stack_count * gj_per_stack) / 100),
@@ -190,7 +186,7 @@ export default class extends SKILL {
                 });
                 if (sh) {
                     me.add_status({
-                        id: "tianmo_quan",
+                        id: "quan",
                         name: "拳罡",
                         duration: 30000,
                         override: 1,
@@ -198,10 +194,9 @@ export default class extends SKILL {
                             add_sh_per: diff_fy_per_stack,
                             diff_fy_per: diff_fy_per_stack,
                         },
-                        desc: "每层增加" + gj_per_stack + "%伤害和" + diff_fy_per_stack + "%破防，可叠加",
-                        start_msg: "<hiz>$N的拳势愈发凌厉，拳罡意境更上一层楼！</hiz>",
+                        desc: "拳势增强",
+                        start_msg: "<hiz>$N的拳势在命中后变得更加狂暴凶猛，战意节节攀升！</hiz>",
                     });
-                    me.send_room("<hiz>$N的拳势在命中后变得更加狂暴凶猛，战意节节攀升！（已叠加" + (stack_count + 1) + "层）</hiz>", target);
                 }
                 me.end_attack(target);
             },
@@ -218,17 +213,17 @@ export default class extends SKILL {
             use: function(me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = 15000 + lv * 5;
                 if (time > 25000) time = 25000;
-                var zj_bonus = Math.floor(lv * 0.8);
+                var zj_bonus = 10 + Math.floor(lv /100);
                 me.send_room("<mag>$N双手结出玄奥法印，魔气与天地元气共鸣，施展出天魔策至高秘术——「<MAG>补天道</MAG>」！一道无形的天道法则环绕周身！</mag>", target);
                 if (!me.query_temp("tianmo_butian", 0)) {
                     me.set_temp("tianmo_butian", 1, time);
                 }
                 me.add_status({
-                    id: "tianmo_butian",
+                    id: "parry",
                     name: "补天道",
                     duration: time,
                     prop: {
-                        zj: zj_bonus,
+                        zj_per: zj_bonus,
                     },
                     desc: "增加招架几率，招架成功后吸收对方功力转为自身气血",
                     start_msg: "<mag>$N周身被一道玄奥的天道法则笼罩，任何攻击都会被法则之力牵引！</mag>",
@@ -241,7 +236,12 @@ export default class extends SKILL {
             },
         },
     };
-
+    on_before_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        if (me.query_status('gui')) {
+            par.no_dodge = true
+            par.no_parry = true
+        }
+    }
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
         if (par.is_parried && me.query_temp("tianmo_butian", 0)) {
             var heal = Math.floor(target.gj * 0.3);

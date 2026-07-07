@@ -89,13 +89,13 @@ export default class extends SKILL {
         pojian: {
             name: "破字诀",
             distime: 30000,
-            enable_skill: "sword",
+            enable_skill: "parry",
             mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 let time: number = 3000 + lv * 5;
                 if (time > 10000) time = 10000;
-                const zj: number = lv + 30;
+                const zj: number = 100;
                 me.send_room("<HIC>$N持剑凝立，默运独孤九剑「破字诀」，剑意弥天盖地，天下武功，无招不破！</HIC>\n", target);
                 me.add_status({
                     id: "weapon",

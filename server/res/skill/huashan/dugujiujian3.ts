@@ -88,23 +88,22 @@ export default class extends SKILL {
         pojian: {
             name: "破字诀",
             distime: 28500,
-            enable_skill: "sword",
+            enable_skill: "parry",
             mp: 20,
             release_time: 500,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
                 let time: number = 3000 + lv * 5;
                 if (time > 10000) time = 10000;
-                const zj: number = lv + 50;
+                const zj: number = 100;
                 me.send_room("<HIC>$N剑尖斜指，默运独孤九剑「破字诀」心法，周身剑气森然——天下武功，无招不破！</HIC>\n", target);
                 me.add_status({
-                    id: "weapon",
-                    name: "破字诀",
-                    desc: "大幅提升招架几率，招架成功时反击威力大增",
+                    id: "parry",
+                    name: "破",
+                    desc: "独孤九剑之破字诀，大幅提升招架几率，招架成功时反击威力大增",
                     duration: time,
                     prop: {
                         zj_per: zj,
                     },
-                    finish_msg: "$N的破字诀剑气渐渐收敛。",
                 });
                 me.set_temp("sk_dugu_pozijue", 1, time);
                 me.reauto_attack();
