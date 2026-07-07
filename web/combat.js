@@ -194,17 +194,19 @@ const Combat = {
         // 无 id 或 id="all"：全局冷却，只读 rtime
         if (!data.id || data.id === 'all') {
             if (data.rtime) {
-                // 只设置全局时间作为冷却下限，不修改 dis_pfms
-                // ANI_PFM 里有独立条目的技能优先用自己，没条目的用全局
-                // setDistime 创建的条目不受影响
-                Combat.ani_time = Combat.ani_time ?? 0;
-                if (data.rtime > Combat.ani_time) {
-                    Combat.distime = data.rtime;
-                    Combat.ani_time = data.rtime;
+                if (!this.dis_pfms) this.dis_pfms = [];
+                // 只保留剩余时间 > rtime 的独立 CD，其余移除走全局显示
+                var saved = [];
+                for (var i = 0; i < this.dis_pfms.length; i++) {
+                    if (this.dis_pfms[i].ani_time > data.rtime) {
+                        saved.push(this.dis_pfms[i]);
+                    }
                 }
-            } else {
-                return this.redisable();
+                Combat.dis_pfms = saved;
+                Combat.distime = data.rtime;
+                Combat.ani_time = data.rtime;
             }
+            // rtime 为 0 时：无全局冷却，保留已有独立 CD，仅确保动画在跑
             if (!this.time_handler) {
                 Combat.ANI_PFM();
             }
