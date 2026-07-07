@@ -15,10 +15,10 @@ export default class extends AREA {
     is_multi = true;
     drops = [
         "st/xuanjing",
-        "st/st_sc",
-        "st/st_s2",
-        "st/st_sc",
-        "st/st_sc",
+        "st/st_sc#1",
+        "st/st_sc#3",
+        "st/st_sc#5",
+        "st/st_sc#7",
         "eq/lv5/yinyanghuan",
         "book/bc#yinyangjiuzhuan",
     ];

@@ -155,7 +155,7 @@ export interface StatusDef {
     is_busy?: boolean;
     /** 是否昏迷状态 */
     is_faint?: boolean;
-    /** 覆盖优先级（数值越大优先级越高） */
+    /** 覆盖方法 0不覆盖，1叠层，2覆盖 */
     override?: number;
     /** 状态叠加层数 */
     count?: number;

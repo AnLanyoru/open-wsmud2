@@ -45,7 +45,9 @@ export default class extends SKILL {
             name: "阴气",
             desc: "九阴劲气侵蚀",
             duration: 10000,
-            override: 2,
+            override: 1,
+            count: 1,
+            max_count: 100,
             downside: true,
             no_diff: true,
             prop: {
