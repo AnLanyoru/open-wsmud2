@@ -42,7 +42,7 @@ export default class extends SKILL {
                 id: "chaoxi",
                 name: "潮汐",
                 desc: "潮汐之力在体内涌动，攻击与内力逐渐增强",
-                duration: 30000,
+                duration: 10000,
                 override: 1,
                 count: 1,
                 max_count: 10

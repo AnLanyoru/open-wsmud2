@@ -118,8 +118,8 @@ body[data-theme="light"] {
     --text-muted2: #444444;
     --text-header: #37352F;
     --text-title: #37352F;
-    --border-primary: #BEB6A8;
-    --border-secondary: #A89F90;
+    --border-primary: #D5CDC0;
+    --border-secondary: #C8BFB0;
     --switch-bg: #D5CDC0;
     --switch-on-bg: #37352F;
     --switch-knob: #FFFFFF;
@@ -128,9 +128,9 @@ body[data-theme="light"] {
     --switch-text-on: #FFFFFF;
     --color-item-border: #A89F90;
     --color-item-select: #9E3024;
-    --dialog-header-bg: #E1DACF;
+    --dialog-header-bg: #D5CDC0;
     --dialog-footer-bg: #E1DACF;
-    --dialog-footer-select: #D5CDC0;
+    --dialog-footer-select: #C8BFB0;
     --dialog-confirm-bg: #E1DACF;
     --warn-bg: #E1DACF;
     --scroll-flag-bg: #D5CDC0;
@@ -228,9 +228,9 @@ body[data-theme="book"] {
     --switch-text-on: #DBD2B8;
     --color-item-border: #A89C7E;
     --color-item-select: #8A3A24;
-    --dialog-header-bg: #CFC4A8;
+    --dialog-header-bg: #C2B698;
     --dialog-footer-bg: #CFC4A8;
-    --dialog-footer-select: #C2B698;
+    --dialog-footer-select: #B5A88A;
     --dialog-confirm-bg: #CFC4A8;
     --warn-bg: #CFC4A8;
     --scroll-flag-bg: #C2B698;
