@@ -172,7 +172,7 @@ export default class extends SKILL {
                     mz: me.mz,
                 });
                 me.end_attack(target);
-                me.set_temp("sk_dg_pr", 1, 7000);
+                me.set_temp("sk_dg_pr", 1, 100);
             }
         }
     }
