@@ -299,6 +299,8 @@ const Combat = {
     // CD 冷却动画（注册至统一动画循环，按 PFM_INTERVAL tick）
     ANI_PFM: function () {
         if (Combat._pfmAnimId && Combat._animItems[Combat._pfmAnimId]) {
+            // 已有动画循环在跑，强制立即执行一次更新以即时反映新 CD
+            Combat._animItems[Combat._pfmAnimId].update(Date.now());
             return;
         }
         Combat._pfmAnimId = null;
@@ -471,6 +473,7 @@ const Combat = {
         item.count = data.count;
         item.elem.innerHTML = item.name + "x" + item.count + shadow.outerHTML;
         if (item._animId) Combat._animUnregister(item._animId);
+        item._hadStatus = false;
         item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     }, StatusItem_override: function (player_status, data) {
@@ -478,6 +481,7 @@ const Combat = {
         var item = player_status.items[data.sid];
         if (!item) return;
         if (item._animId) Combat._animUnregister(item._animId);
+        item._hadStatus = false;
         item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     },
