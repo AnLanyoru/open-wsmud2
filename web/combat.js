@@ -142,7 +142,7 @@ const Combat = {
         var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (Combat.dis_pfms[j].id == pfmid) {
-                Combat.dis_pfms[j].ani_time += data.time;
+                Combat.dis_pfms[j].end += data.time;
                 break;
             }
         }
@@ -151,7 +151,7 @@ const Combat = {
         var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (!pfmid || Combat.dis_pfms[j].id == pfmid) {
-                Combat.dis_pfms[j].ani_time = 0;
+                Combat.dis_pfms[j].end = 0;
             }
 
         }
@@ -166,10 +166,11 @@ const Combat = {
             if (!found) return;
         }
         if (!Combat.dis_pfms) Combat.dis_pfms = [];
+        var now = Date.now();
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
             if (Combat.dis_pfms[j].id == pfmid) {
                 Combat.dis_pfms[j].distime = data.distime;
-                Combat.dis_pfms[j].ani_time = data.distime;
+                Combat.dis_pfms[j].end = now + data.distime;
                 if (!Combat.time_handler) {
                     Combat.ANI_PFM();
                 }
@@ -179,14 +180,15 @@ const Combat = {
         Combat.dis_pfms.push({
             id: pfmid,
             distime: data.distime,
-            ani_time: data.distime
+            end: now + data.distime
         });
         if (!Combat.time_handler) {
             Combat.ANI_PFM();
         }
     }, redisable: function () {
-        // 重置：清空独立 CD，让所有技能走全局（初始为 0%，即就绪态）
+        // 重置：清空独立 CD 和全局冷却
         Combat.dis_pfms = [];
+        Combat.end = 0;
         if (!Combat.time_handler) {
             Combat.ANI_PFM();
         }
@@ -194,17 +196,19 @@ const Combat = {
         // 无 id 或 id="all"：全局冷却，只读 rtime
         if (!data.id || data.id === 'all') {
             if (data.rtime) {
+                var now = Date.now();
+                var newEnd = now + data.rtime;
                 if (!this.dis_pfms) this.dis_pfms = [];
-                // 只保留剩余时间 > rtime 的独立 CD，其余移除走全局显示
+                // 只保留结束时间晚于全局的独立 CD，其余移除走全局显示
                 var saved = [];
                 for (var i = 0; i < this.dis_pfms.length; i++) {
-                    if (this.dis_pfms[i].ani_time > data.rtime) {
+                    if (this.dis_pfms[i].end > newEnd) {
                         saved.push(this.dis_pfms[i]);
                     }
                 }
                 Combat.dis_pfms = saved;
                 Combat.distime = data.rtime;
-                Combat.ani_time = data.rtime;
+                Combat.end = newEnd;
             }
             // rtime 为 0 时：无全局冷却，保留已有独立 CD，仅确保动画在跑
             if (!this.time_handler) {
@@ -216,55 +220,63 @@ const Combat = {
         data.rtime = data.rtime || 0;
         data.distime = data.distime || 0;
         if (!this.dis_pfms) this.dis_pfms = [];
+        var now2 = Date.now();
         for (var i = 0; i < this.dis_pfms.length; i++) {
 
             if (this.dis_pfms[i].id == data.id) {
                 data.id = null;
                 this.dis_pfms[i].distime = data.distime;
-                this.dis_pfms[i].ani_time = data.distime;
+                this.dis_pfms[i].end = now2 + data.distime;
                 continue;
             }
-            if (this.dis_pfms[i].ani_time < data.rtime) {
-                this.dis_pfms[i].ani_time = data.rtime;
+            if (this.dis_pfms[i].end < now2 + data.rtime) {
+                this.dis_pfms[i].end = now2 + data.rtime;
             }
         }
         if (data.id) {
             this.dis_pfms.push({
                 id: data.id,
                 distime: data.distime,
-                ani_time: data.distime
+                end: now2 + data.distime
             });
         }
-        Combat.ani_time = Combat.ani_time ?? 0;
-        if (data.rtime > Combat.ani_time) {
+        Combat.end = Combat.end ?? 0;
+        if (now2 + data.rtime > Combat.end) {
             Combat.distime = data.rtime;
-            Combat.ani_time = data.rtime;
+            Combat.end = now2 + data.rtime;
         }
         if (!this.time_handler) {
             Combat.ANI_PFM();
         }
     }, PFM_INTERVAL: 300
-    // 每 300ms tick 更新技能冷却进度条
-    // cur_per = 剩余时间(ani_time) / 总时间(distime) * 100
+    // 每 300ms tick：用 Date.now() 与 end 时间戳差值计算剩余冷却
+    //   cur_per = 剩余ms / 总时间(distime) * 100
     //   100% → 冷却刚开始（遮罩全覆盖，不可出招）
     //   → 0% → 冷却完毕（遮罩消失，技能就绪）
-    //   < 0  → 条目过期，从 dis_pfms 移除
     , ANI_PFM: function () {
+        var now = Date.now();
+
+        // 清理过期条目（end 已过期的独立 CD）
+        for (var j = Combat.dis_pfms.length - 1; j >= 0; j--) {
+            if (Combat.dis_pfms[j].end <= now) {
+                Combat.dis_pfms.splice(j, 1);
+            }
+        }
+
+        // 全局进度
         var p = 0;
-        if (Combat.distime > 0)
-            p = Combat.ani_time * 100 / Combat.distime;
+        if (Combat.end > now && Combat.distime > 0) {
+            p = (Combat.end - now) * 100 / Combat.distime;
+        }
+
+        // 每技能渲染
         if (Combat.Skills) {
             for (var i = 0; i < Combat.Skills.length; i++) {
                 var skill = Combat.Skills[i];
                 var cur_per = p;
                 for (var j = 0; j < Combat.dis_pfms.length; j++) {
                     if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                        cur_per = Combat.dis_pfms[j].ani_time * 100 / Combat.dis_pfms[j].distime;
-                        if (cur_per < 0) {
-                            Combat.dis_pfms.splice(j, 1);
-                        } else {
-                            Combat.dis_pfms[j].ani_time -= Combat.PFM_INTERVAL;
-                        }
+                        cur_per = (Combat.dis_pfms[j].end - now) * 100 / Combat.dis_pfms[j].distime;
                         break;
                     }
                 }
@@ -276,12 +288,13 @@ const Combat = {
             }
         }
 
-        if (Combat.ani_time > 0 || (Combat.dis_pfms && Combat.dis_pfms.length)) {
+        // 有活动冷却则继续循环
+        var hasActive = Combat.end > now || Combat.dis_pfms.length > 0;
+        if (hasActive) {
             Combat.time_handler = setTimeout(Combat.ANI_PFM, Combat.PFM_INTERVAL);
         } else {
             Combat.time_handler = null;
         }
-        Combat.ani_time -= Combat.PFM_INTERVAL;
     },
     StatusChanged: function (data) {
         var items = $(".room-item");
