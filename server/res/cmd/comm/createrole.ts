@@ -52,6 +52,10 @@ export default class extends COMMAND {
         if (!me.ip_address) return me.send('{"type":"regist","result":"注册信息错误"}');
         if (!WORLD.USERLOGIN.check_user(me, me.userid)) return;
 
+        const userData = WORLD.DB.getUserByID(me.userid);
+        if (!userData) return me.send('{"type":"regist","result":"账号信息错误"}');
+        if (userData.pwd !== me.password)
+            return me.send("{type:'loginerror',msg:'密码失效，请<CMD onclick=\\'Process.relogin()\\'>重新登录</CMD>'}");
         me.name = name;
         me.id = UTIL.create_id();
         me.gender = gender;

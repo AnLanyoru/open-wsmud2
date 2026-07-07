@@ -135,9 +135,9 @@ const USERLOGIN = {
                     `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`
                 );
             }
-
+            let dbUser;
             try {
-                const dbUser = await WORLD.DB.getUserByID(cookieUser.id);
+                dbUser = await WORLD.DB.getUserByID(cookieUser.id);
                 if (!dbUser || dbUser.pwd !== cookieUser.pwd) {
                     return this.login_error(
                         user,
@@ -149,8 +149,8 @@ const USERLOGIN = {
                 return this.login_error(user, '登录验证失败，请稍后再试。');
             }
 
-            user.user_level = cookieUser.level ?? 0;
-            user.userid = cookieUser.id;
+            user.user_level = dbUser.level ?? 0;
+            user.userid = dbUser.id;
             user.password = cookieUser.pwd;
             user.loginTime = cookieUser.loginTime;
             user.ip_address = user.socket?.remoteAddress ?? '';

@@ -387,8 +387,8 @@ export default class extends COMMAND {
                 const fbVal = FBS[area.id];
                 if (typeof fbVal === 'number' && fbVal >= 0) {
                     area.fb_index = fbVal;
-                    map.fbs.push(area.name);
-                    this.fbs.push(area);
+                    map.fbs[fbVal] = area.name;
+                    this.fbs[fbVal] = area;
                     FBS[area.id] = area;
                 } else {
                     const jdVal = JDS[area.id];
