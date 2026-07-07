@@ -388,7 +388,7 @@ const Combat = {
             name: item.name,
             count: item.count,
             duration: item.duration,
-            anitime: item.duration - (item.overtime || 0)
+            end: Date.now() + item.duration - (item.overtime || 0)
         };
         if (item.duration > 0)
             Combat.StatusItemANI(statu_item.items[item.sid]);
@@ -416,14 +416,14 @@ const Combat = {
         item.count = data.count;
         item.elem.innerHTML = item.name + "x" + item.count + shadow.outerHTML;
         item.handler && clearTimeout(item.handler);
-        item.anitime = item.duration;
+        item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     }, StatusItem_override: function (player_status, data) {
 
         var item = player_status.items[data.sid];
         if (!item) return;
         item.handler && clearTimeout(item.handler);
-        item.anitime = item.duration;
+        item.end = Date.now() + item.duration;
         Combat.StatusItemANI(item);
     },
     StatusItem_clear: function (player_status, data) {
@@ -437,13 +437,14 @@ const Combat = {
         }
         player_status.items = {};
     },
+    // 状态倒计时：用 Date.now() 与 item.end 差值计算进度，后台回来也精确
     StatusItemANI: function (item) {
         var shadow = item.elem.lastChild;
-        var p = item.anitime * 100 / item.duration;
-        if (p < 0) p = 0;
+        var remaining = item.end - Date.now();
+        if (remaining < 0) remaining = 0;
+        var p = remaining * 100 / item.duration;
         shadow.style.right = p + "%";
-        item.anitime = item.anitime - 1000;
-        if (p > 0) {
+        if (remaining > 0) {
             item.handler = setTimeout(Combat.StatusItemANI, 1000, item);
         } else {
             //elem.parent().remove();
