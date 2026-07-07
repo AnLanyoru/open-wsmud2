@@ -256,6 +256,11 @@ const Combat = {
             Combat.ANI_PFM();
         }
     }, PFM_INTERVAL: 300
+    // 每 300ms tick 更新技能冷却进度条
+    // cur_per = 剩余时间(ani_time) / 总时间(distime) * 100
+    //   100% → 冷却刚开始（遮罩全覆盖，不可出招）
+    //   → 0% → 冷却完毕（遮罩消失，技能就绪）
+    //   < 0  → 条目过期，从 dis_pfms 移除
     , ANI_PFM: function () {
         var p = 0;
         if (Combat.distime > 0)
