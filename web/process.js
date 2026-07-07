@@ -225,6 +225,10 @@ const Process = {
     }
     , items: function (room) {
         Process.itemsElement.empty();
+        // 换房前清理所有状态动画，避免 shadow 闭包引用已移除的 DOM 元素
+        for (var sid in Combat.STATUS) {
+            Combat.StatusItem_clear(Combat.STATUS[sid]);
+        }
         Combat.STATUS = {};//更换房间，状态信息清空
         for (var i = 0; i < room.items.length; i++) {
             var item = room.items[i];

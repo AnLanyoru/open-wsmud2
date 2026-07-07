@@ -328,11 +328,14 @@ const Combat = {
                             remaining = Combat.end > now ? Combat.end - now : 0;
                         }
                         if (remaining > 0) {
-                            if (!skill._hadCD) {
-                                // 新冷却：瞬间跳到全覆盖
+                            // 用到期时间戳判断是否需要 snap：时间变化 = 新 CD / CD 刷新
+                            var effectiveEnd = now + remaining;
+                            if (skill._cdEnd !== effectiveEnd) {
+                                // 新冷却或 CD 已刷新：瞬间跳到全覆盖，再开始过渡
                                 skill._overlay.css("transition", "none");
                                 skill._overlay.css("transform", "scaleX(1)");
                                 skill._overlay[0].offsetHeight;
+                                skill._cdEnd = effectiveEnd;
                             }
                             // 过渡时长 = 剩余 ms，CSS 自行跑完全程，tick 只负责校准
                             skill._overlay.css("transition", "transform " + remaining + "ms linear");
@@ -341,6 +344,7 @@ const Combat = {
                         } else {
                             skill._overlay.css("transform", "scaleX(0)");
                             skill._hadCD = false;
+                            skill._cdEnd = 0;
                         }
                     }
                 }
@@ -411,6 +415,11 @@ const Combat = {
     },
     STATUS: {},
     AppendStatusItem: function (id, elem, status) {
+        // 清理旧状态条目（换地图/刷新时避免动画泄漏）
+        var old = this.STATUS[id];
+        if (old) {
+            this.StatusItem_clear(old);
+        }
         var stitem = {elem: elem, items: {}};
         if (status) {
             for (var i = 0; i < status.length; i++) {
@@ -497,6 +506,8 @@ const Combat = {
         player_status.items = {};
     },
     // 状态倒计时：统一动画循环驱动，用 Date.now() 与 item.end 差值计算进度
+    // 用 _statusEnd 时间戳替代 _hadStatus 布尔值判断是否需要 snap：
+    // end 变化 → 新 buff / 刷新 → snap 到比例位置；end 相同 → tick 校准 → 不 snap
     StatusItemANI: function (item) {
         var shadow = item.elem.lastChild;
         if (item._animId) Combat._animUnregister(item._animId);
@@ -505,10 +516,14 @@ const Combat = {
             var remaining = item.end - now;
             if (remaining < 0) remaining = 0;
             if (remaining > 0) {
-                if (!item._hadStatus) {
+                if (item._statusEnd !== item.end) {
+                    // 新 buff 或刷新：根据已过时间计算比例起始位置，避免带 overtime 时从头开始
+                    var elapsed = item.duration - remaining;
+                    var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
                     shadow.style.transition = "none";
-                    shadow.style.transform = "scaleX(0)";
+                    shadow.style.transform = "scaleX(" + startScale + ")";
                     shadow.offsetHeight;
+                    item._statusEnd = item.end;
                 }
                 shadow.style.transition = "transform " + remaining + "ms linear";
                 shadow.style.transform = "scaleX(1)";
@@ -516,6 +531,7 @@ const Combat = {
             } else {
                 shadow.style.transform = "scaleX(1)";
                 item._hadStatus = false;
+                item._statusEnd = 0;
             }
             if (remaining <= 0) {
                 item._animId = null;
