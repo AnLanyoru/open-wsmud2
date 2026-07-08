@@ -55,7 +55,7 @@ export default class extends COMMAND {
                     player.send('你从' + obj.color_name + '上拆下来一块' + stone.color_name + "。");
             }
             obj.st_prop.length = 0;
-            // player.send_room("铁匠拿着" + player.name + "的" + obj.color_name + "，三下五除二就把它上面镶嵌的宝石去掉了。");
+            // player.send_room(`铁匠拿着${player.name}的${obj.color_name}，三下五除二就把它上面镶嵌的宝石去掉了。`);
 
             WORLD.STATS.updateWeapon(player, obj);
             return;
@@ -95,7 +95,7 @@ export default class extends COMMAND {
             player.add_money(-money);
             obj.st_prop.splice(index, 1);
             obj.hole_count += 1;
-            // player.send_room("铁匠拿着" + player.name + "的" + obj.color_name + "，三下五除二就把它上面镶嵌的" + st.name + "去掉了。");
+            // player.send_room(`铁匠拿着${player.name}的${obj.color_name}，三下五除二就把它上面镶嵌的${st.name}去掉了。`);
 
             WORLD.STATS.updateWeapon(player, obj);
             let stone = player.add_obj(st.path);

@@ -13,7 +13,7 @@ export default class extends OBJ {
     recover_hp = 100;
 
     on_use(me: CHARACTER) {
-        me.send_room("$N吃下一" + this.unit + this.name + "。");
+        me.send_room(`$N吃下一${this.unit}${this.name}。`);
         me.add_status({
             id: "food",
             name: this.name,

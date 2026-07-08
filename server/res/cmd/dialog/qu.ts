@@ -30,7 +30,7 @@ export default class extends COMMAND {
         moved_obj = me.push_item(moved_obj);
         if (!moved_obj) return me.notify("取出物品中发生错误");
         me.stores = obj.items;
-        me.send_room("$N从仓库里取出" + UTIL.to_c(move_count) + moved_obj.unit + moved_obj.color_name + "。");
+        me.send_room(`$N从仓库里取出${UTIL.to_c(move_count)}${moved_obj.unit}${moved_obj.color_name}。`);
 
         me.notify('{type:"dialog",dialog:"list",id:"' + moved_obj.id + '",storeid:"' + arg + '",store:' + (-move_count) + '}');
 

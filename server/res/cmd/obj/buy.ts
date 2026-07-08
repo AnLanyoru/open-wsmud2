@@ -64,7 +64,7 @@ export default class extends COMMAND {
             if (sellitem.count > 0) sellitem.count -= buy_count;
             let sell_obj = me.add_obj(sellitem.path, buy_count);
             if (sell_obj) {
-                me.send_room("$N从$n兑换了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
+                me.send_room(`$N从$n兑换了${UTIL.to_c(buy_count)}${sell_obj.unit}${sell_obj.color_name}。`, target);
             }
             let money_name = sellitem.currency === "jungong" ? "jungong" : "gongji";
             me.send('{type:"dialog",dialog:"list",id:"' + sellitem.id + '",sell:' + buy_count + ',' + money_name + ':' + me.query_temp(money_name === "jungong" ? 'jg' : 'gongji', 0) + '}');
@@ -85,7 +85,7 @@ export default class extends COMMAND {
             me.add_temp('money1', need_money, UTIL.diff_time());
             let sell_obj = me.add_obj(sellitem.path, buy_count);
             if (sell_obj) {
-                me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
+                me.send_room(`$N从$n购买了${UTIL.to_c(buy_count)}${sell_obj.unit}${sell_obj.color_name}。`, target);
 
                 if (target.on_sell_item) target.on_sell_item(me, sell_obj, buy_count);
             }
@@ -98,7 +98,7 @@ export default class extends COMMAND {
                 me.add_temp('money1', need_money, UTIL.diff_time());
                 let sell_obj = me.add_obj(sellitem.path, buy_count);
                 if (sell_obj) {
-                    me.send_room("$N从$n购买了" + UTIL.to_c(buy_count) + sell_obj.unit + sell_obj.color_name + "。", target);
+                    me.send_room(`$N从$n购买了${UTIL.to_c(buy_count)}${sell_obj.unit}${sell_obj.color_name}。`, target);
                 }
 
                 me.send('{type:"dialog",dialog:"list",id:"' + sellitem.id + '",sell:' + buy_count + '}');

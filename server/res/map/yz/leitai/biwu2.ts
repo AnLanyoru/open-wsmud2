@@ -112,7 +112,7 @@ function challenge_over(this: CHARACTER, killer: CHARACTER) {
 
     this.die = USER.prototype.die;
     killer.die = USER.prototype.die;
-    this.send_room("<hic>比武结束," + killer.name + "获得胜利，5秒钟后将离开擂台。</hic>");
+    this.send_room(`<hic>比武结束,${killer.name}获得胜利，5秒钟后将离开擂台。</hic>`);
     killer.send("<hig>恭喜你获得胜利，积分+1，目前积分</hig>");
 
     this.call_out(move_out, 5000);

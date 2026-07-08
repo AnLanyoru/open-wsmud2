@@ -211,7 +211,7 @@ export default class extends NPC {
 
     testLevel(me: USER) {
 
-    me.send_room("$N向$n恭敬的问道：敢问老先生，" + me.callme() + "武功境界如何？\n", this);
+    me.send_room(`$N向$n恭敬的问道：敢问老先生，${me.callme()}武功境界如何？\n`, this);
 
     if (me.level == 4) {
         return checkWS(me);

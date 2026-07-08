@@ -34,8 +34,8 @@ export default class extends NPC {
     no_marry(me: CHARACTER, par: string) {
         var user = this.check_wife(me);
         if (!user) return;
-        this.send_room("$N说道：离婚这个事情可不能草率，我得问问" + me.name + "愿不愿意。注意了，双方同意离婚后将解除婚姻关系。", user);
-        this.send_room("<yel>$N对著$n问道：你愿意和" + me.name + "离婚吗？</yel>", user);
+        this.send_room(`$N说道：离婚这个事情可不能草率，我得问问${me.name}愿不愿意。注意了，双方同意离婚后将解除婚姻关系。`, user);
+        this.send_room(`<yel>$N对著$n问道：你愿意和${me.name}离婚吗？</yel>`, user);
         user.send_commands("no_marry_no " + this.id, "不愿意", "no_marry_yes " + this.id, "愿意");
         user.set_temp("request_no_marry", 1, 100000);
     }
@@ -77,7 +77,7 @@ export default class extends NPC {
     no_shitu(me: CHARACTER, par: string) {
         var user = this.check_player2(me);
         if (!user) return;
-        this.send_room("<yel>$N对著$n问道：你愿意和" + me.name + "解除师徒关系吗？</yel>", user);
+        this.send_room(`<yel>$N对著$n问道：你愿意和${me.name}解除师徒关系吗？</yel>`, user);
         user.send_commands("no_shitu_no " + this.id, "不愿意", "no_shitu_yes " + this.id, "愿意");
         user.set_temp("request_no_shitu", 1, 100000);
     }

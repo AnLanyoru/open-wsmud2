@@ -44,7 +44,7 @@ export default class extends SKILL {
                 var words = ["临", "兵", "斗", "者", "皆", "阵", "列", "前", "行"];
                 var idx = me.random(words.length);
                 var word = words[idx];
-                me.send_room("<hiy>$N神色肃穆，双手如莲花般绽放，变幻出九种玄奥手印，最后口诵真言「<HIC>" + word + "</HIC>」字，一掌挟无上佛威拍向$n！</hiy>", target);
+                me.send_room(`<hiy>$N神色肃穆，双手如莲花般绽放，变幻出九种玄奥手印，最后口诵真言「<HIC>${word}</HIC>」字，一掌挟无上佛威拍向$n！</hiy>`, target);
                 var sh = me.do_attack({
                     target: target,
                     gj: Math.floor(me.gj * (100 + idx * 10) / 100),

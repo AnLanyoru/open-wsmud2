@@ -13,7 +13,7 @@ export default class extends OBJ {
     transable = true;
 
     on_use(me: CHARACTER) {
-        me.send_room("$N仰头灌下一" + this.unit + this.name + "。");
+        me.send_room(`$N仰头灌下一${this.unit}${this.name}。`);
         me.add_status({
             id: "drink",
             name: this.name,

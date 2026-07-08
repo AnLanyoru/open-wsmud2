@@ -76,7 +76,7 @@ function next_guide3(me: CHARACTER, npc: CHARACTER) {
     if (!obj) return me.notify("你身上没有木头，没法交给指引者。");
 
     if (me.remove_obj(obj, obj.count)) {
-        me.send_room("$N给了$n" + UTIL.to_c(obj.count) + obj.unit + obj.name + "。", npc);
+        me.send_room(`$N给了$n${UTIL.to_c(obj.count)}${obj.unit}${obj.name}。`, npc);
     }
     me.set_temp("new", 6);
     me.notify("<hig>指引者对你说：刚才的战斗应该受了点伤吧，想要治疗自己的伤势，你需要学会内功心法，这里有一本最基本的内功心法，你学会后把伤势治疗好再告诉我。</hig>");

@@ -45,7 +45,7 @@ export default class extends COMMAND {
         }
         var drop_obj = player.remove_obj(obj, drop_count);
         if (drop_obj) {
-            player.send_room("$N丢掉" + UTIL.to_c(drop_count) + obj.unit + obj.color_name + "。");
+            player.send_room(`$N丢掉${UTIL.to_c(drop_count)}${obj.unit}${obj.color_name}。`);
             WORLD.add_recover_obj(player, drop_obj, RecoverType.DROP);
         } else {
             player.notify("你什么都没丢掉。");

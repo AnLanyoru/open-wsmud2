@@ -27,13 +27,13 @@ export default class extends OBJ {
                     me.force_skill.on_relive(me);
                 }
                 me.moveto(me.environment);
-                return me.send_room('<mag>$N吞下一颗' + this.color_name + '，重新获得了新生。</mag>');
+                return me.send_room(`<mag>$N吞下一颗${this.color_name}，重新获得了新生。</mag>`);
             }
         }
         if (me.hp <= 0) return me.notify_fail("你现在是灵魂状态，不能那么做。");
 
         if (this.level === 0) {
-            me.send_room('<hic>$N吞下一颗' + this.color_name + "，重新获得了力量。</hic>");
+            me.send_room(`<hic>$N吞下一颗${this.color_name}，重新获得了力量。</hic>`);
             return me.clear_distime();
         } else if (this.level === 1) {
             me.add_status({
@@ -49,15 +49,15 @@ export default class extends OBJ {
                 max_count: 10,
                 desc: "你的悟性提高了，持续一小时",
             });
-            me.send_room('<hig>$N吞下一颗' + this.color_name + "，顿时心明如镜，经脉通畅，悟性大增。<hig>");
+            me.send_room(`<hig>$N吞下一颗${this.color_name}，顿时心明如镜，经脉通畅，悟性大增。<hig>`);
         } else if (this.level === 3) {
 
             if (me.clear_downside(true) > 0) {
-                return me.send_room('<hiw>$N吞下一颗' + this.color_name + "，驱离了身上所有的不适。</hiw>");
+                return me.send_room(`<hiw>$N吞下一颗${this.color_name}，驱离了身上所有的不适。</hiw>`);
             }
             return me.notify_fail('你现在没有负面状态可以驱除。');
         } else if (this.level === 4) {
-            me.send_room('<hiy>$N吞下一颗' + this.color_name + "，龙气环绕，坚不可摧。</hiy>");
+            me.send_room(`<hiy>$N吞下一颗${this.color_name}，龙气环绕，坚不可摧。</hiy>`);
             me.add_status({
                 id: "drug",
                 name: "龙魂",

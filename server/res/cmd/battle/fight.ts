@@ -44,10 +44,7 @@ export default class extends COMMAND {
         if (target.is_fighting()) {
             return me.notify("对方正在切搓，等对方打完再来吧");
         }
-        me.send_room("\n$N对著$n说道："
-            + me.callme()
-            + me.name + "，领教"
-            + target.call() + "的高招！\n", target);
+        me.send_room(`\n$N对著$n说道：${me.callme()}${me.name}，领教${target.call()}的高招！\n`, target);
 
         if (target.no_fight || target.query_setting("off_fight")) {
             return me.send_room("看起来$n并不想跟$N较量。", target);
@@ -78,7 +75,7 @@ export default class extends COMMAND {
                     return;
 
             }
-            me.send_room("$n说道：既然" + me.call() + "赐教，" + target.callme() + "只好奉陪。\n", target);
+            me.send_room(`$n说道：既然${me.call()}赐教，${target.callme()}只好奉陪。\n`, target);
             me.begin_attack(target, 1);
             target.begin_attack(me, 1);
 

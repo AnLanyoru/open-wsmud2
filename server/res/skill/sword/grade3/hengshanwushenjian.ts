@@ -99,15 +99,15 @@ export default class extends SKILL {
                 var prop = props[int(Math.random() * props.length)];
                 var propMap: any = {};
                 propMap[prop] = per;
-                me.send_room("<HIM>$N长吟一声，引得衡山五峰共鸣，「" + god + "」之力加诸己身！</HIM>", target);
+                me.send_room(`<HIM>$N长吟一声，引得衡山五峰共鸣，「${god}」之力加诸己身！</HIM>`, target);
                 me.add_status({
                     id: "hengshanwushenjian_wsf",
                     name: "五神赋·" + god,
                     desc: god + "之力加身，战斗属性提升",
                     duration: duration,
                     prop: propMap,
-                    start_msg: "<HIM>" + god + "之力灌注全身，$N只觉内力充盈，战意高昂！</HIM>\n",
-                    finish_msg: "<HIY>" + god + "之力渐渐消退，$N恢复常态。</HIY>\n",
+                    start_msg: `<HIM>${god}之力灌注全身，$N只觉内力充盈，战意高昂！</HIM>\n`,
+                    finish_msg: `<HIY>${god}之力渐渐消退，$N恢复常态。</HIY>\n`,
                 }, me);
                 me.end_attack(target);
             },

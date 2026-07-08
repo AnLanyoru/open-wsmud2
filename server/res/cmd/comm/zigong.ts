@@ -32,7 +32,7 @@ export default class extends COMMAND {
                     me.notify('{type:"dialog",dialog:"skills",remove:"' + list[i].id + '"}');
                 }
             }
-            me.send_room("<hic>$N一咬牙，褪下下衣，伸出" + me.weapon_name() + "插到$P两腿之间，飞速一剜，……\n\n</hic>");
+            me.send_room(`<hic>$N一咬牙，褪下下衣，伸出${me.weapon_name()}插到$P两腿之间，飞速一剜，……\n\n</hic>`);
             me.add_status({
                 id: "faint",
                 is_faint: true,

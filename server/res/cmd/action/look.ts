@@ -31,7 +31,7 @@ export default class extends COMMAND {
 
             player.notify(item.get_desc(parent));
             if (parent != player)
-                player.send_room("$N正盯着$n的" + item.color_name + "看，不知道在打什么主意。", parent, true);
+                player.send_room(`$N正盯着$n的${item.color_name}看，不知道在打什么主意。`, parent, true);
 
         } else {
             let parent = player.environment;

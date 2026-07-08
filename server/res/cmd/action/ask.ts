@@ -17,7 +17,7 @@ export default class extends COMMAND {
         if (!par || par.length > 10) return me.notify("你要问什么？");
         par = UTIL.htmlEncode(UTIL.replace_word(par));
 
-        me.send_room("$N向$n打听有关「" + par + "」的问题。", obj);
+        me.send_room(`$N向$n打听有关「${par}」的问题。`, obj);
         if (obj.on_ask(me, par) != false) return;
         me.send_room(ask_dunno.random(), obj);
     }

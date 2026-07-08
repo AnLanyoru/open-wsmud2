@@ -50,7 +50,7 @@ export default class ShouXiCommand extends COMMAND {
         me.set_temp('qingan', 1, UTIL.diff_time());
         //UTIL.add_task(me, 'qa', 1);
         if (userexp < me.exp) {
-            me.send_room("$N向$n拱手道：" + npc.name + "" + ch + "好。", npc);
+            me.send_room(`$N向$n拱手道：${npc.name}${ch}好。`, npc);
 
             // if (WORLD.is_server(me) && userexp < me.exp * 0.9) {
 
@@ -58,7 +58,7 @@ export default class ShouXiCommand extends COMMAND {
             // }
 
         } else {
-            me.send_room("$N向$n恭恭敬敬的一鞠躬：" + npc.name + "" + ch + "，神功盖世，千秋万代。", npc);
+            me.send_room(`$N向$n恭恭敬敬的一鞠躬：${npc.name}${ch}，神功盖世，千秋万代。`, npc);
         }
         me.add_exp(val, val);
     }

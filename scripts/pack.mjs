@@ -137,8 +137,8 @@ if (IS_BINARY) {
     // Pass 1: 收集所有 send_room / send_combat 字面量
     // ============================================================
 
-    /** 匹配 .send_room('literal' 或 "literal" 或 `literal` — 排除拼接（后面紧跟 + 号） */
-    const CALL_RE = /\.(send_room|send_combat)\((["'`])((?:[^"'`\\]|\\.)*?)\2(?!\s*\+)/gs;
+    /** 匹配 .send_room('literal' 或 "literal" — 排除反引号和拼接 */
+    const CALL_RE = /\.(send_room|send_combat)\((["'])((?:[^"'\\]|\\.)*?)\2(?!\s*\+)/gs;
 
     console.log('[pack]   Pass 1: collecting template strings...');
     let scannedFiles = 0;

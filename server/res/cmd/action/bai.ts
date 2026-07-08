@@ -30,10 +30,10 @@ export default class extends COMMAND {
                 if (level < target_npc.family_level) {
                     return me.send_room("$n笑着对$N说：师叔不要开玩笑了。", target_npc);
                 } else if (level == target_npc.family_level) {
-                    return me.send_room("$n笑着对$N说：" + (me.gender === 1 ? "师弟" : "师妹") + "不要开玩笑了。", target_npc);
+                    return me.send_room(`$n笑着对$N说：${(me.gender === 1 ? "师弟" : "师妹")}不要开玩笑了。`, target_npc);
                 }
             } else {
-                return me.send_room("$n对$N说：" + me.call() + "既然已有名师指点，何必再来拜" + target_npc.callme() + "。", target_npc);
+                return me.send_room(`$n对$N说：${me.call()}既然已有名师指点，何必再来拜${target_npc.callme()}。`, target_npc);
             }
         }
         if (target_npc.on_master) {
@@ -55,7 +55,7 @@ export default class extends COMMAND {
             me.remove_temp('sr');
             if (is_reset)
                 WORLD.DATA.reset_famtops(me, FAMILIES.NONE);
-            me.send_room("<HIG>$n说道：好吧，" + target_npc.callme() + "就收下你了。</HIG>\n$n决定收$N为弟子。\n$N跪下来向$n恭恭敬敬的磕了四个响头,叫道：「师父！」", target_npc);
+            me.send_room(`<HIG>$n说道：好吧，${target_npc.callme()}就收下你了。</HIG>\n$n决定收$N为弟子。\n$N跪下来向$n恭恭敬敬的磕了四个响头,叫道：「师父！」`, target_npc);
             return me.notify("<hic>恭喜你成为" + title + "，师门将持续向你发放物资(任务栏领取)。</hic>\n");
 
 

@@ -52,7 +52,7 @@ export default class extends NPC {
 
     on_enter(me: CHARACTER): void {
         if (me.is_player && !this.fight_type) {
-            this.send_room("$N喝道：" + me.call(true) + "，哪里来的小毛贼！");
+            this.send_room(`$N喝道：${me.call(true)}，哪里来的小毛贼！`);
             this.do_kill(me);
         }
     }

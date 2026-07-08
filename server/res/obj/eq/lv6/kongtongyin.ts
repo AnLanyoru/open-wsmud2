@@ -50,7 +50,7 @@ export default class extends EQUIPMENT {
     on_pfm(me: CHARACTER, _tg: CHARACTER, pfm: PERFORM, _lv: number, _sk: string): PfmFlagType {
         let flag = 0
         const pfm_name = pfm.query_name()
-        me.send_room("<hiw>$N欲施展"+ pfm_name +"，却感全身经脉如有石塞，经脉逆流，反致"+ pfm_name + "再难施展！</hiw>");
+        me.send_room(`<hiw>$N欲施展${pfm_name}，却感全身经脉如有石塞，经脉逆流，反致${pfm_name}再难施展！</hiw>`);
         const key = "dt/" + pfm.origin_skill + "/" + pfm.pid;
         me.set_temp(key, 60000, 60000)
         flag |= PfmFlag.NO_USE

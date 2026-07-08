@@ -29,22 +29,22 @@ export default class extends OBJ {
                 prop: prop,
                 duration: 60000 * 20
             });
-            me.send_room("$N吃下一" + this.unit + this.color_name + "。");
+            me.send_room(`$N吃下一${this.unit}${this.color_name}。`);
         } else if (this.grade == 3) {
             if (me.max_hp <= me.hp) return me.notify_fail('你目前气血充沛，用不着恢复。');
             var hp = me.add_hp(parseInt(me.max_hp * 50 / 100));
             hp = hp || 0;
-            me.send_room("$N吃下一" + this.unit + this.color_name + "。");
+            me.send_room(`$N吃下一${this.unit}${this.color_name}。`);
             me.notify("<hig>你恢复了" + hp + "气血。</hig>")
         } else if (this.grade == 4) {
             if (me.max_hp <= me.hp) return me.notify_fail('你目前气血充沛，用不着恢复。');
             var hp = me.add_hp(parseInt(me.max_hp * 80 / 100));
             hp = hp || 0;
-            me.send_room("$N吃下一" + this.unit + this.color_name + "。");
+            me.send_room(`$N吃下一${this.unit}${this.color_name}。`);
             me.notify("<hig>你恢复了" + hp + "气血。</hig>")
         } else {
             me.add_temp("ad_jl", 100);
-            me.send_room("$N吃下一" + this.unit + this.color_name + "。");
+            me.send_room(`$N吃下一${this.unit}${this.color_name}。`);
             me.notify("<hiy>你增加了100点精力。</hiy>");
         }
     }

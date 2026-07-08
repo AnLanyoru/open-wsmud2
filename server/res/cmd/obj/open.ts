@@ -16,7 +16,7 @@ export default class extends COMMAND {
         var items = obj.on_open(player);
         if (items == false) return;
         if (!items || !items.length) {
-            player.send_room("$N打开了" + obj.color_name + "，但是里面什么都没有。");
+            player.send_room(`$N打开了${obj.color_name}，但是里面什么都没有。`);
         } else {
 
             // if (player.is_full()) return player.notify("你身上东西太多了，放不下" + obj.color_name + "里的东西。");

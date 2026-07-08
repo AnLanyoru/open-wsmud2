@@ -23,7 +23,7 @@ export default class extends ROOM {
             me.set_temp("fb/cuifu/yahuan", 4);
             var obj = me.add_obj("sp/yz/box1", 1);
             if (obj) {
-                me.send_room("$N从得到了一个 " + obj.color_name + "。");
+                me.send_room(`$N从得到了一个 ${obj.color_name}。`);
             }
 
         } else {

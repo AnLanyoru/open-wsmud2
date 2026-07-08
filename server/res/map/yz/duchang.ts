@@ -111,7 +111,7 @@ export default class extends ROOM {
     on_leave(me: CHARACTER) {
         if (me == this.master) {
             this.master = null;
-            me.send_room("由于" + me.name + "离开房间，本局作废。");
+            me.send_room(`由于${me.name}离开房间，本局作废。`);
             this.stores.clear();
             if (this.rolle_handler) clearTimeout(this.rolle_handler);
             this.rolle_handler = undefined;
@@ -137,7 +137,7 @@ export default class extends ROOM {
         var num3 = this.random(6) + 1;
         var name = num1 + num2 + num3 > 9 ? "大" : "小";
         var res = num1 + num2 + num3 > 9 ? 2 : 1;
-        this.master.send_room("<hir>$N一把掀开骰盅喊道：买定离手啦，开……" + num1 + "," + num2 + "," + num3 + "……" + name + "！！！</hir>");
+        this.master.send_room(`<hir>$N一把掀开骰盅喊道：买定离手啦，开……${num1},${num2},${num3}……${name}！！！</hir>`);
         for (var i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if ('hp' in item && item.hp && item != this.master) {

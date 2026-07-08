@@ -24,7 +24,7 @@ export default class extends COMMAND {
         }
         msg = UTIL.htmlEncode(UTIL.replace_word(msg));
         me.add_temp('chat2', 1, UTIL.diff_time());
-        return me.send_room("$N说：" + UTIL.htmlEncode(msg));
+        return me.send_room(`$N说：${UTIL.htmlEncode(msg)}`);
     }
 }
 

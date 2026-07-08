@@ -69,8 +69,7 @@ export default class extends COMMAND {
             // return me.notify('对方正在比试，你不能趁人之危。');
         }
         // me.send_room("$N对$n大喊一声：看招！\n", target);
-        me.send_room("\n$N对著$n喝道：「"
-            + target.call(true) + "！今日不是你死就是我活！」\n", target);
+        me.send_room(`\n$N对著$n喝道：「${target.call(true)}！今日不是你死就是我活！」\n`, target);
         //me.begin_attack(target, 2);
 
         if (target.on_kill && target.on_kill(me) === false) return;

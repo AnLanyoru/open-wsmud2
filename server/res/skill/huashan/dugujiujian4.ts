@@ -109,7 +109,7 @@ export default class extends SKILL {
             if (sh_per > 100) sh_per = 100;
             const real_dmg = int(me.gj * sh_per / 100);
             target.damage3(real_dmg, me);
-            me.send_room("<WB-HIZ>一道剑影划过，$n的身上多出一道莫名伤口，受到" + real_dmg + "点真实伤害！</WB-HIZ>", target);
+            me.send_room(`<WB-HIZ>一道剑影划过，$n的身上多出一道莫名伤口，受到${real_dmg}点真实伤害！</WB-HIZ>`, target);
         }
         return 0;
     }

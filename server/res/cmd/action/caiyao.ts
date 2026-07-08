@@ -16,7 +16,7 @@ export default class extends COMMAND {
         let name = "药林";
         if (me.environment.is('home/huayuan'))
             name = '花圃';
-        me.send_room("$N走进" + name + "，开始认真寻找药材。");
+        me.send_room(`$N走进${name}，开始认真寻找药材。`);
         me.set_state({
             id: "cai",
             type: "work",
@@ -103,7 +103,7 @@ function do_cai(me: USER) {
         let lv = calculate_lv(grade);
         let obj = me.add_obj('res/cao#' + lv);
         if (obj) {
-            me.send_room("<hig>$N采到一株" + obj.color_name + "。</hig>");
+            me.send_room(`<hig>$N采到一株${obj.color_name}。</hig>`);
         }
     }
     let exp = WORLD.DATA.get_exp(me)

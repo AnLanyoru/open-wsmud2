@@ -27,7 +27,7 @@ export default class extends COMMAND {
                 //target.money += count;
 
                 // player.add_temp('money1', count, UTIL.diff_time());
-                player.send_room("$N给了$n" + UTIL.moneyToStr(count) + "。", target);
+                player.send_room(`$N给了$n${UTIL.moneyToStr(count)}。`, target);
                 return;
             }
             return player.notify(target.name + "不要你的钱。");
@@ -61,14 +61,14 @@ export default class extends COMMAND {
             obj = player.remove_obj(obj, count);
             if (obj) {
                 target.add_obj(obj);
-                player.send_room("$N给了$n" + UTIL.to_c(count) + obj.unit + obj.color_name + "。", target);
+                player.send_room(`$N给了$n${UTIL.to_c(count)}${obj.unit}${obj.color_name}。`, target);
             }
             return;
         }
         if (target.on_accept && target.on_accept(player, obj, count)) {
             obj = player.remove_obj(obj, count);
             if (obj) {
-                player.send_room("$N给了$n" + UTIL.to_c(count) + obj.unit + obj.color_name + "。", target);
+                player.send_room(`$N给了$n${UTIL.to_c(count)}${obj.unit}${obj.color_name}。`, target);
             }
         }
     }

@@ -60,19 +60,19 @@ export default class extends COMMAND {
             item = player.remove_obj(item as ITEM, need_count) || need_item;
             if (!item) player.notify("你的" + need_item.color_name + "数量不够精炼。");
 
-            player.send_room("<hiw>$N用内力把" + item.color_name + "炼化，小心翼翼的引入" + obj.color_name + "。</hiw>");
+            player.send_room(`<hiw>$N用内力把${item.color_name}炼化，小心翼翼的引入${obj.color_name}。</hiw>`);
             if (isfull) {
-                player.send_room("<ora>$N的" + obj.color_name + "古井无波，空中却一瞬间电闪雷鸣，似有神兵出世，轰鸣声中你好似听到有阵阵龙吟自" + obj.color_name + "中传出！</ora>");
+                player.send_room(`<ora>$N的${obj.color_name}古井无波，空中却一瞬间电闪雷鸣，似有神兵出世，轰鸣声中你好似听到有阵阵龙吟自${obj.color_name}中传出！</ora>`);
                 obj.level_up(12);
             } else {
                 if (obj.level < 5) {
-                    player.send_room("<yel>$N的" + obj.color_name + "发出一阵耀眼的光芒，看上去似乎变强了！</yel>");
+                    player.send_room(`<yel>$N的${obj.color_name}发出一阵耀眼的光芒，看上去似乎变强了！</yel>`);
                 } else if (obj.level < 9) {
-                    player.send_room("<yel>$N的" + obj.color_name + "发出一阵璀璨的光芒，看上去似乎更加强大了！</yel>");
+                    player.send_room(`<yel>$N的${obj.color_name}发出一阵璀璨的光芒，看上去似乎更加强大了！</yel>`);
                 } else if (obj.level < 12) {
-                    player.send_room("<mag>$N的" + obj.color_name + "爆出一阵炽热的光芒，周身似乎有雷光环绕，连绵不绝！</mag>");
+                    player.send_room(`<mag>$N的${obj.color_name}爆出一阵炽热的光芒，周身似乎有雷光环绕，连绵不绝！</mag>`);
                 } else {
-                    player.send_room("<ora>$N的" + obj.color_name + "古井无波，空中却一瞬间电闪雷鸣，似有神兵出世，轰鸣声中你好似听到有阵阵龙吟自" + obj.color_name + "中传出！</ora>");
+                    player.send_room(`<ora>$N的${obj.color_name}古井无波，空中却一瞬间电闪雷鸣，似有神兵出世，轰鸣声中你好似听到有阵阵龙吟自${obj.color_name}中传出！</ora>`);
 
                 }
                 obj.level_up(obj.level + 1);

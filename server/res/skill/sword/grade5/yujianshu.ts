@@ -72,7 +72,7 @@ export default class extends SKILL {
                 var count = maxSwords;
                 if (qiCount > 0) count = Math.min(maxSwords + qiCount, 8);
                 me.set_temp("yujian_qi", 0, 0);
-                me.send_room("<hiw>$N剑诀引动，周身真气鼓荡，$w化作" + count + "道剑光，如流星赶月般射向$n！</hiw>\n", target);
+                me.send_room(`<hiw>$N剑诀引动，周身真气鼓荡，$w化作${count}道剑光，如流星赶月般射向$n！</hiw>\n`, target);
                 for (var i = 0; i < count; i++) {
                     var bonus = Math.floor((count - i - 1) * 2);
                     me.do_attack({

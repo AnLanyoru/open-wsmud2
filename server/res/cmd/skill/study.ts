@@ -59,7 +59,7 @@ export default class extends COMMAND {
             if (me.check_player() && !me.create_for(skill.id))
                 return me.notify('这是别人自创的武功，目前无法学习。');
             else
-                return me.send_room("$N说: 这本书太深奥了，" + me.callme() + "看不懂。")
+                return me.send_room(`$N说: 这本书太深奥了，${me.callme()}看不懂。`)
             }
 
         if (!checkSkillCount(me, skill.id)) return;

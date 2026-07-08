@@ -28,11 +28,11 @@ export default class extends COMMAND {
 
                 if (obj.push_stone(stone) == false)
                     return player.notify("你镶嵌失败了。");
-                player.send_room("$N拿出一" + stone.unit + stone.color_name + "，小心翼翼的往" + obj.color_name + "上镶去。");
+                player.send_room(`$N拿出一${stone.unit}${stone.color_name}，小心翼翼的往${obj.color_name}上镶去。`);
                 if (stone.grade < obj.grade) {
-                    player.send_room("<hig>只听得咔嚓一声，" + stone.color_name + "已嵌入" + obj.color_name + "中！</hig>");
+                    player.send_room(`<hig>只听得咔嚓一声，${stone.color_name}已嵌入${obj.color_name}中！</hig>`);
                 } else {
-                    player.send_room("<hig>只听得咔嚓一声，" + stone.color_name + "已嵌入" + obj.color_name + "中，一眼看去仿若浑然一体！</hig>");
+                    player.send_room(`<hig>只听得咔嚓一声，${stone.color_name}已嵌入${obj.color_name}中，一眼看去仿若浑然一体！</hig>`);
                 }
                 WORLD.STATS.updateWeapon(player, obj);
             }

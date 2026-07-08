@@ -47,7 +47,7 @@ export default class extends COMMAND {
                 if (!get_obj) return player.notify("你什么都没捡起来。");
                 get_obj.count = get_count;
                 player.add_obj(get_obj);
-                player.send_room("$N从" + container.name + "里拿出来" + UTIL.to_c(get_count) + get_obj.unit + get_obj.color_name + "。");
+                player.send_room(`$N从${container.name}里拿出来${UTIL.to_c(get_count)}${get_obj.unit}${get_obj.color_name}。`);
             }
 
         } else {
@@ -65,7 +65,7 @@ export default class extends COMMAND {
             if (!get_obj) return player.notify("你什么都没捡起来。");
             get_obj.count = get_count;
             player.add_obj(get_obj);
-            player.send_room("$N捡起" + UTIL.to_c(get_count) + get_obj.unit + get_obj.color_name + "。");
+            player.send_room(`$N捡起${UTIL.to_c(get_count)}${get_obj.unit}${get_obj.color_name}。`);
             parent.item_changed(get_obj, false);
         }
     }
@@ -128,8 +128,8 @@ function getObj(me: USER, item: OBJ, parent) {
         COMMAND.DO("rumor", "听说有人捡到了一" + item.unit + item.name + "。");
     }
     if (parent)
-        me.send_room("$N从" + parent.name + "里拿出来" + UTIL.to_c(item.count) + item.unit + item.color_name + "。");
+        me.send_room(`$N从${parent.name}里拿出来${UTIL.to_c(item.count)}${item.unit}${item.color_name}。`);
     else
-        me.send_room("$N捡起" + UTIL.to_c(item.count) + item.unit + item.color_name + "。");
+        me.send_room(`$N捡起${UTIL.to_c(item.count)}${item.unit}${item.color_name}。`);
     return true;
 }

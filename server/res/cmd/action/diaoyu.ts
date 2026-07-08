@@ -105,7 +105,7 @@ function do_diaoyu(this: UserState, me: USER | FOLLOWER) {
         let lv = calculate_lv(grade);
         let obj = me.add_obj('res/yu#' + lv);
         if (obj)
-            me.send_room("<hig>$N钓到一条" + obj.color_name + "。</hig>");
+            me.send_room(`<hig>$N钓到一条${obj.color_name}。</hig>`);
         if (er.count > 1) {
             me.remove_obj(er, 1);
         } else {

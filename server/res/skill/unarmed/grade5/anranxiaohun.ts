@@ -58,7 +58,7 @@ export default class extends SKILL {
                         if (!buff.downside && buff.name && !buff.no_clear) {
                             var stolen_prop = buff.prop;
                             var stolen_name = buff.name;
-                            me.send_room("<hiz>$N掌力一吐，竟从$n身上生生剥离出一道「" + stolen_name + "」气劲，化为己用！</hiz>", target);
+                            me.send_room(`<hiz>$N掌力一吐，竟从$n身上生生剥离出一道「${stolen_name}」气劲，化为己用！</hiz>`, target);
                             me.add_status({
                                 id: buff.id,
                                 name: stolen_name,
