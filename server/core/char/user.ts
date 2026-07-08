@@ -534,7 +534,9 @@ export class USER extends CHARACTER {
 
     /** 执行登录初始化 */
     do_login(): void {
+        this._recount_suppressed = true;
         this.init();
+        this._recount_suppressed = false;
         this.recount();
         this.long_name();
         WORLD.STATS.checkStats(this);
@@ -1294,6 +1296,7 @@ export class USER extends CHARACTER {
 
     /** 重新计算属性(玩家版本, 含闪避/招架技能加成) */
     recount(): void {
+        if (this._recount_suppressed || !this._recount_dirty) return;
         super.recount();
         this.recount_max_hp();
     }

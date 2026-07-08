@@ -245,7 +245,9 @@ export class FOLLOWER extends CHARACTER {
             my_npc.items = me.read_items(data.items);
             my_npc.equipment = me.read_equipment(data.eq);
             my_npc.level = my_npc.level || obj.level || 3;
+            my_npc._recount_suppressed = true;
             my_npc.init();
+            my_npc._recount_suppressed = false;
             my_npc.recount();
             my_npc.hp = my_npc.max_hp;
             my_npc.mp = my_npc.max_mp;
@@ -293,7 +295,9 @@ export class FOLLOWER extends CHARACTER {
         npc.id = par.id;
         npc.path = obj.path;
         npc.level = obj.level || 3;
+        npc._recount_suppressed = true;
         npc.init();
+        npc._recount_suppressed = false;
         npc.recount();
         FOLLOWER.STORES.set(id, npc);
         npc.master = me.id;
@@ -339,7 +343,9 @@ export class FOLLOWER extends CHARACTER {
         if ((npc.max_mp || 0) > old.max_mp) old.max_mp = npc.max_mp || 0;
 
         old.prop = {};
+        old._recount_suppressed = true;
         old.init();
+        old._recount_suppressed = false;
         if (old.status) {
             for (let j = old.status.length - 1; j >= 0; j--) {
                 const item = old.status[j];
@@ -682,6 +688,7 @@ export class FOLLOWER extends CHARACTER {
     }
 
     recount(): void {
+        if (this._recount_suppressed || !this._recount_dirty) return;
         super.recount();
         this.recount_max_hp();
     }

@@ -376,6 +376,11 @@ export class CHARACTER extends ITEM {
     /** 子物品列表,生物的通常为物品 */
     items: OBJ[] | null = null;
 
+    /** 重算脏标记 — add_prop 置 true，recount 置 false */
+    protected _recount_dirty: boolean = true;
+    /** 重算抑制 — init 期间为 true，阻止重复 recount */
+    protected _recount_suppressed: boolean = false;
+
     // ============ 战斗系统属性 ============
 
     /** 战斗类型 0=无 1=切磋 2=生死 */
@@ -855,7 +860,9 @@ export class CHARACTER extends ITEM {
         }
         this._isolate_events();
         this.create_id();
+        this._recount_suppressed = true;
         this.init();
+        this._recount_suppressed = false;
         this.recount();
         this.hp = this.max_hp;
         this.mp = this.max_mp;
@@ -974,11 +981,13 @@ export class CHARACTER extends ITEM {
         }
         const v1 = this.prop[p] || 0;
         this.prop[p] = v1 + v;
+        this._recount_dirty = true;
     }
 
     /** 清除所有属性 */
     clear_prop(): void {
         this.prop = {};
+        this._recount_dirty = true;
     }
 
     /**
@@ -2093,6 +2102,7 @@ export class CHARACTER extends ITEM {
     do_escape(): boolean {
         const eny = this.query_enemy();
         if (!eny) return true;
+        this.ensure_recount();
         if (eny.on_escape) return eny.on_escape(this) ?? true;
         let is_esc = this.random(this.ds / 2) + this.ds > eny.mz;
         if (eny.is_faint) is_esc = true;
@@ -2605,9 +2615,18 @@ export class CHARACTER extends ITEM {
     // ================================================================
 
     /**
+     * 确保重算新鲜 — 消费端入口，dirty 时重算，clean 时零开销
+     */
+    ensure_recount(): void {
+        this.recount();
+    }
+
+    /**
      * 重新计算战斗属性
      */
     recount(): void {
+        if (this._recount_suppressed || !this._recount_dirty) return;
+        this._recount_dirty = false;
         this.gjsd = 4000 - this.query_prop('gjsd');
         if (this.gjsd > 500) {
             this.gjsd = int(this.gjsd - (this.gjsd * this.query_prop('gjsd_per') / 100));
@@ -2675,11 +2694,13 @@ export class CHARACTER extends ITEM {
      */
     do_attack(par: DoAttackPar): number {
         if (this.is_faint || this.hp <= 0 || !this.fight_type) return 0;
+        this.ensure_recount();
         let target = par.target;
         if (!target) {
             target = this.query_enemy();
             if (!target) return 0;
         }
+        target.ensure_recount();
         const weapon = this.query_weapon();
         const attackskill = par.no_weapon ? this.noweapon_skill : this.attack_skill;
 
@@ -2825,6 +2846,7 @@ export class CHARACTER extends ITEM {
      */
     from_attack(sh: number, mz: number, gjmsg: string, shmsg: string, dsmsg?: string, parrymsg?: string): boolean {
         if (gjmsg) this.send_room(gjmsg);
+        this.ensure_recount();
         const is_dodged = mz > 0 ? Math.random() * (this.ds / 2) + this.ds / 2 > mz : false;
         if (is_dodged) {
             this.send_room((dsmsg || this.dodge_skill.query_dodge_action()), this);
@@ -2856,6 +2878,7 @@ export class CHARACTER extends ITEM {
      */
     damage(sh: number, from?: CHARACTER, diff_fy?: number): number {
         if (!(sh > 0)) return 0;
+        this.ensure_recount();
         let diff_sh_per = this.diff_sh_per;
         let fy = this.fy;
         if (diff_fy && diff_fy > 0) {
@@ -2941,6 +2964,7 @@ export class CHARACTER extends ITEM {
      * 自动攻击循环
      */
     auto_attack(): void {
+        this.ensure_recount();
         const target = this.query_enemy();
         if (this.hp <= 0) {
             if (this.fight_type && target) {
