@@ -6,11 +6,16 @@
  * 客户端本地还原完整消息文本后，再进行视角转换（替换为你）。
  */
 
+import { PreloadedTable, PreloadedVersion } from './templates-data.js';
+
 /** 模板 ID → 文本 映射表 */
 export const Table = {};
 
 /** 版本号，用于热更新时比对 */
 export let Version = 0;
+
+// 启动时合并预加载模板（pack.js --binary 生成）
+load(PreloadedVersion, PreloadedTable);
 
 /**
  * 从服务端加载模板映射表
