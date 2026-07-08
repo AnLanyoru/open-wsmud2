@@ -10,6 +10,7 @@ data/def/
 .idea/
 .vscode/
 .claude/
+.trae/
 old/
 core/
 res/
