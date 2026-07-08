@@ -688,7 +688,9 @@ export class CHARACTER extends ITEM {
     /** 构建战斗/房间消息 JSON */
     _build_msg(text: string, target?: ITEM): string {
         const rendered = format_msg(this, text, target);
-        return '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
+        // 转义字符串中的特殊字符，防止 JSON 断裂
+        const s = rendered.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        return '{"type":"combat","s":"' + s + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
     }
 
     /** 构建二进制 payload — 按需编码实体字段 + ^args */
