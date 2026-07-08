@@ -169,6 +169,40 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique literal templates`);
 
     // ============================================================
+    // Pass 1.5: 收集 action 数组中的 $ 占位符字符串
+    // ============================================================
+
+    /** 匹配含 $ 的字符串字面量（action 数组元素等） */
+    const ACTION_STR_RE = /(["'])((?:[^"'\\]|\\.)*?)\1/gs;
+
+    let actionStrCount = 0;
+
+    function collectActionStrings(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                collectActionStrings(full);
+            } else if (entry.name.endsWith('.js')) {
+                const content = fs.readFileSync(full, 'utf8');
+                let m;
+                while ((m = ACTION_STR_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[2], m[1]);
+                    if (literal.includes('$') && literal.length >= 4 && !templateMap.has(literal)) {
+                        templateMap.set(literal, templateMap.size);
+                        actionStrCount++;
+                    }
+                }
+            }
+        }
+    }
+
+    collectActionStrings(CORE_DIR);
+    collectActionStrings(RES_DIR);
+    console.log(`[pack]   Found ${actionStrCount} action strings (total: ${templateMap.size})`);
+
+    // ============================================================
     // ============================================================
     // 生成客户端模板数据（带字段掩码）
     // ============================================================
@@ -226,6 +260,7 @@ ${serverLines.join('\n')}
     let replacedFiles = 0;
     let replacedRoom = 0;
     let replacedCombat = 0;
+    let replacedAction = 0;
 
     function transformDir(dir) {
         if (!fs.existsSync(dir)) return;
@@ -251,7 +286,24 @@ ${serverLines.join('\n')}
                     return match;
                 });
 
-                // TODO: action 数组替换 — 需要先修 character.ts 中 + '\n' 调用点
+                // 替换 action 数组中的含 $ 字符串 "str" → id
+                ACTION_STR_RE.lastIndex = 0; // 重置 exec 污染的状态
+                let actionChanged = false;
+                content = content.replace(ACTION_STR_RE, (match, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    if (literal.includes('$') && templateMap.has(literal)) {
+                        actionChanged = true;
+                        replacedAction++;
+                        return String(templateMap.get(literal));
+                    }
+                    return match;
+                });
+                if (actionChanged) changed = true;
+
+                if (changed) {
+                    fs.writeFileSync(full, content);
+                    replacedFiles++;
+                }
             }
         }
     }
@@ -295,7 +347,7 @@ ${serverLines.join('\n')}
     replaceStatusMsgs(CORE_DIR);
     replaceStatusMsgs(RES_DIR);
 
-    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedStatus} status_msg in ${replacedFiles} files`);
+    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedStatus} status_msg + ${replacedAction} actions in ${replacedFiles} files`);
 
     // ============================================================
     // Pass 3: 验证 — 列出未被替换的字面量（可能是正则边缘情况）
