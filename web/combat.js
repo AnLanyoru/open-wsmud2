@@ -68,6 +68,9 @@ const Combat = {
     ShowPFM: function (data) {
         this.Skills = data.skills || [];
         this.create_skillItems(data.skills);
+        if (Combat.dis_pfms && Combat.dis_pfms.length > 0) {
+            Combat.ANI_PFM();
+        }
     },
     append_items: function (items, parent) {
         if (!items) return;
@@ -166,6 +169,28 @@ const Combat = {
             item._overlay = item.elem.find(".cd-overlay");
             item._cdEnd = undefined;
             item._hadCD = false;
+            if (item.distime > 0) {
+                if (!Combat.dis_pfms) Combat.dis_pfms = [];
+                var found = false;
+                for (var j = 0; j < Combat.dis_pfms.length; j++) {
+                    if (Combat.dis_pfms[j].id == item.id) {
+                        Combat.dis_pfms[j].distime = item.distime;
+                        Combat.dis_pfms[j].end = Date.now() + item.distime;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Combat.dis_pfms.push({
+                        id: item.id,
+                        distime: item.distime,
+                        end: Date.now() + item.distime
+                    });
+                }
+                item._overlay.css("transition", "none");
+                item._overlay.css("transform", "scaleX(1)");
+                item._hadCD = true;
+            }
         }
     }, ChangeDistime: function (data) {
         var pfmid = data.id;
