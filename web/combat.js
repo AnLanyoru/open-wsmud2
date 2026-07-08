@@ -52,9 +52,37 @@ const Combat = {
     def_actions: [{cmd: "dazuo", name: "打坐"},
         {cmd: "liaoshang", name: "疗伤"}],
     _resetCDAnimations: function () {
+        var now = Date.now();
         if (Combat.Skills) {
             for (var i = 0; i < Combat.Skills.length; i++) {
-                Combat.Skills[i]._cdEnd = undefined;
+                var skill = Combat.Skills[i];
+                var remaining = 0;
+                var distime = 0;
+                for (var j = 0; j < Combat.dis_pfms.length; j++) {
+                    if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
+                        remaining = Combat.dis_pfms[j].end - now;
+                        distime = Combat.dis_pfms[j].distime;
+                        break;
+                    }
+                }
+                if (remaining <= 0) {
+                    remaining = Combat.end > now ? Combat.end - now : 0;
+                    distime = Combat.distime || 0;
+                }
+                if (remaining > 0) {
+                    var startScale = distime > 0 ? Math.min(1, remaining / distime) : 1;
+                    skill._overlay.css("transition", "none");
+                    skill._overlay.css("transform", "scaleX(" + startScale + ")");
+                    skill._overlay[0].offsetHeight;
+                    skill._cdEnd = now + remaining;
+                    skill._overlay.css("transition", "transform " + remaining + "ms linear");
+                    skill._overlay.css("transform", "scaleX(0)");
+                    skill._hadCD = true;
+                } else {
+                    skill._overlay.css("transform", "scaleX(0)");
+                    skill._hadCD = false;
+                    skill._cdEnd = 0;
+                }
             }
         }
         for (var id in Combat.STATUS) {
@@ -62,17 +90,21 @@ const Combat = {
             if (stitem && stitem.items) {
                 for (var sid in stitem.items) {
                     var item = stitem.items[sid];
-                    item._statusEnd = undefined;
-                    if (item._animId && Combat._animItems[item._animId]) {
-                        Combat._animItems[item._animId].update(Date.now());
+                    var remaining = item.end - now;
+                    if (remaining > 0) {
+                        var elapsed = item.duration - remaining;
+                        var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
+                        var shadow = item.elem.lastChild;
+                        shadow.style.transition = "none";
+                        shadow.style.transform = "scaleX(" + startScale + ")";
+                        shadow.offsetHeight;
+                        item._statusEnd = item.end;
+                        shadow.style.transition = "transform " + remaining + "ms linear";
+                        shadow.style.transform = "scaleX(1)";
+                        item._hadStatus = true;
                     }
                 }
             }
-        }
-        if (Combat._pfmAnimId && Combat._animItems[Combat._pfmAnimId]) {
-            Combat._animItems[Combat._pfmAnimId].update(Date.now());
-        } else if (Combat.dis_pfms && Combat.dis_pfms.length > 0) {
-            Combat.ANI_PFM();
         }
     },
     refActions: function () {
