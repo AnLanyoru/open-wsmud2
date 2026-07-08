@@ -13,6 +13,7 @@ import DialogStats from './stats.js';
 import DialogJh from './jh.js';
 import DialogRelation from './relation.js';
 import DialogTeam from './team.js';
+import Combat from '../combat.js';
 import DialogParty from './party.js';
 import DialogTrade from './trade.js';
 import DialogEvents from './events.js';
@@ -124,6 +125,7 @@ const Dialog = {
         Dialog.isShow = false;
         $(".content-room").removeClass("hide");
         Dialog.element.addClass("hide");
+        Combat._resetCDAnimations();
     },
     injectStyle: function (css) {
         const style = document.createElement("style");

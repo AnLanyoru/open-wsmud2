@@ -120,6 +120,7 @@ const Combat = {
                     }
                     Combat._snapStatus(item, item.end - now);
                     if (item.end - now > 0) {
+                        item._statusEnd = undefined;
                         Combat.StatusItemANI(item);
                     }
                 }
