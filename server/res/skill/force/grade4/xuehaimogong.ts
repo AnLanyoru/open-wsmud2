@@ -117,7 +117,7 @@ export default class extends SKILL {
                     duration: dur,
                     ig_control: true,
                     on_attach: function (p: CHARACTER): void {
-                        p.add_event("on_die", si_bu_liao, dur);
+                        p.add_event("on_die", si_bu_liao, dur, 0);
                     },
                     on_expire: function (p: CHARACTER): void {
                         p.remove_event("on_die", si_bu_liao);
