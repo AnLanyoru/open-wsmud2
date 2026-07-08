@@ -88,11 +88,13 @@ const Combat = {
     },
     _getPFMInfo: function (skill, now) {
         var remaining = 0, distime = 0;
-        for (var j = 0; j < Combat.dis_pfms.length; j++) {
-            if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                remaining = Combat.dis_pfms[j].end - now;
-                distime = Combat.dis_pfms[j].distime;
-                break;
+        if (Combat.dis_pfms) {
+            for (var j = 0; j < Combat.dis_pfms.length; j++) {
+                if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
+                    remaining = Combat.dis_pfms[j].end - now;
+                    distime = Combat.dis_pfms[j].distime;
+                    break;
+                }
             }
         }
         if (remaining <= 0) {
