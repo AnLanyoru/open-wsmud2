@@ -169,50 +169,6 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique literal templates`);
 
     // ============================================================
-    // Pass 1b: 收集 "lit1" + var + "lit2" 拼接模式
-    // ============================================================
-
-    /** 匹配 .send_room("lit1" + varExpr + "lit2" — 两段字面量夹一个变量 */
-    const CONCAT_RE = /\.(send_room|send_combat)\((["'`])((?:[^"'`\\]|\\.)*?)\2\s*\+\s*([^,+]+?)\s*\+\s*(["'`])((?:[^"'`\\]|\\.)*?)\5/gs;
-
-    /** concat 模板 → { parts: [lit1, lit2], varCount: 1 } */
-    const concatInfo = new Map();
-
-    function collectConcatFromDir(dir) {
-        if (!fs.existsSync(dir)) return;
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-            const full = path.join(dir, entry.name);
-            if (entry.isDirectory()) {
-                collectConcatFromDir(full);
-            } else if (entry.name.endsWith('.js')) {
-                const content = fs.readFileSync(full, 'utf8');
-                let m;
-                while ((m = CONCAT_RE.exec(content)) !== null) {
-                    const lit1 = unescapeJS(m[3], m[2]);
-                    const lit2 = unescapeJS(m[6], m[5]);
-                    const tmpl = lit1 + '^' + lit2;
-                    if (!concatInfo.has(tmpl)) {
-                        concatInfo.set(tmpl, { funcName: m[1], lit1, lit2 });
-                    }
-                }
-            }
-        }
-    }
-
-    collectConcatFromDir(CORE_DIR);
-    collectConcatFromDir(RES_DIR);
-
-    // 将拼接模板加入注册表
-    let concatAdded = 0;
-    for (const [tmpl, info] of concatInfo) {
-        if (!templateMap.has(tmpl)) {
-            templateMap.set(tmpl, templateMap.size);
-            concatAdded++;
-        }
-    }
-    console.log(`[pack]   Found ${concatAdded} concat templates (total: ${templateMap.size})`);
-
     // ============================================================
     // 生成客户端模板数据（带字段掩码）
     // ============================================================
@@ -306,64 +262,6 @@ ${serverLines.join('\n')}
     transformDir(CORE_DIR);
     transformDir(RES_DIR);
 
-    // 拼接模式替换（手动循环，保留尾部参数和变量表达式）
-    let replacedConcat = 0;
-
-    function transformConcatDir(dir) {
-        if (!fs.existsSync(dir)) return;
-        const entries = fs.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-            const full = path.join(dir, entry.name);
-            if (entry.isDirectory()) {
-                transformConcatDir(full);
-            } else if (entry.name.endsWith('.js')) {
-                let content = fs.readFileSync(full, 'utf8');
-                let changed = false;
-                let m;
-
-                // 用 exec 遍历匹配，记录替换位置
-                CONCAT_RE.lastIndex = 0;
-                const replacements = [];
-                while ((m = CONCAT_RE.exec(content)) !== null) {
-                    const tmpl = unescapeJS(m[3], m[2]) + '^' + unescapeJS(m[6], m[5]);
-                    const id = templateMap.get(tmpl);
-                    if (id === undefined) continue;
-
-                    const funcName = m[1];
-                    const varExpr = m[4];
-                    const matchEnd = m.index + m[0].length;
-
-                    // 读 match 之后的文本，收集剩余参数
-                    const rest = content.slice(matchEnd);
-                    const tailMatch = rest.match(/^(\s*,\s*[^)]*?)\)/s);
-                    const tailArgs = tailMatch ? tailMatch[1] : '';  // e.g. ", target" or ", target, true"
-
-                    replacements.push({
-                        start: m.index,
-                        end: matchEnd + (tailMatch ? tailMatch[0].length : rest.indexOf(')') + 1),
-                        replacement: `.${funcName}(${id}${tailArgs}, ${varExpr})`,
-                    });
-                }
-
-                // 从后往前替换，避免位置偏移
-                for (let i = replacements.length - 1; i >= 0; i--) {
-                    const r = replacements[i];
-                    content = content.slice(0, r.start) + r.replacement + content.slice(r.end);
-                    changed = true;
-                    replacedConcat++;
-                }
-
-                if (changed) {
-                    fs.writeFileSync(full, content);
-                    replacedFiles++;
-                }
-            }
-        }
-    }
-
-    transformConcatDir(CORE_DIR);
-    transformConcatDir(RES_DIR);
-
     // 状态消息替换: start_msg: "literal" → start_msg: id
     let replacedStatus = 0;
 
@@ -400,7 +298,7 @@ ${serverLines.join('\n')}
     replaceStatusMsgs(CORE_DIR);
     replaceStatusMsgs(RES_DIR);
 
-    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedConcat} concat + ${replacedStatus} status_msg in ${replacedFiles} files`);
+    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedStatus} status_msg in ${replacedFiles} files`);
 
     // ============================================================
     // Pass 3: 验证 — 列出未被替换的字面量（可能是正则边缘情况）
