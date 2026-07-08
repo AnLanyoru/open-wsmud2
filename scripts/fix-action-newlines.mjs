@@ -25,7 +25,7 @@ function processFile(filePath) {
         const line = lines[i];
 
         // 检测进入 actions 块
-        if (/(?:dodge_actions|parry_actions|miss_msg|parry_msg)\s*[:=]\s*\[/.test(line)) {
+        if (/(?:dodge_actions|parry_actions|miss_msg|parry_msg|weapon_vs_weapon|unarmed_vs_weapon)\s*[:=]\s*\[/.test(line)) {
             inActionsBlock = true;
         }
 
