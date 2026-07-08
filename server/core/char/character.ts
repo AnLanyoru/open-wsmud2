@@ -671,35 +671,27 @@ export class CHARACTER extends ITEM {
      * 新格式：服务端只渲染一次（第三人称），附带 A/T 标识，
      * 客户端根据自身是否等于 A/T 来将名字替换为"你"。
      */
-    send_combat(text: string, target?: CHARACTER): void {
-        if (!this.environment || !text) return;
+    // ============================================================
+    // 消息广播（文本 + 二进制）
+    // ============================================================
+    //
+    // send_combat / send_room 共享相同的消息格式：
+    //   {"type":"combat","s":"<rendered>","A":"<name>","T":"<name>"}
+    // 唯一区别在广播过滤：
+    //   combat → no_mcmsg / no_combatmsg 设置
+    //   room   → no_message 设置 + excludeself
+    //
+    // send_*_b 是 pack.js --binary 编译时替换的二进制版本，
+    // 将消息构造下沉到客户端，服务端只发模板 ID + 实体字段。
+
+    /** 构建战斗/房间消息 JSON */
+    _build_msg(text: string, target?: ITEM): string {
         const rendered = format_msg(this, text, target);
-        const msg = '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
-        const list = this.environment.items;
-        let item: any;
-        for (let i = 0; i < list.length; i++) {
-            item = list[i];
-            if (item.is_player) {
-                if (item === this || item === target) {
-                    if (!item.query_setting('no_mcmsg'))
-                        item.notify(msg);
-                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                    item.notify(msg);
-                }
-            }
-        }
+        return '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
     }
 
-    /**
-     * 发送战斗消息（二进制路径）。
-     *
-     * 与 send_room_b 使用相同的 payload 格式，
-     * 仅在广播过滤逻辑上不同（检查 no_mcmsg / no_combatmsg）。
-     */
-    send_combat_b(template_id: number, target?: CHARACTER,
-        _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
-        if (!this.environment || template_id === undefined) return;
-
+    /** 构建二进制 payload — 模板 ID + 8 实体字段 + ^args */
+    _build_binary_buf(template_id: number, target: ITEM | undefined, argOffset: number): Buffer {
         const aName = this.name;
         const aWeapon = this.weapon_name() || '';
         const aCall3 = this.call3();
@@ -711,19 +703,19 @@ export class CHARACTER extends ITEM {
         const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
         const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
 
-        const argList: string[] = [];
-        for (let i = 2; i < arguments.length; i++) {
-            const v = arguments[i];
-            if (v !== undefined && v !== null) argList.push(String(v));
-        }
-
         const fields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
         const fieldBufs = fields.map(f => Buffer.from(f, 'utf8'));
-        const argBufs = argList.map(a => Buffer.from(a, 'utf8'));
 
-        let totalSize = 1 + 2;
+        // ^args 从 arguments[argOffset] 起
+        const argBufs: Buffer[] = [];
+        for (let i = argOffset; i < arguments.length; i++) {
+            const v = arguments[i];
+            if (v !== undefined && v !== null) argBufs.push(Buffer.from(String(v), 'utf8'));
+        }
+
+        let totalSize = 1 + 2; // op + tid
         for (const fb of fieldBufs) totalSize += 1 + fb.length;
-        totalSize += 1;
+        totalSize += 1; // ^count
         for (const ab of argBufs) totalSize += 1 + ab.length;
 
         const buf = Buffer.alloc(totalSize);
@@ -739,119 +731,69 @@ export class CHARACTER extends ITEM {
             buf[pos++] = ab.length;
             ab.copy(buf, pos); pos += ab.length;
         }
+        return buf;
+    }
 
-        // send_combat 特有的过滤逻辑
-        const list = this.environment.items;
+    /** 广播 — combat 过滤（no_mcmsg / no_combatmsg） */
+    _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
+        const list = this.environment!.items;
         for (let i = 0; i < list.length; i++) {
             const item: any = list[i];
-            if (item.is_player) {
-                if (item === this || item === target) {
-                    if (!item.query_setting('no_mcmsg'))
-                        item.sendBinary?.(buf);
-                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                    item.sendBinary?.(buf);
-                }
+            if (!item.is_player) continue;
+            if (item === this || item === target) {
+                if (!item.query_setting('no_mcmsg'))
+                    typeof payload === 'string' ? item.notify(payload) : item.sendBinary?.(payload);
+            } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
+                typeof payload === 'string' ? item.notify(payload) : item.sendBinary?.(payload);
             }
         }
     }
 
-    /**
-     * 发送房间消息。
-     *
-     * 与 send_combat 相同格式：服务端只渲染一次，客户端判断视角。
-     */
-    send_room(text: string, target?: ITEM, excludeself?: boolean): void {
-        if (!this.environment || !text) return;
-        const rendered = format_msg(this, text, target);
-        const msg = '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
-        const list = this.environment.items;
+    /** 广播 — room 过滤（no_message / excludeself） */
+    _broadcast_room(payload: string | Buffer, target: ITEM | undefined, excludeself?: boolean): void {
+        const list = this.environment!.items;
         for (let i = 0; i < list.length; i++) {
-            if (list[i].is_player) {
-                if (list[i] === this) {
-                    if (!excludeself) list[i].notify(msg);
-                } else if (!list[i].no_message) {
-                    list[i].notify(msg);
-                }
+            if (!list[i].is_player) continue;
+            if (list[i] === this) {
+                if (!excludeself)
+                    typeof payload === 'string' ? list[i].notify(payload) : (list[i] as any).sendBinary?.(payload);
+            } else if (!list[i].no_message) {
+                typeof payload === 'string' ? list[i].notify(payload) : (list[i] as any).sendBinary?.(payload);
             }
         }
     }
 
-    /**
-     * 发送房间消息（二进制路径）。
-     *
-     * 打包时替换纯字面量 send_room → send_room_b，
-     * 服务端发送模板ID+占位参数，客户端本地还原字符串。
-     * 未替换的 send_room 保留为文本 fallback。
-     *
-     * @param template_id  模板表中的 ID
-     * @param target       目标实体（$n/$p/$i 的来源）
-     * @param excludeself  是否排除自己
-     * @param _a1.._a4     ^1 ^2 ^3 ^4 额外参数
-     */
-    send_room_b(template_id: number, target?: ITEM, excludeself?: boolean,
+    // ---- 公开 API ----
+    //
+    // send_msg  / send_msg_b  — 统一入口
+    // send_room / send_combat — 向后兼容包装（供未替换的动态调用和 pack.js 转换）
+
+    /** flags: bit0=combat过滤, bit1=排除自己 */
+    static readonly MSG_COMBAT = 1;
+    static readonly MSG_EXCLUDESELF = 2;
+
+    /** 发送房间/战斗消息（文本路径） */
+    send_msg(text: string, target?: ITEM, flags?: number): void {
+        if (!this.environment || !text) return;
+        const payload = this._build_msg(text, target);
+        if (flags && (flags & 1)) this._broadcast_combat(payload, target);
+        else this._broadcast_room(payload, target, !!(flags && (flags & 2)));
+    }
+
+    /** 发送房间/战斗消息（二进制路径） */
+    send_msg_b(template_id: number, target?: ITEM, flags?: number,
         _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
         if (!this.environment || template_id === undefined) return;
-
-        // 实体属性（客户端 $ 占位符替换所需）
-        const aName = this.name;
-        const aWeapon = this.weapon_name() || '';
-        const aCall3 = this.call3();
-        const aPart = this.attack_part ? this.attack_part.name : '';
-        const aThrow = this.throwing_name() || '';
-
-        const hasT = target && (target as any).check_character?.();
-        const tName = hasT ? target!.name : '';
-        const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
-        const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
-
-        // 收集 ^args
-        const argList: string[] = [];
-        for (let i = 3; i < arguments.length; i++) {
-            const v = arguments[i];
-            if (v !== undefined && v !== null) argList.push(String(v));
-        }
-
-        // 编码全部字段
-        const fields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
-        const fieldBufs = fields.map(f => Buffer.from(f, 'utf8'));
-        const argBufs = argList.map(a => Buffer.from(a, 'utf8'));
-
-        let totalSize = 1 + 2; // op + tid
-        for (const fb of fieldBufs) totalSize += 1 + fb.length; // len + data
-        totalSize += 1; // ^count
-        for (const ab of argBufs) totalSize += 1 + ab.length;
-
-        const buf = Buffer.alloc(totalSize);
-        let pos = 0;
-
-        buf[pos++] = 0x12; // opcode: combat/room
-        buf.writeUInt16BE(template_id, pos); pos += 2;
-
-        // 8 个实体字段
-        for (const fb of fieldBufs) {
-            buf[pos++] = fb.length;
-            fb.copy(buf, pos); pos += fb.length;
-        }
-
-        // ^args
-        buf[pos++] = argBufs.length;
-        for (const ab of argBufs) {
-            buf[pos++] = ab.length;
-            ab.copy(buf, pos); pos += ab.length;
-        }
-
-        // 广播到房间
-        const list = this.environment.items;
-        for (let i = 0; i < list.length; i++) {
-            if (list[i].is_player) {
-                if (list[i] === this) {
-                    if (!excludeself) (list[i] as any).sendBinary?.(buf);
-                } else if (!list[i].no_message) {
-                    (list[i] as any).sendBinary?.(buf);
-                }
-            }
-        }
+        const payload = this._build_binary_buf(template_id, target, 3);
+        if (flags && (flags & 1)) this._broadcast_combat(payload, target);
+        else this._broadcast_room(payload, target, !!(flags && (flags & 2)));
     }
+
+    // 向后兼容 — 供未替换的动态 send_room / send_combat 调用
+    send_combat(text: string, target?: CHARACTER): void { this.send_msg(text, target, 1); }
+    send_combat_b(template_id: number, target?: CHARACTER, _a1?: string, _a2?: string, _a3?: string, _a4?: string): void { this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4); }
+    send_room(text: string, target?: ITEM, excludeself?: boolean): void { this.send_msg(text, target, excludeself ? 2 : 0); }
+    send_room_b(template_id: number, target?: ITEM, excludeself?: boolean, _a1?: string, _a2?: string, _a3?: string, _a4?: string): void { this.send_msg_b(template_id, target, excludeself ? 2 : 0, _a1, _a2, _a3, _a4); }
 
     /**
      * 查询用户设置（基类返回 0）
