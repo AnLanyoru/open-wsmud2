@@ -1,8 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 :: ==============================================
-::   ´ò°ü¸üÐÂ×ÊÔ´°ü (Windows)
-::   ±àÒë -> ²¿Êð -> ´ò°ü -> release.tar (²»º¬ node_modules)
+::   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ (Windows)
+::   ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ -> release.tar (ï¿½ï¿½ï¿½ï¿½ node_modules)
 :: ==============================================
 
 set "SCRIPT_DIR=%~dp0"
@@ -11,60 +11,60 @@ set "OUTPUT_DIR=%SCRIPT_DIR%"
 set "PACKAGE_NAME=release.tar"
 
 echo ============================================
-echo   ´ò°ü¸üÐÂ×ÊÔ´°ü (Windows)
-echo   Êä³ö: %PACKAGE_NAME% (²»º¬ node_modules)
+echo   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ (Windows)
+echo   ï¿½ï¿½ï¿½: %PACKAGE_NAME% (ï¿½ï¿½ï¿½ï¿½ node_modules)
 echo ============================================
 echo.
 
-:: --- ¼ì²é Node.js ---
+:: --- ï¿½ï¿½ï¿½ Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [ERROR] Î´ÕÒµ½ Node.js
+    echo [ERROR] Î´ï¿½Òµï¿½ Node.js
     pause
     exit /b 1
 )
 
 cd /d "%PROJECT_ROOT%"
 
-:: --- 1. ±àÒë TypeScript ---
-echo [1/3] ±àÒë TypeScript...
+:: --- 1. ï¿½ï¿½ï¿½ï¿½ TypeScript ---
+echo [1/3] ï¿½ï¿½ï¿½ï¿½ TypeScript...
 cd /d "%PROJECT_ROOT%\server"
 if exist dist rmdir /s /q dist
 call npx tsc --outDir dist
 if %errorlevel% neq 0 (
-    echo [WARN] ´æÔÚÀàÐÍ´íÎó£¬JS Êä³öÕý³££¬¼ÌÐø...
+    echo [WARN] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½JS ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½...
 )
 cd /d "%PROJECT_ROOT%"
 echo.
 
-:: --- 2. ÔËÐÐ²¿Êð ---
-echo [2/3] ÔËÐÐ²¿Êð (core -> os/, res -> world/)...
+:: --- 2. ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ ---
+echo [2/3] ï¿½ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ (core/ res/ ä¿æŒåŽŸå)...
 node server\scripts\deploy.mjs
 if %errorlevel% neq 0 (
-    echo [ERROR] ²¿ÊðÊ§°Ü£¡
+    echo [ERROR] ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½
     pause
     exit /b %errorlevel%
 )
 echo.
 
-:: --- 3. ¹¹½¨Ç°¶Ë²¢´ò°ü ---
-echo [3/3] ¹¹½¨Ç°¶Ë²¢´ò°ü %PACKAGE_NAME% ...
+:: --- 3. ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ ---
+echo [3/3] ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ %PACKAGE_NAME% ...
 call npx vite build
 if %errorlevel% neq 0 (
-    echo [ERROR] Ç°¶Ë¹¹½¨Ê§°Ü£¡
+    echo [ERROR] Ç°ï¿½Ë¹ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½
     pause
     exit /b %errorlevel%
 )
 echo.
 
-:: ÇåÀí¾É°ü
+:: ï¿½ï¿½ï¿½ï¿½ï¿½É°ï¿½
 if exist "%OUTPUT_DIR%%PACKAGE_NAME%" del "%OUTPUT_DIR%%PACKAGE_NAME%"
 
 cd /d "%PROJECT_ROOT%"
 tar -cf "%OUTPUT_DIR%%PACKAGE_NAME%" ^
     web.js main.mjs config.js ^
     package.json ^
-    os/ world/ www/ ^
+    core/ res/ www/ ^
     api/ web/ data/ ^
     --exclude="*.ts" ^
     --exclude="*.map" ^
@@ -82,18 +82,18 @@ tar -cf "%OUTPUT_DIR%%PACKAGE_NAME%" ^
     2>nul
 
 if %errorlevel% neq 0 (
-    echo [ERROR] ´ò°üÊ§°Ü£¡
+    echo [ERROR] ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½
     pause
     exit /b %errorlevel%
 )
 
 echo ============================================
-echo   [OK] ´ò°üÍê³É
+echo   [OK] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 echo   %OUTPUT_DIR%%PACKAGE_NAME%
 echo.
-echo   ¸üÐÂ·½·¨£º
-echo   1. ½« release.tar Óë windows\×Ô¶¯¸üÐÂ.bat
-echo      Ò»Í¬¸´ÖÆµ½·þÎñÆ÷²¿ÊðÄ¿Â¼
-echo   2. ÔÚ·þÎñÆ÷ÉÏÔËÐÐ: ×Ô¶¯¸üÐÂ.bat
+echo   ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½
+echo   1. ï¿½ï¿½ release.tar ï¿½ï¿½ windows\ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½.bat
+echo      Ò»Í¬ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼
+echo   2. ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½.bat
 echo ============================================
 pause

@@ -11,17 +11,17 @@ globalThis['__CONFIG'] = __CONFIG;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 globalThis['__PATH'] = {
-    BASE: "./os/",
-    WORLD: "./world/",
-    COMMAND: "./world/cmd/",
-    SKILL: "./world/skill/",
-    MAP: "./world/map/",
-    NPC: "./world/npc/",
-    OBJ: "./world/obj/",
-    TASK: "./world/task/",
-    AREA: "./world/area/",
-    FAMILY: "./world/family/",
-    EXTENDS: "./world/extends/",
+    BASE: "./core/",
+    WORLD: "./res/",
+    COMMAND: "./res/cmd/",
+    SKILL: "./res/skill/",
+    MAP: "./res/map/",
+    NPC: "./res/npc/",
+    OBJ: "./res/obj/",
+    TASK: "./res/task/",
+    AREA: "./res/area/",
+    FAMILY: "./res/family/",
+    EXTENDS: "./res/extends/",
     DATA: "./data/",
     DEF_DATA: "./data/def/"
 };

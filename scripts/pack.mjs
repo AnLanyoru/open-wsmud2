@@ -7,8 +7,8 @@
  *
  * 流程:
  *   1. tsc 编译 server/ → server/dist/
- *   2. server/dist/core/ → os/,  server/dist/res/ → world/
- *   3. 若 --binary: 扫描 os/ + world/ 中的 send_room/send_combat 字面量，
+ *   2. server/dist/core/ → core/,  server/dist/res/ → res/ (保持原名)
+ *   3. 若 --binary: 扫描 core/ + res/ 中的 send_room/send_combat 字面量，
  *      注册模板、替换为 _b 版本、生成客户端模板数据文件
  */
 
@@ -24,8 +24,8 @@ const IS_BINARY = args.includes('--binary');
 
 const SERVER_DIR = path.join(ROOT, 'server');
 const DIST_DIR = path.join(SERVER_DIR, 'dist');
-const OS_DIR = path.join(ROOT, 'os');
-const WORLD_DIR = path.join(ROOT, 'world');
+const CORE_DIR = path.join(ROOT, 'core');
+const RES_DIR = path.join(ROOT, 'res');
 const WEB_DIR = path.join(ROOT, 'web');
 
 // ============================================================
@@ -37,7 +37,7 @@ fs.rmSync(DIST_DIR, { recursive: true, force: true });
 
 try {
     execSync('npx tsc -p server/tsconfig.json', {
-        cwd: __dirname,
+        cwd: ROOT,
         stdio: 'inherit',
     });
 } catch (e) {
@@ -46,30 +46,29 @@ try {
 }
 
 // ============================================================
-// Step 2: Move to output directories
+// Step 2: 复制到输出目录（保持 core/ res/ 原名，不破坏 import 路径）
 // ============================================================
 
-console.log('[pack] Moving compiled output...');
-fs.rmSync(OS_DIR, { recursive: true, force: true });
-fs.rmSync(WORLD_DIR, { recursive: true, force: true });
+console.log('[pack] Deploying compiled output...');
+fs.rmSync(CORE_DIR, { recursive: true, force: true });
+fs.rmSync(RES_DIR, { recursive: true, force: true });
 
 const distCore = path.join(DIST_DIR, 'core');
 const distRes = path.join(DIST_DIR, 'res');
 
-// 使用 cpSync + rmSync 避免 Windows 跨设备 rename 的 EPERM
 if (fs.existsSync(distCore)) {
-    fs.cpSync(distCore, OS_DIR, { recursive: true });
+    fs.cpSync(distCore, CORE_DIR, { recursive: true });
 }
 if (fs.existsSync(distRes)) {
-    fs.cpSync(distRes, WORLD_DIR, { recursive: true });
+    fs.cpSync(distRes, RES_DIR, { recursive: true });
 }
 
-// 处理其他目录（types 等）→ os/
+// 处理其他目录（types 等）→ core/
 const remainingFiles = fs.readdirSync(DIST_DIR, { withFileTypes: true });
 for (const entry of remainingFiles) {
     if (entry.name === 'core' || entry.name === 'res') continue;
     const src = path.join(DIST_DIR, entry.name);
-    const dest = path.join(OS_DIR, entry.name);
+    const dest = path.join(CORE_DIR, entry.name);
     fs.cpSync(src, dest, { recursive: true, force: true });
 }
 
@@ -129,8 +128,8 @@ if (IS_BINARY) {
         }
     }
 
-    collectFromDir(OS_DIR);
-    collectFromDir(WORLD_DIR);
+    collectFromDir(CORE_DIR);
+    collectFromDir(RES_DIR);
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique templates`);
 
     // ============================================================
@@ -197,8 +196,8 @@ export const PreloadedVersion = 1;
         }
     }
 
-    transformDir(OS_DIR);
-    transformDir(WORLD_DIR);
+    transformDir(CORE_DIR);
+    transformDir(RES_DIR);
 
     console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat in ${replacedFiles} files`);
 
@@ -234,8 +233,8 @@ export const PreloadedVersion = 1;
         }
     }
 
-    verifyDir(OS_DIR);
-    verifyDir(WORLD_DIR);
+    verifyDir(CORE_DIR);
+    verifyDir(RES_DIR);
     if (missed > 0) {
         console.log(`[pack]   ⚠ ${missed} registered templates could not be replaced (edge cases)`);
     }

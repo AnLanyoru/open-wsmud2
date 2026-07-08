@@ -180,7 +180,7 @@ build_full() {
     cd "$root"
     echo ""
 
-    log_info "运行部署 (core → os/, res → world/)..."
+    log_info "运行部署 (core/ res/ 保持原名)..."
     node server/scripts/deploy.mjs
     echo ""
 
@@ -201,7 +201,7 @@ build_light() {
     cd "$root"
     echo ""
 
-    log_info "运行部署 (core → os/, res → world/)..."
+    log_info "运行部署 (core/ res/ 保持原名)..."
     node server/scripts/deploy.mjs
     echo ""
 
@@ -235,7 +235,7 @@ TAR_EXCLUDES=(
 TAR_FILES=(
     web.js main.mjs config.js
     package.json package-lock.json
-    os/ world/ www/
+    core/ res/ www/
     api/ web/ data/
 )
 

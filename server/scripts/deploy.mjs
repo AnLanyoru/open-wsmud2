@@ -1,7 +1,9 @@
 /**
- * deploy.mjs — 将编译产物从 server/dist/core/ 部署到 os/
+ * deploy.mjs — 将编译产物从 server/dist/ 部署到项目根
+ *
+ * 保持 core/ res/ 目录名不变，import 路径天然正确，无需重写。
  */
-import {copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync} from 'fs';
+import {copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, statSync} from 'fs';
 import {dirname, join, relative, resolve} from 'path';
 import {fileURLToPath} from 'url';
 
@@ -9,11 +11,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ROOT = resolve(__dirname, '../..');
-const SRC = join(ROOT, 'server', 'dist', 'core');
-const DEST = join(ROOT, 'os');
+const SRC_CORE = join(ROOT, 'server', 'dist', 'core');
+const SRC_RES = join(ROOT, 'server', 'dist', 'res');
+const DEST_CORE = join(ROOT, 'core');
+const DEST_RES = join(ROOT, 'res');
 
 function walkDir(dir) {
     const files = [];
+    if (!existsSync(dir)) return files;
     const entries = readdirSync(dir);
     for (const entry of entries) {
         const full = join(dir, entry);
@@ -26,10 +31,6 @@ function walkDir(dir) {
     return files;
 }
 
-/**
- * 清理目标目录中的编译残留文件（.js.map / .d.ts / .d.ts.map）
- * 这些文件不应该出现在运行时目录中
- */
 function cleanStale(dir) {
     if (!existsSync(dir)) return;
     const files = walkDir(dir);
@@ -40,92 +41,49 @@ function cleanStale(dir) {
             cleaned++;
         }
     }
-    if (cleaned > 0) {
-        console.log(`  清理残留: ${cleaned} 个文件 (${dir})`);
-    }
+    if (cleaned > 0) console.log(`  清理残留: ${cleaned} 个文件 (${dir})`);
 }
 
-if (!existsSync(SRC)) {
-    console.error('错误: dist/core/ 不存在，请先运行 npm run build');
+if (!existsSync(SRC_CORE)) {
+    console.error('错误: server/dist/core/ 不存在，请先编译');
     process.exit(1);
 }
 
-// Phase 1: 部署前清空 os/core/ 中的旧部署文件，避免残留
-const CORE_DEST = join(DEST, 'core');
-if (existsSync(CORE_DEST)) {
-    rmSync(CORE_DEST, {recursive: true});
-    console.log(`清理目标: ${CORE_DEST}`);
-}
-
-// 部署前清理目标目录中的编译残留
-cleanStale(DEST);
-
-const files = walkDir(SRC);
+// Phase 1: core/
+cleanStale(DEST_CORE);
+const coreFiles = walkDir(SRC_CORE);
 let count = 0;
-
-for (const src of files) {
+for (const src of coreFiles) {
     if (!src.endsWith('.js')) continue;
-
-    const rel = relative(SRC, src);
-    const dest = join(DEST, rel);
+    const rel = relative(SRC_CORE, src);
+    const dest = join(DEST_CORE, rel);
     const destDir = dirname(dest);
-
-    if (!existsSync(destDir)) {
-        mkdirSync(destDir, {recursive: true});
-    }
-
+    if (!existsSync(destDir)) mkdirSync(destDir, {recursive: true});
     copyFileSync(src, dest);
     count++;
 }
+console.log(`部署 core/: ${count} 个文件`);
 
-console.log(`部署完成: ${count} 个文件复制到 ${DEST}`);
-console.log(`  wrapper: os/util/data.js`);
-
-// ============================================================
-// Phase 2: 部署 server/dist/res/ → world/ (路径重写 core/ → os/)
-// ============================================================
-const RES_SRC = join(ROOT, 'server', 'dist', 'res');
-const RES_DEST = join(ROOT, 'world');
-
-if (existsSync(RES_SRC)) {
-    // 部署前清空 world/ 全部旧文件，避免残留
-    if (existsSync(RES_DEST)) {
-        rmSync(RES_DEST, {recursive: true});
-        console.log(`清理目标: ${RES_DEST}`);
-    }
-
-    // 部署前清理目标目录中的编译残留
-    cleanStale(RES_DEST);
-
-    const resFiles = walkDir(RES_SRC);
+// Phase 2: res/ (保持原名，不重写路径)
+if (existsSync(SRC_RES)) {
+    cleanStale(DEST_RES);
+    const resFiles = walkDir(SRC_RES);
     let resCount = 0;
-
     for (const src of resFiles) {
         if (!src.endsWith('.js')) continue;
-
-        const rel = relative(RES_SRC, src);
-        const dest = join(RES_DEST, rel);
+        const rel = relative(SRC_RES, src);
+        const dest = join(DEST_RES, rel);
         const destDir = dirname(dest);
-
-        if (!existsSync(destDir)) {
-            mkdirSync(destDir, {recursive: true});
-        }
-
-        // 重写 import 路径: core/ → os/
-        let content = readFileSync(src, 'utf-8');
-        content = content.replace(/(from\s+["'](?:\.\.\/)+)core\//g, '$1os/');
-        writeFileSync(dest, content, 'utf-8');
+        if (!existsSync(destDir)) mkdirSync(destDir, {recursive: true});
+        copyFileSync(src, dest);
         resCount++;
     }
-
-    console.log(`资源部署完成: ${resCount} 个文件复制到 ${RES_DEST} (路径已重写)`);
+    console.log(`部署 res/: ${resCount} 个文件`);
 }
 
-// ============================================================
-// Phase 3: 清理编译中间产物 dist/，避免下次编译残留
-// ============================================================
+// Phase 3: 清理 dist/
 const DIST_DIR = join(ROOT, 'server', 'dist');
 if (existsSync(DIST_DIR)) {
     rmSync(DIST_DIR, {recursive: true});
-    console.log(`清理编译产物: ${DIST_DIR}`);
+    console.log(`清理: ${DIST_DIR}`);
 }

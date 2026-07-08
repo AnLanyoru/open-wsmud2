@@ -1,33 +1,30 @@
 @echo off
 echo ============================================
-echo   Build TS -^> Deploy (os + world) -^> Start
+echo   Build TS -^> Deploy (core + res) -^> Start
 echo ============================================
 
-cd /d "%~dp0server"
+cd /d "%~dp0"
 
 echo.
-echo [1/3] Compiling TypeScript (core + res)...
-if exist dist rmdir /s /q dist
-call npx tsc --outDir dist
-if %errorlevel% neq 0 (
-    echo Type errors found, but JS output is OK, continuing...
+set /p BINARY="Pre-compile binary messages? (y/n, default n): "
+
+echo.
+echo [1/3] Building and deploying...
+if /i "%BINARY%"=="y" (
+    echo   Mode: binary (send_room -^> send_room_b)
+    node scripts/pack.mjs --binary
+) else (
+    echo   Mode: normal
+    node scripts/pack.mjs
 )
-echo.
-
-echo [2/3] Deploying...
-echo   - core -^> os/
-echo   - res  -^> world/ (overwrite: core/ -^> os/)
-node scripts/deploy.mjs
 if %errorlevel% neq 0 (
-    echo Deploy failed!
+    echo Build failed!
     pause
     exit /b %errorlevel%
 )
 echo.
 
-cd /d "%~dp0"
-
-set /p BUILD_FRONTEND="[3/3] Build frontend? (y/n, default n): "
+set /p BUILD_FRONTEND="[2/3] Build frontend? (y/n, default n): "
 if /i "%BUILD_FRONTEND%"=="y" (
     echo Building frontend...
     call npx vite build
@@ -37,7 +34,7 @@ if /i "%BUILD_FRONTEND%"=="y" (
         exit /b %errorlevel%
     )
 ) else (
-    echo [3/3] Skipping frontend build.
+    echo [2/3] Skipping frontend build.
 )
 echo.
 
