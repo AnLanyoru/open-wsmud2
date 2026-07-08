@@ -22,8 +22,8 @@ export default class extends SKILL {
         "$N双拳齐出，一明一暗，正是「<HIC>日月并行</HIC>」，攻势如潮水般涌向$n的$l",
     ];
     parry_actions = [
-        "$N双拳交错，以日之刚猛与月之阴柔交替化解$P的攻势",
-        "$N拳法陡变，以日月经天之势格挡$P的攻击",
+        "$N双拳交错，以日之刚猛与月之阴柔交替化解$P的攻势\n",
+        "$N拳法陡变，以日月经天之势格挡$P的攻击\n",
     ];
 
     query_enable_prop(lv: number): EnablePropMap {

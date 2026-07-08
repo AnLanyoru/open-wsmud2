@@ -251,10 +251,7 @@ ${serverLines.join('\n')}
                     return match;
                 });
 
-                if (changed) {
-                    fs.writeFileSync(full, content);
-                    replacedFiles++;
-                }
+                // TODO: action 数组替换 — 需要先修 character.ts 中 + '\n' 调用点
             }
         }
     }

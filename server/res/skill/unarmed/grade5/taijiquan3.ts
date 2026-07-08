@@ -24,8 +24,8 @@ export default class extends SKILL {
         "$N脚踏九宫，一招「<HIC>手挥琵琶</HIC>」弹拨间暗藏杀机，袭向$n的$l",
     ];
     parry_actions = [
-        "$N双手划圆，以太极「<HIC>揽雀尾</HIC>」之势将$P的攻势引偏",
-        "$N双掌画弧，如抱太极，以柔克刚化解了$P的攻击",
+        "$N双手划圆，以太极「<HIC>揽雀尾</HIC>」之势将$P的攻势引偏\n",
+        "$N双掌画弧，如抱太极，以柔克刚化解了$P的攻击\n",
     ];
     slots = [
         {

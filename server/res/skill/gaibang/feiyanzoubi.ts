@@ -9,9 +9,9 @@ export default class extends SKILL {
     grade = 1;
     family = FAMILIES.GAIBANG;
     dodge_actions = [
-        "$n身形急转，避过了$N的攻势。",
-        "可是$n拔地而起，躲过了$N这一招。。",
-        "$n作闪右避，总算躲过了$N这一招。"
+        "$n身形急转，避过了$N的攻势。\n",
+        "可是$n拔地而起，躲过了$N这一招。。\n",
+        "$n作闪右避，总算躲过了$N这一招。\n"
     ];
     desc = "江湖中常见的轻功身法。";
     can_enables = ["dodge"];

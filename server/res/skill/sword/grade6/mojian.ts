@@ -24,10 +24,10 @@ export default class extends SKILL {
         "$N一声暴喝，$w直劈而下，正是「<MAG>魔剑裂空</MAG>」，剑光撕裂虚空斩向$n的$l"
     ];
     parry_actions = [
-        "$n狂吼一声，$w魔气大盛，硬生生将$P的攻势震开",
-        "$n$w横劈，以攻为守，$P不得不变招自保",
-        "$n周身魔气缭绕，$w以诡异的角度反撩$P的$l",
-        "$n狞笑一声，$w不退反进，与$P以命换命"
+        "$n狂吼一声，$w魔气大盛，硬生生将$P的攻势震开\n",
+        "$n$w横劈，以攻为守，$P不得不变招自保\n",
+        "$n周身魔气缭绕，$w以诡异的角度反撩$P的$l\n",
+        "$n狞笑一声，$w不退反进，与$P以命换命\n"
     ];
     learn_condition: LearnCondition = {
         max_mp: 60000,

@@ -2896,7 +2896,7 @@ export class CHARACTER extends ITEM {
         }
         if (par.is_dodged) {
             sh = 0;
-            this.send_combat((par.miss_msg || target.dodge_skill.query_dodge_action()) + '\n', target);
+            this.send_combat((par.miss_msg || target.dodge_skill.query_dodge_action()), target);
         } else {
             if (target.parry_skill.on_parry && !par.no_parry && !target.is_busy && !target.is_faint) {
                 target.parry_skill.on_parry(target, this, par);
@@ -2947,7 +2947,7 @@ export class CHARACTER extends ITEM {
                 sh = target.damage(sh, this, par.diff_fy);
 
             if (par.is_parried) {
-                this.send_combat((par.parry_msg || target.parry_skill.query_parry_action(target, this, weapon_type)) + '\n', target);
+                this.send_combat((par.parry_msg || target.parry_skill.query_parry_action(target, this, weapon_type)), target);
                 if (sh > 0) {
                     target.send_combat(query_status_msg(target.hp, target.max_hp));
                     if (target.on_damage) target.on_damage(this, sh);
