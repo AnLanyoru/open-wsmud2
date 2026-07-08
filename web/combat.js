@@ -497,8 +497,11 @@ const Combat = {
             duration: item.duration,
             end: Date.now() + item.duration - (item.overtime || 0)
         };
-        if (item.duration > 0)
-            Combat.StatusItemANI(statu_item.items[item.sid]);
+        if (item.duration > 0) {
+            var newItem = statu_item.items[item.sid];
+            newItem._statusEnd = undefined;
+            Combat.StatusItemANI(newItem);
+        }
     },
     StatusItem_remove: function (player_status, data) {
         if (!player_status) return;
