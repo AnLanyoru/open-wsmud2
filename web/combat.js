@@ -119,6 +119,9 @@ const Combat = {
                         item._animId = null;
                     }
                     Combat._snapStatus(item, item.end - now);
+                    if (item.end - now > 0) {
+                        Combat.StatusItemANI(item);
+                    }
                 }
             }
         }
@@ -136,6 +139,7 @@ const Combat = {
         this.refActions();
         if (data.skills)
             this.ShowPFM(data);
+        Combat._resetCDAnimations();
     },
     ShowPFM: function (data) {
         this.Skills = data.skills || [];
