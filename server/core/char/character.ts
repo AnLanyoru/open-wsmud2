@@ -835,12 +835,27 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 克隆实例到实际场景中
+     * 克隆实例到实际场景中。
+     *
+     * 所有可变引用属性始终写入（即使为 null/undefined），消除条件分支导致的
+     * V8 隐藏类形状发散。同一原型的所有克隆体产生完全相同的 own property 集合。
+     *
+     * @remarks on_clone 回调只应修改已有属性，不应新增 own property。
      */
     clone(): void {
         this.copy_temp_to(this);
-        if (this.prop) this.prop = Object.create(this.prop);
-        if (this.skills) this.skills = new SkillsMap(this.skills);
+        // —— 始终写入可变引用属性以稳定 V8 隐藏类形状 ——
+        if (this.prop) {
+            this.prop = Object.create(this.prop);
+        } else {
+            this.prop = undefined;
+        }
+        if (this.skills) {
+            this.skills = new SkillsMap(this.skills);
+        } else {
+            // skills 类型不含 null，写入空实例避免下游 this.skills.get() 抛 TypeError
+            this.skills = new SkillsMap();
+        }
         if (this.equipment) {
             const eqs: EQUIPMENT[] = [];
             for (let i = 0; i < this.equipment.length; i++) {
@@ -849,7 +864,10 @@ export class CHARACTER extends ITEM {
                     eqs[i] = OBJ.CREATE(item.path) as EQUIPMENT;
                 }
             }
-            this.equipment = eqs as (EQUIPMENT | null)[];
+            this.equipment = eqs;
+        } else {
+            // equipment 类型不含 null，写入空数组避免下游 this.equipment[i] 抛 TypeError
+            this.equipment = [];
         }
         if (this.items) {
             const items: OBJ[] = [];
@@ -857,6 +875,8 @@ export class CHARACTER extends ITEM {
                 items[i] = OBJ.CREATE(this.items[i].path);
             }
             this.items = items;
+        } else {
+            this.items = null;
         }
         this._isolate_events();
         this.create_id();

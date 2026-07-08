@@ -659,9 +659,8 @@ export class ROOM extends ITEM {
     on_clone(): void {
         // —— 可变引用类型，覆盖为独立副本 ——
         this.items = [];
-        if (this.exits) {
-            this.exits = { ...this.exits };
-        }
+        // 始终写入 exits 以稳定 V8 隐藏类形状（避免有出口/无出口房间产生不同 own property 集合）
+        this.exits = this.exits ? { ...this.exits } : null;
         this._temp_values = new Map();
         this._temp_expiry = new Map();
         this._isolate_events();

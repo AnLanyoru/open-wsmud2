@@ -386,8 +386,9 @@ export class OBJ extends ITEM {
         item._isolate_events();
         item.create_id();
         item.on_clone();
-        if (count && count > 1)
-            item.count = count;
+        // 始终写入 count 以稳定 V8 隐藏类形状
+        // 避免堆叠物品(count>1)与非堆叠物品(count=1)产生不同的 own property 集合
+        item.count = (count && count > 1) ? count : (item.count || 1);
         return item;
     }
 
