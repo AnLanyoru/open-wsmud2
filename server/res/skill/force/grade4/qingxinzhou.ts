@@ -61,6 +61,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 78,
             release_time: 500,
+            use_type: 2,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const addSh = calc_powang_add_sh(me, lv);
 
@@ -73,7 +74,7 @@ export default class extends SKILL {
 
                 me.add_status({
                     id: "force",
-                    name: "破妄曲",
+                    name: "破妄",
                     duration: 0,
                     prop: {
                         add_sh: addSh,
@@ -95,6 +96,7 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 78,
             release_time: 500,
+            use_type: 2,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const diffSh = calc_anshen_diff_sh(me, lv);
 
@@ -107,7 +109,7 @@ export default class extends SKILL {
 
                 me.add_status({
                     id: "force",
-                    name: "安神曲",
+                    name: "安魂",
                     duration: 0,
                     prop: {
                         diff_sh: diffSh,
@@ -129,6 +131,11 @@ export default class extends SKILL {
             enable_skill: "force",
             mp: 128,
             release_time: 500,
+            use_type: 2,
+            check(me, lv, _base_type): boolean {
+                return lv >= 1300;
+            },
+            use_condition: "需要将清心咒提升至1300级",
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const dur = calc_gongming_dur(me, lv);
                 const val = calc_gongming_value(me, lv);

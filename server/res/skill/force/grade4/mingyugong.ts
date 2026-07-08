@@ -4,6 +4,7 @@ import type {CHARACTER} from "../../../../core/char/character.js";
 
 // ============================================================
 // 明玉功 — 公共绝世武功（移花宫，内功+轻功双位置）
+// 完成度 80
 // ============================================================
 
 export default class extends SKILL {
@@ -99,8 +100,9 @@ export default class extends SKILL {
             check: function (_me: CHARACTER, lv: number): boolean {
                 return lv >= 900;
             },
+            use_condition: "需要将明玉功提升至900级",
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                const damage = query_myg_tai_damage(lv);
+                const damage = query_myg_tai_damage(me, lv);
                 const baseCount = query_myg_tai_count(lv);
                 const extraCount = me.query_prop("myg_count");
                 const totalCount = baseCount + extraCount;
@@ -143,8 +145,8 @@ export default class extends SKILL {
                     finish_msg: "风停花落，$N周身的寒气也敛去无踪。",
                 });
             },
-            query_desc: function (_me: CHARACTER, lv: number): string {
-                const damage = query_myg_tai_damage(lv);
+            query_desc: function (me: CHARACTER, lv: number): string {
+                const damage = query_myg_tai_damage(me, lv);
                 const count = query_myg_tai_count(lv);
                 return (
                     "明玉功之太上忘情，每2秒对敌人造成" +
@@ -200,8 +202,8 @@ function query_myg_mingyu_duration(lv: number): number {
 }
 
 /** 太上忘情：每次伤害值 */
-function query_myg_tai_damage(lv: number): number {
-    return Math.floor((lv * 17) / 1000);
+function query_myg_tai_damage(me: CHARACTER, lv: number): number {
+    return Math.floor(lv * me.gj / 1000);
 }
 
 /** 太上忘情：持续次数（上限 20） */
