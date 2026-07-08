@@ -259,6 +259,7 @@ const Process = {
         }
         if (!Process.cur_room) Process.cur_room = {};
         Process.cur_room.items = room.items;
+        Combat._resetCDAnimations();
     },
 
     get_hpnum: function (hp, max_hp) {
