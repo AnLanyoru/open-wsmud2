@@ -712,6 +712,83 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 发送房间消息（二进制路径）。
+     *
+     * 打包时替换纯字面量 send_room → send_room_b，
+     * 服务端发送模板ID+占位参数，客户端本地还原字符串。
+     * 未替换的 send_room 保留为文本 fallback。
+     *
+     * @param template_id  模板表中的 ID
+     * @param target       目标实体（$n/$p/$i 的来源）
+     * @param excludeself  是否排除自己
+     * @param _a1.._a4     ^1 ^2 ^3 ^4 额外参数
+     */
+    send_room_b(template_id: number, target?: ITEM, excludeself?: boolean,
+        _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
+        if (!this.environment || template_id === undefined) return;
+
+        // 实体属性（客户端 $ 占位符替换所需）
+        const aName = this.name;
+        const aWeapon = this.weapon_name() || '';
+        const aCall3 = this.call3();
+        const aPart = this.attack_part ? this.attack_part.name : '';
+        const aThrow = this.throwing_name() || '';
+
+        const hasT = target && (target as any).check_character?.();
+        const tName = hasT ? target!.name : '';
+        const tWeapon = hasT ? (target as any).weapon_name?.() || '' : '';
+        const tCall3 = hasT ? (target as any).call3?.() || '' : '';
+
+        // 收集 ^args
+        const argList: string[] = [];
+        for (let i = 3; i < arguments.length; i++) {
+            const v = arguments[i];
+            if (v !== undefined && v !== null) argList.push(String(v));
+        }
+
+        // 编码全部字段
+        const fields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
+        const fieldBufs = fields.map(f => Buffer.from(f, 'utf8'));
+        const argBufs = argList.map(a => Buffer.from(a, 'utf8'));
+
+        let totalSize = 1 + 2; // op + tid
+        for (const fb of fieldBufs) totalSize += 1 + fb.length; // len + data
+        totalSize += 1; // ^count
+        for (const ab of argBufs) totalSize += 1 + ab.length;
+
+        const buf = Buffer.alloc(totalSize);
+        let pos = 0;
+
+        buf[pos++] = 0x12; // opcode: combat/room
+        buf.writeUInt16BE(template_id, pos); pos += 2;
+
+        // 8 个实体字段
+        for (const fb of fieldBufs) {
+            buf[pos++] = fb.length;
+            fb.copy(buf, pos); pos += fb.length;
+        }
+
+        // ^args
+        buf[pos++] = argBufs.length;
+        for (const ab of argBufs) {
+            buf[pos++] = ab.length;
+            ab.copy(buf, pos); pos += ab.length;
+        }
+
+        // 广播到房间
+        const list = this.environment.items;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].is_player) {
+                if (list[i] === this) {
+                    if (!excludeself) (list[i] as any).sendBinary?.(buf);
+                } else if (!list[i].no_message) {
+                    (list[i] as any).sendBinary?.(buf);
+                }
+            }
+        }
+    }
+
+    /**
      * 查询用户设置（基类返回 0）
      */
     query_setting(name: string): number | string {

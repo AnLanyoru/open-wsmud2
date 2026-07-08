@@ -1,5 +1,6 @@
 import * as Util from './utils/util.js';
 import Setting from './setting.js';
+import { ProcessBinary } from './process.js';
 
 let IsConnecting = false;
 let ChangeServer = false;
@@ -165,6 +166,7 @@ export class WSClient {
         try {
             var pol = location.protocol == "http:" ? "ws" : "wss";
             this.ws = new WebSocket(pol + '://' + this.IP + ':' + this.Port);
+            this.ws.binaryType = 'arraybuffer';
             this.ws.onopen = this.OnConnect;
             this.ws.onclose = this.OnClose.bind(this);
             this.ws.onerror = this.OnError;
@@ -178,6 +180,11 @@ export class WSClient {
     OnReceived(evt) {
         if (!evt || !evt.data) return;
         var data = evt.data;
+        // 二进制帧 → 批量解析后逐条处理
+        if (data instanceof ArrayBuffer) {
+            this._processBinary(new Uint8Array(data));
+            return;
+        }
         if (data[0] == '{' || data[0] == '[') {
             var parsed = null;
             try {
@@ -201,6 +208,18 @@ export class WSClient {
             }
         } else {
             this.OnMessage(data);
+        }
+    }
+
+    /**
+     * 解析二进制帧并逐条分发
+     * @param {Uint8Array} data
+     */
+    _processBinary(data) {
+        try {
+            ProcessBinary(data);
+        } catch (e) {
+            ReceiveMessage('<hir>解析二进制数据时发生错误：' + (e.message || e) + '</hir>');
         }
     }
 

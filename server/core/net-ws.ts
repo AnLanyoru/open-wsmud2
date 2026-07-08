@@ -37,8 +37,10 @@ export interface WsSocket {
     /** 移除事件监听 */
     removeListener(event: string, handler: (...args: any[]) => void): this;
 
-    /** 发送消息（由 onClientConnect 注入） */
-    send?: (msg: string) => void;
+    /** 发送文本消息（由 onClientConnect 注入） */
+    send?: (msg: string | Buffer) => void;
+    /** 发送二进制消息（由 onClientConnect 注入） */
+    sendBinary?: (data: Buffer) => void;
     /** 当前使用的协议处理器 */
     protocol?: WsProtocol;
     /** HTTP 请求头（WebSocket 握手阶段解析） */
@@ -55,8 +57,10 @@ export interface WsSocket {
 
 /** 通信协议接口 */
 export interface WsProtocol {
-    /** 发送数据帧 */
+    /** 发送文本帧 */
     sendData: (text: string, socket: WsSocket) => void;
+    /** 发送二进制帧 */
+    sendBinaryData: (data: Buffer, socket: WsSocket) => void;
     /** WebSocket 握手（TCP 协议无需） */
     handShake?: (header: Record<string, string>, socket: WsSocket, data?: Buffer) => void;
     /** 读取并解析收到的数据 */
@@ -187,9 +191,19 @@ export default class wsServer {
  * @param socket - 客户端 socket
  */
 function onClientConnect(this: wsServer, socket: WsSocket): void {
-    socket.send = function (this: WsSocket, msg: string): void {
+    socket.send = function (this: WsSocket, msg: string | Buffer): void {
         if (msg) {
-            this.protocol?.sendData(msg, this);
+            if (Buffer.isBuffer(msg)) {
+                this.protocol?.sendBinaryData(msg, this);
+            } else {
+                this.protocol?.sendData(msg, this);
+            }
+        }
+    };
+
+    socket.sendBinary = function (this: WsSocket, data: Buffer): void {
+        if (data) {
+            this.protocol?.sendBinaryData(data, this);
         }
     };
 
@@ -350,6 +364,10 @@ const protocols: {
             }
             socket.write(data);
         },
+
+        sendBinaryData(data: Buffer, socket: WsSocket): void {
+            writeRawFrame(socket, FrameTypes.Binary, data);
+        },
     },
 
     /** WebSocket 协议版本 00 (Hixie) - 已废弃的旧版本 */
@@ -416,6 +434,12 @@ const protocols: {
             wrappedBytes[wrappedBytes.length - 1] = 255;
             socket.write(wrappedBytes);
         },
+
+        sendBinaryData(data: Buffer, socket: WsSocket): void {
+            // 老协议不支持二进制帧，转为 base64 文本发送
+            const base64 = data.toString('base64');
+            this.sendData(':bin:' + base64, socket);
+        },
     },
 
     /** 原始 TCP 协议 (自定义长度前缀) */
@@ -472,6 +496,27 @@ const protocols: {
                 textBuffer.copy(data, 5);
             }
             socket.write(data);
+        },
+
+        sendBinaryData(data: Buffer, socket: WsSocket): void {
+            const length = data.length;
+            let frame: Buffer;
+            if (length < 254) {
+                frame = Buffer.alloc(length + 1);
+                frame.writeUInt8(length);
+                data.copy(frame, 1);
+            } else if (length < 65536) {
+                frame = Buffer.alloc(length + 3);
+                frame.writeUInt8(254);
+                frame.writeUInt16BE(length, 1);
+                data.copy(frame, 3);
+            } else {
+                frame = Buffer.alloc(length + 5);
+                frame.writeUInt8(255);
+                frame.writeUInt32BE(length, 1);
+                data.copy(frame, 5);
+            }
+            socket.write(frame);
         },
     },
 };

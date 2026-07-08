@@ -2,6 +2,7 @@ import { COMMAND } from "../../../core/command.js";
 import { CHARACTER } from "../../../core/char/character.js";
 import { WORLD } from "../../../core/world.js";
 import type { USER } from "../../../core/char/user.js";
+import { count as templateCount, exportTable } from '../../../core/templates.js';
 
 export default class extends COMMAND {
     command = "login";
@@ -112,6 +113,11 @@ export default class extends COMMAND {
 
     on_user_login(user: USER) {
         user.send("欢迎登陆<HIW>MUD游戏</HIW>");
+
+        // 发送模板映射表（二进制协议所需）
+        if (templateCount() > 0) {
+            user.send(`{"type":"templates","v":1,"data":${JSON.stringify(exportTable())}}`);
+        }
         const area = user.environment?.parent;
         if (!area) return user.notify_fail("登陆失败, 房间加载错误")
         area.on_login && area.on_login(user);

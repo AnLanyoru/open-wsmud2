@@ -7,6 +7,7 @@ import SCRIPT from './script.js';
 import {roles} from './login/index.js';
 import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
+import { format, perspective, F, load as loadTemplates } from './templates.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = {append: (div) => $(".content-message").append(div)};
@@ -148,6 +149,8 @@ const Process = {
         onLogin();
         //var panel = $(".player-panel").html(CreateHeadPanel(x));
 
+    }, templates: function (x) {
+        loadTemplates(x.v, x.data);
     }, levelup: function (x) {
         Process.level = x.level;
     },
@@ -569,5 +572,68 @@ function ReceiveMessage(x) {
     Process.message.scroll2end();
 }
 
+// ============================================================
+// 二进制帧解析
+// ============================================================
+
+/** 读取一个 UTF-8 字符串：1B 长度 + 数据 */
+function readStr(data, pos) {
+    const len = data[pos];
+    const str = new TextDecoder().decode(data.subarray(pos + 1, pos + 1 + len));
+    return { str, next: pos + 1 + len };
+}
+
+/**
+ * 解析并分发二进制帧
+ * @param {Uint8Array} data
+ */
+export function ProcessBinary(data) {
+    let pos = 0;
+    const myName = Process.name || '';
+
+    while (pos < data.length) {
+        const op = data[pos++];
+        switch (op) {
+            case 0x12: { // combat/room
+                const tid = (data[pos] << 8) | data[pos + 1]; pos += 2;
+
+                // 读 8 个实体字段
+                const fields = [];
+                for (let i = 0; i < 8; i++) {
+                    const r = readStr(data, pos);
+                    fields.push(r.str);
+                    pos = r.next;
+                }
+
+                // 读 ^args
+                const argCount = data[pos++];
+                const args = [];
+                for (let i = 0; i < argCount; i++) {
+                    const r = readStr(data, pos);
+                    args.push(r.str);
+                    pos = r.next;
+                }
+
+                // 模板还原 + 视角转换
+                let text = format(tid, fields, args);
+                if (text) {
+                    text = perspective(text, fields[F.A_NAME], fields[F.T_NAME], myName);
+                    Process.message.push(text);
+                    Process.message.scroll2end();
+                }
+                break;
+            }
+            case 0x00: { // raw text fallback
+                const r = readStr(data, pos);
+                ReceiveMessage(r.str);
+                pos = r.next;
+                break;
+            }
+            default:
+                // 未知 opcode：跳过
+                return;
+        }
+    }
+}
 
 export default Process;

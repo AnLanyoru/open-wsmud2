@@ -256,6 +256,15 @@ export class USER extends CHARACTER {
     }
 
     /**
+     * 发送二进制数据(无视状态)
+     */
+    sendBinary(data: Buffer): void {
+        if (this.socket && data && data.length < 30240) {
+            this.socket.sendBinary?.(data);
+        }
+    }
+
+    /**
      * 发送失败通知
      * @returns boolean 是否发送成功(总是返回false，方便调用时直接return)
      */
