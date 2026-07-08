@@ -78,6 +78,13 @@ export const WEAPON_TYPE = {
 };
 
 /**
+ * 武器技能类型集合 — 装备为这些基本技能时需持有对应类型的武器
+ */
+export const WEAPON_SKILLS: ReadonlySet<string> = new Set([
+    "sword", "blade", "staff", "club", "whip",
+]);
+
+/**
  * 属性名称映射表 — key 为属性内部标识，value 为中文显示名
  */
 export const PROPERTIES = {

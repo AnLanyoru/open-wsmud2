@@ -7,7 +7,7 @@ import { UTIL } from "../util.js";
 import { FAMILIES } from "./family.js";
 import type { FAMILY } from './family.js';
 import type { CHARACTER, DoAttackPar } from '../char/character.js';
-import { PROPERTIES, SKILL_TYPES } from "../const.js";
+import { PROPERTIES, SKILL_TYPES, WEAPON_SKILLS } from "../const.js";
 import { SkillsMap } from "../char/skills_map.js";
 import type { PropMap } from "../../types/props.js";
 import { LearnCondition } from "../../types/events.js";
@@ -883,8 +883,7 @@ export class SKILL extends BASE {
                 const raw = this.pfm_set[key];
                 // 将普通对象转换为PERFORM实例(替代原JS的__proto__赋值)
                 const pfm = PERFORM.fromPlain(raw);
-                if (pfm.enable_skill === 'sword' || pfm.enable_skill === 'blade' || pfm.enable_skill === 'whip'
-                    || pfm.enable_skill === 'staff' || pfm.enable_skill === 'club') {
+                if (WEAPON_SKILLS.has(pfm.enable_skill!)) {
                     pfm.is_weapon = true;
                 }
                 pfm.origin_skill = this.id
@@ -1105,6 +1104,8 @@ export class PERFORM {
     use_type?: string | number;
     /** 武器类型（资源文件使用） */
     weapon_type?: string;
+    /** 跳过武器类型检查 */
+    pass_weapon_check?: boolean;
     /** 不使用条件检查函数 */
     no_check?: boolean;
     /** 使用条件检查函数 */
@@ -1152,6 +1153,27 @@ export class PERFORM {
     on_attack?: (me: CHARACTER, target: CHARACTER, lv: number, damage: number) => void;
     /** 查询绝招描述回调 — 触发时机：cha 命令查看技能详情时（query_pfm_desc 调用） */
     query_desc?: (me: CHARACTER, lv: number) => string;
+
+    /**
+     * 统一初始化热路径属性以稳定 V8 隐藏类。
+     * 所有 PERFORM 实例共享同一 own property 集合，避免 fromPlain 按不同
+     * 属性子集写入导致隐藏类发散，进而使 query_distime/query_mp 等方法中
+     * this.xxx 的 IC 退化为 megamorphic。
+     */
+    constructor() {
+        this.origin_skill = "";
+        this.name = "";
+        this.id = "";
+        this.mp = undefined;
+        this.release_time = undefined;
+        this.distime = undefined;
+        this.distime_key = undefined;
+        this.distime_per_key = undefined;
+        this.releasetime_key = undefined;
+        this.releasetime_per_key = undefined;
+        this.expend_mp_per_key = undefined;
+        this.pid = undefined;
+    }
 
     // ============ 冷却/消耗计算（支持热补丁覆盖） ============
 
@@ -1274,12 +1296,7 @@ export class PERFORM {
      * @param obj - 资源文件中的绝招定义对象
      */
     static fromPlain(obj: Partial<PERFORM>): PERFORM {
-        const pfm = new PERFORM();
-        // 复制所有可枚举属性(包含函数)
-        for (const key of Object.keys(obj)) {
-            pfm[key] = obj[key];
-        }
-        return pfm;
+        return Object.assign(new PERFORM(), obj);
     }
 
 }

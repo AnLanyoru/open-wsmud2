@@ -22,18 +22,6 @@ export default class extends SKILL {
         "$N手捏法印凌空一指，金光破空而至，直射$n的$l",
     ];
 
-    on_enable(me: CHARACTER, type: string): void {
-        if (type === 'throwing' && !me.can_throwing()) {
-            me.can_throwing = () => true;
-        }
-    };
-
-    on_disenable(me: CHARACTER, type: string): void {
-        if (type === 'throwing') {
-            me.can_throwing = CHARACTER.prototype.can_throwing;
-        }
-    }
-
     query_enable_prop(lv: number): EnablePropMap {
         return {
             throwing: {
@@ -55,6 +43,7 @@ export default class extends SKILL {
             enable_skill: "throwing",
             mp: 1120,
             release_time: 4000,
+            pass_weapon_check: true,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = shenpan_time(lv);
                 me.send_room("<ord>$N双目微阖，双手结印，朗声道：「天谕在上，代天行法——审判！」</ord>\n<ord>霎时间，九天之上雷云翻涌，一道金光破空而下，将$n笼罩其中！</ord>\n", target);
@@ -89,6 +78,7 @@ export default class extends SKILL {
             enable_skill: "throwing",
             mp: 1910,
             release_time: 4000,
+            pass_weapon_check: true,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const is_shenpan: boolean = !!target.query_status("shenpan");
                 const extra_gj: number = tianfa_extra_gj(lv, is_shenpan);

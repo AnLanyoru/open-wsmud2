@@ -257,18 +257,43 @@ const protocols: {
         readData(data: Buffer, socket: WsSocket, server: wsServer): void {
             let start = 0;
             while (start < data.length) {
+                // 需要至少 2 字节帧头
+                if (start + 2 > data.length) {
+                    break;
+                }
                 const iseof = (data[start] >> 7) > 0;
                 const frameType = data[start++] & 0xf;
                 const hasMask = (data[start] >> 7) > 0;
                 let length = data[start++] & 0x7f;
                 if (length === 126) {
+                    if (start + 2 > data.length) break;
                     length = data.readUInt16BE(start);
                     start = start + 2;
                 } else if (length === 127) {
-                    length = data.readUInt32BE(start);
-                    start = start + 4;
+                    // 8 字节扩展长度 (64-bit, RFC 6455 §5.2)
+                    if (start + 8 > data.length) break;
+                    const high = data.readUInt32BE(start);
+                    const low = data.readUInt32BE(start + 4);
+                    start = start + 8;
+                    // 拒绝超过 10MB 或 high>0 (>4GB) 的帧
+                    if (high > 0 || low > 10 * 1024 * 1024) {
+                        socket.end();
+                        return;
+                    }
+                    length = low;
+                }
+
+                // 客户端帧必须带 mask (RFC 6455 §5.1)
+                if (!hasMask) {
+                    socket.end();
                     return;
                 }
+
+                // 确保帧载荷完整存在于本次 buffer 中
+                if (start + 4 + length > data.length) {
+                    break;
+                }
+
                 const markIndex = start;
                 start = start + 4;
                 for (let i = 0; i < length; i++) {
@@ -282,10 +307,15 @@ const protocols: {
                     case FrameTypes.Binary:
                         break;
                     case FrameTypes.Ping:
+                        // 收到 Ping 回复空 Pong 即可，无需回传载荷
+                        if (length <= 125) {
+                            writeRawFrame(socket, FrameTypes.Pong, Buffer.alloc(0));
+                        }
                         break;
                     case FrameTypes.Pong:
                         break;
                     case FrameTypes.Text:
+                        void (iseof); // FIN 标志：当前仅处理非分片帧
                         const msg = data.toString('utf8', markIndex + 4, markIndex + 4 + length);
                         server.onReceive(msg, socket);
                         break;
@@ -487,6 +517,37 @@ function readHeader(data: Buffer): Record<string, string> {
 // ============================================================
 // 工具函数
 // ============================================================
+
+/**
+ * 发送原始 WebSocket 帧（无 mask，服务端到客户端）
+ * @param socket   - 目标 socket
+ * @param opcode   - 帧操作码
+ * @param payload  - 载荷数据
+ */
+function writeRawFrame(socket: WsSocket, opcode: number, payload: Buffer): void {
+    const length = payload.length;
+    let data: Buffer;
+    if (length < 126) {
+        data = Buffer.alloc(length + 2);
+        data[0] = 0x80 | (opcode & 0xf);
+        data.writeUInt8(length, 1);
+        payload.copy(data, 2);
+    } else if (length < 65536) {
+        data = Buffer.alloc(length + 4);
+        data[0] = 0x80 | (opcode & 0xf);
+        data.writeUInt8(126, 1);
+        data.writeUInt16BE(length, 2);
+        payload.copy(data, 4);
+    } else {
+        data = Buffer.alloc(length + 10);
+        data[0] = 0x80 | (opcode & 0xf);
+        data[1] = 127;
+        data.writeUInt32BE(0, 2);
+        data.writeUInt32BE(length, 6);
+        payload.copy(data, 10);
+    }
+    socket.write(data);
+}
 
 /**
  * 从字符串中提取数字部分

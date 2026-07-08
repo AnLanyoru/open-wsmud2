@@ -7,7 +7,7 @@ import { OBJ } from '../item/obj.js';
 import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
-import { WEAPON_TYPE, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES, PfmFlag } from '../const.js';
+import { WEAPON_TYPE, WEAPON_SKILLS, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES, PfmFlag } from '../const.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -1889,7 +1889,7 @@ export class CHARACTER extends ITEM {
         if (this.on_skillchanged) this.on_skillchanged();
         if (!this.auto_skills) return;
         for (const item of this.auto_skills) {
-            if (WEAPON_TYPES[item.type]) {
+            if (WEAPON_SKILLS.has(item.type)) {
                 item.ban_use = !iseq;
             }
         }
@@ -3165,6 +3165,16 @@ export class CHARACTER extends ITEM {
         if (pfmitem.enable_skill && pfmitem.enable_skill !== baseSkill) return;
         if (pfmitem.check && pfmitem.check(this, level, baseSkill) === false) return;
 
+        if (!pfmitem.pass_weapon_check) {
+            if (baseSkill === "throwing" && !this.can_throwing()) return;
+            if (pfmitem.weapon_type) {
+                if (pfmitem.weapon_type != this.query_weapon_type()) return;
+            } else {
+                const need_weapon = WEAPON_SKILLS.has(baseSkill) ? baseSkill : undefined;
+                if (need_weapon && need_weapon !== this.query_weapon_type()) return;
+            }
+        }
+
         if (pfmitem.allow_busy) this.busy_pfm = true;
         this.auto_skills!.push({
             pfm: pfmitem,
@@ -3632,11 +3642,3 @@ const WINNER_MSG: string[] = [
     '<CYN>$n向后一纵，躬身做揖说道：阁下武艺不凡，果然高明！</CYN>',
 ];
 
-/** 需要武器的技能类型 */
-const WEAPON_TYPES: Record<string, boolean> = {
-    sword: true,
-    blade: true,
-    staff: true,
-    club: true,
-    whip: true,
-};
