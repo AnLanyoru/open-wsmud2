@@ -133,19 +133,35 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique templates`);
 
     // ============================================================
-    // 生成客户端模板数据
+    // 生成客户端模板数据（带字段掩码）
     // ============================================================
+
+    function computeMask(text) {
+        let m = 0;
+        // A_NAME 和 T_NAME 至少有一个时，双方都带（客户端视角转换需要名字）
+        const hasN = text.includes('$N');
+        const hasn = text.includes('$n');
+        if (hasN || hasn) m |= 0x01 | 0x20;  // A_NAME | T_NAME
+        if (text.includes('$P')) m |= 0x04;  // A_CALL3
+        if (text.includes('$p')) m |= 0x80;  // T_CALL3
+        if (text.includes('$l')) m |= 0x08;  // A_PART
+        if (text.includes('$W') || text.includes('$w')) m |= 0x02;  // A_WEAPON
+        if (text.includes('$i')) m |= 0x40;  // T_WEAPON
+        if (text.includes('$T')) m |= 0x10;  // A_THROW
+        return m;
+    }
 
     if (templateMap.size > 0) {
         const clientData = {};
         for (const [literal, id] of templateMap) {
-            clientData[id] = literal;
+            clientData[id] = { t: literal, m: computeMask(literal) };
         }
         fs.writeFileSync(
             path.join(WEB_DIR, 'templates-data.js'),
             `/**
  * 客户端模板映射表 — 由 scripts/pack.mjs --binary 自动生成
  * DO NOT EDIT MANUALLY
+ * 格式: { tid: { t: "template text", m: fieldMask }, ... }
  */
 export const PreloadedTable = ${JSON.stringify(clientData, null, 2)};
 export const PreloadedVersion = 1;

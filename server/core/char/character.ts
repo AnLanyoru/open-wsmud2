@@ -8,6 +8,7 @@ import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
 import { WEAPON_TYPE, WEAPON_SKILLS, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES, PfmFlag } from '../const.js';
+import { FIELD_TO_MASK, getMask, popcount } from '../templates.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -690,8 +691,12 @@ export class CHARACTER extends ITEM {
         return '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
     }
 
-    /** 构建二进制 payload — 模板 ID + 8 实体字段 + ^args */
+    /** 构建二进制 payload — 按需编码实体字段 + ^args */
     _build_binary_buf(template_id: number, target: ITEM | undefined, argOffset: number): Buffer {
+        const mask = getMask(template_id);
+
+        // 按需采集实体字段（只有 mask 置位的才编码）
+        const rawFields: string[] = [];
         const aName = this.name;
         const aWeapon = this.weapon_name() || '';
         const aCall3 = this.call3();
@@ -703,8 +708,14 @@ export class CHARACTER extends ITEM {
         const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
         const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
 
-        const fields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
-        const fieldBufs = fields.map(f => Buffer.from(f, 'utf8'));
+        const allFields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
+        const fieldBufs: Buffer[] = [];
+        for (let i = 0; i < 8; i++) {
+            if (mask & FIELD_TO_MASK[i]) {
+                const fb = Buffer.from(allFields[i], 'utf8');
+                fieldBufs.push(fb);
+            }
+        }
 
         // ^args 从 arguments[argOffset] 起
         const argBufs: Buffer[] = [];
@@ -713,7 +724,7 @@ export class CHARACTER extends ITEM {
             if (v !== undefined && v !== null) argBufs.push(Buffer.from(String(v), 'utf8'));
         }
 
-        let totalSize = 1 + 2; // op + tid
+        let totalSize = 1 + 2 + 1; // op + tid + mask
         for (const fb of fieldBufs) totalSize += 1 + fb.length;
         totalSize += 1; // ^count
         for (const ab of argBufs) totalSize += 1 + ab.length;
@@ -722,6 +733,7 @@ export class CHARACTER extends ITEM {
         let pos = 0;
         buf[pos++] = 0x12;
         buf.writeUInt16BE(template_id, pos); pos += 2;
+        buf[pos++] = mask;
         for (const fb of fieldBufs) {
             buf[pos++] = fb.length;
             fb.copy(buf, pos); pos += fb.length;

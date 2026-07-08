@@ -1,75 +1,106 @@
 /**
  * 模板字符串驻留表 — 客户端本地模板还原引擎
  *
- * 映射表随前端资源一起下发，浏览器可长期缓存。
- * 服务端发送二进制帧 (template_id, 8 entity fields, ^args...)，
- * 客户端本地还原完整消息文本后，再进行视角转换（替换为你）。
+ * 服务端二进制帧按需发送实体字段（由 mask 控制），
+ * 客户端根据 mask 重建字段数组后还原文本，再做视角转换。
  */
 
 import { PreloadedTable, PreloadedVersion } from './templates-data.js';
 
-/** 模板 ID → 文本 映射表 */
-export const Table = {};
+// ============================================================
+// 注册表
+// ============================================================
 
-/** 版本号，用于热更新时比对 */
+/** 模板 ID → 文本 */
+export const Table = {};
+/** 模板 ID → 字段掩码 */
+export const MaskTable = {};
+/** 版本号 */
 export let Version = 0;
 
-// 启动时合并预加载模板（pack.js --binary 生成）
-load(PreloadedVersion, PreloadedTable);
-
 /**
- * 从服务端加载模板映射表
- * @param {number} version
- * @param {Object<number, string>} data
+ * 加载模板数据。data 格式: { tid: { t: "text", m: mask }, ... }
+ * 兼容旧格式: { tid: "text", ... } (mask 默认为全字段)
  */
 export function load(version, data) {
     if (version <= Version) return;
     Version = version;
-    Object.assign(Table, data);
+    for (const tid of Object.keys(data)) {
+        const entry = data[tid];
+        if (typeof entry === 'string') {
+            Table[tid] = entry;
+            MaskTable[tid] = 0xff; // 兼容旧格式：全字段
+        } else {
+            Table[tid] = entry.t;
+            MaskTable[tid] = entry.m;
+        }
+    }
 }
 
+// 启动时合并预加载模板
+load(PreloadedVersion, PreloadedTable);
+
 // ============================================================
-// 实体字段索引
+// 字段掩码 — 与服务端 FMASK 同步
 // ============================================================
 
-// 8 个实体字段在 field 数组中的位置
-export const F = {
-    A_NAME:    0,  // attacker name
-    A_WEAPON:  1,  // attacker weapon_name()
-    A_CALL3:   2,  // attacker call3() — 他/她
-    A_PART:    3,  // attacker attack_part.name
-    A_THROW:   4,  // attacker throwing_name()
-    T_NAME:    5,  // target name
-    T_WEAPON:  6,  // target weapon_name()
-    T_CALL3:   7,  // target call3()
+export const MASK = {
+    A_NAME:   0x01,
+    A_WEAPON: 0x02,
+    A_CALL3:  0x04,
+    A_PART:   0x08,
+    A_THROW:  0x10,
+    T_NAME:   0x20,
+    T_WEAPON: 0x40,
+    T_CALL3:  0x80,
+};
+
+// 掩码位 → 全字段数组索引
+const MASK_TO_IDX = {
+    0x01: 0, 0x02: 1, 0x04: 2, 0x08: 3,
+    0x10: 4, 0x20: 5, 0x40: 6, 0x80: 7,
 };
 
 /**
- * 用实体字段数组替换模板中的 $ 占位符
- * @param {string} text     模板文本
- * @param {string[]} fields 8 个实体字段
- * @returns {string} $ 占位符已替换的文本（尚未做视角转换）
+ * 根据掩码和稀疏字段数组重建完整字段数组（8 元素，未发送的为空串）
+ * @param {number} mask
+ * @param {string[]} sparse  按 mask 位序排列的字段值
+ * @returns {string[]} 8 个元素的完整字段数组
  */
+function buildFields(mask, sparse) {
+    const f = new Array(8).fill('');
+    let si = 0;
+    let bit = 1;
+    for (let i = 0; i < 8; i++) {
+        if (mask & bit) {
+            f[MASK_TO_IDX[bit]] = sparse[si++] || '';
+        }
+        bit <<= 1;
+    }
+    return f;
+}
+
+// ============================================================
+// 文本还原
+// ============================================================
+
 function subsDollar(text, fields) {
     return text.replace(/\$([NnPplWwiT])/g, (_, k) => {
         switch (k) {
-            case 'N': return fields[F.A_NAME];
-            case 'n': return fields[F.T_NAME] || '<hir>未知存在</hir>';
-            case 'P': return fields[F.A_CALL3];
-            case 'p': return fields[F.T_CALL3] || fields[F.T_NAME] || '<hir>未知存在</hir>';
-            case 'l': return fields[F.A_PART] || '';
+            case 'N': return fields[0];                      // A_NAME
+            case 'n': return fields[5] || '<hir>未知存在</hir>'; // T_NAME
+            case 'P': return fields[2];                      // A_CALL3
+            case 'p': return fields[7] || fields[5] || '<hir>未知存在</hir>';
+            case 'l': return fields[3] || '';
             case 'W':
-            case 'w': return fields[F.A_WEAPON] || '手';
-            case 'i': return fields[F.T_WEAPON] || '手';
-            case 'T': return fields[F.A_THROW] || '';
+            case 'w': return fields[1] || '手';              // A_WEAPON
+            case 'i': return fields[6] || '手';              // T_WEAPON
+            case 'T': return fields[4] || '';                // A_THROW
         }
         return _;
     });
 }
 
-/**
- * 用 ^args 数组替换模板中的 ^1 ^2 ... 占位符
- */
 function subsCaret(text, args) {
     return text.replace(/\^(\d+)/g, (_, n) => {
         const idx = parseInt(n) - 1;
@@ -79,31 +110,30 @@ function subsCaret(text, args) {
 
 /**
  * 还原模板文本（不做视角转换）
- * @param {number} tid      模板 ID
- * @param {string[]} fields 8 个实体字段
- * @param {string[]} args   ^1 ^2 ... 额外参数
- * @returns {string} 第三人称完整文本
+ * @param {number} tid
+ * @param {number} mask      字段掩码
+ * @param {string[]} sparse  按掩码位序的字段值
+ * @param {string[]} args    ^1 ^2 ...
+ * @returns {string}
  */
-export function format(tid, fields, args) {
-    let text = Table[tid];
+export function format(tid, mask, sparse, args) {
+    const text = Table[tid];
     if (!text) return '';
 
+    const fields = buildFields(mask, sparse);
+
+    let result = text;
     if (text.includes('$')) {
-        text = subsDollar(text, fields);
+        result = subsDollar(result, fields);
     }
-    if (args && args.length && text.includes('^')) {
-        text = subsCaret(text, args);
+    if (args && args.length && result.includes('^')) {
+        result = subsCaret(result, args);
     }
-    return text;
+    return result;
 }
 
 /**
  * 视角转换：将玩家名替换为"你"
- * @param {string} text  第三人称文本
- * @param {string} aName attacker name
- * @param {string} tName target name
- * @param {string} myName 当前玩家名
- * @returns {string}
  */
 export function perspective(text, aName, tName, myName) {
     if (aName && aName === myName) {

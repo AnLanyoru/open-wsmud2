@@ -6,10 +6,68 @@
  * 调用 register() 分配 ID，生成映射表随前端资源一起下发。
  */
 
+// ============================================================
+// 字段掩码 — 标记模板需要哪些实体属性
+// ============================================================
+
+export const FMASK = {
+    A_NAME:   0x01,  // $N
+    A_WEAPON: 0x02,  // $W $w
+    A_CALL3:  0x04,  // $P
+    A_PART:   0x08,  // $l
+    A_THROW:  0x10,  // $T
+    T_NAME:   0x20,  // $n
+    T_WEAPON: 0x40,  // $i
+    T_CALL3:  0x80,  // $p
+} as const;
+
+/** 全字段数组索引 → 掩码位 */
+export const FIELD_TO_MASK: number[] = (() => {
+    const m: number[] = [];
+    m[0] = FMASK.A_NAME;
+    m[1] = FMASK.A_WEAPON;
+    m[2] = FMASK.A_CALL3;
+    m[3] = FMASK.A_PART;
+    m[4] = FMASK.A_THROW;
+    m[5] = FMASK.T_NAME;
+    m[6] = FMASK.T_WEAPON;
+    m[7] = FMASK.T_CALL3;
+    return m;
+})();
+
+/** 根据模板文本计算字段掩码 */
+function computeMask(text: string): number {
+    let mask = 0;
+    if (text.includes('$N')) mask |= FMASK.A_NAME;
+    if (text.includes('$n')) mask |= FMASK.T_NAME;
+    if (text.includes('$P')) mask |= FMASK.A_CALL3;
+    if (text.includes('$p')) mask |= FMASK.T_CALL3;
+    if (text.includes('$l')) mask |= FMASK.A_PART;
+    if (text.includes('$W') || text.includes('$w')) mask |= FMASK.A_WEAPON;
+    if (text.includes('$i')) mask |= FMASK.T_WEAPON;
+    if (text.includes('$T')) mask |= FMASK.A_THROW;
+    // $N 和 $n 至少有一个时，双方 name 都带上（客户端视角转换需要名字）
+    if (mask & (FMASK.A_NAME | FMASK.T_NAME)) {
+        mask |= FMASK.A_NAME | FMASK.T_NAME;
+    }
+    return mask;
+}
+
+/** 统计掩码中有多少个置位 */
+export function popcount(mask: number): number {
+    let n = 0;
+    while (mask) { n++; mask &= mask - 1; }
+    return n;
+}
+
+// ============================================================
+// 注册表
+// ============================================================
+
 interface TemplateEntry {
     text: string;
-    /** 是否包含 $ 占位符（$N $n $P $p $l $W $i $T） */
-    has_placeholder: boolean;
+    /** 字段掩码 — 标记需要哪些实体属性 */
+    mask: number;
 }
 
 const _templates: Map<string, number> = new Map();
@@ -21,10 +79,7 @@ export function register(text: string): number {
     if (id !== undefined) return id;
     id = _entries.length;
     _templates.set(text, id);
-    _entries.push({
-        text,
-        has_placeholder: text.includes('$'),
-    });
+    _entries.push({ text, mask: computeMask(text) });
     return id;
 }
 
@@ -38,9 +93,9 @@ export function get(id: number): string | undefined {
     return _entries[id]?.text;
 }
 
-/** 模板是否包含 $ 占位符 */
-export function hasPlaceholder(id: number): boolean {
-    return _entries[id]?.has_placeholder ?? false;
+/** 获取模板的字段掩码 */
+export function getMask(id: number): number {
+    return _entries[id]?.mask ?? 0;
 }
 
 /** 模板总数 */
@@ -49,10 +104,10 @@ export function count(): number {
 }
 
 /** 导出映射表（用于发送给客户端） */
-export function exportTable(): Record<number, string> {
-    const out: Record<number, string> = {};
+export function exportTable(): Record<number, { t: string; m: number }> {
+    const out: Record<number, { t: string; m: number }> = {};
     for (let i = 0; i < _entries.length; i++) {
-        out[i] = _entries[i].text;
+        out[i] = { t: _entries[i].text, m: _entries[i].mask };
     }
     return out;
 }

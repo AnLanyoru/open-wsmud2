@@ -583,6 +583,16 @@ function readStr(data, pos) {
     return { str, next: pos + 1 + len };
 }
 
+/** 计数 mask 中低于 bit 的置位数（用于计算 sparse 数组索引） */
+function popcntBelow(mask, bit) {
+    let n = 0, b = 1;
+    while (b < bit) {
+        if (mask & b) n++;
+        b <<= 1;
+    }
+    return n;
+}
+
 /**
  * 解析并分发二进制帧
  * @param {Uint8Array} data
@@ -596,13 +606,18 @@ export function ProcessBinary(data) {
         switch (op) {
             case 0x12: { // combat/room
                 const tid = (data[pos] << 8) | data[pos + 1]; pos += 2;
+                const mask = data[pos++];
 
-                // 读 8 个实体字段
-                const fields = [];
+                // 按掩码读取字段（只读置位的字段）
+                const sparse = [];
+                let bit = 1;
                 for (let i = 0; i < 8; i++) {
-                    const r = readStr(data, pos);
-                    fields.push(r.str);
-                    pos = r.next;
+                    if (mask & bit) {
+                        const r = readStr(data, pos);
+                        sparse.push(r.str);
+                        pos = r.next;
+                    }
+                    bit <<= 1;
                 }
 
                 // 读 ^args
@@ -615,9 +630,11 @@ export function ProcessBinary(data) {
                 }
 
                 // 模板还原 + 视角转换
-                let text = format(tid, fields, args);
+                let text = format(tid, mask, sparse, args);
                 if (text) {
-                    text = perspective(text, fields[F.A_NAME], fields[F.T_NAME], myName);
+                    const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
+                    const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
+                    text = perspective(text, aName, tName, myName);
                     Process.message.push(text);
                     Process.message.scroll2end();
                 }
