@@ -51,38 +51,62 @@ const Combat = {
     },
     def_actions: [{cmd: "dazuo", name: "打坐"},
         {cmd: "liaoshang", name: "疗伤"}],
+    _snapPFM: function (skill, remaining, distime, now) {
+        if (remaining > 0) {
+            var startScale = distime > 0 ? Math.min(1, remaining / distime) : 1;
+            skill._overlay.css("transition", "none");
+            skill._overlay.css("transform", "scaleX(" + startScale + ")");
+            skill._overlay[0].offsetHeight;
+            skill._cdEnd = now + remaining;
+            skill._overlay.css("transition", "transform " + remaining + "ms linear");
+            skill._overlay.css("transform", "scaleX(0)");
+            skill._hadCD = true;
+        } else {
+            skill._overlay.css("transform", "scaleX(0)");
+            skill._hadCD = false;
+            skill._cdEnd = 0;
+        }
+    },
+    _snapStatus: function (item, remaining) {
+        var shadow = item.elem.lastChild;
+        if (remaining > 0) {
+            var elapsed = item.duration - remaining;
+            var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
+            shadow.style.transition = "none";
+            shadow.style.transform = "scaleX(" + startScale + ")";
+            shadow.offsetHeight;
+            shadow.style.transition = "transform " + remaining + "ms linear";
+            shadow.style.transform = "scaleX(1)";
+            item._hadStatus = true;
+            item._statusEnd = item.end;
+        } else {
+            shadow.style.transition = "none";
+            shadow.style.transform = "scaleX(1)";
+            item._hadStatus = false;
+            item._statusEnd = 0;
+        }
+    },
+    _getPFMInfo: function (skill, now) {
+        var remaining = 0, distime = 0;
+        for (var j = 0; j < Combat.dis_pfms.length; j++) {
+            if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
+                remaining = Combat.dis_pfms[j].end - now;
+                distime = Combat.dis_pfms[j].distime;
+                break;
+            }
+        }
+        if (remaining <= 0) {
+            remaining = Combat.end > now ? Combat.end - now : 0;
+            distime = Combat.distime || 0;
+        }
+        return { remaining: remaining, distime: distime };
+    },
     _resetCDAnimations: function () {
         var now = Date.now();
         if (Combat.Skills) {
             for (var i = 0; i < Combat.Skills.length; i++) {
-                var skill = Combat.Skills[i];
-                var remaining = 0;
-                var distime = 0;
-                for (var j = 0; j < Combat.dis_pfms.length; j++) {
-                    if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                        remaining = Combat.dis_pfms[j].end - now;
-                        distime = Combat.dis_pfms[j].distime;
-                        break;
-                    }
-                }
-                if (remaining <= 0) {
-                    remaining = Combat.end > now ? Combat.end - now : 0;
-                    distime = Combat.distime || 0;
-                }
-                if (remaining > 0) {
-                    var startScale = distime > 0 ? Math.min(1, remaining / distime) : 1;
-                    skill._overlay.css("transition", "none");
-                    skill._overlay.css("transform", "scaleX(" + startScale + ")");
-                    skill._overlay[0].offsetHeight;
-                    skill._cdEnd = now + remaining;
-                    skill._overlay.css("transition", "transform " + remaining + "ms linear");
-                    skill._overlay.css("transform", "scaleX(0)");
-                    skill._hadCD = true;
-                } else {
-                    skill._overlay.css("transform", "scaleX(0)");
-                    skill._hadCD = false;
-                    skill._cdEnd = 0;
-                }
+                var info = Combat._getPFMInfo(Combat.Skills[i], now);
+                Combat._snapPFM(Combat.Skills[i], info.remaining, info.distime, now);
             }
         }
         for (var id in Combat.STATUS) {
@@ -90,28 +114,11 @@ const Combat = {
             if (stitem && stitem.items) {
                 for (var sid in stitem.items) {
                     var item = stitem.items[sid];
-                    var remaining = item.end - now;
                     if (item._animId) {
                         Combat._animUnregister(item._animId);
                         item._animId = null;
                     }
-                    var shadow = item.elem.lastChild;
-                    if (remaining > 0) {
-                        var elapsed = item.duration - remaining;
-                        var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
-                        shadow.style.transition = "none";
-                        shadow.style.transform = "scaleX(" + startScale + ")";
-                        shadow.offsetHeight;
-                        shadow.style.transition = "transform " + remaining + "ms linear";
-                        shadow.style.transform = "scaleX(1)";
-                        item._hadStatus = true;
-                        item._statusEnd = item.end;
-                    } else {
-                        shadow.style.transition = "none";
-                        shadow.style.transform = "scaleX(1)";
-                        item._hadStatus = false;
-                        item._statusEnd = 0;
-                    }
+                    Combat._snapStatus(item, item.end - now);
                 }
             }
         }
@@ -223,6 +230,7 @@ const Combat = {
     , create_skillItems: function (items) {
         var elem = $(".combat-commands").empty();
         if (!items.length) return;
+        var now = Date.now();
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             var html = [];
@@ -240,7 +248,7 @@ const Combat = {
                 for (var j = 0; j < Combat.dis_pfms.length; j++) {
                     if (Combat.dis_pfms[j].id == item.id) {
                         Combat.dis_pfms[j].distime = item.distime;
-                        Combat.dis_pfms[j].end = Date.now() + item.distime;
+                        Combat.dis_pfms[j].end = now + item.distime;
                         found = true;
                         break;
                     }
@@ -249,12 +257,10 @@ const Combat = {
                     Combat.dis_pfms.push({
                         id: item.id,
                         distime: item.distime,
-                        end: Date.now() + item.distime
+                        end: now + item.distime
                     });
                 }
-                item._overlay.css("transition", "none");
-                item._overlay.css("transform", "scaleX(1)");
-                item._hadCD = true;
+                Combat._snapPFM(item, item.distime, item.distime, now);
             }
         }
     }, ChangeDistime: function (data) {
@@ -398,53 +404,28 @@ const Combat = {
         }
     },
     PFM_INTERVAL: 500,
-    // CD 冷却动画（注册至统一动画循环，按 PFM_INTERVAL tick）
     ANI_PFM: function () {
         if (Combat._pfmAnimId && Combat._animItems[Combat._pfmAnimId]) {
-            // 已有动画循环在跑，强制立即执行一次更新以即时反映新 CD
             Combat._animItems[Combat._pfmAnimId].update(Date.now());
             return;
         }
         Combat._pfmAnimId = null;
         var animId = Combat._animRegister(function (now) {
-                // 清理过期条目（end 已过期的独立 CD）
                 for (var j = Combat.dis_pfms.length - 1; j >= 0; j--) {
                     if (Combat.dis_pfms[j].end <= now) {
                         Combat.dis_pfms.splice(j, 1);
                     }
                 }
-                // 每技能渲染：线性时间驱动 CSS transition，500ms tick 仅做校准
                 if (Combat.Skills) {
                     for (var i = 0; i < Combat.Skills.length; i++) {
                         var skill = Combat.Skills[i];
-                        // 计算技能独立 CD 剩余时间（ms）及总时长
-                        var remaining = 0;
-                        var distime = 0;
-                        for (var j = 0; j < Combat.dis_pfms.length; j++) {
-                            if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
-                                remaining = Combat.dis_pfms[j].end - now;
-                                distime = Combat.dis_pfms[j].distime;
-                                break;
-                            }
-                        }
-                        // 无独立 CD 则走全局冷却
-                        if (remaining <= 0) {
-                            remaining = Combat.end > now ? Combat.end - now : 0;
-                            distime = Combat.distime || 0;
-                        }
-                        if (remaining > 0) {
-                            // 用到期时间戳判断是否需要 snap：时间变化 = 新 CD / CD 刷新 / 重绘
-                            var effectiveEnd = now + remaining;
+                        var info = Combat._getPFMInfo(skill, now);
+                        if (info.remaining > 0) {
+                            var effectiveEnd = now + info.remaining;
                             if (skill._cdEnd !== effectiveEnd) {
-                                // snap 到剩余比例位置：新 CD 时比例=1，重绘进行中 CD 时比例=remaining/distime
-                                var startScale = distime > 0 ? Math.min(1, remaining / distime) : 1;
-                                skill._overlay.css("transition", "none");
-                                skill._overlay.css("transform", "scaleX(" + startScale + ")");
-                                skill._overlay[0].offsetHeight;
-                                skill._cdEnd = effectiveEnd;
+                                Combat._snapPFM(skill, info.remaining, info.distime, now);
                             }
-                            // 过渡时长 = 剩余 ms，CSS 自行跑完全程，tick 只负责校准
-                            skill._overlay.css("transition", "transform " + remaining + "ms linear");
+                            skill._overlay.css("transition", "transform " + info.remaining + "ms linear");
                             skill._overlay.css("transform", "scaleX(0)");
                             skill._hadCD = true;
                         } else {
@@ -454,7 +435,6 @@ const Combat = {
                         }
                     }
                 }
-                // 有活动冷却则继续循环，否则置空 ID 等待下次注册
                 var hasActive = Combat.end > now || Combat.dis_pfms.length > 0;
                 if (!hasActive) Combat._pfmAnimId = null;
                 return hasActive;
@@ -614,9 +594,6 @@ const Combat = {
         }
         player_status.items = {};
     },
-    // 状态倒计时：统一动画循环驱动，用 Date.now() 与 item.end 差值计算进度
-    // 用 _statusEnd 时间戳替代 _hadStatus 布尔值判断是否需要 snap：
-    // end 变化 → 新 buff / 刷新 → snap 到比例位置；end 相同 → tick 校准 → 不 snap
     StatusItemANI: function (item) {
         var shadow = item.elem.lastChild;
         if (item._animId) Combat._animUnregister(item._animId);
@@ -626,13 +603,7 @@ const Combat = {
             if (remaining < 0) remaining = 0;
             if (remaining > 0) {
                 if (item._statusEnd !== item.end) {
-                    // 新 buff 或刷新：根据已过时间计算比例起始位置，避免带 overtime 时从头开始
-                    var elapsed = item.duration - remaining;
-                    var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
-                    shadow.style.transition = "none";
-                    shadow.style.transform = "scaleX(" + startScale + ")";
-                    shadow.offsetHeight;
-                    item._statusEnd = item.end;
+                    Combat._snapStatus(item, remaining);
                 }
                 shadow.style.transition = "transform " + remaining + "ms linear";
                 shadow.style.transform = "scaleX(1)";
