@@ -7,7 +7,7 @@ import SCRIPT from './script.js';
 import {roles} from './login/index.js';
 import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
-import { format, perspective, F, load as loadTemplates } from './templates.js';
+import { format, perspective, load as loadTemplates } from './templates.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = {append: (div) => $(".content-message").append(div)};

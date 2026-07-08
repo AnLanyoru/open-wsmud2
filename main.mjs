@@ -52,7 +52,7 @@ for (const item in __PATH) {
 }
 
 await readdir(__PATH.BASE);
-const { WORLD } = await import('./os/world.js');
+const { WORLD } = await import('./core/world.js');
 await __CONFIG.init();
 await WORLD.startup(process.argv[2]);
 
