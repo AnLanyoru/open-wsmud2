@@ -221,6 +221,7 @@ const Process = {
         if (Combat.STATUS[data.id]) Process.itemremove(data);
         Combat.AppendStatusItem(item.id, player_item.find(".item-status-bar"), item.status);
         Process.cur_room.items.push(item);
+        Combat._resetCDAnimations();
     }
     , items: function (room) {
         // 先清理所有状态动画，再清空 DOM，避免 tick 引用已移除的 shadow 元素
