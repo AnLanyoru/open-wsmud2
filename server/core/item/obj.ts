@@ -383,6 +383,7 @@ export class OBJ extends ITEM {
         // 隔离可变引用类型，防止通过原型链共享污染原型（temp setter 会沿链修改）
         item._temp_values = new Map();
         item._temp_expiry = new Map();
+        item._isolate_events();
         item.create_id();
         item.on_clone();
         if (count && count > 1)

@@ -853,6 +853,7 @@ export class CHARACTER extends ITEM {
             }
             this.items = items;
         }
+        this._isolate_events();
         this.create_id();
         this.init();
         this.recount();

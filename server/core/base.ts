@@ -18,15 +18,8 @@ interface ResourceObj {
 /** 资源类构造函数（ES class） */
 type CtorFunc = new (par?: string) => ResourceObj;
 
-/** 事件处理记录 */
-interface EventRecord {
-    func: (...args: any[]) => any;
-    time: number;
-    priority: number;
-}
-
-/** 事件存储映射 */
-type EventStore = Record<string, EventRecord[]>;
+/** 事件存储映射 — 纯函数数组，按优先级降序排列 */
+export type EventStore = Record<string, ((...args: any[]) => any)[]>;
 
 // ============================================================
 // BASE 类
@@ -41,8 +34,12 @@ export class BASE {
     /** 资源路径（由 static NEW 在实例化后设置） */
     path?: string;
 
-    /** 事件存储 — add_event / fire_event 系统 */
+    /** 事件存储 — add_event / fire_event 系统，纯函数数组 */
     protected _events?: EventStore;
+    /** 定时 handler 的过期时间: 事件名 → (函数引用 → 过期时间戳) */
+    protected _timed?: Map<string, Map<Function, number>>;
+    /** handler 的优先级: 事件名 → (函数引用 → priority)，仅 add 时用于排序 */
+    protected _priority?: Map<string, Map<Function, number>>;
 
     // ============ 批量属性设置 ============
 
@@ -77,25 +74,46 @@ export class BASE {
      */
     add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number, priority?: number): void {
         if (!this[fname]) {
-            this[fname] = (...args: any[]) => this.fire_event(fname, ...args);
+            const self: BASE = this;
+            (this as any)[fname] = function(this: BASE) {
+                return self.fire_event(fname, arguments as unknown as any[]);
+            } as any;
         }
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
 
         const p = priority ?? 0;
-        const t = time ? (Date.now() + time) : Number.MAX_SAFE_INTEGER;
-        const record: EventRecord = { func: func, time: t, priority: p };
-        const evts = this._events[fname];
+        const funcs = this._events[fname];
 
-        // 按优先级降序插入，同等优先级保持插入顺序（稳定排序）
-        let insertIdx = evts.length;
-        for (let i = 0; i < evts.length; i++) {
-            if (evts[i].priority < p) {
+        // 获取/创建优先级 Map
+        if (!this._priority) this._priority = new Map();
+        let priMap = this._priority.get(fname);
+        if (!priMap) {
+            priMap = new Map();
+            this._priority.set(fname, priMap);
+        }
+
+        // 按优先级降序插入（同优先级保持插入顺序）
+        let insertIdx = funcs.length;
+        for (let i = 0; i < funcs.length; i++) {
+            if ((priMap.get(funcs[i]) ?? 0) < p) {
                 insertIdx = i;
                 break;
             }
         }
-        evts.splice(insertIdx, 0, record);
+        funcs.splice(insertIdx, 0, func);
+        priMap.set(func, p);
+
+        // 定时 handler 记录过期时间
+        if (time) {
+            if (!this._timed) this._timed = new Map();
+            let timedMap = this._timed.get(fname);
+            if (!timedMap) {
+                timedMap = new Map();
+                this._timed.set(fname, timedMap);
+            }
+            timedMap.set(func, Date.now() + time);
+        }
     }
 
     /**
@@ -105,42 +123,104 @@ export class BASE {
      */
     remove_event(name: string, func: Function): void {
         if (!this._events) return;
-        const evts = this._events[name];
-        if (!evts) return;
-        for (let i = 0; i < evts.length; i++) {
-            if (evts[i].func === func) {
-                evts.splice(i, 1);
+        const funcs = this._events[name];
+        if (!funcs) return;
+
+        for (let i = 0; i < funcs.length; i++) {
+            if (funcs[i] === func) {
+                funcs.splice(i, 1);
                 i--;
             }
         }
 
-        if (!evts.length) {
+        // 清理元数据
+        this._timed?.get(name)?.delete(func);
+        this._priority?.get(name)?.delete(func);
+
+        if (!funcs.length) {
             delete this._events[name];
             delete this[name];
+            this._timed?.delete(name);
+            this._priority?.delete(name);
         }
     }
 
     /**
      * 触发事件
      * @param name - 事件名
+     * @param args - 实参数组（或 arguments 对象）
      * @returns 返回 false 表示阻止后续执行
      */
-    fire_event(name: string, ...args: any[]): boolean | undefined {
+    fire_event(name: string, args: any[]): boolean | undefined {
         if (!this._events) return;
-        const evts = this._events[name];
-        if (!evts) return;
-        const dt = Date.now();
-        for (let i = 0; i < evts.length; i++) {
-            if (evts[i].time > dt) {
-                if (evts[i].func.call(this, ...args) === false) return false;
-            } else {
-                evts.splice(i, 1);
-                i--;
+        const funcs = this._events[name];
+        if (!funcs) return;
+
+        const timedMap = this._timed?.get(name);
+        const hasTimed = timedMap && timedMap.size > 0;
+        const dt = hasTimed ? Date.now() : 0;
+        const priMap = this._priority?.get(name);
+
+        let w = 0;
+        let stopped = false;
+        for (let i = 0; i < funcs.length; i++) {
+            const f = funcs[i];
+            // 检查过期
+            if (hasTimed) {
+                const expiry = timedMap!.get(f);
+                if (expiry !== undefined && expiry <= dt) {
+                    timedMap!.delete(f);
+                    priMap?.delete(f);
+                    continue;
+                }
             }
+            if (!stopped) {
+                stopped = f.apply(this, args) === false;
+            }
+            funcs[w++] = f;
         }
-        if (!evts.length) {
+        funcs.length = w;
+
+        if (!w) {
             delete this._events[name];
             delete this[name];
+            this._timed?.delete(name);
+            this._priority?.delete(name);
+        }
+        return stopped ? false : undefined;
+    }
+
+    /**
+     * 深拷贝事件数据并重建桩函数 — Object.create 克隆后调用，使实例脱离原型链独立运作。
+     * 若原型无事件数据则跳过（零开销）。
+     */
+    protected _isolate_events(): void {
+        if (this._events) {
+            const eventsCopy: EventStore = {};
+            for (const key of Object.keys(this._events)) {
+                eventsCopy[key] = [...this._events[key]];
+            }
+            this._events = eventsCopy;
+            for (const fname of Object.keys(eventsCopy)) {
+                const self: BASE = this;
+                (this as any)[fname] = function(this: BASE) {
+                    return self.fire_event(fname, arguments as unknown as any[]);
+                } as any;
+            }
+        }
+        if (this._timed) {
+            const copy = new Map<string, Map<Function, number>>();
+            for (const [name, m] of this._timed) {
+                copy.set(name, new Map(m));
+            }
+            this._timed = copy;
+        }
+        if (this._priority) {
+            const copy = new Map<string, Map<Function, number>>();
+            for (const [name, m] of this._priority) {
+                copy.set(name, new Map(m));
+            }
+            this._priority = copy;
         }
     }
 

@@ -13,11 +13,10 @@ export interface TempValue<T = any> {
 /** temp 存储的完整类型 */
 export type TempStore = Record<string, TempValue>;
 
-/** 事件处理器: {func, time, priority} 三元组 */
+/** 事件处理器: {func, time} 二元组，优先级由所在桶决定 */
 export interface EventHandler<TThis = unknown> {
     func: (this: TThis) => boolean | void;
     time: number;
-    priority: number;
 }
 
 /** 事件映射 */

@@ -664,7 +664,7 @@ export class ROOM extends ITEM {
         }
         this._temp_values = new Map();
         this._temp_expiry = new Map();
-        this._events = undefined;
+        this._isolate_events();
 
         // —— 缓存清零 ——
         this.json = null;
