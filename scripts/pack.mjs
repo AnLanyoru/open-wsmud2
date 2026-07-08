@@ -102,8 +102,8 @@ if (IS_BINARY) {
     // Pass 0: 扫描 status_msg / finish_msg 字面量定义
     // ============================================================
 
-    /** 匹配 start_msg: "..."  或  finish_msg: "..." */
-    const STATUS_MSG_RE = /(start_msg|finish_msg)\s*:\s*(["'`])((?:[^"'`\\]|\\.)*?)\2/gs;
+    /** 匹配 start_msg: "..."  或  finish_msg: "..."，排除换行防止跨行 */
+    const STATUS_MSG_RE = /(start_msg|finish_msg)\s*:\s*(["'`])((?:[^"'`\\\n\r]|\\.)*?)\2/gs;
 
     console.log('[pack]   Pass 0: scanning status messages...');
     let statusMsgCount = 0;
@@ -137,8 +137,11 @@ if (IS_BINARY) {
     // Pass 1: 收集所有 send_room / send_combat 字面量
     // ============================================================
 
-    /** 匹配 .send_room('literal' 或 "literal" — 排除反引号和拼接 */
-    const CALL_RE = /\.(send_room|send_combat)\((["'])((?:[^"'\\]|\\.)*?)\2(?!\s*\+)/gs;
+    /** 匹配 .send_room('literal' 或 "literal" — 排除反引号和拼接，排除换行防止跨行 */
+    const CALL_RE = /\.(send_room|send_combat)\((["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/gs;
+
+    /** 匹配 .send_room(`literal`) — 反引号模板字面量（排除含 ${} 的动态模板），排除换行防止跨行 */
+    const CALL_BT_RE = /\.(send_room|send_combat)\(`((?:[^`\\\n\r]|\\.)*?)`(?!\s*\+)/gs;
 
     console.log('[pack]   Pass 1: collecting template strings...');
     let scannedFiles = 0;
@@ -160,6 +163,13 @@ if (IS_BINARY) {
                         templateMap.set(literal, templateMap.size);
                     }
                 }
+                // 反引号模板字面量（排除含 ${} 的动态模板）
+                while ((m = CALL_BT_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[2], '`');
+                    if (!literal.includes('${') && !templateMap.has(literal)) {
+                        templateMap.set(literal, templateMap.size);
+                    }
+                }
             }
         }
     }
@@ -172,8 +182,8 @@ if (IS_BINARY) {
     // Pass 1.5: 收集 action 数组中的 $ 占位符字符串
     // ============================================================
 
-    /** 匹配含 $ 的字符串字面量（action 数组元素等） */
-    const ACTION_STR_RE = /(["'])((?:[^"'\\]|\\.)*?)\1/gs;
+    /** 匹配含 $ 或 ^ 占位符的字符串字面量（action 数组和模板表），排除换行，排除拼接 */
+    const ACTION_STR_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/gs;
 
     let actionStrCount = 0;
 
@@ -189,7 +199,7 @@ if (IS_BINARY) {
                 let m;
                 while ((m = ACTION_STR_RE.exec(content)) !== null) {
                     const literal = unescapeJS(m[2], m[1]);
-                    if (literal.includes('$') && literal.length >= 4 && !templateMap.has(literal)) {
+                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && literal.length >= 4 && !templateMap.has(literal)) {
                         templateMap.set(literal, templateMap.size);
                         actionStrCount++;
                     }
@@ -249,6 +259,22 @@ import { register } from './templates.js';
 ${serverLines.join('\n')}
 `);
         console.log('[pack]   Generated core/templates-build.js');
+
+        // 将 templates-build.js 的 import 注入到服务端入口 world.js
+        // 使 getMask() 能在运行时返回正确的字段掩码
+        const worldJsPath = path.join(CORE_DIR, 'world.js');
+        if (fs.existsSync(worldJsPath)) {
+            let worldContent = fs.readFileSync(worldJsPath, 'utf8');
+            if (!worldContent.includes("templates-build.js")) {
+                // 在 import './util.js' 之后插入（确保 templates.js 先于 templates-build.js 加载）
+                worldContent = worldContent.replace(
+                    /(import\s+['"]\.\/util\.js['"];)/,
+                    "$1\nimport './templates-build.js';"
+                );
+                fs.writeFileSync(worldJsPath, worldContent);
+                console.log('[pack]   Injected templates-build import into core/world.js');
+            }
+        }
     }
 
     // ============================================================
@@ -269,7 +295,7 @@ ${serverLines.join('\n')}
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 transformDir(full);
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') && entry.name !== 'templates-build.js') {
                 let content = fs.readFileSync(full, 'utf8');
                 let changed = false;
 
@@ -286,12 +312,28 @@ ${serverLines.join('\n')}
                     return match;
                 });
 
+                // 替换反引号模板字面量 send_room(`literal`) → send_room(id)
+                // 排除含 ${} 的动态模板（无法预编译）
+                content = content.replace(CALL_BT_RE, (match, funcName, rawStr) => {
+                    const literal = unescapeJS(rawStr, '`');
+                    if (!literal.includes('${')) {
+                        const id = templateMap.get(literal);
+                        if (id !== undefined) {
+                            changed = true;
+                            if (funcName === 'send_room') replacedRoom++;
+                            else replacedCombat++;
+                            return `.${funcName}(${id}`;
+                        }
+                    }
+                    return match;
+                });
+
                 // 替换 action 数组中的含 $ 字符串 "str" → id
                 ACTION_STR_RE.lastIndex = 0; // 重置 exec 污染的状态
                 let actionChanged = false;
                 content = content.replace(ACTION_STR_RE, (match, quote, rawStr) => {
                     const literal = unescapeJS(rawStr, quote);
-                    if (literal.includes('$') && templateMap.has(literal)) {
+                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
                         actionChanged = true;
                         replacedAction++;
                         return String(templateMap.get(literal));
@@ -321,7 +363,7 @@ ${serverLines.join('\n')}
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 replaceStatusMsgs(full);
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') && entry.name !== 'templates-build.js') {
                 let content = fs.readFileSync(full, 'utf8');
                 let changed = false;
 
@@ -361,7 +403,7 @@ ${serverLines.join('\n')}
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
                 verifyDir(full);
-            } else if (entry.name.endsWith('.js')) {
+            } else if (entry.name.endsWith('.js') && entry.name !== 'templates-build.js') {
                 const content = fs.readFileSync(full, 'utf8');
                 let m;
                 while ((m = CALL_RE.exec(content)) !== null) {
@@ -374,6 +416,19 @@ ${serverLines.join('\n')}
                                 ? literal.slice(0, 60) + '...'
                                 : literal;
                             console.log(`[pack]   ⚠ missed in ${path.relative(ROOT, full)}: ${preview}`);
+                        }
+                    }
+                }
+                // 验证反引号模板字面量（排除含 ${} 的动态模板）
+                while ((m = CALL_BT_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[2], '`');
+                    if (!literal.includes('${') && templateMap.has(literal)) {
+                        missed++;
+                        if (missed <= 5) {
+                            const preview = literal.length > 60
+                                ? literal.slice(0, 60) + '...'
+                                : literal;
+                            console.log(`[pack]   ⚠ missed (backtick) in ${path.relative(ROOT, full)}: ${preview}`);
                         }
                     }
                 }

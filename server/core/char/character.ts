@@ -8,7 +8,7 @@ import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
 import { UTIL } from '../util.js';
 import { WEAPON_TYPE, WEAPON_SKILLS, BASE_SKILLS, EQUIP_TYPE, SKILL_TYPES, PfmFlag } from '../const.js';
-import { FIELD_TO_MASK, getMask, popcount } from '../templates.js';
+import { FIELD_TO_MASK, FMASK, getMask, popcount } from '../templates.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -694,37 +694,36 @@ export class CHARACTER extends ITEM {
     }
 
     /** 构建二进制 payload — 按需编码实体字段 + ^args */
-    _build_binary_buf(template_id: number, target: ITEM | undefined, argOffset: number): Buffer {
+    _build_binary_buf(template_id: number, target: ITEM | undefined,
+        a1?: string, a2?: string, a3?: string, a4?: string): Buffer {
         const mask = getMask(template_id);
 
-        // 按需采集实体字段（只有 mask 置位的才编码）
+        // 只计算 mask 需要的字段（避免无谓的 weapon_name/call3 调用）
         const rawFields: string[] = [];
-        const aName = this.name;
-        const aWeapon = this.weapon_name() || '';
-        const aCall3 = this.call3();
-        const aPart = this.attack_part ? this.attack_part.name : '';
-        const aThrow = this.throwing_name() || '';
+        rawFields[0] = (mask & FMASK.A_NAME) ? this.name : '';
+        rawFields[1] = (mask & FMASK.A_WEAPON) ? (this.weapon_name() || '') : '';
+        rawFields[2] = (mask & FMASK.A_CALL3) ? this.call3() : '';
+        rawFields[3] = (mask & FMASK.A_PART) ? (this.attack_part ? this.attack_part.name : '') : '';
+        rawFields[4] = (mask & FMASK.A_THROW) ? (this.throwing_name() || '') : '';
 
         const hasT = target && (target as any).check_character?.();
-        const tName = hasT ? target!.name : '';
-        const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
-        const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
+        rawFields[5] = (mask & FMASK.T_NAME && hasT) ? target!.name : '';
+        rawFields[6] = (mask & FMASK.T_WEAPON && hasT) ? ((target as any).weapon_name?.() || '') : '';
+        rawFields[7] = (mask & FMASK.T_CALL3 && hasT) ? ((target as any).call3?.() || '') : '';
 
-        const allFields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
         const fieldBufs: Buffer[] = [];
         for (let i = 0; i < 8; i++) {
             if (mask & FIELD_TO_MASK[i]) {
-                const fb = Buffer.from(allFields[i], 'utf8');
-                fieldBufs.push(fb);
+                fieldBufs.push(Buffer.from(rawFields[i], 'utf8'));
             }
         }
 
-        // ^args 从 arguments[argOffset] 起
+        // ^args — 显式参数，零开销
         const argBufs: Buffer[] = [];
-        for (let i = argOffset; i < arguments.length; i++) {
-            const v = arguments[i];
-            if (v !== undefined && v !== null) argBufs.push(Buffer.from(String(v), 'utf8'));
-        }
+        if (a1 !== undefined && a1 !== null) argBufs.push(Buffer.from(a1, 'utf8'));
+        if (a2 !== undefined && a2 !== null) argBufs.push(Buffer.from(a2, 'utf8'));
+        if (a3 !== undefined && a3 !== null) argBufs.push(Buffer.from(a3, 'utf8'));
+        if (a4 !== undefined && a4 !== null) argBufs.push(Buffer.from(a4, 'utf8'));
 
         let totalSize = 1 + 2 + 1; // op + tid + mask
         for (const fb of fieldBufs) totalSize += 1 + fb.length;
@@ -812,7 +811,7 @@ export class CHARACTER extends ITEM {
     send_msg_b(template_id: number, target?: ITEM, flags?: number,
         _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
         if (!this.environment || template_id === undefined) return;
-        const payload = this._build_binary_buf(template_id, target, 3);
+        const payload = this._build_binary_buf(template_id, target, _a1, _a2, _a3, _a4);
         if (flags && (flags & 1)) this._broadcast_combat(payload, target);
         else this._broadcast_room(payload, target, !!(flags && (flags & 2)));
     }
@@ -2954,7 +2953,7 @@ export class CHARACTER extends ITEM {
                 }
             } else {
                 if (sh > 0) {
-                    this.send_combat(damage_msg(sh, par.is_throwing ? WEAPON_TYPE.THROWING : weapon_type, target, par.iscirt ?? false, par.damage_msg), target);
+                    damage_msg(this, sh, par.is_throwing ? WEAPON_TYPE.THROWING : weapon_type, target, par.iscirt ?? false, par.damage_msg);
                     target.send_combat(query_status_msg(target.hp, target.max_hp));
                     if (target.on_damage) target.on_damage(this, sh);
                 } else {
@@ -3420,60 +3419,115 @@ function query_status_msg(hp: number, maxhp: number): string {
 }
 
 /**
- * 格式化伤害消息
+ * 伤害消息模板表 — { type → [{max, tmpl}] }
+ * tmpl 中的 ^ 会被替换为伤害数值字符串（如 "<wht>1234</wht>点伤害"）
+ * 不含 $ 占位符的模板不会被 pack.mjs 自动扫描，由 _DMG_ZERO 和 _DMG_FALLBACK 单独注册
+ * pack.mjs --binary 会将其中含 $ 的 tmpl 字符串替换为模板 ID
  */
-function damage_msg(damage: number, type: string, ob: CHARACTER, iscrit: boolean, msg?: string): string {
+const _DMG_TMPL: Record<string, Array<{max: number, tmpl: string | number}>> = {
+    blade: [
+        { max: 5,  tmpl: "结果只是轻轻地划破$p的皮肉，造成^。" },
+        { max: 10, tmpl: "结果在$p$l划出一道细长的血痕，造成^！" },
+        { max: 20, tmpl: "结果「嗤」地一声划出一道伤口，造成^！" },
+        { max: 40, tmpl: "结果「嗤」地一声划出一道血淋淋的伤口，造成^！" },
+        { max: 80, tmpl: "结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！" },
+        { max: Infinity, tmpl: "结果只听见$n一声惨嚎，$w已在$p$l划出一道深及见骨的可怕伤口，造成^！！" },
+    ],
+    sword: [
+        { max: 10, tmpl: "结果只是轻轻地刺破$p的皮肉，造成^！" },
+        { max: 20, tmpl: "结果在$p$l刺出一个创口，造成^！" },
+        { max: 40, tmpl: "结果「噗」地一声刺入了$n$l寸许，造成^！" },
+        { max: 60, tmpl: "结果「噗」地一声刺进$n的$l，使$p不由自主地退了几步，造成^！" },
+        { max: 80, tmpl: "结果「噗嗤」地一声，$w已在$p$l刺出一个血肉模糊的血窟窿，造成^！" },
+        { max: Infinity, tmpl: "结果只听见$n一声惨嚎，$w已在$p的$l对穿而出，鲜血溅得满地，造成^！！" },
+    ],
+    none: [
+        { max: 5,  tmpl: "结果只是轻轻地碰到，比拍苍蝇稍微重了点，造成^！" },
+        { max: 10, tmpl: "结果在$p的$l造成一处瘀青，造成^！" },
+        { max: 25, tmpl: "结果一击命中，$n的$l登时肿了一块老高，造成^！" },
+        { max: 40, tmpl: "结果一击命中，$n闷哼了一声显然吃了不小的亏，造成^！" },
+        { max: 50, tmpl: "结果「砰」地一声，$n退了两步，造成^！" },
+        { max: 60, tmpl: "结果这一下「砰」地一声打得$n连退了好几步，差一点摔倒，造成^！" },
+        { max: 80, tmpl: "结果重重地击中，$n「哇」地一声吐出一口鲜血，造成^！" },
+        { max: Infinity, tmpl: "结果只听见「砰」地一声巨响，$n像一捆稻草般飞了出去，造成^！！" },
+    ],
+    force: [
+        { max: 10, tmpl: "结果只是把$n打得退了半步，毫发无损，造成^！" },
+        { max: 20, tmpl: "结果$n痛哼一声，在$p的$l造成一处瘀伤，造成^！" },
+        { max: 30, tmpl: "结果一击命中，把$n打得痛得弯下腰去，造成^！" },
+        { max: 40, tmpl: "结果$n闷哼了一声，脸上一阵青一阵白，显然受了点内伤，造成^！" },
+        { max: 60, tmpl: "结果$n脸色一下变得惨白，昏昏沉沉接连退了好几步，造成^！" },
+        { max: 75, tmpl: "结果重重地击中，$n「哇」地一声吐出一口鲜血，造成^！" },
+        { max: 90, tmpl: "结果「轰」地一声，$n全身气血倒流，口中鲜血狂喷而出，造成^！" },
+        { max: Infinity, tmpl: "结果只听见几声喀喀轻响，$n一声惨叫，像滩软泥般塌了下去，造成^！！" },
+    ],
+    throwing: [
+        { max: 5,  tmpl: "结果只是轻轻地划破$p的皮肉，造成^。" },
+        { max: 10, tmpl: "结果在$p$l划出一道细长的血痕，造成^！" },
+        { max: 20, tmpl: "结果「嗤」地一声划出一道伤口，造成^！" },
+        { max: 40, tmpl: "结果「嗤」地一声划出一道血淋淋的伤口，造成^！" },
+        { max: 80, tmpl: "结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！" },
+        { max: Infinity, tmpl: "结果只听见$n一声惨嚎，$T已在$p$l划出一道深及见骨的可怕伤口，造成^！！" },
+    ],
+};
+// fallback 模板 — text 模式为字符串，binary 模式被 pack.mjs 替换为模板 ID
+const _DMG_FALLBACK: string | number = '<wht>结果造成^。</wht>';
+
+/**
+ * 发送伤害消息
+ * 通过 typeof tmpl 自动检测编译模式：
+ *   text 模式：tmpl 为字符串，渲染 ^ 后 send_combat
+ *   binary 模式：tmpl 为模板 ID (number)，send_combat_b
+ * msg 存在或 damage === 0 时走文本路径（动态内容无法预编译）
+ */
+function damage_msg(
+    me: CHARACTER, damage: number, type: string, ob: CHARACTER,
+    iscrit: boolean, msg?: string,
+): void {
+    // 自定义消息 — 动态拼接，走文本路径
     if (msg) {
-        return msg + '\n$N对$n造成' + (iscrit ? ('<hir>' + damage + '</hir>点暴击伤害') : ('<wht>' + damage + '</wht>点伤害'));
+        me.send_combat(msg + '\n$N对$n造成'
+            + (iscrit ? '<hir>' + damage + '</hir>点暴击伤害' : '<wht>' + damage + '</wht>点伤害'), ob);
+        return;
     }
-    if (damage === 0) return '结果没有造成任何伤害。';
-    const sh = iscrit ? '<hir>' + damage + '</hir>点暴击伤害' : '<wht>' + damage + '</wht>点伤害';
-    let ratio = ob.hp > 0 ? damage * 100 / ob.hp : 120;
-    switch (type) {
-        case WEAPON_TYPE.BLADE:
-        case WEAPON_TYPE.WHIP:
-            if (ratio < 5) return '结果只是轻轻地划破$p的皮肉，造成' + sh + '。';
-            else if (ratio < 10) return '结果在$p$l划出一道细长的血痕，造成' + sh + '！';
-            else if (ratio < 20) return '结果「嗤」地一声划出一道伤口，造成' + sh + '！';
-            else if (ratio < 40) return '结果「嗤」地一声划出一道血淋淋的伤口，造成' + sh + '！';
-            else if (ratio < 80) return '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成' + sh + '！';
-            else return '结果只听见$n一声惨嚎，$w已在$p$l划出一道深及见骨的可怕伤口，造成' + sh + '！！';
-        case WEAPON_TYPE.SWORD:
-            if (ratio < 10) return '结果只是轻轻地刺破$p的皮肉，造成' + sh + '！';
-            else if (ratio < 20) return '结果在$p$l刺出一个创口，造成' + sh + '！';
-            else if (ratio < 40) return '结果「噗」地一声刺入了$n$l寸许，造成' + sh + '！';
-            else if (ratio < 60) return '结果「噗」地一声刺进$n的$l，使$p不由自主地退了几步，造成' + sh + '！';
-            else if (ratio < 80) return '结果「噗嗤」地一声，$w已在$p$l刺出一个血肉模糊的血窟窿，造成' + sh + '！';
-            else return '结果只听见$n一声惨嚎，$w已在$p的$l对穿而出，鲜血溅得满地，造成' + sh + '！！';
-        case WEAPON_TYPE.NONE:
-        case WEAPON_TYPE.STAFF:
-        case WEAPON_TYPE.CLUB:
-            if (ratio < 5) return '结果只是轻轻地碰到，比拍苍蝇稍微重了点，造成' + sh + '！';
-            else if (ratio < 10) return '结果在$p的$l造成一处瘀青，造成' + sh + '！';
-            else if (ratio < 25) return '结果一击命中，$n的$l登时肿了一块老高，造成' + sh + '！';
-            else if (ratio < 40) return '结果一击命中，$n闷哼了一声显然吃了不小的亏，造成' + sh + '！';
-            else if (ratio < 50) return '结果「砰」地一声，$n退了两步，造成' + sh + '！';
-            else if (ratio < 60) return '结果这一下「砰」地一声打得$n连退了好几步，差一点摔倒，造成' + sh + '！';
-            else if (ratio < 80) return '结果重重地击中，$n「哇」地一声吐出一口鲜血，造成' + sh + '！';
-            else return '结果只听见「砰」地一声巨响，$n像一捆稻草般飞了出去，造成' + sh + '！！';
-        case 'force':
-            if (ratio < 10) return '结果只是把$n打得退了半步，毫发无损，造成' + sh + '！';
-            else if (ratio < 20) return '结果$n痛哼一声，在$p的$l造成一处瘀伤，造成' + sh + '！';
-            else if (ratio < 30) return '结果一击命中，把$n打得痛得弯下腰去，造成' + sh + '！';
-            else if (ratio < 40) return '结果$n闷哼了一声，脸上一阵青一阵白，显然受了点内伤，造成' + sh + '！';
-            else if (ratio < 60) return '结果$n脸色一下变得惨白，昏昏沉沉接连退了好几步，造成' + sh + '！';
-            else if (ratio < 75) return '结果重重地击中，$n「哇」地一声吐出一口鲜血，造成' + sh + '！';
-            else if (ratio < 90) return '结果「轰」地一声，$n全身气血倒流，口中鲜血狂喷而出，造成' + sh + '！';
-            else return '结果只听见几声喀喀轻响，$n一声惨叫，像滩软泥般塌了下去，造成' + sh + '！！';
-        case WEAPON_TYPE.THROWING:
-            if (ratio < 5) return '结果只是轻轻地划破$p的皮肉，造成' + sh + '。';
-            else if (ratio < 10) return '结果在$p$l划出一道细长的血痕，造成' + sh + '！';
-            else if (ratio < 20) return '结果「嗤」地一声划出一道伤口，造成' + sh + '！';
-            else if (ratio < 40) return '结果「嗤」地一声划出一道血淋淋的伤口，造成' + sh + '！';
-            else if (ratio < 80) return '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成' + sh + '！';
-            else return '结果只听见$n一声惨嚎，$T已在$p$l划出一道深及见骨的可怕伤口，造成' + sh + '！！';
-        default:
-            return '<wht>结果造成' + sh + '。</wht>';
+    // 零伤害 — 文本路径
+    if (damage === 0) { me.send_combat('结果没有造成任何伤害。', ob); return; }
+    // 伤害字符串（^ 参数）
+    const sh: string = iscrit
+        ? '<hir>' + damage + '</hir>点暴击伤害'
+        : '<wht>' + damage + '</wht>点伤害';
+    const ratio: number = ob.hp > 0 ? damage * 100 / ob.hp : 120;
+    // 查找伤害模板
+    let buckets: Array<{max: number, tmpl: string | number}> | undefined;
+    if (type === WEAPON_TYPE.BLADE || type === WEAPON_TYPE.WHIP) {
+        buckets = _DMG_TMPL.blade;
+    } else if (type === WEAPON_TYPE.SWORD) {
+        buckets = _DMG_TMPL.sword;
+    } else if (type === WEAPON_TYPE.NONE || type === WEAPON_TYPE.STAFF || type === WEAPON_TYPE.CLUB) {
+        buckets = _DMG_TMPL.none;
+    } else if (type === 'force') {
+        buckets = _DMG_TMPL.force;
+    } else if (type === WEAPON_TYPE.THROWING) {
+        buckets = _DMG_TMPL.throwing;
+    }
+    if (buckets) {
+        for (let i: number = 0; i < buckets.length; i++) {
+            if (ratio < buckets[i].max) {
+                const tmpl = buckets[i].tmpl;
+                if (typeof tmpl === 'number') {
+                    me.send_combat_b(tmpl, ob, sh);
+                } else {
+                    me.send_combat(tmpl.replace('^', sh), ob);
+                }
+                return;
+            }
+        }
+    }
+    // fallback
+    if (typeof _DMG_FALLBACK === 'number') {
+        me.send_combat_b(_DMG_FALLBACK, ob, sh);
+    } else {
+        me.send_combat(_DMG_FALLBACK.replace('^', sh), ob);
     }
 }
 

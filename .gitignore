@@ -3,7 +3,7 @@ log/
 database.db
 data/database.db
 .env
-www/
+/www/
 data/100/
 data/1/
 data/def/
@@ -11,8 +11,8 @@ data/def/
 .vscode/
 .claude/
 .trae/
-old/
-core/
-res/
+/old/
+/core/
+/res/
 server/dist/
 bench/
