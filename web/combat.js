@@ -140,6 +140,7 @@ const Combat = {
         this.refActions();
         if (data.skills)
             this.ShowPFM(data);
+        Combat._resetCDAnimations();
     },
     ShowPFM: function (data) {
         this.Skills = data.skills || [];
