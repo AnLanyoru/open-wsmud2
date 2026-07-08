@@ -237,7 +237,11 @@ function statusToJson(this: CharacterStatus): string {
         parts.push(String(this.duration));
     }
     parts.push(',overtime:');
-    parts.push(String(now - (this.start_time || now)));
+    if (this.duration) {
+        parts.push(String(now - (this.start_time || now)));
+    } else {
+        parts.push('0');
+    }
     if (this.override === 1) {
         parts.push(',"count":');
         parts.push(String(this.count || 1));

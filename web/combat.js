@@ -81,7 +81,7 @@ const Combat = {
             item._statusEnd = item.end;
         } else {
             shadow.style.transition = "none";
-            shadow.style.transform = "scaleX(1)";
+            shadow.style.transform = item.duration > 0 ? "scaleX(1)" : "scaleX(0)";
             item._hadStatus = false;
             item._statusEnd = 0;
         }
@@ -574,7 +574,7 @@ const Combat = {
         if (item._animId) Combat._animUnregister(item._animId);
         item._hadStatus = false;
         item.end = Date.now() + item.duration;
-        Combat.StatusItemANI(item);
+        if (item.duration > 0) Combat.StatusItemANI(item);
     }, StatusItem_override: function (player_status, data) {
 
         var item = player_status.items[data.sid];
@@ -582,7 +582,7 @@ const Combat = {
         if (item._animId) Combat._animUnregister(item._animId);
         item._hadStatus = false;
         item.end = Date.now() + item.duration;
-        Combat.StatusItemANI(item);
+        if (item.duration > 0) Combat.StatusItemANI(item);
     },
     StatusItem_clear: function (player_status, data) {
         if (!player_status) return;
@@ -608,7 +608,7 @@ const Combat = {
                 shadow.style.transform = "scaleX(1)";
                 item._hadStatus = true;
             } else {
-                shadow.style.transform = "scaleX(1)";
+                shadow.style.transform = item.duration > 0 ? "scaleX(1)" : "scaleX(0)";
                 item._hadStatus = false;
                 item._statusEnd = 0;
             }
