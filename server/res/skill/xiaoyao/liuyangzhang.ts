@@ -102,19 +102,19 @@ export default class extends SKILL {
                 var mz = me.mz;
                 var gj = me.gj;
                 var sp = 150 + parseInt(lv / 30);
-                var before = "";
+                var before_to_b = "";
                 for (var i = 0; i < 3; i++) {
                     if (me.do_attack({
                         target: target,
                         gj: gj,
                         mz: mz,
-                        attack_before: before, no_weapon: true
+                        attack_before: before_to_b, no_weapon: true
                     })) {
                         gj = gj * sp / 100;
-                        before = "<hir>$N长笑一声，运掌如风，掌力更加迅猛\n</hir>";
+                        before_to_b = "<hir>$N长笑一声，运掌如风，掌力更加迅猛</hir>";
                     } else {
                         mz = mz * sp / 100;
-                        before = "<hic>$N气随意转，掌风突变，化刚为柔，又如春风般无孔不入\n</hic>";
+                        before_to_b = "<hic>$N气随意转，掌风突变，化刚为柔，又如春风般无孔不入</hic>";
                     }
                 }
                 me.end_attack(target);

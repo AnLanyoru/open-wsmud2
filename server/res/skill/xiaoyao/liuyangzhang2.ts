@@ -100,20 +100,20 @@ export default class extends SKILL {
                 let mz = me.mz;
                 let gj = me.gj;
                 const sp = 150 + Math.floor(lv / 30);
-                let before = "";
+                let before_to_b = "";
                 for (let i = 0; i < 3; i++) {
                     if (me.do_attack({
                         target: target,
                         gj: gj,
                         mz: mz,
-                        attack_before: before,
+                        attack_before: before_to_b,
                         no_weapon: true,
                     })) {
                         gj = Math.floor(gj * sp / 100);
-                        before = "<hir>$N掌势愈发凌厉，掌风呼啸，如雷霆万钧般接连压下。\n</hir>";
+                        before_to_b = "<hir>$N掌势愈发凌厉，掌风呼啸，如雷霆万钧般接连压下。</hir>";
                     } else {
                         mz = Math.floor(mz * sp / 100);
-                        before = "<hic>$N掌势忽变，化刚猛为灵动，掌影飘忽不定，如春风化雨般无孔不入。\n</hic>";
+                        before_to_b = "<hic>$N掌势忽变，化刚猛为灵动，掌影飘忽不定，如春风化雨般无孔不入。</hic>";
                     }
                 }
                 me.end_attack(target);

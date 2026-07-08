@@ -2853,7 +2853,9 @@ export class CHARACTER extends ITEM {
             attack_msg = attackskill!.query_attack_action(this, target);
         }
         if (par.attack_before) {
-            attack_msg = par.attack_before + attack_msg;
+            // 独立发送前置消息，避免字符串拼接
+            // text 模式为字符串，binary 模式为模板 ID — send_combat 自动路由
+            this.send_combat(par.attack_before, target);
         }
         const weapon_type = par.no_weapon
             ? WEAPON_TYPE.NONE
@@ -3484,9 +3486,10 @@ function damage_msg(
     me: CHARACTER, damage: number, type: string, ob: CHARACTER,
     iscrit: boolean, msg?: string,
 ): void {
-    // 自定义消息 — 动态拼接，走文本路径
+    // 自定义消息 — text 模式字符串走拼接，binary 模式数字走 send_combat_b
     if (msg) {
-        me.send_combat(msg + '\n$N对$n造成'
+        me.send_combat(msg, ob);
+        me.send_combat('$N对$n造成'
             + (iscrit ? '<hir>' + damage + '</hir>点暴击伤害' : '<wht>' + damage + '</wht>点伤害'), ob);
         return;
     }

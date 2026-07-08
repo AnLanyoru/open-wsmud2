@@ -238,6 +238,18 @@ if (IS_BINARY) {
                         collectStr(unescapeJS(sm[2], sm[1]));
                     }
                 }
+
+                // 5) DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
+                const PAR_PROP_RE_C = /(attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                while ((m = PAR_PROP_RE_C.exec(content)) !== null) {
+                    collectStr(unescapeJS(m[3], m[2]));
+                }
+
+                // 6) _to_b 后缀变量赋值（模板字符串优化标记）
+                const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                while ((m = TO_B_RE_C.exec(content)) !== null) {
+                    collectStr(unescapeJS(m[3], m[2]));
+                }
             }
         }
     }
@@ -416,6 +428,28 @@ ${serverLines.join('\n')}
                 const MSG_ARR_RE = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
                 content = content.replace(MSG_ARR_RE, (_, prefix, body, suffix) => {
                     return prefix + body.replace(STR_RE, replaceStr) + suffix;
+                });
+
+                // 5) DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
+                const PAR_PROP_RE = /(attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                content = content.replace(PAR_PROP_RE, (_, key, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
+                        replacedAction++;
+                        return key + ': ' + String(templateMap.get(literal));
+                    }
+                    return _;
+                });
+
+                // 6) _to_b 后缀变量赋值（模板字符串优化标记）
+                const TO_B_RE = /(\w+_to_b\s*=\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                content = content.replace(TO_B_RE, (_, prefix, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
+                        replacedAction++;
+                        return prefix + String(templateMap.get(literal));
+                    }
+                    return _;
                 });
 
                 if (content !== preContent) changed = true;
