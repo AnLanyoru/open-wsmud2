@@ -179,17 +179,24 @@ export class WSClient {
         if (!evt || !evt.data) return;
         var data = evt.data;
         if (data[0] == '{' || data[0] == '[') {
+            var parsed = null;
             try {
                 var func = new Function("return " + data + ";");
-                this.OnData(func());
-            } catch (e) {
-                console.error('OnReceived parse error:', e.message, data.substring(0, 200));
+                parsed = func();
+            } catch (e1) {
                 try {
-                    this.OnData(JSON.parse(data));
+                    parsed = JSON.parse(data);
                 } catch (e2) {
-                    console.error('OnReceived JSON parse also failed:', e2.message);
+                    // Both parsing methods failed, treat as plain text
                     this.OnMessage(data);
+                    return;
                 }
+            }
+            // Parsing succeeded, call OnData; if it throws, do not fall back to OnMessage
+            try {
+                this.OnData(parsed);
+            } catch (e) {
+                console.error('OnData error for JSON:', e);
             }
         } else {
             this.OnMessage(data);
