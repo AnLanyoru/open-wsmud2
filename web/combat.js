@@ -113,16 +113,7 @@ const Combat = {
             var stitem = Combat.STATUS[id];
             if (stitem && stitem.items) {
                 for (var sid in stitem.items) {
-                    var item = stitem.items[sid];
-                    if (item._animId) {
-                        Combat._animUnregister(item._animId);
-                        item._animId = null;
-                    }
-                    Combat._snapStatus(item, item.end - now);
-                    if (item.end - now > 0) {
-                        item._statusEnd = undefined;
-                        Combat.StatusItemANI(item);
-                    }
+                    Combat._snapStatus(stitem.items[sid], stitem.items[sid].end - now);
                 }
             }
         }
@@ -607,9 +598,7 @@ const Combat = {
             var remaining = item.end - now;
             if (remaining < 0) remaining = 0;
             if (remaining > 0) {
-                if (item._statusEnd !== item.end) {
-                    Combat._snapStatus(item, remaining);
-                }
+                Combat._snapStatus(item, remaining);
                 shadow.style.transition = "transform " + remaining + "ms linear";
                 shadow.style.transform = "scaleX(1)";
                 item._hadStatus = true;
