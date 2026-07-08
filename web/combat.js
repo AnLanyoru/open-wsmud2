@@ -156,19 +156,17 @@ const Combat = {
         var elem = $(".combat-commands").empty();
         if (!items.length) return;
         for (var i = 0; i < items.length; i++) {
+            var item = items[i];
             var html = [];
-            html.push("<span class='pfm-item' pid='" + items[i].id + "'>");
-            html.push(items[i].name);
+            html.push("<span class='pfm-item' pid='" + item.id + "'>");
+            html.push(item.name);
             html.push("<span class='cd-overlay'></span>");
             html.push("</span>");
-            items[i].elem = $(html.join("")).appendTo(elem);
-            items[i]._overlay = items[i].elem.find(".cd-overlay");
-            // 重绘后重置 CD 动画状态，强制下次 tick 重新 snap 到正确比例
-            items[i]._cdEnd = undefined;
-            items[i]._hadCD = false;
+            item.elem = $(html.join("")).appendTo(elem);
+            item._overlay = item.elem.find(".cd-overlay");
+            item._cdEnd = undefined;
+            item._hadCD = false;
         }
-        // 重绘后若存在活动 CD，立即触发动画更新，避免新 overlay 停在默认 scaleX(0)
-        Combat.ANI_PFM();
     }, ChangeDistime: function (data) {
         var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
