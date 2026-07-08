@@ -90,9 +90,27 @@ const Combat = {
             if (stitem && stitem.items) {
                 for (var sid in stitem.items) {
                     var item = stitem.items[sid];
-                    if (item.end - now > 0) {
-                        item._statusEnd = undefined;
-                        Combat.StatusItemANI(item);
+                    var remaining = item.end - now;
+                    if (item._animId) {
+                        Combat._animUnregister(item._animId);
+                        item._animId = null;
+                    }
+                    var shadow = item.elem.lastChild;
+                    if (remaining > 0) {
+                        var elapsed = item.duration - remaining;
+                        var startScale = elapsed > 0 ? Math.min(1, elapsed / item.duration) : 0;
+                        shadow.style.transition = "none";
+                        shadow.style.transform = "scaleX(" + startScale + ")";
+                        shadow.offsetHeight;
+                        shadow.style.transition = "transform " + remaining + "ms linear";
+                        shadow.style.transform = "scaleX(1)";
+                        item._hadStatus = true;
+                        item._statusEnd = item.end;
+                    } else {
+                        shadow.style.transition = "none";
+                        shadow.style.transform = "scaleX(1)";
+                        item._hadStatus = false;
+                        item._statusEnd = 0;
                     }
                 }
             }
