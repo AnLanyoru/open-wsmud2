@@ -70,7 +70,7 @@ export class BASE {
      * @param fname - 事件名（即要覆盖的方法名）
      * @param func - 替换的函数
      * @param time - 有效期（毫秒），不传则永久有效
-     * @param priority - 优先级，数值越大越先执行（默认 0）
+     * @param priority - 优先级，数值越小越先执行，不传则排在最后
      */
     add_event(fname: string, func: (this: this, ...args: any[]) => any, time?: number, priority?: number): void {
         if (!this[fname]) {
@@ -82,27 +82,31 @@ export class BASE {
         if (!this._events) this._events = {};
         if (!this._events[fname]) this._events[fname] = [];
 
-        const p = priority ?? 0;
         const funcs = this._events[fname];
 
-        // 获取/创建优先级 Map
-        if (!this._priority) this._priority = new Map();
-        let priMap = this._priority.get(fname);
-        if (!priMap) {
-            priMap = new Map();
-            this._priority.set(fname, priMap);
-        }
-
-        // 按优先级降序插入（同优先级保持插入顺序）
-        let insertIdx = funcs.length;
-        for (let i = 0; i < funcs.length; i++) {
-            if ((priMap.get(funcs[i]) ?? 0) < p) {
-                insertIdx = i;
-                break;
+        if (priority !== undefined) {
+            // 懒加载优先级 Map
+            if (!this._priority) this._priority = new Map();
+            let priMap = this._priority.get(fname);
+            if (!priMap) {
+                priMap = new Map();
+                this._priority.set(fname, priMap);
             }
+            priMap.set(func, priority);
+
+            // 按优先级升序插入，无优先级的不在 priMap 中视为垫底
+            let insertIdx = funcs.length;
+            for (let i = 0; i < funcs.length; i++) {
+                const ep = priMap.get(funcs[i]);
+                if (ep === undefined || ep > priority) {
+                    insertIdx = i;
+                    break;
+                }
+            }
+            funcs.splice(insertIdx, 0, func);
+        } else {
+            funcs.push(func);
         }
-        funcs.splice(insertIdx, 0, func);
-        priMap.set(func, p);
 
         // 定时 handler 记录过期时间
         if (time) {
