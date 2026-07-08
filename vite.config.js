@@ -17,6 +17,16 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 index: 'index.html'
+            },
+            output: {
+                entryFileNames: 'assets/ws.js',
+                chunkFileNames: 'assets/ws-[name].js',
+                assetFileNames: (assetInfo) => {
+                    const name = assetInfo.name || '';
+                    if (name.endsWith('.css')) return 'assets/ws.css';
+                    if (name.endsWith('.png')) return 'assets/icon.png';
+                    return 'assets/[name]-[hash][extname]';
+                }
             }
         }
     },

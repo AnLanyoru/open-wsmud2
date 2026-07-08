@@ -179,37 +179,71 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique literal templates`);
 
     // ============================================================
-    // Pass 1.5: 收集 action 数组中的 $ 占位符字符串
+    // Pass 1.5: 收集已知安全上下文中的 $/^ 模板字符串
+    // 只收集以下上下文（与 Pass 2 的替换保持一致）：
+    //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
+    //   2. _DMG_TMPL 的 tmpl 值
+    //   3. _DMG_FALLBACK 值
+    //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
     // ============================================================
 
-    /** 匹配含 $ 或 ^ 占位符的字符串字面量（action 数组和模板表），排除换行，排除拼接 */
-    const ACTION_STR_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/gs;
+    const STR_LIT_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
 
     let actionStrCount = 0;
 
-    function collectActionStrings(dir) {
+    function collectStr(literal) {
+        if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && literal.length >= 4 && !templateMap.has(literal)) {
+            templateMap.set(literal, templateMap.size);
+            actionStrCount++;
+        }
+    }
+
+    function collectActionStrs(dir) {
         if (!fs.existsSync(dir)) return;
         const entries = fs.readdirSync(dir, { withFileTypes: true });
         for (const entry of entries) {
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
-                collectActionStrings(full);
+                collectActionStrs(full);
             } else if (entry.name.endsWith('.js')) {
                 const content = fs.readFileSync(full, 'utf8');
+
+                // 1) action 数组
+                const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
                 let m;
-                while ((m = ACTION_STR_RE.exec(content)) !== null) {
-                    const literal = unescapeJS(m[2], m[1]);
-                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && literal.length >= 4 && !templateMap.has(literal)) {
-                        templateMap.set(literal, templateMap.size);
-                        actionStrCount++;
+                while ((m = ACTION_ARR_RE_C.exec(content)) !== null) {
+                    let sm;
+                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
+                        collectStr(unescapeJS(sm[2], sm[1]));
+                    }
+                }
+
+                // 2) _DMG_TMPL 的 tmpl: "..."
+                const DMG_TMPL_RE_C = /tmpl\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
+                while ((m = DMG_TMPL_RE_C.exec(content)) !== null) {
+                    collectStr(unescapeJS(m[2], m[1]));
+                }
+
+                // 3) _DMG_FALLBACK = "..."
+                const DMG_FB_RE_C = /_DMG_FALLBACK\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
+                while ((m = DMG_FB_RE_C.exec(content)) !== null) {
+                    collectStr(unescapeJS(m[2], m[1]));
+                }
+
+                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+                const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
+                while ((m = MSG_ARR_RE_C.exec(content)) !== null) {
+                    let sm;
+                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
+                        collectStr(unescapeJS(sm[2], sm[1]));
                     }
                 }
             }
         }
     }
 
-    collectActionStrings(CORE_DIR);
-    collectActionStrings(RES_DIR);
+    collectActionStrs(CORE_DIR);
+    collectActionStrs(RES_DIR);
     console.log(`[pack]   Found ${actionStrCount} action strings (total: ${templateMap.size})`);
 
     // ============================================================
@@ -241,12 +275,12 @@ if (IS_BINARY) {
             serverLines.push(`register(${JSON.stringify(literal)});`);
         }
 
-        // 客户端模板表 (JSON, Express 自动 gzip)
+        // 客户端模板表 (JSON, 写到项目根目录避免被 vite build 清空)
         fs.writeFileSync(
-            path.join(WWW_DIR, 'templates-data.json'),
+            path.join(ROOT, 'templates-data.json'),
             JSON.stringify({ v: 1, d: clientData })
         );
-        console.log('[pack]   Generated www/templates-data.json');
+        console.log('[pack]   Generated templates-data.json');
 
         // 服务端模板注册（供 getMask() 使用）
         fs.writeFileSync(
@@ -328,19 +362,63 @@ ${serverLines.join('\n')}
                     return match;
                 });
 
-                // 替换 action 数组中的含 $ 字符串 "str" → id
-                ACTION_STR_RE.lastIndex = 0; // 重置 exec 污染的状态
-                let actionChanged = false;
-                content = content.replace(ACTION_STR_RE, (match, quote, rawStr) => {
+                // ============================================================
+                // 替换已知安全上下文中的 $/^ 字符串
+                // 只替换以下上下文，避免误伤 attack_before / damage_msg 等动态拼接场景：
+                //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
+                //   2. _DMG_TMPL 的 tmpl 值
+                //   3. _DMG_FALLBACK 值
+                //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+                // ============================================================
+
+                /** 在已知数组/对象上下文中替换 $/^ 字符串 */
+                const STR_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
+                function replaceStr(_, quote, rawStr) {
                     const literal = unescapeJS(rawStr, quote);
                     if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
-                        actionChanged = true;
                         replacedAction++;
                         return String(templateMap.get(literal));
                     }
-                    return match;
+                    return _;
+                }
+
+                const preContent = content;
+
+                // 1) action 数组: attack_actions: ["...", ...]
+                const ACTION_ARR_RE = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
+                content = content.replace(ACTION_ARR_RE, (_, prefix, body, suffix) => {
+                    return prefix + body.replace(STR_RE, replaceStr) + suffix;
                 });
-                if (actionChanged) changed = true;
+
+                // 2) _DMG_TMPL 的 tmpl: "..."
+                const DMG_TMPL_RE = /(tmpl\s*:\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                content = content.replace(DMG_TMPL_RE, (_, prefix, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    if (templateMap.has(literal)) {
+                        replacedAction++;
+                        return prefix + String(templateMap.get(literal));
+                    }
+                    return _;
+                });
+
+                // 3) _DMG_FALLBACK = "..."
+                const DMG_FB_RE = /(_DMG_FALLBACK\s*=\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                content = content.replace(DMG_FB_RE, (_, prefix, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    if (templateMap.has(literal)) {
+                        replacedAction++;
+                        return prefix + String(templateMap.get(literal));
+                    }
+                    return _;
+                });
+
+                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+                const MSG_ARR_RE = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
+                content = content.replace(MSG_ARR_RE, (_, prefix, body, suffix) => {
+                    return prefix + body.replace(STR_RE, replaceStr) + suffix;
+                });
+
+                if (content !== preContent) changed = true;
 
                 if (changed) {
                     fs.writeFileSync(full, content);

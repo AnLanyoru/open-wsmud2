@@ -14,5 +14,6 @@ data/def/
 /old/
 /core/
 /res/
+/templates-data.json
 server/dist/
 bench/

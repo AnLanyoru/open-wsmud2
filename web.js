@@ -30,6 +30,13 @@ const APIS = {
 
 app.use(express.static(path.join(__dirname, 'www'), {fallthrough: true}));
 
+// templates-data.json 不在 www/（避免被 vite build 清空），从项目根目录 serve
+app.get('/templates-data.json', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'templates-data.json'), {fallthrough: true}, (err) => {
+        if (err) res.status(404).end();
+    });
+});
+
 
 app.disable('x-powered-by');
 app.use(cookieParser());
