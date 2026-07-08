@@ -11,7 +11,7 @@
     "dev": "vite",
     "start": "npm run build && concurrently \"node web.js\" \"node main.mjs\"",
     "start-b": "npm run build-b && concurrently \"node web.js\" \"node main.mjs\"",
-    "clean": "node -e \"var f=require('fs');['core','res','server/dist'].forEach(d=>f.rmSync(d,{recursive:true,force:true}));f.rmSync('web/templates-data.js',{force:true})\"",
+    "clean": "node -e \"var f=require('fs');['core','res','server/dist'].forEach(d=>f.rmSync(d,{recursive:true,force:true}));['web/templates-data.js','core/templates-build.js'].forEach(x=>f.rmSync(x,{force:true}))\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

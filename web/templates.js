@@ -102,9 +102,9 @@ function subsDollar(text, fields) {
 }
 
 function subsCaret(text, args) {
-    return text.replace(/\^(\d+)/g, (_, n) => {
-        const idx = parseInt(n) - 1;
-        return (idx < args.length) ? String(args[idx]) : '';
+    let idx = 0;
+    return text.replace(/\^/g, () => {
+        return (idx < args.length) ? String(args[idx++]) : '';
     });
 }
 
@@ -113,7 +113,7 @@ function subsCaret(text, args) {
  * @param {number} tid
  * @param {number} mask      字段掩码
  * @param {string[]} sparse  按掩码位序的字段值
- * @param {string[]} args    ^1 ^2 ...
+ * @param {string[]} args    按 ^ 出现顺序填入的值
  * @returns {string}
  */
 export function format(tid, mask, sparse, args) {
