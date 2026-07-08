@@ -1,9 +1,9 @@
 /**
- * pack.js — 编译打包脚本
+ * scripts/pack.mjs — 编译打包脚本
  *
  * 用法:
- *   node pack.js           正常编译（不打包二进制）
- *   node pack.js --binary  编译 + send_room → send_room_b 转换
+ *   node scripts/pack.mjs           正常编译（不打包二进制）
+ *   node scripts/pack.mjs --binary  编译 + send_room → send_room_b 转换
  *
  * 流程:
  *   1. tsc 编译 server/ → server/dist/
@@ -18,14 +18,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const IS_BINARY = args.includes('--binary');
 
-const SERVER_DIR = path.join(__dirname, 'server');
+const SERVER_DIR = path.join(ROOT, 'server');
 const DIST_DIR = path.join(SERVER_DIR, 'dist');
-const OS_DIR = path.join(__dirname, 'os');
-const WORLD_DIR = path.join(__dirname, 'world');
-const WEB_DIR = path.join(__dirname, 'web');
+const OS_DIR = path.join(ROOT, 'os');
+const WORLD_DIR = path.join(ROOT, 'world');
+const WEB_DIR = path.join(ROOT, 'web');
 
 // ============================================================
 // Step 1: Compile TypeScript
@@ -144,7 +145,7 @@ if (IS_BINARY) {
         fs.writeFileSync(
             path.join(WEB_DIR, 'templates-data.js'),
             `/**
- * 客户端模板映射表 — 由 pack.js --binary 自动生成
+ * 客户端模板映射表 — 由 scripts/pack.mjs --binary 自动生成
  * DO NOT EDIT MANUALLY
  */
 export const PreloadedTable = ${JSON.stringify(clientData, null, 2)};
@@ -225,7 +226,7 @@ export const PreloadedVersion = 1;
                             const preview = literal.length > 60
                                 ? literal.slice(0, 60) + '...'
                                 : literal;
-                            console.log(`[pack]   ⚠ missed in ${path.relative(__dirname, full)}: ${preview}`);
+                            console.log(`[pack]   ⚠ missed in ${path.relative(ROOT, full)}: ${preview}`);
                         }
                     }
                 }

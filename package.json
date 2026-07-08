@@ -6,8 +6,8 @@
   "main": "web.js",
   "bin": "web.js",
   "scripts": {
-    "build": "node pack.js",
-    "build-b": "node pack.js --binary",
+    "build": "node scripts/pack.mjs",
+    "build-b": "node scripts/pack.mjs --binary",
     "dev": "vite",
     "start": "npm run build && concurrently \"node web.js\" \"node main.mjs\"",
     "start-b": "npm run build-b && concurrently \"node web.js\" \"node main.mjs\"",
