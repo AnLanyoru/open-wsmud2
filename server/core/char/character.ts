@@ -662,46 +662,46 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 发送战斗消息（支持多视角）
+     * 发送战斗消息。
+     *
+     * 新格式：服务端只渲染一次（第三人称），附带 A/T 标识，
+     * 客户端根据自身是否等于 A/T 来将名字替换为"你"。
      */
     send_combat(text: string, target?: CHARACTER): void {
         if (!this.environment || !text) return;
+        const rendered = format_msg(this, text, target);
+        const msg = '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
         const list = this.environment.items;
-        let th_vision: string | undefined;
         let item: any;
         for (let i = 0; i < list.length; i++) {
             item = list[i];
             if (item.is_player) {
-                if (item === this) {
+                if (item === this || item === target) {
                     if (!item.query_setting('no_mcmsg'))
-                        item.notify(splitmessage(this, text, 1, target));
-                } else if (item === target) {
-                    if (!item.query_setting('no_mcmsg'))
-                        item.notify(splitmessage(this, text, 2, target));
+                        item.notify(msg);
                 } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                    if (!th_vision) th_vision = splitmessage(this, text, 3, target);
-                    item.notify(th_vision);
+                    item.notify(msg);
                 }
             }
         }
     }
 
     /**
-     * 发送房间消息（支持多视角）
+     * 发送房间消息。
+     *
+     * 与 send_combat 相同格式：服务端只渲染一次，客户端判断视角。
      */
-    send_room(text: string, target?: any, excludeself?: boolean): void {
+    send_room(text: string, target?: ITEM, excludeself?: boolean): void {
         if (!this.environment || !text) return;
+        const rendered = format_msg(this, text, target);
+        const msg = '{"type":"combat","s":"' + rendered + '","A":"' + this.name + '","T":"' + (target?.name ?? '') + '"}';
         const list = this.environment.items;
-        let th_vision: string | undefined;
         for (let i = 0; i < list.length; i++) {
             if (list[i].is_player) {
                 if (list[i] === this) {
-                    if (!excludeself) list[i].notify(splitmessage(this, text, 1, target));
-                } else if (list[i] === target) {
-                    list[i].notify(splitmessage(this, text, 2, target));
+                    if (!excludeself) list[i].notify(msg);
                 } else if (!list[i].no_message) {
-                    if (!th_vision) th_vision = splitmessage(this, text, 3, target);
-                    list[i].notify(th_vision);
+                    list[i].notify(msg);
                 }
             }
         }
@@ -3216,9 +3216,14 @@ export class CHARACTER extends ITEM {
 // ================================================================
 
 /**
- * 根据视角类型拆分消息模板中的 $ 占位符
+ * 将消息模板中的 $ 占位符替换为实际值（始终第三人称）。
+ *
+ * 新消息格式仅为一种渲染结果，客户端根据消息中的 A/T 字段判断视角：
+ * - 自身为 A → 将 A 名字替换为"你"
+ * - 自身为 T → 将 T 名字替换为"你"
+ * - 否则 → 直接显示
  */
-function splitmessage(me: CHARACTER, text: string, type: number, target: any): string {
+function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
     if (text.length < 3) return text;
     const str: string[] = [];
     let start = 0;
@@ -3230,25 +3235,26 @@ function splitmessage(me: CHARACTER, text: string, type: number, target: any): s
             start = i + 1;
             switch (ch) {
                 case 'N':
-                    str.push(type === 1 ? '你' : me.name);
+                    str.push(me.name);
                     break;
                 case 'n':
                     if (target) {
-                        str.push(type === 2 ? '你' : target.name);
+                        str.push(target.name);
                     } else {
                         str.push('<hir>未知存在</hir>');
-                        console.warn('[splitmessage] $n 占位符缺少 target，消息文本:', text);
+                        console.warn('[format_msg] $n 占位符缺少 target，消息文本:', text);
                     }
                     break;
                 case 'P':
-                    str.push(type === 1 ? '你' : me.call3());
+                    str.push(me.call3());
                     break;
                 case 'p':
                     if (target) {
-                        str.push(type === 2 ? '你' : target.call3());
+                        // 角色用第三人称代词，物品直接用名字
+                        str.push(target.check_character() ? target.call3() : target.name);
                     } else {
                         str.push('<hir>未知存在</hir>');
-                        console.warn('[splitmessage] $p 占位符缺少 target，消息文本:', text);
+                        console.warn('[format_msg] $p 占位符缺少 target，消息文本:', text);
                     }
                     break;
                 case 'l':
@@ -3260,10 +3266,11 @@ function splitmessage(me: CHARACTER, text: string, type: number, target: any): s
                     break;
                 case 'i':
                     if (target) {
-                        str.push(target.weapon_name() || '手');
+                        // 角色取武器名，物品直接用名字
+                        str.push(target.check_character() ? (target.weapon_name() || '手') : target.name);
                     } else {
                         str.push('<hir>未知兵刃</hir>');
-                        console.warn('[splitmessage] $i 占位符缺少 target，消息文本:', text);
+                        console.warn('[format_msg] $i 占位符缺少 target，消息文本:', text);
                     }
                     break;
                 case 'T':

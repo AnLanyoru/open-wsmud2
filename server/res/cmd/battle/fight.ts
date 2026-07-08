@@ -14,9 +14,10 @@ export default class extends COMMAND {
         if (argid == "none") {
             var items = now_room.items;
             for (var i = 0; i < items.length; i++) {
-                if (items[i].is_player && items[i].query_temp("fight") == me.id) {
-                    me.send_room("看起来$N并不想跟$n较量。", items[i], true);
-                    return me.notify("你拒绝了" + items[i].name + "的比试请求。");
+                const tg = items[i]
+                if (tg.check_player() && tg.query_temp("fight") == me.id) {
+                    me.send_room("看起来$N并不想跟$n较量。", tg, true);
+                    return me.notify("你拒绝了" + tg.name + "的比试请求。");
                 }
             }
             return me.notify("这里没有人想要和你比试。");

@@ -491,6 +491,14 @@ const Process = {
                 }
             }
         }
+        // 新格式战斗文本：服务端只发第三人称，客户端根据 A/T 判断视角
+        if (data.s) {
+            var s = data.s;
+            if (data.A && data.A === Process.name) s = s.split(data.A).join('你');
+            if (data.T && data.T === Process.name) s = s.split(data.T).join('你');
+            Process.message.push(s);
+            Process.message.scroll2end();
+        }
     }, state: function (data) {
         if (data && data.state) {
 
