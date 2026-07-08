@@ -196,9 +196,8 @@ const Process = {
     }, itemremove: function (data) {
         var item = Combat.STATUS[data.id];
         if (item) {
-            for (var si in item.items) {
-                clearInterval(item.items[si].handler);
-            }
+            // 用 StatusItem_clear 正确注销 _animId 动画，避免闭包引用已移除的 shadow 元素
+            Combat.StatusItem_clear(item);
             var div = item.elem.parent();
             if (div.next().is(".item-commands")) {
                 div.next().remove();
@@ -224,12 +223,12 @@ const Process = {
         Process.cur_room.items.push(item);
     }
     , items: function (room) {
-        Process.itemsElement.empty();
-        // 换房前清理所有状态动画，避免 shadow 闭包引用已移除的 DOM 元素
+        // 先清理所有状态动画，再清空 DOM，避免 tick 引用已移除的 shadow 元素
         for (var sid in Combat.STATUS) {
             Combat.StatusItem_clear(Combat.STATUS[sid]);
         }
         Combat.STATUS = {};//更换房间，状态信息清空
+        Process.itemsElement.empty();
         for (var i = 0; i < room.items.length; i++) {
             var item = room.items[i];
             if (!item) continue;

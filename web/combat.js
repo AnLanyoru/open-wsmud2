@@ -76,7 +76,11 @@ const Combat = {
                 $(`<span class='act-item' cmd='${item.cmd}'>${item.name}<span class='cd-overlay'></span></span>`)
                     .appendTo(parent);
             item._overlay = item.elem.find(".cd-overlay");
-            if (item.disper > 0) {
+            // 重绘后重置 CD 动画状态，强制 ANI_OBJ 下次 tick 重新 snap 到正确比例
+            item._hadCD = false;
+            // 仅在无活动动画时应用 disper（服务端初始静态状态）；
+            // 有 _animId 时 disper 已过期，交由 ANI_OBJ tick 重新 snap
+            if (item.disper > 0 && !item._animId) {
                 item._overlay.css("transform", "scaleX(" + (item.disper / 100) + ")");
                 item._hadCD = true;
             }
@@ -117,16 +121,21 @@ const Combat = {
     }
     , ANI_OBJ: function (obj, time) {
         var end = Date.now() + time;
+        obj._cdTotal = time;
         if (obj._animId) Combat._animUnregister(obj._animId);
         obj._animId = null;
+        // 新 CD 开始，强制下次 tick 重新 snap（避免 stale disper 或 _hadCD 残留导致跳过 snap）
+        obj._hadCD = false;
         var aid = Combat._animRegister(function (now) {
             var overlay = obj._overlay;
             if (!overlay) { obj._animId = null; return false; }
             var remaining = end - now;
             if (remaining > 0) {
                 if (!obj._hadCD) {
+                    // snap 到剩余比例位置：新 CD 时比例=1，重绘进行中 CD 时比例=remaining/_cdTotal
+                    var startScale = obj._cdTotal > 0 ? Math.min(1, remaining / obj._cdTotal) : 1;
                     overlay.css("transition", "none");
-                    overlay.css("transform", "scaleX(1)");
+                    overlay.css("transform", "scaleX(" + startScale + ")");
                     overlay[0].offsetHeight;
                 }
                 overlay.css("transition", "transform " + remaining + "ms linear");
@@ -154,7 +163,12 @@ const Combat = {
             html.push("</span>");
             items[i].elem = $(html.join("")).appendTo(elem);
             items[i]._overlay = items[i].elem.find(".cd-overlay");
+            // 重绘后重置 CD 动画状态，强制下次 tick 重新 snap 到正确比例
+            items[i]._cdEnd = undefined;
+            items[i]._hadCD = false;
         }
+        // 重绘后若存在活动 CD，立即触发动画更新，避免新 overlay 停在默认 scaleX(0)
+        Combat.ANI_PFM();
     }, ChangeDistime: function (data) {
         var pfmid = data.id;
         for (var j = 0; j < Combat.dis_pfms.length; j++) {
@@ -315,25 +329,29 @@ const Combat = {
                 if (Combat.Skills) {
                     for (var i = 0; i < Combat.Skills.length; i++) {
                         var skill = Combat.Skills[i];
-                        // 计算技能独立 CD 剩余时间（ms）
+                        // 计算技能独立 CD 剩余时间（ms）及总时长
                         var remaining = 0;
+                        var distime = 0;
                         for (var j = 0; j < Combat.dis_pfms.length; j++) {
                             if (Combat.dis_pfms[j].id == skill.id && Combat.dis_pfms[j].distime) {
                                 remaining = Combat.dis_pfms[j].end - now;
+                                distime = Combat.dis_pfms[j].distime;
                                 break;
                             }
                         }
                         // 无独立 CD 则走全局冷却
                         if (remaining <= 0) {
                             remaining = Combat.end > now ? Combat.end - now : 0;
+                            distime = Combat.distime || 0;
                         }
                         if (remaining > 0) {
-                            // 用到期时间戳判断是否需要 snap：时间变化 = 新 CD / CD 刷新
+                            // 用到期时间戳判断是否需要 snap：时间变化 = 新 CD / CD 刷新 / 重绘
                             var effectiveEnd = now + remaining;
                             if (skill._cdEnd !== effectiveEnd) {
-                                // 新冷却或 CD 已刷新：瞬间跳到全覆盖，再开始过渡
+                                // snap 到剩余比例位置：新 CD 时比例=1，重绘进行中 CD 时比例=remaining/distime
+                                var startScale = distime > 0 ? Math.min(1, remaining / distime) : 1;
                                 skill._overlay.css("transition", "none");
-                                skill._overlay.css("transform", "scaleX(1)");
+                                skill._overlay.css("transform", "scaleX(" + startScale + ")");
                                 skill._overlay[0].offsetHeight;
                                 skill._cdEnd = effectiveEnd;
                             }
