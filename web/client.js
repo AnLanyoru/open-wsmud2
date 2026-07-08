@@ -196,7 +196,8 @@ export class WSClient {
             try {
                 this.OnData(parsed);
             } catch (e) {
-                console.error('OnData error for JSON:', e);
+                var errMsg = e instanceof Error ? e.stack || e.message : String(e);
+                ReceiveMessage('<hir>解析数据时发生了一个错误，请尝试联系管理解决，具体错误：' + errMsg + '</hir>');
             }
         } else {
             this.OnMessage(data);
