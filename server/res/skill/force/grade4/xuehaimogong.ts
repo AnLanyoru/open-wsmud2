@@ -184,7 +184,10 @@ function xueji_dur(lv: number): number {
     return Math.min(10000, 4000 + lv * 5);
 }
 
-function si_bu_liao(me: CHARACTER): boolean {
-    me.hp = 2;
+// on_die 事件触发时，fire_event 会传入 [killer] 作为参数列表；
+// si_bu_liao 通过 add_event 注册到玩家自己身上，f.apply(this, args) 中 this 是玩家本身
+// 因此应该从 this 拿角色，而不是依赖第一个参数（那是 killer）
+function si_bu_liao(this: CHARACTER, _killer: CHARACTER): boolean {
+    this.hp = 2;
     return false;
 }

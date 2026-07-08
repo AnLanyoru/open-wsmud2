@@ -31,8 +31,10 @@ export default class extends SKILL {
             mp: 20,
             release_time: 4000,
             use: function(me: CHARACTER, target: CHARACTER, lv: number): void {
-                const layers: number = me.query_temp("sk/qk/layer", 0);
+                const layers = me.query_status("qiankun");
                 const dmgBonus: number = int(layers / 2) * me.gj;
+                // 消耗所有乾坤层数
+                me.remove_status("qiankun", true);
                 me.send_room("<HIO>$N双臂一震，乾坤大挪移心法运转，将积蓄的层层劲力汇于一击，如天塌地陷般朝$n轰去！</HIO>", target);
                 me.do_attack({
                     target: target,
@@ -62,6 +64,9 @@ export default class extends SKILL {
                 const healHp = int(me.max_hp * healPer * layers / 100);
                 me.add_hp(healHp);
                 me.send_room(`<HIO>$N颠倒体内阴阳二气，长舒出一口浊气，精神为之一振。</HIO>`, target);
+
+                // 消耗所有乾坤层数
+                me.remove_status("qiankun", true);
 
                 // 将一个负面状态转移给敌人
                 const downsides = me.status?.filter((s: CharacterStatus) => s.downside && s.id !== "busy" && s.id !== "faint") || [];
