@@ -19,6 +19,7 @@ const Combat = {
         }
         $(".combat-panel").removeClass("hide");
         this.refActions();
+        Combat._resetCDAnimations();
         Process.message.scroll2end();
         // $(".right-bar")[0].style.bottom = ($(".combat-panel").height() + $(".bottom-bar").height()) + "px";
     },
@@ -50,7 +51,30 @@ const Combat = {
     },
     def_actions: [{cmd: "dazuo", name: "打坐"},
         {cmd: "liaoshang", name: "疗伤"}],
-
+    _resetCDAnimations: function () {
+        if (Combat.Skills) {
+            for (var i = 0; i < Combat.Skills.length; i++) {
+                Combat.Skills[i]._cdEnd = undefined;
+            }
+        }
+        for (var id in Combat.STATUS) {
+            var stitem = Combat.STATUS[id];
+            if (stitem && stitem.items) {
+                for (var sid in stitem.items) {
+                    var item = stitem.items[sid];
+                    item._statusEnd = undefined;
+                    if (item._animId && Combat._animItems[item._animId]) {
+                        Combat._animItems[item._animId].update(Date.now());
+                    }
+                }
+            }
+        }
+        if (Combat._pfmAnimId && Combat._animItems[Combat._pfmAnimId]) {
+            Combat._animItems[Combat._pfmAnimId].update(Date.now());
+        } else if (Combat.dis_pfms && Combat.dis_pfms.length > 0) {
+            Combat.ANI_PFM();
+        }
+    },
     refActions: function () {
         let actions = [...this.def_actions];
         this.actions = actions;
