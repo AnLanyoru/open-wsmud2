@@ -233,6 +233,10 @@ export default {
             value = 1;
         }
         switch (forProp) {
+            case "show_binary":
+                Setting.show_binary = value;
+                localStorage.setItem("ui_show_binary", value);
+                break;
             case "auto_pfm":
             case "auto_pfm2":
                 if (value) {
@@ -608,6 +612,18 @@ const setting_template = `
             <div class="setting-item" for="show_send">
                 <span class="title">
                     显示指令
+                </span>
+                <span class="switch">
+                    <span class="switch-button">
+                    </span>
+                    <span class="switch-text">
+                        关
+                    </span>
+                </span>
+            </div>
+            <div class="setting-item" for="show_binary">
+                <span class="title">
+                    二进制分析模式（消息标注来源）
                 </span>
                 <span class="switch">
                     <span class="switch-button">

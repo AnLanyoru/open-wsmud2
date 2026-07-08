@@ -633,6 +633,7 @@ export function ProcessBinary(data) {
                     const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
                     const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
                     text = perspective(text, aName, tName, myName);
+                    if (Setting.show_binary) text += ' <hib>(binary)</hib>';
                     Process.message.push(text);
                     Process.message.scroll2end();
                 }

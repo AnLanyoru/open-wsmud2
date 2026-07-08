@@ -158,6 +158,9 @@ function HandlerMenuCommand(cmd) {
         case "stateinfo":
             SendCommand("state info");
             break;
+        case "toggle_binary":
+            Setting.toggleBinary();
+            break;
         default:
             Dialog.show(cmd);
             break;

@@ -40,6 +40,7 @@ const Setting = {
     float_archive: 0,
     theme: "dark",
     no_load: true,
+    show_binary: 0,
     load: function (data) {
         Dialog.keys.init_key();
         Dialog.extend.init_extend();
@@ -55,7 +56,7 @@ const Setting = {
         this.loadLocal();
     },
     loadLocal: function () {
-        var localKeys = ["top_safe_distance", "bottom_safe_distance", "float_archive", "theme"];
+        var localKeys = ["top_safe_distance", "bottom_safe_distance", "float_archive", "theme", "show_binary"];
         for (var i = 0; i < localKeys.length; i++) {
             var val = localStorage.getItem("ui_" + localKeys[i]);
             if (val !== null) {
@@ -211,6 +212,11 @@ const Setting = {
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
+    },
+    toggleBinary: function () {
+        this.show_binary = this.show_binary ? 0 : 1;
+        localStorage.setItem("ui_show_binary", this.show_binary);
+        ReceiveMessage('<hiy>二进制分析模式：' + (this.show_binary ? '开启' : '关闭') + '</hiy>');
     }
 }
 export default Setting;

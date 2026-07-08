@@ -46,7 +46,7 @@ body[data-theme="dark"] {
     --tool-bg: gray;
     --tool-color: #111;
     --tool-hover: #666;
-    --font-family: system-ui, "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
+    --font-family: system-ui, "微软雅黑", "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
 
     /* MUD 颜色标签 — 暗黑终端风格 (保持原色) */
     --mud-nor: #008000;
@@ -145,7 +145,7 @@ body[data-theme="light"] {
     --tool-bg: #D5CDC0;
     --tool-color: #37352F;
     --tool-hover: #C8BFB0;
-    --font-family: "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
+    --font-family: "微软雅黑", "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
     --font-weight: 600;
 
     /* MUD 颜色标签 — 水墨画风 */
@@ -245,7 +245,7 @@ body[data-theme="book"] {
     --tool-bg: #C2B698;
     --tool-color: #1A1A18;
     --tool-hover: #B5A88A;
-    --font-family: "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
+    --font-family: "微软雅黑", "黑体", "PingFang SC", "Noto Sans SC", sans-serif;
     --font-weight: 650;
 
     /* MUD 颜色标签 — 水墨画风 */
