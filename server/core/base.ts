@@ -84,6 +84,52 @@ export class BASE {
 
         const funcs = this._events[fname];
 
+        // 重复添加：更新过期时间与优先级，重排列表
+        const dupIdx = funcs.indexOf(func);
+        if (dupIdx !== -1) {
+            console.warn("add_event: %s 重复添加 handler — %s", fname, func.name || func);
+
+            // 更新过期时间
+            if (time) {
+                if (!this._timed) this._timed = new Map();
+                let timedMap = this._timed.get(fname);
+                if (!timedMap) {
+                    timedMap = new Map();
+                    this._timed.set(fname, timedMap);
+                }
+                timedMap.set(func, Date.now() + time);
+            } else {
+                this._timed?.get(fname)?.delete(func);
+            }
+
+            // 移除旧位置，按新优先级重插
+            funcs.splice(dupIdx, 1);
+
+            if (priority !== undefined) {
+                if (!this._priority) this._priority = new Map();
+                let priMap = this._priority.get(fname);
+                if (!priMap) {
+                    priMap = new Map();
+                    this._priority.set(fname, priMap);
+                }
+                priMap.set(func, priority);
+
+                let insertIdx = funcs.length;
+                for (let i = 0; i < funcs.length; i++) {
+                    const ep = priMap.get(funcs[i]);
+                    if (ep === undefined || ep > priority) {
+                        insertIdx = i;
+                        break;
+                    }
+                }
+                funcs.splice(insertIdx, 0, func);
+            } else {
+                this._priority?.get(fname)?.delete(func);
+                funcs.push(func);
+            }
+            return;
+        }
+
         if (priority !== undefined) {
             // 懒加载优先级 Map
             if (!this._priority) this._priority = new Map();
