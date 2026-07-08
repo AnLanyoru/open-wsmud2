@@ -1075,6 +1075,7 @@ export class USER extends CHARACTER {
             const bases = ['', 'force', 'unarmed', 'dodge', 'parry', 'bite', 'throwing'];
             const weapon = this.query_weapon_type();
             if (weapon !== WEAPON_TYPE.NONE) bases[0] = weapon;
+            const now = Date.now();
             for (let i = 0; i < bases.length; i++) {
                 const base_type = bases[i];
                 if (!base_type) continue;
@@ -1096,6 +1097,13 @@ export class USER extends CHARACTER {
                             if (pfmitem.distime) {
                                 str.push(',distime:');
                                 str.push(pfmitem.query_distime?.(this).toString() || "0");
+                                const cdKey = base_type + '.' + p;
+                                const cdEnd = this.pfm_cd.get(cdKey);
+                                const remaining = cdEnd && cdEnd > now ? cdEnd - now : 0;
+                                if (remaining > 0) {
+                                    str.push(',distime_now:');
+                                    str.push(remaining.toString());
+                                }
                             }
                             str.push('}');
                         }
@@ -1112,6 +1120,13 @@ export class USER extends CHARACTER {
                             if (pfmitem.distime) {
                                 str.push(',distime:');
                                 str.push(pfmitem.query_distime(this, this.query_skill(base_skill.enable_skill), true));
+                                const cdKey = bases[i] + '.ref';
+                                const cdEnd = this.pfm_cd.get(cdKey);
+                                const remaining = cdEnd && cdEnd > now ? cdEnd - now : 0;
+                                if (remaining > 0) {
+                                    str.push(',distime_now:');
+                                    str.push(remaining.toString());
+                                }
                             }
                             str.push('}');
                         }
