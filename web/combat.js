@@ -243,7 +243,6 @@ const Combat = {
                 var found = false;
                 for (var j = 0; j < Combat.dis_pfms.length; j++) {
                     if (Combat.dis_pfms[j].id == item.id) {
-                        Combat.dis_pfms[j].distime = item.distime;
                         Combat.dis_pfms[j].end = now + item.distime;
                         found = true;
                         break;
@@ -256,7 +255,9 @@ const Combat = {
                         end: now + item.distime
                     });
                 }
-                Combat._snapPFM(item, item.distime, item.distime, now);
+                item._overlay.css("transition", "none");
+                item._overlay.css("transform", "scaleX(1)");
+                item._hadCD = true;
             }
         }
     }, ChangeDistime: function (data) {
