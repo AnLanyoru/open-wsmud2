@@ -27,6 +27,7 @@ const DIST_DIR = path.join(SERVER_DIR, 'dist');
 const CORE_DIR = path.join(ROOT, 'core');
 const RES_DIR = path.join(ROOT, 'res');
 const WEB_DIR = path.join(ROOT, 'web');
+const WWW_DIR = path.join(ROOT, 'www');
 
 // ============================================================
 // Step 1: Compile TypeScript
@@ -96,6 +97,41 @@ if (IS_BINARY) {
             return c;
         });
     }
+
+    // ============================================================
+    // Pass 0: 扫描 status_msg / finish_msg 字面量定义
+    // ============================================================
+
+    /** 匹配 start_msg: "..."  或  finish_msg: "..." */
+    const STATUS_MSG_RE = /(start_msg|finish_msg)\s*:\s*(["'`])((?:[^"'`\\]|\\.)*?)\2/gs;
+
+    console.log('[pack]   Pass 0: scanning status messages...');
+    let statusMsgCount = 0;
+
+    function collectStatusMsgs(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                collectStatusMsgs(full);
+            } else if (entry.name.endsWith('.js')) {
+                const content = fs.readFileSync(full, 'utf8');
+                let m;
+                while ((m = STATUS_MSG_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[3], m[2]);
+                    if (!templateMap.has(literal)) {
+                        templateMap.set(literal, templateMap.size);
+                        statusMsgCount++;
+                    }
+                }
+            }
+        }
+    }
+
+    collectStatusMsgs(CORE_DIR);
+    collectStatusMsgs(RES_DIR);
+    console.log(`[pack]   Found ${statusMsgCount} status messages (total: ${templateMap.size})`);
 
     // ============================================================
     // Pass 1: 收集所有 send_room / send_combat 字面量
@@ -205,18 +241,12 @@ if (IS_BINARY) {
             serverLines.push(`register(${JSON.stringify(literal)});`);
         }
 
-        // 客户端模板表
+        // 客户端模板表 (JSON, Express 自动 gzip)
         fs.writeFileSync(
-            path.join(WEB_DIR, 'templates-data.js'),
-            `/**
- * 客户端模板映射表 — 由 scripts/pack.mjs --binary 自动生成
- * DO NOT EDIT MANUALLY
- * 格式: { tid: { t: "template text", m: fieldMask }, ... }
- */
-export const PreloadedTable = ${JSON.stringify(clientData, null, 2)};
-export const PreloadedVersion = 1;
-`);
-        console.log('[pack]   Generated web/templates-data.js');
+            path.join(WWW_DIR, 'templates-data.json'),
+            JSON.stringify({ v: 1, d: clientData })
+        );
+        console.log('[pack]   Generated www/templates-data.json');
 
         // 服务端模板注册（供 getMask() 使用）
         fs.writeFileSync(
@@ -252,8 +282,7 @@ ${serverLines.join('\n')}
                 let content = fs.readFileSync(full, 'utf8');
                 let changed = false;
 
-                // 使用与 Pass 1 完全相同的正则做替换，
-                // 避免 unescape → escape 往返导致的匹配失败
+                // typeof 分支自动路由，不需要 _b 后缀
                 content = content.replace(CALL_RE, (match, funcName, quote, rawStr) => {
                     const literal = unescapeJS(rawStr, quote);
                     const id = templateMap.get(literal);
@@ -261,7 +290,7 @@ ${serverLines.join('\n')}
                         changed = true;
                         if (funcName === 'send_room') replacedRoom++;
                         else replacedCombat++;
-                        return `.${funcName}_b(${id}`;
+                        return `.${funcName}(${id}`;
                     }
                     return match;
                 });
@@ -312,7 +341,7 @@ ${serverLines.join('\n')}
                     replacements.push({
                         start: m.index,
                         end: matchEnd + (tailMatch ? tailMatch[0].length : rest.indexOf(')') + 1),
-                        replacement: `.${funcName}_b(${id}${tailArgs}, ${varExpr})`,
+                        replacement: `.${funcName}(${id}${tailArgs}, ${varExpr})`,
                     });
                 }
 
@@ -335,7 +364,43 @@ ${serverLines.join('\n')}
     transformConcatDir(CORE_DIR);
     transformConcatDir(RES_DIR);
 
-    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedConcat} concat in ${replacedFiles} files`);
+    // 状态消息替换: start_msg: "literal" → start_msg: id
+    let replacedStatus = 0;
+
+    function replaceStatusMsgs(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                replaceStatusMsgs(full);
+            } else if (entry.name.endsWith('.js')) {
+                let content = fs.readFileSync(full, 'utf8');
+                let changed = false;
+
+                content = content.replace(STATUS_MSG_RE, (match, key, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    const id = templateMap.get(literal);
+                    if (id !== undefined) {
+                        changed = true;
+                        replacedStatus++;
+                        return `${key}: ${id}`;
+                    }
+                    return match;
+                });
+
+                if (changed) {
+                    fs.writeFileSync(full, content);
+                    replacedFiles++;
+                }
+            }
+        }
+    }
+
+    replaceStatusMsgs(CORE_DIR);
+    replaceStatusMsgs(RES_DIR);
+
+    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedConcat} concat + ${replacedStatus} status_msg in ${replacedFiles} files`);
 
     // ============================================================
     // Pass 3: 验证 — 列出未被替换的字面量（可能是正则边缘情况）

@@ -208,7 +208,7 @@ export interface CharacterStatus extends StatusDef {
     /** 是否不可被清除 */
     no_clear?: boolean;
     /** 状态施加时的消息（仅限第一人称占位符：$N/$P/$W/$w/$l/$T，禁用 $n/$p/$i） */
-    start_msg?: string;
+    start_msg?: string | number;
     /** 是否为闪避状态 */
     is_miss?: boolean;
     /** 是否为鲁莽状态 */
@@ -786,15 +786,29 @@ export class CHARACTER extends ITEM {
     static readonly MSG_COMBAT = 1;
     static readonly MSG_EXCLUDESELF = 2;
 
-    /** 发送房间/战斗消息（文本路径） */
-    send_msg(text: string, target?: ITEM, flags?: number): void {
-        if (!this.environment || !text) return;
+    /**
+     * 发送房间/战斗消息。
+     * 第一参数为 string → 文本路径，为 number → 二进制路径（模板 ID）。
+     * typeof 分支零开销，允许调用点逐步从字面量迁移到模板 ID。
+     */
+    send_msg(text: string | number, target?: ITEM, flags?: number): void {
+        if (!this.environment || text === undefined) return;
+        if (typeof text === 'number') {
+            this._send_binary(text, target, flags);
+            return;
+        }
+        if (!text) return;
         const payload = this._build_msg(text, target);
         if (flags && (flags & 1)) this._broadcast_combat(payload, target);
         else this._broadcast_room(payload, target, !!(flags && (flags & 2)));
     }
 
-    /** 发送房间/战斗消息（二进制路径） */
+    /** 二进制路径（内部实现，由 send_msg 的 typeof 分支调用） */
+    _send_binary(template_id: number, target?: ITEM, flags?: number): void {
+        this.send_msg_b(template_id, target, flags);
+    }
+
+    /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
     send_msg_b(template_id: number, target?: ITEM, flags?: number,
         _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
         if (!this.environment || template_id === undefined) return;
@@ -804,9 +818,10 @@ export class CHARACTER extends ITEM {
     }
 
     // 向后兼容 — 供未替换的动态 send_room / send_combat 调用
-    send_combat(text: string, target?: CHARACTER): void { this.send_msg(text, target, 1); }
+    // 第一参数接受 string | number，自动交由 send_msg 的 typeof 分支路由
+    send_combat(text: string | number, target?: CHARACTER): void { this.send_msg(text, target, 1); }
     send_combat_b(template_id: number, target?: CHARACTER, _a1?: string, _a2?: string, _a3?: string, _a4?: string): void { this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4); }
-    send_room(text: string, target?: ITEM, excludeself?: boolean): void { this.send_msg(text, target, excludeself ? 2 : 0); }
+    send_room(text: string | number, target?: ITEM, excludeself?: boolean): void { this.send_msg(text, target, excludeself ? 2 : 0); }
     send_room_b(template_id: number, target?: ITEM, excludeself?: boolean, _a1?: string, _a2?: string, _a3?: string, _a4?: string): void { this.send_msg_b(template_id, target, excludeself ? 2 : 0, _a1, _a2, _a3, _a4); }
 
     /**

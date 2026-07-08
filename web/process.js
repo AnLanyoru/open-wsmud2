@@ -7,7 +7,7 @@ import SCRIPT from './script.js';
 import {roles} from './login/index.js';
 import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
-import { format, perspective, load as loadTemplates } from './templates.js';
+import { format, perspective, ready as templatesReady } from './templates.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = {append: (div) => $(".content-message").append(div)};
@@ -149,8 +149,6 @@ const Process = {
         onLogin();
         //var panel = $(".player-panel").html(CreateHeadPanel(x));
 
-    }, templates: function (x) {
-        loadTemplates(x.v, x.data);
     }, levelup: function (x) {
         Process.level = x.level;
     },

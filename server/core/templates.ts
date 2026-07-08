@@ -93,6 +93,11 @@ export function get(id: number): string | undefined {
     return _entries[id]?.text;
 }
 
+/** 通过文本查找模板 ID（未注册返回 undefined） */
+export function getId(text: string): number | undefined {
+    return _templates.get(text);
+}
+
 /** 获取模板的字段掩码 */
 export function getMask(id: number): number {
     return _entries[id]?.mask ?? 0;
