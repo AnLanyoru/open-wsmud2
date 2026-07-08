@@ -691,6 +691,71 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 发送战斗消息（二进制路径）。
+     *
+     * 与 send_room_b 使用相同的 payload 格式，
+     * 仅在广播过滤逻辑上不同（检查 no_mcmsg / no_combatmsg）。
+     */
+    send_combat_b(template_id: number, target?: CHARACTER,
+        _a1?: string, _a2?: string, _a3?: string, _a4?: string): void {
+        if (!this.environment || template_id === undefined) return;
+
+        const aName = this.name;
+        const aWeapon = this.weapon_name() || '';
+        const aCall3 = this.call3();
+        const aPart = this.attack_part ? this.attack_part.name : '';
+        const aThrow = this.throwing_name() || '';
+
+        const hasT = target && (target as any).check_character?.();
+        const tName = hasT ? target!.name : '';
+        const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
+        const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
+
+        const argList: string[] = [];
+        for (let i = 2; i < arguments.length; i++) {
+            const v = arguments[i];
+            if (v !== undefined && v !== null) argList.push(String(v));
+        }
+
+        const fields = [aName, aWeapon, aCall3, aPart, aThrow, tName, tWeapon, tCall3];
+        const fieldBufs = fields.map(f => Buffer.from(f, 'utf8'));
+        const argBufs = argList.map(a => Buffer.from(a, 'utf8'));
+
+        let totalSize = 1 + 2;
+        for (const fb of fieldBufs) totalSize += 1 + fb.length;
+        totalSize += 1;
+        for (const ab of argBufs) totalSize += 1 + ab.length;
+
+        const buf = Buffer.alloc(totalSize);
+        let pos = 0;
+        buf[pos++] = 0x12;
+        buf.writeUInt16BE(template_id, pos); pos += 2;
+        for (const fb of fieldBufs) {
+            buf[pos++] = fb.length;
+            fb.copy(buf, pos); pos += fb.length;
+        }
+        buf[pos++] = argBufs.length;
+        for (const ab of argBufs) {
+            buf[pos++] = ab.length;
+            ab.copy(buf, pos); pos += ab.length;
+        }
+
+        // send_combat 特有的过滤逻辑
+        const list = this.environment.items;
+        for (let i = 0; i < list.length; i++) {
+            const item: any = list[i];
+            if (item.is_player) {
+                if (item === this || item === target) {
+                    if (!item.query_setting('no_mcmsg'))
+                        item.sendBinary?.(buf);
+                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
+                    item.sendBinary?.(buf);
+                }
+            }
+        }
+    }
+
+    /**
      * 发送房间消息。
      *
      * 与 send_combat 相同格式：服务端只渲染一次，客户端判断视角。
@@ -736,8 +801,8 @@ export class CHARACTER extends ITEM {
 
         const hasT = target && (target as any).check_character?.();
         const tName = hasT ? target!.name : '';
-        const tWeapon = hasT ? (target as any).weapon_name?.() || '' : '';
-        const tCall3 = hasT ? (target as any).call3?.() || '' : '';
+        const tWeapon = hasT ? ((target as any).weapon_name?.() || '') : '';
+        const tCall3 = hasT ? ((target as any).call3?.() || '') : '';
 
         // 收集 ^args
         const argList: string[] = [];

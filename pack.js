@@ -82,26 +82,31 @@ fs.rmSync(DIST_DIR, { recursive: true, force: true });
 if (IS_BINARY) {
     console.log('[pack] Binary mode: scanning and transforming...');
 
-    /** literal string → template id */
+    /** unescaped literal → template id */
     const templateMap = new Map();
 
-    // --- Utility: JS string unescape ---
+    // --- Utility: JS string unescape (仅用于 JSON 输出) ---
     function unescapeJS(str, quote) {
         return str.replace(/\\(.)/g, (_, c) => {
             if (c === quote) return quote;
             if (c === 'n') return '\n';
             if (c === 't') return '\t';
+            if (c === 'r') return '\r';
             if (c === '\\') return '\\';
             return c;
         });
     }
 
-    /** Escape a string for use in a regex replacement pattern */
-    function escapeRegex(str) {
-        return str.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&');
-    }
+    // ============================================================
+    // Pass 1: 收集所有 send_room / send_combat 字面量
+    // ============================================================
 
-    /** Collect unique literal strings from all .js files in a directory */
+    /** 匹配 .send_room('literal' 或 "literal" 或 `literal` — 排除拼接（后面紧跟 + 号） */
+    const CALL_RE = /\.(send_room|send_combat)\((["'`])((?:[^"'`\\]|\\.)*?)\2(?!\s*\+)/gs;
+
+    console.log('[pack]   Pass 1: collecting template strings...');
+    let scannedFiles = 0;
+
     function collectFromDir(dir) {
         if (!fs.existsSync(dir)) return;
         const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -110,13 +115,11 @@ if (IS_BINARY) {
             if (entry.isDirectory()) {
                 collectFromDir(full);
             } else if (entry.name.endsWith('.js')) {
+                scannedFiles++;
                 const content = fs.readFileSync(full, 'utf8');
-                // 匹配 .send_room('literal' 或 "literal" 或 `literal`
-                // 排除后面有 + 的（动态拼接），只看纯字面量
-                const re = /\.send_room\((["'`])((?:[^"'`\\]|\\.)*?)\1(?!\s*[+)])/gs;
                 let m;
-                while ((m = re.exec(content)) !== null) {
-                    const literal = unescapeJS(m[2], m[1]);
+                while ((m = CALL_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[3], m[2]);
                     if (!templateMap.has(literal)) {
                         templateMap.set(literal, templateMap.size);
                     }
@@ -125,68 +128,115 @@ if (IS_BINARY) {
         }
     }
 
-    console.log('[pack]   Pass 1: collecting template strings...');
     collectFromDir(OS_DIR);
     collectFromDir(WORLD_DIR);
-    console.log(`[pack]   Found ${templateMap.size} unique templates`);
+    console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique templates`);
+
+    // ============================================================
+    // 生成客户端模板数据
+    // ============================================================
 
     if (templateMap.size > 0) {
-        // --- Generate client template data ---
         const clientData = {};
         for (const [literal, id] of templateMap) {
             clientData[id] = literal;
         }
-        const clientJS = `/**
+        fs.writeFileSync(
+            path.join(WEB_DIR, 'templates-data.js'),
+            `/**
  * 客户端模板映射表 — 由 pack.js --binary 自动生成
  * DO NOT EDIT MANUALLY
  */
 export const PreloadedTable = ${JSON.stringify(clientData, null, 2)};
 export const PreloadedVersion = 1;
-`;
-        fs.writeFileSync(path.join(WEB_DIR, 'templates-data.js'), clientJS);
+`);
         console.log('[pack]   Generated web/templates-data.js');
+    }
 
-        // --- Transform JS files ---
-        console.log('[pack]   Pass 2: replacing send_room → send_room_b...');
-        let replacedCount = 0;
+    // ============================================================
+    // Pass 2: 替换 send_room("literal") → send_room_b(id)
+    //         替换 send_combat("literal") → send_combat_b(id)
+    // ============================================================
 
-        function transformDir(dir) {
-            if (!fs.existsSync(dir)) return;
-            const entries = fs.readdirSync(dir, { withFileTypes: true });
-            for (const entry of entries) {
-                const full = path.join(dir, entry.name);
-                if (entry.isDirectory()) {
-                    transformDir(full);
-                } else if (entry.name.endsWith('.js')) {
-                    let content = fs.readFileSync(full, 'utf8');
-                    let changed = false;
+    console.log('[pack]   Pass 2: replacing calls...');
+    let replacedFiles = 0;
+    let replacedRoom = 0;
+    let replacedCombat = 0;
 
-                    for (const [literal, id] of templateMap) {
-                        const escaped = escapeRegex(literal);
-                        // 匹配 .send_room("literal" 或 'literal' 或 `literal`
-                        // 替换为 .send_room_b(id
-                        const re = new RegExp(
-                            `(\\.send_room)\\((["'\`])${escaped}\\2(?!\\s*[+)])`,
-                            'gs'
-                        );
-                        const newContent = content.replace(re, `.send_room_b(${id}`);
-                        if (newContent !== content) {
-                            content = newContent;
-                            changed = true;
-                            replacedCount++;
-                        }
+    function transformDir(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                transformDir(full);
+            } else if (entry.name.endsWith('.js')) {
+                let content = fs.readFileSync(full, 'utf8');
+                let changed = false;
+
+                // 使用与 Pass 1 完全相同的正则做替换，
+                // 避免 unescape → escape 往返导致的匹配失败
+                content = content.replace(CALL_RE, (match, funcName, quote, rawStr) => {
+                    const literal = unescapeJS(rawStr, quote);
+                    const id = templateMap.get(literal);
+                    if (id !== undefined) {
+                        changed = true;
+                        if (funcName === 'send_room') replacedRoom++;
+                        else replacedCombat++;
+                        return `.${funcName}_b(${id}`;
                     }
+                    return match;
+                });
 
-                    if (changed) {
-                        fs.writeFileSync(full, content);
+                if (changed) {
+                    fs.writeFileSync(full, content);
+                    replacedFiles++;
+                }
+            }
+        }
+    }
+
+    transformDir(OS_DIR);
+    transformDir(WORLD_DIR);
+
+    console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat in ${replacedFiles} files`);
+
+    // ============================================================
+    // Pass 3: 验证 — 列出未被替换的字面量（可能是正则边缘情况）
+    // ============================================================
+
+    let missed = 0;
+    function verifyDir(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                verifyDir(full);
+            } else if (entry.name.endsWith('.js')) {
+                const content = fs.readFileSync(full, 'utf8');
+                let m;
+                while ((m = CALL_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[3], m[2]);
+                    if (templateMap.has(literal)) {
+                        // 已注册但未被替换 — 可能是正则边缘情况
+                        missed++;
+                        if (missed <= 5) {
+                            const preview = literal.length > 60
+                                ? literal.slice(0, 60) + '...'
+                                : literal;
+                            console.log(`[pack]   ⚠ missed in ${path.relative(__dirname, full)}: ${preview}`);
+                        }
                     }
                 }
             }
         }
+    }
 
-        transformDir(OS_DIR);
-        transformDir(WORLD_DIR);
-        console.log(`[pack]   Replaced ${replacedCount} call sites`);
+    verifyDir(OS_DIR);
+    verifyDir(WORLD_DIR);
+    if (missed > 0) {
+        console.log(`[pack]   ⚠ ${missed} registered templates could not be replaced (edge cases)`);
     }
 }
 
