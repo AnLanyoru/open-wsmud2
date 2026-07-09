@@ -639,6 +639,33 @@ export function ProcessBinary(data) {
                 }
                 break;
             }
+            case 0x53: { // SC: HP/MP 状态变更 (notify_hp_b)
+                const flags = data[pos++];
+
+                // 解码玩家 ID (7 字节: 前4字符 24bit + hex时间戳 int32)
+                const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+                const first4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
+                pos += 3;
+                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+                const ts = dv.getInt32(pos);
+                pos += 4;
+                const id = ID_CHARS[(first4 >> 18) & 0x3F]
+                         + ID_CHARS[(first4 >> 12) & 0x3F]
+                         + ID_CHARS[(first4 >> 6) & 0x3F]
+                         + ID_CHARS[first4 & 0x3F]
+                         + ts.toString(16);
+
+                // 读取 float64 值
+                const sc = { id };
+                if (flags & 0x01) { sc.hp = dv.getFloat64(pos); pos += 8; }
+                if (flags & 0x02) { sc.max_hp = dv.getFloat64(pos); pos += 8; }
+                if (flags & 0x04) { sc.mp = dv.getFloat64(pos); pos += 8; }
+                if (flags & 0x08) { sc.max_mp = dv.getFloat64(pos); pos += 8; }
+                if (flags & 0x10) { sc.damage = dv.getFloat64(pos); pos += 8; }
+
+                Process.sc(sc);
+                break;
+            }
             case 0x00: { // raw text fallback
                 const r = readStr(data, pos);
                 ReceiveMessage(r.str);
