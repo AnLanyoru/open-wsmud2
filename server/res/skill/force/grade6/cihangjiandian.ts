@@ -179,8 +179,8 @@ export default class extends SKILL {
     /**
      * 心有灵犀——命中后触发多次攻击
      */
-    on_force_over(me: CHARACTER, target: CHARACTER, _par: DoAttackPar, sh: number): void {
-        if (sh <= 0) return;
+    on_force_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
+        if (par.is_dodged || par.is_parried) return;
         if (!target || target.hp <= 0) return;
         const extra_hit = me.query_temp('cihang_lx', 0);
         if (!extra_hit) return;
