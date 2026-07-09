@@ -1,5 +1,5 @@
 import { SKILL, PERFORM } from '../../../core/skill/skill.js';
-import { SKILL_TYPES, WEAPON_TYPE } from '../../../core/const.js';
+import { SKILL_TYPES } from '../../../core/const.js';
 import { FAMILIES } from '../../../core/skill/family.js';
 import type { PerformData, EnablePropMap } from '../../../core/skill/skill.js';
 import type { SkillSlotDef } from '../../../types/props.js';
@@ -107,7 +107,6 @@ export default class extends SKILL {
             name: '焚尽八荒',
             distime: 20000,
             enable_skill: 'blade',
-            weapon_type: WEAPON_TYPE.BLADE,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room(

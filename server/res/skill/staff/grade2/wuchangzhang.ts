@@ -1,5 +1,5 @@
 import { SKILL } from '../../../../core/skill/skill.js';
-import { WEAPON_TYPE } from '../../../../core/const.js';
+
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -43,7 +43,6 @@ export default class extends SKILL {
             name: '无常五化',
             distime: 6000,
             enable_skill: 'staff',
-            weapon_type: WEAPON_TYPE.STAFF,
             releasetime_key: 'wcz_gcd',
             mp: 20,
             release_time: 10000,

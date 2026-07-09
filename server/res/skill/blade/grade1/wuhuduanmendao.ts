@@ -1,5 +1,5 @@
 import { SKILL } from '../../../../core/skill/skill.js';
-import { WEAPON_TYPE } from '../../../../core/const.js';
+
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -43,7 +43,6 @@ export default class extends SKILL {
             name: '断字诀',
             distime: 10000,
             enable_skill: 'blade',
-            weapon_type: WEAPON_TYPE.BLADE,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var gj = parseInt(50 + lv / 5);

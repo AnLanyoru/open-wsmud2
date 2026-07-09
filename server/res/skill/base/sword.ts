@@ -1,5 +1,5 @@
 import { PERFORM, SKILL } from '../../../core/skill/skill.js';
-import { SKILL_TYPES, WEAPON_TYPE } from '../../../core/const.js';
+import { SKILL_TYPES } from '../../../core/const.js';
 import type { PropMap } from '../../../types/props.js';
 import type { CHARACTER, DoAttackPar } from '../../../core/char/character.js';
 
@@ -18,7 +18,6 @@ export default class extends SKILL {
             name: '连击',
             distime: 5,
             mp: 5,
-            weapon_type: WEAPON_TYPE.SWORD,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var msg = '<hig>$N加快速度，手中的$W快速向$n刺去</hig>';
                 me.send_room(msg, target);

@@ -1,6 +1,6 @@
 import { SKILL } from '../../../core/skill/skill.js';
 import { FAMILIES } from '../../../core/skill/family.js';
-import { WEAPON_TYPE } from '../../../core/const.js';
+
 import type { PropMap } from '../../../types/props.js';
 import type { PerformData, EnablePropMap } from '../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../core/char/character.js';
@@ -59,7 +59,6 @@ export default class extends SKILL {
             name: '缠字诀',
             distime: 20000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             release_time: 0,
             mp: 10,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -93,7 +92,6 @@ export default class extends SKILL {
             name: '连字诀',
             distime: 15000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = parseInt(lv / 10) + 110;
@@ -120,7 +118,6 @@ export default class extends SKILL {
             name: '随字决',
             distime: 20000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             release_time: 1000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {

@@ -1,6 +1,6 @@
 import { SKILL } from '../../../core/skill/skill.js';
 import { FAMILIES } from '../../../core/skill/family.js';
-import { WEAPON_TYPE } from '../../../core/const.js';
+
 import type { CHARACTER, DoAttackPar } from '../../../core/char/character.js';
 import type { PropMap } from '../../../types/props.js';
 import type { PerformData, EnablePropMap } from '../../../core/skill/skill.js';
@@ -33,7 +33,6 @@ export default class extends SKILL {
             name: '倚天剑决',
             distime: 20000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(
@@ -73,7 +72,6 @@ export default class extends SKILL {
             name: '号令天下',
             distime: 30000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = 10 + parseInt(lv / 50);

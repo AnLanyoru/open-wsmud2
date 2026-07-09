@@ -1,5 +1,5 @@
 import { SKILL } from '../../../../core/skill/skill.js';
-import { WEAPON_TYPE } from '../../../../core/const.js';
+
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -56,7 +56,6 @@ export default class extends SKILL {
             distime: 10000,
             enable_skill: 'blade',
             release_time: 5000,
-            weapon_type: WEAPON_TYPE.BLADE,
 
             releasetime_per_key: 'hjdf_sf_per',
             mp: 20,

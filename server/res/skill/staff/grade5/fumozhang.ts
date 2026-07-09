@@ -1,5 +1,5 @@
 import { SKILL } from '../../../../core/skill/skill.js';
-import { WEAPON_TYPE } from '../../../../core/const.js';
+
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -29,7 +29,6 @@ export default class extends SKILL {
             name: '罗汉伏魔',
             distime: 20000,
             enable_skill: 'staff',
-            weapon_type: WEAPON_TYPE.STAFF,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(

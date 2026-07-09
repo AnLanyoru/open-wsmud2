@@ -1,6 +1,6 @@
 import { SKILL } from '../../../core/skill/skill.js';
 import { FAMILIES } from '../../../core/skill/family.js';
-import { WEAPON_TYPE } from '../../../core/const.js';
+
 import type { PerformData, EnablePropMap } from '../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../core/char/character.js';
 
@@ -32,7 +32,6 @@ export default class extends SKILL {
             name: '灭剑',
             distime: 20000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -70,7 +69,6 @@ export default class extends SKILL {
             name: '绝剑',
             distime: 20000,
             enable_skill: 'sword',
-            weapon_type: WEAPON_TYPE.SWORD,
             mp: 10,
             release_time: 5000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
