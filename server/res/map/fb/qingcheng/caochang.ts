@@ -1,10 +1,10 @@
-import {ROOM} from "../../../../core/room/room.js";
+import { ROOM } from "../../../../core/room/room.js";
 
 export default class extends ROOM {
-    name = "练武场";
-    exits = {
-        "south": "fb/qingcheng/zoulang",
-        "east": "fb/qingcheng/huayuan",
-        "north": "fb/qingcheng/zhudian",
-    };
+  name = "练武场";
+  exits = {
+    south: "fb/qingcheng/zoulang",
+    east: "fb/qingcheng/huayuan",
+    north: "fb/qingcheng/zhudian",
+  };
 }

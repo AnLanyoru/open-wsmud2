@@ -1,62 +1,63 @@
-import {COMMAND} from "../../../core/command.js";
-import type {CHARACTER} from "../../../core/char/character.js";
-import type {FOLLOWER} from "../../../core/char/follower.js";
-import type {USER} from "../../../core/char/user.js";
+import { COMMAND } from "../../../core/command.js";
+import type { CHARACTER } from "../../../core/char/character.js";
+import type { FOLLOWER } from "../../../core/char/follower.js";
+import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
-    command = "dc";
-    regex = /(\w+)\s+(\w+)\s*(.+)?/;
+  command = "dc";
+  regex = /(\w+)\s+(\w+)\s*(.+)?/;
 
-    /**
-     * @param {CHARACTER} player - 执行命令的角色
-     */
-    enter(me: CHARACTER, arg: string, cmd: string, par: string) {
-        if (!arg || !cmd) return;
-        if (!me.is_player) return;
-        let player = me as USER;
-        var target = player.find_obj(arg, player.environment) as FOLLOWER | undefined;
-        if (!target) return player.send("没有这个人。");
-        if (target.master != player.id) return player.send("你没办法这么做。");
-        try {
-            if (!ALLOW_DC[cmd]) return;
-            target.set_listener(player, player);
-            target.do_command(cmd, par);
-        } catch (e) {
-            throw e;
-        }
-        target.set_listener(player, undefined);
+  /**
+   * @param {CHARACTER} player - 执行命令的角色
+   */
+  enter(me: CHARACTER, arg: string, cmd: string, par: string) {
+    if (!arg || !cmd) return;
+    if (!me.is_player) return;
+    let player = me as USER;
+    var target = player.find_obj(arg, player.environment) as
+      FOLLOWER | undefined;
+    if (!target) return player.send("没有这个人。");
+    if (target.master != player.id) return player.send("你没办法这么做。");
+    try {
+      if (!ALLOW_DC[cmd]) return;
+      target.set_listener(player, player);
+      target.do_command(cmd, par);
+    } catch (e) {
+      throw e;
     }
+    target.set_listener(player, undefined);
+  }
 }
 
 const ALLOW_DC = {
-    study: true,
-    store: true,
-    dazuo: true,
-    liaoshang: true,
-    learn: true,
-    xue: true,
-    enable: true,
-    equip: true,
-    unequip: true,
-    lianxi: true,
-    fangqi: true,
-    give: true,
-    caiyao: true,
-    diaoyu: true,
-    cai: true,
-    diao: true,
-    wa: true,
-    wk: true,
-    stopstate: true,
-    state: true,
-    eq: true,
-    uneq: true,
-    checkobj: true,
-    drop: true,
-    lingwu: true,
-    use: true,
-    lianyao: true,
-    sell: true,
-    lingwu3: true,
-    fenjie: true
+  study: true,
+  store: true,
+  dazuo: true,
+  liaoshang: true,
+  learn: true,
+  xue: true,
+  enable: true,
+  equip: true,
+  unequip: true,
+  lianxi: true,
+  fangqi: true,
+  give: true,
+  caiyao: true,
+  diaoyu: true,
+  cai: true,
+  diao: true,
+  wa: true,
+  wk: true,
+  stopstate: true,
+  state: true,
+  eq: true,
+  uneq: true,
+  checkobj: true,
+  drop: true,
+  lingwu: true,
+  use: true,
+  lianyao: true,
+  sell: true,
+  lingwu3: true,
+  fenjie: true,
 };

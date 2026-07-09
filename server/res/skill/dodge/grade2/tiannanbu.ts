@@ -1,4 +1,4 @@
-import {SKILL} from "../../../../core/skill/skill.js";
+import { SKILL } from "../../../../core/skill/skill.js";
 import type { EnablePropMap } from "../../../../core/skill/skill.js";
 
 // ============================================================
@@ -8,27 +8,28 @@ import type { EnablePropMap } from "../../../../core/skill/skill.js";
 // ============================================================
 
 export default class extends SKILL {
-    name = "天南步";
-    id = "tiannanbu";
-    grade = 2;
+  name = "天南步";
+  id = "tiannanbu";
+  grade = 2;
 
-    desc = "大理段家的轻功身法，与段氏「一阳指」同出一源。步法暗合奇门八卦，举手投足间尽是帝王家的雍容气度。";
-    can_enables = ["dodge"];
-    dodge_actions = [
-        "$n微微一笑，足下并不见如何动作，身形已如行云流水般向后退开，虽在避招，竟无半分狼狈之色。\n",
-        "却见$n袍袖轻拂，左足踏「<HIG>泰</HIG>」位，右足转「<HIG>复</HIG>」位，$N只觉眼前一花，$n已如天南彩云般飘然远去。\n",
-        "$n口中轻吟：「<HIY>苍山不墨千秋画，洱海无弦万古琴</HIY>」，身形随诗意而动，$N的攻势贴着$n衣袂而过。\n",
-        "只见$n足踏「<HIC>无妄</HIC>」之位，身形借势一侧，$N这一击虽凌厉无比，却如抽刀断水，徒劳无功。\n",
-        "$n步履从容，身形微侧间如帝王临朝，衣袂翻飞之际已踏出了丈余，$N但觉眼前之人仿佛远在天边，触手可及却又遥不可及。\n",
-        "$n神色淡然，脚下暗踩八卦方位，身形如御风而行，$N连出数招尽皆落空，不由得心下骇然。\n",
-    ];
+  desc =
+    "大理段家的轻功身法，与段氏「一阳指」同出一源。步法暗合奇门八卦，举手投足间尽是帝王家的雍容气度。";
+  can_enables = ["dodge"];
+  dodge_actions = [
+    "$n微微一笑，足下并不见如何动作，身形已如行云流水般向后退开，虽在避招，竟无半分狼狈之色。\n",
+    "却见$n袍袖轻拂，左足踏「<HIG>泰</HIG>」位，右足转「<HIG>复</HIG>」位，$N只觉眼前一花，$n已如天南彩云般飘然远去。\n",
+    "$n口中轻吟：「<HIY>苍山不墨千秋画，洱海无弦万古琴</HIY>」，身形随诗意而动，$N的攻势贴着$n衣袂而过。\n",
+    "只见$n足踏「<HIC>无妄</HIC>」之位，身形借势一侧，$N这一击虽凌厉无比，却如抽刀断水，徒劳无功。\n",
+    "$n步履从容，身形微侧间如帝王临朝，衣袂翻飞之际已踏出了丈余，$N但觉眼前之人仿佛远在天边，触手可及却又遥不可及。\n",
+    "$n神色淡然，脚下暗踩八卦方位，身形如御风而行，$N连出数招尽皆落空，不由得心下骇然。\n",
+  ];
 
-    query_enable_prop(lv: number): EnablePropMap {
-        return {
-            dodge: {
-                ds: 30 + Math.floor(lv * 8 / 5),
-                int: Math.floor(lv / 6),
-            },
-        };
-    }
+  query_enable_prop(lv: number): EnablePropMap {
+    return {
+      dodge: {
+        ds: 30 + Math.floor((lv * 8) / 5),
+        int: Math.floor(lv / 6),
+      },
+    };
+  }
 }

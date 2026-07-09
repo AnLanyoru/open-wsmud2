@@ -1,20 +1,18 @@
 /**
  * ROOM 房间类
  */
-import {BASE} from "../base.js";
-import {WORLD} from "../world.js";
-import {ITEM, RoomAction} from "../item.js";
-import {OBJ} from "../item/obj.js";
-import type {AREA} from "./area.js";
-import type {CHARACTER} from "../char/character.js";
-import {NPC} from "../char/npc.js";
-import type {USER} from "../char/user.js";
+import { BASE } from "../base.js";
+import { WORLD } from "../world.js";
+import { ITEM, RoomAction } from "../item.js";
+import { OBJ } from "../item/obj.js";
+import type { AREA } from "./area.js";
+import type { CHARACTER } from "../char/character.js";
+import { NPC } from "../char/npc.js";
+import type { USER } from "../char/user.js";
 import { ItemCommandsJson } from "../char/follower.js";
-
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
-
 
 /**
  * 隐藏物品被look时的描述
@@ -22,18 +20,17 @@ declare const __PATH: Record<string, string>;
  * @param player - 查看的玩家
  */
 function on_look_hidden_item(this: ITEM, player: USER): string {
-    if (this.json) return this.json;
-    const json: ItemCommandsJson = {
-        type: "item",
-        desc: this.desc,
-        commands: this.commands?.filter(
-            cmd => cmd[0]
-        ).map(
-            cmd => ({ cmd: cmd[0] + " " + this.id, name: cmd[1] })
-        ) ?? [],
-    };
-    this.json = JSON.stringify(json);
-    return this.json;
+  if (this.json) return this.json;
+  const json: ItemCommandsJson = {
+    type: "item",
+    desc: this.desc,
+    commands:
+      this.commands
+        ?.filter((cmd) => cmd[0])
+        .map((cmd) => ({ cmd: cmd[0] + " " + this.id, name: cmd[1] })) ?? [],
+  };
+  this.json = JSON.stringify(json);
+  return this.json;
 }
 
 /**
@@ -41,1061 +38,1086 @@ function on_look_hidden_item(this: ITEM, player: USER): string {
  * @param path - 房间路径
  */
 function getAreaByPath(path: string): AREA | undefined {
-    let index = path.lastIndexOf("/");
-    path = path.slice(0, index + 1);
-    const items = WORLD.AREAS;
-    for (let i = 0; i < items.length; i++) {
-        if ((items[i] as AREA).room_path == path) return items[i] as AREA;
-    }
+  let index = path.lastIndexOf("/");
+  path = path.slice(0, index + 1);
+  const items = WORLD.AREAS;
+  for (let i = 0; i < items.length; i++) {
+    if ((items[i] as AREA).room_path == path) return items[i] as AREA;
+  }
 }
 
 export class ROOM extends ITEM {
+  // ============ 核心标识属性 ============
 
-    // ============ 核心标识属性 ============
+  /** 最大容纳物品/角色数 */
+  max_item_count: number = 50;
+  /** 房间全名(含区域前缀) — 内部赋值用, 外部调long_name() */
+  _room_name!: string;
 
-    /** 最大容纳物品/角色数 */
-    max_item_count: number = 50;
-    /** 房间全名(含区域前缀) — 内部赋值用, 外部调long_name() */
-    _room_name!: string;
+  /**
+   * 房间完整显示名称 — 覆写ITEM同名方法
+   */
+  long_name(): string {
+    return this._room_name;
+  }
 
-    /**
-     * 房间完整显示名称 — 覆写ITEM同名方法
-     */
-    long_name(): string {
-        return this._room_name;
+  /** 房间描述 */
+  desc: string = "";
+  /** 所属区域路径(由资源文件设置) */
+  area: AREA | null;
+
+  // ============ 容器与出口 ============
+
+  /** 房间内的物品和角色 — 运行时CHARACTER或OBJ */
+  items: ITEM[] = [];
+  /** 出口映射 {方向: 目标路径} */
+  exits: Record<string, string> | null = null;
+  /** 出口JSON缓存 */
+  room_exits_json: string | null = null;
+  /** 隐藏物品映射 */
+  hidden_items: ITEM[] | null = null;
+  /** 命令JSON缓存 */
+  commands_json: string | null = null;
+
+  // ============ 层级关系 ============
+
+  /** 所属区域 */
+  parent: AREA | null = null;
+
+  // ============ 副本与镜像 ============
+  /** 是否为不持久化房间 */
+  no_save?: boolean;
+  /** 是否为副本房间 */
+  is_copy_room: boolean = false;
+  /** 是否为镜像房间 */
+  is_shadow: boolean = false;
+  /** 是否禁止创建镜像 */
+  no_shadow: boolean = false;
+  /** 房间创建时间戳 */
+  create_time: number = 0;
+  /** 副本房间映射 {ownerId: ROOM} */
+  copy_rooms: Record<string, ROOM> | null = null;
+  /** 镜像房间列表 */
+  shadow_rooms: ROOM[] | null = null;
+  /** 副本持有者ID */
+  owner: string | null = null;
+  /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
+  _npc_records: [string, number][] = [];
+
+  // ============ 玩法相关 ============
+
+  /** 副本分数（由 CHARACTER.add_fbscore 设置） */
+  score?: number;
+  /** 是否可钓鱼 */
+  can_diaoyu: boolean = false;
+  /** 是否可采药 */
+  can_caiyao: boolean = false;
+  /** 比武擂台：计时步数 */
+  biwu_step?: number;
+  /** 是否禁止战斗 */
+  no_fight?: boolean;
+  /** 是否无法复活 */
+  no_relive?: boolean;
+
+  // ============ 公共房间缓存(静态) ============
+
+  /** 公共房间列表(由RANDOM静态方法管理) */
+  static public_rooms: ROOM[] | null = null;
+
+  /**
+   * 创建房间实例（从干净原型克隆）
+   * @param path - 房间路径
+   */
+  static CREATE(path: string): ROOM {
+    const base = WORLD.ROOM_STORE.get(path);
+    if (!base) {
+      throw new Error("room not preloaded: " + path);
     }
+    const room = Object.create(base) as ROOM;
+    room.on_clone();
+    room.create(path);
+    return room;
+  }
 
-    /** 房间描述 */
-    desc: string = "";
-    /** 所属区域路径(由资源文件设置) */
-    area: AREA | null;
+  // ============ 回调（由资源文件设置） ============
 
-    // ============ 容器与出口 ============
+  /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
+  on_leave(obj: ITEM, dir: string): boolean | void {
+    return;
+  }
 
-    /** 房间内的物品和角色 — 运行时CHARACTER或OBJ */
-    items: ITEM[] = [];
-    /** 出口映射 {方向: 目标路径} */
-    exits: Record<string, string> | null = null;
-    /** 出口JSON缓存 */
-    room_exits_json: string | null = null;
-    /** 隐藏物品映射 */
-    hidden_items: ITEM[] | null = null;
-    /** 命令JSON缓存 */
-    commands_json: string | null = null;
+  /** 房间中复活回调，目标复活前；返回 false 阻止复活 */
+  on_relive?(obj: CHARACTER, is_relive_here: boolean): boolean | void;
 
-    // ============ 层级关系 ============
+  /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
+  on_before_enter(obj: ITEM): void {
+    return;
+  }
 
-    /** 所属区域 */
-    parent: AREA | null = null;
+  /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
+  on_enter(obj: ITEM): void {
+    return;
+  }
 
-    // ============ 副本与镜像 ============
-    /** 是否为不持久化房间 */
-    no_save?: boolean;
-    /** 是否为副本房间 */
-    is_copy_room: boolean = false;
-    /** 是否为镜像房间 */
-    is_shadow: boolean = false;
-    /** 是否禁止创建镜像 */
-    no_shadow: boolean = false;
-    /** 房间创建时间戳 */
-    create_time: number = 0;
-    /** 副本房间映射 {ownerId: ROOM} */
-    copy_rooms: Record<string, ROOM> | null = null;
-    /** 镜像房间列表 */
-    shadow_rooms: ROOM[] | null = null;
-    /** 副本持有者ID */
-    owner: string | null = null;
-    /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
-    _npc_records: [string, number][] = [];
+  /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
+  on_heart_beat?(dt: number): void {
+    return;
+  }
 
-    // ============ 玩法相关 ============
+  /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
+  on_login?: (user: USER) => void;
+  /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
+  on_create?: () => void;
+  /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
+  on_set_difficulty?: (type: number) => void;
 
-    /** 副本分数（由 CHARACTER.add_fbscore 设置） */
-    score?: number;
-    /** 是否可钓鱼 */
-    can_diaoyu: boolean = false;
-    /** 是否可采药 */
-    can_caiyao: boolean = false;
-    /** 比武擂台：计时步数 */
-    biwu_step?: number;
-    /** 是否禁止战斗 */
-    no_fight?: boolean;
-    /** 是否无法复活 */
-    no_relive?: boolean;
+  /** 是否为白天（资源文件注入，用于狼王等 NPC 行为） */
+  is_time(): boolean {
+    return false;
+  }
 
-    // ============ 公共房间缓存(静态) ============
+  /** 创建狼王变身（资源文件注入，lw 任务用） */
+  create_lw(me: CHARACTER, npc: CHARACTER, zone: number, msg: string): void {
+    return;
+  }
 
-    /** 公共房间列表(由RANDOM静态方法管理) */
-    static public_rooms: ROOM[] | null = null;
+  /** 可移动出口列表（资源文件注入，巡逻 NPC 用） */
+  move_exits?: string[];
 
-    /**
-     * 创建房间实例（从干净原型克隆）
-     * @param path - 房间路径
-     */
-    static CREATE(path: string): ROOM {
-        const base = WORLD.ROOM_STORE.get(path);
-        if (!base) {
-            throw new Error('room not preloaded: ' + path);
+  // ============ 核心方法 ============
+
+  /**
+   * 玩家/物件离开房间
+   * @param obj - 离开的对象
+   * @param dir - 离开方向
+   * @param leave_msg - 离开消息
+   */
+  do_leave(
+    obj: OBJ | CHARACTER | NPC | USER,
+    dir: string,
+    leave_msg: string,
+  ): boolean | undefined {
+    if (this.on_leave(obj, dir) == false) {
+      return false;
+    }
+    if (this.item_changed(obj, false, leave_msg, dir) == false) {
+      return false;
+    }
+  }
+
+  /**
+   * 玩家/物件进入房间
+   * @param obj - 进入的对象
+   * @param isshow - 是否显示
+   * @param in_msg - 进入消息
+   */
+  do_enter(
+    obj: OBJ | CHARACTER | NPC | USER,
+    isshow: boolean,
+    in_msg?: string,
+  ): void {
+    this.on_before_enter && this.on_before_enter(obj);
+    if (obj.check_player()) {
+      obj.send(this.to_json());
+      this.send_exits(obj);
+    }
+    this.item_changed(obj, true, in_msg);
+    this.on_enter(obj);
+  }
+
+  /**
+   * 房间内容物变更(核心方法)。处理物件进出房间的完整流程：
+   * 通知房间内玩家、触发 on_enter/on_leave 回调、维护 items 数组。
+   * @param obj - 变更对象
+   * @param isin - true进入 false离开
+   * @param changed_msg - 变更消息(广播给房间内玩家)
+   * @param dir - 移动方向
+   */
+  item_changed(
+    obj: ITEM,
+    isin: boolean,
+    changed_msg?: string,
+    dir?: string,
+  ): boolean | undefined {
+    if (!obj) return;
+    let msg: string | undefined;
+    let obj_index = -1,
+      isshow = !obj.query_temp("hidden");
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      if (item == obj) {
+        obj_index = i;
+        continue;
+      }
+      if (item.check_player() && isshow) {
+        item as USER;
+        if (!msg) msg = this.item_json(obj, isin);
+        item.send(msg);
+
+        if (changed_msg && item != obj && !item.query_setting("off_move")) {
+          item.send(changed_msg);
         }
-        const room = Object.create(base) as ROOM;
-        room.on_clone();
-        room.create(path);
-        return room;
-    }
-
-    // ============ 回调（由资源文件设置） ============
-
-    /** 离开房间前回调 — 触发时机：do_leave() 开头，物件离开房间前；返回 false 阻止离开 */
-    on_leave(obj: ITEM, dir: string): boolean | void {
-        return;
-    }
-    
-    /** 房间中复活回调，目标复活前；返回 false 阻止复活 */
-    on_relive?(obj: CHARACTER, is_relive_here: boolean): boolean | void;
-
-    /** 进入房间前回调 — 触发时机：do_enter() 开头，物件进入房间、生成 JSON 之前 */
-    on_before_enter(obj: ITEM): void {
-        return;
-    }
-
-    /** 进入房间后回调 — 触发时机：do_enter() 末尾，物件已加入房间 items 数组之后 */
-    on_enter(obj: ITEM): void {
-        return;
-    }
-
-    /** 心跳回调 — 触发时机：房间每帧 heart_beat(dt) 末尾（在遍历子物品之后） */
-    on_heart_beat?(dt: number): void {
-        return;
-    }
-
-    /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
-    on_login?: (user: USER) => void;
-    /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
-    on_create?: () => void;
-    /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
-    on_set_difficulty?: (type: number) => void;
-
-    /** 是否为白天（资源文件注入，用于狼王等 NPC 行为） */
-    is_time(): boolean {
-        return false;
-    }
-
-    /** 创建狼王变身（资源文件注入，lw 任务用） */
-    create_lw(me: CHARACTER, npc: CHARACTER, zone: number, msg: string): void {
-        return;
-    }
-
-    /** 可移动出口列表（资源文件注入，巡逻 NPC 用） */
-    move_exits?: string[];
-
-    // ============ 核心方法 ============
-
-    /**
-     * 玩家/物件离开房间
-     * @param obj - 离开的对象
-     * @param dir - 离开方向
-     * @param leave_msg - 离开消息
-     */
-    do_leave(obj: OBJ | CHARACTER | NPC | USER, dir: string, leave_msg: string): boolean | undefined {
-        if (this.on_leave(obj, dir) == false) {
-            return false;
+      } else {
+        if (obj.check_character() && item.check_character()) {
+          if (isin && item.on_enter) {
+            item.on_enter(obj);
+          } else if (!isin && item.on_leave) {
+            if (item.on_leave(obj, dir || "") == false) return false;
+          }
         }
-        if (this.item_changed(obj, false, leave_msg, dir) == false) {
-            return false;
-        }
+      }
     }
 
-    /**
-     * 玩家/物件进入房间
-     * @param obj - 进入的对象
-     * @param isshow - 是否显示
-     * @param in_msg - 进入消息
-     */
-    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg?: string): void {
-        this.on_before_enter && this.on_before_enter(obj);
-        if (obj.check_player()) {
-            obj.send(this.to_json());
-            this.send_exits(obj);
-        }
-        this.item_changed(obj, true, in_msg);
-        this.on_enter(obj);
+    if (isin) {
+      obj.environment = this;
+      if (obj_index == -1) {
+        this.items.push(obj as CHARACTER | OBJ | NPC);
+        if (obj.check_player()) obj.send(this.items_to_json());
+      } else if (obj.check_player()) {
+        if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
+        obj.send(msg);
+      }
+    } else if (obj_index > -1) {
+      this.items.splice(obj_index, 1);
+      obj.environment = undefined;
     }
+  }
 
-    /**
-     * 房间内容物变更(核心方法)。处理物件进出房间的完整流程：
-     * 通知房间内玩家、触发 on_enter/on_leave 回调、维护 items 数组。
-     * @param obj - 变更对象
-     * @param isin - true进入 false离开
-     * @param changed_msg - 变更消息(广播给房间内玩家)
-     * @param dir - 移动方向
-     */
-    item_changed(obj: ITEM, isin: boolean, changed_msg?: string, dir?: string): boolean | undefined {
-        if (!obj) return;
-        let msg: string | undefined;
-        let obj_index = -1, isshow = !obj.query_temp('hidden');
-        for (let i = 0; i < this.items.length; i++) {
-            const item = this.items[i];
-            if (item == obj) {
-                obj_index = i;
-                continue;
-            }
-            if (item.check_player() && isshow) {
-                item as USER;
-                if (!msg) msg = this.item_json(obj, isin);
-                item.send(msg);
-
-                if (changed_msg && item != obj && !item.query_setting("off_move")) {
-                    item.send(changed_msg);
-                }
-
-            } else {
-                if (obj.check_character() && item.check_character()) {
-                    if (isin && (item.on_enter)) {
-                        item.on_enter(obj);
-                    } else if (!isin && item.on_leave) {
-                        if (item.on_leave(obj, dir || '') == false) return false;
-                    }
-                }
-            }
-        }
-
-        if (isin) {
-            obj.environment = this;
-            if (obj_index == -1) {
-                this.items.push(obj as CHARACTER | OBJ | NPC);
-                if (obj.check_player()) obj.send(this.items_to_json());
-
-            } else if (obj.check_player()) {
-                if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
-                obj.send(msg);
-            }
-        } else if (obj_index > -1) {
-            this.items.splice(obj_index, 1);
-            obj.environment = undefined;
-        }
+  /**
+   * 生成物件JSON消息
+   * @param item - 物件
+   * @param isin - 是否进入
+   */
+  item_json(item: ITEM, isin: boolean): string {
+    if (!item) return "";
+    const str: string[] = [];
+    if (isin) {
+      str.push('{"type":"itemadd",');
+      str.push('id:"');
+      str.push(item.id);
+      str.push('",name:"');
+      str.push(item.long_name());
+      str.push('"');
+      if (item.is_player) {
+        str.push(",p:1");
+      }
+      if (item.check_character()) {
+        const ch = item as CHARACTER;
+        str.push(",mp:");
+        str.push(String(ch.mp));
+        str.push(",hp:");
+        str.push(String(ch.hp));
+        str.push(",max_mp:");
+        str.push(String(ch.max_mp));
+        str.push(",max_hp:");
+        str.push(String(ch.max_hp));
+        if (ch.append_status) ch.append_status(str);
+      }
+      str.push("}");
+    } else {
+      str.push('{"type":"itemremove",id:"');
+      str.push(item.id);
+      str.push('"}');
     }
+    return str.join("");
+  }
 
-    /**
-     * 生成物件JSON消息
-     * @param item - 物件
-     * @param isin - 是否进入
-     */
-    item_json(item: ITEM, isin: boolean): string {
-        if (!item) return "";
-        const str: string[] = [];
-        if (isin) {
-            str.push('{"type":"itemadd",');
-            str.push("id:\"");
-            str.push(item.id);
-            str.push("\",name:\"");
-            str.push(item.long_name());
-            str.push("\"");
-            if (item.is_player) {
-                str.push(",p:1");
-            }
-            if (item.check_character()) {
-                const ch = item as CHARACTER;
-                str.push(",mp:");
-                str.push(String(ch.mp));
-                str.push(",hp:");
-                str.push(String(ch.hp));
-                str.push(",max_mp:");
-                str.push(String(ch.max_mp));
-                str.push(",max_hp:");
-                str.push(String(ch.max_hp));
-                if (ch.append_status) ch.append_status(str);
-            }
-            str.push("}");
+  /**
+   * 生成所有物件列表JSON
+   */
+  items_to_json(): string {
+    const str: string[] = ['{"type":"items","items":['];
+    for (let i = 0; i < this.items.length; i++) {
+      const item: Record<string, any> = this.items[i];
+      if (!item.is_hidden()) {
+        str.push('{id:"');
+        str.push(item.id);
+        str.push('",name:"');
+        str.push(item.long_name());
+        str.push('"');
+        if (item.is_player) {
+          str.push(",p:1");
         } else {
-            str.push('{"type":"itemremove",id:"');
-            str.push(item.id);
-            str.push('"}');
+          if (!item.item_types) {
+            item.item_types =
+              item.hp > 0
+                ? `,m:${item.on_checkskill || item.on_master ? 1 : 0},l:${item.sell_list ? 1 : 0},f:${item.master ? 1 : 0}`
+                : ",o:1";
+          }
+          str.push(item.item_types);
         }
-        return str.join("");
+        if (item.append_status) {
+          str.push(",mp:");
+          str.push(item.mp);
+          str.push(",hp:");
+          str.push(item.hp);
+          str.push(",max_mp:");
+          str.push(item.max_mp);
+          str.push(",max_hp:");
+          str.push(item.max_hp);
+
+          item.append_status(str);
+        }
+        str.push("},");
+      }
     }
+    str.push("0]}");
+    return str.join("");
+  }
 
-    /**
-     * 生成所有物件列表JSON
-     */
-    items_to_json(): string {
-        const str: string[] = ['{"type":"items","items":['];
-        for (let i = 0; i < this.items.length; i++) {
-            const item: Record<string, any> = this.items[i];
-            if (!item.is_hidden()) {
-                str.push("{id:\"");
-                str.push(item.id);
-                str.push("\",name:\"");
-                str.push(item.long_name());
-                str.push("\"");
-                if (item.is_player) {
-                    str.push(",p:1");
-                } else {
-                    if (!item.item_types) {
-                        item.item_types = item.hp > 0
-                            ? `,m:${(item.on_checkskill || item.on_master) ? 1 : 0},l:${item.sell_list ? 1 : 0},f:${item.master ? 1 : 0}`
-                            : ",o:1";
-                    }
-                    str.push(item.item_types);
-                }
-                if (item.append_status) {
-                    str.push(",mp:");
-                    str.push(item.mp);
-                    str.push(",hp:");
-                    str.push(item.hp);
-                    str.push(",max_mp:");
-                    str.push(item.max_mp);
-                    str.push(",max_hp:");
-                    str.push(item.max_hp);
-
-                    item.append_status(str);
-                }
-                str.push("},");
-            }
-        }
-        str.push("0]}");
-        return str.join("");
+  /**
+   * 设置房间NPC(创建时调用)
+   * @param arguments - NPC路径或[NPC路径, 数量]
+   */
+  set_npc(...args: (string | [string, number])[]): void {
+    for (let i = 0; i < args.length; i++) {
+      let name = args[i];
+      if (typeof name == "string") name = [name, 1];
+      const obj_path = name[0];
+      if (!obj_path) continue;
+      this._npc_records.push([obj_path, name[1]]);
     }
+  }
 
-    /**
-     * 设置房间NPC(创建时调用)
-     * @param arguments - NPC路径或[NPC路径, 数量]
-     */
-    set_npc(...args: (string | [string, number])[]): void {
-        for (let i = 0; i < args.length; i++) {
-            let name = args[i];
-            if (typeof name == "string") name = [name, 1];
-            const obj_path = name[0];
-            if (!obj_path) continue;
-            this._npc_records.push([obj_path, name[1]]);
-        }
+  /**
+   * 设置房间物品(创建时调用)
+   * @param names - 物品路径或[物品路径, 数量]
+   */
+  set_obj(...names: (string | [string, number])[]): void {
+    for (let i = 0; i < arguments.length; i++) {
+      let name = arguments[i];
+      if (typeof name == "string") name = [name, 1];
+      const obj = OBJ.CREATE(name[0], name[1]);
+      if (obj) {
+        this.items.push(obj);
+      }
     }
+  }
 
-    /**
-     * 设置房间物品(创建时调用)
-     * @param names - 物品路径或[物品路径, 数量]
-     */
-    set_obj(...names: (string | [string, number])[]): void {
-        for (let i = 0; i < arguments.length; i++) {
-            let name = arguments[i];
-            if (typeof name == "string") name = [name, 1];
-            const obj = OBJ.CREATE(name[0], name[1]);
-            if (obj) {
-                this.items.push(obj);
-            }
-        }
+  /**
+   * 设置隐藏物品(需look才能发现)
+   * @param id - 物品ID
+   * @param name - 名称
+   * @param desc - 描述
+   * @param commands - 命令列表
+   */
+  set_item(
+    id: string,
+    name: string,
+    desc: string,
+    commands?: RoomAction[] | RoomAction,
+  ): ITEM {
+    this.hidden_items = this.hidden_items || [];
+    let cmd_lsit: RoomAction[] = [];
+    if (commands && typeof commands[0] == "string") {
+      cmd_lsit = [commands as RoomAction];
+    } else {
+      cmd_lsit = commands as RoomAction[];
     }
+    const hidden_item: ITEM = new ITEM();
+    hidden_item.set({
+      id: id,
+      name: name,
+      desc: desc,
+      commands: cmd_lsit,
+      query_desc: on_look_hidden_item,
+      environment: this,
+    });
 
-    /**
-     * 设置隐藏物品(需look才能发现)
-     * @param id - 物品ID
-     * @param name - 名称
-     * @param desc - 描述
-     * @param commands - 命令列表
-     */
-    set_item(id: string, name: string, desc: string, commands?: RoomAction[] | RoomAction): ITEM {
-        this.hidden_items = this.hidden_items || [];
-        let cmd_lsit: RoomAction[] = []
-        if (commands && typeof commands[0] == "string") {
-            cmd_lsit = [commands as RoomAction];
-        } else {
-            cmd_lsit = commands as RoomAction[]
-        }
-        const hidden_item: ITEM = new ITEM();
-        hidden_item.set({
-            id: id,
+    this.hidden_items.push(hidden_item);
+    if (cmd_lsit) {
+      for (let j = 0; j < cmd_lsit.length; j++) {
+        this.add_action(cmd_lsit[j][0], "", cmd_lsit[j][2]);
+      }
+    }
+    return hidden_item;
+  }
+
+  /**
+   * 根据ID查找物件(含隐藏物品)
+   * @param oid
+   */
+  find_obj(oid: string): ITEM | undefined {
+    const items = this.items;
+    if (!items) return;
+    const item = this.find_obj_byid.call(this, items, oid);
+    if (item) return item;
+    if (!this.hidden_items) return;
+    for (let i = 0; i < this.hidden_items.length; i++) {
+      if (this.hidden_items[i].id == oid) return this.hidden_items[i];
+    }
+    return;
+  }
+
+  /**
+   * 根据路径查找物件
+   * @param path
+   */
+  find_by_path(path: string): ITEM | undefined {
+    const items = this.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].path == path) {
+        return items[i];
+      }
+    }
+  }
+
+  /**
+   * 房间是否包含指定路径的物件
+   * @param path
+   */
+  is_here(path: string): boolean | undefined {
+    const items = this.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].path == path) {
+        return true;
+      }
+    }
+  }
+
+  /**
+   * 向房间内所有玩家发送消息
+   * @param msg
+   */
+  notify(msg: string): void {
+    if (!this.items) return;
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].is_player) {
+        this.items[i].notify(msg);
+      }
+    }
+  }
+
+  /**
+   * 查询指定方向是否存在出口
+   * @param dir
+   */
+  query_exits(dir: string): boolean {
+    if (this.exits && this.exits[dir]) return true;
+    return false;
+  }
+
+  /**
+   * 添加出口
+   * @param dir - 方向名
+   * @param rm - 目标房间路径
+   */
+  add_exit(dir: string, rm: string): void {
+    this.exits = this.exits || {};
+    this.exits[dir] = rm;
+    this.exits_changed();
+  }
+
+  /**
+   * 移除出口
+   * @param dir
+   */
+  remove_exit(dir: string): void {
+    this.exits = this.exits || {};
+    delete this.exits[dir];
+    this.exits_changed();
+  }
+
+  /**
+   * 出口变更后通知所有玩家
+   */
+  exits_changed(): void {
+    this.room_exits_json = null;
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].is_player) this.send_exits(this.items[i]);
+    }
+  }
+
+  /**
+   * 向玩家发送出口信息
+   * @param player
+   */
+  send_exits(player: Record<string, any>): void {
+    player.send(this.exitsto_roomjson());
+  }
+
+  /**
+   * 生成出口JSON
+   */
+  exitsto_roomjson(): string {
+    if (this.room_exits_json) return this.room_exits_json;
+    const obj: Record<string, any> = {};
+    obj.type = "exits";
+    obj.items = {};
+    if (this.exits) {
+      for (let dir in this.exits) {
+        if (!this.exits[dir]) continue;
+        const rm = WORLD.getRoom(this.exits[dir]);
+        if (!rm) continue;
+        obj.items[dir] = rm.name;
+      }
+    }
+    this.room_exits_json = JSON.stringify(obj);
+    return this.room_exits_json;
+  }
+
+  /**
+   * 生成房间JSON(含命令)
+   */
+  to_json(): string {
+    if (this.json) return this.json;
+    const obj: Record<string, any> = {};
+    obj.type = "room";
+    obj.path = this.path;
+    obj.name = this._room_name;
+    obj.desc = this.desc;
+    obj.commands = [];
+    if (this.actions) {
+      for (let cmd in this.actions) {
+        const name = this.actions[cmd].name;
+        if (name)
+          obj.commands.push({
+            cmd: cmd,
             name: name,
-            desc: desc,
-            commands: cmd_lsit,
-            query_desc: on_look_hidden_item,
-            environment: this
-        })
-
-        this.hidden_items.push(hidden_item);
-        if (cmd_lsit) {
-            for (let j = 0; j < cmd_lsit.length; j++) {
-                this.add_action(cmd_lsit[j][0], "", cmd_lsit[j][2]);
-            }
-        }
-        return hidden_item;
+          });
+      }
     }
-
-    /**
-     * 根据ID查找物件(含隐藏物品)
-     * @param oid
-     */
-    find_obj(oid: string): ITEM | undefined {
-        const items = this.items;
-        if (!items) return;
-        const item = this.find_obj_byid.call(this, items, oid);
-        if (item) return item;
-        if (!this.hidden_items) return;
-        for (let i = 0; i < this.hidden_items.length; i++) {
-            if (this.hidden_items[i].id == oid) return this.hidden_items[i];
-        }
-        return
+    if (this.is_copy_room && !(this.parent as AREA)!.not_fb) {
+      obj.commands.push({
+        cmd: "cr",
+        name: "完成副本",
+      });
     }
+    this.json = JSON.stringify(obj);
+    return this.json;
+  }
 
-    /**
-     * 根据路径查找物件
-     * @param path
-     */
-    find_by_path(path: string): ITEM | undefined {
-        const items = this.items;
-        if (!items) return;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].path == path) {
-                return items[i];
-            }
-        }
-    }
+  /**
+   * 查询命令列表JSON
+   */
+  query_commands(): string {
+    if (this.commands_json) return this.commands_json;
+    const json: Record<string, any> = {};
+    json.type = "command";
 
-    /**
-     * 房间是否包含指定路径的物件
-     * @param path
-     */
-    is_here(path: string): boolean | undefined {
-        const items = this.items;
-        if (!items) return;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].path == path) {
-                return true;
-            }
-        }
-    }
-
-    /**
-     * 向房间内所有玩家发送消息
-     * @param msg
-     */
-    notify(msg: string): void {
-        if (!this.items) return;
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player) {
-                this.items[i].notify(msg);
-            }
-        }
-    }
-
-    /**
-     * 查询指定方向是否存在出口
-     * @param dir
-     */
-    query_exits(dir: string): boolean {
-        if (this.exits && this.exits[dir]) return true;
-        return false;
-    }
-
-    /**
-     * 添加出口
-     * @param dir - 方向名
-     * @param rm - 目标房间路径
-     */
-    add_exit(dir: string, rm: string): void {
-        this.exits = this.exits || {};
-        this.exits[dir] = rm;
-        this.exits_changed();
-    }
-
-    /**
-     * 移除出口
-     * @param dir
-     */
-    remove_exit(dir: string): void {
-        this.exits = this.exits || {};
-        delete this.exits[dir];
-        this.exits_changed();
-    }
-
-    /**
-     * 出口变更后通知所有玩家
-     */
-    exits_changed(): void {
-        this.room_exits_json = null;
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player)
-                this.send_exits(this.items[i]);
-        }
-    }
-
-    /**
-     * 向玩家发送出口信息
-     * @param player
-     */
-    send_exits(player: Record<string, any>): void {
-        player.send(this.exitsto_roomjson());
-    }
-
-    /**
-     * 生成出口JSON
-     */
-    exitsto_roomjson(): string {
-        if (this.room_exits_json) return this.room_exits_json;
-        const obj: Record<string, any> = {};
-        obj.type = "exits";
-        obj.items = {};
-        if (this.exits) {
-            for (let dir in this.exits) {
-                if (!this.exits[dir]) continue;
-                const rm = WORLD.getRoom(this.exits[dir]);
-                if (!rm) continue;
-                obj.items[dir] = rm.name;
-            }
-        }
-        this.room_exits_json = JSON.stringify(obj);
-        return this.room_exits_json;
-    }
-
-    /**
-     * 生成房间JSON(含命令)
-     */
-    to_json(): string {
-        if (this.json) return this.json;
-        const obj: Record<string, any> = {};
-        obj.type = "room";
-        obj.path = this.path;
-        obj.name = this._room_name;
-        obj.desc = this.desc;
-        obj.commands = [];
-        if (this.actions) {
-            for (let cmd in this.actions) {
-                const name = this.actions[cmd].name;
-                if (name)
-                    obj.commands.push({
-                        cmd: cmd,
-                        name: name
-                    });
-            }
-        }
-        if (this.is_copy_room && !(this.parent as AREA)!.not_fb) {
-            obj.commands.push({
-                cmd: "cr",
-                name: "完成副本"
-            });
-        }
-        this.json = JSON.stringify(obj);
-        return this.json;
-    }
-
-    /**
-     * 查询命令列表JSON
-     */
-    query_commands(): string {
-        if (this.commands_json) return this.commands_json;
-        const json: Record<string, any> = {};
-        json.type = "command";
-
-        json.commands = [];
-        if (this.actions) {
-            for (let cmd in this.actions) {
-                json.commands.push({
-                    name: this.actions[cmd].name,
-                    cmd: cmd
-                });
-            }
-        }
-
-        this.commands_json = JSON.stringify(json);
-        return this.commands_json;
-    }
-
-    /**
-     * 刷新房间数据(热更新)
-     * @param obj
-     */
-    refresh(obj?: Record<string, any>): void {
-        this.json = null;
-        this.commands_json = null;
-        this.room_exits_json = null;
-        const rmname = this.parent!.name + "-" + this.name;
-        if (this.parent!.not_fb || !this.parent!.is_copy) {
-            this._room_name = rmname;
-        } else {
-            this._room_name = rmname + "(副本区域)";
-        }
-        if (obj) {
-            for (let i = 0; i < this.items.length; i++) {
-                let item = this.items[i]
-                if (item.check_player()) {
-                    item.send(this.to_json());
-                    this.send_exits(item);
-                    item.send(this.items_to_json());
-                }
-            }
-        }
-    }
-
-    /**
-     * 获取房间完整路径
-     */
-    get_path(): string {
-        if (this.path) return this.path;
-        let str = this.name;
-        let area: any = this.area;
-        while (area) {
-            str = area.name + "-" + str;
-            area = area.parent;
-        }
-        this.path = str;
-        return this.path;
-    }
-
-    /**
-     * 查询复活房间路径
-     */
-    query_recover_room(): string {
-        let area: any = this.parent;
-        while (area) {
-            if (area.recover_room) {
-                return area.recover_room;
-            }
-            area = area.parent;
-        }
-        return "yz/wumiao";
-    }
-
-    /**
-     * 原型克隆回调 — Object.create后初始化可变字段，使其独立于原型
-     */
-    on_clone(): void {
-        // —— 可变引用类型，覆盖为独立副本 ——
-        this.items = [];
-        // 始终写入 exits 以稳定 V8 隐藏类形状（避免有出口/无出口房间产生不同 own property 集合）
-        this.exits = this.exits ? { ...this.exits } : null;
-        this._temp_values = new Map();
-        this._temp_expiry = new Map();
-        this._isolate_events();
-
-        // —— 缓存清零 ——
-        this.json = null;
-        this.room_exits_json = null;
-        this.commands_json = null;
-
-        // —— 重放NPC生成（读取原型的_npc_records） ——
-        const records = this._npc_records;
-        this._npc_records = [];
-        if (records) {
-            for (let i = 0; i < records.length; i++) {
-                const [obj_path, count] = records[i];
-                for (let j = 0; j < count; j++) {
-                    const obj = NPC.CLONE(obj_path);
-                    if (obj) {
-                        this.items.push(obj);
-                        obj.environment = this;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 房间创建回调
-     * @param file - 文件名
-     */
-    create(file: string): void {
-        const base_room = WORLD.ROOMS.get(file);
-
-        if (base_room) {
-            this.parent = base_room.parent;
-            if (this.parent && this.parent.is_copy) {
-                if (this.parent.not_fb) {
-                    this._room_name = base_room._room_name;
-                } else {
-                    this._room_name = base_room._room_name + "(副本区域)";
-                }
-                this.create_time = Date.now();
-                this.is_copy_room = true;
-            } else {
-                this.is_shadow = true;
-                this._room_name = base_room._room_name;
-            }
-            WORLD.RUN_ROOMS.push(this);
-        } else {
-            // 首次创建：this是干净原型，保存后用克隆作为实际房间
-            WORLD.ROOM_STORE.set(file, this);
-            const active = Object.create(this) as ROOM;
-            active.on_clone();
-            active.initBaseRoom(file);
-        }
-
-        this.on_create && this.on_create();
-    }
-
-    /**
-     * 初始化基础房间(模板)
-     * @param file
-     */
-    initBaseRoom(file: string): void {
-        WORLD.ROOMS.set(file, this);
-
-        const area = getAreaByPath(this.path);
-
-        this.parent = area ?? null;
-        if (!area || !area.is_copy) {
-            WORLD.RUN_ROOMS.push(this);
-        }
-        if (area) {
-            if (!area.rooms) area.rooms = [];
-            for (let i = 0; i < area.rooms.length; i++) {
-                if (area.rooms[i].path == this.path) {
-                    area.rooms.splice(i, 1);
-                    break;
-                }
-            }
-            area.rooms.push(this);
-            this._room_name = area.name + "-" + this.name;
-        } else {
-            this._room_name = this.name;
-        }
-    }
-
-    /**
-     * 热更新房间
-     * @param file
-     */
-    update(file: string): void {
-        this.on_create && this.on_create();
-        const oldroom = WORLD.ROOMS.get(file);
-
-        // 保存新原型，创建新的活跃房间
-        WORLD.ROOM_STORE.set(file, this);
-        const active = Object.create(this) as ROOM;
-        active.on_clone();
-        active.initBaseRoom(file);
-
-        // 原型的影子标记需从RUN_ROOMS清除（create时被误加入）
-        const idx = WORLD.RUN_ROOMS.indexOf(this);
-        if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
-
-        if (!oldroom) return;
-        if (oldroom.copy_rooms) {
-            active.copy_rooms = {};
-            for (let key in oldroom.copy_rooms) {
-                const rm = oldroom.copy_rooms[key];
-                const newRm = ROOM.CREATE(active.path);
-                active.replaceRoom(rm, newRm);
-                newRm.owner = key;
-                if (!active.copy_rooms) active.copy_rooms = {};
-                active.copy_rooms[key] = newRm;
-            }
-            oldroom.copy_rooms = null;
-        } else {
-            if (ROOM.public_rooms) {
-                for (let i = 0; i < ROOM.public_rooms.length; i++) {
-                    if (ROOM.public_rooms[i] == oldroom) {
-                        ROOM.public_rooms[i] = active;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 替换房间(迁移玩家)
-     * @param oldroom
-     * @param newRoom
-     */
-    replaceRoom(oldroom: Record<string, any>, newRoom: Record<string, any>): void {
-        const items = oldroom.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].is_player || items[i].master) {
-                newRoom.items.push(items[i]);
-                items[i].environment = newRoom;
-            }
-        }
-        oldroom.destroy();
-    }
-
-    /**
-     * 销毁房间(清空物品和所有者)
-     */
-    destroy(): void {
-        this.items.length = 0;
-        this.owner = null;
-    }
-
-    /**
-     * 房间心跳
-     * @param dt
-     */
-    heart_beat(dt: number): void {
-        for (let i = 0; i < this.items.length; i++) {
-            if (!this.items[i].check_player())
-                this.items[i].heart_beat?.(dt);
-        }
-        this.on_heart_beat?.(dt);
-    }
-
-    /**
-     * 是否是副本房间
-     */
-    is_copy(): boolean {
-        if (!this.parent) return false;
-        return this.parent.is_copy;
-    }
-
-    /**
-     * 是否是副本(会消失的)
-     */
-    is_fb(): boolean {
-        if (!this.parent) return false;
-        return this.parent.is_copy && !this.parent.not_fb;
-    }
-
-    /**
-     * 是否是入口房间
-     */
-    is_enter(): boolean {
-        if (!this.parent) return false;
-        return this.parent.first == this.path;
-    }
-
-    /**
-     * 查询副本入口房间
-     * @param id - 队伍/用户ID
-     */
-    query_fb_first(id: string): ROOM | undefined {
-        if (!this.parent || !this.parent.is_copy || !this.parent.rooms) return;
-        return this.parent.rooms[0].query_copy(id);
-    }
-
-    /**
-     * 查询副本房间
-     * @param id
-     */
-    query_copy(id: string): ROOM | undefined {
-        if (!this.copy_rooms) this.copy_rooms = {};
-        return this.copy_rooms[id];
-    }
-
-    /**
-     * 根据用户查找对应副本
-     * @param user
-     */
-    query_copy2(user: CHARACTER): ROOM | undefined {
-        const id = this.parent?.query_owner(user);
-        if (!id) return this;
-        return this.query_copy(id);
-    }
-
-    /**
-     * 清除副本区域
-     * @param me
-     */
-    clear_copy(me: CHARACTER): void {
-        if (!this.owner) return;
-        const id = this.parent?.query_owner(me);
-        if (id !== this.owner) return;
-        const name = "fb/";
-        const toDelete: string[] = [];
-        me.forEach_temp((key) => {
-            if (key.startsWith(name)) toDelete.push(key);
+    json.commands = [];
+    if (this.actions) {
+      for (let cmd in this.actions) {
+        json.commands.push({
+          name: this.actions[cmd].name,
+          cmd: cmd,
         });
-        for (const key of toDelete) {
-            me.remove_temp(key);
+      }
+    }
+
+    this.commands_json = JSON.stringify(json);
+    return this.commands_json;
+  }
+
+  /**
+   * 刷新房间数据(热更新)
+   * @param obj
+   */
+  refresh(obj?: Record<string, any>): void {
+    this.json = null;
+    this.commands_json = null;
+    this.room_exits_json = null;
+    const rmname = this.parent!.name + "-" + this.name;
+    if (this.parent!.not_fb || !this.parent!.is_copy) {
+      this._room_name = rmname;
+    } else {
+      this._room_name = rmname + "(副本区域)";
+    }
+    if (obj) {
+      for (let i = 0; i < this.items.length; i++) {
+        let item = this.items[i];
+        if (item.check_player()) {
+          item.send(this.to_json());
+          this.send_exits(item);
+          item.send(this.items_to_json());
         }
-        if (me.team) {
-            for (let i = 0; i < me.team.length; i++) {
-                const tm = me.team[i];
-                if (tm !== me && tm.environment && tm.environment.parent === this.parent
-                    && tm.environment.owner == this.owner) {
-                    return;
-                }
-            }
+      }
+    }
+  }
+
+  /**
+   * 获取房间完整路径
+   */
+  get_path(): string {
+    if (this.path) return this.path;
+    let str = this.name;
+    let area: any = this.area;
+    while (area) {
+      str = area.name + "-" + str;
+      area = area.parent;
+    }
+    this.path = str;
+    return this.path;
+  }
+
+  /**
+   * 查询复活房间路径
+   */
+  query_recover_room(): string {
+    let area: any = this.parent;
+    while (area) {
+      if (area.recover_room) {
+        return area.recover_room;
+      }
+      area = area.parent;
+    }
+    return "yz/wumiao";
+  }
+
+  /**
+   * 原型克隆回调 — Object.create后初始化可变字段，使其独立于原型
+   */
+  on_clone(): void {
+    // —— 可变引用类型，覆盖为独立副本 ——
+    this.items = [];
+    // 始终写入 exits 以稳定 V8 隐藏类形状（避免有出口/无出口房间产生不同 own property 集合）
+    this.exits = this.exits ? { ...this.exits } : null;
+    this._temp_values = new Map();
+    this._temp_expiry = new Map();
+    this._isolate_events();
+
+    // —— 缓存清零 ——
+    this.json = null;
+    this.room_exits_json = null;
+    this.commands_json = null;
+
+    // —— 重放NPC生成（读取原型的_npc_records） ——
+    const records = this._npc_records;
+    this._npc_records = [];
+    if (records) {
+      for (let i = 0; i < records.length; i++) {
+        const [obj_path, count] = records[i];
+        for (let j = 0; j < count; j++) {
+          const obj = NPC.CLONE(obj_path);
+          if (obj) {
+            this.items.push(obj);
+            obj.environment = this;
+          }
         }
-        this.parent && this.clear_by_area(this.parent, this.owner);
+      }
     }
+  }
 
-    /**
-     * 为用户创建副本
-     * @param me
-     * @param diff_type - 难度
-     */
-    create_copy2(me: CHARACTER, diff_type?: number): ROOM | undefined {
-        const id = this.parent?.query_owner(me);
-        if (!id) return;
-        return this.create_copy(id, diff_type || 0);
-    }
+  /**
+   * 房间创建回调
+   * @param file - 文件名
+   */
+  create(file: string): void {
+    const base_room = WORLD.ROOMS.get(file);
 
-    /**
-     * 创建副本房间
-     * @param id - 副本所有者ID
-     * @param diff_type - 难度
-     */
-    create_copy(id: string, diff_type: number): ROOM | undefined {
-        if (!this.parent) return;
-        this.create_by_area(this.parent, id, diff_type);
-        return this.query_copy(id);
-    }
-
-    /**
-     * 按区域递归创建副本
-     * @param area
-     * @param id
-     * @param diff_type
-     */
-    create_by_area(area: Record<string, any>, id: string, diff_type?: number): void {
-        if (area.rooms) {
-            for (let i = 0; i < area.rooms.length; i++) {
-                const base_room = area.rooms[i];
-                const copy_room = ROOM.CREATE(base_room.path);
-                if (!copy_room) continue;
-                if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
-                if (!base_room.copy_rooms) base_room.copy_rooms = {};
-                base_room.copy_rooms[id] = copy_room;
-                copy_room.owner = id;
-            }
+    if (base_room) {
+      this.parent = base_room.parent;
+      if (this.parent && this.parent.is_copy) {
+        if (this.parent.not_fb) {
+          this._room_name = base_room._room_name;
+        } else {
+          this._room_name = base_room._room_name + "(副本区域)";
         }
-        if (area.areas) {
-            for (let i = 0; i < area.areas.length; i++) {
-                this.create_by_area(area.areas[i], id);
-            }
+        this.create_time = Date.now();
+        this.is_copy_room = true;
+      } else {
+        this.is_shadow = true;
+        this._room_name = base_room._room_name;
+      }
+      WORLD.RUN_ROOMS.push(this);
+    } else {
+      // 首次创建：this是干净原型，保存后用克隆作为实际房间
+      WORLD.ROOM_STORE.set(file, this);
+      const active = Object.create(this) as ROOM;
+      active.on_clone();
+      active.initBaseRoom(file);
+    }
+
+    this.on_create && this.on_create();
+  }
+
+  /**
+   * 初始化基础房间(模板)
+   * @param file
+   */
+  initBaseRoom(file: string): void {
+    WORLD.ROOMS.set(file, this);
+
+    const area = getAreaByPath(this.path);
+
+    this.parent = area ?? null;
+    if (!area || !area.is_copy) {
+      WORLD.RUN_ROOMS.push(this);
+    }
+    if (area) {
+      if (!area.rooms) area.rooms = [];
+      for (let i = 0; i < area.rooms.length; i++) {
+        if (area.rooms[i].path == this.path) {
+          area.rooms.splice(i, 1);
+          break;
         }
+      }
+      area.rooms.push(this);
+      this._room_name = area.name + "-" + this.name;
+    } else {
+      this._room_name = this.name;
     }
+  }
 
-    /**
-     * 创建房间投影(人满时)
-     */
-    create_shadow(): ROOM | undefined {
-        if (this.is_copy_room || this.no_shadow) return;
+  /**
+   * 热更新房间
+   * @param file
+   */
+  update(file: string): void {
+    this.on_create && this.on_create();
+    const oldroom = WORLD.ROOMS.get(file);
 
-        if (!this.shadow_rooms) this.shadow_rooms = [];
-        for (let i = 0; i < this.shadow_rooms.length; i++) {
-            if (!this.shadow_rooms[i].is_full()) {
-                return this.shadow_rooms[i];
-            }
+    // 保存新原型，创建新的活跃房间
+    WORLD.ROOM_STORE.set(file, this);
+    const active = Object.create(this) as ROOM;
+    active.on_clone();
+    active.initBaseRoom(file);
+
+    // 原型的影子标记需从RUN_ROOMS清除（create时被误加入）
+    const idx = WORLD.RUN_ROOMS.indexOf(this);
+    if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
+
+    if (!oldroom) return;
+    if (oldroom.copy_rooms) {
+      active.copy_rooms = {};
+      for (let key in oldroom.copy_rooms) {
+        const rm = oldroom.copy_rooms[key];
+        const newRm = ROOM.CREATE(active.path);
+        active.replaceRoom(rm, newRm);
+        newRm.owner = key;
+        if (!active.copy_rooms) active.copy_rooms = {};
+        active.copy_rooms[key] = newRm;
+      }
+      oldroom.copy_rooms = null;
+    } else {
+      if (ROOM.public_rooms) {
+        for (let i = 0; i < ROOM.public_rooms.length; i++) {
+          if (ROOM.public_rooms[i] == oldroom) {
+            ROOM.public_rooms[i] = active;
+            break;
+          }
         }
-        const shadow = ROOM.CREATE(this.path);
-        if (shadow) {
-            this.shadow_rooms.push(shadow);
+      }
+    }
+  }
+
+  /**
+   * 替换房间(迁移玩家)
+   * @param oldroom
+   * @param newRoom
+   */
+  replaceRoom(
+    oldroom: Record<string, any>,
+    newRoom: Record<string, any>,
+  ): void {
+    const items = oldroom.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].is_player || items[i].master) {
+        newRoom.items.push(items[i]);
+        items[i].environment = newRoom;
+      }
+    }
+    oldroom.destroy();
+  }
+
+  /**
+   * 销毁房间(清空物品和所有者)
+   */
+  destroy(): void {
+    this.items.length = 0;
+    this.owner = null;
+  }
+
+  /**
+   * 房间心跳
+   * @param dt
+   */
+  heart_beat(dt: number): void {
+    for (let i = 0; i < this.items.length; i++) {
+      if (!this.items[i].check_player()) this.items[i].heart_beat?.(dt);
+    }
+    this.on_heart_beat?.(dt);
+  }
+
+  /**
+   * 是否是副本房间
+   */
+  is_copy(): boolean {
+    if (!this.parent) return false;
+    return this.parent.is_copy;
+  }
+
+  /**
+   * 是否是副本(会消失的)
+   */
+  is_fb(): boolean {
+    if (!this.parent) return false;
+    return this.parent.is_copy && !this.parent.not_fb;
+  }
+
+  /**
+   * 是否是入口房间
+   */
+  is_enter(): boolean {
+    if (!this.parent) return false;
+    return this.parent.first == this.path;
+  }
+
+  /**
+   * 查询副本入口房间
+   * @param id - 队伍/用户ID
+   */
+  query_fb_first(id: string): ROOM | undefined {
+    if (!this.parent || !this.parent.is_copy || !this.parent.rooms) return;
+    return this.parent.rooms[0].query_copy(id);
+  }
+
+  /**
+   * 查询副本房间
+   * @param id
+   */
+  query_copy(id: string): ROOM | undefined {
+    if (!this.copy_rooms) this.copy_rooms = {};
+    return this.copy_rooms[id];
+  }
+
+  /**
+   * 根据用户查找对应副本
+   * @param user
+   */
+  query_copy2(user: CHARACTER): ROOM | undefined {
+    const id = this.parent?.query_owner(user);
+    if (!id) return this;
+    return this.query_copy(id);
+  }
+
+  /**
+   * 清除副本区域
+   * @param me
+   */
+  clear_copy(me: CHARACTER): void {
+    if (!this.owner) return;
+    const id = this.parent?.query_owner(me);
+    if (id !== this.owner) return;
+    const name = "fb/";
+    const toDelete: string[] = [];
+    me.forEach_temp((key) => {
+      if (key.startsWith(name)) toDelete.push(key);
+    });
+    for (const key of toDelete) {
+      me.remove_temp(key);
+    }
+    if (me.team) {
+      for (let i = 0; i < me.team.length; i++) {
+        const tm = me.team[i];
+        if (
+          tm !== me &&
+          tm.environment &&
+          tm.environment.parent === this.parent &&
+          tm.environment.owner == this.owner
+        ) {
+          return;
         }
-        return shadow;
+      }
     }
+    this.parent && this.clear_by_area(this.parent, this.owner);
+  }
 
-    /**
-     * 按区域递归清除副本
-     * @param area
-     * @param id
-     */
-    clear_by_area(area: Record<string, any>, id: string): void {
-        if (area.rooms) {
-            for (let i = 0; i < area.rooms.length; i++) {
-                const base_room = area.rooms[i];
-                if (base_room.copy_rooms) {
-                    const rm = base_room.copy_rooms[id];
-                    if (rm) {
-                        const idx = WORLD.RUN_ROOMS.indexOf(rm);
-                        if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
-                        rm.destroy();
-                        delete base_room.copy_rooms[id];
-                    }
-                }
-            }
+  /**
+   * 为用户创建副本
+   * @param me
+   * @param diff_type - 难度
+   */
+  create_copy2(me: CHARACTER, diff_type?: number): ROOM | undefined {
+    const id = this.parent?.query_owner(me);
+    if (!id) return;
+    return this.create_copy(id, diff_type || 0);
+  }
+
+  /**
+   * 创建副本房间
+   * @param id - 副本所有者ID
+   * @param diff_type - 难度
+   */
+  create_copy(id: string, diff_type: number): ROOM | undefined {
+    if (!this.parent) return;
+    this.create_by_area(this.parent, id, diff_type);
+    return this.query_copy(id);
+  }
+
+  /**
+   * 按区域递归创建副本
+   * @param area
+   * @param id
+   * @param diff_type
+   */
+  create_by_area(
+    area: Record<string, any>,
+    id: string,
+    diff_type?: number,
+  ): void {
+    if (area.rooms) {
+      for (let i = 0; i < area.rooms.length; i++) {
+        const base_room = area.rooms[i];
+        const copy_room = ROOM.CREATE(base_room.path);
+        if (!copy_room) continue;
+        if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
+        if (!base_room.copy_rooms) base_room.copy_rooms = {};
+        base_room.copy_rooms[id] = copy_room;
+        copy_room.owner = id;
+      }
+    }
+    if (area.areas) {
+      for (let i = 0; i < area.areas.length; i++) {
+        this.create_by_area(area.areas[i], id);
+      }
+    }
+  }
+
+  /**
+   * 创建房间投影(人满时)
+   */
+  create_shadow(): ROOM | undefined {
+    if (this.is_copy_room || this.no_shadow) return;
+
+    if (!this.shadow_rooms) this.shadow_rooms = [];
+    for (let i = 0; i < this.shadow_rooms.length; i++) {
+      if (!this.shadow_rooms[i].is_full()) {
+        return this.shadow_rooms[i];
+      }
+    }
+    const shadow = ROOM.CREATE(this.path);
+    if (shadow) {
+      this.shadow_rooms.push(shadow);
+    }
+    return shadow;
+  }
+
+  /**
+   * 按区域递归清除副本
+   * @param area
+   * @param id
+   */
+  clear_by_area(area: Record<string, any>, id: string): void {
+    if (area.rooms) {
+      for (let i = 0; i < area.rooms.length; i++) {
+        const base_room = area.rooms[i];
+        if (base_room.copy_rooms) {
+          const rm = base_room.copy_rooms[id];
+          if (rm) {
+            const idx = WORLD.RUN_ROOMS.indexOf(rm);
+            if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
+            rm.destroy();
+            delete base_room.copy_rooms[id];
+          }
         }
-        if (area.areas) {
-            for (let i = 0; i < area.areas.length; i++) {
-                this.clear_by_area(area.areas[i], id);
-            }
+      }
+    }
+    if (area.areas) {
+      for (let i = 0; i < area.areas.length; i++) {
+        this.clear_by_area(area.areas[i], id);
+      }
+    }
+  }
+
+  // ============ 静态方法 ============
+
+  /**
+   * 查询副本临时数据(按队伍隔离，委托给队长 USER 实例)
+   */
+  fb_query_temp(name: string, me: USER, def?: any): any {
+    const first = this.query_fb_first(me.query_teamid());
+    if (!first) return;
+    return first.query_temp(name, def);
+  }
+
+  /**
+   * 设置副本临时数据(按队伍隔离)
+   */
+  fb_set_temp(name: string, value: unknown, me: USER, time?: number): void {
+    const first = this.query_fb_first(me.query_teamid());
+    if (!first) return;
+    first.set_temp(name, value, time);
+  }
+
+  /**
+   * 累加副本临时数据(按队伍隔离)
+   */
+  fb_add_temp(name: string, value: number, me: USER, time?: number): number {
+    const val = (this.fb_query_temp(name, me, 0) as number) + value;
+    this.fb_set_temp(name, val, me, time);
+    return val;
+  }
+
+  /**
+   * 随机获取一个公共房间
+   */
+  static RANDOM(): ROOM | undefined {
+    if (!this.public_rooms) {
+      this.public_rooms = [];
+      for (let i = 0; i < WORLD.AREAS.length; i++) {
+        if (WORLD.AREAS[i].is_area && !WORLD.AREAS[i].is_public) {
+          const rms = WORLD.AREAS[i].rooms;
+
+          for (let j = 0; j < rms.length; j++) {
+            if (rms[j].max_item_count > 1) this.public_rooms.push(rms[j]);
+          }
         }
+      }
     }
+    return this.public_rooms.random();
+  }
 
-    // ============ 静态方法 ============
+  /**
+   * 设置副本难度
+   * @param type
+   */
+  set_difficulty(type: number): void {
+    this.on_set_difficulty && this.on_set_difficulty(type);
+  }
 
-    /**
-     * 查询副本临时数据(按队伍隔离，委托给队长 USER 实例)
-     */
-    fb_query_temp(name: string, me: USER, def?: any): any {
-        const first = this.query_fb_first(me.query_teamid());
-        if (!first) return;
-        return first.query_temp(name, def);
+  /**
+   * 向房间内所有玩家发送消息
+   * @param msg
+   */
+  send(msg: string): void {
+    for (let i = 0; i < this.items.length; i++) {
+      let item = this.items[i];
+      if (item.check_player()) {
+        item.send(msg);
+      }
     }
+  }
 
-    /**
-     * 设置副本临时数据(按队伍隔离)
-     */
-    fb_set_temp(name: string, value: unknown, me: USER, time?: number): void {
-        const first = this.query_fb_first(me.query_teamid());
-        if (!first) return;
-        first.set_temp(name, value, time);
+  /**
+   * 查找房间中第一个玩家
+   */
+  find_me(): CHARACTER | undefined {
+    for (let i = 0; i < this.items.length; i++) {
+      if (this.items[i].is_player) {
+        return this.items[i] as unknown as CHARACTER;
+      }
     }
+  }
 
-    /**
-     * 累加副本临时数据(按队伍隔离)
-     */
-    fb_add_temp(name: string, value: number, me: USER, time?: number): number {
-        const val = (this.fb_query_temp(name, me, 0) as number) + value;
-        this.fb_set_temp(name, val, me, time);
-        return val;
+  /**
+   * 查询房间(考虑副本)
+   * @param id - 房间路径
+   */
+  query(id: string): ROOM | undefined {
+    const room = WORLD.getRoom(id);
+    if (!room) return undefined;
+    if (this.owner) {
+      return room.query_copy(this.owner);
     }
-
-    /**
-     * 随机获取一个公共房间
-     */
-    static RANDOM(): ROOM | undefined {
-        if (!this.public_rooms) {
-            this.public_rooms = [];
-            for (let i = 0; i < WORLD.AREAS.length; i++) {
-                if (WORLD.AREAS[i].is_area && !WORLD.AREAS[i].is_public) {
-                    const rms = WORLD.AREAS[i].rooms;
-
-                    for (let j = 0; j < rms.length; j++) {
-                        if (rms[j].max_item_count > 1)
-                            this.public_rooms.push(rms[j]);
-                    }
-                }
-            }
-        }
-        return this.public_rooms.random();
-    }
-
-    /**
-     * 设置副本难度
-     * @param type
-     */
-    set_difficulty(type: number): void {
-        this.on_set_difficulty && this.on_set_difficulty(type);
-    }
-
-    /**
-     * 向房间内所有玩家发送消息
-     * @param msg
-     */
-    send(msg: string): void {
-        for (let i = 0; i < this.items.length; i++) {
-            let item = this.items[i]
-            if (item.check_player()) {
-                item.send(msg);
-            }
-        }
-    }
-
-    /**
-     * 查找房间中第一个玩家
-     */
-    find_me(): CHARACTER | undefined {
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].is_player) {
-                return this.items[i] as unknown as CHARACTER;
-            }
-        }
-    }
-
-    /**
-     * 查询房间(考虑副本)
-     * @param id - 房间路径
-     */
-    query(id: string): ROOM | undefined {
-        const room = WORLD.getRoom(id);
-        if (!room) return undefined;
-        if (this.owner) {
-            return room.query_copy(this.owner);
-        }
-        return room;
-    }
+    return room;
+  }
 }
 
 declare global {
-  var ROOM: any
+  var ROOM: any;
 }
 
 globalThis.ROOM = ROOM;

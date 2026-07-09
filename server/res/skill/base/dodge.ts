@@ -1,27 +1,28 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {SKILL_TYPES} from "../../../core/const.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { SKILL_TYPES } from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
-    id = "dodge";
-    name = "基本轻功";
-    grade = 0;
-    desc = "轻功的基础功法，坚持锻炼会身轻如燕。每10级增加1点后天身法";
-    type = SKILL_TYPES.BASE;
-    dodge_actions = ["但是和$p$l偏了几寸。\n",
-        "但是被$p机灵地躲开了。\n",
-        "但是$n身子一侧，闪了开去。\n",
-        "但是被$p及时避开。\n",
-        "但是$n已有准备，不慌不忙的躲开。\n"];
+  id = "dodge";
+  name = "基本轻功";
+  grade = 0;
+  desc = "轻功的基础功法，坚持锻炼会身轻如燕。每10级增加1点后天身法";
+  type = SKILL_TYPES.BASE;
+  dodge_actions = [
+    "但是和$p$l偏了几寸。\n",
+    "但是被$p机灵地躲开了。\n",
+    "但是$n身子一侧，闪了开去。\n",
+    "但是被$p及时避开。\n",
+    "但是$n已有准备，不慌不忙的躲开。\n",
+  ];
 
-    query_prop(lv: number): PropMap {
-        return {dex: Math.floor(lv / 10)};
-    }
+  query_prop(lv: number): PropMap {
+    return { dex: Math.floor(lv / 10) };
+  }
 
-    constructor() {
-        super();
-        this.set_default(this.id);
-    }
+  constructor() {
+    super();
+    this.set_default(this.id);
+  }
 }
-

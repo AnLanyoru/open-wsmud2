@@ -1,33 +1,32 @@
-import {SKILL} from "../../../core/skill/skill.js";
-import {FAMILIES} from "../../../core/skill/family.js";
+import { SKILL } from "../../../core/skill/skill.js";
+import { FAMILIES } from "../../../core/skill/family.js";
 import type { EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
-    name = "飞檐走壁";
-    id = "feiyanzoubi";
-    grade = 1;
-    family = FAMILIES.GAIBANG;
-    dodge_actions = [
-        "$n身形急转，避过了$N的攻势。\n",
-        "可是$n拔地而起，躲过了$N这一招。。\n",
-        "$n作闪右避，总算躲过了$N这一招。\n"
-    ];
-    desc = "江湖中常见的轻功身法。";
-    can_enables = ["dodge"];
-    learn_condition = {
-        max_mp: 700,
-        skill: {
-            dodge: 50
-        }
+  name = "飞檐走壁";
+  id = "feiyanzoubi";
+  grade = 1;
+  family = FAMILIES.GAIBANG;
+  dodge_actions = [
+    "$n身形急转，避过了$N的攻势。\n",
+    "可是$n拔地而起，躲过了$N这一招。。\n",
+    "$n作闪右避，总算躲过了$N这一招。\n",
+  ];
+  desc = "江湖中常见的轻功身法。";
+  can_enables = ["dodge"];
+  learn_condition = {
+    max_mp: 700,
+    skill: {
+      dodge: 50,
+    },
+  };
+
+  query_enable_prop(lv: number): EnablePropMap {
+    return {
+      dodge: {
+        ds: lv + 5,
+      },
     };
-
-    query_enable_prop(lv: number): EnablePropMap {
-        return {
-            dodge: {
-                ds: lv + 5
-            }
-        };
-    }
+  }
 }
-

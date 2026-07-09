@@ -1,25 +1,21 @@
-import {COMMAND} from "../../../core/command.js";
+import { COMMAND } from "../../../core/command.js";
 import type { USER } from "../../../core/char/user.js";
 
 export default class extends COMMAND {
-    command = "ex";
-    allow_busy = true;
-    allow_state = true;
-    allow_die = true;
-    admin = true;
+  command = "ex";
+  allow_busy = true;
+  allow_state = true;
+  allow_die = true;
+  admin = true;
 
-    /**
-     * @param {CHARACTER} me - 执行命令的角色
-     */
-    enter(me: USER, type: string) {
-        return false;
-    }
+  /**
+   * @param {CHARACTER} me - 执行命令的角色
+   */
+  enter(me: USER, type: string) {
+    return false;
+  }
 
-    append_sklf(env) {
+  append_sklf(env) {}
 
-    }
-
-    on_enter_fb(me, env) {
-
-    }
+  on_enter_fb(me, env) {}
 }

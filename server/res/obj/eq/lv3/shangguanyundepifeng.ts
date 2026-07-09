@@ -1,18 +1,18 @@
-import {EQUIPMENT} from "../../../../core/item/equipment.js";
-import {EQUIP_TYPE} from "../../../../core/const.js";
+import { EQUIPMENT } from "../../../../core/item/equipment.js";
+import { EQUIP_TYPE } from "../../../../core/const.js";
 import type { PropMap } from "../../../../types/props.js";
 
 export default class extends EQUIPMENT {
-    unit = "件";
-    name = "上官云的披风";
-    desc = "白虎堂堂主上官云的披风，";
-    value = 200000;
-    grade = 3;
-    hole_count = 2;
-    eq_type = EQUIP_TYPE.CAPE;
-    prop: PropMap = {
-        fy: 98,
-        ds: 90,
-        diff_bj: 2,
-    };
+  unit = "件";
+  name = "上官云的披风";
+  desc = "白虎堂堂主上官云的披风，";
+  value = 200000;
+  grade = 3;
+  hole_count = 2;
+  eq_type = EQUIP_TYPE.CAPE;
+  prop: PropMap = {
+    fy: 98,
+    ds: 90,
+    diff_bj: 2,
+  };
 }

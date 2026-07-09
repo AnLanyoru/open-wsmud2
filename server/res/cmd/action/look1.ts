@@ -1,43 +1,41 @@
-import {COMMAND} from "../../../core/command.js";
-import {CHARACTER} from "../../../core/char/character.js";
+import { COMMAND } from "../../../core/command.js";
+import { CHARACTER } from "../../../core/char/character.js";
 import type { USER } from "../../../core/char/user.js";
-import {WORLD} from "../../../core/world.js";
+import { WORLD } from "../../../core/world.js";
 
 //只能看排行榜的物品
 export default class extends COMMAND {
-    command = "look1";
-    allow_busy = true;
-    allow_state = true;
-    regex = /^(\d+)(?:\sof\s(\w+))?$/;
+  command = "look1";
+  allow_busy = true;
+  allow_state = true;
+  regex = /^(\d+)(?:\sof\s(\w+))?$/;
 
-    /**
-     * @param {CHARACTER} player - 执行命令的角色
-     */
-    enter(player: USER, index_str: string, from: string) {
-        const index = parseInt(index_str);
-        if (from) {
-            var paras = from.split('_');
-            let tops = WORLD.STATS.TOPS;
-            if (paras[1]) tops = WORLD.STATS['tops_' + paras[1]] ?? [];
-            let parent = tops[parseInt(paras[2])];
-            if (!parent) {
-                return player.notify("你要看什么？");
-            }
-            if (!(index >= 0 && index < 11)) return player.notify("你要看什么？");
-            var item = parent.equipment[index];
+  /**
+   * @param {CHARACTER} player - 执行命令的角色
+   */
+  enter(player: USER, index_str: string, from: string) {
+    const index = parseInt(index_str);
+    if (from) {
+      var paras = from.split("_");
+      let tops = WORLD.STATS.TOPS;
+      if (paras[1]) tops = WORLD.STATS["tops_" + paras[1]] ?? [];
+      let parent = tops[parseInt(paras[2])];
+      if (!parent) {
+        return player.notify("你要看什么？");
+      }
+      if (!(index >= 0 && index < 11)) return player.notify("你要看什么？");
+      var item = parent.equipment[index];
 
-            if (!item) return player.notify(parent.name + "没有装备你要看的东西。");
-            player.notify(item.get_desc(parent));
-
-        } else {
-            var obj = WORLD.STATS.TOPS[index - 1];
-            if (!obj) {
-                return player.notify("你要看什么？");
-            }
-            if (obj.query_desc) {
-                player.notify(obj.query_desc(player, "look1"));
-            }
-        }
+      if (!item) return player.notify(parent.name + "没有装备你要看的东西。");
+      player.notify(item.get_desc(parent));
+    } else {
+      var obj = WORLD.STATS.TOPS[index - 1];
+      if (!obj) {
+        return player.notify("你要看什么？");
+      }
+      if (obj.query_desc) {
+        player.notify(obj.query_desc(player, "look1"));
+      }
     }
+  }
 }
-
