@@ -1,107 +1,104 @@
-import { SKILL } from "../../../../core/skill/skill.js";
-import type {
-  PerformData,
-  EnablePropMap,
-} from "../../../../core/skill/skill.js";
-import type { CHARACTER } from "../../../../core/char/character.js";
-import type { PropMap } from "../../../../types/props.js";
+import { SKILL } from '../../../../core/skill/skill.js';
+import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
+import type { CHARACTER } from '../../../../core/char/character.js';
+import type { PropMap } from '../../../../types/props.js';
 // ============================================================
 // 狂风快刀
 // ============================================================
 
 export default class extends SKILL {
-  name = "狂风快刀";
-  id = "kuangfengkuaidao";
-  grade = 3;
+    name = '狂风快刀';
+    id = 'kuangfengkuaidao';
+    grade = 3;
 
-  desc =
-    "采花大盗田伯光的成名刀法，出刀如狂风骤雨，迅捷无伦，一刀快似一刀，教人眼花缭乱，防不胜防。";
-  can_enables = ["blade"];
-  attack_actions = [
-    "$N身形一晃，$W挟破风之声劈向$n的$l，快得只见刀光不见刀",
-    "$N踏步欺身，$W化作一道白虹，瞬息间已斩至$n$l",
-    "$N大喝一声，$W连劈带削，刀影重重笼住$n周身要害",
-    "$N刀交左手，右腕急翻，$W自意想不到的方位削向$n的$l",
-    "$N旋身借势，$W划出一道弧形刀光，快如电闪般掠向$n的$l",
-    "$N口中低啸，$W骤然加快，一刀方出二刀又至，连绵不绝斩向$n",
-    "$N足尖一点，身形如风欺近$n，$W已抢先一步抵至$n$l",
-    "$N刀势展开，恍若平地起了一阵旋风，$W刀刀不离$n周身要穴",
-  ];
+    desc =
+        '采花大盗田伯光的成名刀法，出刀如狂风骤雨，迅捷无伦，一刀快似一刀，教人眼花缭乱，防不胜防。';
+    can_enables = ['blade'];
+    attack_actions = [
+        '$N身形一晃，$W挟破风之声劈向$n的$l，快得只见刀光不见刀',
+        '$N踏步欺身，$W化作一道白虹，瞬息间已斩至$n$l',
+        '$N大喝一声，$W连劈带削，刀影重重笼住$n周身要害',
+        '$N刀交左手，右腕急翻，$W自意想不到的方位削向$n的$l',
+        '$N旋身借势，$W划出一道弧形刀光，快如电闪般掠向$n的$l',
+        '$N口中低啸，$W骤然加快，一刀方出二刀又至，连绵不绝斩向$n',
+        '$N足尖一点，身形如风欺近$n，$W已抢先一步抵至$n$l',
+        '$N刀势展开，恍若平地起了一阵旋风，$W刀刀不离$n周身要穴',
+    ];
 
-  slots = [
-    {
-      prop: "kfkd_mz",
-      name: "风劲",
-      value: (lv: number) => 2 + Math.floor(lv / 100),
-      format: (val: number) => `狂风二十一式期间命中增加${val}%`,
-    },
-    {
-      prop: "kfkd_gj",
-      name: "刀罡",
-      value: (lv: number) => 2 + Math.floor(lv / 100),
-      format: (val: number) => `狂风二十一式期间攻击力增加${val}%`,
-    },
-    {
-      prop: "kfkd_hsfy",
-      name: "破风",
-      value: (lv: number) => 5 + Math.floor(lv / 200),
-      format: (val: number) => `狂风二十一式期间忽视对方防御${val}%`,
-    },
-  ];
+    slots = [
+        {
+            prop: 'kfkd_mz',
+            name: '风劲',
+            value: (lv: number) => 2 + Math.floor(lv / 100),
+            format: (val: number) => `狂风二十一式期间命中增加${val}%`,
+        },
+        {
+            prop: 'kfkd_gj',
+            name: '刀罡',
+            value: (lv: number) => 2 + Math.floor(lv / 100),
+            format: (val: number) => `狂风二十一式期间攻击力增加${val}%`,
+        },
+        {
+            prop: 'kfkd_hsfy',
+            name: '破风',
+            value: (lv: number) => 5 + Math.floor(lv / 200),
+            format: (val: number) => `狂风二十一式期间忽视对方防御${val}%`,
+        },
+    ];
 
-  query_enable_prop(lv: number): EnablePropMap {
-    return {
-      blade: {
-        gj: Math.floor(lv * 1.5) + 10,
-        bj_per: 2 + Math.floor(lv / 500),
-        dex: Math.floor(lv * 0.2),
-      },
-    };
-  }
-
-  pfm_set: PerformData = {
-    kuang: {
-      name: "狂风二十一式",
-      distime: 30000,
-      enable_skill: "blade",
-      mp: 20,
-      use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-        const speedBonus = query_kfkd_gjsd_per(lv);
-        const mz_per = me.query_prop("kfkd_mz");
-        const gj_per = me.query_prop("kfkd_gj");
-        const diff_fy_per = me.query_prop("kfkd_hsfy");
-        const prop: PropMap = {
-          gjsd_per: speedBonus,
+    query_enable_prop(lv: number): EnablePropMap {
+        return {
+            blade: {
+                gj: Math.floor(lv * 1.5) + 10,
+                bj_per: 2 + Math.floor(lv / 500),
+                dex: Math.floor(lv * 0.2),
+            },
         };
+    }
 
-        // 变量不为0才追加属性
-        if (mz_per !== 0) prop.mz_per = mz_per;
-        if (gj_per !== 0) prop.gj_per = gj_per;
-        if (diff_fy_per !== 0) prop.diff_fy_per = diff_fy_per;
-        const buffDuration = query_kfkd_buff_duration(me, speedBonus);
+    pfm_set: PerformData = {
+        kuang: {
+            name: '狂风二十一式',
+            distime: 30000,
+            enable_skill: 'blade',
+            mp: 20,
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
+                const speedBonus = query_kfkd_gjsd_per(lv);
+                const mz_per = me.query_prop('kfkd_mz');
+                const gj_per = me.query_prop('kfkd_gj');
+                const diff_fy_per = me.query_prop('kfkd_hsfy');
+                const prop: PropMap = {
+                    gjsd_per: speedBonus,
+                };
 
-        me.send_room(
-          "<hiy>$N眼中厉芒一闪，狂啸一声，手中$W骤然化作漫天刀影，狂风般向$n连劈二十一式！</hiy>",
-          target,
-        );
+                // 变量不为0才追加属性
+                if (mz_per !== 0) prop.mz_per = mz_per;
+                if (gj_per !== 0) prop.gj_per = gj_per;
+                if (diff_fy_per !== 0) prop.diff_fy_per = diff_fy_per;
+                const buffDuration = query_kfkd_buff_duration(me, speedBonus);
 
-        me.add_status({
-          id: "weapon",
-          name: "狂风",
-          desc: "刀出如风，迅捷无伦",
-          duration: buffDuration,
-          override: 0,
-          prop,
-          finish_msg: "$N刀势渐缓，狂风之势随之消散。",
-        });
-        me.reauto_attack();
-      },
-      query_desc: function (_me: CHARACTER, lv: number): string {
-        const speedBonus = query_kfkd_gjsd_per(lv);
-        return `快速攻击敌方21招，攻击期间增加你${speedBonus}%的攻速`;
-      },
-    },
-  };
+                me.send_room(
+                    '<hiy>$N眼中厉芒一闪，狂啸一声，手中$W骤然化作漫天刀影，狂风般向$n连劈二十一式！</hiy>',
+                    target,
+                );
+
+                me.add_status({
+                    id: 'weapon',
+                    name: '狂风',
+                    desc: '刀出如风，迅捷无伦',
+                    duration: buffDuration,
+                    override: 0,
+                    prop,
+                    finish_msg: '$N刀势渐缓，狂风之势随之消散。',
+                });
+                me.reauto_attack();
+            },
+            query_desc: function (_me: CHARACTER, lv: number): string {
+                const speedBonus = query_kfkd_gjsd_per(lv);
+                return `快速攻击敌方21招，攻击期间增加你${speedBonus}%的攻速`;
+            },
+        },
+    };
 }
 
 // ============================================================
@@ -110,8 +107,8 @@ export default class extends SKILL {
 
 /** 狂风二十一式：攻速加成百分比，500级封顶100% */
 function query_kfkd_gjsd_per(lv: number): number {
-  const val = 50 + Math.floor(lv / 10);
-  return val > 100 ? 100 : val;
+    const val = 50 + Math.floor(lv / 10);
+    return val > 100 ? 100 : val;
 }
 
 /**
@@ -121,16 +118,16 @@ function query_kfkd_gjsd_per(lv: number): number {
  *   interval = max(500, base × (1 - gjsd_per/100))
  */
 function query_kfkd_buff_duration(me: CHARACTER, speedBonus: number): number {
-  const flatGjsd = me.query_prop("gjsd");
-  let baseInterval = 4000 - flatGjsd;
-  if (baseInterval <= 500) baseInterval = 500;
+    const flatGjsd = me.query_prop('gjsd');
+    let baseInterval = 4000 - flatGjsd;
+    if (baseInterval <= 500) baseInterval = 500;
 
-  const totalGjsdPer = me.query_prop("gjsd_per") + speedBonus;
-  let newInterval = baseInterval;
-  if (newInterval > 500) {
-    newInterval = Math.floor(newInterval - (newInterval * totalGjsdPer) / 100);
-    if (newInterval < 500) newInterval = 500;
-  }
+    const totalGjsdPer = me.query_prop('gjsd_per') + speedBonus;
+    let newInterval = baseInterval;
+    if (newInterval > 500) {
+        newInterval = Math.floor(newInterval - (newInterval * totalGjsdPer) / 100);
+        if (newInterval < 500) newInterval = 500;
+    }
 
-  return 21 * newInterval;
+    return 21 * newInterval;
 }

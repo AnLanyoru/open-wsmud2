@@ -1,5 +1,5 @@
-import { SKILL } from "../../../../core/skill/skill.js";
-import type { EnablePropMap } from "../../../../core/skill/skill.js";
+import { SKILL } from '../../../../core/skill/skill.js';
+import type { EnablePropMap } from '../../../../core/skill/skill.js';
 
 // ============================================================
 // 身空行 — 血刀门高级轻功
@@ -8,28 +8,28 @@ import type { EnablePropMap } from "../../../../core/skill/skill.js";
 // ============================================================
 
 export default class extends SKILL {
-  name = "身空行";
-  id = "shenkongxing";
-  grade = 2;
+    name = '身空行';
+    id = 'shenkongxing';
+    grade = 2;
 
-  desc =
-    "血刀门的轻功身法，源于藏地密宗「身空」法门。修习者于大雪山上赤足踏雪，日复一日，直至雪上不留足迹，方为小成。";
-  can_enables = ["dodge"];
-  dodge_actions = [
-    "$n双目微垂，口中低诵密宗真言，身形如融入虚空般淡去，$N一击穿过残影——「<HIR>诸法空相</HIR>」！\n",
-    "却见$n足尖在雪地上轻轻一点，雪面竟无半分凹陷！整个人如鬼魅般向后飘出三丈，$N只觉眼前一花，目标已然远去。\n",
-    "$n嘴角泛起一丝诡异微笑，身形忽然化作一缕血雾——「<RED>色即是空</RED>」！$N的兵刃穿雾而过，$n却已在数丈之外重新凝形。\n",
-    "只闻$n一声冷哼：「<HIR>凡所有相，皆是虚妄</HIR>。」话音未落，身形已如镜花水月般散去，$N这一招分明击中，却只是一道残影。\n",
-    "$n不闪不避，待到$N招式及身的一霎，整个人倏地向上拔起，如大雪山上的秃鹫盘旋，$N的兵刃扫过空处。\n",
-    "$n双掌合十，竟在$N攻势之中闭上了眼——「<HIR>五蕴皆空</HIR>」！下一刻身形已如轻烟般从$N的招式缝隙间穿过。\n",
-  ];
+    desc =
+        '血刀门的轻功身法，源于藏地密宗「身空」法门。修习者于大雪山上赤足踏雪，日复一日，直至雪上不留足迹，方为小成。';
+    can_enables = ['dodge'];
+    dodge_actions = [
+        '$n双目微垂，口中低诵密宗真言，身形如融入虚空般淡去，$N一击穿过残影——「<HIR>诸法空相</HIR>」！\n',
+        '却见$n足尖在雪地上轻轻一点，雪面竟无半分凹陷！整个人如鬼魅般向后飘出三丈，$N只觉眼前一花，目标已然远去。\n',
+        '$n嘴角泛起一丝诡异微笑，身形忽然化作一缕血雾——「<RED>色即是空</RED>」！$N的兵刃穿雾而过，$n却已在数丈之外重新凝形。\n',
+        '只闻$n一声冷哼：「<HIR>凡所有相，皆是虚妄</HIR>。」话音未落，身形已如镜花水月般散去，$N这一招分明击中，却只是一道残影。\n',
+        '$n不闪不避，待到$N招式及身的一霎，整个人倏地向上拔起，如大雪山上的秃鹫盘旋，$N的兵刃扫过空处。\n',
+        '$n双掌合十，竟在$N攻势之中闭上了眼——「<HIR>五蕴皆空</HIR>」！下一刻身形已如轻烟般从$N的招式缝隙间穿过。\n',
+    ];
 
-  query_enable_prop(lv: number): EnablePropMap {
-    return {
-      dodge: {
-        ds: 100 + lv * 2,
-        con: 10 + Math.floor(lv / 5),
-      },
-    };
-  }
+    query_enable_prop(lv: number): EnablePropMap {
+        return {
+            dodge: {
+                ds: 100 + lv * 2,
+                con: 10 + Math.floor(lv / 5),
+            },
+        };
+    }
 }

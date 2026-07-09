@@ -1,5 +1,5 @@
-import { ROOM } from "../../../../core/room/room.js";
+import { ROOM } from '../../../../core/room/room.js';
 
 export default class extends ROOM {
-  name = "熔岩炼狱";
+    name = '熔岩炼狱';
 }

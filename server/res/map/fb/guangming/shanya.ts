@@ -1,8 +1,8 @@
-import { ROOM } from "../../../../core/room/room.js";
+import { ROOM } from '../../../../core/room/room.js';
 
 export default class extends ROOM {
-  name = "山崖";
-  exits = {
-    west: "fb/guangming/qi_hongshui",
-  };
+    name = '山崖';
+    exits = {
+        west: 'fb/guangming/qi_hongshui',
+    };
 }

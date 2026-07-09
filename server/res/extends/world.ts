@@ -11,31 +11,31 @@
  *   WORLD.on_startup = function () { /* ... * / };
  *   WORLD.check_connect = function (socket) { return true; };
  */
-import { WORLD } from "../../core/world.js";
-import { USER } from "../../core/char/user.js";
-import { db } from "../../core/util/data.js";
+import { WORLD } from '../../core/world.js';
+import { USER } from '../../core/char/user.js';
+import { db } from '../../core/util/data.js';
 
 // 覆盖 os/world.js 中的空壳实现
 WORLD.connect = function (socket) {
-  if (WORLD.status < 0) return socket.end();
-  if (!WORLD.check_connect(socket)) return socket.end();
+    if (WORLD.status < 0) return socket.end();
+    if (!WORLD.check_connect(socket)) return socket.end();
 
-  socket.user = new USER();
+    socket.user = new USER();
 
-  socket.user.socket = socket;
-  socket.user.wait_input = WORLD.USERLOGIN.check_session.bind(WORLD.USERLOGIN);
+    socket.user.socket = socket;
+    socket.user.wait_input = WORLD.USERLOGIN.check_session.bind(WORLD.USERLOGIN);
 
-  socket.setTimeout(60000);
+    socket.setTimeout(60000);
 };
 
 WORLD.loadLocalData = function () {
-  const data = db.getLocalRoles();
-  if (!data || !data.length) return;
-  console.log("加载上次未保存的本地用户%d", data.length);
-  for (let i = 0; i < data.length; i++) {
-    const user = new USER();
-    user.loadData(data[i]);
-    WORLD.USERS.push(user);
-  }
-  db.deleteLocalRoles();
+    const data = db.getLocalRoles();
+    if (!data || !data.length) return;
+    console.log('加载上次未保存的本地用户%d', data.length);
+    for (let i = 0; i < data.length; i++) {
+        const user = new USER();
+        user.loadData(data[i]);
+        WORLD.USERS.push(user);
+    }
+    db.deleteLocalRoles();
 };

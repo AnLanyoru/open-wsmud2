@@ -1,370 +1,368 @@
 /**
  * AREA 区域类 - 管理一组房间
  */
-import { WORLD } from "../world.js";
-import { FAMILIES } from "../skill/family.js";
-import { NPC } from "../char/npc.js";
-import type { ROOM } from "./room.js";
-import type { OddsEntry } from "../item/obj.js";
-import type { USER } from "../char/user.js";
-import type { CHARACTER } from "../char/character.js";
-import type { SKILL } from "../skill/skill.js";
-import type { ActionMap } from "../../types/base.js";
-import { BASE } from "../base.js";
+import { WORLD } from '../world.js';
+import { FAMILIES } from '../skill/family.js';
+import { NPC } from '../char/npc.js';
+import type { ROOM } from './room.js';
+import type { OddsEntry } from '../item/obj.js';
+import type { USER } from '../char/user.js';
+import type { CHARACTER } from '../char/character.js';
+import type { SKILL } from '../skill/skill.js';
+import type { ActionMap } from '../../types/base.js';
+import { BASE } from '../base.js';
 
 export class AREA extends BASE {
-  // ============ 核心属性 ============
+    // ============ 核心属性 ============
 
-  /** 资源路径(由资源加载系统设置) */
-  path?: string;
-  /** 区域名称 */
-  name: string = "";
-  /** 区域ID */
-  id: string = "";
-  /** 区域描述 */
-  desc: string = "";
-  /** 是否为区域 */
-  is_area: boolean = false;
-  /** 是否在小地图显示 */
-  is_show: boolean = true;
+    /** 资源路径(由资源加载系统设置) */
+    path?: string;
+    /** 区域名称 */
+    name: string = '';
+    /** 区域ID */
+    id: string = '';
+    /** 区域描述 */
+    desc: string = '';
+    /** 是否为区域 */
+    is_area: boolean = false;
+    /** 是否在小地图显示 */
+    is_show: boolean = true;
 
-  // ============ 房间管理 ============
+    // ============ 房间管理 ============
 
-  /** 区域内的房间列表 */
-  rooms: ROOM[] = [];
-  /** 子区域列表(由extends设置) */
-  areas?: AREA[];
-  /** 小地图数据 */
-  map: any[] = [];
-  /** 默认入口房间路径 */
-  first?: string;
+    /** 区域内的房间列表 */
+    rooms: ROOM[] = [];
+    /** 子区域列表(由extends设置) */
+    areas?: AREA[];
+    /** 小地图数据 */
+    map: any[] = [];
+    /** 默认入口房间路径 */
+    first?: string;
 
-  // ============ 副本相关 ============
-  /** 是否为不持久化区域 */
-  no_save?: boolean;
-  /** 是否为副本区域 */
-  is_copy: boolean = false;
-  /** 是否支持多人副本 */
-  is_multi: boolean = false;
-  /** 副本消耗(体力/令牌等) */
-  expend: number = 10;
-  /** 副本索引 */
-  index: number = 0;
-  /** 副本基础经验 */
-  exp: number = 1000;
-  /** 副本基础潜能 */
-  pot: number = 1000;
-  /** 是否非副本(普通区域标识) */
-  not_fb: boolean = false;
-  /** 重生房间路径 */
-  recover_room?: string;
+    // ============ 副本相关 ============
+    /** 是否为不持久化区域 */
+    no_save?: boolean;
+    /** 是否为副本区域 */
+    is_copy: boolean = false;
+    /** 是否支持多人副本 */
+    is_multi: boolean = false;
+    /** 副本消耗(体力/令牌等) */
+    expend: number = 10;
+    /** 副本索引 */
+    index: number = 0;
+    /** 副本基础经验 */
+    exp: number = 1000;
+    /** 副本基础潜能 */
+    pot: number = 1000;
+    /** 是否非副本(普通区域标识) */
+    not_fb: boolean = false;
+    /** 重生房间路径 */
+    recover_room?: string;
 
-  // ============ 掉落相关 ============
+    // ============ 掉落相关 ============
 
-  /** 掉落列表缓存 */
-  drop_list?: OddsEntry[][];
-  /** 困难模式掉落列表缓存 */
-  diff_drop_list?: OddsEntry[][];
-  /** 普通模式 NPC掉落配置(NPC路径列表) */
-  drop_npcs0?: string[];
-  /** 困难模式 NPC掉落配置(NPC路径列表) */
-  drop_npcs1?: string[];
+    /** 掉落列表缓存 */
+    drop_list?: OddsEntry[][];
+    /** 困难模式掉落列表缓存 */
+    diff_drop_list?: OddsEntry[][];
+    /** 普通模式 NPC掉落配置(NPC路径列表) */
+    drop_npcs0?: string[];
+    /** 困难模式 NPC掉落配置(NPC路径列表) */
+    drop_npcs1?: string[];
 
-  // ============ 门派与社交 ============
+    // ============ 门派与社交 ============
 
-  /** 所属门派标识 */
-  family?: string;
-  /** 是否为公共区域 */
-  is_public: boolean = false;
+    /** 所属门派标识 */
+    family?: string;
+    /** 是否为公共区域 */
+    is_public: boolean = false;
 
-  // ============ 缓存 ============
+    // ============ 缓存 ============
 
-  /** JSON缓存 */
-  json?: string;
-  /** 所属区域路径(用于快速查找) */
-  room_path?: string;
-  /** 副本难度系数 */
-  fb_index: number = 1;
+    /** JSON缓存 */
+    json?: string;
+    /** 所属区域路径(用于快速查找) */
+    room_path?: string;
+    /** 副本难度系数 */
+    fb_index: number = 1;
 
-  // ============ 交互属性 ============
+    // ============ 交互属性 ============
 
-  /** 区域级命令映射 */
-  actions: (string | number)[][] = [];
-  /** 区域掉落物品列表 */
-  drop_items?: any[];
-  /** 区域掉落列表（资源文件直接定义） */
-  drops?: string[];
+    /** 区域级命令映射 */
+    actions: (string | number)[][] = [];
+    /** 区域掉落物品列表 */
+    drop_items?: any[];
+    /** 区域掉落列表（资源文件直接定义） */
+    drops?: string[];
 
-  // ============ 动态属性(由资源文件设置) ============
+    // ============ 动态属性(由资源文件设置) ============
 
-  /** 进阶难度索引 */
-  jd_index?: number;
-  /** 只能通过索引解锁的关卡 */
-  unlock_index?: number;
-  /** 是否锁定（暂未开放） */
-  is_lock?: boolean;
-  /** 是否有困难难度 */
-  is_diffi?: boolean;
-  /** 首通称号 */
-  ss_title?: string;
-  /** 副本计数键名（替代默认 fbc_0_ 前缀） */
-  count_key?: string;
-  /** 起始房间路径 */
-  start_room?: string;
-  /** 是否禁用缓存 */
-  no_cache?: boolean;
-  /** 是否禁止组队 */
-  no_team?: boolean;
-  /** 特殊属性（由资源文件设置，用于 dialog JSON） */
-  sp?: string | Record<string, any>;
-  /** 在 getAllMaps 遍历中设置的区域索引 */
-  area_index?: number;
-  /** 门派武功列表（由 jh.ts 从 FAMILY 复制） */
-  skills?: SKILL[];
-  /** 门派进阶武功列表（由 jh.ts 从 FAMILY 复制） */
-  skills2?: SKILL[];
-  /** 门派终极武功列表（由 jh.ts 从 FAMILY 复制） */
-  skills4?: SKILL[];
+    /** 进阶难度索引 */
+    jd_index?: number;
+    /** 只能通过索引解锁的关卡 */
+    unlock_index?: number;
+    /** 是否锁定（暂未开放） */
+    is_lock?: boolean;
+    /** 是否有困难难度 */
+    is_diffi?: boolean;
+    /** 首通称号 */
+    ss_title?: string;
+    /** 副本计数键名（替代默认 fbc_0_ 前缀） */
+    count_key?: string;
+    /** 起始房间路径 */
+    start_room?: string;
+    /** 是否禁用缓存 */
+    no_cache?: boolean;
+    /** 是否禁止组队 */
+    no_team?: boolean;
+    /** 特殊属性（由资源文件设置，用于 dialog JSON） */
+    sp?: string | Record<string, any>;
+    /** 在 getAllMaps 遍历中设置的区域索引 */
+    area_index?: number;
+    /** 门派武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills?: SKILL[];
+    /** 门派进阶武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills2?: SKILL[];
+    /** 门派终极武功列表（由 jh.ts 从 FAMILY 复制） */
+    skills4?: SKILL[];
 
-  // ============ 回调（由资源文件设置） ============
+    // ============ 回调（由资源文件设置） ============
 
-  /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
-  on_login?(user: USER): void;
-  /** 人物进入后回调 — 触发时机：人物首次进入该区域房间后 */
-  on_enterd?(me: CHARACTER): void;
-  /** 自定义客户端地图渲染 */
-  render_map?(me: USER): void;
-  /**
-   * 区域创建回调
-   */
-  create(path: string): void {
-    WORLD.AREAS.push(this);
-    if (this.family) {
-      FAMILIES[this.family].area = this;
-    }
-  }
-
-  /**
-   * 根据ID获取区域
-   * @param id
-   */
-  static Get(id: string): AREA | undefined {
-    if (!WORLD.AREAS) return;
-    for (let i = 0; i < WORLD.AREAS.length; i++) {
-      if (WORLD.AREAS[i].id == id) return WORLD.AREAS[i];
-    }
-  }
-
-  /**
-   * 人物离开区域回调
-   * @param me
-   */
-  on_leaved(me: CHARACTER): void {
-    return undefined;
-  }
-
-  /**
-   * 人物离开前回调
-   * @param me
-   */
-  on_leave(me: CHARACTER): boolean | void {
-    return true;
-  }
-
-  /**
-   * 人物进入后回调
-   * @param me
-   */
-  on_enter(me: CHARACTER): boolean | void {
-    return true;
-  }
-
-  /**
-   * 查找子区域
-   * @param path
-   */
-  find_area(path: string): AREA | undefined {
-    return undefined;
-  }
-
-  /**
-   * 查询指定难度的通关记录 是否通关
-   * @param diff
-   */
-  is_record(diff: number): boolean {
-    return this["record_" + diff];
-  }
-
-  /**
-   * 查询区域经验奖励
-   */
-  query_exp(): number {
-    const lv = this.fb_index || 0;
-    return 1000 + lv * 100;
-  }
-
-  /**
-   * 查询区域潜能奖励
-   */
-  query_pot(): number {
-    if (this.pot >= 0 && this.pot != 1000) return this.pot;
-    return this.query_exp();
-  }
-
-  /**
-   * 查询区域描述
-   */
-  query_desc(): string {
-    return this.desc;
-  }
-
-  /**
-   * 清除缓存(重置json和掉落列表)
-   */
-  clear(): void {
-    this.json = undefined;
-    this.drop_list = undefined;
-    this.diff_drop_list = undefined;
-  }
-
-  /**
-   * 查询普通掉落列表
-   * @param isdiff
-   */
-  query_drops(isdiff?: boolean): OddsEntry[][] | undefined {
-    if (isdiff) return this.query_diff_drops();
-    if (this.drop_list) return this.drop_list;
-    const items: OddsEntry[][] = [];
-    for (let i = 0; i < this.rooms.length; i++) {
-      const rm = this.rooms[i];
-      for (let j = 0; j < rm.items.length; j++) {
-        const dl = rm.items[j].drop_list;
-        if (dl) {
-          items.push(dl);
-        }
-      }
-    }
-    this.query_npc_drops(this.drop_npcs0, items);
-    this.drop_list = items;
-    return this.drop_list;
-  }
-
-  /**
-   * 查询NPC掉落
-   * @param npcs
-   * @param items
-   */
-  query_npc_drops(npcs: string[] | undefined, items: OddsEntry[][]): void {
-    if (!npcs || !npcs.length) return;
-    for (let i = 0; i < npcs.length; i++) {
-      const npc = NPC.GET_BASE(npcs[i]);
-      if (!npc || !npc.drop_list) continue;
-      items.push(npc.drop_list);
-    }
-  }
-
-  /**
-   * 查询困难模式掉落
-   */
-  query_diff_drops(): OddsEntry[][] | undefined {
-    if (this.diff_drop_list) return this.diff_drop_list;
-    const items: OddsEntry[][] = [];
-    for (let i = 0; i < this.rooms.length; i++) {
-      const rm = this.rooms[i];
-      for (let j = 0; j < rm.items.length; j++) {
-        const dl = rm.items[j].drop_list;
-        if (dl) {
-          items.push(dl);
-        }
-      }
-    }
-    this.query_npc_drops(this.drop_npcs1, items);
-    this.diff_drop_list = items;
-    return this.diff_drop_list;
-  }
-
-  /**
-   * 区域热更新
-   * @param path
-   */
-  update(path: string): void {
-    WORLD.COMMANDS.get("jh")!.map_json = null;
-    for (let i = 0; i < WORLD.AREAS.length; i++) {
-      if (WORLD.AREAS[i].path == path) {
-        const old_area = WORLD.AREAS[i];
-        WORLD.AREAS[i] = this;
-        this.rooms = old_area.rooms;
-        if (this.rooms) {
-          for (let room of this.rooms) {
-            room.parent = this;
-          }
-        }
-        old_area.rooms = [];
+    /** 玩家登录回调 — 触发时机：玩家登录游戏进入该区域时 */
+    on_login?(user: USER): void;
+    /** 人物进入后回调 — 触发时机：人物首次进入该区域房间后 */
+    on_enterd?(me: CHARACTER): void;
+    /** 自定义客户端地图渲染 */
+    render_map?(me: USER): void;
+    /**
+     * 区域创建回调
+     */
+    create(path: string): void {
+        WORLD.AREAS.push(this);
         if (this.family) {
-          FAMILIES[this.family].area = this;
+            FAMILIES[this.family].area = this;
         }
-        return;
-      }
     }
-    this.create(path);
-  }
 
-  /**
-   * 查询掉落物品列表
-   */
-  query_drop_items(): any[] | undefined {
-    return this.drop_items;
-  }
+    /**
+     * 根据ID获取区域
+     * @param id
+     */
+    static Get(id: string): AREA | undefined {
+        if (!WORLD.AREAS) return;
+        for (let i = 0; i < WORLD.AREAS.length; i++) {
+            if (WORLD.AREAS[i].id == id) return WORLD.AREAS[i];
+        }
+    }
 
-  /**
-   * 查询区域命令
-   */
-  query_actions(me?: USER): (string | number)[][] {
-    return this.actions;
-  }
+    /**
+     * 人物离开区域回调
+     * @param me
+     */
+    on_leaved(me: CHARACTER): void {
+        return undefined;
+    }
 
-  // ============ 区域扩展(由extends合并) ============
+    /**
+     * 人物离开前回调
+     * @param me
+     */
+    on_leave(me: CHARACTER): boolean | void {
+        return true;
+    }
 
-  /** 通知区域更新 */
-  notify_update(): void {
-    this.json = undefined;
-    if (this.is_area)
-      WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
-    else
-      WORLD.send(`{type:"dialog",dialog:"jh",t:"fb",refresh:${this.fb_index}}`);
-  }
+    /**
+     * 人物进入后回调
+     * @param me
+     */
+    on_enter(me: CHARACTER): boolean | void {
+        return true;
+    }
 
-  /** @param me */
-  query_owner(me: { query_teamid(): string | null }): string {
-    return me.query_teamid() || "";
-  }
+    /**
+     * 查找子区域
+     * @param path
+     */
+    find_area(path: string): AREA | undefined {
+        return undefined;
+    }
 
-  /** @param me */
-  clear_copy(me: USER): void {
-    const room = WORLD.getRoom(this.first!)?.query_copy2(me);
-    if (room) room.clear_copy(me);
-  }
+    /**
+     * 查询指定难度的通关记录 是否通关
+     * @param diff
+     */
+    is_record(diff: number): boolean {
+        return this['record_' + diff];
+    }
 
-  /** @param me */
-  is_unlock(me: USER): boolean {
-    if (this.jd_index! >= 0) return me.isenable_area(this);
-    return (this.unlock_index ?? this.fb_index) <= me.query_temp("fb", 0)!;
-  }
+    /**
+     * 查询区域经验奖励
+     */
+    query_exp(): number {
+        const lv = this.fb_index || 0;
+        return 1000 + lv * 100;
+    }
 
-  /** 快速扫荡回调 */
-  on_quick?(me: CHARACTER): boolean | void;
+    /**
+     * 查询区域潜能奖励
+     */
+    query_pot(): number {
+        if (this.pot >= 0 && this.pot != 1000) return this.pot;
+        return this.query_exp();
+    }
 
-  /** 快速扫荡结束回调 */
-  on_quick_over?(me: CHARACTER): void;
+    /**
+     * 查询区域描述
+     */
+    query_desc(): string {
+        return this.desc;
+    }
 
-  /** 副本分数 */
-  score?: number;
+    /**
+     * 清除缓存(重置json和掉落列表)
+     */
+    clear(): void {
+        this.json = undefined;
+        this.drop_list = undefined;
+        this.diff_drop_list = undefined;
+    }
 
-  /** 按 ID 获取副本区域（由 world/cmd/dialog/jh.js 注入实现） */
-  static Get_FB(_id: string): AREA | undefined {
-    return undefined;
-  }
+    /**
+     * 查询普通掉落列表
+     * @param isdiff
+     */
+    query_drops(isdiff?: boolean): OddsEntry[][] | undefined {
+        if (isdiff) return this.query_diff_drops();
+        if (this.drop_list) return this.drop_list;
+        const items: OddsEntry[][] = [];
+        for (let i = 0; i < this.rooms.length; i++) {
+            const rm = this.rooms[i];
+            for (let j = 0; j < rm.items.length; j++) {
+                const dl = rm.items[j].drop_list;
+                if (dl) {
+                    items.push(dl);
+                }
+            }
+        }
+        this.query_npc_drops(this.drop_npcs0, items);
+        this.drop_list = items;
+        return this.drop_list;
+    }
 
-  /** 副本区域索引 */
-  static FBS: AREA[] | undefined;
+    /**
+     * 查询NPC掉落
+     * @param npcs
+     * @param items
+     */
+    query_npc_drops(npcs: string[] | undefined, items: OddsEntry[][]): void {
+        if (!npcs || !npcs.length) return;
+        for (let i = 0; i < npcs.length; i++) {
+            const npc = NPC.GET_BASE(npcs[i]);
+            if (!npc || !npc.drop_list) continue;
+            items.push(npc.drop_list);
+        }
+    }
+
+    /**
+     * 查询困难模式掉落
+     */
+    query_diff_drops(): OddsEntry[][] | undefined {
+        if (this.diff_drop_list) return this.diff_drop_list;
+        const items: OddsEntry[][] = [];
+        for (let i = 0; i < this.rooms.length; i++) {
+            const rm = this.rooms[i];
+            for (let j = 0; j < rm.items.length; j++) {
+                const dl = rm.items[j].drop_list;
+                if (dl) {
+                    items.push(dl);
+                }
+            }
+        }
+        this.query_npc_drops(this.drop_npcs1, items);
+        this.diff_drop_list = items;
+        return this.diff_drop_list;
+    }
+
+    /**
+     * 区域热更新
+     * @param path
+     */
+    update(path: string): void {
+        WORLD.COMMANDS.get('jh')!.map_json = null;
+        for (let i = 0; i < WORLD.AREAS.length; i++) {
+            if (WORLD.AREAS[i].path == path) {
+                const old_area = WORLD.AREAS[i];
+                WORLD.AREAS[i] = this;
+                this.rooms = old_area.rooms;
+                if (this.rooms) {
+                    for (let room of this.rooms) {
+                        room.parent = this;
+                    }
+                }
+                old_area.rooms = [];
+                if (this.family) {
+                    FAMILIES[this.family].area = this;
+                }
+                return;
+            }
+        }
+        this.create(path);
+    }
+
+    /**
+     * 查询掉落物品列表
+     */
+    query_drop_items(): any[] | undefined {
+        return this.drop_items;
+    }
+
+    /**
+     * 查询区域命令
+     */
+    query_actions(me?: USER): (string | number)[][] {
+        return this.actions;
+    }
+
+    // ============ 区域扩展(由extends合并) ============
+
+    /** 通知区域更新 */
+    notify_update(): void {
+        this.json = undefined;
+        if (this.is_area) WORLD.send(`{type:"dialog",dialog:"jh",t:"fam",refresh:${this.index}}`);
+        else WORLD.send(`{type:"dialog",dialog:"jh",t:"fb",refresh:${this.fb_index}}`);
+    }
+
+    /** @param me */
+    query_owner(me: { query_teamid(): string | null }): string {
+        return me.query_teamid() || '';
+    }
+
+    /** @param me */
+    clear_copy(me: USER): void {
+        const room = WORLD.getRoom(this.first!)?.query_copy2(me);
+        if (room) room.clear_copy(me);
+    }
+
+    /** @param me */
+    is_unlock(me: USER): boolean {
+        if (this.jd_index! >= 0) return me.isenable_area(this);
+        return (this.unlock_index ?? this.fb_index) <= me.query_temp('fb', 0)!;
+    }
+
+    /** 快速扫荡回调 */
+    on_quick?(me: CHARACTER): boolean | void;
+
+    /** 快速扫荡结束回调 */
+    on_quick_over?(me: CHARACTER): void;
+
+    /** 副本分数 */
+    score?: number;
+
+    /** 按 ID 获取副本区域（由 world/cmd/dialog/jh.js 注入实现） */
+    static Get_FB(_id: string): AREA | undefined {
+        return undefined;
+    }
+
+    /** 副本区域索引 */
+    static FBS: AREA[] | undefined;
 }

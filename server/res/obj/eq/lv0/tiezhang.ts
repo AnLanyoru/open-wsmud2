@@ -1,15 +1,15 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE, WEAPON_TYPE } from "../../../../core/const.js";
-import type { PropMap } from "../../../../types/props.js";
+import { EQUIPMENT } from '../../../../core/item/equipment.js';
+import { EQUIP_TYPE, WEAPON_TYPE } from '../../../../core/const.js';
+import type { PropMap } from '../../../../types/props.js';
 
 export default class extends EQUIPMENT {
-  unit = "根";
-  name = "铁杖";
-  desc = "这是一根浑铁杖，似乎威力不大。";
-  value = 2500;
-  eq_type = EQUIP_TYPE.WEAPON;
-  weapon_type = WEAPON_TYPE.STAFF;
-  prop: PropMap = {
-    gj: 2,
-  };
+    unit = '根';
+    name = '铁杖';
+    desc = '这是一根浑铁杖，似乎威力不大。';
+    value = 2500;
+    eq_type = EQUIP_TYPE.WEAPON;
+    weapon_type = WEAPON_TYPE.STAFF;
+    prop: PropMap = {
+        gj: 2,
+    };
 }

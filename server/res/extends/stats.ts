@@ -11,59 +11,59 @@
  *   const STATS = WORLD.STATS;
  *   STATS.load_tops = function (tops, defname, key) { /* ... * / };
  */
-import { COPY_PROPS, WORLD } from "../../core/world.js";
-import { NPC } from "../../core/char/npc.js";
-import { SkillsMap } from "../../core/char/skills_map.js";
-import { OBJ } from "../../core/item/obj.js";
-import type { StatsTopEntry } from "../../core/world.js";
-import type { EQUIPMENT } from "../../core/item/equipment.js";
+import { COPY_PROPS, WORLD } from '../../core/world.js';
+import { NPC } from '../../core/char/npc.js';
+import { SkillsMap } from '../../core/char/skills_map.js';
+import { OBJ } from '../../core/item/obj.js';
+import type { StatsTopEntry } from '../../core/world.js';
+import type { EQUIPMENT } from '../../core/item/equipment.js';
 
 const STATS = WORLD.STATS;
 
 STATS.load_tops = function (
-  tops: StatsTopEntry[],
-  defname: string = "武林高手",
-  key: string = "",
+    tops: StatsTopEntry[],
+    defname: string = '武林高手',
+    key: string = '',
 ): NPC[] {
-  tops = tops ?? new Array(10).fill({ path: "pub/gaoshou1" });
-  const ary: NPC[] = [];
-  for (let i = 0; i < tops.length; i++) {
-    let item = tops[i];
-    let npc = NPC.CLONE("pub/gaoshou1");
-    npc.name = defname;
-    if (item.userid) {
-      this.loadTopUser(item, npc);
-    } else {
-      npc.score = 10 - i;
+    tops = tops ?? new Array(10).fill({ path: 'pub/gaoshou1' });
+    const ary: NPC[] = [];
+    for (let i = 0; i < tops.length; i++) {
+        let item = tops[i];
+        let npc = NPC.CLONE('pub/gaoshou1');
+        npc.name = defname;
+        if (item.userid) {
+            this.loadTopUser(item, npc);
+        } else {
+            npc.score = 10 - i;
+        }
+        npc.top_index = i + 1;
+        npc.id = 'top_' + key + '_' + i;
+        ary.push(npc);
     }
-    npc.top_index = i + 1;
-    npc.id = "top_" + key + "_" + i;
-    ary.push(npc);
-  }
-  return ary;
+    return ary;
 };
 
 STATS.loadTopUser = function (data, npc) {
-  npc.title = data.title;
-  npc.name = data.name;
-  for (let i = 0; i < COPY_PROPS.length; i++) {
-    npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
-  }
-  npc.skills = SkillsMap.from(data.skills);
-  if (data.eq) {
-    npc.equipment = [];
-    for (let i = 0; i < data.eq.length; i++) {
-      let item = data.eq[i];
-      if (!item) continue;
-      let obj = OBJ.CREATE(item[0]) as EQUIPMENT;
-      if (!obj) continue;
-      obj.load_db(item);
-      npc.equipment[i] = obj;
+    npc.title = data.title;
+    npc.name = data.name;
+    for (let i = 0; i < COPY_PROPS.length; i++) {
+        npc[COPY_PROPS[i]] = data[COPY_PROPS[i]];
     }
-  }
-  npc.userid = data.userid;
-  npc.temp = data.temp;
-  npc.clear_prop();
-  npc.init();
-  npc.recount();
+    npc.skills = SkillsMap.from(data.skills);
+    if (data.eq) {
+        npc.equipment = [];
+        for (let i = 0; i < data.eq.length; i++) {
+            let item = data.eq[i];
+            if (!item) continue;
+            let obj = OBJ.CREATE(item[0]) as EQUIPMENT;
+            if (!obj) continue;
+            obj.load_db(item);
+            npc.equipment[i] = obj;
+        }
+    }
+    npc.userid = data.userid;
+    npc.temp = data.temp;
+    npc.clear_prop();
+    npc.init();
+    npc.recount();
 };

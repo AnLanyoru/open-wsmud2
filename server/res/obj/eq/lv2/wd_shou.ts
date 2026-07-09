@@ -1,17 +1,17 @@
-import { EQUIPMENT } from "../../../../core/item/equipment.js";
-import { EQUIP_TYPE } from "../../../../core/const.js";
-import type { PropMap } from "../../../../types/props.js";
+import { EQUIPMENT } from '../../../../core/item/equipment.js';
+import { EQUIP_TYPE } from '../../../../core/const.js';
+import type { PropMap } from '../../../../types/props.js';
 
 export default class extends EQUIPMENT {
-  name = "金鋘钩";
-  desc = "何铁手的假手，形似钩状，如纤纤女手";
-  unit = "副";
-  grade = 2;
-  eq_type = EQUIP_TYPE.WRIST;
-  value = 30000;
-  hole_count = 2;
-  prop: PropMap = {
-    gj: 20,
-    zj: 20,
-  };
+    name = '金鋘钩';
+    desc = '何铁手的假手，形似钩状，如纤纤女手';
+    unit = '副';
+    grade = 2;
+    eq_type = EQUIP_TYPE.WRIST;
+    value = 30000;
+    hole_count = 2;
+    prop: PropMap = {
+        gj: 20,
+        zj: 20,
+    };
 }

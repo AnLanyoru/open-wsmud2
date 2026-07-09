@@ -1,27 +1,27 @@
-import { COMMAND } from "../../../core/command.js";
-import { CHARACTER } from "../../../core/char/character.js";
-import { WORLD } from "../../../core/world.js";
-import type { USER } from "../../../core/char/user.js";
+import { COMMAND } from '../../../core/command.js';
+import { CHARACTER } from '../../../core/char/character.js';
+import { WORLD } from '../../../core/world.js';
+import type { USER } from '../../../core/char/user.js';
 
 export default class extends COMMAND {
-  command = "speed";
-  allow_busy = true;
-  allow_state = true;
-  allow_level = 6;
+    command = 'speed';
+    allow_busy = true;
+    allow_state = true;
+    allow_level = 6;
 
-  /**
-   * @param {CHARACTER} me - 执行命令的角色
-   */
-  enter(me: USER, arg: string) {
-    const ms = parseInt(arg);
-    if (!(ms >= 100)) {
-      return me.send(
-        `当前心跳间隔: ${WORLD.heartbeat_interval}ms，用法: speed <毫秒数，最小100>`,
-      );
+    /**
+     * @param {CHARACTER} me - 执行命令的角色
+     */
+    enter(me: USER, arg: string) {
+        const ms = parseInt(arg);
+        if (!(ms >= 100)) {
+            return me.send(
+                `当前心跳间隔: ${WORLD.heartbeat_interval}ms，用法: speed <毫秒数，最小100>`,
+            );
+        }
+        WORLD.heartbeat_interval = ms;
+        if (WORLD.heart_beat_service) clearInterval(WORLD.heart_beat_service);
+        WORLD.heart_beat_service = setInterval(WORLD.heart_beat, ms);
+        me.send(`心跳间隔已修改为 ${ms}ms`);
     }
-    WORLD.heartbeat_interval = ms;
-    if (WORLD.heart_beat_service) clearInterval(WORLD.heart_beat_service);
-    WORLD.heart_beat_service = setInterval(WORLD.heart_beat, ms);
-    me.send(`心跳间隔已修改为 ${ms}ms`);
-  }
 }

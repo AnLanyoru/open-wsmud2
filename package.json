@@ -37,5 +37,15 @@
     "esbuild": "^0.28.0",
     "pinyin": "^4.0.0",
     "typescript": "^6.0.3"
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "printWidth": 100,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "arrowParens": "avoid"
   }
 }

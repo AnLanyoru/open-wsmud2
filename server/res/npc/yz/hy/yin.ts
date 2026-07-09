@@ -1,84 +1,84 @@
-import { NPC } from "../../../../core/char/npc.js";
-import { USER } from "../../../../core/char/user.js";
-import { CORPSE } from "../../../../core/item/corpse.js";
-import { OBJ } from "../../../../core/item/obj.js";
+import { NPC } from '../../../../core/char/npc.js';
+import { USER } from '../../../../core/char/user.js';
+import { CORPSE } from '../../../../core/item/corpse.js';
+import { OBJ } from '../../../../core/item/obj.js';
 
 export default class extends NPC {
-  name = "尹小龙";
-  desc = "他本是青木堂的堂主，被黑鹰队所擒";
-  title = "青木堂堂主";
-  gender = 1;
-  age = 55;
-  per = 22;
-  mp = 400;
-  max_mp = 400;
-  hp = 1000;
-  max_hp = 1000;
-  score = 10;
-  no_refresh = true;
+    name = '尹小龙';
+    desc = '他本是青木堂的堂主，被黑鹰队所擒';
+    title = '青木堂堂主';
+    gender = 1;
+    age = 55;
+    per = 22;
+    mp = 400;
+    max_mp = 400;
+    hp = 1000;
+    max_hp = 1000;
+    score = 10;
+    no_refresh = true;
 
-  constructor() {
-    super();
-    this.set_objects(["eq/lv0/cloth", 1, 1]);
-    this.skill_map(
-      ["dodge", 200],
-      ["parry", 200],
-      ["force", 200],
-      ["unarmed", 200],
-      ["houquan", 200, "unarmed"],
-      ["yunlongshenfa", 200, "dodge"],
-      ["yunlongxinfa", 200, "force"],
-    );
-    this.set_drop(
-      {
-        obj: ["eq/lv1/xk_cloth", "eq/lv1/xk_shoes"],
-        odds: 5000,
-      },
-      {
-        obj: ["eq/lv1/xk_head", "eq/lv1/qingmu"],
-        odds: 500,
-      },
-    );
-  }
-
-  on_enter(me: USER) {
-    if (me.is_player) {
-      this.die();
+    constructor() {
+        super();
+        this.set_objects(['eq/lv0/cloth', 1, 1]);
+        this.skill_map(
+            ['dodge', 200],
+            ['parry', 200],
+            ['force', 200],
+            ['unarmed', 200],
+            ['houquan', 200, 'unarmed'],
+            ['yunlongshenfa', 200, 'dodge'],
+            ['yunlongxinfa', 200, 'force'],
+        );
+        this.set_drop(
+            {
+                obj: ['eq/lv1/xk_cloth', 'eq/lv1/xk_shoes'],
+                odds: 5000,
+            },
+            {
+                obj: ['eq/lv1/xk_head', 'eq/lv1/qingmu'],
+                odds: 500,
+            },
+        );
     }
-  }
 
-  on_died(killer: USER, corpse: CORPSE) {
-    if (killer) corpse.items = null;
-    else {
-      corpse.no_alloc = true;
-      corpse.query_items = this.query_items;
-      corpse.clear_items = this.clear_items;
+    on_enter(me: USER) {
+        if (me.is_player) {
+            this.die();
+        }
     }
-  }
 
-  owner: string | null = null;
+    on_died(killer: USER, corpse: CORPSE) {
+        if (killer) corpse.items = null;
+        else {
+            corpse.no_alloc = true;
+            corpse.query_items = this.query_items;
+            corpse.clear_items = this.clear_items;
+        }
+    }
 
-  query_items(eny: USER) {
-    let items = this.items as OBJ[];
-    if (!items || !items.length) return;
-    if (this.owner) {
-      if (this.owner === eny.id) return items;
-      return;
-    }
-    let count = eny.query_temp("hy_ct", 0);
-    if (count > 0) {
-      this.owner = eny.id;
-      return items;
-    }
-    return;
-  }
+    owner: string | null = null;
 
-  clear_items(eny: USER) {
-    this.items = null;
-    if (this.owner && this.owner === eny.id && eny.query_temp("hy_ct", 0) > 0) {
-      eny.add_exp(0, 10000);
-      eny.add_temp("hy_ct", -1);
-      this.owner = null;
+    query_items(eny: USER) {
+        let items = this.items as OBJ[];
+        if (!items || !items.length) return;
+        if (this.owner) {
+            if (this.owner === eny.id) return items;
+            return;
+        }
+        let count = eny.query_temp('hy_ct', 0);
+        if (count > 0) {
+            this.owner = eny.id;
+            return items;
+        }
+        return;
     }
-  }
+
+    clear_items(eny: USER) {
+        this.items = null;
+        if (this.owner && this.owner === eny.id && eny.query_temp('hy_ct', 0) > 0) {
+            eny.add_exp(0, 10000);
+            eny.add_temp('hy_ct', -1);
+            this.owner = null;
+        }
+    }
 }
