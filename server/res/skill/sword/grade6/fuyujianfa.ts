@@ -120,8 +120,7 @@ export default class extends SKILL {
         if (100 - me.random(100) > rate) return;
         par.diff_fy = 100
     }
-    on_force_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
-        if (par.is_dodged || par.is_parried) return;
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
         if (!target || target.hp <= 0) return;
         const extra_hit = me.query_temp('fyj_r', 0);
         if (!extra_hit) return;
