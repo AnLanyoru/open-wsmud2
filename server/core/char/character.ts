@@ -599,12 +599,12 @@ export class CHARACTER extends ITEM {
     /**
      * 发送消息给自身（不考虑状态）
      */
-    send(_msg: string): void {}
+    send(_msg: string): void { }
 
     /**
      * 发送命令列表（客户端交互菜单）
      */
-    send_commands(...args: string[]): void {}
+    send_commands(...args: string[]): void { }
 
     /**
      * 操作失败通知
@@ -624,7 +624,7 @@ export class CHARACTER extends ITEM {
     /**
      * 角色死亡处理
      */
-    die(_killer?: CHARACTER): boolean | void {}
+    die(_killer?: CHARACTER): boolean | void { }
 
     /**
      * 是否在指定路径的房间
@@ -1290,7 +1290,7 @@ export class CHARACTER extends ITEM {
     /**
      * 增加积分（仅 USER 覆写）
      */
-    add_score(_val: number): void {}
+    add_score(_val: number): void { }
 
     // ================================================================
     // 战斗临时属性
@@ -2887,16 +2887,16 @@ export class CHARACTER extends ITEM {
 
         this.gj = int(
             this.str +
-                ((this.query_prop('gj') + (this.query_prop('str') * this.str) / 10) *
-                    (100 + this.query_prop('gj_per'))) /
-                    100,
+            ((this.query_prop('gj') + (this.query_prop('str') * this.str) / 10) *
+                (100 + this.query_prop('gj_per'))) /
+            100,
         );
         this.fy = int(
             (((this.str + this.con) / 10 +
                 this.query_prop('fy') +
                 (this.query_prop('con') * this.con) / 10) *
                 (100 + this.query_prop('fy_per'))) /
-                100,
+            100,
         );
         this.mz = int(
             ((this.dex / 2 + this.query_prop('mz')) * (100 + this.query_prop('mz_per'))) / 100,
@@ -2904,7 +2904,7 @@ export class CHARACTER extends ITEM {
         this.ds = int(
             ((this.dex / 2 + this.query_prop('ds') + (this.query_prop('dex') * this.dex) / 10) *
                 (100 + this.query_prop('ds_per'))) /
-                100,
+            100,
         );
         if (this.dodge_skill?.on_recount_dodge) {
             this.ds += this.dodge_skill.on_recount_dodge(this);
@@ -2912,7 +2912,7 @@ export class CHARACTER extends ITEM {
         this.zj = int(
             ((this.str / 2 + this.query_prop('zj') + (this.query_prop('str') * this.str) / 10) *
                 (100 + this.query_prop('zj_per'))) /
-                100,
+            100,
         );
         if (this.parry_skill?.on_recount_parry) {
             this.zj += this.parry_skill.on_recount_parry(this);
@@ -2941,11 +2941,11 @@ export class CHARACTER extends ITEM {
     recount_max_hp(): void {
         this.max_hp = int(
             this.con * 5 +
-                ((this.max_mp * this.query_force_rad() +
-                    this.query_prop('max_hp') +
-                    this.query_prop('con') * this.con) *
-                    (100 + this.query_prop('hp_per'))) /
-                    100,
+            ((this.max_mp * this.query_force_rad() +
+                this.query_prop('max_hp') +
+                this.query_prop('con') * this.con) *
+                (100 + this.query_prop('hp_per'))) /
+            100,
         );
         if (this.max_hp < 1) this.max_hp = 1;
         if (this.hp > this.max_hp) this.hp = this.max_hp;
@@ -2986,7 +2986,7 @@ export class CHARACTER extends ITEM {
 
         let attack_msg = par.attack_msg;
         if (attack_msg === undefined) {
-            attack_msg = attackskill!.query_attack_action(this, target);
+            attack_msg = attackskill.query_attack_action(this, target);
         }
         if (par.attack_before) {
             // 独立发送前置消息，避免字符串拼接
@@ -2996,8 +2996,8 @@ export class CHARACTER extends ITEM {
         const weapon_type = par.no_weapon
             ? WEAPON_TYPE.NONE
             : weapon
-              ? weapon.weapon_type
-              : WEAPON_TYPE.NONE;
+                ? weapon.weapon_type
+                : WEAPON_TYPE.NONE;
         if (attack_msg) this.send_combat(attack_msg, target);
 
         // 入口归一化：确保输出属性在此初始化，后续只做覆盖（V8 隐藏类稳定）
@@ -3108,7 +3108,7 @@ export class CHARACTER extends ITEM {
             if (par.is_parried) {
                 this.send_combat(
                     par.parry_msg ||
-                        target.parry_skill.query_parry_action(target, this, weapon_type),
+                    target.parry_skill.query_parry_action(target, this, weapon_type),
                     target,
                 );
                 if (sh > 0) {
@@ -3711,9 +3711,9 @@ function damage_msg(
         me.send_combat(msg, ob);
         me.send_combat(
             '$N对$n造成' +
-                (iscrit
-                    ? '<hir>' + damage + '</hir>点暴击伤害'
-                    : '<wht>' + damage + '</wht>点伤害'),
+            (iscrit
+                ? '<hir>' + damage + '</hir>点暴击伤害'
+                : '<wht>' + damage + '</wht>点伤害'),
             ob,
         );
         return;

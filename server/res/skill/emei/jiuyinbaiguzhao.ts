@@ -70,7 +70,6 @@ export default class extends SKILL {
             name: '风卷残云',
             distime: 18000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 lv = 30 - lv / 100;
