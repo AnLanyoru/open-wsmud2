@@ -27,6 +27,7 @@ import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
+import { encodeBinaryFrame } from '../net-ws.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -772,14 +773,29 @@ export class CHARACTER extends ITEM {
     /** 广播 — combat 过滤（no_mcmsg / no_combatmsg） */
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
+        if (typeof payload !== 'string') {
+            // 二进制路径：预编码 WebSocket 帧一次，所有 socket 复用同一个 Buffer
+            const frame = encodeBinaryFrame(payload);
+            for (let i = 0; i < list.length; i++) {
+                const item: any = list[i];
+                if (!item.is_player || !item.socket) continue;
+                if (item === this || item === target) {
+                    if (!item.query_setting('no_mcmsg'))
+                        item.socket.write(frame);
+                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
+                    item.socket.write(frame);
+                }
+            }
+            return;
+        }
         for (let i = 0; i < list.length; i++) {
             const item: any = list[i];
             if (!item.is_player) continue;
             if (item === this || item === target) {
                 if (!item.query_setting('no_mcmsg'))
-                    typeof payload === 'string' ? item.notify(payload) : item.sendBinary?.(payload);
+                    item.notify(payload);
             } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                typeof payload === 'string' ? item.notify(payload) : item.sendBinary?.(payload);
+                item.notify(payload);
             }
         }
     }
@@ -791,17 +807,28 @@ export class CHARACTER extends ITEM {
         excludeself?: boolean,
     ): void {
         const list = this.environment!.items;
+        if (typeof payload !== 'string') {
+            // 二进制路径：预编码 WebSocket 帧一次，所有 socket 复用同一个 Buffer
+            const frame = encodeBinaryFrame(payload);
+            for (let i = 0; i < list.length; i++) {
+                const item: any = list[i];
+                if (!item.is_player || !item.socket) continue;
+                if (item === this) {
+                    if (!excludeself)
+                        item.socket.write(frame);
+                } else if (!item.no_message) {
+                    item.socket.write(frame);
+                }
+            }
+            return;
+        }
         for (let i = 0; i < list.length; i++) {
             if (!list[i].is_player) continue;
             if (list[i] === this) {
                 if (!excludeself)
-                    typeof payload === 'string'
-                        ? list[i].notify(payload)
-                        : (list[i] as any).sendBinary?.(payload);
+                    list[i].notify(payload);
             } else if (!list[i].no_message) {
-                typeof payload === 'string'
-                    ? list[i].notify(payload)
-                    : (list[i] as any).sendBinary?.(payload);
+                list[i].notify(payload);
             }
         }
     }
@@ -2674,6 +2701,107 @@ export class CHARACTER extends ITEM {
                     player.send(str + '}');
                 }
             }
+        }
+    }
+
+    /**
+     * create_id() = 4 随机字符(idstr 索引, 各6bit) + hex 时间戳
+     * → 编码为 [前4字符_24bit_BE][时间戳_int32_BE] = 固定 7 字节
+     */
+    static readonly STAT_ID_BYTES = 7;
+    /** create_id() 使用的字符集，与 UTIL.idstr 一致 */
+    static readonly ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+
+    /** 将 create_id() 字符串编码为固定 7 字节 Buffer */
+    private static _pack_id(id: string): Buffer {
+        const buf = Buffer.alloc(7);
+        // 前 4 字符 → 6-bit 索引打包为 24-bit BE
+        let packed = 0;
+        for (let i = 0; i < 4; i++) {
+            packed = (packed << 6) | CHARACTER.ID_CHARS.indexOf(id[i]);
+        }
+        buf[0] = (packed >> 16) & 0xFF;
+        buf[1] = (packed >> 8) & 0xFF;
+        buf[2] = packed & 0xFF;
+        // 剩余字符 → hex 时间戳 int32 BE
+        buf.writeInt32BE(parseInt(id.slice(4), 16) || 0, 3);
+        return buf;
+    }
+
+    /**
+     * 通知房间内玩家 HP / MP 变化 (二进制最小带宽版本)
+     *
+     * 二进制格式 (大端序):
+     *   [0]      0x53      消息类型 ('S' = Status)
+     *   [1]      flags     位掩码: 0x01=hp, 0x02=max_hp, 0x04=mp, 0x08=max_mp, 0x10=damage
+     *   [2..8]   id        数值编码的玩家 ID (固定 7 字节):
+     *                        [0..2] 前4字符 24-bit BE (每字符 6-bit idstr 索引)
+     *                        [3..6] hex 时间戳 int32 BE
+     *   [9..]    values    按 flags 顺序排列的 float64 BE 值 (一个 flag 位 = 8 字节)
+     *
+     * 全量更新: 9 + 4×8 = 41 字节 (文本版 ~72 字节，节省 ~43%)
+     * 部分 hp:  9 + 8   = 17 字节
+     *
+     * 客户端解码:
+     *   const dv = new DataView(buf);
+     *   const flags = dv.getUint8(1);
+     *   const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+     *   const first4 = (buf[2]<<16)|(buf[3]<<8)|buf[4];
+     *   const id = ID_CHARS[first4>>18&63]+ID_CHARS[first4>>12&63]
+     *            +ID_CHARS[first4>>6&63]+ID_CHARS[first4&63]
+     *            +dv.getInt32(5).toString(16);
+     *   let off = 9;
+     *   if (flags & 0x01) { hp    = dv.getFloat64(off); off += 8; }
+     *   if (flags & 0x02) { maxHp = dv.getFloat64(off); off += 8; }
+     *   if (flags & 0x04) { mp    = dv.getFloat64(off); off += 8; }
+     *   if (flags & 0x08) { maxMp = dv.getFloat64(off); off += 8; }
+     *   if (flags & 0x10) { dmg   = dv.getFloat64(off); off += 8; }
+     */
+    notify_hp_b(type?: string, val?: number): void {
+        if (!this.environment) return;
+
+        // 构建 flags 和基础 values
+        let baseFlags = 0;
+        let baseValues: number[] = [];
+        if (type) {
+            if (type === 'hp') {
+                baseFlags = 0x01;
+            } else {
+                baseFlags = 0x04; // mp
+            }
+            baseValues.push(val!);
+        } else {
+            baseFlags = 0x0F; // hp | max_hp | mp | max_mp
+            baseValues.push(this.hp, this.max_hp, this.mp, this.max_mp);
+        }
+        const showdamage = type ? type === 'hp' : false;
+
+        const idBuf = CHARACTER._pack_id(this.id);
+
+        const items = this.environment.items;
+        for (let i = 0; i < items.length; i++) {
+            const player = items[i];
+            if (!player.check_player()) continue;
+
+            let flags = baseFlags;
+            let damage = 0;
+            if (showdamage && this.damages && player.query_setting('show_damage')) {
+                flags |= 0x10;
+                damage = this.damages?.[player.id] || 0;
+            }
+
+            const valCount = baseValues.length + (flags & 0x10 ? 1 : 0);
+            const msg = Buffer.alloc(9 + valCount * 8);
+            msg[0] = 0x53;
+            msg[1] = flags;
+            idBuf.copy(msg, 2);
+            let pos = 9;
+            for (let v = 0; v < baseValues.length; v++, pos += 8)
+                msg.writeDoubleBE(baseValues[v], pos);
+            if (flags & 0x10)
+                msg.writeDoubleBE(damage, pos);
+
+            (player as any).sendBinary?.(msg);
         }
     }
 
