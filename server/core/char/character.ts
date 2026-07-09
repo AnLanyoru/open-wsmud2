@@ -2777,31 +2777,48 @@ export class CHARACTER extends ITEM {
         const showdamage = type ? type === 'hp' : false;
 
         const idBuf = CHARACTER._pack_id(this.id);
-
         const items = this.environment.items;
-        for (let i = 0; i < items.length; i++) {
-            const player = items[i];
-            if (!player.check_player()) continue;
 
-            let flags = baseFlags;
-            let damage = 0;
-            if (showdamage && this.damages && player.query_setting('show_damage')) {
-                flags |= 0x10;
-                damage = this.damages?.[player.id] || 0;
+        // 构建公共 msg（不带 damage）并预编码 WebSocket 帧
+        const commonLen = 9 + baseValues.length * 8;
+        const commonMsg = Buffer.alloc(commonLen);
+        commonMsg[0] = 0x53;
+        commonMsg[1] = baseFlags;
+        idBuf.copy(commonMsg, 2);
+        let cpos = 9;
+        for (let v = 0; v < baseValues.length; v++, cpos += 8)
+            commonMsg.writeDoubleBE(baseValues[v], cpos);
+        const commonFrame = encodeBinaryFrame(commonMsg);
+
+        // 无 showdamage 或没有伤害数据：所有玩家复用同一帧
+        if (!showdamage || !this.damages) {
+            for (let i = 0; i < items.length; i++) {
+                const player: any = items[i];
+                if (!player.check_player() || !player.socket) continue;
+                player.socket.write(commonFrame);
             }
+            return;
+        }
 
-            const valCount = baseValues.length + (flags & 0x10 ? 1 : 0);
-            const msg = Buffer.alloc(9 + valCount * 8);
-            msg[0] = 0x53;
-            msg[1] = flags;
-            idBuf.copy(msg, 2);
-            let pos = 9;
-            for (let v = 0; v < baseValues.length; v++, pos += 8)
-                msg.writeDoubleBE(baseValues[v], pos);
-            if (flags & 0x10)
-                msg.writeDoubleBE(damage, pos);
-
-            (player as any).sendBinary?.(msg);
+        // showdamage 模式：大部分玩家用公共帧，show_damage 玩家单独构建含 damage 的帧
+        const dmgLen = commonLen + 8;
+        const damages = this.damages;
+        for (let i = 0; i < items.length; i++) {
+            const player: any = items[i];
+            if (!player.check_player() || !player.socket) continue;
+            if (player.query_setting('show_damage')) {
+                const msg = Buffer.alloc(dmgLen);
+                msg[0] = 0x53;
+                msg[1] = baseFlags | 0x10;
+                idBuf.copy(msg, 2);
+                let pos = 9;
+                for (let v = 0; v < baseValues.length; v++, pos += 8)
+                    msg.writeDoubleBE(baseValues[v], pos);
+                msg.writeDoubleBE(damages[player.id] || 0, pos);
+                player.socket.write(encodeBinaryFrame(msg));
+            } else {
+                player.socket.write(commonFrame);
+            }
         }
     }
 
