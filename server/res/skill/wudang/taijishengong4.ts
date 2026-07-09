@@ -122,7 +122,7 @@ export default class extends SKILL {
                 }
             },
             query_desc: function (_me: CHARACTER, _lv: number): string {
-                return '上善若水，水利万物而不争，处众人之所恶，故几于道。将自身气血内力尽复旧观，并涤除一切异常状态，如清泉洗尘，复还本来面目。';
+                return '上善若水，水利万物而不争，将自身气血内力重置，并清除异常状态。';
             },
         },
     };
