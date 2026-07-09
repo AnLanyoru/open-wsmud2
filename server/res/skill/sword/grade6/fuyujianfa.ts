@@ -67,7 +67,7 @@ export default class extends SKILL {
                 );
                 var time = calcJiangangTime(lv);
                 me.add_status({
-                    id: 's_rain',
+                    id: 'weapon',
                     name: '剑雨',
                     duration: time,
                     on_attach(me) {
@@ -91,36 +91,20 @@ export default class extends SKILL {
             enable_skill: 'sword',
             mp: 1140,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var time = calcJiangangTime(lv);
+                const bounsDmg = 2 + int(lv/1000)
+                me.set_temp('fyj_g', 1, 100)
                 me.send_room(
-                    '<hiw>$N深吸一口气，$w骤然爆发出万丈剑罡，剑气如实质般凝结，天地为之色变！</hiw>\n',
+                    '<hiw>$N深吸一口气，$w骤然爆发出万丈剑罡，剑气如实质般凝结，一股可怖的罡气直冲$n面门！</hiw>\n',
                     target,
                 );
-                me.add_status({
-                    id: 'weapon',
-                    name: '剑罡',
-                    duration: time,
-                    prop: {
-                        mz_per: 100,
-                        add_sh_per: 100,
-                    },
-                    on_attach(me) {
-                        me.set_temp('fyj_g', 1, time)
-                    },
-                    on_expire(me) {
-                        me.remove_temp('fyj_g')
-                    },
-                    start_msg: '<hiw>$N周身剑罡爆射，光芒万丈，剑气纵横！</hiw>',
-                    desc: '覆雨剑法之剑罡，命中和伤害大幅提升，必定穿透防御',
-                });
+                me.do_attack({
+                target,
+                gj: me.gj * bounsDmg,
+                mz: me.mz * 2,
+            })
             },
-            query_desc: function (me: CHARACTER, lv: number) {
-                var time = calcJiangangTime(lv);
-                return (
-                    '极致的剑法，大幅度增加命中和伤害，必定触发穿透，持续' +
-                    toSec(int(time)) +
-                    '秒。'
-                );
+            query_desc: function (_me: CHARACTER, _lv: number) {
+                return '极致的剑法，大幅度增加命中和伤害，必定触发穿透';
             },
         },
     };
