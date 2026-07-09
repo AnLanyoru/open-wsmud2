@@ -62,15 +62,22 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var count = calcJianyuCount(lv);
                 me.send_room(
-                    '<hib>$N$w一引，剑光化作漫天细雨，绵绵密密，无孔不入地向$n笼罩而去！</hib>\n',
+                    '<hib>$N$w一引，剑光化作漫天细雨，绵绵密密，无孔不入。</hib>\n',
                     target,
                 );
-                for (var i = 0; i < count; i++) {
-                    me.do_attack({
-                        target: target,
-                        attack_msg: '<hib>剑雨如丝，绵绵不绝地洒向$n</hib>',
-                    });
-                }
+                var time = calcJiangangTime(lv);
+                me.add_status({
+                    id: 's_rain',
+                    name: '剑雨',
+                    duration: time,
+                    on_attach(me) {
+                        me.set_temp('fyj_r', count, time)
+                    },
+                    on_expire(me) {
+                        me.remove_temp('fyj_r')
+                    },
+                    desc: '覆雨剑法之剑雨，攻击变为多次，增加穿透防御的几率',
+                });
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
@@ -94,9 +101,14 @@ export default class extends SKILL {
                     name: '剑罡',
                     duration: time,
                     prop: {
-                        mz_per: 50,
-                        add_sh_per: 50,
-                        diff_fy_per: 100,
+                        mz_per: 100,
+                        add_sh_per: 100,
+                    },
+                    on_attach(me) {
+                        me.set_temp('fyj_g', 1, time)
+                    },
+                    on_expire(me) {
+                        me.remove_temp('fyj_g')
                     },
                     start_msg: '<hiw>$N周身剑罡爆射，光芒万丈，剑气纵横！</hiw>',
                     desc: '覆雨剑法之剑罡，命中和伤害大幅提升，必定穿透防御',
@@ -112,10 +124,38 @@ export default class extends SKILL {
             },
         },
     };
+
+    on_before_attack(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
+        let rate = 1 + (me.query_skill('fuyujianfa') / 200)
+        if (me.query_temp('fyj_r', 0)) {
+            rate *= 2
+        }
+        if (me.query_temp('fyj_g', 0)){
+            rate = 100
+        }
+        if (100 - me.random(100) > rate) return;
+        par.diff_fy = 100
+    }
+    on_force_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
+        if (par.is_dodged || par.is_parried) return;
+        if (!target || target.hp <= 0) return;
+        const extra_hit = me.query_temp('fyj_r', 0);
+        if (!extra_hit) return;
+        for (let i = 0; i < extra_hit; i++) {
+            if (target.hp <= 0) break;
+            me.do_attack({
+                target,
+                gj: me.gj,
+                mz: me.mz,
+                no_append: true,
+                attack_msg: '<hir>· · · · · 剑雨落下 · · · · ·</hir>',
+            });
+        }
+    }
 }
 
 function calcJianyuCount(lv: number): number {
-    const c = 5 + Math.floor(lv / 150);
+    const c = 2 + Math.floor(lv / 1000);
     if (c > 12) return 12;
     return c;
 }

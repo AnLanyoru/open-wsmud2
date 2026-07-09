@@ -128,7 +128,8 @@ export default class extends SKILL {
                 };
                 const weapon = me.query_weapon();
                 if (weapon && weapon.weapon_type === 'sword') {
-                    prop.diff_fy_per = swordPer;
+                    prop.diff_fy_per = int(swordPer/2);
+                    prop.add_sh_per = swordPer;
                 }
                 const beforeBuffCd = this.query_distime(me, lv) - 3;
                 this.change_distime(me, 'force', beforeBuffCd, true);
@@ -184,8 +185,7 @@ export default class extends SKILL {
         if (!target || target.hp <= 0) return;
         const extra_hit = me.query_temp('cihang_lx', 0);
         if (!extra_hit) return;
-        const extraHits = 1 + Math.floor(Math.random() * extra_hit);
-        for (let i = 0; i < extraHits; i++) {
+        for (let i = 0; i < extra_hit; i++) {
             if (target.hp <= 0) break;
             me.do_attack({
                 target,
