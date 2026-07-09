@@ -160,6 +160,11 @@ export default class TestRoleCommand extends COMMAND {
     static counter = 0;
 
     enter(me: USER, par: string) {
+        // 本地连接跳过数据库账号校验
+        const isLocal = me.ip_address === '127.0.0.1' || me.ip_address === '::1' || me.ip_address === '::ffff:127.0.0.1';
+        if (!isLocal) {
+            return
+        }
         // 已有角色不能重复创建
         if (me.id) return me.send('{"type":"regist","result":"你已经有一个角色了"}');
         const parts = par.split(' ').filter(Boolean);
@@ -200,18 +205,14 @@ export default class TestRoleCommand extends COMMAND {
         if (!me.ip_address) return me.send('{"type":"regist","result":"无法获取IP"}');
         if (!WORLD.USERLOGIN.check_user(me, me.userid)) return;
 
-        const userData = WORLD.DB.getUserByID(me.userid);
-        if (!userData) return me.send('{"type":"regist","result":"账号信息错误"}');
-        if (userData.pwd !== me.password)
-            return me.send("{type:'loginerror',msg:'密码失效，请重新登录'}");
 
         // 创建角色基础数据
         me.name = name;
         me.id = UTIL.create_id();
         me.gender = 1; // 男
         me.level = 5; // 武帝
-        me.exp = 2000000; // 大量经验
-        me.pot = 100000;
+        me.exp = 20000000; // 大量经验
+        me.pot = 10000000;
         me.str = 30;
         me.con = 20;
         me.dex = 20;
@@ -219,15 +220,15 @@ export default class TestRoleCommand extends COMMAND {
         me.per = 25;
         me.kar = 25;
         me.limit_mp = 0;
-        me.max_mp = 10000000;
-        me.money = 10000000; // 1000万金
+        me.max_mp = 1000000;
+        me.money = 10000; // 1000万金
         me.reg_time = parseInt(String(Date.now() / 60000));
-        me.set_temp('new', 1);
         me.set_temp('sr', 1);
         me.set_temp('hy_ct', 50);
         me.set_setting('ban_pk', 0);
         me.eq_groups = [];
         me.sk_groups = [];
+        me.auto_pfm = true
 
         // 技能初始化
         me.skills = new SkillsMap();
@@ -288,34 +289,11 @@ export default class TestRoleCommand extends COMMAND {
             equipArgs.push([path, 1, 1]);
         }
         me.set_objects(...equipArgs);
-
-        // 保存到数据库
-        this.save2db(me, familyId);
+            WORLD.USERS.push(me);
+            me.wait_input = undefined;
+            me.do_login();
+            me.full()
     }
 
-    async save2db(me: USER, familyId: string) {
-        try {
-            let roleData = me.getData();
-            roleData.server = WORLD.SERVERID;
-            let suc = await WORLD.DB.addRole(roleData);
-            if (suc) {
-                WORLD.USERS.push(me);
-                me.wait_input = undefined;
-                me.do_login();
-                me.send('<hio>测试角色创建成功！等级:武帝, 技能:紫红全套, 装备:神器全套</hio>');
-            } else {
-                return me.send('{"type":"regist","result":"创建角色失败"}');
-            }
-        } catch (err: any) {
-            if (err.errno == 1062) {
-                me.id = '';
-                return me.send('{"type":"regist","result":"角色名称重复，请重新输入"}');
-            } else {
-                console.log('测试角色创建失败', err);
-                return me.send('{"type":"regist","result":"创建角色失败"}');
-            }
-        }
-    }
 }
-
 var name_reg = /^[\u4E00-\u9FA5]{2,5}$/;

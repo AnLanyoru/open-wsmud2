@@ -115,14 +115,34 @@ const USERLOGIN = {
         if (user.userid) {
             return this.login_error(user, '参数错误');
         }
-        // 防止同一 socket 并发鉴权导致会话数据被覆盖（串号）
         if (user._authing) {
             return this.login_error(user, '登录验证进行中，请稍后重试。', false);
         }
         user._authing = true;
 
         try {
+            const remoteIP: string = user.socket?.remoteAddress ?? '';
+            const isLocalhost = remoteIP === '127.0.0.1' || remoteIP === '::1' || remoteIP === '::ffff:127.0.0.1';
+
             const parts = str.split(' ');
+
+            // 本地连接 + localhost 用户名：提前跳过，不检查 session 格式
+            if (isLocalhost && parts.length >= 2) {
+                const cookieUser = this.encryptUser(parts[0], parts[1]);
+                if (cookieUser && cookieUser.name.startsWith('localhost')) {
+                    user.userid = -1;
+                    user.user_level = 0;
+                    user.password = '';
+                    user.loginTime = Date.now();
+                    user.ip_address = remoteIP;
+                    user.serverid = WORLD.SERVERID;
+                    (user as any)._local = true;
+                    user.wait_input = null;
+                    user.send("{type:'roles',roles:[]}");
+                    user.wait_input = this.wait_login;
+                    return;
+                }
+            }
 
             if (parts.length < 2) {
                 return this.login_error(user, '参数错误');
@@ -135,6 +155,7 @@ const USERLOGIN = {
                     `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
                 );
             }
+
             let dbUser;
             try {
                 dbUser = await WORLD.DB.getUserByID(cookieUser.id);
@@ -153,7 +174,7 @@ const USERLOGIN = {
             user.userid = dbUser.id;
             user.password = cookieUser.pwd;
             user.loginTime = cookieUser.loginTime;
-            user.ip_address = user.socket?.remoteAddress ?? '';
+            user.ip_address = remoteIP;
 
             if (cookieUser.id !== WORLD.admin_user) {
                 if (WORLD.CONNECT_COUNT > WORLD.max_connect_count) {

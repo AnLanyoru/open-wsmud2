@@ -18,7 +18,11 @@ export default class extends COMMAND {
         if (me.environment?.no_fight) {
             return me.notify('这里不允许战斗。');
         }
-        var target = me.find_obj(argid, me.environment);
+        if (argid === 'random') {
+            var target = me.environment?.items.random();
+        } else {
+            var target = me.find_obj(argid, me.environment);
+        }
         if (!target || !target.check_character() || !target.do_kill) {
             return me.notify('你要攻击谁？');
         }

@@ -1036,6 +1036,7 @@ class World {
         const roles: any[] = [];
         for (let i = 0; i < this.USERS.length; i++) {
             if (this.USERS[i].serverid !== this.SERVERID) continue;
+            if ((this.USERS[i] as any)._local) continue;  // 跳过本地测试用户
             roles.push(this.USERS[i].getData());
         }
         try {
