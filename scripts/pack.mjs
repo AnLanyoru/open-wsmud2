@@ -504,6 +504,37 @@ ${serverLines.join('\n')}
     console.log(`[pack]   Replaced ${replacedRoom} send_room + ${replacedCombat} send_combat + ${replacedStatus} status_msg + ${replacedAction} actions in ${replacedFiles} files`);
 
     // ============================================================
+    // notify_hp → notify_hp_b: 二进制模式 HP/MP 通知走二进制通道
+    // ============================================================
+
+    let replacedHp = 0;
+    let hpChangedFiles = 0;
+
+    function replaceNotifyHp(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                replaceNotifyHp(full);
+            } else if (entry.name.endsWith('.js') && entry.name !== 'templates-build.js') {
+                const content = fs.readFileSync(full, 'utf8');
+                const count = (content.match(/\.notify_hp\(/g) || []).length;
+                if (count > 0) {
+                    const newContent = content.replace(/\.notify_hp\(/g, '.notify_hp_b(');
+                    fs.writeFileSync(full, newContent);
+                    replacedHp += count;
+                    hpChangedFiles++;
+                }
+            }
+        }
+    }
+
+    replaceNotifyHp(CORE_DIR);
+    replaceNotifyHp(RES_DIR);
+    console.log(`[pack]   Replaced ${replacedHp} notify_hp → notify_hp_b in ${hpChangedFiles} files`);
+
+    // ============================================================
     // Pass 3: 验证 — 列出未被替换的字面量（可能是正则边缘情况）
     // ============================================================
 
