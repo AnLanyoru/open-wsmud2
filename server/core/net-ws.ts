@@ -561,12 +561,12 @@ function readHeader(data: Buffer): Record<string, string> {
 // ============================================================
 
 /**
- * 发送原始 WebSocket 帧（无 mask，服务端到客户端）
- * @param socket   - 目标 socket
- * @param opcode   - 帧操作码
- * @param payload  - 载荷数据
+ * 将 payload 编码为完整的 WebSocket 二进制帧（无 mask，服务端→客户端），
+ * 返回的 Buffer 可直接写入任意多个 socket，避免重复编码。
+ * @param payload - 载荷数据
+ * @param opcode   - 帧操作码，默认 Binary (0x2)
  */
-function writeRawFrame(socket: WsSocket, opcode: number, payload: Buffer): void {
+export function encodeBinaryFrame(payload: Buffer, opcode: number = FrameTypes.Binary): Buffer {
     const length = payload.length;
     let data: Buffer;
     if (length < 126) {
@@ -588,7 +588,17 @@ function writeRawFrame(socket: WsSocket, opcode: number, payload: Buffer): void 
         data.writeUInt32BE(length, 6);
         payload.copy(data, 10);
     }
-    socket.write(data);
+    return data;
+}
+
+/**
+ * 发送原始 WebSocket 帧（无 mask，服务端到客户端）
+ * @param socket   - 目标 socket
+ * @param opcode   - 帧操作码
+ * @param payload  - 载荷数据
+ */
+function writeRawFrame(socket: WsSocket, opcode: number, payload: Buffer): void {
+    socket.write(encodeBinaryFrame(payload, opcode));
 }
 
 /**
