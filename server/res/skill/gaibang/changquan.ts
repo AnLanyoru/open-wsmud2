@@ -69,7 +69,6 @@ export default class extends SKILL {
             name: '太祖八式',
             distime: 16000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             release_time: 8000,
             use: function (this: PERFORM, me: CHARACTER, target: CHARACTER, lv: number) {

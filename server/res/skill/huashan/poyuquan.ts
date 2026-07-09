@@ -33,7 +33,6 @@ export default class extends SKILL {
             name: '破玉',
             distime: 16000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.do_attack({
@@ -65,7 +64,6 @@ export default class extends SKILL {
             name: '劈石',
             distime: 38000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 25,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 let par: DoAttackPar = {

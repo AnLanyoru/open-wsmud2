@@ -64,7 +64,6 @@ export default class extends SKILL {
         zhen: {
             name: '震字决',
             distime: 15000,
-            weapon_type: WEAPON_TYPE.UNARMED,
             enable_skill: 'unarmed',
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {

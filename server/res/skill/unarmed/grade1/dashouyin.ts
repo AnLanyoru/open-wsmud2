@@ -48,7 +48,6 @@ export default class extends SKILL {
             name: '金刚印',
             distime: 16000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var lv2 = me.query_skill('mizongxinfa', 0);

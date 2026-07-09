@@ -61,8 +61,6 @@ export const EQUIP_TYPE = {
 export const WEAPON_TYPE = {
     /** 空手（无武器） */
     NONE: 'unarmed',
-    /** 拳脚（有武器） */
-    UNARMED: undefined,
     /** 剑 */
     SWORD: 'sword',
     /** 刀 */

@@ -32,7 +32,6 @@ export default class extends SKILL {
             name: '佛光普照',
             distime: 6000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var sh = me.gj + (100 + lv * parseInt(lv / 500 + 1));

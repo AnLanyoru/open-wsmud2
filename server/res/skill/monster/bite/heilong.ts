@@ -34,7 +34,6 @@ export default class extends SKILL {
             name: '黑龙吐水',
             distime: 30000,
             enable_skill: 'bite',
-            weapon_type: WEAPON_TYPE.UNARMED,
             release_time: 0,
             mp: 30,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -71,7 +70,6 @@ export default class extends SKILL {
             name: '撕咬',
             distime: 7000,
             enable_skill: 'bite',
-            weapon_type: WEAPON_TYPE.UNARMED,
             release_time: 3000,
             mp: 25,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {

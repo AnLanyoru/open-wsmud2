@@ -30,7 +30,6 @@ export default class extends SKILL {
             name: '撕咬',
             distime: 7000,
             enable_skill: 'bite',
-            weapon_type: WEAPON_TYPE.UNARMED,
             release_time: 3000,
             mp: 10,
             attack_msgs: [

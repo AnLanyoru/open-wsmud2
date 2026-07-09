@@ -63,7 +63,6 @@ export default class extends SKILL {
             name: '锁龙',
             distime: 32000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             distime_per_key: 'qlz_cd',
             mp: 30,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {

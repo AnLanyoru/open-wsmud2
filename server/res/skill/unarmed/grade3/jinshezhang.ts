@@ -50,7 +50,6 @@ export default class extends SKILL {
             name: '金龙升天',
             distime: 26000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = 100 + parseInt(lv / 100) + me.query_prop('jsys_sh');

@@ -44,7 +44,6 @@ export default class extends SKILL {
             name: '惊魔一指',
             distime: 30000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const bonusMZ: number = me.query_prop('yizhi_mz');

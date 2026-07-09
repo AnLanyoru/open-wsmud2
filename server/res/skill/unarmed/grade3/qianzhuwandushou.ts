@@ -48,7 +48,6 @@ export default class extends SKILL {
             name: '千蛛万毒',
             distime: 36000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 if (

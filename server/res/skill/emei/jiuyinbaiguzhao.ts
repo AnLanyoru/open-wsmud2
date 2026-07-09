@@ -30,7 +30,6 @@ export default class extends SKILL {
             name: '夺命',
             distime: 18000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var gj = (me.gj * (200 + lv / 10)) / 100;

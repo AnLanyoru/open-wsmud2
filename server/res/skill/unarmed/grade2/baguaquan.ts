@@ -46,7 +46,6 @@ export default class extends SKILL {
             name: '震字诀',
             distime: 20000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var t = 10 + parseInt(lv / 100);

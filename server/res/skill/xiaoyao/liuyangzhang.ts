@@ -35,7 +35,6 @@ export default class extends SKILL {
             name: '生死符',
             distime: 30000,
             enable_skill: 'unarmed',
-            weapon_type: WEAPON_TYPE.UNARMED,
             mp: 20,
             release_time: 8000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {

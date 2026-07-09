@@ -44,10 +44,19 @@ export default class extends SKILL {
         luo: {
             name: '落花',
             distime: 20000,
-            enable_skill: 'sword',
             mp: 25,
-            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                me.send_room('<hiy>$N手中$W一抖，幻出万点星光，如朵朵落花般撒向$n</hiy>', target);
+            use: function (me: CHARACTER, target: CHARACTER, lv: number, type): void {
+                let is_throwing = type !== 'sword';
+                if (is_throwing)
+                    me.send_room(
+                        '<hiy>$N手中$T一抖，幻出万点星光，如朵朵落花般撒向$n</hiy>',
+                        target,
+                    );
+                else
+                    me.send_room(
+                        '<hiy>$N手中$W一抖，幻出万点星光，如朵朵落花般撒向$n</hiy>',
+                        target,
+                    );
                 const count: number = Math.min(10, 1 + int(me.bj / 5));
                 for (let i = 0; i < count; i++) {
                     me.do_attack({
@@ -56,6 +65,7 @@ export default class extends SKILL {
                         gj: me.gj,
                         mz: me.mz,
                         no_append: true,
+                        is_throwing
                     });
                 }
                 me.end_attack(target);
@@ -67,7 +77,7 @@ export default class extends SKILL {
         wu: {
             name: '定影',
             distime: 30000,
-            enable_skill: 'sword',
+            enable_skill: 'throwing',
             mp: 20,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
