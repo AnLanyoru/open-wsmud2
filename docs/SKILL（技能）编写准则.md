@@ -18,3 +18,5 @@
 当进阶效果影响状态的属性时，若未进阶情况下没有该数值，则应提取prop: PropMap = {}来动态赋值，而不是让0值显示
 
 注意在技能介绍中，毫秒转化为秒展示时，通常使用全局挂载的函数toSec将毫秒变为秒为单位的显示字符串数字（没有秒字），并且框架会自动添加冷却和内力消耗展示，不要重复添加，取数字整数使用全局挂载的int函数
+
+**战斗动作字符串换行约定：** `dodge_actions`、`parry_actions`、`weapon_vs_weapon_actions`、`weapon_vs_unarmed_actions`、`unarmed_vs_weapon_actions` 中的每条消息必须以 `\n` 结尾（引擎不再在 `send_combat` 处自动追加换行）。`attack_actions` 和 `attack_msg` 等攻击类消息不需要手动加 `\n`。
