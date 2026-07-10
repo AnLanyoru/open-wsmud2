@@ -208,7 +208,7 @@ export default class extends SKILL {
                             i === 0
                                 ? '<hio>$N的魔刀挟毁天灭地之势斩落，$n但觉眼前一片血芒，避无可避！</hio>'
                                 : undefined,
-                        attack_before: i > 0 ? '<hio>刀势未尽，紧跟着</hio>' : undefined,
+                        attack_before: i > 0 ? _tmpl('<hio>刀势未尽，紧跟着</hio>\n') : undefined,
                     });
                     totalDamage += sh;
                 }

@@ -137,7 +137,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_before: i > 0 ? '<hiw>紧跟着</hiw>' : undefined,
+                        attack_before: i > 0 ? _tmpl('<hiw>紧跟着</hiw>\n') : undefined,
                     });
                     totalDamage += sh;
                 }

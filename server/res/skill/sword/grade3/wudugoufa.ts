@@ -73,7 +73,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_before: i > 0 ? '<MAG>钩势未衰，紧跟着又是一钩</MAG>' : undefined,
+                        attack_before: i > 0 ? _tmpl('<MAG>钩势未衰，紧跟着又是一钩</MAG>\n') : undefined,
                     });
                 }
                 me.end_attack(target);

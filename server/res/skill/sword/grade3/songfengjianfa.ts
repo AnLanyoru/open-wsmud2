@@ -70,7 +70,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_before: i > 0 ? '<HIG>松风未止，紧跟着又是一剑</HIG>' : undefined,
+                        attack_before: i > 0 ? _tmpl('<HIG>松风未止，紧跟着又是一剑</HIG>\n') : undefined,
                     });
                 }
                 me.set_temp('songfeng', 0);

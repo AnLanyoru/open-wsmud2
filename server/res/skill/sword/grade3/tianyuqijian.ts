@@ -62,7 +62,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_before: i > 0 ? '<HIM>剑花纷飞，紧跟着又是一剑</HIM>' : undefined,
+                        attack_before: i > 0 ? _tmpl('<HIM>剑花纷飞，紧跟着又是一剑</HIM>\n') : undefined,
                     });
                 }
                 me.end_attack(target);

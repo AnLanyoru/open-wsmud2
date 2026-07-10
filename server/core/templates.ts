@@ -111,12 +111,6 @@ export function count(): number {
     return _entries.length;
 }
 
-/**
- * 标记字符串为可预编译模板 — pack.mjs --binary 将 _tmpl('...') 替换为数字 ID。
- * 返回 string，send_combat_b 等内部接受 string|number 并自动兼容 text/binary 模式。
- */
-export function _tmpl(s: string): string { return s; }
-
 /** 导出映射表（用于发送给客户端） */
 export function exportTable(): Record<number, { t: string; m: number }> {
     const out: Record<number, { t: string; m: number }> = {};
@@ -125,3 +119,17 @@ export function exportTable(): Record<number, { t: string; m: number }> {
     }
     return out;
 }
+
+// ============================================================
+// 全局挂载 — 技能文件无需 import
+// ============================================================
+
+/**
+ * 标记字符串为可预编译模板 — pack.mjs --binary 将 _tmpl('...') 替换为数字 ID。
+ */
+function _tmpl(s: string): string { return s; }
+
+declare global {
+    var _tmpl: (s: string) => string;
+}
+globalThis._tmpl = _tmpl;

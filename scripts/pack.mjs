@@ -179,84 +179,38 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique literal templates`);
 
     // ============================================================
-    // Pass 1.5: 收集已知安全上下文中的 $/^ 模板字符串
-    // 只收集以下上下文（与 Pass 2 的替换保持一致）：
-    //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
-    //   2. _DMG_TMPL 的 tmpl 值
-    //   3. _DMG_FALLBACK 值
-    //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+    // Pass 1.5: 简单上下文 — attack_msg / attack_before 直接字符串赋值
     // ============================================================
 
-    const STR_LIT_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
+    const SIMPLE_PROP_RE = /(?:attack_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
 
-    let actionStrCount = 0;
+    console.log('[pack]   Pass 1.5: scanning attack_msg/attack_before literals...');
+    let simpleCount = 0;
 
-    function collectStr(literal) {
-        if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && literal.length >= 4 && !templateMap.has(literal)) {
-            templateMap.set(literal, templateMap.size);
-            actionStrCount++;
-        }
-    }
-
-    function collectActionStrs(dir) {
+    function collectSimple(dir) {
         if (!fs.existsSync(dir)) return;
         const entries = fs.readdirSync(dir, { withFileTypes: true });
         for (const entry of entries) {
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
-                collectActionStrs(full);
+                collectSimple(full);
             } else if (entry.name.endsWith('.js')) {
                 const content = fs.readFileSync(full, 'utf8');
-
-                // 1) action 数组
-                const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
                 let m;
-                while ((m = ACTION_ARR_RE_C.exec(content)) !== null) {
-                    let sm;
-                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
-                        collectStr(unescapeJS(sm[2], sm[1]));
+                while ((m = SIMPLE_PROP_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[2], m[1]);
+                    if (!templateMap.has(literal)) {
+                        templateMap.set(literal, templateMap.size);
+                        simpleCount++;
                     }
-                }
-
-                // 2) _DMG_TMPL 的 tmpl: "..."
-                const DMG_TMPL_RE_C = /tmpl\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
-                while ((m = DMG_TMPL_RE_C.exec(content)) !== null) {
-                    collectStr(unescapeJS(m[2], m[1]));
-                }
-
-                // 3) _DMG_FALLBACK = "..."
-                const DMG_FB_RE_C = /_DMG_FALLBACK\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
-                while ((m = DMG_FB_RE_C.exec(content)) !== null) {
-                    collectStr(unescapeJS(m[2], m[1]));
-                }
-
-                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
-                const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
-                while ((m = MSG_ARR_RE_C.exec(content)) !== null) {
-                    let sm;
-                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
-                        collectStr(unescapeJS(sm[2], sm[1]));
-                    }
-                }
-
-                // 5) DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
-                const PAR_PROP_RE_C = /(attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
-                while ((m = PAR_PROP_RE_C.exec(content)) !== null) {
-                    collectStr(unescapeJS(m[3], m[2]));
-                }
-
-                // 6) _to_b 后缀变量赋值（模板字符串优化标记）
-                const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
-                while ((m = TO_B_RE_C.exec(content)) !== null) {
-                    collectStr(unescapeJS(m[3], m[2]));
                 }
             }
         }
     }
 
-    collectActionStrs(CORE_DIR);
-    collectActionStrs(RES_DIR);
-    console.log(`[pack]   Found ${actionStrCount} action strings (total: ${templateMap.size})`);
+    collectSimple(CORE_DIR);
+    collectSimple(RES_DIR);
+    console.log(`[pack]   Found ${simpleCount} simple props (total: ${templateMap.size})`);
 
     // ============================================================
     // Pass 2: 扫描 _tmpl('...') 标记 — 替换为模板 ID
@@ -368,11 +322,11 @@ ${serverLines.join('\n')}
     }
 
     // ============================================================
-    // Pass 2: 替换 send_room("literal") → send_room_b(id)
+    // Pass 3: 替换 send_room("literal") → send_room_b(id)
     //         替换 send_combat("literal") → send_combat_b(id)
     // ============================================================
 
-    console.log('[pack]   Pass 2: replacing calls...');
+    console.log('[pack]   Pass 3: replacing calls...');
     let replacedFiles = 0;
     let replacedRoom = 0;
     let replacedCombat = 0;

@@ -15,7 +15,7 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FIELD_TO_MASK, FMASK, getMask, popcount, _tmpl } from '../templates.js';
+import { FIELD_TO_MASK, FMASK, getMask, popcount } from '../templates.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -771,16 +771,16 @@ export class CHARACTER extends ITEM {
         const argEnc: Buffer[] = []; // encoded arg bodies
         for (let i = 0; i < argItems.length; i++) {
             const v = argItems[i];
-            if (_isTplRef(v)) {
+            if (Array.isArray(v)) {
                 refMask |= (1 << i);
                 argMask |= (1 << i);
                 // 编码嵌套模板: [refTid uint16][refArgc 1B][refMask 1B][refFloatMask 1B][refArgs...]
-                const tid = v.tmpl;
-                const rargs = v.args;
+                const tid = v[0];
+                const rargc = v.length - 1;
                 let rargMask = 0, rfloatMask = 0;
                 const rargEnc: Buffer[] = [];
-                for (let j = 0; j < rargs.length; j++) {
-                    const rs = rargs[j];
+                for (let j = 0; j < rargc; j++) {
+                    const rs: string = v[j + 1] as string;
                     if (/^\d+$/.test(rs)) {
                         rargMask |= (1 << j);
                         rargEnc.push(this._encodeVarint(parseInt(rs, 10)));
@@ -804,14 +804,14 @@ export class CHARACTER extends ITEM {
                 const rbuf = Buffer.alloc(rtotal);
                 let rpos = 0;
                 rbuf.writeUInt16BE(tid as number, rpos); rpos += 2;
-                rbuf[rpos++] = rargs.length;
+                rbuf[rpos++] = rargc;
                 rbuf[rpos++] = rargMask;
                 rbuf[rpos++] = rfloatMask;
                 for (let j = 0; j < rargEnc.length; j++) {
                     const ab = rargEnc[j];
                     if (rargMask & (1 << j)) {
                         if (rfloatMask & (1 << j)) {
-                            rbuf.writeDoubleBE(parseFloat(rargs[j]), rpos); rpos += 8;
+                            rbuf.writeDoubleBE(parseFloat(v[j + 1] as string), rpos); rpos += 8;
                         } else {
                             ab.copy(rbuf, rpos); rpos += ab.length;
                         }
@@ -1075,7 +1075,6 @@ export class CHARACTER extends ITEM {
         _a4?: string | TplRef,
     ): void {
         if (!this.environment || template_id === undefined) return;
-        // text 模式回退：_tmpl() 未被 pack.mjs 替换时仍为字符串，走 send_msg
         if (typeof template_id === 'string') {
             this.send_msg(template_id, target, flags);
             return;
@@ -1104,6 +1103,7 @@ export class CHARACTER extends ITEM {
         }
         this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4);
     }
+
     send_room(text: string | number, target?: ITEM, excludeself?: boolean): void {
         this.send_msg(text, target, excludeself ? 2 : 0);
     }
@@ -3342,12 +3342,17 @@ export class CHARACTER extends ITEM {
         if (attack_msg === undefined) {
             attack_msg = attackskill.query_attack_action(this, target);
         }
-        if (par.attack_before) {
-            // 独立发送前置消息，避免字符串拼接
-            // text 模式为字符串，binary 模式为模板 ID — send_combat 自动路由
+        if (par.attack_before && attack_msg) {
+            if (typeof (attack_msg as any) === 'number') {
+                this.send_combat_b(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
+            } else {
+                this.send_combat(par.attack_before + attack_msg, target);
+            }
+        } else if (par.attack_before) {
             this.send_combat(par.attack_before, target);
+        } else if (attack_msg) {
+            this.send_combat(attack_msg, target);
         }
-        if (attack_msg) this.send_combat(attack_msg, target);
         const weapon_type = par.no_weapon
             ? WEAPON_TYPE.NONE
             : weapon
@@ -3960,13 +3965,10 @@ function query_status_msg(hp: number, maxhp: number): string {
  * 不含 $ 占位符的模板不会被 pack.mjs 自动扫描，由 _DMG_ZERO 和 _DMG_FALLBACK 单独注册
  * pack.mjs --binary 会将其中含 $ 的 tmpl 字符串替换为模板 ID
  */
-/** 模板引用 — 嵌套模板展开 */
-export interface TplRef {
-    tmpl: string | number;
-    args: string[];
-}
-function _isTplRef(v: any): v is TplRef { return v && typeof v === 'object' && 'tmpl' in v; }
-function _toRef(tmpl: string | number, ...args: string[]): TplRef { return { tmpl, args }; }
+/** 数组 [tmpl, ...args] 作为嵌套模板引用 */
+type TplRef = (string | number)[];
+/** 双槽拼接模板 — pack.mjs 替换为 ID */
+const _TMPL_CONCAT2 = _tmpl('^^');
 
 // 伤害占比模板（原版，^ 传 TplRef 嵌套 damage 显示模板）
 const _DMG_TMPL: Record<string, Array<{ max: number; tmpl: string | number }>> = {
@@ -4043,7 +4045,7 @@ function damage_msg(
     // 自定义消息 — ^ 嵌套 damage 显示模板
     if (msg) {
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat_b(dmgTmpl, ob, _toRef(disp, sh));
+        me.send_combat_b(dmgTmpl, ob, [disp, sh]);
         return;
     }
     // 零伤害
@@ -4072,13 +4074,13 @@ function damage_msg(
     if (buckets) {
         for (let i: number = 0; i < buckets.length; i++) {
             if (ratio < buckets[i].max) {
-                me.send_combat_b(buckets[i].tmpl, ob, _toRef(disp, sh));
+                me.send_combat_b(buckets[i].tmpl, ob, [disp, sh]);
                 return;
             }
         }
     }
     // fallback
-    me.send_combat_b(_DMG_FALLBACK, ob, _toRef(disp, sh));
+    me.send_combat_b(_DMG_FALLBACK, ob, [disp, sh]);
 }
 
 // ================================================================
