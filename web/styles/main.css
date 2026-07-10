@@ -358,6 +358,7 @@
     padding-right: 0.4em;
     margin-bottom: 2px;
     overflow: hidden;
+    vertical-align: middle;
 }
 .room-commands > .act-item > .cd-overlay,
 .combat-commands > .pfm-item > .cd-overlay {
