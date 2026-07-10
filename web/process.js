@@ -575,7 +575,7 @@ function ReceiveMessage(x) {
 // ============================================================
 
 /** 读取嵌套模板引用，递归 format 返回展开字符串 */
-function readTplRef(data, pos) {
+function readTplRef(data, pos, parentMask, parentSparse) {
     const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
     const refArgc = data[pos++];
     const refArgMask = data[pos++];
@@ -598,7 +598,8 @@ function readTplRef(data, pos) {
             pos = r.next;
         }
     }
-    return { str: format(refTid, 0, [], refArgs), next: pos };
+    // 透传父级 mask/sparse — 嵌套模板复用外层帧携带的实体字段
+    return { str: format(refTid, parentMask, parentSparse, refArgs), next: pos };
 }
 
 /** 读取 LEB128 无符号 varint */
@@ -673,7 +674,7 @@ export function ProcessBinary(data) {
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
                     if (refMask & (1 << i)) {
-                        const r = readTplRef(data, pos);
+                        const r = readTplRef(data, pos, mask, sparse);
                         args.push(r.str);
                         pos = r.next;
                     } else if (argMask & (1 << i)) {

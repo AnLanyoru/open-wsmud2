@@ -15,7 +15,7 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FIELD_TO_MASK, FMASK, getMask, popcount } from '../templates.js';
+import { FIELD_TO_MASK, FMASK, get, popcount } from '../templates.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -738,7 +738,23 @@ export class CHARACTER extends ITEM {
         a3?: string | TplRef,
         a4?: string | TplRef,
     ): Buffer {
-        const mask = getMask(template_id);
+        // 从模板 ID 提取 mask 和 pure_id（pack 预编译时编码为 (mask << 16) | pure_id）
+        let mask = template_id >> 16;
+        const pure_id = template_id & 0xFFFF;
+
+        // 预扫描 args，提取 TplRef 的 mask 并 OR 进外层 mask
+        // 确保外层帧携带嵌套模板所需的全部字段
+        const argItems: (string | TplRef)[] = [];
+        if (a1 !== undefined && a1 !== null) argItems.push(a1);
+        if (a2 !== undefined && a2 !== null) argItems.push(a2);
+        if (a3 !== undefined && a3 !== null) argItems.push(a3);
+        if (a4 !== undefined && a4 !== null) argItems.push(a4);
+        for (let i = 0; i < argItems.length; i++) {
+            const v = argItems[i];
+            if (Array.isArray(v)) {
+                mask |= (v[0] as number) >> 16;
+            }
+        }
 
         // 只计算 mask 需要的字段（避免无谓的 weapon_name/call3 调用）
         const rawFields: string[] = [];
@@ -760,13 +776,6 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        // ^args — TplRef 嵌套，整数 varint，浮点 float64，字符串 [len1B][utf8]
-        const argItems: (string | TplRef)[] = [];
-        if (a1 !== undefined && a1 !== null) argItems.push(a1);
-        if (a2 !== undefined && a2 !== null) argItems.push(a2);
-        if (a3 !== undefined && a3 !== null) argItems.push(a3);
-        if (a4 !== undefined && a4 !== null) argItems.push(a4);
-
         let argMask = 0, floatMask = 0, refMask = 0;
         const argEnc: Buffer[] = []; // encoded arg bodies
         for (let i = 0; i < argItems.length; i++) {
@@ -774,8 +783,9 @@ export class CHARACTER extends ITEM {
             if (Array.isArray(v)) {
                 refMask |= (1 << i);
                 argMask |= (1 << i);
-                // 编码嵌套模板: [refTid uint16][refArgc 1B][refMask 1B][refFloatMask 1B][refArgs...]
-                const tid = v[0];
+                // 编码嵌套模板: [refPureId uint16][refArgc 1B][refMask 1B][refFloatMask 1B][refArgs...]
+                // 发送 pure_id（消费 mask 后的纯 uint16），客户端通过父级 mask/sparse 渲染
+                const refPureId = (v[0] as number) & 0xFFFF;
                 const rargc = v.length - 1;
                 let rargMask = 0, rfloatMask = 0;
                 const rargEnc: Buffer[] = [];
@@ -803,7 +813,7 @@ export class CHARACTER extends ITEM {
                 }
                 const rbuf = Buffer.alloc(rtotal);
                 let rpos = 0;
-                rbuf.writeUInt16BE(tid as number, rpos); rpos += 2;
+                rbuf.writeUInt16BE(refPureId, rpos); rpos += 2;
                 rbuf[rpos++] = rargc;
                 rbuf[rpos++] = rargMask;
                 rbuf[rpos++] = rfloatMask;
@@ -855,7 +865,7 @@ export class CHARACTER extends ITEM {
         const buf = Buffer.alloc(totalSize);
         let pos = 0;
         buf[pos++] = 0x12;
-        buf.writeUInt16BE(template_id, pos);
+        buf.writeUInt16BE(pure_id, pos);
         pos += 2;
         buf[pos++] = mask;
         for (const fb of fieldBufs) {
@@ -3348,6 +3358,18 @@ export class CHARACTER extends ITEM {
         if (par.attack_before && attack_msg) {
             if (typeof (par.attack_before as any) === 'number') {
                 this.send_combat_b(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
+            } else if (typeof (attack_msg as any) === 'number') {
+                // attack_before 是动态字符串，attack_msg 是模板 ID
+                // 文本路径：展开模板为文本后拼接，format_msg 正确替换 $ 占位符
+                const tmplText = get(attack_msg as any);
+                if (tmplText) {
+                    this.send_combat(
+                        (par.attack_before as string) + format_msg(this, tmplText, target),
+                        target,
+                    );
+                } else {
+                    this.send_combat(par.attack_before as string, target);
+                }
             } else {
                 this.send_combat(par.attack_before + attack_msg, target);
             }
@@ -4035,7 +4057,7 @@ const _DMG_FALLBACK = _tmpl('结果造成<wht>^</wht>点伤害。');
  * 通过 typeof tmpl 自动检测编译模式：
  *   text 模式：tmpl 为字符串，渲染 ^ 后 send_combat
  *   binary 模式：tmpl 为模板 ID (number)，send_combat_b
- * msg 存在或 damage === 0 时走文本路径（动态内容无法预编译）
+ * msg 为动态字符串时走文本路径（无法预编译为模板 ID）
  */
 function damage_msg(
     me: CHARACTER,
@@ -4048,8 +4070,17 @@ function damage_msg(
     const sh: string = String(damage);
     const disp = iscrit ? _DMG_DISP_CRIT : _DMG_DISP_NORMAL;
     if (msg) {
+        if (typeof (msg as any) !== 'number') {
+            // 动态 msg — 文本路径，单次 send_combat 完成 $ 替换
+            const dmgSuffix = iscrit
+                ? '$N对$n造成了<hir>' + sh + '</hir>点暴击伤害'
+                : '$N对$n造成了<wht>' + sh + '</wht>点伤害';
+            me.send_combat(msg + '\n' + dmgSuffix, ob);
+            return;
+        }
+        // msg 为模板 ID — 二进制路径
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat_b(dmgTmpl, ob, [msg], [disp, sh]);
+        me.send_combat_b(dmgTmpl, ob, [msg as any], [disp, sh]);
         return;
     }
     // 零伤害

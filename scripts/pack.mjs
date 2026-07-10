@@ -83,7 +83,7 @@ fs.rmSync(DIST_DIR, { recursive: true, force: true });
 if (IS_BINARY) {
     console.log('[pack] Binary mode: scanning and transforming...');
 
-    /** unescaped literal → template id */
+    /** unescaped literal → (mask << 16) | pure_id */
     const templateMap = new Map();
 
     // --- Utility: JS string unescape (仅用于 JSON 输出) ---
@@ -96,6 +96,34 @@ if (IS_BINARY) {
             if (c === '\\') return '\\';
             return c;
         });
+    }
+
+    // --- Mask 计算 (与 templates.ts computeMask 保持一致) ---
+    // 8 位 mask: A_NAME=0x01 A_WEAPON=0x02 A_CALL3=0x04 A_PART=0x08
+    //            A_THROW=0x10 T_NAME=0x20 T_WEAPON=0x40 T_CALL3=0x80
+    // 模板 ID 编码: (mask << 16) | pure_id，发送时消费 mask 削除回纯 uint16
+    function computeMask(text) {
+        let m = 0;
+        const hasN = text.includes('$N');
+        const hasn = text.includes('$n');
+        if (hasN || hasn) m |= 0x01 | 0x20;  // A_NAME | T_NAME (视角转换需要双方名字)
+        if (text.includes('$P')) m |= 0x04;  // A_CALL3
+        if (text.includes('$p')) m |= 0x80;  // T_CALL3
+        if (text.includes('$l')) m |= 0x08;  // A_PART
+        if (text.includes('$W') || text.includes('$w')) m |= 0x02;  // A_WEAPON
+        if (text.includes('$i')) m |= 0x40;  // T_WEAPON
+        if (text.includes('$T')) m |= 0x10;  // A_THROW
+        return m;
+    }
+
+    /** 注册模板: value = (mask << 16) | pure_id */
+    function registerTemplate(literal) {
+        let val = templateMap.get(literal);
+        if (val !== undefined) return val;
+        const pureId = templateMap.size;
+        val = (computeMask(literal) << 16) | pureId;
+        templateMap.set(literal, val);
+        return val;
     }
 
     // ============================================================
@@ -121,7 +149,7 @@ if (IS_BINARY) {
                 while ((m = STATUS_MSG_RE.exec(content)) !== null) {
                     const literal = unescapeJS(m[3], m[2]);
                     if (!templateMap.has(literal)) {
-                        templateMap.set(literal, templateMap.size);
+                        registerTemplate(literal);
                         statusMsgCount++;
                     }
                 }
@@ -160,14 +188,14 @@ if (IS_BINARY) {
                 while ((m = CALL_RE.exec(content)) !== null) {
                     const literal = unescapeJS(m[3], m[2]);
                     if (!templateMap.has(literal)) {
-                        templateMap.set(literal, templateMap.size);
+                        registerTemplate(literal);
                     }
                 }
                 // 反引号模板字面量（排除含 ${} 的动态模板）
                 while ((m = CALL_BT_RE.exec(content)) !== null) {
                     const literal = unescapeJS(m[2], '`');
                     if (!literal.includes('${') && !templateMap.has(literal)) {
-                        templateMap.set(literal, templateMap.size);
+                        registerTemplate(literal);
                     }
                 }
             }
@@ -179,38 +207,78 @@ if (IS_BINARY) {
     console.log(`[pack]   Scanned ${scannedFiles} files, found ${templateMap.size} unique literal templates`);
 
     // ============================================================
-    // Pass 1.5: 简单上下文 — attack_msg / attack_before 直接字符串赋值
+    // Pass 1.5: 收集已知安全上下文中的字符串字面量
+    // 上下文已精确匹配，不依赖 $/^ 内容过滤：
+    //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
+    //   2. DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
+    //   3. _to_b 后缀变量赋值（模板字符串优化标记）
+    //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
     // ============================================================
 
-    const SIMPLE_PROP_RE = /(?:attack_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
+    const STR_LIT_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
+    const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
+    const PAR_PROP_RE_C = /(?:attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
+    const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
+    const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
 
-    console.log('[pack]   Pass 1.5: scanning attack_msg/attack_before literals...');
-    let simpleCount = 0;
+    console.log('[pack]   Pass 1.5: scanning context string literals...');
+    let ctxStrCount = 0;
 
-    function collectSimple(dir) {
+    function collectCtxStr(literal) {
+        if (literal.length === 0 || templateMap.has(literal)) return;
+        registerTemplate(literal);
+        ctxStrCount++;
+    }
+
+    function collectContextStrs(dir) {
         if (!fs.existsSync(dir)) return;
         const entries = fs.readdirSync(dir, { withFileTypes: true });
         for (const entry of entries) {
             const full = path.join(dir, entry.name);
             if (entry.isDirectory()) {
-                collectSimple(full);
+                collectContextStrs(full);
             } else if (entry.name.endsWith('.js')) {
                 const content = fs.readFileSync(full, 'utf8');
                 let m;
-                while ((m = SIMPLE_PROP_RE.exec(content)) !== null) {
-                    const literal = unescapeJS(m[2], m[1]);
-                    if (!templateMap.has(literal)) {
-                        templateMap.set(literal, templateMap.size);
-                        simpleCount++;
+
+                // 1) action 数组
+                ACTION_ARR_RE_C.lastIndex = 0;
+                while ((m = ACTION_ARR_RE_C.exec(content)) !== null) {
+                    let sm;
+                    STR_LIT_RE.lastIndex = 0;
+                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
+                        collectCtxStr(unescapeJS(sm[2], sm[1]));
+                    }
+                }
+
+                // 2) DoAttackPar 属性值
+                PAR_PROP_RE_C.lastIndex = 0;
+                while ((m = PAR_PROP_RE_C.exec(content)) !== null) {
+                    collectCtxStr(unescapeJS(m[2], m[1]));
+                }
+
+                // 3) _to_b 后缀变量赋值
+                TO_B_RE_C.lastIndex = 0;
+                while ((m = TO_B_RE_C.exec(content)) !== null) {
+                    collectCtxStr(unescapeJS(m[3], m[2]));
+                }
+
+                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+                MSG_ARR_RE_C.lastIndex = 0;
+                while ((m = MSG_ARR_RE_C.exec(content)) !== null) {
+                    let sm;
+                    STR_LIT_RE.lastIndex = 0;
+                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
+                        collectCtxStr(unescapeJS(sm[2], sm[1]));
                     }
                 }
             }
         }
     }
 
-    collectSimple(CORE_DIR);
-    collectSimple(RES_DIR);
-    console.log(`[pack]   Found ${simpleCount} simple props (total: ${templateMap.size})`);
+    collectContextStrs(CORE_DIR);
+    collectContextStrs(RES_DIR);
+    console.log(`[pack]   Found ${ctxStrCount} context strings (total: ${templateMap.size})`);
 
     // ============================================================
     // Pass 2: 扫描 _tmpl('...') 标记 — 替换为模板 ID
@@ -237,12 +305,8 @@ if (IS_BINARY) {
                 TMPL_RE.lastIndex = 0;
                 while ((m = TMPL_RE.exec(content)) !== null) {
                     const literal = unescapeJS(m[2], m[1]);
-                    let id = templateMap.get(literal);
-                    if (id === undefined) {
-                        id = templateMap.size;
-                        templateMap.set(literal, id);
-                    }
-                    // 替换 _tmpl('...') → 数字 ID
+                    const id = registerTemplate(literal);
+                    // 替换 _tmpl('...') → 模板 ID (含 mask 编码)
                     content = content.slice(0, m.index) + String(id) + content.slice(m.index + m[0].length);
                     TMPL_RE.lastIndex = m.index + String(id).length;
                     tmplCount++;
@@ -261,27 +325,13 @@ if (IS_BINARY) {
     // 生成客户端模板数据（带字段掩码）
     // ============================================================
 
-    function computeMask(text) {
-        let m = 0;
-        // A_NAME 和 T_NAME 至少有一个时，双方都带（客户端视角转换需要名字）
-        const hasN = text.includes('$N');
-        const hasn = text.includes('$n');
-        if (hasN || hasn) m |= 0x01 | 0x20;  // A_NAME | T_NAME
-        if (text.includes('$P')) m |= 0x04;  // A_CALL3
-        if (text.includes('$p')) m |= 0x80;  // T_CALL3
-        if (text.includes('$l')) m |= 0x08;  // A_PART
-        if (text.includes('$W') || text.includes('$w')) m |= 0x02;  // A_WEAPON
-        if (text.includes('$i')) m |= 0x40;  // T_WEAPON
-        if (text.includes('$T')) m |= 0x10;  // A_THROW
-        return m;
-    }
-
     if (templateMap.size > 0) {
         const clientData = {};
         const serverLines = [];
-        for (const [literal, id] of templateMap) {
-            const mask = computeMask(literal);
-            clientData[id] = { t: literal, m: mask };
+        for (const [literal, val] of templateMap) {
+            const pureId = val & 0xFFFF;
+            const mask = val >> 16;
+            clientData[pureId] = { t: literal, m: mask };
             serverLines.push(`register(${JSON.stringify(literal)});`);
         }
 
@@ -373,19 +423,21 @@ ${serverLines.join('\n')}
                 });
 
                 // ============================================================
-                // 替换已知安全上下文中的 $/^ 字符串
-                // 只替换以下上下文，避免误伤 attack_before / damage_msg 等动态拼接场景：
+                // 替换已知安全上下文中的字符串字面量
+                // 上下文已精确匹配，不依赖 $/^ 内容过滤：
                 //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
                 //   2. _DMG_TMPL 的 tmpl 值
                 //   3. _DMG_FALLBACK 值
                 //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
+                //   5. DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
+                //   6. _to_b 后缀变量赋值（模板字符串优化标记）
                 // ============================================================
 
-                /** 在已知数组/对象上下文中替换 $/^ 字符串 */
+                /** 在已知数组/对象上下文中替换已注册的字符串字面量 */
                 const STR_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
                 function replaceStr(_, quote, rawStr) {
                     const literal = unescapeJS(rawStr, quote);
-                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
+                    if (templateMap.has(literal)) {
                         replacedAction++;
                         return String(templateMap.get(literal));
                     }
@@ -395,7 +447,7 @@ ${serverLines.join('\n')}
                 const preContent = content;
 
                 // 1) action 数组: attack_actions: ["...", ...]
-                const ACTION_ARR_RE = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
+                const ACTION_ARR_RE = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
                 content = content.replace(ACTION_ARR_RE, (_, prefix, body, suffix) => {
                     return prefix + body.replace(STR_RE, replaceStr) + suffix;
                 });
@@ -429,10 +481,10 @@ ${serverLines.join('\n')}
                 });
 
                 // 5) DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
-                const PAR_PROP_RE = /(attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                const PAR_PROP_RE = /(attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
                 content = content.replace(PAR_PROP_RE, (_, key, quote, rawStr) => {
                     const literal = unescapeJS(rawStr, quote);
-                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
+                    if (templateMap.has(literal)) {
                         replacedAction++;
                         return key + ': ' + String(templateMap.get(literal));
                     }
@@ -440,10 +492,10 @@ ${serverLines.join('\n')}
                 });
 
                 // 6) _to_b 后缀变量赋值（模板字符串优化标记）
-                const TO_B_RE = /(\w+_to_b\s*=\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2/g;
+                const TO_B_RE = /(\w+_to_b\s*=\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
                 content = content.replace(TO_B_RE, (_, prefix, quote, rawStr) => {
                     const literal = unescapeJS(rawStr, quote);
-                    if ((/\$(?!\{)/.test(literal) || /\^/.test(literal)) && templateMap.has(literal)) {
+                    if (templateMap.has(literal)) {
                         replacedAction++;
                         return prefix + String(templateMap.get(literal));
                     }
