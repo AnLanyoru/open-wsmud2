@@ -259,6 +259,50 @@ if (IS_BINARY) {
     console.log(`[pack]   Found ${actionStrCount} action strings (total: ${templateMap.size})`);
 
     // ============================================================
+    // Pass 2: 扫描 _tmpl('...') 标记 — 替换为模板 ID
+    // ============================================================
+
+    /** 匹配 _tmpl('literal') 或 _tmpl("literal") */
+    const TMPL_RE = /_tmpl\((["'])((?:[^"'\\\n\r]|\\.)*?)\1\)/gs;
+
+    console.log('[pack]   Pass 2: scanning _tmpl() markers...');
+    let tmplCount = 0;
+
+    function transformTmpl(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                transformTmpl(full);
+            } else if (entry.name.endsWith('.js')) {
+                let content = fs.readFileSync(full, 'utf8');
+                let changed = false;
+                let m;
+                // Reset regex state
+                TMPL_RE.lastIndex = 0;
+                while ((m = TMPL_RE.exec(content)) !== null) {
+                    const literal = unescapeJS(m[2], m[1]);
+                    let id = templateMap.get(literal);
+                    if (id === undefined) {
+                        id = templateMap.size;
+                        templateMap.set(literal, id);
+                    }
+                    // 替换 _tmpl('...') → 数字 ID
+                    content = content.slice(0, m.index) + String(id) + content.slice(m.index + m[0].length);
+                    TMPL_RE.lastIndex = m.index + String(id).length;
+                    tmplCount++;
+                    changed = true;
+                }
+                if (changed) fs.writeFileSync(full, content);
+            }
+        }
+    }
+
+    transformTmpl(CORE_DIR);
+    transformTmpl(RES_DIR);
+    console.log(`[pack]   Registered ${tmplCount} _tmpl() calls (total templates: ${templateMap.size})`);
+
     // ============================================================
     // 生成客户端模板数据（带字段掩码）
     // ============================================================
