@@ -1330,6 +1330,33 @@ async function loadResource(): Promise<void> {
 }
 
 // ============================================================
+// 房间批处理刷新服务 — 每 10ms 遍历有堆积的房间
+// ============================================================
+
+/** 有待处理批次的房间列表 */
+let _dirty_rooms: ROOM[] = [];
+/** 全局刷新定时器 */
+let _flush_timer: ReturnType<typeof setInterval> | null = null;
+
+function ensureFlushTimer(): void {
+    if (_flush_timer) return;
+    _flush_timer = setInterval(() => {
+        const rooms = _dirty_rooms;
+        if (rooms.length === 0) return;
+        _dirty_rooms = [];
+        for (let i = 0; i < rooms.length; i++) {
+            rooms[i]._flush_batch();
+        }
+    }, 10);
+}
+
+/** 标记房间为待刷新（由 _broadcast_room / _broadcast_combat 调用） */
+export function markRoomDirty(room: ROOM): void {
+    _dirty_rooms.push(room);
+    ensureFlushTimer();
+}
+
+// ============================================================
 // 导出单例
 // ============================================================
 

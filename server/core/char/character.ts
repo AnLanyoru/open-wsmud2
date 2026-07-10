@@ -28,7 +28,7 @@ import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
 import { encodeBinaryFrame } from '../net-ws.js';
-import { _markRoomDirty } from '../room/room.js';
+import { markRoomDirty } from '../world.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -484,6 +484,13 @@ export class CHARACTER extends ITEM {
     /** 自动绝招触发频率 */
     pfm_rate?: number;
 
+    // ============ 绝招缓冲模式 ============
+
+    /** 绝招缓冲模式：开启期间发起者的消息写入缓冲区而非立刻发送 */
+    _burst_buffering: boolean = false;
+    /** 绝招缓冲区 */
+    _burst_buffer: Buffer[] = [];
+
     // ============ 回调字段（可选，由资源文件在对象定义时设置） ============
     /**
      * 请求学习技能时的回调
@@ -771,29 +778,53 @@ export class CHARACTER extends ITEM {
         return buf;
     }
 
+    /**
+     * 开启绝招缓冲模式 — 期间发起者的二进制消息写入缓冲区而非立刻发送。
+     * 与房间批处理有机共存：发起者消息入 burst buffer，其他玩家仍走房间 batch。
+     */
+    begin_burst(): void {
+        this._burst_buffering = true;
+    }
+
+    /**
+     * 结束绝招缓冲模式 — 合并缓冲区所有帧并立刻发送给发起者。
+     * 绝招释放是同步帧，缓冲无延迟代价。
+     */
+    end_burst(): void {
+        this._burst_buffering = false;
+        const buf = this._burst_buffer;
+        if (buf.length === 0) return;
+        this._burst_buffer = [];
+        const self = this as any;
+        if (self.socket) {
+            self.socket.write(encodeBinaryFrame(Buffer.concat(buf)));
+        }
+    }
+
     /** 广播 — combat 过滤（no_mcmsg / no_combatmsg） */
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 二进制路径：预编码 WebSocket 帧一次
-            const frame = encodeBinaryFrame(payload);
-
-            // 消息主体立刻发送（自身战斗消息需要及时反馈）
+            // 消息主体发送：绝招缓冲模式写入原始 payload，否则立刻编码发送
             const self = this as any;
             if (self.is_player && self.socket && !self.query_setting('no_mcmsg')) {
-                self.socket.write(frame);
+                if (this._burst_buffering) {
+                    this._burst_buffer.push(payload as Buffer);
+                } else {
+                    self.socket.write(encodeBinaryFrame(payload));
+                }
             }
 
-            // 房间其他玩家：缓存到批处理缓冲区
+            // 房间其他玩家：缓存原始 payload 到批处理缓冲区（flush 时统一编码）
             const room = this.environment as ROOM;
             const now = Date.now();
 
             const wasEmpty = room._batch_all.length === 0;
-            room._batch_all.push(frame);
+            room._batch_all.push(payload);
             room._batch_has_combat = true;
             if (wasEmpty) {
                 room._batch_timestamp = now;
-                _markRoomDirty(room);
+                markRoomDirty(room);
             } else if (now - room._batch_timestamp >= 10) {
                 room._flush_batch();
             }
@@ -820,27 +851,28 @@ export class CHARACTER extends ITEM {
     ): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 二进制路径：预编码 WebSocket 帧一次
-            const frame = encodeBinaryFrame(payload);
-
-            // 消息主体立刻发送，保证操作者响应零延迟
+            // 消息主体发送：绝招缓冲模式写入原始 payload，否则立刻编码发送
             if (!excludeself) {
                 const self = this as any;
                 if (self.is_player && self.socket) {
-                    self.socket.write(frame);
+                    if (this._burst_buffering) {
+                        this._burst_buffer.push(payload as Buffer);
+                    } else {
+                        self.socket.write(encodeBinaryFrame(payload));
+                    }
                 }
             }
 
-            // 房间其他玩家：缓存到批处理缓冲区
+            // 房间其他玩家：缓存原始 payload 到批处理缓冲区（flush 时统一编码）
             const room = this.environment as ROOM;
             const now = Date.now();
 
             const wasEmpty = room._batch_all.length === 0;
-            room._batch_all.push(frame);
-            room._batch_noncombat.push(frame);
+            room._batch_all.push(payload as Buffer);
+            room._batch_noncombat.push(payload as Buffer);
             if (wasEmpty) {
                 room._batch_timestamp = now;
-                _markRoomDirty(room);
+                markRoomDirty(room);
             } else if (now - room._batch_timestamp >= 10) {
                 room._flush_batch();
             }
@@ -2810,18 +2842,16 @@ export class CHARACTER extends ITEM {
         let cpos = 9;
         for (let v = 0; v < baseValues.length; v++, cpos += 8)
             commonMsg.writeDoubleBE(baseValues[v], cpos);
-        const commonFrame = encodeBinaryFrame(commonMsg);
-
-        // 写入批处理缓冲区（不再逐玩家构建 damage 帧，由客户端本地处理）
+        // 写入批处理缓冲区（原始 payload，flush 时统一编码）
         const room = this.environment as ROOM;
         const now = Date.now();
 
         const wasEmpty = room._batch_all.length === 0;
-        room._batch_all.push(commonFrame);
-        room._batch_noncombat.push(commonFrame);
+        room._batch_all.push(commonMsg);
+        room._batch_noncombat.push(commonMsg);
         if (wasEmpty) {
             room._batch_timestamp = now;
-            _markRoomDirty(room);
+            markRoomDirty(room);
         } else if (now - room._batch_timestamp >= 10) {
             room._flush_batch();
         }
@@ -3512,7 +3542,10 @@ export class CHARACTER extends ITEM {
         if (pfm.is_weapon && pfm.origin_skill != this.attack_skill.id) {
             this.remove_status('weapon', true);
         }
-        return pfm.use?.(this, target, lv, sk) != false;
+        this.begin_burst();
+        const result = pfm.use?.(this, target, lv, sk) != false;
+        this.end_burst();
+        return result;
     }
 
     /**

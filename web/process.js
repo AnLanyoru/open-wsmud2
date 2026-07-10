@@ -602,34 +602,9 @@ export function ProcessBinary(data) {
     let pos = 0;
     const myName = Process.name || '';
 
-    // 预扫描：判断是否为批处理合并帧（≥2 帧），单帧可能是立刻发送不应去重
-    let isBatch = false;
-    {
-        let p = 0, frames = 0;
-        while (p < data.length) {
-            const op = data[p++];
-            if (op === 0x12) {
-                p += 2; const m = data[p++];
-                let b = 1;
-                for (let i = 0; i < 8; i++) {
-                    if (m & b) { const l = data[p]; p += 1 + l; }
-                    b <<= 1;
-                }
-                const ac = data[p++];
-                for (let i = 0; i < ac; i++) { const l = data[p]; p += 1 + l; }
-            } else if (op === 0x53) {
-                const fl = data[p++]; p += 7;
-                if (fl & 0x01) p += 8;
-                if (fl & 0x02) p += 8;
-                if (fl & 0x04) p += 8;
-                if (fl & 0x08) p += 8;
-                if (fl & 0x10) p += 8;
-            } else if (op === 0x00) {
-                const l = data[p]; p += 1 + l;
-            } else break;
-            if (++frames >= 2) { isBatch = true; break; }
-        }
-    }
+    // 0xFE 为批处理合并帧标记，立刻发送的单帧无此标记
+    const isBatch = data[0] === 0xFE;
+    if (isBatch) pos = 1;
 
     while (pos < data.length) {
         const op = data[pos++];

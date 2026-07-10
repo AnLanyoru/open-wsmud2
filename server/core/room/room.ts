@@ -5,6 +5,7 @@ import { BASE } from '../base.js';
 import { WORLD } from '../world.js';
 import { ITEM, RoomAction } from '../item.js';
 import { OBJ } from '../item/obj.js';
+import { encodeBinaryFrame } from '../net-ws.js';
 import type { AREA } from './area.js';
 import type { CHARACTER } from '../char/character.js';
 import { NPC } from '../char/npc.js';
@@ -822,8 +823,8 @@ export class ROOM extends ITEM {
     }
 
     /**
-     * 刷新二进制批处理 — 合并缓存帧并发送给房间内玩家。
-     * 预建两个合并 Buffer（全量 + 非战斗），按玩家 no_combatmsg 选择写入。
+     * 刷新二进制批处理 — 合并原始 payload 并编码为单个 WebSocket 帧发送。
+     * 首字节 0xFE 为批处理标记，供客户端区分立刻发送与批处理去重。
      */
     _flush_batch(): void {
         const all = this._batch_all;
@@ -835,8 +836,14 @@ export class ROOM extends ITEM {
         this._batch_timestamp = 0;
         if (all.length === 0) return;
 
-        const mergedAll = Buffer.concat(all);
-        const mergedNonCombat = hasCombat ? Buffer.concat(noncombat) : mergedAll;
+        const BATCH_MARKER = Buffer.from([0xFE]);
+        all.unshift(BATCH_MARKER);
+        const mergedAll = encodeBinaryFrame(Buffer.concat(all));
+        let mergedNonCombat: Buffer | null = null;
+        if (hasCombat && noncombat.length > 0) {
+            noncombat.unshift(BATCH_MARKER);
+            mergedNonCombat = encodeBinaryFrame(Buffer.concat(noncombat));
+        }
 
         const items = this.items;
         for (let i = 0; i < items.length; i++) {
@@ -844,7 +851,7 @@ export class ROOM extends ITEM {
             if (!item.is_player || !item.socket) continue;
             if (item.no_message) continue;
             if (hasCombat && item.query_setting('no_combatmsg')) {
-                if (noncombat.length > 0) {
+                if (mergedNonCombat) {
                     item.socket.write(mergedNonCombat);
                 }
             } else {
@@ -1141,34 +1148,6 @@ export class ROOM extends ITEM {
         }
         return room;
     }
-}
-
-// ============================================================
-// 全局批处理刷新服务 — 每 10ms 遍历有堆积的房间
-// ============================================================
-
-/** 有待处理批次的房间列表 */
-let _dirty_rooms: ROOM[] = [];
-/** 全局刷新定时器 */
-let _flush_timer: ReturnType<typeof setInterval> | null = null;
-
-/** 确保全局刷新定时器已启动（惰性初始化） */
-function ensureFlushTimer(): void {
-    if (_flush_timer) return;
-    _flush_timer = setInterval(() => {
-        const rooms = _dirty_rooms;
-        if (rooms.length === 0) return;
-        _dirty_rooms = [];
-        for (let i = 0; i < rooms.length; i++) {
-            rooms[i]._flush_batch();
-        }
-    }, 10);
-}
-
-/** 标记房间为待刷新（由 _broadcast_room 调用） */
-export function _markRoomDirty(room: ROOM): void {
-    _dirty_rooms.push(room);
-    ensureFlushTimer();
 }
 
 declare global {
