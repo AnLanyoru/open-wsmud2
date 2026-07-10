@@ -912,12 +912,9 @@ export class CHARACTER extends ITEM {
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
+            const room = this.environment as ROOM;
             // 小房间（<10人）：立刻发送给所有人，不批处理
-            let playerCount = 0;
-            for (let i = 0; i < list.length; i++) {
-                if ((list[i] as any).is_player) playerCount++;
-            }
-            if (playerCount < 10) {
+            if (room._player_count < 10) {
                 const frame = encodeBinaryFrame(payload);
                 for (let i = 0; i < list.length; i++) {
                     const item: any = list[i];
@@ -941,7 +938,6 @@ export class CHARACTER extends ITEM {
                 }
             }
 
-            const room = this.environment as ROOM;
             const now = Date.now();
 
             const wasEmpty = room._batch_all.length === 0;
@@ -976,12 +972,9 @@ export class CHARACTER extends ITEM {
     ): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
+            const room = this.environment as ROOM;
             // 小房间（<10人）：立刻发送给所有人，不批处理
-            let playerCount = 0;
-            for (let i = 0; i < list.length; i++) {
-                if ((list[i] as any).is_player) playerCount++;
-            }
-            if (playerCount < 10) {
+            if (room._player_count < 10) {
                 const frame = encodeBinaryFrame(payload);
                 for (let i = 0; i < list.length; i++) {
                     const item: any = list[i];
@@ -1007,7 +1000,6 @@ export class CHARACTER extends ITEM {
                 }
             }
 
-            const room = this.environment as ROOM;
             const now = Date.now();
 
             const wasEmpty = room._batch_all.length === 0;
@@ -1065,6 +1057,21 @@ export class CHARACTER extends ITEM {
     }
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
+    /** 文本模式回退：展开 TplRef 数组，替换 template 中的 ^ */
+    _expand_text(template: string, _a1?: string | TplRef, _a2?: string | TplRef, _a3?: string | TplRef, _a4?: string | TplRef): string {
+        let text = template;
+        const args = [_a1, _a2, _a3, _a4];
+        for (let i = 0; i < args.length; i++) {
+            const a = args[i];
+            if (a === undefined || a === null) break;
+            const val = Array.isArray(a)
+                ? (a[0] as string).replace('^', String(a[1] ?? ''))
+                : String(a);
+            text = text.replace('^', val);
+        }
+        return text;
+    }
+
     send_msg_b(
         template_id: number | string,
         target?: ITEM,
@@ -1076,7 +1083,7 @@ export class CHARACTER extends ITEM {
     ): void {
         if (!this.environment || template_id === undefined) return;
         if (typeof template_id === 'string') {
-            this.send_msg(template_id, target, flags);
+            this.send_msg(this._expand_text(template_id, _a1, _a2, _a3, _a4), target, flags);
             return;
         }
         const payload = this._build_binary_buf(template_id, target, _a1, _a2, _a3, _a4);
@@ -1098,7 +1105,7 @@ export class CHARACTER extends ITEM {
         _a4?: string | TplRef,
     ): void {
         if (typeof template_id === 'string') {
-            this.send_combat(template_id, target);
+            this.send_combat(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
             return;
         }
         this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4);
@@ -3002,12 +3009,8 @@ export class CHARACTER extends ITEM {
         const room = this.environment as ROOM;
 
         // 小房间（<10人）：立刻发送，不批处理
-        let playerCount = 0;
-        const items = room.items;
-        for (let i = 0; i < items.length; i++) {
-            if ((items[i] as any).is_player) playerCount++;
-        }
-        if (playerCount < 10) {
+        if (room._player_count < 10) {
+            const items = room.items;
             const frame = encodeBinaryFrame(commonMsg);
             for (let i = 0; i < items.length; i++) {
                 const player: any = items[i];
@@ -3343,7 +3346,7 @@ export class CHARACTER extends ITEM {
             attack_msg = attackskill.query_attack_action(this, target);
         }
         if (par.attack_before && attack_msg) {
-            if (typeof (attack_msg as any) === 'number') {
+            if (typeof (par.attack_before as any) === 'number') {
                 this.send_combat_b(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
             } else {
                 this.send_combat(par.attack_before + attack_msg, target);
@@ -3722,9 +3725,11 @@ export class CHARACTER extends ITEM {
             this.remove_status('weapon', true);
         }
         this.begin_burst();
-        const result = pfm.use?.(this, target, lv, sk) != false;
-        this.end_burst();
-        return result;
+        try {
+            return pfm.use?.(this, target, lv, sk) != false;
+        } finally {
+            this.end_burst();
+        }
     }
 
     /**
@@ -3967,7 +3972,7 @@ function query_status_msg(hp: number, maxhp: number): string {
  */
 /** 数组 [tmpl, ...args] 作为嵌套模板引用 */
 type TplRef = (string | number)[];
-/** 双槽拼接模板 — pack.mjs 替换为 ID */
+/** 双槽拼接模板 */
 const _TMPL_CONCAT2 = _tmpl('^^');
 
 // 伤害占比模板（原版，^ 传 TplRef 嵌套 damage 显示模板）
@@ -4018,12 +4023,12 @@ const _DMG_TMPL: Record<string, Array<{ max: number; tmpl: string | number }>> =
     ],
 };
 // 伤害显示模板（被 _DMG_TMPL 的 ^ 嵌套引用，颜色在模板内）
-const _DMG_DISP_NORMAL = _tmpl('<wht>^点伤害</wht>');
-const _DMG_DISP_CRIT = _tmpl('<hir>^点暴击伤害</hir>');
-const _DMG_DISP_MSG = _tmpl('<wht>$N对$n造成了^点伤害</wht>');
-const _DMG_DISP_MSG_CRIT = _tmpl('<hir>$N对$n造成了^点暴击伤害</hir>');
+const _DMG_DISP_NORMAL = _tmpl('<wht>^</wht>点伤害');
+const _DMG_DISP_CRIT = _tmpl('<hir>^</hir>点暴击伤害');
+const _DMG_DISP_MSG = _tmpl('^\n$N对$n造成了<wht>^</wht>点伤害');
+const _DMG_DISP_MSG_CRIT = _tmpl('^\n$N对$n造成了<hir>^</hir>点暴击伤害');
 // fallback
-const _DMG_FALLBACK = _tmpl('<wht>结果造成^点伤害。</wht>');
+const _DMG_FALLBACK = _tmpl('结果造成<wht>^</wht>点伤害。');
 
 /**
  * 发送伤害消息
@@ -4042,10 +4047,9 @@ function damage_msg(
 ): void {
     const sh: string = String(damage);
     const disp = iscrit ? _DMG_DISP_CRIT : _DMG_DISP_NORMAL;
-    // 自定义消息 — ^ 嵌套 damage 显示模板
     if (msg) {
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat_b(dmgTmpl, ob, [disp, sh]);
+        me.send_combat_b(dmgTmpl, ob, [msg], [disp, sh]);
         return;
     }
     // 零伤害

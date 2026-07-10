@@ -82,7 +82,7 @@ export default class extends SKILL {
                         mz: me.mz,
                         no_weapon: true,
                         attack_msg: first
-                            ? '<hio>$N的长春真气如岳如渊，含八荒之势，挟万钧之力朝$n席卷而来！</hio>'
+                            ? _tmpl('<hio>$N的长春真气如岳如渊，含八荒之势，挟万钧之力朝$n席卷而来！</hio>')
                             : undefined,
                     });
                     if (first) first = false;

@@ -634,8 +634,9 @@ function popcntBelow(mask, bit) {
  * 解析并分发二进制帧
  * @param {Uint8Array} data
  */
-/** 玩家 HP 缓存（用于本地计算 damage） */
-const _prevHP = {};
+/** 玩家 HP 缓存（用于本地计算 damage），上限 500 个 ID */
+const _prevHP = new Map();
+const _MAX_PREV_HP = 500;
 
 export function ProcessBinary(data) {
     let pos = 0;
@@ -731,11 +732,16 @@ export function ProcessBinary(data) {
                 if (flags & 0x10) { sc.damage = dv.getFloat64(pos); pos += 8; }
                 // 服务端不再逐玩家发送 damage，客户端本地计算
                 if (Setting.show_damage && (flags & 0x01) && !(flags & 0x10)) {
-                    const prev = _prevHP[id];
+                    const prev = _prevHP.get(id);
                     if (prev !== undefined && prev > sc.hp) {
                         sc.damage = prev - sc.hp;
                     }
-                    _prevHP[id] = sc.hp;
+                    if (_prevHP.size >= _MAX_PREV_HP) {
+                        // 驱逐最旧的条目
+                        const first = _prevHP.keys().next().value;
+                        if (first !== undefined) _prevHP.delete(first);
+                    }
+                    _prevHP.set(id, sc.hp);
                 }
 
                 Process.sc(sc);

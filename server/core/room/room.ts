@@ -115,6 +115,8 @@ export class ROOM extends ITEM {
     _batch_has_combat: boolean = false;
     /** 批处理开始时间戳（毫秒），0 表示无待处理批次 */
     _batch_timestamp: number = 0;
+    /** 房间玩家数缓存（避免广播时重复扫描） */
+    _player_count: number = 0;
 
     // ============ 玩法相关 ============
 
@@ -280,13 +282,14 @@ export class ROOM extends ITEM {
             obj.environment = this;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
-                if (obj.check_player()) obj.send(this.items_to_json());
+                if (obj.check_player()) { this._player_count++; obj.send(this.items_to_json()); }
             } else if (obj.check_player()) {
                 if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
                 obj.send(msg);
             }
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
+            if (obj.check_player()) this._player_count--;
             obj.environment = undefined;
         }
     }
@@ -837,7 +840,6 @@ export class ROOM extends ITEM {
         this._batch_timestamp = 0;
         if (all.length === 0) return;
 
-        const BATCH_MARKER = Buffer.from([0xFE]);
         all.unshift(BATCH_MARKER);
         const mergedAll = encodeBinaryFrame(Buffer.concat(all));
         let mergedNonCombat: Buffer | null = null;
@@ -1150,6 +1152,8 @@ export class ROOM extends ITEM {
         return room;
     }
 }
+
+const BATCH_MARKER = Buffer.from([0xFE]);
 
 declare global {
     var ROOM: any;

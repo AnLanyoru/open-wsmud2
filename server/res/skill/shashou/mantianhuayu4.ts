@@ -102,11 +102,11 @@ export default class extends SKILL {
                     gj: Math.floor((me.gj * extra_gj) / 100),
                     mz: me.mz,
                     attack_msg: is_shenpan
-                        ? '<ord>$N周身雷光如狱，引九天紫雷贯顶而下，直劈$n！</ord>'
-                        : '<ord>$N扬手间一道雷光划破长空，轰然击向$n！</ord>',
+                        ? _tmpl('<ord>$N周身雷光如狱，引九天紫雷贯顶而下，直劈$n！</ord>')
+                        : _tmpl('<ord>$N扬手间一道雷光划破长空，轰然击向$n！</ord>'),
                     damage_msg: is_shenpan
-                        ? '<hir>万钧雷霆轰然落下，$n避无可避，被紫雷透体而过，全身焦黑，惨嚎震天！</hir>'
-                        : '<hir>雷光正中$n，炸开一片焦痕！</hir>',
+                        ? _tmpl('<hir>万钧雷霆轰然落下，$n避无可避，被紫雷透体而过，全身焦黑，惨嚎震天！</hir>')
+                        : _tmpl('<hir>雷光正中$n，炸开一片焦痕！</hir>'),
                     miss_msg: '<cyn>$n慌忙闪避，堪堪躲过了天雷一击。</cyn>',
                     is_throwing: true,
                 };

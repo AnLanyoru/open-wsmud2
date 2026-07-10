@@ -60,19 +60,12 @@ export default class extends SKILL {
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = calcWSJPer(lv);
-                var gods = [
-                    '<HIM>紫盖</HIM>',
-                    '<HIM>芙蓉</HIM>',
-                    '<HIM>石廪</HIM>',
-                    '<HIR>祝融</HIR>',
-                    '<HIM>天柱</HIM>',
-                ];
                 var msgs = [
-                    '$N剑光如紫盖凝霞，绚烂夺目',
-                    '$N剑势如芙蓉出水，清丽脱俗',
-                    '$N剑劲如山石廪耸立，沉稳凝重',
-                    '$N剑光如火祝融焚天，炽烈霸道',
-                    '$N剑意如天柱擎天，势不可挡',
+                    _tmpl('<HIM>紫盖</HIM>\n$N剑光如紫盖凝霞，绚烂夺目！'),
+                    _tmpl('<HIG>芙蓉</HIG>\n$N剑势如芙蓉出水，清丽脱俗！'),
+                    _tmpl('<HIY>石廪</HIY>\n$N剑劲如山石廪耸立，沉稳凝重！'),
+                    _tmpl('<HIR>祝融</HIR>\n$N剑光如火祝融焚天，炽烈霸道！'),
+                    _tmpl('<HIC>天柱</HIC>\n$N剑意如天柱擎天，势不可挡！'),
                 ];
                 me.send_room(
                     '<HIM>$N剑势忽变，以五峰之势施出衡山绝技「五神剑」，五道剑光先后射向$n！</HIM>',
@@ -83,7 +76,7 @@ export default class extends SKILL {
                         target: target,
                         gj: (me.gj * per) / 100,
                         mz: me.mz,
-                        attack_msg: i < 5 ? msgs[i] + '！' : undefined,
+                        attack_msg: i < 5 ? msgs[i] : undefined,
                     });
                 }
                 me.end_attack(target);
@@ -114,12 +107,10 @@ export default class extends SKILL {
                 me.add_status(
                     {
                         id: 'hengshanwushenjian_wsf',
-                        name: '五神赋·' + god,
+                        name: god,
                         desc: god + '之力加身，战斗属性提升',
                         duration: duration,
                         prop: propMap,
-                        start_msg: `<HIM>${god}之力灌注全身，$N只觉内力充盈，战意高昂！</HIM>\n`,
-                        finish_msg: `<HIY>${god}之力渐渐消退，$N恢复常态。</HIY>\n`,
                     },
                     me,
                 );
