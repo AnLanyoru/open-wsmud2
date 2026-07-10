@@ -378,6 +378,9 @@ export default {
             html.push(this.createSkillItem(items[i], skills));
         }
         this.element.html(html.join(""));
+        this.element.find(".skill-item").each(function () {
+            void this.scrollWidth;
+        });
 
     }, level_color: ["wht", "hig", "hic", "hij", "hiz", "hio", "ord"]
     , get_lvdesc: function (level) {
