@@ -107,7 +107,7 @@ export class ROOM extends ITEM {
 
     // ============ 广播批处理缓冲区 ============
 
-    /** 全量帧缓冲区 */
+    /** 全量帧 payload 缓冲区 */
     _batch_all: Buffer[] = [];
     /** 非战斗帧缓冲区（排除 combat 消息，供 no_combatmsg 玩家） */
     _batch_noncombat: Buffer[] = [];
@@ -825,6 +825,7 @@ export class ROOM extends ITEM {
     /**
      * 刷新二进制批处理 — 合并原始 payload 并编码为单个 WebSocket 帧发送。
      * 首字节 0xFE 为批处理标记，供客户端区分立刻发送与批处理去重。
+     * 全量下发给所有玩家，发起者重复帧由客户端去重处理。
      */
     _flush_batch(): void {
         const all = this._batch_all;

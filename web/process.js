@@ -574,6 +574,18 @@ function ReceiveMessage(x) {
 // 二进制帧解析
 // ============================================================
 
+/** 读取 LEB128 无符号 varint */
+function readVarint(data, pos) {
+    let value = 0, shift = 0;
+    while (true) {
+        const b = data[pos++];
+        value |= (b & 0x7f) << shift;
+        if (!(b & 0x80)) break;
+        shift += 7;
+    }
+    return { value, next: pos };
+}
+
 /** 读取一个 UTF-8 字符串：1B 长度 + 数据 */
 function readStr(data, pos) {
     const len = data[pos];
@@ -625,13 +637,27 @@ export function ProcessBinary(data) {
                     bit <<= 1;
                 }
 
-                // 读 ^args
+                // 读 ^args（整数 varint，浮点 float64，字符串 len+utf8）
                 const argCount = data[pos++];
+                const argMask = data[pos++];
+                const floatMask = data[pos++];
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
-                    const r = readStr(data, pos);
-                    args.push(r.str);
-                    pos = r.next;
+                    if (argMask & (1 << i)) {
+                        if (floatMask & (1 << i)) {
+                            const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+                            args.push(String(dv.getFloat64(pos)));
+                            pos += 8;
+                        } else {
+                            const r = readVarint(data, pos);
+                            args.push(String(r.value));
+                            pos = r.next;
+                        }
+                    } else {
+                        const r = readStr(data, pos);
+                        args.push(r.str);
+                        pos = r.next;
+                    }
                 }
 
                 // 模板还原 + 视角转换

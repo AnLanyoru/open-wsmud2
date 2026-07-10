@@ -715,7 +715,21 @@ export class CHARACTER extends ITEM {
         );
     }
 
-    /** 构建二进制 payload — 按需编码实体字段 + ^args */
+    /** LEB128 无符号 varint 编码 */
+    _encodeVarint(n: number): Buffer {
+        const bytes: number[] = [];
+        let v = n | 0;
+        if (v < 0) v = 0;
+        do {
+            let b = v & 0x7f;
+            v = Math.floor(v / 128);
+            if (v) b |= 0x80;
+            bytes.push(b);
+        } while (v);
+        return Buffer.from(bytes);
+    }
+
+    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 arg 用 varint 压缩） */
     _build_binary_buf(
         template_id: number,
         target: ITEM | undefined,
@@ -746,17 +760,43 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        // ^args — 显式参数，零开销
-        const argBufs: Buffer[] = [];
-        if (a1 !== undefined && a1 !== null) argBufs.push(Buffer.from(a1, 'utf8'));
-        if (a2 !== undefined && a2 !== null) argBufs.push(Buffer.from(a2, 'utf8'));
-        if (a3 !== undefined && a3 !== null) argBufs.push(Buffer.from(a3, 'utf8'));
-        if (a4 !== undefined && a4 !== null) argBufs.push(Buffer.from(a4, 'utf8'));
+        // ^args — 整数 varint，浮点 float64，字符串 [len1B][utf8]
+        const argStrs: string[] = [];
+        if (a1 !== undefined && a1 !== null) argStrs.push(a1);
+        if (a2 !== undefined && a2 !== null) argStrs.push(a2);
+        if (a3 !== undefined && a3 !== null) argStrs.push(a3);
+        if (a4 !== undefined && a4 !== null) argStrs.push(a4);
+
+        let argMask = 0;
+        let floatMask = 0;
+        const argEnc: Buffer[] = [];
+        for (let i = 0; i < argStrs.length; i++) {
+            const s = argStrs[i];
+            if (/^\d+$/.test(s)) {
+                argMask |= (1 << i);
+                argEnc.push(this._encodeVarint(parseInt(s, 10)));
+            } else if (/^\d+\.\d+$/.test(s)) {
+                argMask |= (1 << i);
+                floatMask |= (1 << i);
+                const fb = Buffer.alloc(8);
+                fb.writeDoubleBE(parseFloat(s));
+                argEnc.push(fb);
+            } else {
+                argEnc.push(Buffer.from(s, 'utf8'));
+            }
+        }
 
         let totalSize = 1 + 2 + 1; // op + tid + mask
         for (const fb of fieldBufs) totalSize += 1 + fb.length;
-        totalSize += 1; // ^count
-        for (const ab of argBufs) totalSize += 1 + ab.length;
+        totalSize += 1 + 1 + 1; // ^count + argMask + floatMask
+        for (let i = 0; i < argEnc.length; i++) {
+            const ab = argEnc[i];
+            if (argMask & (1 << i)) {
+                totalSize += (floatMask & (1 << i)) ? 8 : ab.length;
+            } else {
+                totalSize += 1 + ab.length;
+            }
+        }
 
         const buf = Buffer.alloc(totalSize);
         let pos = 0;
@@ -769,11 +809,24 @@ export class CHARACTER extends ITEM {
             fb.copy(buf, pos);
             pos += fb.length;
         }
-        buf[pos++] = argBufs.length;
-        for (const ab of argBufs) {
-            buf[pos++] = ab.length;
-            ab.copy(buf, pos);
-            pos += ab.length;
+        buf[pos++] = argStrs.length;
+        buf[pos++] = argMask;
+        buf[pos++] = floatMask;
+        for (let i = 0; i < argEnc.length; i++) {
+            const ab = argEnc[i];
+            if (argMask & (1 << i)) {
+                if (floatMask & (1 << i)) {
+                    buf.writeDoubleBE(parseFloat(argStrs[i]), pos);
+                    pos += 8;
+                } else {
+                    ab.copy(buf, pos);
+                    pos += ab.length;
+                }
+            } else {
+                buf[pos++] = ab.length;
+                ab.copy(buf, pos);
+                pos += ab.length;
+            }
         }
         return buf;
     }
@@ -805,7 +858,26 @@ export class CHARACTER extends ITEM {
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 消息主体发送：绝招缓冲模式写入原始 payload，否则立刻编码发送
+            // 小房间（<10人）：立刻发送给所有人，不批处理
+            let playerCount = 0;
+            for (let i = 0; i < list.length; i++) {
+                if ((list[i] as any).is_player) playerCount++;
+            }
+            if (playerCount < 10) {
+                const frame = encodeBinaryFrame(payload);
+                for (let i = 0; i < list.length; i++) {
+                    const item: any = list[i];
+                    if (!item.is_player || !item.socket) continue;
+                    if (item === this || item === target) {
+                        if (!item.query_setting('no_mcmsg')) item.socket.write(frame);
+                    } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
+                        item.socket.write(frame);
+                    }
+                }
+                return;
+            }
+
+            // 大房间：消息主体立刻发送，其他玩家走批处理
             const self = this as any;
             if (self.is_player && self.socket && !self.query_setting('no_mcmsg')) {
                 if (this._burst_buffering) {
@@ -815,7 +887,6 @@ export class CHARACTER extends ITEM {
                 }
             }
 
-            // 房间其他玩家：缓存原始 payload 到批处理缓冲区（flush 时统一编码）
             const room = this.environment as ROOM;
             const now = Date.now();
 
@@ -851,7 +922,26 @@ export class CHARACTER extends ITEM {
     ): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 消息主体发送：绝招缓冲模式写入原始 payload，否则立刻编码发送
+            // 小房间（<10人）：立刻发送给所有人，不批处理
+            let playerCount = 0;
+            for (let i = 0; i < list.length; i++) {
+                if ((list[i] as any).is_player) playerCount++;
+            }
+            if (playerCount < 10) {
+                const frame = encodeBinaryFrame(payload);
+                for (let i = 0; i < list.length; i++) {
+                    const item: any = list[i];
+                    if (!item.is_player || !item.socket) continue;
+                    if (item === this) {
+                        if (!excludeself) item.socket.write(frame);
+                    } else if (!item.no_message) {
+                        item.socket.write(frame);
+                    }
+                }
+                return;
+            }
+
+            // 大房间：消息主体立刻发送，其他玩家走批处理
             if (!excludeself) {
                 const self = this as any;
                 if (self.is_player && self.socket) {
@@ -863,7 +953,6 @@ export class CHARACTER extends ITEM {
                 }
             }
 
-            // 房间其他玩家：缓存原始 payload 到批处理缓冲区（flush 时统一编码）
             const room = this.environment as ROOM;
             const now = Date.now();
 
@@ -2844,6 +2933,24 @@ export class CHARACTER extends ITEM {
             commonMsg.writeDoubleBE(baseValues[v], cpos);
         // 写入批处理缓冲区（原始 payload，flush 时统一编码）
         const room = this.environment as ROOM;
+
+        // 小房间（<10人）：立刻发送，不批处理
+        let playerCount = 0;
+        const items = room.items;
+        for (let i = 0; i < items.length; i++) {
+            if ((items[i] as any).is_player) playerCount++;
+        }
+        if (playerCount < 10) {
+            const frame = encodeBinaryFrame(commonMsg);
+            for (let i = 0; i < items.length; i++) {
+                const player: any = items[i];
+                if (player.check_player() && player.socket) {
+                    player.socket.write(frame);
+                }
+            }
+            return;
+        }
+
         const now = Date.now();
 
         const wasEmpty = room._batch_all.length === 0;
