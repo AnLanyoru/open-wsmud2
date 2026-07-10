@@ -104,6 +104,17 @@ export class ROOM extends ITEM {
     /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
     _npc_records: [string, number][] = [];
 
+    // ============ 广播批处理缓冲区 ============
+
+    /** 全量帧缓冲区 */
+    _batch_all: Buffer[] = [];
+    /** 非战斗帧缓冲区（排除 combat 消息，供 no_combatmsg 玩家） */
+    _batch_noncombat: Buffer[] = [];
+    /** 批次中是否包含战斗消息 */
+    _batch_has_combat: boolean = false;
+    /** 批处理开始时间戳（毫秒），0 表示无待处理批次 */
+    _batch_timestamp: number = 0;
+
     // ============ 玩法相关 ============
 
     /** 副本分数（由 CHARACTER.add_fbscore 设置） */
@@ -811,6 +822,38 @@ export class ROOM extends ITEM {
     }
 
     /**
+     * 刷新二进制批处理 — 合并缓存帧并发送给房间内玩家。
+     * 预建两个合并 Buffer（全量 + 非战斗），按玩家 no_combatmsg 选择写入。
+     */
+    _flush_batch(): void {
+        const all = this._batch_all;
+        const noncombat = this._batch_noncombat;
+        const hasCombat = this._batch_has_combat;
+        this._batch_all = [];
+        this._batch_noncombat = [];
+        this._batch_has_combat = false;
+        this._batch_timestamp = 0;
+        if (all.length === 0) return;
+
+        const mergedAll = Buffer.concat(all);
+        const mergedNonCombat = hasCombat ? Buffer.concat(noncombat) : mergedAll;
+
+        const items = this.items;
+        for (let i = 0; i < items.length; i++) {
+            const item: any = items[i];
+            if (!item.is_player || !item.socket) continue;
+            if (item.no_message) continue;
+            if (hasCombat && item.query_setting('no_combatmsg')) {
+                if (noncombat.length > 0) {
+                    item.socket.write(mergedNonCombat);
+                }
+            } else {
+                item.socket.write(mergedAll);
+            }
+        }
+    }
+
+    /**
      * 销毁房间(清空物品和所有者)
      */
     destroy(): void {
@@ -1098,6 +1141,34 @@ export class ROOM extends ITEM {
         }
         return room;
     }
+}
+
+// ============================================================
+// 全局批处理刷新服务 — 每 10ms 遍历有堆积的房间
+// ============================================================
+
+/** 有待处理批次的房间列表 */
+let _dirty_rooms: ROOM[] = [];
+/** 全局刷新定时器 */
+let _flush_timer: ReturnType<typeof setInterval> | null = null;
+
+/** 确保全局刷新定时器已启动（惰性初始化） */
+function ensureFlushTimer(): void {
+    if (_flush_timer) return;
+    _flush_timer = setInterval(() => {
+        const rooms = _dirty_rooms;
+        if (rooms.length === 0) return;
+        _dirty_rooms = [];
+        for (let i = 0; i < rooms.length; i++) {
+            rooms[i]._flush_batch();
+        }
+    }, 10);
+}
+
+/** 标记房间为待刷新（由 _broadcast_room 调用） */
+export function _markRoomDirty(room: ROOM): void {
+    _dirty_rooms.push(room);
+    ensureFlushTimer();
 }
 
 declare global {

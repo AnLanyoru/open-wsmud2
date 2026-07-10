@@ -28,6 +28,7 @@ import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
 import { encodeBinaryFrame } from '../net-ws.js';
+import { _markRoomDirty } from '../room/room.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -774,18 +775,29 @@ export class CHARACTER extends ITEM {
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 二进制路径：预编码 WebSocket 帧一次，所有 socket 复用同一个 Buffer
+            // 二进制路径：预编码 WebSocket 帧一次
             const frame = encodeBinaryFrame(payload);
-            for (let i = 0; i < list.length; i++) {
-                const item: any = list[i];
-                if (!item.is_player || !item.socket) continue;
-                if (item === this || item === target) {
-                    if (!item.query_setting('no_mcmsg'))
-                        item.socket.write(frame);
-                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                    item.socket.write(frame);
-                }
+
+            // 消息主体立刻发送（自身战斗消息需要及时反馈）
+            const self = this as any;
+            if (self.is_player && self.socket && !self.query_setting('no_mcmsg')) {
+                self.socket.write(frame);
             }
+
+            // 房间其他玩家：缓存到批处理缓冲区
+            const room = this.environment as ROOM;
+            const now = Date.now();
+
+            const wasEmpty = room._batch_all.length === 0;
+            room._batch_all.push(frame);
+            room._batch_has_combat = true;
+            if (wasEmpty) {
+                room._batch_timestamp = now;
+                _markRoomDirty(room);
+            } else if (now - room._batch_timestamp >= 10) {
+                room._flush_batch();
+            }
+
             return;
         }
         for (let i = 0; i < list.length; i++) {
@@ -808,18 +820,31 @@ export class CHARACTER extends ITEM {
     ): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
-            // 二进制路径：预编码 WebSocket 帧一次，所有 socket 复用同一个 Buffer
+            // 二进制路径：预编码 WebSocket 帧一次
             const frame = encodeBinaryFrame(payload);
-            for (let i = 0; i < list.length; i++) {
-                const item: any = list[i];
-                if (!item.is_player || !item.socket) continue;
-                if (item === this) {
-                    if (!excludeself)
-                        item.socket.write(frame);
-                } else if (!item.no_message) {
-                    item.socket.write(frame);
+
+            // 消息主体立刻发送，保证操作者响应零延迟
+            if (!excludeself) {
+                const self = this as any;
+                if (self.is_player && self.socket) {
+                    self.socket.write(frame);
                 }
             }
+
+            // 房间其他玩家：缓存到批处理缓冲区
+            const room = this.environment as ROOM;
+            const now = Date.now();
+
+            const wasEmpty = room._batch_all.length === 0;
+            room._batch_all.push(frame);
+            room._batch_noncombat.push(frame);
+            if (wasEmpty) {
+                room._batch_timestamp = now;
+                _markRoomDirty(room);
+            } else if (now - room._batch_timestamp >= 10) {
+                room._flush_batch();
+            }
+
             return;
         }
         for (let i = 0; i < list.length; i++) {
@@ -2774,10 +2799,7 @@ export class CHARACTER extends ITEM {
             baseFlags = 0x0F; // hp | max_hp | mp | max_mp
             baseValues.push(this.hp, this.max_hp, this.mp, this.max_mp);
         }
-        const showdamage = type ? type === 'hp' : false;
-
         const idBuf = CHARACTER._pack_id(this.id);
-        const items = this.environment.items;
 
         // 构建公共 msg（不带 damage）并预编码 WebSocket 帧
         const commonLen = 9 + baseValues.length * 8;
@@ -2790,35 +2812,18 @@ export class CHARACTER extends ITEM {
             commonMsg.writeDoubleBE(baseValues[v], cpos);
         const commonFrame = encodeBinaryFrame(commonMsg);
 
-        // 无 showdamage 或没有伤害数据：所有玩家复用同一帧
-        if (!showdamage || !this.damages) {
-            for (let i = 0; i < items.length; i++) {
-                const player: any = items[i];
-                if (!player.check_player() || !player.socket) continue;
-                player.socket.write(commonFrame);
-            }
-            return;
-        }
+        // 写入批处理缓冲区（不再逐玩家构建 damage 帧，由客户端本地处理）
+        const room = this.environment as ROOM;
+        const now = Date.now();
 
-        // showdamage 模式：大部分玩家用公共帧，show_damage 玩家单独构建含 damage 的帧
-        const dmgLen = commonLen + 8;
-        const damages = this.damages;
-        for (let i = 0; i < items.length; i++) {
-            const player: any = items[i];
-            if (!player.check_player() || !player.socket) continue;
-            if (player.query_setting('show_damage')) {
-                const msg = Buffer.alloc(dmgLen);
-                msg[0] = 0x53;
-                msg[1] = baseFlags | 0x10;
-                idBuf.copy(msg, 2);
-                let pos = 9;
-                for (let v = 0; v < baseValues.length; v++, pos += 8)
-                    msg.writeDoubleBE(baseValues[v], pos);
-                msg.writeDoubleBE(damages[player.id] || 0, pos);
-                player.socket.write(encodeBinaryFrame(msg));
-            } else {
-                player.socket.write(commonFrame);
-            }
+        const wasEmpty = room._batch_all.length === 0;
+        room._batch_all.push(commonFrame);
+        room._batch_noncombat.push(commonFrame);
+        if (wasEmpty) {
+            room._batch_timestamp = now;
+            _markRoomDirty(room);
+        } else if (now - room._batch_timestamp >= 10) {
+            room._flush_batch();
         }
     }
 

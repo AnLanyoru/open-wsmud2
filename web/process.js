@@ -595,9 +595,41 @@ function popcntBelow(mask, bit) {
  * 解析并分发二进制帧
  * @param {Uint8Array} data
  */
+/** 玩家 HP 缓存（用于本地计算 damage） */
+const _prevHP = {};
+
 export function ProcessBinary(data) {
     let pos = 0;
     const myName = Process.name || '';
+
+    // 预扫描：判断是否为批处理合并帧（≥2 帧），单帧可能是立刻发送不应去重
+    let isBatch = false;
+    {
+        let p = 0, frames = 0;
+        while (p < data.length) {
+            const op = data[p++];
+            if (op === 0x12) {
+                p += 2; const m = data[p++];
+                let b = 1;
+                for (let i = 0; i < 8; i++) {
+                    if (m & b) { const l = data[p]; p += 1 + l; }
+                    b <<= 1;
+                }
+                const ac = data[p++];
+                for (let i = 0; i < ac; i++) { const l = data[p]; p += 1 + l; }
+            } else if (op === 0x53) {
+                const fl = data[p++]; p += 7;
+                if (fl & 0x01) p += 8;
+                if (fl & 0x02) p += 8;
+                if (fl & 0x04) p += 8;
+                if (fl & 0x08) p += 8;
+                if (fl & 0x10) p += 8;
+            } else if (op === 0x00) {
+                const l = data[p]; p += 1 + l;
+            } else break;
+            if (++frames >= 2) { isBatch = true; break; }
+        }
+    }
 
     while (pos < data.length) {
         const op = data[pos++];
@@ -631,6 +663,8 @@ export function ProcessBinary(data) {
                 let text = format(tid, mask, sparse, args);
                 if (text) {
                     const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
+                    // 去重：只在批处理合并帧中跳过以自己为主视角的帧（立刻发送的单帧不跳过）
+                    if (isBatch && aName === myName) break;
                     const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
                     text = perspective(text, aName, tName, myName);
                     if (Setting.show_binary) text += ' <hib>(binary)</hib>';
@@ -662,6 +696,14 @@ export function ProcessBinary(data) {
                 if (flags & 0x04) { sc.mp = dv.getFloat64(pos); pos += 8; }
                 if (flags & 0x08) { sc.max_mp = dv.getFloat64(pos); pos += 8; }
                 if (flags & 0x10) { sc.damage = dv.getFloat64(pos); pos += 8; }
+                // 服务端不再逐玩家发送 damage，客户端本地计算
+                if (Setting.show_damage && (flags & 0x01) && !(flags & 0x10)) {
+                    const prev = _prevHP[id];
+                    if (prev !== undefined && prev > sc.hp) {
+                        sc.damage = prev - sc.hp;
+                    }
+                    _prevHP[id] = sc.hp;
+                }
 
                 Process.sc(sc);
                 break;
