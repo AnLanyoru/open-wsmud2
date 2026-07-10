@@ -574,6 +574,33 @@ function ReceiveMessage(x) {
 // 二进制帧解析
 // ============================================================
 
+/** 读取嵌套模板引用，递归 format 返回展开字符串 */
+function readTplRef(data, pos) {
+    const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
+    const refArgc = data[pos++];
+    const refArgMask = data[pos++];
+    const refFloatMask = data[pos++];
+    const refArgs = [];
+    for (let i = 0; i < refArgc; i++) {
+        if (refArgMask & (1 << i)) {
+            if (refFloatMask & (1 << i)) {
+                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+                refArgs.push(String(dv.getFloat64(pos)));
+                pos += 8;
+            } else {
+                const r = readVarint(data, pos);
+                refArgs.push(String(r.value));
+                pos = r.next;
+            }
+        } else {
+            const r = readStr(data, pos);
+            refArgs.push(r.str);
+            pos = r.next;
+        }
+    }
+    return { str: format(refTid, 0, [], refArgs), next: pos };
+}
+
 /** 读取 LEB128 无符号 varint */
 function readVarint(data, pos) {
     let value = 0, shift = 0;
@@ -637,13 +664,18 @@ export function ProcessBinary(data) {
                     bit <<= 1;
                 }
 
-                // 读 ^args（整数 varint，浮点 float64，字符串 len+utf8）
+                // 读 ^args（模板引用、整数 varint，浮点 float64，字符串 len+utf8）
                 const argCount = data[pos++];
                 const argMask = data[pos++];
                 const floatMask = data[pos++];
+                const refMask = data[pos++];
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
-                    if (argMask & (1 << i)) {
+                    if (refMask & (1 << i)) {
+                        const r = readTplRef(data, pos);
+                        args.push(r.str);
+                        pos = r.next;
+                    } else if (argMask & (1 << i)) {
                         if (floatMask & (1 << i)) {
                             const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
                             args.push(String(dv.getFloat64(pos)));

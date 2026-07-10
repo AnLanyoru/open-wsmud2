@@ -15,7 +15,7 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FIELD_TO_MASK, FMASK, getMask, popcount } from '../templates.js';
+import { FIELD_TO_MASK, FMASK, getMask, popcount, _tmpl } from '../templates.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -729,14 +729,14 @@ export class CHARACTER extends ITEM {
         return Buffer.from(bytes);
     }
 
-    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 arg 用 varint 压缩） */
+    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 varint，浮点 float64，TplRef 嵌套） */
     _build_binary_buf(
         template_id: number,
         target: ITEM | undefined,
-        a1?: string,
-        a2?: string,
-        a3?: string,
-        a4?: string,
+        a1?: string | TplRef,
+        a2?: string | TplRef,
+        a3?: string | TplRef,
+        a4?: string | TplRef,
     ): Buffer {
         const mask = getMask(template_id);
 
@@ -760,38 +760,92 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        // ^args — 整数 varint，浮点 float64，字符串 [len1B][utf8]
-        const argStrs: string[] = [];
-        if (a1 !== undefined && a1 !== null) argStrs.push(a1);
-        if (a2 !== undefined && a2 !== null) argStrs.push(a2);
-        if (a3 !== undefined && a3 !== null) argStrs.push(a3);
-        if (a4 !== undefined && a4 !== null) argStrs.push(a4);
+        // ^args — TplRef 嵌套，整数 varint，浮点 float64，字符串 [len1B][utf8]
+        const argItems: (string | TplRef)[] = [];
+        if (a1 !== undefined && a1 !== null) argItems.push(a1);
+        if (a2 !== undefined && a2 !== null) argItems.push(a2);
+        if (a3 !== undefined && a3 !== null) argItems.push(a3);
+        if (a4 !== undefined && a4 !== null) argItems.push(a4);
 
-        let argMask = 0;
-        let floatMask = 0;
-        const argEnc: Buffer[] = [];
-        for (let i = 0; i < argStrs.length; i++) {
-            const s = argStrs[i];
-            if (/^\d+$/.test(s)) {
+        let argMask = 0, floatMask = 0, refMask = 0;
+        const argEnc: Buffer[] = []; // encoded arg bodies
+        for (let i = 0; i < argItems.length; i++) {
+            const v = argItems[i];
+            if (_isTplRef(v)) {
+                refMask |= (1 << i);
                 argMask |= (1 << i);
-                argEnc.push(this._encodeVarint(parseInt(s, 10)));
-            } else if (/^\d+\.\d+$/.test(s)) {
-                argMask |= (1 << i);
-                floatMask |= (1 << i);
-                const fb = Buffer.alloc(8);
-                fb.writeDoubleBE(parseFloat(s));
-                argEnc.push(fb);
+                // 编码嵌套模板: [refTid uint16][refArgc 1B][refMask 1B][refFloatMask 1B][refArgs...]
+                const tid = v.tmpl;
+                const rargs = v.args;
+                let rargMask = 0, rfloatMask = 0;
+                const rargEnc: Buffer[] = [];
+                for (let j = 0; j < rargs.length; j++) {
+                    const rs = rargs[j];
+                    if (/^\d+$/.test(rs)) {
+                        rargMask |= (1 << j);
+                        rargEnc.push(this._encodeVarint(parseInt(rs, 10)));
+                    } else if (/^\d+\.\d+$/.test(rs)) {
+                        rargMask |= (1 << j);
+                        rfloatMask |= (1 << j);
+                        const fb = Buffer.alloc(8);
+                        fb.writeDoubleBE(parseFloat(rs));
+                        rargEnc.push(fb);
+                    } else {
+                        rargEnc.push(Buffer.from(rs, 'utf8'));
+                    }
+                }
+                let rtotal = 2 + 1 + 1 + 1; // refTid + refArgc + refMask + refFloatMask
+                for (let j = 0; j < rargEnc.length; j++) {
+                    const ab = rargEnc[j];
+                    rtotal += (rargMask & (1 << j))
+                        ? ((rfloatMask & (1 << j)) ? 8 : ab.length)
+                        : (1 + ab.length);
+                }
+                const rbuf = Buffer.alloc(rtotal);
+                let rpos = 0;
+                rbuf.writeUInt16BE(tid as number, rpos); rpos += 2;
+                rbuf[rpos++] = rargs.length;
+                rbuf[rpos++] = rargMask;
+                rbuf[rpos++] = rfloatMask;
+                for (let j = 0; j < rargEnc.length; j++) {
+                    const ab = rargEnc[j];
+                    if (rargMask & (1 << j)) {
+                        if (rfloatMask & (1 << j)) {
+                            rbuf.writeDoubleBE(parseFloat(rargs[j]), rpos); rpos += 8;
+                        } else {
+                            ab.copy(rbuf, rpos); rpos += ab.length;
+                        }
+                    } else {
+                        rbuf[rpos++] = ab.length;
+                        ab.copy(rbuf, rpos); rpos += ab.length;
+                    }
+                }
+                argEnc.push(rbuf);
             } else {
-                argEnc.push(Buffer.from(s, 'utf8'));
+                const s = v as string;
+                if (/^\d+$/.test(s)) {
+                    argMask |= (1 << i);
+                    argEnc.push(this._encodeVarint(parseInt(s, 10)));
+                } else if (/^\d+\.\d+$/.test(s)) {
+                    argMask |= (1 << i);
+                    floatMask |= (1 << i);
+                    const fb = Buffer.alloc(8);
+                    fb.writeDoubleBE(parseFloat(s));
+                    argEnc.push(fb);
+                } else {
+                    argEnc.push(Buffer.from(s, 'utf8'));
+                }
             }
         }
 
         let totalSize = 1 + 2 + 1; // op + tid + mask
         for (const fb of fieldBufs) totalSize += 1 + fb.length;
-        totalSize += 1 + 1 + 1; // ^count + argMask + floatMask
+        totalSize += 1 + 1 + 1 + 1; // ^count + argMask + floatMask + refMask
         for (let i = 0; i < argEnc.length; i++) {
             const ab = argEnc[i];
-            if (argMask & (1 << i)) {
+            if (refMask & (1 << i)) {
+                totalSize += ab.length;
+            } else if (argMask & (1 << i)) {
                 totalSize += (floatMask & (1 << i)) ? 8 : ab.length;
             } else {
                 totalSize += 1 + ab.length;
@@ -809,23 +863,23 @@ export class CHARACTER extends ITEM {
             fb.copy(buf, pos);
             pos += fb.length;
         }
-        buf[pos++] = argStrs.length;
+        buf[pos++] = argItems.length;
         buf[pos++] = argMask;
         buf[pos++] = floatMask;
+        buf[pos++] = refMask;
         for (let i = 0; i < argEnc.length; i++) {
             const ab = argEnc[i];
-            if (argMask & (1 << i)) {
+            if (refMask & (1 << i)) {
+                ab.copy(buf, pos); pos += ab.length;
+            } else if (argMask & (1 << i)) {
                 if (floatMask & (1 << i)) {
-                    buf.writeDoubleBE(parseFloat(argStrs[i]), pos);
-                    pos += 8;
+                    buf.writeDoubleBE(parseFloat(argItems[i] as string), pos); pos += 8;
                 } else {
-                    ab.copy(buf, pos);
-                    pos += ab.length;
+                    ab.copy(buf, pos); pos += ab.length;
                 }
             } else {
                 buf[pos++] = ab.length;
-                ab.copy(buf, pos);
-                pos += ab.length;
+                ab.copy(buf, pos); pos += ab.length;
             }
         }
         return buf;
@@ -1012,15 +1066,20 @@ export class CHARACTER extends ITEM {
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
     send_msg_b(
-        template_id: number,
+        template_id: number | string,
         target?: ITEM,
         flags?: number,
-        _a1?: string,
-        _a2?: string,
-        _a3?: string,
-        _a4?: string,
+        _a1?: string | TplRef,
+        _a2?: string | TplRef,
+        _a3?: string | TplRef,
+        _a4?: string | TplRef,
     ): void {
         if (!this.environment || template_id === undefined) return;
+        // text 模式回退：_tmpl() 未被 pack.mjs 替换时仍为字符串，走 send_msg
+        if (typeof template_id === 'string') {
+            this.send_msg(template_id, target, flags);
+            return;
+        }
         const payload = this._build_binary_buf(template_id, target, _a1, _a2, _a3, _a4);
         if (flags && flags & 1) this._broadcast_combat(payload, target);
         else this._broadcast_room(payload, target, !!(flags && flags & 2));
@@ -1032,27 +1091,35 @@ export class CHARACTER extends ITEM {
         this.send_msg(text, target, 1);
     }
     send_combat_b(
-        template_id: number,
+        template_id: number | string,
         target?: CHARACTER,
-        _a1?: string,
-        _a2?: string,
-        _a3?: string,
-        _a4?: string,
+        _a1?: string | TplRef,
+        _a2?: string | TplRef,
+        _a3?: string | TplRef,
+        _a4?: string | TplRef,
     ): void {
+        if (typeof template_id === 'string') {
+            this.send_combat(template_id, target);
+            return;
+        }
         this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4);
     }
     send_room(text: string | number, target?: ITEM, excludeself?: boolean): void {
         this.send_msg(text, target, excludeself ? 2 : 0);
     }
     send_room_b(
-        template_id: number,
+        template_id: number | string,
         target?: ITEM,
         excludeself?: boolean,
-        _a1?: string,
-        _a2?: string,
-        _a3?: string,
-        _a4?: string,
+        _a1?: string | TplRef,
+        _a2?: string | TplRef,
+        _a3?: string | TplRef,
+        _a4?: string | TplRef,
     ): void {
+        if (typeof template_id === 'string') {
+            this.send_room(template_id, target, excludeself);
+            return;
+        }
         this.send_msg_b(template_id, target, excludeself ? 2 : 0, _a1, _a2, _a3, _a4);
     }
 
@@ -3280,12 +3347,12 @@ export class CHARACTER extends ITEM {
             // text 模式为字符串，binary 模式为模板 ID — send_combat 自动路由
             this.send_combat(par.attack_before, target);
         }
+        if (attack_msg) this.send_combat(attack_msg, target);
         const weapon_type = par.no_weapon
             ? WEAPON_TYPE.NONE
             : weapon
                 ? weapon.weapon_type
                 : WEAPON_TYPE.NONE;
-        if (attack_msg) this.send_combat(attack_msg, target);
 
         // 入口归一化：确保输出属性在此初始化，后续只做覆盖（V8 隐藏类稳定）
         par.flags = par.flags ?? 0;
@@ -3893,37 +3960,31 @@ function query_status_msg(hp: number, maxhp: number): string {
  * 不含 $ 占位符的模板不会被 pack.mjs 自动扫描，由 _DMG_ZERO 和 _DMG_FALLBACK 单独注册
  * pack.mjs --binary 会将其中含 $ 的 tmpl 字符串替换为模板 ID
  */
+/** 模板引用 — 嵌套模板展开 */
+export interface TplRef {
+    tmpl: string | number;
+    args: string[];
+}
+function _isTplRef(v: any): v is TplRef { return v && typeof v === 'object' && 'tmpl' in v; }
+function _toRef(tmpl: string | number, ...args: string[]): TplRef { return { tmpl, args }; }
+
+// 伤害占比模板（原版，^ 传 TplRef 嵌套 damage 显示模板）
 const _DMG_TMPL: Record<string, Array<{ max: number; tmpl: string | number }>> = {
     blade: [
         { max: 5, tmpl: '结果只是轻轻地划破$p的皮肉，造成^。' },
         { max: 10, tmpl: '结果在$p$l划出一道细长的血痕，造成^！' },
         { max: 20, tmpl: '结果「嗤」地一声划出一道伤口，造成^！' },
         { max: 40, tmpl: '结果「嗤」地一声划出一道血淋淋的伤口，造成^！' },
-        {
-            max: 80,
-            tmpl: '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！',
-        },
-        {
-            max: Infinity,
-            tmpl: '结果只听见$n一声惨嚎，$w已在$p$l划出一道深及见骨的可怕伤口，造成^！！',
-        },
+        { max: 80, tmpl: '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！' },
+        { max: Infinity, tmpl: '结果只听见$n一声惨嚎，$w已在$p$l划出一道深及见骨的可怕伤口，造成^！！' },
     ],
     sword: [
         { max: 10, tmpl: '结果只是轻轻地刺破$p的皮肉，造成^！' },
         { max: 20, tmpl: '结果在$p$l刺出一个创口，造成^！' },
         { max: 40, tmpl: '结果「噗」地一声刺入了$n$l寸许，造成^！' },
-        {
-            max: 60,
-            tmpl: '结果「噗」地一声刺进$n的$l，使$p不由自主地退了几步，造成^！',
-        },
-        {
-            max: 80,
-            tmpl: '结果「噗嗤」地一声，$w已在$p$l刺出一个血肉模糊的血窟窿，造成^！',
-        },
-        {
-            max: Infinity,
-            tmpl: '结果只听见$n一声惨嚎，$w已在$p的$l对穿而出，鲜血溅得满地，造成^！！',
-        },
+        { max: 60, tmpl: '结果「噗」地一声刺进$n的$l，使$p不由自主地退了几步，造成^！' },
+        { max: 80, tmpl: '结果「噗嗤」地一声，$w已在$p$l刺出一个血肉模糊的血窟窿，造成^！' },
+        { max: Infinity, tmpl: '结果只听见$n一声惨嚎，$w已在$p的$l对穿而出，鲜血溅得满地，造成^！！' },
     ],
     none: [
         { max: 5, tmpl: '结果只是轻轻地碰到，比拍苍蝇稍微重了点，造成^！' },
@@ -3931,55 +3992,36 @@ const _DMG_TMPL: Record<string, Array<{ max: number; tmpl: string | number }>> =
         { max: 25, tmpl: '结果一击命中，$n的$l登时肿了一块老高，造成^！' },
         { max: 40, tmpl: '结果一击命中，$n闷哼了一声显然吃了不小的亏，造成^！' },
         { max: 50, tmpl: '结果「砰」地一声，$n退了两步，造成^！' },
-        {
-            max: 60,
-            tmpl: '结果这一下「砰」地一声打得$n连退了好几步，差一点摔倒，造成^！',
-        },
+        { max: 60, tmpl: '结果这一下「砰」地一声打得$n连退了好几步，差一点摔倒，造成^！' },
         { max: 80, tmpl: '结果重重地击中，$n「哇」地一声吐出一口鲜血，造成^！' },
-        {
-            max: Infinity,
-            tmpl: '结果只听见「砰」地一声巨响，$n像一捆稻草般飞了出去，造成^！！',
-        },
+        { max: Infinity, tmpl: '结果只听见「砰」地一声巨响，$n像一捆稻草般飞了出去，造成^！！' },
     ],
     force: [
         { max: 10, tmpl: '结果只是把$n打得退了半步，毫发无损，造成^！' },
         { max: 20, tmpl: '结果$n痛哼一声，在$p的$l造成一处瘀伤，造成^！' },
         { max: 30, tmpl: '结果一击命中，把$n打得痛得弯下腰去，造成^！' },
-        {
-            max: 40,
-            tmpl: '结果$n闷哼了一声，脸上一阵青一阵白，显然受了点内伤，造成^！',
-        },
-        {
-            max: 60,
-            tmpl: '结果$n脸色一下变得惨白，昏昏沉沉接连退了好几步，造成^！',
-        },
+        { max: 40, tmpl: '结果$n闷哼了一声，脸上一阵青一阵白，显然受了点内伤，造成^！' },
+        { max: 60, tmpl: '结果$n脸色一下变得惨白，昏昏沉沉接连退了好几步，造成^！' },
         { max: 75, tmpl: '结果重重地击中，$n「哇」地一声吐出一口鲜血，造成^！' },
-        {
-            max: 90,
-            tmpl: '结果「轰」地一声，$n全身气血倒流，口中鲜血狂喷而出，造成^！',
-        },
-        {
-            max: Infinity,
-            tmpl: '结果只听见几声喀喀轻响，$n一声惨叫，像滩软泥般塌了下去，造成^！！',
-        },
+        { max: 90, tmpl: '结果「轰」地一声，$n全身气血倒流，口中鲜血狂喷而出，造成^！' },
+        { max: Infinity, tmpl: '结果只听见几声喀喀轻响，$n一声惨叫，像滩软泥般塌了下去，造成^！！' },
     ],
     throwing: [
         { max: 5, tmpl: '结果只是轻轻地划破$p的皮肉，造成^。' },
         { max: 10, tmpl: '结果在$p$l划出一道细长的血痕，造成^！' },
         { max: 20, tmpl: '结果「嗤」地一声划出一道伤口，造成^！' },
         { max: 40, tmpl: '结果「嗤」地一声划出一道血淋淋的伤口，造成^！' },
-        {
-            max: 80,
-            tmpl: '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！',
-        },
-        {
-            max: Infinity,
-            tmpl: '结果只听见$n一声惨嚎，$T已在$p$l划出一道深及见骨的可怕伤口，造成^！！',
-        },
+        { max: 80, tmpl: '结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！' },
+        { max: Infinity, tmpl: '结果只听见$n一声惨嚎，$T已在$p$l划出一道深及见骨的可怕伤口，造成^！！' },
     ],
 };
-// fallback 模板 — text 模式为字符串，binary 模式被 pack.mjs 替换为模板 ID
-const _DMG_FALLBACK: string | number = '<wht>结果造成^。</wht>';
+// 伤害显示模板（被 _DMG_TMPL 的 ^ 嵌套引用，颜色在模板内）
+const _DMG_DISP_NORMAL = _tmpl('<wht>^点伤害</wht>');
+const _DMG_DISP_CRIT = _tmpl('<hir>^点暴击伤害</hir>');
+const _DMG_DISP_MSG = _tmpl('<wht>$N对$n造成了^点伤害</wht>');
+const _DMG_DISP_MSG_CRIT = _tmpl('<hir>$N对$n造成了^点暴击伤害</hir>');
+// fallback
+const _DMG_FALLBACK = _tmpl('<wht>结果造成^点伤害。</wht>');
 
 /**
  * 发送伤害消息
@@ -3996,29 +4038,21 @@ function damage_msg(
     iscrit: boolean,
     msg?: string,
 ): void {
-    // 自定义消息 — text 模式字符串走拼接，binary 模式数字走 send_combat_b
+    const sh: string = String(damage);
+    const disp = iscrit ? _DMG_DISP_CRIT : _DMG_DISP_NORMAL;
+    // 自定义消息 — ^ 嵌套 damage 显示模板
     if (msg) {
-        me.send_combat(msg, ob);
-        me.send_combat(
-            '$N对$n造成' +
-            (iscrit
-                ? '<hir>' + damage + '</hir>点暴击伤害'
-                : '<wht>' + damage + '</wht>点伤害'),
-            ob,
-        );
+        const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
+        me.send_combat_b(dmgTmpl, ob, _toRef(disp, sh));
         return;
     }
-    // 零伤害 — 文本路径
+    // 零伤害
     if (damage === 0) {
         me.send_combat('结果没有造成任何伤害。', ob);
         return;
     }
-    // 伤害字符串（^ 参数）
-    const sh: string = iscrit
-        ? '<hir>' + damage + '</hir>点暴击伤害'
-        : '<wht>' + damage + '</wht>点伤害';
     const ratio: number = ob.hp > 0 ? (damage * 100) / ob.hp : 120;
-    // 查找伤害模板
+    // 查找伤害占比模板（^ 嵌套 damage 显示模板）
     let buckets: Array<{ max: number; tmpl: string | number }> | undefined;
     if (type === WEAPON_TYPE.BLADE || type === WEAPON_TYPE.WHIP) {
         buckets = _DMG_TMPL.blade;
@@ -4038,22 +4072,13 @@ function damage_msg(
     if (buckets) {
         for (let i: number = 0; i < buckets.length; i++) {
             if (ratio < buckets[i].max) {
-                const tmpl = buckets[i].tmpl;
-                if (typeof tmpl === 'number') {
-                    me.send_combat_b(tmpl, ob, sh);
-                } else {
-                    me.send_combat(tmpl.replace('^', sh), ob);
-                }
+                me.send_combat_b(buckets[i].tmpl, ob, _toRef(disp, sh));
                 return;
             }
         }
     }
     // fallback
-    if (typeof _DMG_FALLBACK === 'number') {
-        me.send_combat_b(_DMG_FALLBACK, ob, sh);
-    } else {
-        me.send_combat(_DMG_FALLBACK.replace('^', sh), ob);
-    }
+    me.send_combat_b(_DMG_FALLBACK, ob, _toRef(disp, sh));
 }
 
 // ================================================================
