@@ -461,6 +461,7 @@ const skills_css = `
     border-left-style: solid;
     white-space: nowrap;
     overflow-x: auto;
+    overscroll-behavior-x: none;
     margin-bottom: 0.5em;
     background-color: var(--bg-surface);
     cursor: pointer;
@@ -512,6 +513,7 @@ const skills_css = `
     border-left-style: solid;
     white-space: nowrap;
     overflow-x: auto;
+    overscroll-behavior-x: none;
     margin-bottom: 0.5em;
     background-color: var(--bg-surface);
     cursor: pointer;
