@@ -1015,21 +1015,41 @@ export class CHARACTER extends ITEM {
      * isCombat: true=战斗过滤(no_mcmsg/no_combatmsg)，false=房间过滤(no_message)
      * excludeSelf: true=排除自身（由 send_room_others 调用，一般不直接使用）
      */
-    send_msg(text: string | number, target?: ITEM, isCombat?: boolean, excludeSelf?: boolean): void {
+    send_msg(
+        text: string | number,
+        target?: ITEM,
+        isCombat?: boolean,
+        excludeSelf?: boolean,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
+    ): void {
         if (!this.environment || text === undefined) return;
         if (typeof text === 'number') {
-            this._send_binary(text, target, isCombat, excludeSelf);
+            this._send_binary(text, target, isCombat, excludeSelf, _a1, _a2, _a3, _a4);
             return;
         }
         if (!text) return;
+        // 文本模式：若携带参数，先展开 ^ 占位符
+        if (_a1 !== undefined) text = this._expand_text(text, _a1, _a2, _a3, _a4);
         const payload = this._build_msg(text, target);
         if (isCombat) this._broadcast_combat(payload, target);
         else this._broadcast_room(payload, target, excludeSelf);
     }
 
     /** 二进制路径（内部实现，由 send_msg 的 typeof 分支调用） */
-    _send_binary(template_id: number, target?: ITEM, isCombat?: boolean, excludeSelf?: boolean): void {
-        this.send_msg_b(template_id, target, isCombat, excludeSelf);
+    _send_binary(
+        template_id: number,
+        target?: ITEM,
+        isCombat?: boolean,
+        excludeSelf?: boolean,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
+    ): void {
+        this.send_msg_b(template_id, target, isCombat, excludeSelf, _a1, _a2, _a3, _a4);
     }
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
@@ -1078,8 +1098,15 @@ export class CHARACTER extends ITEM {
 
     // 向后兼容 — 供未替换的动态 send_room / send_combat 调用
     // 第一参数接受 string | number，自动交由 send_msg 的 typeof 分支路由
-    send_combat(text: string | number, target?: CHARACTER): void {
-        this.send_msg(text, target, true);
+    send_combat(
+        text: string | number,
+        target?: CHARACTER,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
+    ): void {
+        this.send_msg(text, target, true, undefined, _a1, _a2, _a3, _a4);
     }
     send_combat_b(
         template_id: number | string,
@@ -1096,8 +1123,15 @@ export class CHARACTER extends ITEM {
         this.send_msg_b(template_id, target, true, false, _a1, _a2, _a3, _a4);
     }
 
-    send_room(text: string | number, target?: ITEM): void {
-        this.send_msg(text, target, false);
+    send_room(
+        text: string | number,
+        target?: ITEM,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
+    ): void {
+        this.send_msg(text, target, false, undefined, _a1, _a2, _a3, _a4);
     }
     send_room_b(
         template_id: number | string,
@@ -1115,8 +1149,15 @@ export class CHARACTER extends ITEM {
     }
 
     /** 广播房间消息（排除自身）— 文本路径 */
-    send_room_others(text: string | number, target?: ITEM): void {
-        this.send_msg(text, target, false, true);
+    send_room_others(
+        text: string | number,
+        target?: ITEM,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
+    ): void {
+        this.send_msg(text, target, false, true, _a1, _a2, _a3, _a4);
     }
     /** 广播房间消息（排除自身）— 二进制路径
      *  模板路径强制置 A_NAME 掩码位，确保客户端拿到发送者名字做 excludeSelf 过滤 */
