@@ -4,10 +4,22 @@
  * 模板 ID 单调递增，永不回收，保证热更新兼容。
  * 打包阶段扫描 send_room/send_combat 的字面量参数，
  * 调用 register() 分配 ID，生成映射表随前端资源一起下发。
+ *
+ * 二进制帧优化：0x12 帧不再携带字符串字段，改为携带 7B 玩家 ID，
+ * 客户端从 cur_room.items 缓存中按 ID 查找字段值。
  */
 
 // ============================================================
-// 字段掩码 — 标记模板需要哪些实体属性
+// ID 掩码 — 标记 0x12 帧需要携带哪些 ID（2 位有效，6 位保留）
+// ============================================================
+
+export const ID_MASK = {
+    A_ID: 0x01, // $N $W $w $P $l $T — 攻击者侧任意占位符
+    T_ID: 0x02, // $n $i $p — 目标侧任意占位符
+} as const;
+
+// ============================================================
+// 字段掩码 — 标记模板需要哪些实体属性（8 位，用于刷新帧和客户端 sparse 构建）
 // ============================================================
 
 export const FMASK = {
@@ -35,8 +47,27 @@ export const FIELD_TO_MASK: number[] = (() => {
     return m;
 })();
 
-/** 根据模板文本计算字段掩码 */
-function computeMask(text: string): number {
+/**
+ * 计算模板的 ID 掩码 — 用于 template_id 编码 (mask << 16 | pure_id)
+ * 0x12 帧按此掩码决定是否携带 A_ID / T_ID（各 7 字节）
+ */
+function computeIdMask(text: string): number {
+    let mask = 0;
+    if (text.includes('$N') || text.includes('$W') || text.includes('$w')
+        || text.includes('$P') || text.includes('$l') || text.includes('$T')) {
+        mask |= ID_MASK.A_ID;
+    }
+    if (text.includes('$n') || text.includes('$i') || text.includes('$p')) {
+        mask |= ID_MASK.T_ID;
+    }
+    return mask;
+}
+
+/**
+ * 计算模板的字段掩码 — 8 位 FMASK，导出到客户端供 sparse 构建使用
+ * 客户端按此掩码从 cur_room.items 缓存中提取字段填充 sparse 数组
+ */
+function computeFieldMask(text: string): number {
     let mask = 0;
     if (text.includes('$N')) mask |= FMASK.A_NAME;
     if (text.includes('$n')) mask |= FMASK.T_NAME;
@@ -46,10 +77,6 @@ function computeMask(text: string): number {
     if (text.includes('$W') || text.includes('$w')) mask |= FMASK.A_WEAPON;
     if (text.includes('$i')) mask |= FMASK.T_WEAPON;
     if (text.includes('$T')) mask |= FMASK.A_THROW;
-    // $N 和 $n 至少有一个时，双方 name 都带上（客户端视角转换需要名字）
-    if (mask & (FMASK.A_NAME | FMASK.T_NAME)) {
-        mask |= FMASK.A_NAME | FMASK.T_NAME;
-    }
     return mask;
 }
 
@@ -69,8 +96,10 @@ export function popcount(mask: number): number {
 
 interface TemplateEntry {
     text: string;
-    /** 字段掩码 — 标记需要哪些实体属性 */
-    mask: number;
+    /** ID 掩码 (2 位) — 用于 template_id 编码，决定 0x12 帧携带哪些 ID */
+    idMask: number;
+    /** 字段掩码 (8 位 FMASK) — 导出到客户端，供 sparse 构建使用 */
+    fieldMask: number;
 }
 
 const _templates: Map<string, number> = new Map();
@@ -82,7 +111,7 @@ export function register(text: string): number {
     if (id !== undefined) return id;
     id = _entries.length;
     _templates.set(text, id);
-    _entries.push({ text, mask: computeMask(text) });
+    _entries.push({ text, idMask: computeIdMask(text), fieldMask: computeFieldMask(text) });
     return id;
 }
 
@@ -101,9 +130,14 @@ export function getId(text: string): number | undefined {
     return _templates.get(text);
 }
 
-/** 获取模板的字段掩码 */
+/** 获取模板的 ID 掩码（用于 template_id 编码） */
 export function getMask(id: number): number {
-    return _entries[id]?.mask ?? 0;
+    return _entries[id]?.idMask ?? 0;
+}
+
+/** 获取模板的字段掩码（8 位 FMASK，用于客户端 sparse 构建） */
+export function getFieldMask(id: number): number {
+    return _entries[id]?.fieldMask ?? 0;
 }
 
 /** 模板总数 */
@@ -111,11 +145,11 @@ export function count(): number {
     return _entries.length;
 }
 
-/** 导出映射表（用于发送给客户端） */
+/** 导出映射表（用于发送给客户端，m 为 8 位 fieldMask） */
 export function exportTable(): Record<number, { t: string; m: number }> {
     const out: Record<number, { t: string; m: number }> = {};
     for (let i = 0; i < _entries.length; i++) {
-        out[i] = { t: _entries[i].text, m: _entries[i].mask };
+        out[i] = { t: _entries[i].text, m: _entries[i].fieldMask };
     }
     return out;
 }

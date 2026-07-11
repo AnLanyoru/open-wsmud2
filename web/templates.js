@@ -106,3 +106,8 @@ export function perspective(text, aName, tName, myName) {
     if (tName && tName === myName) text = text.split(tName).join('你');
     return text;
 }
+
+/** 获取模板的 8 位字段掩码（从 MaskTable 查询，供客户端构建 sparse） */
+export function getMask(tid) {
+    return MaskTable[tid] || 0;
+}

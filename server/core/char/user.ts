@@ -861,6 +861,7 @@ export class USER extends CHARACTER {
             this.color_name = '';
             if (this.environment) {
                 this.environment.item_changed(this, true);
+                this._mark_dirty(0x01); // DIRTY.NAME
             }
         }
     }
@@ -948,6 +949,7 @@ export class USER extends CHARACTER {
         this.color_name = '';
         if (this.environment) {
             this.environment.item_changed(this, true);
+            this._mark_dirty(0x01); // DIRTY.NAME
         }
     }
 
@@ -1419,6 +1421,7 @@ export class USER extends CHARACTER {
         }
         this.color_name = '';
         this.environment!.item_changed(this, true);
+        this._mark_dirty(0x01); // DIRTY.NAME
         this.send(`{type:"levelup",level:${this.level}}`);
     }
 

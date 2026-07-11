@@ -15,7 +15,16 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FIELD_TO_MASK, FMASK, get, popcount } from '../templates.js';
+import { FIELD_TO_MASK, FMASK, ID_MASK, get, popcount } from '../templates.js';
+
+/** 脏字段位掩码 — 用于刷新帧 (op 0x55) 标记哪些实体属性已变更 */
+const DIRTY = {
+    NAME: 0x01,     // 玩家名称（对应 FMASK.A_NAME | FMASK.T_NAME）
+    WEAPON: 0x02,   // 武器名（对应 FMASK.A_WEAPON | FMASK.T_WEAPON）
+    CALL3: 0x04,    // 第三人称（对应 FMASK.A_CALL3 | FMASK.T_CALL3）
+    PART: 0x08,     // 攻击部位（对应 FMASK.A_PART）
+    THROWING: 0x10, // 暗器名（对应 FMASK.A_THROW）
+} as const;
 import type { EQUIPMENT } from '../item/equipment.js';
 
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
@@ -414,6 +423,8 @@ export class CHARACTER extends ITEM {
     pfm_cd: Map<string, number> = new Map();
     /** 当前攻击部位 */
     attack_part: AttackPart | null = null;
+    /** 脏字段掩码 (5 位: NAME/WEAPON/CALL3/PART/THROWING)，非零表示有未推送的字段变更 */
+    _dirty_fields: number = 0;
     /** 忙乱状态（不可行动，不可招架）倒计时 */
     is_busy: number = 0;
     /** 昏迷状态倒计时 */
@@ -740,7 +751,8 @@ export class CHARACTER extends ITEM {
         return Buffer.from(bytes);
     }
 
-    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 varint，浮点 float64，TplRef 嵌套）
+    /** 构建二进制 payload — 携带 7B 玩家 ID + ^args（数字 varint，浮点 float64，TplRef 嵌套）
+     *  客户端从 cur_room.items 缓存按 ID 查找字段值（name/weapon/call3/part/throwing）
      *  excludeSelf: 编码进 op 高位（0x12 | 0x80 = 0x92），客户端识别后跳过自身消息 */
     _build_binary_buf(
         template_id: number,
@@ -751,12 +763,12 @@ export class CHARACTER extends ITEM {
         a4?: string | number | TplRef,
         excludeSelf?: boolean,
     ): Buffer {
-        // 从模板 ID 提取 mask 和 pure_id（pack 预编译时编码为 (mask << 16) | pure_id）
-        let mask = template_id >> 16;
+        // 从模板 ID 提取 idMask 和 pure_id（pack 预编译时编码为 (idMask << 16) | pure_id）
+        let idMask = template_id >> 16;
         const pure_id = template_id & 0xFFFF;
 
-        // 预扫描 args，提取 TplRef 的 mask 并 OR 进外层 mask
-        // 确保外层帧携带嵌套模板所需的全部字段
+        // 预扫描 args，提取 TplRef 的 idMask 并 OR 进外层
+        // 确保外层帧携带嵌套模板所需的全部 ID
         const argItems: (string | number | TplRef)[] = [];
         if (a1 !== undefined && a1 !== null) argItems.push(a1);
         if (a2 !== undefined && a2 !== null) argItems.push(a2);
@@ -765,29 +777,15 @@ export class CHARACTER extends ITEM {
         for (let i = 0; i < argItems.length; i++) {
             const v = argItems[i];
             if (Array.isArray(v)) {
-                mask |= (v[0] as number) >> 16;
+                idMask |= (v[0] as number) >> 16;
             }
         }
 
-        // 只计算 mask 需要的字段（避免无谓的 weapon_name/call3 调用）
-        const rawFields: string[] = [];
-        rawFields[0] = mask & FMASK.A_NAME ? this.name : '';
-        rawFields[1] = mask & FMASK.A_WEAPON ? this.weapon_name() || '' : '';
-        rawFields[2] = mask & FMASK.A_CALL3 ? this.call3() : '';
-        rawFields[3] = mask & FMASK.A_PART ? (this.attack_part ? this.attack_part.name : '') : '';
-        rawFields[4] = mask & FMASK.A_THROW ? this.throwing_name() || '' : '';
-
-        const hasT = target && (target as any).check_character?.();
-        rawFields[5] = mask & FMASK.T_NAME && hasT ? target!.name : '';
-        rawFields[6] = mask & FMASK.T_WEAPON && hasT ? (target as any).weapon_name?.() || '' : '';
-        rawFields[7] = mask & FMASK.T_CALL3 && hasT ? (target as any).call3?.() || '' : '';
-
-        const fieldBufs: Buffer[] = [];
-        for (let i = 0; i < 8; i++) {
-            if (mask & FIELD_TO_MASK[i]) {
-                fieldBufs.push(Buffer.from(rawFields[i], 'utf8'));
-            }
-        }
+        // 判断实际需要携带的 ID（目标可能不是角色）
+        const hasA = !!(idMask & ID_MASK.A_ID);
+        const hasT = !!(idMask & ID_MASK.T_ID) && target && (target as any).check_character?.();
+        // 实际写入帧的 idMask（清除无对应 target 的 T_ID 位）
+        const actualMask = (hasA ? ID_MASK.A_ID : 0) | (hasT ? ID_MASK.T_ID : 0);
 
         // arg 编码统一逻辑：number → varint（_encodeVarint 内部按 uint32 阈值智能分流）
         // string → 正则判断（向后兼容 pack 生成的字面量）
@@ -818,7 +816,7 @@ export class CHARACTER extends ITEM {
                 refMask |= (1 << i);
                 argMask |= (1 << i);
                 // 编码嵌套模板: [refPureId uint16][refArgc 1B][refMask 1B][refFloatMask 1B][refArgs...]
-                // 发送 pure_id（消费 mask 后的纯 uint16），客户端通过父级 mask/sparse 渲染
+                // 发送 pure_id（消费 idMask 后的纯 uint16），客户端通过父级 ID 缓存渲染
                 const refPureId = (v[0] as number) & 0xFFFF;
                 const rargc = v.length - 1;
                 let rargMask = 0, rfloatMask = 0;
@@ -875,8 +873,10 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        let totalSize = 1 + 2 + 1; // op + tid + mask
-        for (const fb of fieldBufs) totalSize += 1 + fb.length;
+        // 计算总大小: op(1) + tid(2) + idMask(1) + A_ID(7) + T_ID(7) + args头(4)
+        let totalSize = 1 + 2 + 1;
+        if (hasA) totalSize += 7;
+        if (hasT) totalSize += 7;
         totalSize += 1 + 1 + 1 + 1; // ^count + argMask + floatMask + refMask
         for (let i = 0; i < argEnc.length; i++) {
             const ab = argEnc[i];
@@ -894,11 +894,14 @@ export class CHARACTER extends ITEM {
         buf[pos++] = excludeSelf ? 0x92 : 0x12;
         buf.writeUInt16BE(pure_id, pos);
         pos += 2;
-        buf[pos++] = mask;
-        for (const fb of fieldBufs) {
-            buf[pos++] = fb.length;
-            fb.copy(buf, pos);
-            pos += fb.length;
+        buf[pos++] = actualMask;
+        if (hasA) {
+            CHARACTER._pack_id(this.id).copy(buf, pos);
+            pos += 7;
+        }
+        if (hasT) {
+            CHARACTER._pack_id(target!.id).copy(buf, pos);
+            pos += 7;
         }
         buf[pos++] = argItems.length;
         buf[pos++] = argMask;
@@ -1117,8 +1120,8 @@ export class CHARACTER extends ITEM {
             this.send_room_others(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
             return;
         }
-        // 模板路径：OR 进 A_NAME 位，确保帧携带发送者名字供客户端过滤
-        template_id |= (FMASK.A_NAME << 16);
+        // 模板路径：OR 进 A_ID 位，确保帧携带发送者 ID 供客户端过滤
+        template_id |= (ID_MASK.A_ID << 16);
         this.send_msg_b(template_id, target, false, true, _a1, _a2, _a3, _a4);
     }
 
@@ -2262,6 +2265,7 @@ export class CHARACTER extends ITEM {
             }
         }
         if (obj.eq_type === EQUIP_TYPE.WEAPON) this.weapon_changed(false);
+        if (obj.eq_type === EQUIP_TYPE.THROWING) this._mark_dirty(DIRTY.THROWING);
         this.recount();
         if (recover_time > 0 && this.is_player) {
             this.set_temp('eq_wea', obj.id, 60000);
@@ -2302,6 +2306,7 @@ export class CHARACTER extends ITEM {
         this.items!.remove(obj);
         this.equipment[obj.eq_type] = obj;
         if (obj.eq_type === EQUIP_TYPE.WEAPON) this.weapon_changed(true);
+        if (obj.eq_type === EQUIP_TYPE.THROWING) this._mark_dirty(DIRTY.THROWING);
         this.recount();
         if (obj.is_shortcut) {
             this.send("{type:'removeAction',id:'" + obj.id + "'}");
@@ -2323,12 +2328,25 @@ export class CHARACTER extends ITEM {
     weapon_changed(iseq: boolean): void {
         this.attack_skill = this.query_used_skill(this.query_weapon_type());
         if (this.on_skillchanged) this.on_skillchanged();
+        this._mark_dirty(DIRTY.WEAPON);
         if (!this.auto_skills) return;
         for (const item of this.auto_skills) {
             if (WEAPON_SKILLS.has(item.type)) {
                 item.ban_use = !iseq;
             }
         }
+    }
+
+    /**
+     * 标记字段为脏 — 将自身推入房间脏数据玩家列表，下次 flush 时编码刷新帧
+     * @param fieldMask - DIRTY 位掩码，标记哪些字段已变更
+     */
+    _mark_dirty(fieldMask: number): void {
+        const room = this.environment as ROOM;
+        if (!room) return;
+        this._dirty_fields |= fieldMask;
+        room._dirty_players.add(this);
+        markRoomDirty(room);
     }
 
     /**
@@ -2925,7 +2943,7 @@ export class CHARACTER extends ITEM {
     static readonly ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
 
     /** 将 create_id() 字符串编码为固定 7 字节 Buffer */
-    private static _pack_id(id: string): Buffer {
+    static _pack_id(id: string): Buffer {
         const buf = Buffer.alloc(7);
         // 前 4 字符 → 6-bit 索引打包为 24-bit BE
         let packed = 0;
@@ -3340,6 +3358,7 @@ export class CHARACTER extends ITEM {
         }
 
         this.attack_part = par.part ?? target.query_part();
+        this._mark_dirty(DIRTY.PART);
 
         let attack_msg = par.attack_msg;
         if (attack_msg === undefined) {

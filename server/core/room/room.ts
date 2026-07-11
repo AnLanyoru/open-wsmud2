@@ -6,8 +6,9 @@ import { WORLD } from '../world.js';
 import { ITEM, RoomAction } from '../item.js';
 import { OBJ } from '../item/obj.js';
 import { encodeBinaryFrame } from '../net-ws.js';
+import { FMASK } from '../templates.js';
 import type { AREA } from './area.js';
-import type { CHARACTER } from '../char/character.js';
+import { CHARACTER } from '../char/character.js';
 import { NPC } from '../char/npc.js';
 import type { USER } from '../char/user.js';
 import { ItemCommandsJson } from '../char/follower.js';
@@ -117,6 +118,8 @@ export class ROOM extends ITEM {
     _batch_delay: number = 0;
     /** 入队时间戳（毫秒），0 表示不在 dirty 队列 */
     _batch_timestamp: number = 0;
+    /** 脏数据玩家列表 — 下次 flush 时编码为 0x55 刷新帧推送给客户端 */
+    _dirty_players: Set<CHARACTER> = new Set();
 
     // ============ 玩法相关 ============
 
@@ -290,6 +293,8 @@ export class ROOM extends ITEM {
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
             if (obj.check_player()) this._batch_delay = Math.max(0, this._batch_delay - 1);
+            // 离房时从脏数据列表移除（避免给已离开的玩家发刷新帧）
+            if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
             obj.environment = undefined;
         }
     }
@@ -322,6 +327,16 @@ export class ROOM extends ITEM {
                 str.push(String(ch.max_mp));
                 str.push(',max_hp:');
                 str.push(String(ch.max_hp));
+                // AT 缓存字段：客户端存入 cur_room.items 供 0x12 帧按 ID 查找
+                str.push(',w:"');
+                str.push(ch.weapon_name() || '');
+                str.push('",c:"');
+                str.push(ch.call3());
+                str.push('",ap:"');
+                str.push(ch.attack_part ? ch.attack_part.name : '');
+                str.push('",th:"');
+                str.push(ch.throwing_name() || '');
+                str.push('"');
                 if (ch.append_status) ch.append_status(str);
             }
             str.push('}');
@@ -368,6 +383,18 @@ export class ROOM extends ITEM {
                     str.push(item.max_hp);
 
                     item.append_status(str);
+                }
+                // AT 缓存字段：角色物件才有，客户端存入 cur_room.items 供 0x12 帧按 ID 查找
+                if (item.check_character?.()) {
+                    str.push(',w:"');
+                    str.push(item.weapon_name() || '');
+                    str.push('",c:"');
+                    str.push(item.call3());
+                    str.push('",ap:"');
+                    str.push(item.attack_part ? item.attack_part.name : '');
+                    str.push('",th:"');
+                    str.push(item.throwing_name() || '');
+                    str.push('"');
                 }
                 str.push('},');
             }
@@ -690,6 +717,7 @@ export class ROOM extends ITEM {
         this._batch_has_combat = false;
         this._batch_delay = 0;
         this._batch_timestamp = 0;
+        this._dirty_players = new Set();
 
         // —— 缓存清零 ——
         this.json = null;
@@ -831,15 +859,86 @@ export class ROOM extends ITEM {
                     newRoom._batch_delay = Math.min(16, newRoom._batch_delay + 1);
                     oldroom._batch_delay = Math.max(0, oldroom._batch_delay - 1);
                 }
+                // 迁移脏标记：从旧房间脏列表移除（新房间靠 items_to_json 下发全量数据）
+                if (items[i].check_character?.()) {
+                    oldroom._dirty_players.delete(items[i]);
+                }
             }
         }
         oldroom.destroy();
     }
 
     /**
+     * 构建脏数据刷新帧 (op 0x55) — 编码所有脏玩家的新字段数据。
+     * 格式: [0x55][1B count][count × ([7B id][1B field_mask][按 mask 顺序的字段...])]
+     * field_mask 沿用 8 位 FMASK，字段编码: [1B len][utf8]
+     * per-player 的 A_NAME/T_NAME 都映射到 cache.name（冗余但一致）
+     */
+    _build_dirty_refresh_frame(): Buffer | null {
+        const dirty = this._dirty_players;
+        if (dirty.size === 0) return null;
+
+        const parts: Buffer[] = [];
+        let count = 0;
+        for (const ch of dirty) {
+            // 边界检查：玩家可能已离开房间
+            if ((ch as any).environment !== this) continue;
+            const df = (ch as any)._dirty_fields || 0;
+            if (!df) continue;
+
+            // 将 5 位 DIRTY 掩码扩展为 8 位 FMASK
+            let fm = 0;
+            if (df & 0x01) fm |= FMASK.A_NAME | FMASK.T_NAME;       // NAME
+            if (df & 0x02) fm |= FMASK.A_WEAPON | FMASK.T_WEAPON;   // WEAPON
+            if (df & 0x04) fm |= FMASK.A_CALL3 | FMASK.T_CALL3;     // CALL3
+            if (df & 0x08) fm |= FMASK.A_PART;                      // PART
+            if (df & 0x10) fm |= FMASK.A_THROW;                     // THROWING
+
+            // 准备字段值（按 FMASK 位顺序）
+            const name = ch.name;
+            const weapon = ch.weapon_name() || '';
+            const call3 = ch.call3();
+            const part = ch.attack_part ? ch.attack_part.name : '';
+            const throwing = ch.throwing_name() || '';
+
+            // 编码: [7B id][1B field_mask][fields...]
+            const packedId = CHARACTER._pack_id(ch.id);
+            parts.push(packedId);
+
+            const fmBuf = Buffer.alloc(1);
+            fmBuf[0] = fm;
+            parts.push(fmBuf);
+
+            // 按 FMASK 位顺序编码字段: A_NAME, A_WEAPON, A_CALL3, A_PART, A_THROW, T_NAME, T_WEAPON, T_CALL3
+            const fieldValues = [name, weapon, call3, part, throwing, name, weapon, call3];
+            const fieldBits = [FMASK.A_NAME, FMASK.A_WEAPON, FMASK.A_CALL3, FMASK.A_PART, FMASK.A_THROW, FMASK.T_NAME, FMASK.T_WEAPON, FMASK.T_CALL3];
+            for (let i = 0; i < 8; i++) {
+                if (fm & fieldBits[i]) {
+                    const strBuf = Buffer.from(fieldValues[i], 'utf8');
+                    const lenBuf = Buffer.alloc(1);
+                    lenBuf[0] = strBuf.length;
+                    parts.push(lenBuf, strBuf);
+                }
+            }
+
+            // 清除脏标记
+            (ch as any)._dirty_fields = 0;
+            count++;
+        }
+        if (count === 0) return null;
+
+        // 构建完整帧: [0x55][1B count][...]
+        const header = Buffer.alloc(2);
+        header[0] = 0x55;
+        header[1] = count;
+        return Buffer.concat([header, ...parts]);
+    }
+
+    /**
      * 刷新二进制批处理 — 合并原始 payload 并编码为单个 WebSocket 帧发送。
      * 首字节 0xFE 为批处理标记，供客户端识别合并帧。
      * 全量下发给所有玩家，主视角消息也统一走批处理。
+     * 刷新帧 (0x55) 作为合并帧的首子帧，确保后续 0x12 帧使用最新缓存。
      */
     _flush_batch(): void {
         const all = this._batch_all;
@@ -849,6 +948,15 @@ export class ROOM extends ITEM {
         this._batch_noncombat = [];
         this._batch_has_combat = false;
         this._batch_timestamp = 0;
+
+        // 编码脏数据刷新帧，插入到 batch 首位
+        const refreshFrame = this._build_dirty_refresh_frame();
+        if (refreshFrame) {
+            all.unshift(refreshFrame);
+            noncombat.unshift(refreshFrame);
+        }
+        this._dirty_players.clear();
+
         if (all.length === 0) return;
 
         all.unshift(BATCH_MARKER);

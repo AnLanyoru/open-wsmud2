@@ -125,15 +125,27 @@ if (IS_BINARY) {
         return { template, exprs };
     }
 
-    // --- Mask 计算 (与 templates.ts computeMask 保持一致) ---
-    // 8 位 mask: A_NAME=0x01 A_WEAPON=0x02 A_CALL3=0x04 A_PART=0x08
-    //            A_THROW=0x10 T_NAME=0x20 T_WEAPON=0x40 T_CALL3=0x80
-    // 模板 ID 编码: (mask << 16) | pure_id，发送时消费 mask 削除回纯 uint16
-    function computeMask(text) {
+    // --- ID 掩码计算 (与 templates.ts computeIdMask 保持一致) ---
+    // 2 位 idMask: A_ID=0x01 (攻击者侧 $N $W $w $P $l $T), T_ID=0x02 (目标侧 $n $i $p)
+    // 模板 ID 编码: (idMask << 16) | pure_id，0x12 帧按 idMask 携带 7B A_ID/T_ID
+    function computeIdMask(text) {
         let m = 0;
-        const hasN = text.includes('$N');
-        const hasn = text.includes('$n');
-        if (hasN || hasn) m |= 0x01 | 0x20;  // A_NAME | T_NAME (视角转换需要双方名字)
+        if (text.includes('$N') || text.includes('$W') || text.includes('$w')
+            || text.includes('$P') || text.includes('$l') || text.includes('$T')) {
+            m |= 0x01;  // A_ID
+        }
+        if (text.includes('$n') || text.includes('$i') || text.includes('$p')) {
+            m |= 0x02;  // T_ID
+        }
+        return m;
+    }
+
+    // --- 字段掩码计算 (与 templates.ts computeFieldMask 保持一致) ---
+    // 8 位 fieldMask，导出到客户端 templates-data.json 供 sparse 构建
+    function computeFieldMask(text) {
+        let m = 0;
+        if (text.includes('$N')) m |= 0x01;  // A_NAME
+        if (text.includes('$n')) m |= 0x20;  // T_NAME
         if (text.includes('$P')) m |= 0x04;  // A_CALL3
         if (text.includes('$p')) m |= 0x80;  // T_CALL3
         if (text.includes('$l')) m |= 0x08;  // A_PART
@@ -143,12 +155,12 @@ if (IS_BINARY) {
         return m;
     }
 
-    /** 注册模板: value = (mask << 16) | pure_id */
+    /** 注册模板: value = (idMask << 16) | pure_id */
     function registerTemplate(literal) {
         let val = templateMap.get(literal);
         if (val !== undefined) return val;
         const pureId = templateMap.size;
-        val = (computeMask(literal) << 16) | pureId;
+        val = (computeIdMask(literal) << 16) | pureId;
         templateMap.set(literal, val);
         return val;
     }
@@ -362,8 +374,8 @@ if (IS_BINARY) {
         const serverLines = [];
         for (const [literal, val] of templateMap) {
             const pureId = val & 0xFFFF;
-            const mask = val >> 16;
-            clientData[pureId] = { t: literal, m: mask };
+            // 客户端需要 8 位 fieldMask 构建 sparse，而非 2 位 idMask
+            clientData[pureId] = { t: literal, m: computeFieldMask(literal) };
             serverLines.push(`register(${JSON.stringify(literal)});`);
         }
 

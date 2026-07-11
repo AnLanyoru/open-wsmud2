@@ -7,7 +7,7 @@ import SCRIPT from './script.js';
 import {roles} from './login/index.js';
 import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
-import { format, perspective, ready as templatesReady } from './templates.js';
+import { format, ready as templatesReady, getMask } from './templates.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = {append: (div) => $(".content-message").append(div)};
@@ -574,8 +574,51 @@ function ReceiveMessage(x) {
 // 二进制帧解析
 // ============================================================
 
+/** ID 字符集（与服务端 ID_CHARS 一致） */
+const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+
+/** 从 data[pos] 读取 7 字节 ID，返回 { id, next } */
+function read7BId(data, pos, dv) {
+    const first4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
+    pos += 3;
+    const ts = dv.getInt32(pos);
+    pos += 4;
+    const id = ID_CHARS[(first4 >> 18) & 0x3F]
+             + ID_CHARS[(first4 >> 12) & 0x3F]
+             + ID_CHARS[(first4 >> 6) & 0x3F]
+             + ID_CHARS[first4 & 0x3F]
+             + ts.toString(16);
+    return { id, next: pos };
+}
+
+/** 从 cur_room.items 按 ID 查找缓存条目 */
+function lookupCache(id) {
+    if (!Process.cur_room || !Process.cur_room.items) return null;
+    for (let i = 0; i < Process.cur_room.items.length; i++) {
+        if (Process.cur_room.items[i].id === id) return Process.cur_room.items[i];
+    }
+    return null;
+}
+
+/** 按 8 位 fieldMask 从缓存构建 sparse 数组（A 侧字段从 aCache，T 侧从 tCache） */
+function buildSparseFromCache(fieldMask, aId, tId) {
+    const aCache = aId ? lookupCache(aId) : null;
+    const tCache = tId ? lookupCache(tId) : null;
+    const sparse = [];
+    // FMASK 位顺序: A_NAME(0x01) A_WEAPON(0x02) A_CALL3(0x04) A_PART(0x08) A_THROW(0x10) T_NAME(0x20) T_WEAPON(0x40) T_CALL3(0x80)
+    if (fieldMask & 0x01) sparse.push(aCache ? aCache.name : '');           // A_NAME
+    if (fieldMask & 0x02) sparse.push(aCache ? (aCache.w || '手') : '手');  // A_WEAPON
+    if (fieldMask & 0x04) sparse.push(aCache ? (aCache.c || '') : '');     // A_CALL3
+    if (fieldMask & 0x08) sparse.push(aCache ? (aCache.ap || '') : '');    // A_PART
+    if (fieldMask & 0x10) sparse.push(aCache ? (aCache.th || '') : '');    // A_THROW
+    if (fieldMask & 0x20) sparse.push(tCache ? tCache.name : '<hir>未知存在</hir>'); // T_NAME
+    if (fieldMask & 0x40) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
+    if (fieldMask & 0x80) sparse.push(tCache ? (tCache.c || '') : '');     // T_CALL3
+    return sparse;
+}
+
 /** 读取嵌套模板引用，递归 format 返回展开字符串 */
-function readTplRef(data, pos, parentMask, parentSparse, dv) {
+function readTplRef(data, pos, aId, tId, dv) {
     const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
     const refArgc = data[pos++];
     const refArgMask = data[pos++];
@@ -597,8 +640,10 @@ function readTplRef(data, pos, parentMask, parentSparse, dv) {
             pos = r.next;
         }
     }
-    // 透传父级 mask/sparse — 嵌套模板复用外层帧携带的实体字段
-    return { str: format(refTid, parentMask, parentSparse, refArgs), next: pos };
+    // 嵌套模板用自己的 fieldMask 从缓存构建 sparse（缓存有全部字段）
+    const refFieldMask = getMask(refTid);
+    const refSparse = buildSparseFromCache(refFieldMask, aId, tId);
+    return { str: format(refTid, refFieldMask, refSparse, refArgs), next: pos };
 }
 
 /** 读取 LEB128 无符号 varint — 用 BigInt 中间值避免 32 位 << 溢出，转回 number */
@@ -636,7 +681,6 @@ function popcntBelow(mask, bit) {
  */
 export function ProcessBinary(data) {
     let pos = 0;
-    const myName = Process.name || '';
     const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
     // 0xFE 为批处理合并帧标记（所有二进制帧统一走批处理）
@@ -648,21 +692,18 @@ export function ProcessBinary(data) {
         const excludeSelf = (op & 0x80) !== 0;
         const realOp = op & 0x7F;
         switch (realOp) {
-            case 0x12: { // combat/room
+            case 0x12: { // combat/room — ID-based: 携带 7B A_ID/T_ID，从 cur_room.items 缓存查字段
                 const tid = (data[pos] << 8) | data[pos + 1]; pos += 2;
-                const mask = data[pos++];
+                const idMask = data[pos++];
 
-                // 按掩码读取字段（只读置位的字段）
-                const sparse = [];
-                let bit = 1;
-                for (let i = 0; i < 8; i++) {
-                    if (mask & bit) {
-                        const r = readStr(data, pos);
-                        sparse.push(r.str);
-                        pos = r.next;
-                    }
-                    bit <<= 1;
-                }
+                // 读取 7B A_ID / T_ID
+                let aId = null, tId = null;
+                if (idMask & 0x01) { const r = read7BId(data, pos, dv); aId = r.id; pos = r.next; }
+                if (idMask & 0x02) { const r = read7BId(data, pos, dv); tId = r.id; pos = r.next; }
+
+                // 从模板表查 8 位 fieldMask，从缓存构建 sparse
+                const fieldMask = getMask(tid);
+                const sparse = buildSparseFromCache(fieldMask, aId, tId);
 
                 // 读 ^args（模板引用、整数 varint，浮点 float64，字符串 len+utf8）
                 const argCount = data[pos++];
@@ -672,7 +713,7 @@ export function ProcessBinary(data) {
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
                     if (refMask & (1 << i)) {
-                        const r = readTplRef(data, pos, mask, sparse, dv);
+                        const r = readTplRef(data, pos, aId, tId, dv);
                         args.push(r.str);
                         pos = r.next;
                     } else if (argMask & (1 << i)) {
@@ -691,46 +732,65 @@ export function ProcessBinary(data) {
                     }
                 }
 
-                // 模板还原 + 视角转换
-                let text = format(tid, mask, sparse, args);
+                // 模板还原 + 视角转换（用 ID 比较，无名字碰撞风险）
+                let text = format(tid, fieldMask, sparse, args);
                 if (text) {
-                    const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
-                    // excludeself：send_room_others 广播，跳过自身消息
-                    if (excludeSelf && aName === myName) break;
-                    // no_mcmsg：不显示自己的普通战斗信息（主视角也统一走批处理，无需去重）
-                    if (aName === myName && Setting.no_mcmsg) break;
-                    const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
-                    text = perspective(text, aName, tName, myName);
+                    // excludeSelf / no_mcmsg：用 A_ID 比较
+                    if (excludeSelf && aId === Process.player) break;
+                    if (aId === Process.player && Setting.no_mcmsg) break;
+                    // 视角转换：玩家是 A 或 T 时替换名字为"你"
+                    const aName = (fieldMask & 0x01) ? sparse[popcntBelow(fieldMask, 0x01)] : '';
+                    const tName = (fieldMask & 0x20) ? sparse[popcntBelow(fieldMask, 0x20)] : '';
+                    if (aId && aId === Process.player) text = text.split(aName).join('你');
+                    if (tId && tId === Process.player) text = text.split(tName).join('你');
                     if (Setting.show_binary) {
+                        // 调试输出：字段值来自 cur_room.items 缓存（非帧内下发），帧仅携带 idMask + 7B ID
                         const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'A_PART', 'A_THROW', 'T_NAME', 'T_WEAPON', 'T_CALL3'];
                         const fields = [];
                         let fbit = 1, sIdx = 0;
                         for (let i = 0; i < 8; i++) {
-                            if (mask & fbit) fields.push(`${FIELD_NAMES[i]}:${sparse[sIdx++]}`);
+                            if (fieldMask & fbit) fields.push(`(cache)${FIELD_NAMES[i]}:${sparse[sIdx++]}`);
                             fbit <<= 1;
                         }
                         const opHex = '0x' + (excludeSelf ? 0x92 : 0x12).toString(16);
-                        text += ` <hib>(b-${opHex} tid:${tid} mask:0x${mask.toString(16)}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
+                        text += ` <hib>(b-${opHex} tid:${tid} idMask:0x${idMask.toString(16)} aId:${aId||'-'} tId:${tId||'-'}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
                     }
                     Process.message.push(text);
                     Process.message.scroll2end();
                 }
                 break;
             }
+            case 0x55: { // 脏数据刷新帧 — 更新 cur_room.items 中的 AT 缓存字段
+                const count = data[pos++];
+                for (let i = 0; i < count; i++) {
+                    const r = read7BId(data, pos, dv);
+                    const id = r.id;
+                    pos = r.next;
+                    const fm = data[pos++];
+                    const item = lookupCache(id);
+                    // 按 FMASK 位顺序读取字段并更新缓存
+                    const fieldReaders = [
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // A_NAME
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // A_WEAPON
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // A_CALL3
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.ap = r.str; },           // A_PART
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.th = r.str; },           // A_THROW
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // T_NAME (同 A_NAME)
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // T_WEAPON (同 A_WEAPON)
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // T_CALL3 (同 A_CALL3)
+                    ];
+                    const fieldBits = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
+                    for (let j = 0; j < 8; j++) {
+                        if (fm & fieldBits[j]) fieldReaders[j]();
+                    }
+                }
+                break;
+            }
             case 0x53: { // SC: HP/MP 状态变更 (notify_hp_b)
                 const flags = data[pos++];
-
-                // 解码玩家 ID (7 字节: 前4字符 24bit + hex时间戳 int32)
-                const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
-                const first4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
-                pos += 3;
-                const ts = dv.getInt32(pos);
-                pos += 4;
-                const id = ID_CHARS[(first4 >> 18) & 0x3F]
-                         + ID_CHARS[(first4 >> 12) & 0x3F]
-                         + ID_CHARS[(first4 >> 6) & 0x3F]
-                         + ID_CHARS[first4 & 0x3F]
-                         + ts.toString(16);
+                const r = read7BId(data, pos, dv);
+                const id = r.id;
+                pos = r.next;
 
                 // 读取 float64 值
                 const sc = { id };
@@ -743,29 +803,16 @@ export function ProcessBinary(data) {
                 break;
             }
             case 0x54: { // 伤害占比广播 (每100ms 服务端推送分玩家伤害)
-                const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
                 // 读受击单位 id (7B)
-                const tFirst4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
-                pos += 3;
-                const tTs = dv.getInt32(pos);
-                pos += 4;
-                const targetId = ID_CHARS[(tFirst4 >> 18) & 0x3F]
-                               + ID_CHARS[(tFirst4 >> 12) & 0x3F]
-                               + ID_CHARS[(tFirst4 >> 6) & 0x3F]
-                               + ID_CHARS[tFirst4 & 0x3F]
-                               + tTs.toString(16);
+                const tr = read7BId(data, pos, dv);
+                const targetId = tr.id;
+                pos = tr.next;
                 const count = data[pos++];
                 let myDamage = 0;
                 for (let i = 0; i < count; i++) {
-                    const aFirst4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
-                    pos += 3;
-                    const aTs = dv.getInt32(pos);
-                    pos += 4;
-                    const attackerId = ID_CHARS[(aFirst4 >> 18) & 0x3F]
-                                     + ID_CHARS[(aFirst4 >> 12) & 0x3F]
-                                     + ID_CHARS[(aFirst4 >> 6) & 0x3F]
-                                     + ID_CHARS[aFirst4 & 0x3F]
-                                     + aTs.toString(16);
+                    const ar = read7BId(data, pos, dv);
+                    const attackerId = ar.id;
+                    pos = ar.next;
                     const r = readVarint(data, pos);
                     pos = r.next;
                     if (attackerId === Process.player) myDamage = r.value;
