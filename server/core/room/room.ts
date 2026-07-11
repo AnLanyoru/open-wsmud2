@@ -684,6 +684,13 @@ export class ROOM extends ITEM {
         this._temp_expiry = new Map();
         this._isolate_events();
 
+        // —— 批处理缓冲区清零（必须创建自有属性，避免 Object.create 原型链共享） ——
+        this._batch_all = [];
+        this._batch_noncombat = [];
+        this._batch_has_combat = false;
+        this._batch_timestamp = 0;
+        this._player_count = 0;
+
         // —— 缓存清零 ——
         this.json = null;
         this.room_exits_json = null;
@@ -820,6 +827,7 @@ export class ROOM extends ITEM {
             if (items[i].is_player || items[i].master) {
                 newRoom.items.push(items[i]);
                 items[i].environment = newRoom;
+                if (items[i].is_player) newRoom._player_count++;
             }
         }
         oldroom.destroy();
