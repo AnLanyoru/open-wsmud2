@@ -14,7 +14,7 @@ export default class BanPaiCangKuRoom extends ROOM {
         this.add_action('roll', '掷骰子', function (me: CHARACTER, par) {
             let rad = me.random(100) + 1;
 
-            me.send_room(rollDesc.random() + '，稳稳停在了' + rad + '点。');
+            me.send_room_b(rollDesc_to_b.random(), me, String(rad));
         });
         this.add_action('pandian', '仓库盘点', function (me: CHARACTER, per) {
             WORLD.COMMANDS.get('party')!.enter(me, 'stores');
@@ -25,8 +25,8 @@ export default class BanPaiCangKuRoom extends ROOM {
     }
 }
 
-const rollDesc = [
-    '$N摸出一枚骰子，指尖一捻便抛向空中，骰子在半空划出一道弧线后坠落',
-    '$N将骰子扣在掌心轻轻摇晃，伴随着清脆的碰撞声，骰子在桌面飞速旋转',
-    '$N随手抄起桌上的骰子，手腕轻抖掷出，骰子在地面弹跳数下后逐渐减速',
+const rollDesc_to_b = [
+    '$N摸出一枚骰子，指尖一捻便抛向空中，骰子在半空划出一道弧线后坠落，稳稳停在了^点。',
+    '$N将骰子扣在掌心轻轻摇晃，伴随着清脆的碰撞声，骰子在桌面飞速旋转，稳稳停在了^点。',
+    '$N随手抄起桌上的骰子，手腕轻抖掷出，骰子在地面弹跳数下后逐渐减速，稳稳停在了^点。',
 ];

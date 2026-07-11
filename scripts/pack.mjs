@@ -165,11 +165,11 @@ if (IS_BINARY) {
     // Pass 1: 收集所有 send_room / send_combat 字面量
     // ============================================================
 
-    /** 匹配 .send_room('literal' 或 "literal" — 排除反引号和拼接，排除换行防止跨行 */
-    const CALL_RE = /\.(send_room|send_combat)\((["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/gs;
+    /** 匹配 .send_room('literal' 或 "literal" — 允许 ( 和引号间有空白（多行格式），排除拼接 */
+    const CALL_RE = /\.(send_room|send_room_others|send_combat)\(\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/gs;
 
-    /** 匹配 .send_room(`literal`) — 反引号模板字面量（排除含 ${} 的动态模板），排除换行防止跨行 */
-    const CALL_BT_RE = /\.(send_room|send_combat)\(`((?:[^`\\\n\r]|\\.)*?)`(?!\s*\+)/gs;
+    /** 匹配 .send_room(`literal`) — 反引号模板字面量（排除含 ${} 的动态模板），允许多行格式 */
+    const CALL_BT_RE = /\.(send_room|send_room_others|send_combat)\(\s*(`)((?:[^`\\\n\r]|\\.)*?)\2(?!\s*\+)/gs;
 
     console.log('[pack]   Pass 1: collecting template strings...');
     let scannedFiles = 0;
@@ -219,7 +219,7 @@ if (IS_BINARY) {
     const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
     const PAR_PROP_RE_C = /(?:attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
     const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
-    const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
+    const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg|DIE_MSG|ask_dunno|look_str|rollDesc)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
 
     console.log('[pack]   Pass 1.5: scanning context string literals...');
     let ctxStrCount = 0;
@@ -399,8 +399,8 @@ ${serverLines.join('\n')}
                     const id = templateMap.get(literal);
                     if (id !== undefined) {
                         changed = true;
-                        if (funcName === 'send_room') replacedRoom++;
-                        else replacedCombat++;
+                        if (funcName === 'send_combat') replacedCombat++;
+                        else replacedRoom++;
                         return `.${funcName}(${id}`;
                     }
                     return match;
@@ -414,8 +414,8 @@ ${serverLines.join('\n')}
                         const id = templateMap.get(literal);
                         if (id !== undefined) {
                             changed = true;
-                            if (funcName === 'send_room') replacedRoom++;
-                            else replacedCombat++;
+                            if (funcName === 'send_combat') replacedCombat++;
+                            else replacedRoom++;
                             return `.${funcName}(${id}`;
                         }
                     }
@@ -474,8 +474,8 @@ ${serverLines.join('\n')}
                     return _;
                 });
 
-                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
-                const MSG_ARR_RE = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
+                // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg / DIE_MSG / ask_dunno / look_str / rollDesc 数组
+                const MSG_ARR_RE = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg|DIE_MSG|ask_dunno|look_str|rollDesc)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
                 content = content.replace(MSG_ARR_RE, (_, prefix, body, suffix) => {
                     return prefix + body.replace(STR_RE, replaceStr) + suffix;
                 });

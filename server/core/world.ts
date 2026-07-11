@@ -1394,6 +1394,57 @@ export function flushRoomNow(room: ROOM): void {
 }
 
 // ============================================================
+// 伤害占比广播服务 — 100ms 循环，向房间推送分玩家伤害统计
+// 单位首次记录伤害来源时注册，战斗结束/清理时注销，定时器惰性兜底
+// ============================================================
+
+/** 已注册伤害占比广播的单位集合 */
+const _damage_broadcast_set: Set<CHARACTER> = new Set();
+/** 100ms 循环定时器，无注册单位时停止以节省开销 */
+let _damage_timer: ReturnType<typeof setInterval> | null = null;
+
+/** 注册单位到伤害占比广播列表 */
+export function registerDamageBroadcast(char: CHARACTER): void {
+    _damage_broadcast_set.add(char);
+    if (_damage_timer === null) {
+        _damage_timer = setInterval(_damage_tick, 100);
+    }
+}
+
+/** 从伤害占比广播列表注销 */
+export function unregisterDamageBroadcast(char: CHARACTER): void {
+    _damage_broadcast_set.delete(char);
+    if (_damage_broadcast_set.size === 0 && _damage_timer !== null) {
+        clearInterval(_damage_timer);
+        _damage_timer = null;
+    }
+}
+
+/** 100ms 定时回调：遍历注册单位，构建帧并推入房间批处理缓冲区 */
+function _damage_tick(): void {
+    if (_damage_broadcast_set.size === 0) return;
+    for (const char of _damage_broadcast_set) {
+        // 惰性清理：无 damages 或无 environment 时注销
+        if (!char.damages || !char.environment) {
+            char._damage_registered = false;
+            _damage_broadcast_set.delete(char);
+            continue;
+        }
+        const frame = char._build_damage_frame();
+        if (frame) {
+            const room = char.environment as ROOM;
+            room._batch_all.push(frame);
+            markRoomDirty(room);
+        }
+    }
+    // 全部清理后停止定时器
+    if (_damage_broadcast_set.size === 0 && _damage_timer !== null) {
+        clearInterval(_damage_timer);
+        _damage_timer = null;
+    }
+}
+
+// ============================================================
 // 导出单例
 // ============================================================
 

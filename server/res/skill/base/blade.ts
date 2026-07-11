@@ -19,13 +19,13 @@ export default class extends SKILL {
             distime: 5000,
             mp: 5,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var msg = '<hic>$N看$n露出破绽，挥动$W斩向$n的$l</hic>';
+                var msg_to_b = '<hic>$N看$n露出破绽，挥动$W斩向$n的$l</hic>';
                 var gj = 10 + lv;
                 me.do_attack({
                     target: target,
                     gj: me.gj + gj,
                     mz: me.mz,
-                    attack_msg: msg,
+                    attack_msg: msg_to_b,
                 });
                 me.end_attack(target);
             },

@@ -16,7 +16,7 @@ export default class extends COMMAND {
             for (var i = 0; i < items.length; i++) {
                 const tg = items[i];
                 if (tg.check_player() && tg.query_temp('fight') == me.id) {
-                    me.send_room('看起来$N并不想跟$n较量。', tg, true);
+                    me.send_room_others('看起来$N并不想跟$n较量。', tg);
                     return me.notify('你拒绝了' + tg.name + '的比试请求。');
                 }
             }

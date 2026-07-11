@@ -52,9 +52,9 @@ export default class extends SKILL {
                 time += me.query_prop('ylbf_ml');
                 let add = (me.mz * me.query_prop('ylbf_mz')) / 100;
                 let rad_mz = me.mz - add;
-                var msg = '<hic>$N使出云龙鞭法「缠」字诀，连挥长鞭企图把$n的全身缠住</hic>\n';
+                var msg_to_b: string | number;
                 if (add + me.random(rad_mz) > target.ds / 2) {
-                    msg += '结果$p被$P攻了个措手不及!\n';
+                    msg_to_b = '<hic>$N使出云龙鞭法「缠」字诀，连挥长鞭企图把$n的全身缠住</hic>\n结果$p被$P攻了个措手不及!\n';
                     target.add_status(
                         {
                             id: 'busy',
@@ -66,9 +66,9 @@ export default class extends SKILL {
                         me,
                     );
                 } else {
-                    msg += '可是$p看破了$P的企图，并没有上当。\n';
+                    msg_to_b = '<hic>$N使出云龙鞭法「缠」字诀，连挥长鞭企图把$n的全身缠住</hic>\n可是$p看破了$P的企图，并没有上当。\n';
                 }
-                me.send_room(msg, target);
+                me.send_room(msg_to_b, target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var time = Math.round(lv / 50);

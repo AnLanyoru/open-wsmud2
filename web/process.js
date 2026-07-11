@@ -635,10 +635,6 @@ function popcntBelow(mask, bit) {
  * 解析并分发二进制帧
  * @param {Uint8Array} data
  */
-/** 玩家 HP 缓存（用于本地计算 damage），上限 500 个 ID */
-const _prevHP = new Map();
-const _MAX_PREV_HP = 500;
-
 export function ProcessBinary(data) {
     let pos = 0;
     const myName = Process.name || '';
@@ -648,7 +644,10 @@ export function ProcessBinary(data) {
 
     while (pos < data.length) {
         const op = data[pos++];
-        switch (op) {
+        // op 高位 0x80 = excludeself 标记（send_room_others_b 编码），低 7 位为真实 op
+        const excludeSelf = (op & 0x80) !== 0;
+        const realOp = op & 0x7F;
+        switch (realOp) {
             case 0x12: { // combat/room
                 const tid = (data[pos] << 8) | data[pos + 1]; pos += 2;
                 const mask = data[pos++];
@@ -697,6 +696,8 @@ export function ProcessBinary(data) {
                 let text = format(tid, mask, sparse, args);
                 if (text) {
                     const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
+                    // excludeself：send_room_others 广播，跳过自身消息
+                    if (excludeSelf && aName === myName) break;
                     // no_mcmsg：不显示自己的普通战斗信息（主视角也统一走批处理，无需去重）
                     if (aName === myName && Setting.no_mcmsg) break;
                     const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
@@ -730,21 +731,39 @@ export function ProcessBinary(data) {
                 if (flags & 0x04) { sc.mp = dv.getFloat64(pos); pos += 8; }
                 if (flags & 0x08) { sc.max_mp = dv.getFloat64(pos); pos += 8; }
                 if (flags & 0x10) { sc.damage = dv.getFloat64(pos); pos += 8; }
-                // 服务端不再逐玩家发送 damage，客户端本地计算
-                if (Setting.show_damage && (flags & 0x01) && !(flags & 0x10)) {
-                    const prev = _prevHP.get(id);
-                    if (prev !== undefined && prev > sc.hp) {
-                        sc.damage = prev - sc.hp;
-                    }
-                    if (_prevHP.size >= _MAX_PREV_HP) {
-                        // 驱逐最旧的条目
-                        const first = _prevHP.keys().next().value;
-                        if (first !== undefined) _prevHP.delete(first);
-                    }
-                    _prevHP.set(id, sc.hp);
-                }
-
                 Process.sc(sc);
+                break;
+            }
+            case 0x54: { // 伤害占比广播 (每100ms 服务端推送分玩家伤害)
+                const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
+                // 读受击单位 id (7B)
+                const tFirst4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
+                pos += 3;
+                const tTs = dv.getInt32(pos);
+                pos += 4;
+                const targetId = ID_CHARS[(tFirst4 >> 18) & 0x3F]
+                               + ID_CHARS[(tFirst4 >> 12) & 0x3F]
+                               + ID_CHARS[(tFirst4 >> 6) & 0x3F]
+                               + ID_CHARS[tFirst4 & 0x3F]
+                               + tTs.toString(16);
+                const count = data[pos++];
+                let myDamage = 0;
+                for (let i = 0; i < count; i++) {
+                    const aFirst4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
+                    pos += 3;
+                    const aTs = dv.getInt32(pos);
+                    pos += 4;
+                    const attackerId = ID_CHARS[(aFirst4 >> 18) & 0x3F]
+                                     + ID_CHARS[(aFirst4 >> 12) & 0x3F]
+                                     + ID_CHARS[(aFirst4 >> 6) & 0x3F]
+                                     + ID_CHARS[aFirst4 & 0x3F]
+                                     + aTs.toString(16);
+                    const r = readVarint(data, pos);
+                    pos = r.next;
+                    if (attackerId === Process.player) myDamage = r.value;
+                }
+                if (myDamage > 0) Process.sc({ id: targetId, damage: myDamage });
                 break;
             }
             case 0x00: { // raw text fallback

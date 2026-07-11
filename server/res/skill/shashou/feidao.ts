@@ -24,8 +24,8 @@ export default class extends SKILL {
             release_time: 1000,
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var msg = '<hic>$N手中$T寒光一闪，幻化出一道重影射向$n</hic>';
-                me.send_room(msg, target);
+                var msg_to_b = '<hic>$N手中$T寒光一闪，幻化出一道重影射向$n</hic>';
+                me.send_room(msg_to_b, target);
                 for (var i = 0; i < 2; i++) {
                     me.do_attack({
                         target: target,

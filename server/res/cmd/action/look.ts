@@ -30,10 +30,9 @@ export default class extends COMMAND {
 
             player.notify(item.get_desc(parent));
             if (parent != player)
-                player.send_room(
+                player.send_room_others(
                     `$N正盯着$n的${item.color_name}看，不知道在打什么主意。`,
                     parent,
-                    true,
                 );
         } else {
             let parent = player.environment;
@@ -44,7 +43,7 @@ export default class extends COMMAND {
             }
             if (obj.query_desc) {
                 player.notify(obj.query_desc(player));
-                if (obj != player) player.send_room(look_str.random(), obj, true);
+                if (obj != player) player.send_room_others(look_str.random(), obj);
                 if (obj.check_character()) {
                     this.obs(player, obj);
                 }

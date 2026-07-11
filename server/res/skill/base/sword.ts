@@ -19,8 +19,8 @@ export default class extends SKILL {
             distime: 5,
             mp: 5,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var msg = '<hig>$N加快速度，手中的$W快速向$n刺去</hig>';
-                me.send_room(msg, target);
+                var msg_to_b = '<hig>$N加快速度，手中的$W快速向$n刺去</hig>';
+                me.send_room(msg_to_b, target);
                 me.do_attack({
                     target: target,
                     gj: me.gj,

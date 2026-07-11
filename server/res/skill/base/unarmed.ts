@@ -30,13 +30,13 @@ export default class extends SKILL {
             mp: 5,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var msg = '<hig>$N看准时机，双拳蓄力对准$n的$l用力砸去</hig>';
+                var msg_to_b = '<hig>$N看准时机，双拳蓄力对准$n的$l用力砸去</hig>';
                 var gj = 10 + lv;
                 me.do_attack({
                     target: target,
                     gj: me.gj + gj,
                     mz: me.mz,
-                    attack_msg: msg,
+                    attack_msg: msg_to_b,
                     no_weapon: true,
                 });
                 me.end_attack(target);

@@ -28,7 +28,7 @@ import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
 import { encodeBinaryFrame } from '../net-ws.js';
-import { markRoomDirty, flushRoomNow } from '../world.js';
+import { markRoomDirty, flushRoomNow, registerDamageBroadcast, unregisterDamageBroadcast } from '../world.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -434,6 +434,8 @@ export class CHARACTER extends ITEM {
     damages: Record<string, number> | null = null;
     /** 是否记录伤害统计 */
     record_damage: boolean = false;
+    /** 是否已注册伤害占比广播 */
+    _damage_registered: boolean = false;
     /** 攻击速度（ms） */
     gjsd: number = 0;
     /** 闪避值 */
@@ -726,7 +728,8 @@ export class CHARACTER extends ITEM {
         return Buffer.from(bytes);
     }
 
-    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 varint，浮点 float64，TplRef 嵌套） */
+    /** 构建二进制 payload — 按需编码实体字段 + ^args（数字 varint，浮点 float64，TplRef 嵌套）
+     *  excludeSelf: 编码进 op 高位（0x12 | 0x80 = 0x92），客户端识别后跳过自身消息 */
     _build_binary_buf(
         template_id: number,
         target: ITEM | undefined,
@@ -734,6 +737,7 @@ export class CHARACTER extends ITEM {
         a2?: string | TplRef,
         a3?: string | TplRef,
         a4?: string | TplRef,
+        excludeSelf?: boolean,
     ): Buffer {
         // 从模板 ID 提取 mask 和 pure_id（pack 预编译时编码为 (mask << 16) | pure_id）
         let mask = template_id >> 16;
@@ -861,7 +865,7 @@ export class CHARACTER extends ITEM {
 
         const buf = Buffer.alloc(totalSize);
         let pos = 0;
-        buf[pos++] = 0x12;
+        buf[pos++] = excludeSelf ? 0x92 : 0x12;
         buf.writeUInt16BE(pure_id, pos);
         pos += 2;
         buf[pos++] = mask;
@@ -937,6 +941,7 @@ export class CHARACTER extends ITEM {
     ): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
+            // 二进制路径：excludeself 已编码进 op 高位（0x92），客户端按标记跳过
             const room = this.environment as ROOM;
             room._batch_all.push(payload as Buffer);
             room._batch_noncombat.push(payload as Buffer);
@@ -961,28 +966,29 @@ export class CHARACTER extends ITEM {
 
     /** flags: bit0=combat过滤, bit1=排除自己 */
     static readonly MSG_COMBAT = 1;
-    static readonly MSG_EXCLUDESELF = 2;
 
     /**
      * 发送房间/战斗消息。
      * 第一参数为 string → 文本路径，为 number → 二进制路径（模板 ID）。
      * typeof 分支零开销，允许调用点逐步从字面量迁移到模板 ID。
+     * isCombat: true=战斗过滤(no_mcmsg/no_combatmsg)，false=房间过滤(no_message)
+     * excludeSelf: true=排除自身（由 send_room_others 调用，一般不直接使用）
      */
-    send_msg(text: string | number, target?: ITEM, flags?: number): void {
+    send_msg(text: string | number, target?: ITEM, isCombat?: boolean, excludeSelf?: boolean): void {
         if (!this.environment || text === undefined) return;
         if (typeof text === 'number') {
-            this._send_binary(text, target, flags);
+            this._send_binary(text, target, isCombat, excludeSelf);
             return;
         }
         if (!text) return;
         const payload = this._build_msg(text, target);
-        if (flags && flags & 1) this._broadcast_combat(payload, target);
-        else this._broadcast_room(payload, target, !!(flags && flags & 2));
+        if (isCombat) this._broadcast_combat(payload, target);
+        else this._broadcast_room(payload, target, excludeSelf);
     }
 
     /** 二进制路径（内部实现，由 send_msg 的 typeof 分支调用） */
-    _send_binary(template_id: number, target?: ITEM, flags?: number): void {
-        this.send_msg_b(template_id, target, flags);
+    _send_binary(template_id: number, target?: ITEM, isCombat?: boolean, excludeSelf?: boolean): void {
+        this.send_msg_b(template_id, target, isCombat, excludeSelf);
     }
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
@@ -1004,7 +1010,8 @@ export class CHARACTER extends ITEM {
     send_msg_b(
         template_id: number | string,
         target?: ITEM,
-        flags?: number,
+        isCombat?: boolean,
+        excludeSelf?: boolean,
         _a1?: string | TplRef,
         _a2?: string | TplRef,
         _a3?: string | TplRef,
@@ -1012,18 +1019,18 @@ export class CHARACTER extends ITEM {
     ): void {
         if (!this.environment || template_id === undefined) return;
         if (typeof template_id === 'string') {
-            this.send_msg(this._expand_text(template_id, _a1, _a2, _a3, _a4), target, flags);
+            this.send_msg(this._expand_text(template_id, _a1, _a2, _a3, _a4), target, isCombat, excludeSelf);
             return;
         }
-        const payload = this._build_binary_buf(template_id, target, _a1, _a2, _a3, _a4);
-        if (flags && flags & 1) this._broadcast_combat(payload, target);
-        else this._broadcast_room(payload, target, !!(flags && flags & 2));
+        const payload = this._build_binary_buf(template_id, target, _a1, _a2, _a3, _a4, excludeSelf);
+        if (isCombat) this._broadcast_combat(payload, target);
+        else this._broadcast_room(payload, target, excludeSelf);
     }
 
     // 向后兼容 — 供未替换的动态 send_room / send_combat 调用
     // 第一参数接受 string | number，自动交由 send_msg 的 typeof 分支路由
     send_combat(text: string | number, target?: CHARACTER): void {
-        this.send_msg(text, target, 1);
+        this.send_msg(text, target, true);
     }
     send_combat_b(
         template_id: number | string,
@@ -1037,26 +1044,45 @@ export class CHARACTER extends ITEM {
             this.send_combat(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
             return;
         }
-        this.send_msg_b(template_id, target, 1, _a1, _a2, _a3, _a4);
+        this.send_msg_b(template_id, target, true, false, _a1, _a2, _a3, _a4);
     }
 
-    send_room(text: string | number, target?: ITEM, excludeself?: boolean): void {
-        this.send_msg(text, target, excludeself ? 2 : 0);
+    send_room(text: string | number, target?: ITEM): void {
+        this.send_msg(text, target, false);
     }
     send_room_b(
         template_id: number | string,
         target?: ITEM,
-        excludeself?: boolean,
         _a1?: string | TplRef,
         _a2?: string | TplRef,
         _a3?: string | TplRef,
         _a4?: string | TplRef,
     ): void {
         if (typeof template_id === 'string') {
-            this.send_room(template_id, target, excludeself);
+            this.send_room(template_id, target);
             return;
         }
-        this.send_msg_b(template_id, target, excludeself ? 2 : 0, _a1, _a2, _a3, _a4);
+        this.send_msg_b(template_id, target, false, false, _a1, _a2, _a3, _a4);
+    }
+
+    /** 广播房间消息（排除自身）— 文本路径 */
+    send_room_others(text: string | number, target?: ITEM): void {
+        this.send_msg(text, target, false, true);
+    }
+    /** 广播房间消息（排除自身）— 二进制路径，excludeself 编码进 op 高位 */
+    send_room_others_b(
+        template_id: number | string,
+        target?: ITEM,
+        _a1?: string | TplRef,
+        _a2?: string | TplRef,
+        _a3?: string | TplRef,
+        _a4?: string | TplRef,
+    ): void {
+        if (typeof template_id === 'string') {
+            this.send_room_others(template_id, target);
+            return;
+        }
+        this.send_msg_b(template_id, target, false, true, _a1, _a2, _a3, _a4);
     }
 
     /**
@@ -2942,6 +2968,32 @@ export class CHARACTER extends ITEM {
     }
 
     /**
+     * 构建伤害占比二进制帧 (op 0x54)
+     * 格式: [1B op=0x54][7B 受击单位id][1B count][count × (7B 攻击者id + varint 伤害值)]
+     * 客户端读取后找到自身 id 对应的伤害值，作为 data.damage 更新 UI
+     */
+    _build_damage_frame(): Buffer | null {
+        if (!this.damages) return null;
+        const entries = Object.entries(this.damages);
+        if (entries.length === 0) return null;
+        const idBuf = CHARACTER._pack_id(this.id);
+        const parts: Buffer[] = [];
+        let count = 0;
+        for (const [attackerId, dmg] of entries) {
+            if (!(dmg > 0)) continue;
+            parts.push(CHARACTER._pack_id(attackerId), this._encodeVarint(dmg));
+            count++;
+            if (count >= 255) break;
+        }
+        if (count === 0) return null;
+        const header = Buffer.allocUnsafe(9);
+        header[0] = 0x54;
+        idBuf.copy(header, 1);
+        header[8] = count;
+        return Buffer.concat([header, ...parts]);
+    }
+
+    /**
      * 增加 / 减少气血
      */
     add_hp(v: number): number {
@@ -2992,6 +3044,10 @@ export class CHARACTER extends ITEM {
         if (!this.fight_type) return false;
         this.send('{type:"combat",end:1}');
         if (this.record_damage && this.hp > 0) this.damages = null;
+        if (this._damage_registered) {
+            this._damage_registered = false;
+            unregisterDamageBroadcast(this);
+        }
         this.fight_type = 0;
         if (this.attack_handler) clearTimeout(this.attack_handler);
         this.attack_handler = null;
@@ -3504,7 +3560,13 @@ export class CHARACTER extends ITEM {
         if (sh > 0) {
             sh = int(sh);
             if (this.record_damage && from) {
-                if (!this.damages) this.damages = {};
+                if (!this.damages) {
+                    this.damages = {};
+                    if (!this._damage_registered) {
+                        this._damage_registered = true;
+                        registerDamageBroadcast(this);
+                    }
+                }
                 const damag = (this.damages[from.id] || 0) + sh;
                 this.damages[from.id] = damag;
                 this.sum_damages = (this.sum_damages ?? 0) + sh;
@@ -3521,7 +3583,13 @@ export class CHARACTER extends ITEM {
     damage2(sh: number, from?: CHARACTER): number | undefined {
         if (!sh) return;
         if (this.record_damage && from) {
-            if (!this.damages) this.damages = {};
+            if (!this.damages) {
+                this.damages = {};
+                if (!this._damage_registered) {
+                    this._damage_registered = true;
+                    registerDamageBroadcast(this);
+                }
+            }
             const damag = (this.damages[from.id] || 0) + sh;
             this.damages[from.id] = damag;
         }

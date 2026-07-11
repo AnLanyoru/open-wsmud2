@@ -49,11 +49,11 @@ export default class extends SKILL {
                 if (time < 2000) time == 2000;
                 else if (time > 10000) time = 10000;
                 time += me.query_prop('qffc_ml');
-                var msg = '<hic>$N使出秋风尘法「缠」字诀，拂尘连挥企图把$n的全身缠住。</hic>';
+                var msg_to_b: string | number;
                 let mz = me.mz + (me.mz * me.query_prop('qffc_mz')) / 100;
 
                 if (me.random(mz) > target.ds / 2) {
-                    msg += '结果$p被$P攻了个措手不及!\n';
+                    msg_to_b = '<hic>$N使出秋风尘法「缠」字诀，拂尘连挥企图把$n的全身缠住。</hic>结果$p被$P攻了个措手不及!\n';
                     target.add_status(
                         {
                             id: 'busy',
@@ -65,9 +65,9 @@ export default class extends SKILL {
                         me,
                     );
                 } else {
-                    msg += '可是$p看破了$P的企图，并没有上当。\n';
+                    msg_to_b = '<hic>$N使出秋风尘法「缠」字诀，拂尘连挥企图把$n的全身缠住。</hic>可是$p看破了$P的企图，并没有上当。\n';
                 }
-                me.send_room(msg, target);
+                me.send_room(msg_to_b, target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var time = Math.round(lv / 50);
