@@ -15,6 +15,8 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+import zlib from 'zlib';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -380,24 +382,49 @@ if (IS_BINARY) {
             serverLines.push(`register(${JSON.stringify(literal)});`);
         }
 
-        // 客户端模板表 (JSON, 写到项目根目录避免被 vite build 清空)
-        fs.writeFileSync(
-            path.join(ROOT, 'templates-data.json'),
-            JSON.stringify({ v: 1, d: clientData })
-        );
-        console.log('[pack]   Generated templates-data.json');
+        // 客户端模板表 (JSON, 写到 res/ 作为构建中间产物)
+        const tmplData = JSON.stringify({ v: 1, d: clientData });
+        fs.writeFileSync(path.join(RES_DIR, 'templates-data.json'), tmplData);
+        console.log('[pack]   Generated res/templates-data.json');
 
-        // 客户端部位名表 (JSON, 供 0x12 帧 HURT_PART 1B 索引查名)
+        // 客户端部位名表 (JSON, 写到 res/ 作为构建中间产物)
         const partsTable = {
             character: ['左脚', '右脚', '左腿', '右腿', '小腹', '胸前', '后背',
                 '头部', '颈部', '后心', '左肩', '右肩', '左手', '左手', '腰间'],
             monster: ['左爪', '右爪', '后腿', '小腹', '胸前', '背部', '头部', '颈部', '前肢', '腰间'],
         };
+        const partsData = JSON.stringify(partsTable);
+        fs.writeFileSync(path.join(RES_DIR, 'parts-table.json'), partsData);
+        console.log('[pack]   Generated res/parts-table.json');
+
+        // 合并两个 JSON → gzip 压缩 → tmpl_<hash>.gz，部署到 www/
+        const combined = JSON.stringify({
+            templates: { v: 1, d: clientData },
+            parts: partsTable,
+        });
+        const gzipped = zlib.gzipSync(combined);
+        const hash = crypto.createHash('sha256').update(gzipped).digest('hex').slice(0, 12);
+        const gzFileName = `tmpl_${hash}.gz`;
+
+        // 确保 www/ 目录存在
+        if (!fs.existsSync(WWW_DIR)) fs.mkdirSync(WWW_DIR, { recursive: true });
+
+        // 清理旧的 tmpl_*.gz 文件
+        for (const oldFile of fs.readdirSync(WWW_DIR)) {
+            if (/^tmpl_[0-9a-f]+\.gz$/.test(oldFile) && oldFile !== gzFileName) {
+                fs.unlinkSync(path.join(WWW_DIR, oldFile));
+            }
+        }
+
+        fs.writeFileSync(path.join(WWW_DIR, gzFileName), gzipped);
+        console.log(`[pack]   Generated www/${gzFileName} (${(gzipped.length / 1024).toFixed(1)}KB)`);
+
+        // 写入哈希清单供客户端比对
         fs.writeFileSync(
-            path.join(ROOT, 'parts-table.json'),
-            JSON.stringify(partsTable)
+            path.join(WWW_DIR, 'tmpl-hash.json'),
+            JSON.stringify({ hash, file: gzFileName })
         );
-        console.log('[pack]   Generated parts-table.json');
+        console.log('[pack]   Generated www/tmpl-hash.json');
 
         // 服务端模板注册（供 getMask() 使用）
         fs.writeFileSync(

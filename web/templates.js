@@ -1,7 +1,9 @@
 /**
  * 模板字符串驻留表 — 客户端本地模板还原引擎
  *
- * 启动时从 /templates-data.json 加载映射表（Express 自动 gzip），
+ * 启动时从服务器获取哈希值，与 localStorage 缓存比对：
+ * - 哈希一致 → 直接使用缓存数据，零额外网络传输
+ * - 哈希不一致 → 下载 tmpl_<hash>.gz (gzip)，原生 DecompressionStream 解压
  * 服务端二进制帧按需发送实体字段（由 mask 控制），
  * 客户端根据 mask 重建字段数组后还原文本，再做视角转换。
  */
@@ -17,30 +19,70 @@ const PartsTable = [[], []];
 let Version = 0;
 let _ready = false;
 
+const LS_HASH_KEY = 'tmpl_hash';
+const LS_DATA_KEY = 'tmpl_data';
+
+/** 解压 gzip 数据 → JSON 对象（使用浏览器原生 DecompressionStream） */
+async function decompressGzipToJson(gzBlob) {
+    const ds = new DecompressionStream('gzip');
+    const decompressed = gzBlob.stream().pipeThrough(ds);
+    const text = await new Response(decompressed).text();
+    return JSON.parse(text);
+}
+
+/** 将模板数据写入内存表 */
+function loadIntoTables(data) {
+    if (data.templates) {
+        const { v, d } = data.templates;
+        if (v > Version && d) {
+            Version = v;
+            for (const tid of Object.keys(d)) {
+                Table[tid] = d[tid].t;
+                MaskTable[tid] = d[tid].m;
+            }
+        }
+    }
+    if (data.parts) {
+        PartsTable[0] = data.parts.character || [];
+        PartsTable[1] = data.parts.monster || [];
+    }
+}
+
 /** 等待模板表加载完成的 Promise */
 export const ready = (async () => {
     try {
-        const resp = await fetch('/templates-data.json');
-        if (resp.ok) {
-            const { v, d } = await resp.json();
-            if (v > Version && d) {
-                Version = v;
-                for (const tid of Object.keys(d)) {
-                    Table[tid] = d[tid].t;
-                    MaskTable[tid] = d[tid].m;
-                }
+        // 1. 获取服务器最新哈希
+        const hashResp = await fetch('/tmpl-hash.json');
+        if (!hashResp.ok) throw new Error('hash fetch failed');
+        const { hash, file } = await hashResp.json();
+
+        // 2. 比对 localStorage 缓存
+        const cachedHash = localStorage.getItem(LS_HASH_KEY);
+        const cachedData = localStorage.getItem(LS_DATA_KEY);
+
+        if (hash === cachedHash && cachedData) {
+            // 哈希一致，直接用缓存
+            loadIntoTables(JSON.parse(cachedData));
+        } else {
+            // 3. 哈希不一致，下载压缩包
+            const gzResp = await fetch('/' + file);
+            if (!gzResp.ok) throw new Error('gzip fetch failed: ' + file);
+            const gzBlob = await gzResp.blob();
+            const data = await decompressGzipToJson(gzBlob);
+            loadIntoTables(data);
+            // 4. 写入 localStorage 缓存
+            try {
+                localStorage.setItem(LS_HASH_KEY, hash);
+                localStorage.setItem(LS_DATA_KEY, JSON.stringify(data));
+            } catch (_) {
+                // localStorage 配额不足时清除旧数据后重试一次
+                localStorage.removeItem(LS_DATA_KEY);
+                try { localStorage.setItem(LS_HASH_KEY, hash); } catch (_) {}
             }
         }
-    } catch (_) { /* 网络错误或 JSON 不存在 → 退化为文本路径 */ }
-    // 加载部位名表（供 0x12 帧 HURT_PART 1B 索引查名）
-    try {
-        const resp = await fetch('/parts-table.json');
-        if (resp.ok) {
-            const { character, monster } = await resp.json();
-            PartsTable[0] = character || [];
-            PartsTable[1] = monster || [];
-        }
-    } catch (_) { /* 部位表加载失败 → hurtPart 显示为空 */ }
+    } catch (_) {
+        // 网络错误或解析失败 → 退化为文本路径（format 返回空字符串）
+    }
     _ready = true;
 })();
 
