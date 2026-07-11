@@ -14,7 +14,7 @@ export default class BanPaiCangKuRoom extends ROOM {
         this.add_action('roll', '掷骰子', function (me: CHARACTER, par) {
             let rad = me.random(100) + 1;
 
-            me.send_room_b(rollDesc_to_b.random(), me, String(rad));
+            me.send_room(rollDesc_to_b.random(), me, String(rad));
         });
         this.add_action('pandian', '仓库盘点', function (me: CHARACTER, per) {
             WORLD.COMMANDS.get('party')!.enter(me, 'stores');

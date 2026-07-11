@@ -1015,41 +1015,11 @@ export class CHARACTER extends ITEM {
      * isCombat: true=战斗过滤(no_mcmsg/no_combatmsg)，false=房间过滤(no_message)
      * excludeSelf: true=排除自身（由 send_room_others 调用，一般不直接使用）
      */
-    send_msg(
-        text: string | number,
-        target?: ITEM,
-        isCombat?: boolean,
-        excludeSelf?: boolean,
-        _a1?: string | number | TplRef,
-        _a2?: string | number | TplRef,
-        _a3?: string | number | TplRef,
-        _a4?: string | number | TplRef,
-    ): void {
-        if (!this.environment || text === undefined) return;
-        if (typeof text === 'number') {
-            this._send_binary(text, target, isCombat, excludeSelf, _a1, _a2, _a3, _a4);
-            return;
-        }
-        if (!text) return;
-        // 文本模式：若携带参数，先展开 ^ 占位符
-        if (_a1 !== undefined) text = this._expand_text(text, _a1, _a2, _a3, _a4);
+    send_msg(text: string, target?: ITEM, isCombat?: boolean, excludeSelf?: boolean): void {
+        if (!this.environment || !text) return;
         const payload = this._build_msg(text, target);
         if (isCombat) this._broadcast_combat(payload, target);
         else this._broadcast_room(payload, target, excludeSelf);
-    }
-
-    /** 二进制路径（内部实现，由 send_msg 的 typeof 分支调用） */
-    _send_binary(
-        template_id: number,
-        target?: ITEM,
-        isCombat?: boolean,
-        excludeSelf?: boolean,
-        _a1?: string | number | TplRef,
-        _a2?: string | number | TplRef,
-        _a3?: string | number | TplRef,
-        _a4?: string | number | TplRef,
-    ): void {
-        this.send_msg_b(template_id, target, isCombat, excludeSelf, _a1, _a2, _a3, _a4);
     }
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
@@ -1106,23 +1076,8 @@ export class CHARACTER extends ITEM {
         _a3?: string | number | TplRef,
         _a4?: string | number | TplRef,
     ): void {
-        this.send_msg(text, target, true, undefined, _a1, _a2, _a3, _a4);
+        this.send_msg_b(text, target, true, false, _a1, _a2, _a3, _a4);
     }
-    send_combat_b(
-        template_id: number | string,
-        target?: CHARACTER,
-        _a1?: string | number | TplRef,
-        _a2?: string | number | TplRef,
-        _a3?: string | number | TplRef,
-        _a4?: string | number | TplRef,
-    ): void {
-        if (typeof template_id === 'string') {
-            this.send_combat(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
-            return;
-        }
-        this.send_msg_b(template_id, target, true, false, _a1, _a2, _a3, _a4);
-    }
-
     send_room(
         text: string | number,
         target?: ITEM,
@@ -1131,23 +1086,8 @@ export class CHARACTER extends ITEM {
         _a3?: string | number | TplRef,
         _a4?: string | number | TplRef,
     ): void {
-        this.send_msg(text, target, false, undefined, _a1, _a2, _a3, _a4);
+        this.send_msg_b(text, target, false, false, _a1, _a2, _a3, _a4);
     }
-    send_room_b(
-        template_id: number | string,
-        target?: ITEM,
-        _a1?: string | number | TplRef,
-        _a2?: string | number | TplRef,
-        _a3?: string | number | TplRef,
-        _a4?: string | number | TplRef,
-    ): void {
-        if (typeof template_id === 'string') {
-            this.send_room(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
-            return;
-        }
-        this.send_msg_b(template_id, target, false, false, _a1, _a2, _a3, _a4);
-    }
-
     /** 广播房间消息（排除自身）— 文本路径 */
     send_room_others(
         text: string | number,
@@ -1157,7 +1097,7 @@ export class CHARACTER extends ITEM {
         _a3?: string | number | TplRef,
         _a4?: string | number | TplRef,
     ): void {
-        this.send_msg(text, target, false, true, _a1, _a2, _a3, _a4);
+        this.send_msg_b(text, target, false, true, _a1, _a2, _a3, _a4);
     }
     /** 广播房间消息（排除自身）— 二进制路径
      *  模板路径强制置 A_NAME 掩码位，确保客户端拿到发送者名字做 excludeSelf 过滤 */
@@ -3435,7 +3375,7 @@ export class CHARACTER extends ITEM {
         }
         if (par.attack_before && attack_msg) {
             if (typeof (par.attack_before as any) === 'number') {
-                this.send_combat_b(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
+                this.send_combat(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
             } else if (typeof (attack_msg as any) === 'number') {
                 // attack_before 是动态字符串，attack_msg 是模板 ID
                 // 文本路径：展开模板为文本后拼接，format_msg 正确替换 $ 占位符
@@ -4169,7 +4109,7 @@ function damage_msg(
         }
         // msg 为模板 ID — 二进制路径，damage 以原始 number 传入
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat_b(dmgTmpl, ob, [msg as any], [disp, damage]);
+        me.send_combat(dmgTmpl, ob, [msg as any], [disp, damage]);
         return;
     }
     // 零伤害
@@ -4198,13 +4138,13 @@ function damage_msg(
     if (buckets) {
         for (let i: number = 0; i < buckets.length; i++) {
             if (ratio < buckets[i].max) {
-                me.send_combat_b(buckets[i].tmpl, ob, [disp, damage]);
+                me.send_combat(buckets[i].tmpl, ob, [disp, damage]);
                 return;
             }
         }
     }
     // fallback
-    me.send_combat_b(_DMG_FALLBACK, ob, [disp, damage]);
+    me.send_combat(_DMG_FALLBACK, ob, [disp, damage]);
 }
 
 // ================================================================
