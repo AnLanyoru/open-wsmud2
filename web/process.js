@@ -701,7 +701,17 @@ export function ProcessBinary(data) {
                     if (aName === myName && Setting.no_mcmsg) break;
                     const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
                     text = perspective(text, aName, tName, myName);
-                    if (Setting.show_binary) text += ' <hib>(binary)</hib>';
+                    if (Setting.show_binary) {
+                        const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'A_PART', 'A_THROW', 'T_NAME', 'T_WEAPON', 'T_CALL3'];
+                        const fields = [];
+                        let fbit = 1, sIdx = 0;
+                        for (let i = 0; i < 8; i++) {
+                            if (mask & fbit) fields.push(`${FIELD_NAMES[i]}:${sparse[sIdx++]}`);
+                            fbit <<= 1;
+                        }
+                        const opHex = '0x' + (excludeSelf ? 0x92 : 0x12).toString(16);
+                        text += ` <hib>(b-${opHex} tid:${tid} mask:0x${mask.toString(16)}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
+                    }
                     Process.message.push(text);
                     Process.message.scroll2end();
                 }
