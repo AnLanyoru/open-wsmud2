@@ -606,7 +606,7 @@ function buildSparseFromCache(fieldMask, aId, tId) {
     const tCache = tId ? lookupCache(tId) : null;
     const sparse = [];
     // FMASK 位顺序: A_NAME(0x01) A_WEAPON(0x02) A_CALL3(0x04) T_WEAPON(0x08) A_THROW(0x10) T_NAME(0x20) [0x40保留] T_CALL3(0x80)
-    if (fieldMask & 0x01) sparse.push(aCache ? aCache.name : '');           // A_NAME
+    if (fieldMask & 0x01) sparse.push(aCache ? (aCache.n || aCache.name) : '');           // A_NAME (纯名字)
     if (fieldMask & 0x02) sparse.push(aCache ? (aCache.w || '手') : '手');  // A_WEAPON
     if (fieldMask & 0x04) sparse.push(aCache ? (aCache.c || '') : '');     // A_CALL3
     if (fieldMask & 0x08) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
@@ -774,7 +774,7 @@ export function ProcessBinary(data) {
                     // 按 FMASK 位顺序读取字段并更新缓存
                     // bit3 (0x08) 现在是 T_WEAPON，与 A_WEAPON 共用缓存字段 w
                     const fieldReaders = [
-                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // A_NAME (long_name 含称号)
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.n = r.str; },            // A_NAME (纯名字，更新缓存 n)
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // A_WEAPON
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // A_CALL3
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // T_WEAPON (同 A_WEAPON 缓存字段 w)
