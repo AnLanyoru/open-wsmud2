@@ -98,6 +98,33 @@ if (IS_BINARY) {
         });
     }
 
+    // --- Utility: 提取模板字面量中的 ${} 插值，替换为 ^ 占位符 ---
+    // 返回 { template: 含 ^ 的纯模板, exprs: 表达式列表 }
+    function extractInterpolation(literal) {
+        const exprs = [];
+        let template = '';
+        let i = 0;
+        while (i < literal.length) {
+            if (literal[i] === '$' && literal[i + 1] === '{') {
+                let depth = 1;
+                let j = i + 2;
+                while (j < literal.length && depth > 0) {
+                    if (literal[j] === '{') depth++;
+                    else if (literal[j] === '}') depth--;
+                    if (depth === 0) break;
+                    j++;
+                }
+                exprs.push(literal.slice(i + 2, j));
+                template += '^';
+                i = j + 1;
+            } else {
+                template += literal[i];
+                i++;
+            }
+        }
+        return { template, exprs };
+    }
+
     // --- Mask 计算 (与 templates.ts computeMask 保持一致) ---
     // 8 位 mask: A_NAME=0x01 A_WEAPON=0x02 A_CALL3=0x04 A_PART=0x08
     //            A_THROW=0x10 T_NAME=0x20 T_WEAPON=0x40 T_CALL3=0x80
@@ -191,10 +218,15 @@ if (IS_BINARY) {
                         registerTemplate(literal);
                     }
                 }
-                // 反引号模板字面量（排除含 ${} 的动态模板）
+                // 反引号模板字面量（含 ${} 的动态模板提取表达式后注册纯模板）
                 while ((m = CALL_BT_RE.exec(content)) !== null) {
-                    const literal = unescapeJS(m[2], '`');
-                    if (!literal.includes('${') && !templateMap.has(literal)) {
+                    const literal = unescapeJS(m[3], '`');
+                    if (literal.includes('${')) {
+                        const { template } = extractInterpolation(literal);
+                        if (!templateMap.has(template)) {
+                            registerTemplate(template);
+                        }
+                    } else if (!templateMap.has(literal)) {
                         registerTemplate(literal);
                     }
                 }
@@ -407,20 +439,54 @@ ${serverLines.join('\n')}
                 });
 
                 // 替换反引号模板字面量 send_room(`literal`) → send_room(id)
-                // 排除含 ${} 的动态模板（无法预编译）
-                content = content.replace(CALL_BT_RE, (match, funcName, rawStr) => {
-                    const literal = unescapeJS(rawStr, '`');
-                    if (!literal.includes('${')) {
-                        const id = templateMap.get(literal);
-                        if (id !== undefined) {
-                            changed = true;
-                            if (funcName === 'send_combat') replacedCombat++;
-                            else replacedRoom++;
-                            return `.${funcName}(${id}`;
-                        }
+                // 含 ${} 的动态模板：提取表达式替换为 ^，表达式作为尾参追加到参数列表末尾
+                CALL_BT_RE.lastIndex = 0;
+                let btMatch;
+                while ((btMatch = CALL_BT_RE.exec(content)) !== null) {
+                    const funcName = btMatch[1];
+                    const literal = unescapeJS(btMatch[3], '`');
+                    const hasInterp = literal.includes('${');
+                    let template, exprs;
+                    if (hasInterp) {
+                        const result = extractInterpolation(literal);
+                        template = result.template;
+                        exprs = result.exprs;
+                    } else {
+                        template = literal;
+                        exprs = null;
                     }
-                    return match;
-                });
+                    const id = templateMap.get(template);
+                    if (id === undefined) continue;
+
+                    changed = true;
+                    if (funcName === 'send_combat') replacedCombat++;
+                    else replacedRoom++;
+
+                    if (!hasInterp) {
+                        // 简单替换：保留后面的参数
+                        const replacement = `.${funcName}(${id}`;
+                        content = content.slice(0, btMatch.index) + replacement + content.slice(btMatch.index + btMatch[0].length);
+                        CALL_BT_RE.lastIndex = btMatch.index + replacement.length;
+                    } else {
+                        // 动态模板：从反引号结束位置开始，追踪括号深度找到函数调用的 )
+                        const matchEnd = btMatch.index + btMatch[0].length;
+                        let depth = 1;
+                        let parenEnd = matchEnd;
+                        while (parenEnd < content.length && depth > 0) {
+                            if (content[parenEnd] === '(') depth++;
+                            else if (content[parenEnd] === ')') depth--;
+                            if (depth === 0) break;
+                            parenEnd++;
+                        }
+                        if (depth !== 0) continue;
+                        let argsStr = content.slice(matchEnd, parenEnd).trim();
+                        // 去掉首尾逗号和空白（处理多行格式和尾逗号）
+                        argsStr = argsStr.replace(/^,\s*/, '').replace(/\s*,\s*$/, '');
+                        const newCall = `.${funcName}(${id}${argsStr ? ', ' + argsStr : ''}${exprs.length ? ', ' + exprs.join(', ') : ''})`;
+                        content = content.slice(0, btMatch.index) + newCall + content.slice(parenEnd + 1);
+                        CALL_BT_RE.lastIndex = btMatch.index + newCall.length;
+                    }
+                }
 
                 // ============================================================
                 // 替换已知安全上下文中的字符串字面量
