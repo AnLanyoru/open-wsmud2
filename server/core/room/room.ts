@@ -328,12 +328,15 @@ export class ROOM extends ITEM {
                 str.push(',max_hp:');
                 str.push(String(ch.max_hp));
                 // AT 缓存字段：客户端存入 cur_room.items 供 0x12 帧按 ID 查找
+                // name=long_name() 供 A_NAME($N)，n=纯名称供 T_NAME($n)
                 str.push(',w:"');
                 str.push(ch.weapon_name() || '');
                 str.push('",c:"');
                 str.push(ch.call3());
                 str.push('",th:"');
                 str.push(ch.throwing_name() || '');
+                str.push('",n:"');
+                str.push(ch.name);
                 str.push('"');
                 if (ch.append_status) ch.append_status(str);
             }
@@ -383,6 +386,7 @@ export class ROOM extends ITEM {
                     item.append_status(str);
                 }
                 // AT 缓存字段：角色物件才有，客户端存入 cur_room.items 供 0x12 帧按 ID 查找
+                // name=long_name() 供 A_NAME($N)，n=纯名称供 T_NAME($n)
                 if (item.check_character?.()) {
                     str.push(',w:"');
                     str.push(item.weapon_name() || '');
@@ -390,6 +394,8 @@ export class ROOM extends ITEM {
                     str.push(item.call3());
                     str.push('",th:"');
                     str.push(item.throwing_name() || '');
+                    str.push('",n:"');
+                    str.push(item.name);
                     str.push('"');
                 }
                 str.push('},');
@@ -868,7 +874,7 @@ export class ROOM extends ITEM {
      * 构建脏数据刷新帧 (op 0x55) — 编码所有脏玩家的新字段数据。
      * 格式: [0x55][1B count][count × ([7B id][1B field_mask][按 mask 顺序的字段...])]
      * field_mask 沿用 8 位 FMASK，字段编码: [1B len][utf8]
-     * per-player 的 A_NAME/T_NAME 都映射到 cache.name（冗余但一致）
+     * A_NAME 映射 cache.name (long_name 含称号)，T_NAME 映射 cache.n (纯名称)
      */
     _build_dirty_refresh_frame(): Buffer | null {
         const dirty = this._dirty_players;
@@ -890,7 +896,8 @@ export class ROOM extends ITEM {
             if (df & 0x10) fm |= FMASK.A_THROW;                     // THROWING
 
             // 准备字段值（按 FMASK 位顺序）
-            const name = ch.name;
+            const fullName = ch.long_name();  // A_NAME: 含称号
+            const pureName = ch.name;          // T_NAME: 纯名称
             const weapon = ch.weapon_name() || '';
             const call3 = ch.call3();
             const throwing = ch.throwing_name() || '';
@@ -904,7 +911,7 @@ export class ROOM extends ITEM {
             parts.push(fmBuf);
 
             // 按 FMASK 位顺序编码字段: A_NAME, A_WEAPON, A_CALL3, T_WEAPON, A_THROW, T_NAME, (0x40保留), T_CALL3
-            const fieldValues = [name, weapon, call3, weapon, throwing, name, '', call3];
+            const fieldValues = [fullName, weapon, call3, weapon, throwing, pureName, '', call3];
             const fieldBits = [FMASK.A_NAME, FMASK.A_WEAPON, FMASK.A_CALL3, FMASK.T_WEAPON, FMASK.A_THROW, FMASK.T_NAME, 0x40, FMASK.T_CALL3];
             for (let i = 0; i < 8; i++) {
                 if (fm & fieldBits[i]) {

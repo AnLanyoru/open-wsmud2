@@ -611,7 +611,7 @@ function buildSparseFromCache(fieldMask, aId, tId) {
     if (fieldMask & 0x04) sparse.push(aCache ? (aCache.c || '') : '');     // A_CALL3
     if (fieldMask & 0x08) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
     if (fieldMask & 0x10) sparse.push(aCache ? (aCache.th || '') : '');    // A_THROW
-    if (fieldMask & 0x20) sparse.push(tCache ? tCache.name : '<hir>未知存在</hir>'); // T_NAME
+    if (fieldMask & 0x20) sparse.push(tCache ? (tCache.n || tCache.name) : '<hir>未知存在</hir>'); // T_NAME (纯名称)
     // 0x40 保留，不消费 sparse
     if (fieldMask & 0x80) sparse.push(tCache ? (tCache.c || '') : '');     // T_CALL3
     return sparse;
@@ -774,12 +774,12 @@ export function ProcessBinary(data) {
                     // 按 FMASK 位顺序读取字段并更新缓存
                     // bit3 (0x08) 现在是 T_WEAPON，与 A_WEAPON 共用缓存字段 w
                     const fieldReaders = [
-                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // A_NAME
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // A_NAME (long_name 含称号)
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // A_WEAPON
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // A_CALL3
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // T_WEAPON (同 A_WEAPON 缓存字段 w)
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.th = r.str; },           // A_THROW
-                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // T_NAME (同 A_NAME)
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.n = r.str; },            // T_NAME (纯名称，独立缓存字段 n)
                         () => { const r = readStr(data, pos); pos = r.next; },                                      // 0x40 保留（不更新缓存）
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // T_CALL3 (同 A_CALL3)
                     ];
