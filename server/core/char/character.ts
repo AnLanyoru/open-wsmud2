@@ -15,14 +15,13 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FIELD_TO_MASK, FMASK, ID_MASK, get, popcount } from '../templates.js';
+import { FMASK, ID_MASK, get, popcount } from '../templates.js';
 
 /** 脏字段位掩码 — 用于刷新帧 (op 0x55) 标记哪些实体属性已变更 */
 const DIRTY = {
     NAME: 0x01,     // 玩家名称（对应 FMASK.A_NAME | FMASK.T_NAME）
     WEAPON: 0x02,   // 武器名（对应 FMASK.A_WEAPON | FMASK.T_WEAPON）
     CALL3: 0x04,    // 第三人称（对应 FMASK.A_CALL3 | FMASK.T_CALL3）
-    PART: 0x08,     // 攻击部位（对应 FMASK.A_PART）
     THROWING: 0x10, // 暗器名（对应 FMASK.A_THROW）
 } as const;
 import type { EQUIPMENT } from '../item/equipment.js';
@@ -784,8 +783,12 @@ export class CHARACTER extends ITEM {
         // 判断实际需要携带的 ID（目标可能不是角色）
         const hasA = !!(idMask & ID_MASK.A_ID);
         const hasT = !!(idMask & ID_MASK.T_ID) && target && (target as any).check_character?.();
+        const hasPart = !!(idMask & ID_MASK.HURT_PART);
+        // 攻击部位字符串（帧内内联传递，不走缓存）
+        const partStr = hasPart ? (this.attack_part ? this.attack_part.name : '') : '';
+        const partBuf = hasPart ? Buffer.from(partStr, 'utf8') : Buffer.alloc(0);
         // 实际写入帧的 idMask（清除无对应 target 的 T_ID 位）
-        const actualMask = (hasA ? ID_MASK.A_ID : 0) | (hasT ? ID_MASK.T_ID : 0);
+        const actualMask = (hasA ? ID_MASK.A_ID : 0) | (hasT ? ID_MASK.T_ID : 0) | (hasPart ? ID_MASK.HURT_PART : 0);
 
         // arg 编码统一逻辑：number → varint（_encodeVarint 内部按 uint32 阈值智能分流）
         // string → 正则判断（向后兼容 pack 生成的字面量）
@@ -873,10 +876,11 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        // 计算总大小: op(1) + tid(2) + idMask(1) + A_ID(7) + T_ID(7) + args头(4)
+        // 计算总大小: op(1) + tid(2) + idMask(1) + A_ID(7) + T_ID(7) + HURT_PART(1+len) + args头(4)
         let totalSize = 1 + 2 + 1;
         if (hasA) totalSize += 7;
         if (hasT) totalSize += 7;
+        if (hasPart) totalSize += 1 + partBuf.length;
         totalSize += 1 + 1 + 1 + 1; // ^count + argMask + floatMask + refMask
         for (let i = 0; i < argEnc.length; i++) {
             const ab = argEnc[i];
@@ -902,6 +906,11 @@ export class CHARACTER extends ITEM {
         if (hasT) {
             CHARACTER._pack_id(target!.id).copy(buf, pos);
             pos += 7;
+        }
+        if (hasPart) {
+            buf[pos++] = partBuf.length;
+            partBuf.copy(buf, pos);
+            pos += partBuf.length;
         }
         buf[pos++] = argItems.length;
         buf[pos++] = argMask;
@@ -1138,10 +1147,14 @@ export class CHARACTER extends ITEM {
 
     /**
      * 执行命令字符串（解析并分发）
+     *
+     * 玩家指令即时反馈：指令执行后立刻 flush 房间 batch，不等 0-16ms 延迟。
+     * perform 命令已内置 begin_burst/end_burst（use_pfm 中），跳过。
      */
     command(req: string): void {
         if (this.wait_input) {
             this.wait_input.apply(this, [this, req]);
+            this._flush_cmd_batch();
             return;
         }
         let cmd = '';
@@ -1160,6 +1173,19 @@ export class CHARACTER extends ITEM {
         }
         if (!cmd) cmd = req;
         this.do_command(cmd, pars);
+        // perform 命令已内置 begin_burst/end_burst，跳过
+        if (cmd !== 'perform') {
+            this._flush_cmd_batch();
+        }
+    }
+
+    /** 玩家指令执行后立刻 flush 房间 batch，提供即时反馈 */
+    private _flush_cmd_batch(): void {
+        const room = this.environment;
+        if (!room) return;
+        // batch 为空且无脏玩家时跳过，避免无意义 flush
+        if (room._batch_all.length === 0 && room._dirty_players.size === 0) return;
+        flushRoomNow(room);
     }
 
     /**
@@ -3358,7 +3384,6 @@ export class CHARACTER extends ITEM {
         }
 
         this.attack_part = par.part ?? target.query_part();
-        this._mark_dirty(DIRTY.PART);
 
         let attack_msg = par.attack_msg;
         if (attack_msg === undefined) {

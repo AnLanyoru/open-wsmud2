@@ -605,20 +605,20 @@ function buildSparseFromCache(fieldMask, aId, tId) {
     const aCache = aId ? lookupCache(aId) : null;
     const tCache = tId ? lookupCache(tId) : null;
     const sparse = [];
-    // FMASK 位顺序: A_NAME(0x01) A_WEAPON(0x02) A_CALL3(0x04) A_PART(0x08) A_THROW(0x10) T_NAME(0x20) T_WEAPON(0x40) T_CALL3(0x80)
+    // FMASK 位顺序: A_NAME(0x01) A_WEAPON(0x02) A_CALL3(0x04) T_WEAPON(0x08) A_THROW(0x10) T_NAME(0x20) [0x40保留] T_CALL3(0x80)
     if (fieldMask & 0x01) sparse.push(aCache ? aCache.name : '');           // A_NAME
     if (fieldMask & 0x02) sparse.push(aCache ? (aCache.w || '手') : '手');  // A_WEAPON
     if (fieldMask & 0x04) sparse.push(aCache ? (aCache.c || '') : '');     // A_CALL3
-    if (fieldMask & 0x08) sparse.push(aCache ? (aCache.ap || '') : '');    // A_PART
+    if (fieldMask & 0x08) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
     if (fieldMask & 0x10) sparse.push(aCache ? (aCache.th || '') : '');    // A_THROW
     if (fieldMask & 0x20) sparse.push(tCache ? tCache.name : '<hir>未知存在</hir>'); // T_NAME
-    if (fieldMask & 0x40) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
+    // 0x40 保留，不消费 sparse
     if (fieldMask & 0x80) sparse.push(tCache ? (tCache.c || '') : '');     // T_CALL3
     return sparse;
 }
 
 /** 读取嵌套模板引用，递归 format 返回展开字符串 */
-function readTplRef(data, pos, aId, tId, dv) {
+function readTplRef(data, pos, aId, tId, dv, hurtPart) {
     const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
     const refArgc = data[pos++];
     const refArgMask = data[pos++];
@@ -640,10 +640,10 @@ function readTplRef(data, pos, aId, tId, dv) {
             pos = r.next;
         }
     }
-    // 嵌套模板用自己的 fieldMask 从缓存构建 sparse（缓存有全部字段）
+    // 嵌套模板用自己的 fieldMask 从缓存构建 sparse（缓存有全部字段），复用父级 hurtPart
     const refFieldMask = getMask(refTid);
     const refSparse = buildSparseFromCache(refFieldMask, aId, tId);
-    return { str: format(refTid, refFieldMask, refSparse, refArgs), next: pos };
+    return { str: format(refTid, refFieldMask, refSparse, refArgs, hurtPart), next: pos };
 }
 
 /** 读取 LEB128 无符号 varint — 用 BigInt 中间值避免 32 位 << 溢出，转回 number */
@@ -692,7 +692,7 @@ export function ProcessBinary(data) {
         const excludeSelf = (op & 0x80) !== 0;
         const realOp = op & 0x7F;
         switch (realOp) {
-            case 0x12: { // combat/room — ID-based: 携带 7B A_ID/T_ID，从 cur_room.items 缓存查字段
+            case 0x12: { // combat/room — ID-based: 携带 7B A_ID/T_ID + HURT_PART，从 cur_room.items 缓存查字段
                 const tid = (data[pos] << 8) | data[pos + 1]; pos += 2;
                 const idMask = data[pos++];
 
@@ -700,6 +700,9 @@ export function ProcessBinary(data) {
                 let aId = null, tId = null;
                 if (idMask & 0x01) { const r = read7BId(data, pos, dv); aId = r.id; pos = r.next; }
                 if (idMask & 0x02) { const r = read7BId(data, pos, dv); tId = r.id; pos = r.next; }
+                // 读取内联攻击部位（HURT_PART 位置位时）
+                let hurtPart = null;
+                if (idMask & 0x04) { const r = readStr(data, pos); hurtPart = r.str; pos = r.next; }
 
                 // 从模板表查 8 位 fieldMask，从缓存构建 sparse
                 const fieldMask = getMask(tid);
@@ -713,7 +716,7 @@ export function ProcessBinary(data) {
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
                     if (refMask & (1 << i)) {
-                        const r = readTplRef(data, pos, aId, tId, dv);
+                        const r = readTplRef(data, pos, aId, tId, dv, hurtPart);
                         args.push(r.str);
                         pos = r.next;
                     } else if (argMask & (1 << i)) {
@@ -733,7 +736,7 @@ export function ProcessBinary(data) {
                 }
 
                 // 模板还原 + 视角转换（用 ID 比较，无名字碰撞风险）
-                let text = format(tid, fieldMask, sparse, args);
+                let text = format(tid, fieldMask, sparse, args, hurtPart);
                 if (text) {
                     // excludeSelf / no_mcmsg：用 A_ID 比较
                     if (excludeSelf && aId === Process.player) break;
@@ -745,7 +748,7 @@ export function ProcessBinary(data) {
                     if (tId && tId === Process.player) text = text.split(tName).join('你');
                     if (Setting.show_binary) {
                         // 调试输出：字段值来自 cur_room.items 缓存（非帧内下发），帧仅携带 idMask + 7B ID
-                        const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'A_PART', 'A_THROW', 'T_NAME', 'T_WEAPON', 'T_CALL3'];
+                        const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'T_WEAPON', 'A_THROW', 'T_NAME', '(reserved)', 'T_CALL3'];
                         const fields = [];
                         let fbit = 1, sIdx = 0;
                         for (let i = 0; i < 8; i++) {
@@ -753,7 +756,7 @@ export function ProcessBinary(data) {
                             fbit <<= 1;
                         }
                         const opHex = '0x' + (excludeSelf ? 0x92 : 0x12).toString(16);
-                        text += ` <hib>(b-${opHex} tid:${tid} idMask:0x${idMask.toString(16)} aId:${aId||'-'} tId:${tId||'-'}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
+                        text += ` <hib>(b-${opHex} tid:${tid} idMask:0x${idMask.toString(16)} aId:${aId||'-'} tId:${tId||'-'}${hurtPart ? ' hurtPart:' + hurtPart : ''}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
                     }
                     Process.message.push(text);
                     Process.message.scroll2end();
@@ -769,14 +772,15 @@ export function ProcessBinary(data) {
                     const fm = data[pos++];
                     const item = lookupCache(id);
                     // 按 FMASK 位顺序读取字段并更新缓存
+                    // bit3 (0x08) 现在是 T_WEAPON，与 A_WEAPON 共用缓存字段 w
                     const fieldReaders = [
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // A_NAME
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // A_WEAPON
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // A_CALL3
-                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.ap = r.str; },           // A_PART
+                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // T_WEAPON (同 A_WEAPON 缓存字段 w)
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.th = r.str; },           // A_THROW
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.name = r.str; },        // T_NAME (同 A_NAME)
-                        () => { const r = readStr(data, pos); pos = r.next; if (item) item.w = r.str; },            // T_WEAPON (同 A_WEAPON)
+                        () => { const r = readStr(data, pos); pos = r.next; },                                      // 0x40 保留（不更新缓存）
                         () => { const r = readStr(data, pos); pos = r.next; if (item) item.c = r.str; },            // T_CALL3 (同 A_CALL3)
                     ];
                     const fieldBits = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];

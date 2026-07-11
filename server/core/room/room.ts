@@ -332,8 +332,6 @@ export class ROOM extends ITEM {
                 str.push(ch.weapon_name() || '');
                 str.push('",c:"');
                 str.push(ch.call3());
-                str.push('",ap:"');
-                str.push(ch.attack_part ? ch.attack_part.name : '');
                 str.push('",th:"');
                 str.push(ch.throwing_name() || '');
                 str.push('"');
@@ -390,8 +388,6 @@ export class ROOM extends ITEM {
                     str.push(item.weapon_name() || '');
                     str.push('",c:"');
                     str.push(item.call3());
-                    str.push('",ap:"');
-                    str.push(item.attack_part ? item.attack_part.name : '');
                     str.push('",th:"');
                     str.push(item.throwing_name() || '');
                     str.push('"');
@@ -886,19 +882,17 @@ export class ROOM extends ITEM {
             const df = (ch as any)._dirty_fields || 0;
             if (!df) continue;
 
-            // 将 5 位 DIRTY 掩码扩展为 8 位 FMASK
+            // 将 4 位 DIRTY 掩码扩展为 8 位 FMASK
             let fm = 0;
             if (df & 0x01) fm |= FMASK.A_NAME | FMASK.T_NAME;       // NAME
             if (df & 0x02) fm |= FMASK.A_WEAPON | FMASK.T_WEAPON;   // WEAPON
             if (df & 0x04) fm |= FMASK.A_CALL3 | FMASK.T_CALL3;     // CALL3
-            if (df & 0x08) fm |= FMASK.A_PART;                      // PART
             if (df & 0x10) fm |= FMASK.A_THROW;                     // THROWING
 
             // 准备字段值（按 FMASK 位顺序）
             const name = ch.name;
             const weapon = ch.weapon_name() || '';
             const call3 = ch.call3();
-            const part = ch.attack_part ? ch.attack_part.name : '';
             const throwing = ch.throwing_name() || '';
 
             // 编码: [7B id][1B field_mask][fields...]
@@ -909,9 +903,9 @@ export class ROOM extends ITEM {
             fmBuf[0] = fm;
             parts.push(fmBuf);
 
-            // 按 FMASK 位顺序编码字段: A_NAME, A_WEAPON, A_CALL3, A_PART, A_THROW, T_NAME, T_WEAPON, T_CALL3
-            const fieldValues = [name, weapon, call3, part, throwing, name, weapon, call3];
-            const fieldBits = [FMASK.A_NAME, FMASK.A_WEAPON, FMASK.A_CALL3, FMASK.A_PART, FMASK.A_THROW, FMASK.T_NAME, FMASK.T_WEAPON, FMASK.T_CALL3];
+            // 按 FMASK 位顺序编码字段: A_NAME, A_WEAPON, A_CALL3, T_WEAPON, A_THROW, T_NAME, (0x40保留), T_CALL3
+            const fieldValues = [name, weapon, call3, weapon, throwing, name, '', call3];
+            const fieldBits = [FMASK.A_NAME, FMASK.A_WEAPON, FMASK.A_CALL3, FMASK.T_WEAPON, FMASK.A_THROW, FMASK.T_NAME, 0x40, FMASK.T_CALL3];
             for (let i = 0; i < 8; i++) {
                 if (fm & fieldBits[i]) {
                     const strBuf = Buffer.from(fieldValues[i], 'utf8');

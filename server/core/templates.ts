@@ -14,8 +14,9 @@
 // ============================================================
 
 export const ID_MASK = {
-    A_ID: 0x01, // $N $W $w $P $l $T — 攻击者侧任意占位符
-    T_ID: 0x02, // $n $i $p — 目标侧任意占位符
+    A_ID: 0x01,       // $N $W $P $T — 攻击者侧任意占位符
+    T_ID: 0x02,       // $n $w $i $p — 目标侧任意占位符
+    HURT_PART: 0x04,  // $l — 攻击部位（帧内内联传递，不缓存）
 } as const;
 
 // ============================================================
@@ -24,12 +25,12 @@ export const ID_MASK = {
 
 export const FMASK = {
     A_NAME: 0x01, // $N
-    A_WEAPON: 0x02, // $W $w
+    A_WEAPON: 0x02, // $W
     A_CALL3: 0x04, // $P
-    A_PART: 0x08, // $l
+    T_WEAPON: 0x08, // $w $i (原 A_PART 位，$l 改为帧内内联)
     A_THROW: 0x10, // $T
     T_NAME: 0x20, // $n
-    T_WEAPON: 0x40, // $i
+    // 0x40 保留（原 T_WEAPON 已移至 0x08）
     T_CALL3: 0x80, // $p
 } as const;
 
@@ -39,10 +40,10 @@ export const FIELD_TO_MASK: number[] = (() => {
     m[0] = FMASK.A_NAME;
     m[1] = FMASK.A_WEAPON;
     m[2] = FMASK.A_CALL3;
-    m[3] = FMASK.A_PART;
+    m[3] = FMASK.T_WEAPON;
     m[4] = FMASK.A_THROW;
     m[5] = FMASK.T_NAME;
-    m[6] = FMASK.T_WEAPON;
+    m[6] = 0x40; // 保留
     m[7] = FMASK.T_CALL3;
     return m;
 })();
@@ -53,12 +54,17 @@ export const FIELD_TO_MASK: number[] = (() => {
  */
 function computeIdMask(text: string): number {
     let mask = 0;
-    if (text.includes('$N') || text.includes('$W') || text.includes('$w')
-        || text.includes('$P') || text.includes('$l') || text.includes('$T')) {
+    // A_ID: 攻击者侧占位符（$l 不再触发 A_ID，改为 HURT_PART 内联传递）
+    if (text.includes('$N') || text.includes('$W') || text.includes('$P') || text.includes('$T')) {
         mask |= ID_MASK.A_ID;
     }
-    if (text.includes('$n') || text.includes('$i') || text.includes('$p')) {
+    // T_ID: 目标侧占位符（$w 现在是 T武器，归属目标侧）
+    if (text.includes('$n') || text.includes('$w') || text.includes('$i') || text.includes('$p')) {
         mask |= ID_MASK.T_ID;
+    }
+    // HURT_PART: 攻击部位（帧内内联，不走缓存）
+    if (text.includes('$l')) {
+        mask |= ID_MASK.HURT_PART;
     }
     return mask;
 }
@@ -70,13 +76,13 @@ function computeIdMask(text: string): number {
 function computeFieldMask(text: string): number {
     let mask = 0;
     if (text.includes('$N')) mask |= FMASK.A_NAME;
-    if (text.includes('$n')) mask |= FMASK.T_NAME;
+    if (text.includes('$W')) mask |= FMASK.A_WEAPON;
     if (text.includes('$P')) mask |= FMASK.A_CALL3;
-    if (text.includes('$p')) mask |= FMASK.T_CALL3;
-    if (text.includes('$l')) mask |= FMASK.A_PART;
-    if (text.includes('$W') || text.includes('$w')) mask |= FMASK.A_WEAPON;
-    if (text.includes('$i')) mask |= FMASK.T_WEAPON;
+    if (text.includes('$w') || text.includes('$i')) mask |= FMASK.T_WEAPON;
     if (text.includes('$T')) mask |= FMASK.A_THROW;
+    if (text.includes('$n')) mask |= FMASK.T_NAME;
+    if (text.includes('$p')) mask |= FMASK.T_CALL3;
+    // $l 不再设置 fieldMask（改为 idMask HURT_PART 内联传递）
     return mask;
 }
 

@@ -43,10 +43,10 @@ const MASK = {
     A_NAME:   0x01,
     A_WEAPON: 0x02,
     A_CALL3:  0x04,
-    A_PART:   0x08,
+    T_WEAPON: 0x08, // $w $i（原 A_PART 位，$l 改为帧内内联）
     A_THROW:  0x10,
     T_NAME:   0x20,
-    T_WEAPON: 0x40,
+    // 0x40 保留（原 T_WEAPON 已移至 0x08）
     T_CALL3:  0x80,
 };
 
@@ -69,17 +69,17 @@ function buildFields(mask, sparse) {
 // 文本还原
 // ============================================================
 
-function subsDollar(text, fields) {
+function subsDollar(text, fields, hurtPart) {
     return text.replace(/\$([NnPplWwiT])/g, (_, k) => {
         switch (k) {
             case 'N': return fields[0];
             case 'n': return fields[5] || '<hir>未知存在</hir>';
             case 'P': return fields[2];
             case 'p': return fields[7] || fields[5] || '<hir>未知存在</hir>';
-            case 'l': return fields[3] || '';
-            case 'W':
-            case 'w': return fields[1] || '手';
-            case 'i': return fields[6] || '手';
+            case 'l': return hurtPart || '';
+            case 'W': return fields[1] || '手';
+            case 'w': return fields[3] || '手';
+            case 'i': return fields[3] || '手';
             case 'T': return fields[4] || '';
         }
         return _;
@@ -91,12 +91,12 @@ function subsCaret(text, args) {
     return text.replace(/\^/g, () => (idx < args.length) ? String(args[idx++]) : '');
 }
 
-export function format(tid, mask, sparse, args) {
+export function format(tid, mask, sparse, args, hurtPart) {
     if (!isReady()) return '';
     const text = Table[tid];
     if (!text) return '';
     let result = text;
-    if (text.includes('$')) result = subsDollar(result, buildFields(mask, sparse));
+    if (text.includes('$')) result = subsDollar(result, buildFields(mask, sparse), hurtPart);
     if (args && args.length && result.includes('^')) result = subsCaret(result, args);
     return result;
 }
