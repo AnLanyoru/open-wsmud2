@@ -83,7 +83,7 @@ export default class extends SKILL {
                     var weap = target.query_weapon();
                     if (weap && weap.weapon_type !== WEAPON_TYPE.NONE) {
                         target.unequip(weap, true, 8000);
-                        me.send_room('<hiy>$n被$N的松筋手法命中，手中$i脱手飞出！</hiy>', target);
+                        me.send_room('<hiy>$n被$N的松筋手法命中，手中$w脱手飞出！</hiy>', target);
                     }
                 }
                 me.end_attack(target);

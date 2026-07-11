@@ -65,7 +65,7 @@ export default class extends SKILL {
                         return false;
                     },
                     miss_msg:
-                        '<hic>$n大惊之下，$i连划三个半圆护住身前，同时足尖着力，飘身后退，避开了$N的一掌。</hic>',
+                        '<hic>$n大惊之下，$w连划三个半圆护住身前，同时足尖着力，飘身后退，避开了$N的一掌。</hic>',
                 });
                 if (sh && !is_parried) {
                     target.add_status(

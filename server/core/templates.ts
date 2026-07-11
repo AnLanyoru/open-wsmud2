@@ -15,7 +15,7 @@
 
 export const ID_MASK = {
     A_ID: 0x01,       // $N $W $P $T — 攻击者侧任意占位符
-    T_ID: 0x02,       // $n $w $i $p — 目标侧任意占位符
+    T_ID: 0x02,       // $n $W $w $p — 目标侧任意占位符
     HURT_PART: 0x04,  // $l — 攻击部位（帧内内联传递，不缓存）
 } as const;
 
@@ -27,7 +27,7 @@ export const FMASK = {
     A_NAME: 0x01, // $N
     A_WEAPON: 0x02, // $W
     A_CALL3: 0x04, // $P
-    T_WEAPON: 0x08, // $w $i (原 A_PART 位，$l 改为帧内内联)
+    T_WEAPON: 0x08, // $W $w (原 A_PART 位，$l 改为帧内内联)
     A_THROW: 0x10, // $T
     T_NAME: 0x20, // $n
     // 0x40 保留（原 T_WEAPON 已移至 0x08）
@@ -58,8 +58,8 @@ function computeIdMask(text: string): number {
     if (text.includes('$N') || text.includes('$W') || text.includes('$P') || text.includes('$T')) {
         mask |= ID_MASK.A_ID;
     }
-    // T_ID: 目标侧占位符（$w 现在是 T武器，归属目标侧）
-    if (text.includes('$n') || text.includes('$w') || text.includes('$i') || text.includes('$p')) {
+    // T_ID: 目标侧占位符（$w 是 T武器，归属目标侧）
+    if (text.includes('$n') || text.includes('$w') || text.includes('$p')) {
         mask |= ID_MASK.T_ID;
     }
     // HURT_PART: 攻击部位（帧内内联，不走缓存）
@@ -78,7 +78,7 @@ function computeFieldMask(text: string): number {
     if (text.includes('$N')) mask |= FMASK.A_NAME;
     if (text.includes('$W')) mask |= FMASK.A_WEAPON;
     if (text.includes('$P')) mask |= FMASK.A_CALL3;
-    if (text.includes('$w') || text.includes('$i')) mask |= FMASK.T_WEAPON;
+    if (text.includes('$w')) mask |= FMASK.T_WEAPON;
     if (text.includes('$T')) mask |= FMASK.A_THROW;
     if (text.includes('$n')) mask |= FMASK.T_NAME;
     if (text.includes('$p')) mask |= FMASK.T_CALL3;

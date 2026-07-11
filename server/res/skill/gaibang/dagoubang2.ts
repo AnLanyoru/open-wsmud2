@@ -76,10 +76,10 @@ export default class extends SKILL {
             enable_skill: 'club',
             mp: 20,
             attack_msgs: [
-                '<hiw>$N使出一招「棒打双犬」，手中$w化作两道青光砸向$n的$l</hiw>',
-                '<hiw>$N手中$w左右晃动，一招「拨草寻蛇」向$n的$l攻去</hiw>',
-                '<hiw>$N举起$w，居高临下使一招「打草惊蛇」敲向$n的$l</hiw>',
-                '<hiw>$N施出「拨狗朝天」，$w由下往上向$n撩去</hiw>',
+                '<hiw>$N使出一招「棒打双犬」，手中$W化作两道青光砸向$n的$l</hiw>',
+                '<hiw>$N手中$W左右晃动，一招「拨草寻蛇」向$n的$l攻去</hiw>',
+                '<hiw>$N举起$W，居高临下使一招「打草惊蛇」敲向$n的$l</hiw>',
+                '<hiw>$N施出「拨狗朝天」，$W由下往上向$n撩去</hiw>',
             ],
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const count = wuCount(lv);

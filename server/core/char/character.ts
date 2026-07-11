@@ -223,7 +223,7 @@ export interface CharacterStatus extends StatusDef {
     only_combat?: boolean;
     /** 是否不可被清除 */
     no_clear?: boolean;
-    /** 状态施加时的消息（仅限第一人称占位符：$N/$P/$W/$w/$l/$T，禁用 $n/$p/$i） */
+    /** 状态施加时的消息（仅限第一人称占位符：$N/$P/$W/$l/$T，禁用 $n/$p/$w） */
     start_msg?: string | number;
     /** 是否为闪避状态 */
     is_miss?: boolean;
@@ -3999,10 +3999,9 @@ function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
                     str.push(me.attack_part ? me.attack_part.name : '');
                     break;
                 case 'W':
-                case 'w':
                     str.push(me.weapon_name() || '手');
                     break;
-                case 'i':
+                case 'w':
                     if (target) {
                         // 角色取武器名，物品直接用名字
                         str.push(
@@ -4010,7 +4009,7 @@ function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
                         );
                     } else {
                         str.push('<hir>未知兵刃</hir>');
-                        console.warn('[format_msg] $i 占位符缺少 target，消息文本:', text);
+                        console.warn('[format_msg] $w 占位符缺少 target，消息文本:', text);
                     }
                     break;
                 case 'T':
@@ -4051,15 +4050,15 @@ const _DMG_TMPL: Record<string, Array<{ max: number; tmpl: string | number }>> =
         { max: 20, tmpl: _tmpl('结果「嗤」地一声划出一道伤口，造成^！') },
         { max: 40, tmpl: _tmpl('结果「嗤」地一声划出一道血淋淋的伤口，造成^！') },
         { max: 80, tmpl: _tmpl('结果「嗤」地一声划出一道又长又深的伤口，溅得$N满脸鲜血，造成^！') },
-        { max: Infinity, tmpl: _tmpl('结果只听见$n一声惨嚎，$w已在$p$l划出一道深及见骨的可怕伤口，造成^！！') },
+        { max: Infinity, tmpl: _tmpl('结果只听见$n一声惨嚎，$W已在$p$l划出一道深及见骨的可怕伤口，造成^！！') },
     ],
     sword: [
         { max: 10, tmpl: _tmpl('结果只是轻轻地刺破$p的皮肉，造成^！') },
         { max: 20, tmpl: _tmpl('结果在$p$l刺出一个创口，造成^！') },
         { max: 40, tmpl: _tmpl('结果「噗」地一声刺入了$n$l寸许，造成^！') },
         { max: 60, tmpl: _tmpl('结果「噗」地一声刺进$n的$l，使$p不由自主地退了几步，造成^！') },
-        { max: 80, tmpl: _tmpl('结果「噗嗤」地一声，$w已在$p$l刺出一个血肉模糊的血窟窿，造成^！') },
-        { max: Infinity, tmpl: _tmpl('结果只听见$n一声惨嚎，$w已在$p的$l对穿而出，鲜血溅得满地，造成^！！') },
+        { max: 80, tmpl: _tmpl('结果「噗嗤」地一声，$W已在$p$l刺出一个血肉模糊的血窟窿，造成^！') },
+        { max: Infinity, tmpl: _tmpl('结果只听见$n一声惨嚎，$W已在$p的$l对穿而出，鲜血溅得满地，造成^！！') },
     ],
     none: [
         { max: 5, tmpl: _tmpl('结果只是轻轻地碰到，比拍苍蝇稍微重了点，造成^！') },

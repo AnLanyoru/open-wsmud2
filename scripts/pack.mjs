@@ -126,14 +126,14 @@ if (IS_BINARY) {
     }
 
     // --- ID 掩码计算 (与 templates.ts computeIdMask 保持一致) ---
-    // 3 位 idMask: A_ID=0x01 ($N $W $P $T), T_ID=0x02 ($n $w $i $p), HURT_PART=0x04 ($l)
+    // 3 位 idMask: A_ID=0x01 ($N $W $P $T), T_ID=0x02 ($n $w $p), HURT_PART=0x04 ($l)
     // 模板 ID 编码: (idMask << 16) | pure_id，0x12 帧按 idMask 携带 7B A_ID/T_ID + 内联部位
     function computeIdMask(text) {
         let m = 0;
         if (text.includes('$N') || text.includes('$W') || text.includes('$P') || text.includes('$T')) {
             m |= 0x01;  // A_ID
         }
-        if (text.includes('$n') || text.includes('$w') || text.includes('$i') || text.includes('$p')) {
+        if (text.includes('$n') || text.includes('$w') || text.includes('$p')) {
             m |= 0x02;  // T_ID
         }
         if (text.includes('$l')) {
@@ -149,7 +149,7 @@ if (IS_BINARY) {
         if (text.includes('$N')) m |= 0x01;  // A_NAME
         if (text.includes('$W')) m |= 0x02;  // A_WEAPON
         if (text.includes('$P')) m |= 0x04;  // A_CALL3
-        if (text.includes('$w') || text.includes('$i')) m |= 0x08;  // T_WEAPON
+        if (text.includes('$w')) m |= 0x08;  // T_WEAPON
         if (text.includes('$T')) m |= 0x10;  // A_THROW
         if (text.includes('$n')) m |= 0x20;  // T_NAME
         if (text.includes('$p')) m |= 0x80;  // T_CALL3

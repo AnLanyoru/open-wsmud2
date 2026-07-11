@@ -72,7 +72,7 @@ export default class extends SKILL {
                 var self = this as PERFORM;
                 var count = 7;
                 me.send_room(
-                    '<him>$N盘膝而坐，$w横于膝上，十指拨弦，琴音如剑，无形剑气破空而出！</him>\n',
+                    '<him>$N盘膝而坐，$W横于膝上，十指拨弦，琴音如剑，无形剑气破空而出！</him>\n',
                     target,
                 );
                 for (var i = 0; i < count; i++) {

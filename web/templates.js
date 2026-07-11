@@ -70,7 +70,7 @@ function buildFields(mask, sparse) {
 // ============================================================
 
 function subsDollar(text, fields, hurtPart) {
-    return text.replace(/\$([NnPplWwiT])/g, (_, k) => {
+    return text.replace(/\$([NnPplWwT])/g, (_, k) => {
         switch (k) {
             case 'N': return fields[0];
             case 'n': return fields[5] || '<hir>未知存在</hir>';
@@ -79,7 +79,6 @@ function subsDollar(text, fields, hurtPart) {
             case 'l': return hurtPart || '';
             case 'W': return fields[1] || '手';
             case 'w': return fields[3] || '手';
-            case 'i': return fields[3] || '手';
             case 'T': return fields[4] || '';
         }
         return _;

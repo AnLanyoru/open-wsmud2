@@ -28,7 +28,7 @@ export default class extends SKILL {
         '结果「当」地一声被$p以纵横术挡开了。',
     ];
 
-    unarmed_vs_weapon_actions = ['但是$p横掌一推，$w失了准头，和$p的$l偏了几寸。'];
+    unarmed_vs_weapon_actions = ['但是$p横掌一推，$W失了准头，和$p的$l偏了几寸。'];
 
     slots = [
         {

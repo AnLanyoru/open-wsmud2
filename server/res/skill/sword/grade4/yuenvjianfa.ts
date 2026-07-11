@@ -13,13 +13,13 @@ export default class extends SKILL {
     desc = '传说是古代一位女子所创，剑势轻盈灵动如猿猱穿林，迅捷中暗藏杀机。';
     can_enables = ['sword'];
     attack_actions = [
-        '$N身形一纵，如灵猿穿林，一招「<HIG>灵猿探月</HIG>」，$w疾点$n的$l',
-        '$N忽地翻身倒纵，$w自腋下穿出，正是「<HIY>白猿献果</HIY>」，剑光一闪直取$n',
-        '$N脚步轻点，身法飘逸如猿猱，一招「<HIC>猿臂轻舒</HIC>」，$w如电刺向$n的$l',
-        '$N身形急转，$w化作一团银光，正是「<HIM>越女穿林</HIM>」，剑影重重罩向$n',
-        '$N凌空翻身，头下脚上，一招「<HIW>猿攀绝壁</HIW>」，$w自下而上挑向$n的$l',
+        '$N身形一纵，如灵猿穿林，一招「<HIG>灵猿探月</HIG>」，$W疾点$n的$l',
+        '$N忽地翻身倒纵，$W自腋下穿出，正是「<HIY>白猿献果</HIY>」，剑光一闪直取$n',
+        '$N脚步轻点，身法飘逸如猿猱，一招「<HIC>猿臂轻舒</HIC>」，$W如电刺向$n的$l',
+        '$N身形急转，$W化作一团银光，正是「<HIM>越女穿林</HIM>」，剑影重重罩向$n',
+        '$N凌空翻身，头下脚上，一招「<HIW>猿攀绝壁</HIW>」，$W自下而上挑向$n的$l',
         '$N身形一晃，化作数道残影，正是「<HIG>群猿逐月</HIG>」，数道剑光同时刺向$n的$l',
-        '$N一声清啸，$w直进中宫，使出「<HIY>白虹贯日</HIY>」，剑光如练直贯$n',
+        '$N一声清啸，$W直进中宫，使出「<HIY>白虹贯日</HIY>」，剑光如练直贯$n',
         '$N身剑合一，如灵猿跃涧，一招「<HIC>越女击剑</HIC>」，剑光快如闪电刺向$n的$l',
     ];
     learn_condition: LearnCondition = {
@@ -65,11 +65,11 @@ export default class extends SKILL {
             mp: 75,
             release_time: 1000,
             attack_msgs: [
-                '<hiy>$N身形一纵，如灵猿跃涧，$w直刺$n的$l</hiy>',
-                '<hiy>$N翻身疾进，$w如白猿献果，疾点$n</hiy>',
-                '<hiy>$N凌空倒翻，$w自下而上撩向$n</hiy>',
-                '<hiy>$N身形一晃，$w化作数道残影罩向$n</hiy>',
-                '<hiy>$N如猿猱般腾挪，$w连绵不绝地攻向$n</hiy>',
+                '<hiy>$N身形一纵，如灵猿跃涧，$W直刺$n的$l</hiy>',
+                '<hiy>$N翻身疾进，$W如白猿献果，疾点$n</hiy>',
+                '<hiy>$N凌空倒翻，$W自下而上撩向$n</hiy>',
+                '<hiy>$N身形一晃，$W化作数道残影罩向$n</hiy>',
+                '<hiy>$N如猿猱般腾挪，$W连绵不绝地攻向$n</hiy>',
             ],
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var self = this as PERFORM;
@@ -78,7 +78,7 @@ export default class extends SKILL {
                 count += extra;
                 if (count > 10) count = 10;
                 me.send_room(
-                    '<hiy>$N清啸一声，身如灵猿纵跃，$w化作漫天剑影，向$n发起连绵攻势！</hiy>\n',
+                    '<hiy>$N清啸一声，身如灵猿纵跃，$W化作漫天剑影，向$n发起连绵攻势！</hiy>\n',
                     target,
                 );
                 for (var i = 0; i < count; i++) {
@@ -104,7 +104,7 @@ export default class extends SKILL {
                 var maxExtra = calcPozhuMaxExtra(lv);
                 var diffFy = calcPozhuDiffFy(lv);
                 me.send_room(
-                    '<hiw>$N$w急振，剑势如破竹般连绵不绝，一击得手后更不罢休！</hiw>\n',
+                    '<hiw>$N$W急振，剑势如破竹般连绵不绝，一击得手后更不罢休！</hiw>\n',
                     target,
                 );
                 var extraCount = 0;

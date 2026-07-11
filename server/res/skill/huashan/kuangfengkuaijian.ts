@@ -9,10 +9,10 @@ export default class extends SKILL {
     grade = 3;
     family = FAMILIES.HUASHAN;
     attack_actions = [
-        '$N纵身跃起手中$w轻挥，斩向$n后颈',
-        '$N手中$w连话三个弧形，向$n的右臂齐肩斩落',
+        '$N纵身跃起手中$W轻挥，斩向$n后颈',
+        '$N手中$W连话三个弧形，向$n的右臂齐肩斩落',
         '$N轻吁一声，刷刷刷刷四剑，向$n胸，腹，腰，肩四处连刺',
-        '$N仰天一声清啸，斜行向前，$w横削直击，迅捷无比，击向$n的$l',
+        '$N仰天一声清啸，斜行向前，$W横削直击，迅捷无比，击向$n的$l',
     ];
     dodge_actions = [
         '$n一式<HIY>「巨鹏亮翅」</HIY>，两臂鹏举如翼，在剌剌风声中，从$N头顶横跃而过。\n',
