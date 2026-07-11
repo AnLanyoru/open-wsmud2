@@ -714,14 +714,26 @@ export class CHARACTER extends ITEM {
         );
     }
 
-    /** LEB128 无符号 varint 编码 */
+    /** LEB128 无符号 varint 编码 — number <= uint32 走快路径，溢出时自动转 bigint */
     _encodeVarint(n: number): Buffer {
         const bytes: number[] = [];
-        let v = n | 0;
-        if (v < 0) v = 0;
+        if (Number.isFinite(n) && n <= 0xFFFFFFFF && n >= 0) {
+            // 32 位以内快路径
+            let v = n | 0;
+            if (v < 0) v = 0;  // 处理 0x80000000~0xFFFFFFFF 被 |0 变负数的情况
+            do {
+                let b = v & 0x7f;
+                v = Math.floor(v / 128);
+                if (v) b |= 0x80;
+                bytes.push(b);
+            } while (v);
+            return Buffer.from(bytes);
+        }
+        // 溢出 uint32 — 转 bigint 无限精度编码
+        let v = n < 0 ? 0n : BigInt(Math.trunc(n));
         do {
-            let b = v & 0x7f;
-            v = Math.floor(v / 128);
+            let b = Number(v & 0x7fn);
+            v >>= 7n;
             if (v) b |= 0x80;
             bytes.push(b);
         } while (v);
@@ -733,10 +745,10 @@ export class CHARACTER extends ITEM {
     _build_binary_buf(
         template_id: number,
         target: ITEM | undefined,
-        a1?: string | TplRef,
-        a2?: string | TplRef,
-        a3?: string | TplRef,
-        a4?: string | TplRef,
+        a1?: string | number | TplRef,
+        a2?: string | number | TplRef,
+        a3?: string | number | TplRef,
+        a4?: string | number | TplRef,
         excludeSelf?: boolean,
     ): Buffer {
         // 从模板 ID 提取 mask 和 pure_id（pack 预编译时编码为 (mask << 16) | pure_id）
@@ -745,7 +757,7 @@ export class CHARACTER extends ITEM {
 
         // 预扫描 args，提取 TplRef 的 mask 并 OR 进外层 mask
         // 确保外层帧携带嵌套模板所需的全部字段
-        const argItems: (string | TplRef)[] = [];
+        const argItems: (string | number | TplRef)[] = [];
         if (a1 !== undefined && a1 !== null) argItems.push(a1);
         if (a2 !== undefined && a2 !== null) argItems.push(a2);
         if (a3 !== undefined && a3 !== null) argItems.push(a3);
@@ -777,8 +789,29 @@ export class CHARACTER extends ITEM {
             }
         }
 
+        // arg 编码统一逻辑：number → varint（_encodeVarint 内部按 uint32 阈值智能分流）
+        // string → 正则判断（向后兼容 pack 生成的字面量）
+        // 返回 { enc: Buffer, isVarint, isFloat } 供外层计算大小和写入
+        const encodeArg = (v: string | number): { enc: Buffer; isVarint: boolean; isFloat: boolean } => {
+            if (typeof v === 'number') {
+                return { enc: this._encodeVarint(v), isVarint: true, isFloat: false };
+            }
+            // string 路径 — 向后兼容 pack 生成的字面量
+            const s = v;
+            if (/^\d+$/.test(s)) {
+                return { enc: this._encodeVarint(Number(s)), isVarint: true, isFloat: false };
+            }
+            if (/^\d+\.\d+$/.test(s)) {
+                const fb = Buffer.alloc(8);
+                fb.writeDoubleBE(parseFloat(s));
+                return { enc: fb, isVarint: false, isFloat: true };
+            }
+            return { enc: Buffer.from(s, 'utf8'), isVarint: false, isFloat: false };
+        };
+
         let argMask = 0, floatMask = 0, refMask = 0;
         const argEnc: Buffer[] = []; // encoded arg bodies
+        const argMeta: { isFloat: boolean }[] = []; // 非 ref arg 的 float 标记
         for (let i = 0; i < argItems.length; i++) {
             const v = argItems[i];
             if (Array.isArray(v)) {
@@ -790,19 +823,15 @@ export class CHARACTER extends ITEM {
                 const rargc = v.length - 1;
                 let rargMask = 0, rfloatMask = 0;
                 const rargEnc: Buffer[] = [];
+                const rargVals: (string | number)[] = [];
                 for (let j = 0; j < rargc; j++) {
-                    const rs: string = v[j + 1] as string;
-                    if (/^\d+$/.test(rs)) {
+                    const rv = v[j + 1] as string | number;
+                    const r = encodeArg(rv);
+                    rargEnc.push(r.enc);
+                    rargVals.push(rv);
+                    if (r.isVarint || r.isFloat) {
                         rargMask |= (1 << j);
-                        rargEnc.push(this._encodeVarint(parseInt(rs, 10)));
-                    } else if (/^\d+\.\d+$/.test(rs)) {
-                        rargMask |= (1 << j);
-                        rfloatMask |= (1 << j);
-                        const fb = Buffer.alloc(8);
-                        fb.writeDoubleBE(parseFloat(rs));
-                        rargEnc.push(fb);
-                    } else {
-                        rargEnc.push(Buffer.from(rs, 'utf8'));
+                        if (r.isFloat) rfloatMask |= (1 << j);
                     }
                 }
                 let rtotal = 2 + 1 + 1 + 1; // refTid + refArgc + refMask + refFloatMask
@@ -822,7 +851,7 @@ export class CHARACTER extends ITEM {
                     const ab = rargEnc[j];
                     if (rargMask & (1 << j)) {
                         if (rfloatMask & (1 << j)) {
-                            rbuf.writeDoubleBE(parseFloat(v[j + 1] as string), rpos); rpos += 8;
+                            rbuf.writeDoubleBE(Number(rargVals[j]), rpos); rpos += 8;
                         } else {
                             ab.copy(rbuf, rpos); rpos += ab.length;
                         }
@@ -832,20 +861,17 @@ export class CHARACTER extends ITEM {
                     }
                 }
                 argEnc.push(rbuf);
+                argMeta.push({ isFloat: false });
             } else {
-                const s = v as string;
-                if (/^\d+$/.test(s)) {
+                const r = encodeArg(v);
+                argEnc.push(r.enc);
+                if (r.isVarint) {
                     argMask |= (1 << i);
-                    argEnc.push(this._encodeVarint(parseInt(s, 10)));
-                } else if (/^\d+\.\d+$/.test(s)) {
+                } else if (r.isFloat) {
                     argMask |= (1 << i);
                     floatMask |= (1 << i);
-                    const fb = Buffer.alloc(8);
-                    fb.writeDoubleBE(parseFloat(s));
-                    argEnc.push(fb);
-                } else {
-                    argEnc.push(Buffer.from(s, 'utf8'));
                 }
+                argMeta.push({ isFloat: r.isFloat });
             }
         }
 
@@ -857,7 +883,7 @@ export class CHARACTER extends ITEM {
             if (refMask & (1 << i)) {
                 totalSize += ab.length;
             } else if (argMask & (1 << i)) {
-                totalSize += (floatMask & (1 << i)) ? 8 : ab.length;
+                totalSize += argMeta[i].isFloat ? 8 : ab.length;
             } else {
                 totalSize += 1 + ab.length;
             }
@@ -883,8 +909,8 @@ export class CHARACTER extends ITEM {
             if (refMask & (1 << i)) {
                 ab.copy(buf, pos); pos += ab.length;
             } else if (argMask & (1 << i)) {
-                if (floatMask & (1 << i)) {
-                    buf.writeDoubleBE(parseFloat(argItems[i] as string), pos); pos += 8;
+                if (argMeta[i].isFloat) {
+                    buf.writeDoubleBE(Number(argItems[i]), pos); pos += 8;
                 } else {
                     ab.copy(buf, pos); pos += ab.length;
                 }
@@ -993,15 +1019,23 @@ export class CHARACTER extends ITEM {
 
     /** 发送房间/战斗消息（显式二进制路径，供 pack.js 直接调用） */
     /** 文本模式回退：展开 TplRef 数组，替换 template 中的 ^ */
-    _expand_text(template: string, _a1?: string | TplRef, _a2?: string | TplRef, _a3?: string | TplRef, _a4?: string | TplRef): string {
+    _expand_text(template: string, _a1?: string | number | TplRef, _a2?: string | number | TplRef, _a3?: string | number | TplRef, _a4?: string | number | TplRef): string {
         let text = template;
         const args = [_a1, _a2, _a3, _a4];
         for (let i = 0; i < args.length; i++) {
             const a = args[i];
             if (a === undefined || a === null) break;
-            const val = Array.isArray(a)
-                ? (a[0] as string).replace('^', String(a[1] ?? ''))
-                : String(a);
+            let val: string;
+            if (Array.isArray(a)) {
+                // a[0] pack 前为 string，pack 后为 number（模板 ID）— 还原模板文本
+                const t0 = a[0];
+                const tmplText: string = typeof t0 === 'number' ? (get(t0) ?? '') : (typeof t0 === 'string' ? t0 : String(t0));
+                // 逐个替换 ^，消费 a[1..] 参数
+                let ai = 1;
+                val = tmplText.replace(/\^/g, () => String(a[ai++] ?? ''));
+            } else {
+                val = String(a);
+            }
             text = text.replace('^', val);
         }
         return text;
@@ -1012,10 +1046,10 @@ export class CHARACTER extends ITEM {
         target?: ITEM,
         isCombat?: boolean,
         excludeSelf?: boolean,
-        _a1?: string | TplRef,
-        _a2?: string | TplRef,
-        _a3?: string | TplRef,
-        _a4?: string | TplRef,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
     ): void {
         if (!this.environment || template_id === undefined) return;
         if (typeof template_id === 'string') {
@@ -1035,10 +1069,10 @@ export class CHARACTER extends ITEM {
     send_combat_b(
         template_id: number | string,
         target?: CHARACTER,
-        _a1?: string | TplRef,
-        _a2?: string | TplRef,
-        _a3?: string | TplRef,
-        _a4?: string | TplRef,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
     ): void {
         if (typeof template_id === 'string') {
             this.send_combat(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
@@ -1053,13 +1087,13 @@ export class CHARACTER extends ITEM {
     send_room_b(
         template_id: number | string,
         target?: ITEM,
-        _a1?: string | TplRef,
-        _a2?: string | TplRef,
-        _a3?: string | TplRef,
-        _a4?: string | TplRef,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
     ): void {
         if (typeof template_id === 'string') {
-            this.send_room(template_id, target);
+            this.send_room(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
             return;
         }
         this.send_msg_b(template_id, target, false, false, _a1, _a2, _a3, _a4);
@@ -1069,19 +1103,22 @@ export class CHARACTER extends ITEM {
     send_room_others(text: string | number, target?: ITEM): void {
         this.send_msg(text, target, false, true);
     }
-    /** 广播房间消息（排除自身）— 二进制路径，excludeself 编码进 op 高位 */
+    /** 广播房间消息（排除自身）— 二进制路径
+     *  模板路径强制置 A_NAME 掩码位，确保客户端拿到发送者名字做 excludeSelf 过滤 */
     send_room_others_b(
         template_id: number | string,
         target?: ITEM,
-        _a1?: string | TplRef,
-        _a2?: string | TplRef,
-        _a3?: string | TplRef,
-        _a4?: string | TplRef,
+        _a1?: string | number | TplRef,
+        _a2?: string | number | TplRef,
+        _a3?: string | number | TplRef,
+        _a4?: string | number | TplRef,
     ): void {
         if (typeof template_id === 'string') {
-            this.send_room_others(template_id, target);
+            this.send_room_others(this._expand_text(template_id, _a1, _a2, _a3, _a4), target);
             return;
         }
+        // 模板路径：OR 进 A_NAME 位，确保帧携带发送者名字供客户端过滤
+        template_id |= (FMASK.A_NAME << 16);
         this.send_msg_b(template_id, target, false, true, _a1, _a2, _a3, _a4);
     }
 
@@ -3957,7 +3994,7 @@ function query_status_msg(hp: number, maxhp: number): string {
  * 不含 $ 占位符的模板不会被 pack.mjs 自动扫描，由 _DMG_ZERO 和 _DMG_FALLBACK 单独注册
  * pack.mjs --binary 会将其中含 $ 的 tmpl 字符串替换为模板 ID
  */
-/** 数组 [tmpl, ...args] 作为嵌套模板引用 */
+/** 数组 [tmpl, ...args] 作为嵌套模板引用，args 支持 number 直接传输 */
 type TplRef = (string | number)[];
 /** 双槽拼接模板 */
 const _TMPL_CONCAT2 = _tmpl('^^');
@@ -4043,9 +4080,9 @@ function damage_msg(
             me.send_combat(msg + '\n' + dmgSuffix, ob);
             return;
         }
-        // msg 为模板 ID — 二进制路径
+        // msg 为模板 ID — 二进制路径，damage 以原始 number 传入
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat_b(dmgTmpl, ob, [msg as any], [disp, sh]);
+        me.send_combat_b(dmgTmpl, ob, [msg as any], [disp, damage]);
         return;
     }
     // 零伤害
@@ -4074,13 +4111,13 @@ function damage_msg(
     if (buckets) {
         for (let i: number = 0; i < buckets.length; i++) {
             if (ratio < buckets[i].max) {
-                me.send_combat_b(buckets[i].tmpl, ob, [disp, sh]);
+                me.send_combat_b(buckets[i].tmpl, ob, [disp, damage]);
                 return;
             }
         }
     }
     // fallback
-    me.send_combat_b(_DMG_FALLBACK, ob, [disp, sh]);
+    me.send_combat_b(_DMG_FALLBACK, ob, [disp, damage]);
 }
 
 // ================================================================

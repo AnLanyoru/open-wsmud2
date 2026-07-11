@@ -575,7 +575,7 @@ function ReceiveMessage(x) {
 // ============================================================
 
 /** 读取嵌套模板引用，递归 format 返回展开字符串 */
-function readTplRef(data, pos, parentMask, parentSparse) {
+function readTplRef(data, pos, parentMask, parentSparse, dv) {
     const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
     const refArgc = data[pos++];
     const refArgMask = data[pos++];
@@ -584,7 +584,6 @@ function readTplRef(data, pos, parentMask, parentSparse) {
     for (let i = 0; i < refArgc; i++) {
         if (refArgMask & (1 << i)) {
             if (refFloatMask & (1 << i)) {
-                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
                 refArgs.push(String(dv.getFloat64(pos)));
                 pos += 8;
             } else {
@@ -602,16 +601,16 @@ function readTplRef(data, pos, parentMask, parentSparse) {
     return { str: format(refTid, parentMask, parentSparse, refArgs), next: pos };
 }
 
-/** 读取 LEB128 无符号 varint */
+/** 读取 LEB128 无符号 varint — 用 BigInt 中间值避免 32 位 << 溢出，转回 number */
 function readVarint(data, pos) {
-    let value = 0, shift = 0;
+    let value = 0n, shift = 0n;
     while (true) {
         const b = data[pos++];
-        value |= (b & 0x7f) << shift;
+        value |= BigInt(b & 0x7f) << shift;
         if (!(b & 0x80)) break;
-        shift += 7;
+        shift += 7n;
     }
-    return { value, next: pos };
+    return { value: Number(value), next: pos };
 }
 
 /** 读取一个 UTF-8 字符串：1B 长度 + 数据 */
@@ -638,6 +637,7 @@ function popcntBelow(mask, bit) {
 export function ProcessBinary(data) {
     let pos = 0;
     const myName = Process.name || '';
+    const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
     // 0xFE 为批处理合并帧标记（所有二进制帧统一走批处理）
     if (data[0] === 0xFE) pos = 1;
@@ -672,12 +672,11 @@ export function ProcessBinary(data) {
                 const args = [];
                 for (let i = 0; i < argCount; i++) {
                     if (refMask & (1 << i)) {
-                        const r = readTplRef(data, pos, mask, sparse);
+                        const r = readTplRef(data, pos, mask, sparse, dv);
                         args.push(r.str);
                         pos = r.next;
                     } else if (argMask & (1 << i)) {
                         if (floatMask & (1 << i)) {
-                            const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
                             args.push(String(dv.getFloat64(pos)));
                             pos += 8;
                         } else {
@@ -715,7 +714,6 @@ export function ProcessBinary(data) {
                 const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
                 const first4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
                 pos += 3;
-                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
                 const ts = dv.getInt32(pos);
                 pos += 4;
                 const id = ID_CHARS[(first4 >> 18) & 0x3F]
@@ -736,7 +734,6 @@ export function ProcessBinary(data) {
             }
             case 0x54: { // 伤害占比广播 (每100ms 服务端推送分玩家伤害)
                 const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
-                const dv = new DataView(data.buffer, data.byteOffset, data.byteLength);
                 // 读受击单位 id (7B)
                 const tFirst4 = (data[pos] << 16) | (data[pos + 1] << 8) | data[pos + 2];
                 pos += 3;

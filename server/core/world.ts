@@ -1333,8 +1333,8 @@ async function loadResource(): Promise<void> {
 // 房间批处理刷新服务 — 单 setTimeout 递归调度，延迟随玩家数动态变化
 // ============================================================
 
-/** 有待处理批次的房间列表 */
-let _dirty_rooms: ROOM[] = [];
+/** 有待处理批次的房间集合 */
+let _dirty_rooms: Set<ROOM> = new Set();
 /** 当前调度的 timer，null 表示无待处理批次 */
 let _flush_timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -1342,8 +1342,7 @@ let _flush_timer: ReturnType<typeof setTimeout> | null = null;
 function _nextDelay(): number {
     const now = Date.now();
     let min = Infinity;
-    for (let i = 0; i < _dirty_rooms.length; i++) {
-        const r = _dirty_rooms[i];
+    for (const r of _dirty_rooms) {
         const remain = r._batch_delay - (now - r._batch_timestamp);
         if (remain < min) min = remain;
     }
@@ -1354,23 +1353,19 @@ function _nextDelay(): number {
 function _tick(): void {
     _flush_timer = null;
     const now = Date.now();
-    const pending: ROOM[] = [];
-    for (let i = 0; i < _dirty_rooms.length; i++) {
-        const r = _dirty_rooms[i];
+    for (const r of _dirty_rooms) {
         if (now - r._batch_timestamp >= r._batch_delay) {
             r._batch_timestamp = 0;
+            _dirty_rooms.delete(r);
             r._flush_batch();
-        } else {
-            pending.push(r);
         }
     }
-    _dirty_rooms = pending;
     _schedule();
 }
 
 /** 调度下一次 tick（无 dirty 则不调度） */
 function _schedule(): void {
-    if (_flush_timer || _dirty_rooms.length === 0) return;
+    if (_flush_timer || _dirty_rooms.size === 0) return;
     _flush_timer = setTimeout(_tick, _nextDelay());
 }
 
@@ -1378,7 +1373,7 @@ function _schedule(): void {
 export function markRoomDirty(room: ROOM): void {
     if (room._batch_timestamp === 0) {
         room._batch_timestamp = Date.now();
-        _dirty_rooms.push(room);
+        _dirty_rooms.add(room);
     }
     _schedule();
 }
@@ -1386,8 +1381,7 @@ export function markRoomDirty(room: ROOM): void {
 /** 立刻 flush 指定房间并从 dirty 队列移除（由 end_burst 调用） */
 export function flushRoomNow(room: ROOM): void {
     if (room._batch_timestamp !== 0) {
-        const idx = _dirty_rooms.indexOf(room);
-        if (idx !== -1) _dirty_rooms.splice(idx, 1);
+        _dirty_rooms.delete(room);
         room._batch_timestamp = 0;
     }
     room._flush_batch();
