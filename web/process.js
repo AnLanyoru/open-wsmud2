@@ -643,9 +643,8 @@ export function ProcessBinary(data) {
     let pos = 0;
     const myName = Process.name || '';
 
-    // 0xFE 为批处理合并帧标记，立刻发送的单帧无此标记
-    const isBatch = data[0] === 0xFE;
-    if (isBatch) pos = 1;
+    // 0xFE 为批处理合并帧标记（所有二进制帧统一走批处理）
+    if (data[0] === 0xFE) pos = 1;
 
     while (pos < data.length) {
         const op = data[pos++];
@@ -698,8 +697,8 @@ export function ProcessBinary(data) {
                 let text = format(tid, mask, sparse, args);
                 if (text) {
                     const aName = (mask & 1) ? sparse[popcntBelow(mask, 1)] : '';
-                    // 去重：只在批处理合并帧中跳过以自己为主视角的帧（立刻发送的单帧不跳过）
-                    if (isBatch && aName === myName) break;
+                    // no_mcmsg：不显示自己的普通战斗信息（主视角也统一走批处理，无需去重）
+                    if (aName === myName && Setting.no_mcmsg) break;
                     const tName = (mask & 0x20) ? sparse[popcntBelow(mask, 0x20)] : '';
                     text = perspective(text, aName, tName, myName);
                     if (Setting.show_binary) text += ' <hib>(binary)</hib>';

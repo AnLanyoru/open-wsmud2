@@ -113,10 +113,10 @@ export class ROOM extends ITEM {
     _batch_noncombat: Buffer[] = [];
     /** 批次中是否包含战斗消息 */
     _batch_has_combat: boolean = false;
-    /** 批处理开始时间戳（毫秒），0 表示无待处理批次 */
+    /** 动态推送延迟（毫秒），由玩家进出维护：min(16, 玩家数) */
+    _batch_delay: number = 0;
+    /** 入队时间戳（毫秒），0 表示不在 dirty 队列 */
     _batch_timestamp: number = 0;
-    /** 房间玩家数缓存（避免广播时重复扫描） */
-    _player_count: number = 0;
 
     // ============ 玩法相关 ============
 
@@ -282,14 +282,14 @@ export class ROOM extends ITEM {
             obj.environment = this;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
-                if (obj.check_player()) { this._player_count++; obj.send(this.items_to_json()); }
+                if (obj.check_player()) { this._batch_delay = Math.min(16, this._batch_delay + 1); obj.send(this.items_to_json()); }
             } else if (obj.check_player()) {
                 if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
                 obj.send(msg);
             }
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
-            if (obj.check_player()) this._player_count--;
+            if (obj.check_player()) this._batch_delay = Math.max(0, this._batch_delay - 1);
             obj.environment = undefined;
         }
     }
@@ -688,8 +688,8 @@ export class ROOM extends ITEM {
         this._batch_all = [];
         this._batch_noncombat = [];
         this._batch_has_combat = false;
+        this._batch_delay = 0;
         this._batch_timestamp = 0;
-        this._player_count = 0;
 
         // —— 缓存清零 ——
         this.json = null;
@@ -827,7 +827,10 @@ export class ROOM extends ITEM {
             if (items[i].is_player || items[i].master) {
                 newRoom.items.push(items[i]);
                 items[i].environment = newRoom;
-                if (items[i].is_player) newRoom._player_count++;
+                if (items[i].is_player) {
+                    newRoom._batch_delay = Math.min(16, newRoom._batch_delay + 1);
+                    oldroom._batch_delay = Math.max(0, oldroom._batch_delay - 1);
+                }
             }
         }
         oldroom.destroy();
@@ -835,8 +838,8 @@ export class ROOM extends ITEM {
 
     /**
      * 刷新二进制批处理 — 合并原始 payload 并编码为单个 WebSocket 帧发送。
-     * 首字节 0xFE 为批处理标记，供客户端区分立刻发送与批处理去重。
-     * 全量下发给所有玩家，发起者重复帧由客户端去重处理。
+     * 首字节 0xFE 为批处理标记，供客户端识别合并帧。
+     * 全量下发给所有玩家，主视角消息也统一走批处理。
      */
     _flush_batch(): void {
         const all = this._batch_all;

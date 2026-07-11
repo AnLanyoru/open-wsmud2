@@ -28,7 +28,7 @@ import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
 import { encodeBinaryFrame } from '../net-ws.js';
-import { markRoomDirty } from '../world.js';
+import { markRoomDirty, flushRoomNow } from '../world.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
 
@@ -486,10 +486,7 @@ export class CHARACTER extends ITEM {
 
     // ============ 绝招缓冲模式 ============
 
-    /** 绝招缓冲模式：开启期间发起者的消息写入缓冲区而非立刻发送 */
-    _burst_buffering: boolean = false;
-    /** 绝招缓冲区 */
-    _burst_buffer: Buffer[] = [];
+    // 统一批处理后，burst 模式仅标记同步帧边界：end_burst 立刻 flush 房间 batch
 
     // ============ 回调字段（可选，由资源文件在对象定义时设置） ============
     /**
@@ -896,70 +893,28 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 开启绝招缓冲模式 — 期间发起者的二进制消息写入缓冲区而非立刻发送。
-     * 与房间批处理有机共存：发起者消息入 burst buffer，其他玩家仍走房间 batch。
+     * 开启绝招同步帧 — 标记开始，消息统一入房间 batch。
      */
     begin_burst(): void {
-        this._burst_buffering = true;
     }
 
     /**
-     * 结束绝招缓冲模式 — 合并缓冲区所有帧并立刻发送给发起者。
-     * 绝招释放是同步帧，缓冲无延迟代价。
+     * 结束绝招同步帧 — 立刻 flush 房间 batch，确保绝招消息无延迟送达所有人。
      */
     end_burst(): void {
-        this._burst_buffering = false;
-        const buf = this._burst_buffer;
-        if (buf.length === 0) return;
-        this._burst_buffer = [];
-        const self = this as any;
-        if (self.socket) {
-            self.socket.write(encodeBinaryFrame(Buffer.concat(buf)));
-        }
+        const room = this.environment as ROOM;
+        if (!room || room._batch_all.length === 0) return;
+        flushRoomNow(room);
     }
 
-    /** 广播 — combat 过滤（no_mcmsg / no_combatmsg） */
+    /** 广播 — combat 过滤（no_mcmsg / no_combatmsg），统一走房间批处理 */
     _broadcast_combat(payload: string | Buffer, target?: ITEM): void {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
             const room = this.environment as ROOM;
-            // 小房间（<10人）：立刻发送给所有人，不批处理
-            if (room._player_count < 10) {
-                const frame = encodeBinaryFrame(payload);
-                for (let i = 0; i < list.length; i++) {
-                    const item: any = list[i];
-                    if (!item.is_player || !item.socket) continue;
-                    if (item === this || item === target) {
-                        if (!item.query_setting('no_mcmsg')) item.socket.write(frame);
-                    } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                        item.socket.write(frame);
-                    }
-                }
-                return;
-            }
-
-            // 大房间：消息主体立刻发送，其他玩家走批处理
-            const self = this as any;
-            if (self.is_player && self.socket && !self.query_setting('no_mcmsg')) {
-                if (this._burst_buffering) {
-                    this._burst_buffer.push(payload as Buffer);
-                } else {
-                    self.socket.write(encodeBinaryFrame(payload));
-                }
-            }
-
-            const now = Date.now();
-
-            const wasEmpty = room._batch_all.length === 0;
             room._batch_all.push(payload);
             room._batch_has_combat = true;
-            if (wasEmpty) {
-                room._batch_timestamp = now;
-                markRoomDirty(room);
-            } else if (now - room._batch_timestamp >= 10) {
-                room._flush_batch();
-            }
-
+            markRoomDirty(room);
             return;
         }
         for (let i = 0; i < list.length; i++) {
@@ -974,7 +929,7 @@ export class CHARACTER extends ITEM {
         }
     }
 
-    /** 广播 — room 过滤（no_message / excludeself） */
+    /** 广播 — room 过滤（no_message / excludeself），统一走房间批处理 */
     _broadcast_room(
         payload: string | Buffer,
         target: ITEM | undefined,
@@ -983,45 +938,9 @@ export class CHARACTER extends ITEM {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
             const room = this.environment as ROOM;
-            // 小房间（<10人）：立刻发送给所有人，不批处理
-            if (room._player_count < 10) {
-                const frame = encodeBinaryFrame(payload);
-                for (let i = 0; i < list.length; i++) {
-                    const item: any = list[i];
-                    if (!item.is_player || !item.socket) continue;
-                    if (item === this) {
-                        if (!excludeself) item.socket.write(frame);
-                    } else if (!item.no_message) {
-                        item.socket.write(frame);
-                    }
-                }
-                return;
-            }
-
-            // 大房间：消息主体立刻发送，其他玩家走批处理
-            if (!excludeself) {
-                const self = this as any;
-                if (self.is_player && self.socket) {
-                    if (this._burst_buffering) {
-                        this._burst_buffer.push(payload as Buffer);
-                    } else {
-                        self.socket.write(encodeBinaryFrame(payload));
-                    }
-                }
-            }
-
-            const now = Date.now();
-
-            const wasEmpty = room._batch_all.length === 0;
             room._batch_all.push(payload as Buffer);
             room._batch_noncombat.push(payload as Buffer);
-            if (wasEmpty) {
-                room._batch_timestamp = now;
-                markRoomDirty(room);
-            } else if (now - room._batch_timestamp >= 10) {
-                room._flush_batch();
-            }
-
+            markRoomDirty(room);
             return;
         }
         for (let i = 0; i < list.length; i++) {
@@ -3017,31 +2936,9 @@ export class CHARACTER extends ITEM {
             commonMsg.writeDoubleBE(baseValues[v], cpos);
         // 写入批处理缓冲区（原始 payload，flush 时统一编码）
         const room = this.environment as ROOM;
-
-        // 小房间（<10人）：立刻发送，不批处理
-        if (room._player_count < 10) {
-            const items = room.items;
-            const frame = encodeBinaryFrame(commonMsg);
-            for (let i = 0; i < items.length; i++) {
-                const player: any = items[i];
-                if (player.check_player() && player.socket) {
-                    player.socket.write(frame);
-                }
-            }
-            return;
-        }
-
-        const now = Date.now();
-
-        const wasEmpty = room._batch_all.length === 0;
         room._batch_all.push(commonMsg);
         room._batch_noncombat.push(commonMsg);
-        if (wasEmpty) {
-            room._batch_timestamp = now;
-            markRoomDirty(room);
-        } else if (now - room._batch_timestamp >= 10) {
-            room._flush_batch();
-        }
+        markRoomDirty(room);
     }
 
     /**
