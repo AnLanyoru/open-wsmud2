@@ -12,6 +12,8 @@
 
 const Table = {};
 const MaskTable = {};
+/** 部位名表：[0]=character 部位表，[1]=monster 部位表 */
+const PartsTable = [[], []];
 let Version = 0;
 let _ready = false;
 
@@ -30,6 +32,15 @@ export const ready = (async () => {
             }
         }
     } catch (_) { /* 网络错误或 JSON 不存在 → 退化为文本路径 */ }
+    // 加载部位名表（供 0x12 帧 HURT_PART 1B 索引查名）
+    try {
+        const resp = await fetch('/parts-table.json');
+        if (resp.ok) {
+            const { character, monster } = await resp.json();
+            PartsTable[0] = character || [];
+            PartsTable[1] = monster || [];
+        }
+    } catch (_) { /* 部位表加载失败 → hurtPart 显示为空 */ }
     _ready = true;
 })();
 
@@ -109,4 +120,11 @@ export function perspective(text, aName, tName, myName) {
 /** 获取模板的 8 位字段掩码（从 MaskTable 查询，供客户端构建 sparse） */
 export function getMask(tid) {
     return MaskTable[tid] || 0;
+}
+
+/** 解包部位索引（1B: 高4位类型 + 低4位索引）→ 中文名 */
+export function getPartName(packed) {
+    const typeIdx = (packed & 0xF0) === 0x10 ? 1 : 0;
+    const idx = packed & 0x0F;
+    return PartsTable[typeIdx][idx] || '';
 }

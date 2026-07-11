@@ -15,7 +15,7 @@ import {
     SKILL_TYPES,
     PfmFlag,
 } from '../const.js';
-import { FMASK, ID_MASK, get, popcount } from '../templates.js';
+import { FMASK, ID_MASK, PART_TYPE, get, getPartName, packPart, popcount } from '../templates.js';
 
 /** 脏字段位掩码 — 用于刷新帧 (op 0x55) 标记哪些实体属性已变更 */
 const DIRTY = {
@@ -92,6 +92,8 @@ interface AttackPart {
     hert: number;
     /** 暴击率加成 */
     crit: number;
+    /** 在部位表中的索引（用于二进制帧编码） */
+    idx: number;
 }
 
 // ================================================================
@@ -784,9 +786,12 @@ export class CHARACTER extends ITEM {
         const hasA = !!(idMask & ID_MASK.A_ID);
         const hasT = !!(idMask & ID_MASK.T_ID) && target && (target as any).check_character?.();
         const hasPart = !!(idMask & ID_MASK.HURT_PART);
-        // 攻击部位字符串（帧内内联传递，不走缓存）
-        const partStr = hasPart ? (this.attack_part ? this.attack_part.name : '') : '';
-        const partBuf = hasPart ? Buffer.from(partStr, 'utf8') : Buffer.alloc(0);
+        // 攻击部位打包为 1B 索引（高4位类型 + 低4位索引），客户端查表还原中文名
+        // 怪物用 MONSTER 部位表，其他角色用 CHARACTER 部位表
+        const partType = (this as any).is_monster ? PART_TYPE.MONSTER : PART_TYPE.CHARACTER;
+        const partByte = hasPart
+            ? packPart(partType, this.attack_part ? this.attack_part.idx : 0)
+            : 0;
         // 实际写入帧的 idMask（清除无对应 target 的 T_ID 位）
         const actualMask = (hasA ? ID_MASK.A_ID : 0) | (hasT ? ID_MASK.T_ID : 0) | (hasPart ? ID_MASK.HURT_PART : 0);
 
@@ -876,11 +881,11 @@ export class CHARACTER extends ITEM {
             }
         }
 
-        // 计算总大小: op(1) + tid(2) + idMask(1) + A_ID(7) + T_ID(7) + HURT_PART(1+len) + args头(4)
+        // 计算总大小: op(1) + tid(2) + idMask(1) + A_ID(7) + T_ID(7) + HURT_PART(1) + args头(4)
         let totalSize = 1 + 2 + 1;
         if (hasA) totalSize += 7;
         if (hasT) totalSize += 7;
-        if (hasPart) totalSize += 1 + partBuf.length;
+        if (hasPart) totalSize += 1;
         totalSize += 1 + 1 + 1 + 1; // ^count + argMask + floatMask + refMask
         for (let i = 0; i < argEnc.length; i++) {
             const ab = argEnc[i];
@@ -908,9 +913,7 @@ export class CHARACTER extends ITEM {
             pos += 7;
         }
         if (hasPart) {
-            buf[pos++] = partBuf.length;
-            partBuf.copy(buf, pos);
-            pos += partBuf.length;
+            buf[pos++] = partByte;
         }
         buf[pos++] = argItems.length;
         buf[pos++] = argMask;
@@ -3996,7 +3999,12 @@ function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
                     }
                     break;
                 case 'l':
-                    str.push(me.attack_part ? me.attack_part.name : '');
+                    if (me.attack_part) {
+                        const pt = (me as any).is_monster ? PART_TYPE.MONSTER : PART_TYPE.CHARACTER;
+                        str.push(getPartName(packPart(pt, me.attack_part.idx)));
+                    } else {
+                        str.push('');
+                    }
                     break;
                 case 'W':
                     str.push(me.weapon_name() || '手');
@@ -4422,21 +4430,21 @@ const status_msg: string[] = [
 
 /** 人物攻击部位定义 */
 const CHARACTER_PARTS: AttackPart[] = [
-    { name: '左脚', hert: 0.8, crit: 0 },
-    { name: '右脚', hert: 0.8, crit: 0 },
-    { name: '左腿', hert: 0.85, crit: 0 },
-    { name: '右腿', hert: 0.85, crit: 0 },
-    { name: '小腹', hert: 0.91, crit: 3 },
-    { name: '胸前', hert: 0.95, crit: 4 },
-    { name: '后背', hert: 0.97, crit: 4 },
-    { name: '头部', hert: 1.2, crit: 10 },
-    { name: '颈部', hert: 1.1, crit: 5 },
-    { name: '后心', hert: 1, crit: 4 },
-    { name: '左肩', hert: 0.85, crit: 1 },
-    { name: '右肩', hert: 0.89, crit: 1 },
-    { name: '左手', hert: 0.85, crit: 0 },
-    { name: '左手', hert: 0.85, crit: 0 },
-    { name: '腰间', hert: 0.99, crit: 5 },
+    { name: '左脚', hert: 0.8, crit: 0, idx: 0 },
+    { name: '右脚', hert: 0.8, crit: 0, idx: 1 },
+    { name: '左腿', hert: 0.85, crit: 0, idx: 2 },
+    { name: '右腿', hert: 0.85, crit: 0, idx: 3 },
+    { name: '小腹', hert: 0.91, crit: 3, idx: 4 },
+    { name: '胸前', hert: 0.95, crit: 4, idx: 5 },
+    { name: '后背', hert: 0.97, crit: 4, idx: 6 },
+    { name: '头部', hert: 1.2, crit: 10, idx: 7 },
+    { name: '颈部', hert: 1.1, crit: 5, idx: 8 },
+    { name: '后心', hert: 1, crit: 4, idx: 9 },
+    { name: '左肩', hert: 0.85, crit: 1, idx: 10 },
+    { name: '右肩', hert: 0.89, crit: 1, idx: 11 },
+    { name: '左手', hert: 0.85, crit: 0, idx: 12 },
+    { name: '左手', hert: 0.85, crit: 0, idx: 13 },
+    { name: '腰间', hert: 0.99, crit: 5, idx: 14 },
 ];
 
 /** 胜利消息 */

@@ -387,6 +387,18 @@ if (IS_BINARY) {
         );
         console.log('[pack]   Generated templates-data.json');
 
+        // 客户端部位名表 (JSON, 供 0x12 帧 HURT_PART 1B 索引查名)
+        const partsTable = {
+            character: ['左脚', '右脚', '左腿', '右腿', '小腹', '胸前', '后背',
+                '头部', '颈部', '后心', '左肩', '右肩', '左手', '左手', '腰间'],
+            monster: ['左爪', '右爪', '后腿', '小腹', '胸前', '背部', '头部', '颈部', '前肢', '腰间'],
+        };
+        fs.writeFileSync(
+            path.join(ROOT, 'parts-table.json'),
+            JSON.stringify(partsTable)
+        );
+        console.log('[pack]   Generated parts-table.json');
+
         // 服务端模板注册（供 getMask() 使用）
         fs.writeFileSync(
             path.join(CORE_DIR, 'templates-build.js'),

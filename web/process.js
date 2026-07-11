@@ -7,7 +7,7 @@ import SCRIPT from './script.js';
 import {roles} from './login/index.js';
 import {SERVERS} from "./login/server.js";
 import FloatDialog from './floatdialog.js';
-import { format, ready as templatesReady, getMask } from './templates.js';
+import { format, ready as templatesReady, getMask, getPartName } from './templates.js';
 
 const MessageContent = () => $(".content-message");
 const MessagePage = {append: (div) => $(".content-message").append(div)};
@@ -700,9 +700,9 @@ export function ProcessBinary(data) {
                 let aId = null, tId = null;
                 if (idMask & 0x01) { const r = read7BId(data, pos, dv); aId = r.id; pos = r.next; }
                 if (idMask & 0x02) { const r = read7BId(data, pos, dv); tId = r.id; pos = r.next; }
-                // 读取内联攻击部位（HURT_PART 位置位时）
+                // 读取内联攻击部位（HURT_PART 位置位时，1B 索引：高4位类型 + 低4位索引）
                 let hurtPart = null;
-                if (idMask & 0x04) { const r = readStr(data, pos); hurtPart = r.str; pos = r.next; }
+                if (idMask & 0x04) { hurtPart = getPartName(data[pos++]); }
 
                 // 从模板表查 8 位 fieldMask，从缓存构建 sparse
                 const fieldMask = getMask(tid);

@@ -161,6 +161,45 @@ export function exportTable(): Record<number, { t: string; m: number }> {
 }
 
 // ============================================================
+// 攻击部位表 — 预编码索引，帧内传 1B (低4位索引 + 高4位类型)
+// ============================================================
+
+/** 部位类型（高4位） */
+export const PART_TYPE = {
+    CHARACTER: 0x00, // 角色部位表（CHARACTER_PARTS）
+    MONSTER: 0x10,   // 怪物部位表（MONSTER_PARTS）
+} as const;
+
+/** 角色部位名表（与 character.ts CHARACTER_PARTS 同步） */
+const CHARACTER_PART_NAMES = [
+    '左脚', '右脚', '左腿', '右腿', '小腹', '胸前', '后背',
+    '头部', '颈部', '后心', '左肩', '右肩', '左手', '左手', '腰间',
+];
+
+/** 怪物部位名表（与 monster.ts MONSTER_PARTS 同步） */
+const MONSTER_PART_NAMES = [
+    '左爪', '右爪', '后腿', '小腹', '胸前', '背部', '头部', '颈部', '前肢', '腰间',
+];
+
+/** 打包部位索引：type(高4位) | index(低4位) */
+export function packPart(type: number, index: number): number {
+    return (type & 0xF0) | (index & 0x0F);
+}
+
+/** 解包部位索引 → 名字 */
+export function getPartName(packed: number): string {
+    const type = packed & 0xF0;
+    const idx = packed & 0x0F;
+    if (type === PART_TYPE.MONSTER) return MONSTER_PART_NAMES[idx] ?? '';
+    return CHARACTER_PART_NAMES[idx] ?? '';
+}
+
+/** 导出部位名表（供客户端 parts-table.json 使用） */
+export function exportPartsTable(): { character: string[]; monster: string[] } {
+    return { character: CHARACTER_PART_NAMES, monster: MONSTER_PART_NAMES };
+}
+
+// ============================================================
 // 全局挂载 — 技能文件无需 import
 // ============================================================
 

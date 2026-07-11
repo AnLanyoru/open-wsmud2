@@ -147,7 +147,7 @@ export class MONSTER extends CHARACTER {
     /**
      * 随机查询攻击部位
      */
-    query_part(): { name: string; hert: number; crit: number } {
+    query_part(): { name: string; hert: number; crit: number; idx: number } {
         return MONSTER_PARTS[Math.floor(Math.random() * MONSTER_PARTS.length)];
     }
 
@@ -181,15 +181,15 @@ export class MONSTER extends CHARACTER {
 // 怪物攻击部位定义
 // ================================================================
 
-const MONSTER_PARTS: { name: string; hert: number; crit: number }[] = [
-    { name: '左爪', hert: 0.8, crit: 0 },
-    { name: '右爪', hert: 0.8, crit: 0 },
-    { name: '后腿', hert: 0.85, crit: 0 },
-    { name: '小腹', hert: 0.91, crit: 3 },
-    { name: '胸前', hert: 0.95, crit: 4 },
-    { name: '背部', hert: 0.97, crit: 4 },
-    { name: '头部', hert: 1.2, crit: 10 },
-    { name: '颈部', hert: 1.1, crit: 5 },
-    { name: '前肢', hert: 0.85, crit: 1 },
-    { name: '腰间', hert: 0.99, crit: 5 },
+const MONSTER_PARTS: { name: string; hert: number; crit: number; idx: number }[] = [
+    { name: '左爪', hert: 0.8, crit: 0, idx: 0 },
+    { name: '右爪', hert: 0.8, crit: 0, idx: 1 },
+    { name: '后腿', hert: 0.85, crit: 0, idx: 2 },
+    { name: '小腹', hert: 0.91, crit: 3, idx: 3 },
+    { name: '胸前', hert: 0.95, crit: 4, idx: 4 },
+    { name: '背部', hert: 0.97, crit: 4, idx: 5 },
+    { name: '头部', hert: 1.2, crit: 10, idx: 6 },
+    { name: '颈部', hert: 1.1, crit: 5, idx: 7 },
+    { name: '前肢', hert: 0.85, crit: 1, idx: 8 },
+    { name: '腰间', hert: 0.99, crit: 5, idx: 9 },
 ];
