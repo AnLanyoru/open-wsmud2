@@ -498,7 +498,7 @@ const Process = {
             if (data.A && data.A === Process.name) s = s.split(data.A).join('你');
             if (data.T && data.T === Process.name) s = s.split(data.T).join('你');
             Process.message.push(s);
-            Process.message.scroll2end();
+            Process.message.flushScroll();
         }
     }, state: function (data) {
         if (data && data.state) {
@@ -567,7 +567,7 @@ const Process = {
 
 function ReceiveMessage(x) {
     Process.message.push(x);
-    Process.message.scroll2end();
+    Process.message.flushScroll();
 }
 
 // ============================================================
@@ -835,6 +835,8 @@ export function ProcessBinary(data) {
                 return;
         }
     }
+    // 批处理帧结束 — 统一触发一次滚动（用 rAF 合并到下一渲染帧）
+    Process.message.flushScroll();
 }
 
 export default Process;

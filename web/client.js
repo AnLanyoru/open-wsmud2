@@ -93,7 +93,7 @@ export function ReceiveMessage(x) {
     if (Dialog.extend.message_filter(x)) return;
     Process._lastMessageText = x;
     Process.message.push(x);
-    Process.message.scroll2end();
+    Process.message.flushScroll();
     Dialog.extend.trigger(x);
 }
 
