@@ -5,7 +5,7 @@ import { BASE } from '../base.js';
 import { WORLD } from '../world.js';
 import { ITEM, RoomAction } from '../item.js';
 import { OBJ } from '../item/obj.js';
-import { encodeBinaryFrame } from '../net-ws.js';
+import { encodeBinaryFrame, encodeTextFrame, WsSocket } from '../net-ws.js';
 import { FMASK } from '../templates.js';
 import type { AREA } from './area.js';
 import { CHARACTER } from '../char/character.js';
@@ -80,6 +80,8 @@ export class ROOM extends ITEM {
     hidden_items: ITEM[] | null = null;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
+    /** items_to_json 缓存 — 物件进出时失效，避免每次进房重建 1000 项 JSON */
+    _items_json: string | null = null;
 
     // ============ 层级关系 ============
 
@@ -253,9 +255,12 @@ export class ROOM extends ITEM {
         dir?: string,
     ): boolean | undefined {
         if (!obj) return;
-        let msg: string | undefined;
+        // 预编码 WebSocket 文本帧 — 同一 Buffer 复用给所有 socket，避免逐玩家重复 UTF-8 编码+帧分配+拷贝
+        let msgFrame: Buffer | undefined;
+        let changedFrame: Buffer | undefined;
         let obj_index = -1,
             isshow = !obj.query_temp('hidden');
+        const MAX_TEXT = 30240; // 与 USER.send 的长度上限保持一致
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item == obj) {
@@ -264,11 +269,17 @@ export class ROOM extends ITEM {
             }
             if (item.check_player() && isshow) {
                 item as USER;
-                if (!msg) msg = this.item_json(obj, isin);
-                item.send(msg);
+                if (!msgFrame) {
+                    const msg = this.item_json(obj, isin);
+                    if (msg.length < MAX_TEXT) msgFrame = encodeTextFrame(msg);
+                }
+                if (msgFrame) item.socket?.write(msgFrame);
 
                 if (changed_msg && item != obj && !item.query_setting('off_move')) {
-                    item.send(changed_msg);
+                    if (!changedFrame && changed_msg.length < MAX_TEXT) {
+                        changedFrame = encodeTextFrame(changed_msg);
+                    }
+                    if (changedFrame) item.socket?.write(changedFrame);
                 }
             } else {
                 if (obj.check_character() && item.check_character()) {
@@ -285,13 +296,18 @@ export class ROOM extends ITEM {
             obj.environment = this;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
+                this._items_json = null;
                 if (obj.check_player()) { this._batch_delay = Math.min(16, this._batch_delay + 1); obj.send(this.items_to_json()); }
             } else if (obj.check_player()) {
-                if (!msg) msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
-                obj.send(msg);
+                if (!msgFrame) {
+                    const msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
+                    msgFrame = encodeTextFrame(msg);
+                }
+                obj.socket?.write(msgFrame);
             }
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
+            this._items_json = null;
             if (obj.check_player()) this._batch_delay = Math.max(0, this._batch_delay - 1);
             // 离房时从脏数据列表移除（避免给已离开的玩家发刷新帧）
             if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
@@ -350,9 +366,10 @@ export class ROOM extends ITEM {
     }
 
     /**
-     * 生成所有物件列表JSON
+     * 生成所有物件列表JSON（带缓存 — 物件进出时失效）
      */
     items_to_json(): string {
+        if (this._items_json !== null) return this._items_json;
         const str: string[] = ['{"type":"items","items":['];
         for (let i = 0; i < this.items.length; i++) {
             const item: Record<string, any> = this.items[i];
@@ -402,7 +419,8 @@ export class ROOM extends ITEM {
             }
         }
         str.push('0]}');
-        return str.join('');
+        this._items_json = str.join('');
+        return this._items_json;
     }
 
     /**

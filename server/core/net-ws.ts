@@ -72,7 +72,7 @@ export interface WsProtocol {
 // ============================================================
 
 /** WebSocket 帧类型常量 (RFC 6455) */
-const FrameTypes = {
+export const FrameTypes = {
     Continuation: 0,
     Text: 1,
     Binary: 2,
@@ -589,6 +589,15 @@ export function encodeBinaryFrame(payload: Buffer, opcode: number = FrameTypes.B
         payload.copy(data, 10);
     }
     return data;
+}
+
+/**
+ * 将文本字符串编码为 WebSocket 文本帧 (opcode=1)。
+ * 用于高频广播场景：预编码一次，多个 socket 共用同一 Buffer 写入，
+ * 避免每次 socket.send(text) 重复 Buffer.from + alloc + copy。
+ */
+export function encodeTextFrame(text: string): Buffer {
+    return encodeBinaryFrame(Buffer.from(text, 'utf8'), FrameTypes.Text);
 }
 
 /**

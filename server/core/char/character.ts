@@ -2356,6 +2356,9 @@ export class CHARACTER extends ITEM {
         if (!room) return;
         this._dirty_fields |= fieldMask;
         room._dirty_players.add(this);
+        // 令房间 items_to_json 缓存失效 — 缓存内联了 weapon/call3/throwing 等动态字段，
+        // 字段变更后新进房玩家必须拿到最新值（房间内玩家走 0x55 刷新帧更新）
+        room._items_json = null;
         markRoomDirty(room);
     }
 
