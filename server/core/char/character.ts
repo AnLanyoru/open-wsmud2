@@ -3795,12 +3795,7 @@ export class CHARACTER extends ITEM {
         if (pfm.is_weapon && pfm.origin_skill != this.attack_skill.id) {
             this.remove_status('weapon', true);
         }
-        this.begin_burst();
-        try {
-            return pfm.use?.(this, target, lv, sk) != false;
-        } finally {
-            this.end_burst();
-        }
+        return pfm.use?.(this, target, lv, sk) != false;
     }
 
     /**
