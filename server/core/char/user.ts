@@ -587,7 +587,7 @@ export class USER extends CHARACTER {
         }
         this.check_state();
         if (
-            this.follower &&
+            this.follower && this.follower.length &&
             (!this.environment || (this.environment as ROOM).parent?.id !== 'home')
         ) {
             const home = WORLD.getRoom('home/yuanzi');
