@@ -78,6 +78,9 @@ JSON.toObject = function (str: string): any {
 // UTIL 单例
 // ============================================================
 
+/** create_id() 使用的字符集（36 进制：0-9, a-z）— 共享常量，供 _pack_id/_get_packed_id 编解码引用 */
+export const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
+
 export const UTIL = {
     /** 空函数占位 */
     empty(): void {},
@@ -385,8 +388,8 @@ export const UTIL = {
         fs.writeFileSync(path, JSON.stringify(this.logs));
     },
 
-    /** ID 可用字符集（36 进制） */
-    idstr: '0123456789abcdefghijklmnopqrstuvwxwz',
+    /** ID 可用字符集（36 进制）— 引用共享常量 ID_CHARS */
+    idstr: ID_CHARS,
     /** 基准时间戳（用于缩短 ID 长度） */
     begin: 1490276099978,
 

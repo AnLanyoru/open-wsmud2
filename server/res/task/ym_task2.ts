@@ -134,11 +134,7 @@ export default class YaMenLevelUpTask extends USERTASK {
         if (request) {
             let npc = request.npc;
             if (npc && npc.hp > 0) {
-                player.moveto(
-                    npc.environment,
-                    player.name + '离开了。',
-                    player.name + '走了过来。',
-                );
+                player.moveto(npc.environment, '$N离开了。', '$N走了过来。');
             }
         }
     }

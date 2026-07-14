@@ -662,7 +662,7 @@ export class FOLLOWER extends CHARACTER {
             if (this.master == tm.id) {
                 this.do_follow(null);
                 if (this.environment && this.environment.is_fb()) {
-                    this.environment.item_changed(this, false, this.name + '离开了。');
+                    this.environment.item_changed(this, false, '$N离开了。');
                 }
             }
         }

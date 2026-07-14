@@ -140,7 +140,7 @@ function ask6(me: CHARACTER) {
     const fb = me.environment;
 
     me.call_out(function (this: CHARACTER) {
-        if (this.moveto('yz/kedian', undefined, me.name + '风尘仆仆的走了进来.') != false) {
+        if (this.moveto('yz/kedian', undefined, '$N风尘仆仆的走了进来.') != false) {
             if (fb) {
                 if ('clear_copy' in fb) {
                     (fb as any).clear_copy(me);

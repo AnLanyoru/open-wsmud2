@@ -30,7 +30,7 @@ export default class extends ROOM {
                 }
             }
 
-            me.moveto(rm, '', me.name + '跳了进来。');
+            me.moveto(rm, undefined, '$N跳了进来。');
         } else {
             me.send_room('$N在绝壁前站定,深吸一口气，猛然跃起，可还差一大截呢,看来是轻功不够好。');
         }

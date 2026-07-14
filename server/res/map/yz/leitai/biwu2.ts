@@ -72,7 +72,7 @@ export default class extends ROOM {
                         obj.moveto(
                             obj.query_temp('enter_room'),
                             undefined,
-                            obj.name + '走了进来。',
+                            '$N走了进来。',
                             'endfight',
                         );
                         obj.notify('<yel>你挑战失败。</yel>');
@@ -95,7 +95,7 @@ export default class extends ROOM {
                     player.moveto(
                         player.query_temp('enter_room'),
                         undefined,
-                        player.name + '走了进来。',
+                        '$N走了进来。',
                         'endfight',
                     );
                     player.notify('<yel>你挑战超时，自动离开擂台。</yel>');

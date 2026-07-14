@@ -19,7 +19,7 @@ export default class extends ROOM {
         if (dir == 'west') {
             var count = me.add_temp('fb/tdh/andao', 1);
             if (count > 3) {
-                me.moveto('bj/tdh/andao2', me.name + '向西方离去。', me.name + '走了过来。');
+                me.moveto('bj/tdh/andao2', '$N向西方离去。', '$N走了过来。');
                 return false;
             }
         } else {

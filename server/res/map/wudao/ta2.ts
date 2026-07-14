@@ -41,7 +41,7 @@ export default class extends ROOM {
                 }
             }
             if (me.environment) {
-                me.environment.item_changed(this, false, this.name + '离开了。');
+                me.environment.item_changed(this, false, '$N离开了。');
             }
         };
         npc.init_from(me, level);

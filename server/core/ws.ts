@@ -3,7 +3,7 @@
  * 封装网络层并桥接到 WORLD
  */
 
-import { WORLD } from './world.js';
+import { WORLD, BATCH_MODE } from './world.js';
 import wsServer from './net-ws.js';
 import type { WsSocket } from './net-ws.js';
 
@@ -41,10 +41,52 @@ server.onSocketIn = function (this: void, socket: WsSocket): void {
 };
 
 /**
- * 接收消息回调
+ * 接收消息回调 — 根据模式切换：
+ *   BATCH_MODE=1（默认）入队后分批处理，每批 20ms 让出事件循环
+ *   BATCH_MODE=0   同步模式：直接调用 WORLD.request，便于 A/B 对比
  */
+
+const _msgQueue: Array<[string, WsSocket]> = [];
+let _msgIndex = 0;
+let _msgScheduled = false;
+const _MSG_TIMESLICE_MS = 20;
+/** 队列长度上限，超过后降级为同步处理，防止内存溢出 */
+const _MSG_QUEUE_LIMIT = 10000;
+
+function _processMsgBatch(): void {
+    _msgScheduled = false;
+    const t0 = Date.now();
+    while (_msgIndex < _msgQueue.length) {
+        const entry = _msgQueue[_msgIndex];
+        _msgIndex++;
+        WORLD.request(entry[0], entry[1]);
+        if (Date.now() - t0 >= _MSG_TIMESLICE_MS) break;
+    }
+    if (_msgIndex < _msgQueue.length) {
+        _msgScheduled = true;
+        setImmediate(_processMsgBatch);
+    } else {
+        _msgQueue.length = 0;
+        _msgIndex = 0;
+    }
+}
+
 server.onReceive = function (this: void, msg: string, socket: WsSocket): void {
-    WORLD.request(msg, socket);
+    if (BATCH_MODE === 0) {
+        // 同步模式：直接处理，不排队不分批
+        WORLD.request(msg, socket);
+        return;
+    }
+    // 背压保护：队列超限时降级为同步处理，避免内存无限增长
+    if (_msgQueue.length - _msgIndex >= _MSG_QUEUE_LIMIT) {
+        WORLD.request(msg, socket);
+        return;
+    }
+    _msgQueue.push([msg, socket]);
+    if (!_msgScheduled) {
+        _msgScheduled = true;
+        setImmediate(_processMsgBatch);
+    }
 };
 
 /**

@@ -6,7 +6,7 @@ import { ITEM } from '../item.js';
 import { OBJ } from '../item/obj.js';
 import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD } from '../world.js';
-import { UTIL } from '../util.js';
+import { UTIL, ID_CHARS } from '../util.js';
 import {
     WEAPON_TYPE,
     WEAPON_SKILLS,
@@ -905,7 +905,7 @@ export class CHARACTER extends ITEM {
         pos += 2;
         buf[pos++] = actualMask;
         if (hasA) {
-            CHARACTER._pack_id(this.id).copy(buf, pos);
+            this._get_packed_id().copy(buf, pos);
             pos += 7;
         }
         if (hasT) {
@@ -2481,8 +2481,8 @@ export class CHARACTER extends ITEM {
      */
     moveto(
         rm?: string | ROOM,
-        leave_msg?: string,
-        in_msg?: string,
+        leave_msg?: string | number,
+        in_msg?: string | number,
         dir?: string,
     ): boolean | undefined {
         const cur_room = this.environment;
@@ -2584,9 +2584,9 @@ export class CHARACTER extends ITEM {
                             continue;
                         }
                     }
-                    item.moveto(this.environment, sendOutMessage(item, dir), sendInMessage(item));
+                    item.moveto(this.environment, '', '', dir);
                 } else {
-                    item.moveto(this.environment, sendOutMessage(item, dir), sendInMessage(item));
+                    item.moveto(this.environment, '', '', dir);
                 }
             }
         }
@@ -2952,8 +2952,6 @@ export class CHARACTER extends ITEM {
      * → 编码为 [前4字符_24bit_BE][时间戳_int32_BE] = 固定 7 字节
      */
     static readonly STAT_ID_BYTES = 7;
-    /** create_id() 使用的字符集，与 UTIL.idstr 一致 */
-    static readonly ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
 
     /** 将 create_id() 字符串编码为固定 7 字节 Buffer */
     static _pack_id(id: string): Buffer {
@@ -2961,7 +2959,7 @@ export class CHARACTER extends ITEM {
         // 前 4 字符 → 6-bit 索引打包为 24-bit BE
         let packed = 0;
         for (let i = 0; i < 4; i++) {
-            packed = (packed << 6) | CHARACTER.ID_CHARS.indexOf(id[i]);
+            packed = (packed << 6) | ID_CHARS.indexOf(id[i]);
         }
         buf[0] = (packed >> 16) & 0xFF;
         buf[1] = (packed >> 8) & 0xFF;
@@ -3017,7 +3015,7 @@ export class CHARACTER extends ITEM {
             baseFlags = 0x0F; // hp | max_hp | mp | max_mp
             baseValues.push(this.hp, this.max_hp, this.mp, this.max_mp);
         }
-        const idBuf = CHARACTER._pack_id(this.id);
+        const idBuf = this._get_packed_id();
 
         // 构建公共 msg（不带 damage）并预编码 WebSocket 帧
         const commonLen = 9 + baseValues.length * 8;
@@ -3044,7 +3042,7 @@ export class CHARACTER extends ITEM {
         if (!this.damages) return null;
         const entries = Object.entries(this.damages);
         if (entries.length === 0) return null;
-        const idBuf = CHARACTER._pack_id(this.id);
+        const idBuf = this._get_packed_id();
         const parts: Buffer[] = [];
         let count = 0;
         for (const [attackerId, dmg] of entries) {

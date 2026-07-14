@@ -57,7 +57,7 @@ export default class extends COMMAND {
                 me.clear_status();
                 let room = me.environment;
                 me.environment = undefined;
-                me.moveto(room, '', '<mag>' + me.name + '的尸体发出阵阵光芒。</mag>');
+                me.moveto(room, '', '<mag>$N的尸体发出阵阵光芒。</mag>');
             }, 5000);
         } else {
             var area = me.environment.parent;
@@ -79,11 +79,7 @@ export default class extends COMMAND {
             var room = WORLD.getRoom(recover_room) as WuMiaoRoom;
             me.hp = 1;
             me.clear_status();
-            room.do_enter(
-                me,
-                true,
-                '<wht>你忽然发现前面多了一个人影，不过那人影又好像已经在那里很久了，只是你一直没发觉。</wht>',
-            );
+            room.do_enter(me, true, '<wht>你忽然发现前面多了一个人影，不过那人影又好像已经在那里很久了，只是你一直没发觉。</wht>');
 
             area.on_leaved(me);
 

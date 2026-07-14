@@ -60,7 +60,7 @@ export default class HeiYingJiaoXi extends NPC {
                 }
             }
             for (let item of list) {
-                item.moveto(this.environment!, item.name + '冲了过来。');
+                item.moveto(this.environment!, undefined, '$N冲了过来。');
                 item.do_kill(me);
             }
         }

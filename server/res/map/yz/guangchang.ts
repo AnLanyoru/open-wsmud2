@@ -24,24 +24,17 @@ export default class extends ROOM {
 
 function climb_tree(me: CHARACTER, par?: string) {
     if (par != 'tree') return me.notify('你要爬什么？');
-    var leave_msg: string | null = null;
+    var leave_msg: string | undefined;
+    var in_msg: string | undefined;
     if (me.gender == 1) {
-        leave_msg = me.name + '战战兢兢的抓住树干往上爬去。';
+        leave_msg = '$N战战兢兢的抓住树干往上爬去。';
+        in_msg = '$N战战兢兢地从下面爬了上来。';
+    } else if (me.per > 40) {
+        leave_msg = '$N轻轻一跳，衣裙飘飘，犹如仙子般飞上大榕树。';
+        in_msg = '一阵清香飞来，你定眼一看，$N已经婷婷玉立在你眼前。';
     } else {
-        leave_msg =
-            me.per > 40
-                ? me.name + '轻轻一跳，衣裙飘飘，犹如仙子般飞上大榕树。'
-                : me.name + '战战兢兢地拉着大榕树的盘根，缓慢地往上爬去。';
+        leave_msg = '$N战战兢兢地拉着大榕树的盘根，缓慢地往上爬去。';
+        in_msg = '$N气喘嘘嘘地爬了上来。';
     }
-    var in_msg: string | null = null;
-
-    if (me.gender == 1) {
-        in_msg = me.name + '战战兢兢地从下面爬了上来。';
-    } else {
-        in_msg =
-            me.per > 40
-                ? '一阵清香飞来，你定眼一看，' + me.name + '已经婷婷玉立在你眼前。'
-                : me.name + '气喘嘘嘘地爬了上来。';
-    }
-    me.moveto('yz/tree1', leave_msg ?? undefined, in_msg ?? undefined);
+    me.moveto('yz/tree1', leave_msg, in_msg);
 }

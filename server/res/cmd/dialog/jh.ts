@@ -208,7 +208,7 @@ export default class extends COMMAND {
                         if (fb.on_enter(me) == false) {
                             return;
                         }
-                        me.moveto(fb.first!, me.name + '走了。', me.name + '来了。');
+                        me.moveto(fb.first!, '$N走了。', '$N来了。');
                     }
                 } else {
                     if (!me.can_trans!()) return;
@@ -217,7 +217,7 @@ export default class extends COMMAND {
                     if (fb.on_enter(me) == false) {
                         return;
                     }
-                    me.moveto(WORLD.getRoom(fb.first)!, me.name + '走了。', me.name + '来了。');
+                    me.moveto(WORLD.getRoom(fb.first)!, '$N走了。', '$N来了。');
                 }
                 me.send('{type:"dialog",dialog:"jh",close:true}');
             }

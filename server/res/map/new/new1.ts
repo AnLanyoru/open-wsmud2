@@ -45,7 +45,7 @@ export default class extends ROOM {
         var fb = me.environment;
         const room = this;
         me.call_out(function (this: CHARACTER) {
-            if (this.moveto('yz/kedian', undefined, me.name + '风尘仆仆的走了进来.') != false) {
+            if (this.moveto('yz/kedian', undefined, '$N风尘仆仆的走了进来.') != false) {
                 if (fb) {
                     const fbRoom: any = fb;
                     fbRoom.clear_copy(me);

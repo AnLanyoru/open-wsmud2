@@ -646,6 +646,64 @@ function readTplRef(data, pos, aId, tId, dv, hurtPart) {
     return { str: format(refTid, refFieldMask, refSparse, refArgs, hurtPart), next: pos };
 }
 
+// ============================================================
+// 客户端本地生成进出消息（替代服务端 0x56 文本广播）
+// ============================================================
+
+/** 方向索引 → 中文名（0=无方向）— 与服务端 go.ts dirs 一致 */
+const DIR_NAMES = ['', '北方', '南方', '东方', '西方', '北边', '南边', '东边', '西边',
+    '北边', '南边', '东边', '西边', '东北', '西北', '东南', '西南', '上面', '下面', '里面', '外面'];
+
+/** 生成进入消息（与服务端 sendInMessage 逻辑一致） */
+function _genInMessage(item, isFighting) {
+    const name = item.n || item.name || '';
+    if (isFighting) return name + '跌跌撞撞地跑了过来，模样有些狼狈。';
+    if (item.hp && item.max_hp) {
+        const eq = (item.hp * 100) / item.max_hp;
+        if (eq < 5) return name + '撑着满是<HIR>鲜血</HIR>的躯体，一瘸一拐地挪了过来。';
+        if (eq < 10) return name + '一边擦着嘴角的<HIR>鲜血</HIR>，一边走了过来，龇牙咧嘴的。';
+        if (eq < 30) return name + '灰头土脸、狼狈不堪地走了过来。';
+        if (eq < 50) return name + '像斗败了的公鸡，垂头丧气地走了过来。';
+    }
+    // 面容 + 武器 + 衣着（与服务端原 sendInMessage/getFace 逻辑一致）
+    var face = _getFace(item) + '的' + name;
+    var weapon = item.w || '';
+    if (weapon) face += '手执' + weapon;
+    if (item.cl === 0) face += '全身清洁溜溜的';  // cl=0 表示无衣
+    return face + '走了过来。';
+}
+
+/** 面容描述词表（与服务端原 go.ts face1/face2 一致） */
+var _face1 = ['眉歪眼斜','贼眉鼠眼','尖嘴猴腮','相貌平平','膀大腰圆','一表人才','仪表堂堂','丰神如玉','气宇不凡','玉树临风','风度翩翩'];
+var _face2 = ['奇丑无比','獐头鼠目','身材干瘦','相貌平平','体态轻盈','亭亭玉立','面目姣好','容色秀丽','风情万种','清丽绝俗','美若天仙'];
+
+/** 根据 per（容貌）和 gender（性别）生成面容描述 — 与服务端原 go.ts getFace 一致 */
+function _getFace(item) {
+    var v = parseInt((item.per || 20) / 4);
+    if (item.gender == 1) {
+        if (v > _face1.length - 1) v = _face1.length - 1;
+        return _face1[v];
+    } else {
+        if (v > _face2.length - 1) v = _face2.length - 1;
+        return _face2[v];
+    }
+}
+
+/** 生成离开消息（与服务端 sendOutMessage 逻辑一致） */
+function _genLeaveMessage(cached, dirIndex, isFighting) {
+    const name = cached.n || cached.name || '';
+    const d = DIR_NAMES[dirIndex] || '';
+    if (isFighting) return name + '往' + d + '落荒而逃了。';
+    if (cached.hp && cached.max_hp) {
+        const eq = (cached.hp * 100) / cached.max_hp;
+        if (eq < 5) return name + '撑起满是<HIR>鲜血</HIR>的躯体，一瘸一拐地朝' + d + '挪去。';
+        if (eq < 10) return name + '一边擦着嘴角的<HIR>鲜血</HIR>，一边朝' + d + '走去。';
+        if (eq < 30) return name + '灰头土脸、狼狈不堪地向' + d + '离去。';
+        if (eq < 50) return name + '一声不吭的转身朝' + d + '走去，脸色好像有些难看。';
+    }
+    return name + '往' + d + '离开。';
+}
+
 /** 读取 LEB128 无符号 varint — 用 BigInt 中间值避免 32 位 << 溢出，转回 number */
 function readVarint(data, pos) {
     let value = 0n, shift = 0n;
@@ -828,6 +886,146 @@ export function ProcessBinary(data) {
                 const r = readStr(data, pos);
                 ReceiveMessage(r.str);
                 pos = r.next;
+                break;
+            }
+            case 0x56: { // JSON 文本（itemadd/itemremove/移动消息等）— 走 OnData 解析
+                const r = readVarint(data, pos);
+                pos = r.next;
+                const jsonStr = new TextDecoder().decode(data.subarray(pos, pos + r.value));
+                pos += r.value;
+                try {
+                    // 服务端 item_json 输出的是 JS 对象字面量（键名无引号），用 Function 解析兼容
+                    const parsed = (new Function('return ' + jsonStr))();
+                    if (parsed && parsed.type) {
+                        const handler = Process[parsed.type];
+                        if (typeof handler === 'function') {
+                            if (parsed.type === 'itemremove') {
+                                // 离开消息：先查缓存判断是否玩家，再移除
+                                const cached = lookupCache(parsed.id);
+                                if (cached && cached.p && !Setting.off_move) {
+                                    if (parsed.msg) {
+                                        ReceiveMessage(parsed.msg);
+                                    } else {
+                                        ReceiveMessage(_genLeaveMessage(cached, 0, false));
+                                    }
+                                }
+                                handler.call(Process, parsed);
+                            } else {
+                                handler.call(Process, parsed);
+                                // 进入消息：itemadd 后检查 msg，无 msg 时客户端本地生成
+                                if (parsed.type === 'itemadd' && parsed.p && !Setting.off_move) {
+                                    if (parsed.msg) {
+                                        ReceiveMessage(parsed.msg);
+                                    } else {
+                                        ReceiveMessage(_genInMessage(parsed, false));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (e) { /* ignore parse error */ }
+                break;
+            }
+            case 0x57: { // 房间人员增量（二进制 itemadd + 客户端生成 in_msg）
+                const idR = read7BId(data, pos, dv);
+                pos = idR.next;
+                const flags = data[pos++];
+                const item = { id: idR.id };
+
+                // name (long_name) — 必有
+                const nr = readStr(data, pos);
+                item.name = nr.str;
+                pos = nr.next;
+
+                const isPlayer = (flags & 0x01) !== 0;
+                if (isPlayer) item.p = 1;
+
+                if (flags & 0x02) { // has_status
+                    let r;
+                    r = readVarint(data, pos); pos = r.next; item.mp = r.value;
+                    r = readVarint(data, pos); pos = r.next; item.hp = r.value;
+                    r = readVarint(data, pos); pos = r.next; item.max_mp = r.value;
+                    r = readVarint(data, pos); pos = r.next; item.max_hp = r.value;
+                }
+
+                if (flags & 0x04) { // has_combat (w/c/th/n)
+                    let r;
+                    r = readStr(data, pos); pos = r.next; item.w = r.str;
+                    r = readStr(data, pos); pos = r.next; item.c = r.str;
+                    r = readStr(data, pos); pos = r.next; item.th = r.str;
+                    r = readStr(data, pos); pos = r.next; item.n = r.str;
+                }
+
+                if (flags & 0x08) { // has_status_effects
+                    const sl = readVarint(data, pos);
+                    pos = sl.next;
+                    const sJson = new TextDecoder().decode(data.subarray(pos, pos + sl.value));
+                    pos += sl.value;
+                    try {
+                        const parsed = (new Function('return {' + sJson + '}'))();
+                        if (parsed.status) item.status = parsed.status;
+                    } catch (e) { /* ignore */ }
+                }
+
+                if (flags & 0x40) { // has_profile: per(1B) + gender(1B) + cl(1B)
+                    item.per = data[pos++];
+                    item.gender = data[pos++];
+                    item.cl = data[pos++];  // 0=无衣, 1=有衣
+                }
+
+                // 读取可选的模板 ID（has_tpl_id = bit5，2 字节）
+                let tplId = -1;
+                if (flags & 0x20) {
+                    tplId = (data[pos] << 8) | data[pos + 1];
+                    pos += 2;
+                }
+
+                const isFighting = (flags & 0x10) !== 0;
+                Process.itemadd.call(Process, item);
+
+                // 只有玩家物件才生成进入消息（避免尸体/掉落物产生虚假消息）
+                if (isPlayer && !Setting.off_move) {
+                    if (tplId >= 0) {
+                        // 复用模板表 + $N 机制：用 item.name 替换 $N
+                        const fieldMask = getMask(tplId);
+                        const sparse = [item.n || item.name || ''];  // A_NAME = item.name
+                        const msg = format(tplId, fieldMask, sparse, null, null);
+                        if (msg) ReceiveMessage(msg);
+                    } else {
+                        ReceiveMessage(_genInMessage(item, isFighting));
+                    }
+                }
+                break;
+            }
+            case 0x58: { // 房间人员离开（二进制 itemremove + 客户端生成 leave_msg）
+                const r = read7BId(data, pos, dv);
+                pos = r.next;
+                const dirIndex = data[pos++];
+                const flags8 = data[pos++];
+                const isFighting = (flags8 & 0x01) !== 0;
+
+                // 读取可选的模板 ID（has_tpl_id = bit1，2 字节）
+                let tplId = -1;
+                if (flags8 & 0x02) {
+                    tplId = (data[pos] << 8) | data[pos + 1];
+                    pos += 2;
+                }
+
+                // 先查缓存获取玩家信息，再移除
+                const cached = lookupCache(r.id);
+                // 只有玩家物件才生成离开消息（避免尸体/掉落物产生虚假消息）
+                if (cached && cached.p && !Setting.off_move) {
+                    if (tplId >= 0) {
+                        // 复用模板表 + $N 机制：用 cached.name 替换 $N
+                        const fieldMask = getMask(tplId);
+                        const sparse = [cached.n || cached.name || ''];  // A_NAME = cached.name
+                        const msg = format(tplId, fieldMask, sparse, null, null);
+                        if (msg) ReceiveMessage(msg);
+                    } else {
+                        ReceiveMessage(_genLeaveMessage(cached, dirIndex, isFighting));
+                    }
+                }
+                Process.itemremove.call(Process, { id: r.id });
                 break;
             }
             default:

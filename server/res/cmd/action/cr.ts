@@ -283,7 +283,7 @@ function fb_start(me, path) {
 
     me.set_temp('enter_room', me.environment.path);
 
-    if (me.moveto(next_room, me.name + '离开了。', me.name + '走了进来。')) {
+    if (me.moveto(next_room, '$N离开了。', '$N走了进来。')) {
         if (me.team) {
             me.notify(
                 '<hic>你已进入组队副本，在副本中退出游戏，退出队伍，完成副本都会离开当前副本，当前队伍所有人都离开副本后才可以重新进入。</hic>',
@@ -307,8 +307,7 @@ function fb_over(me) {
     var fb = me.environment;
     var diff = fb.fb_query_temp('diff', me) || 0;
     if (
-        me.moveto(me.query_temp('enter_room'), me.name + '离开了副本。', me.name + '走了过来。') !=
-        false
+        me.moveto(me.query_temp('enter_room'), '$N离开了副本。', '$N走了过来。') != false
     ) {
         if (me.team && me.environment.parent.id !== 'home') {
             for (let i = 0; i < me.team.length; i++) {

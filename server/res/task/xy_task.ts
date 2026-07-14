@@ -345,7 +345,9 @@ export default class XiangYangTask extends TASK {
         npc.per = npc.random(40) + 1;
 
         npc.is_menggubing = true;
-        rm.item_changed(npc, true, '一个' + npc.title + '冲了过来。');
+        rm.item_changed(npc, true);
+        // 消息含 npc.title（非 name），item_changed 的 $N 替换为 name 无法表达，改用 send_room 单独发送
+        npc.send_room('一个' + npc.title + '冲了过来。');
         var item = rm.items.random();
         if (item && item.check_player()) {
             npc.do_kill(item);
@@ -444,7 +446,7 @@ export default class XiangYangTask extends TASK {
         npc.on_die = this.on_bing_die.bind(this, npc);
         npc.on_died = this.on_bing_died;
 
-        WORLD.getRoom('xiangyang/guangchang')!.item_changed(npc, true, npc.name + '出现了。');
+        WORLD.getRoom('xiangyang/guangchang')!.item_changed(npc, true, '$N出现了。');
         this.check_handler = this.call_out(this.finish.bind(this, 2), 600000);
     }
 

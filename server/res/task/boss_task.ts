@@ -39,7 +39,7 @@ class BossTask extends TASK {
         if (this.time_handler) clearTimeout(this.time_handler);
         if (this.boss && this.boss.length) {
             for (let i = 0; i < this.boss.length; i++) {
-                this.boss[i].destroy(this.boss[i].name + '离开了。');
+                this.boss[i].destroy('$N离开了。');
             }
             this.boss.length = 0;
             this.boss = null;
@@ -124,7 +124,7 @@ class BossTask extends TASK {
                     return me.send('你今日的BOSS挑战次数已满。');
                 if (!me.can_trans()) return;
                 if (rm.is_full(1)) return me.send('那里人太多了，你过不去。');
-                me.moveto(rm.path, me.name + '离开了。', me.name + '走了过来。');
+                me.moveto(rm.path, '$N离开了。', '$N走了过来。');
                 return true;
             },
         };

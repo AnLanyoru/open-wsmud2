@@ -19,7 +19,7 @@ export default class extends OBJ {
         if (me.environment.no_fight) return me.notify_fail('这里没办法战斗，你召唤出来干嘛。');
         var boss = task.create_boss();
         if (!boss) return me.notify_fail('现在没有可以召唤的BOSS。');
-        me.environment.item_changed(boss, true, '<hiw>' + boss.name + '突然出现一片烟雾中。</hiw>');
+        me.environment.item_changed(boss, true, '<hiw>$N突然出现一片烟雾中。</hiw>');
         this.call_out(this.on_disappear, 1800000, boss);
     }
 

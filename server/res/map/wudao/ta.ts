@@ -61,7 +61,7 @@ export default class extends ROOM {
                 }
             }
             if (killer.environment) {
-                killer.environment.item_changed(this, false, this.name + '离开了。');
+                killer.environment.item_changed(this, false, '$N离开了。');
                 room.reward(killer, count);
             }
 

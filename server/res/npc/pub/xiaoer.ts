@@ -76,17 +76,17 @@ export default class extends NPC {
         } else if (count === 1000) {
             me.set_temp('kezhan', 1, 1000 * 3600 * 24);
             me.send_message('小二一哈腰，说道：多谢您老，客官请楼上歇息。');
-            me.moveto('kezhan/fang1', me.name + '向客店二楼走去。');
+            me.moveto('kezhan/fang1', '$N向客店二楼走去。');
             return true;
         } else if (count === 3000) {
             me.set_temp('kezhan', 2, 1000 * 3600 * 24);
             me.send_message('小二一哈腰，说道：多谢您老，客官请楼上歇息。');
-            me.moveto('kezhan/fang2', me.name + '向客店二楼走去。');
+            me.moveto('kezhan/fang2', '$N向客店二楼走去。');
             return true;
         } else if (count === 10000) {
             me.set_temp('kezhan', 3, 1000 * 3600 * 24);
             me.send_message('小二一哈腰，说道：多谢您老，客官请楼上歇息。');
-            me.moveto('kezhan/fang3', me.name + '向客店二楼走去。');
+            me.moveto('kezhan/fang3', '$N向客店二楼走去。');
             return true;
         }
         return false;
@@ -96,7 +96,7 @@ export default class extends NPC {
 function zhudian(this: NPC, me: CHARACTER, par: string): void {
     var kd = me.query_temp('kezhan');
     if (kd) {
-        me.moveto('kezhan/fang' + kd, me.name + '向客店二楼走去。');
+        me.moveto('kezhan/fang' + kd, '$N向客店二楼走去。');
     } else {
         me.notify(
             '小二对你说道：这位' +

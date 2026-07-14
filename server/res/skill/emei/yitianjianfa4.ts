@@ -157,11 +157,9 @@ export default class extends SKILL {
                             demon.recount();
 
                             // 加入房间
-                            me.environment!.item_changed(
-                                demon,
-                                true,
-                                '<ord>$n的心魔被$N的佛光剥离而出，化作$N的护法！</ord>',
-                            );
+                            me.environment!.item_changed(demon, true);
+                            // 多主体消息含 me($N) + demon($n)，item_changed 仅支持 $N，改用 send_room 单独发送
+                            me.send_room('<ord>$n的心魔被$N的佛光剥离而出，化作$N的护法！</ord>', demon);
 
                             // 攻击召唤者的当前敌人
                             const enemy = me.query_enemy() || target;

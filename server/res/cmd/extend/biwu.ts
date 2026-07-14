@@ -83,7 +83,7 @@ export default class BiWuCmd extends COMMAND {
         me.init_pfms = this.init_pfms;
 
         npc.fight_type = 0;
-        room.item_changed(npc, true, npc.name + '跳上了擂台。');
+        room.item_changed(npc, true, '$N跳上了擂台。');
         npc.full();
         me.add_temp('top_c', 1, UTIL.diff_time());
         me.set_temp('biwu_fam', fam);
@@ -421,17 +421,15 @@ function challenge_over(me: USER, result: number, npc: CHARACTER) {
     me.init_pfms = USER.prototype.init_pfms;
 
     const leitai = me.environment!;
-    if (result === 0)
-        me.moveto(
-            'yz/leitai/ltx',
-            undefined,
-            me.name + '被' + npc.name + '一脚踢下了擂台。',
-            'fightend',
-        );
+    if (result === 0) {
+        me.moveto('yz/leitai/ltx', '', '', 'fightend');
+        // 多主体消息含 me + npc，item_changed 仅支持 $N 单主体，改用 send_room_others 单独发送
+        me.send_room_others('$N被$n一脚踢下了擂台。', npc);
+    }
     else if (result === 1) {
-        me.moveto('yz/leitai/ltx', undefined, me.name + '走了下来。', 'fightend');
+        me.moveto('yz/leitai/ltx', undefined, '$N走了下来。', 'fightend');
     } else {
-        me.moveto('yz/leitai/ltx', undefined, me.name + '被赶下来。', 'fightend');
+        me.moveto('yz/leitai/ltx', undefined, '$N被赶下来。', 'fightend');
     }
     leitai.items = [];
     me.clear_downside(true);

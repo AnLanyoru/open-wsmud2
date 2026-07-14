@@ -12,6 +12,7 @@ import { CHARACTER } from '../char/character.js';
 import { NPC } from '../char/npc.js';
 import type { USER } from '../char/user.js';
 import { ItemCommandsJson } from '../char/follower.js';
+import { BATCH_MODE, markRoomDirty } from '../world.js';
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -118,6 +119,16 @@ export class ROOM extends ITEM {
     _batch_has_combat: boolean = false;
     /** 动态推送延迟（毫秒），由玩家进出维护：min(16, 玩家数) */
     _batch_delay: number = 0;
+    /**
+     * 文本帧（itemadd/itemremove/移动消息）缓冲区 — 延迟到 tick flush 合并发送
+     * 存储格式：裸 WebSocket payload（已 encodeTextFrame），flush 时 Buffer.concat 合并
+     */
+    _text_batch: Buffer[] = [];
+    /**
+     * 待下发 items 列表的进入玩家 — flush 时统一调用 items_to_json() 一次，分发给所有待发玩家。
+     * 避免并发进房时每次 push 都失效缓存导致 O(N²) 重建。
+     */
+    _pending_items_send: USER[] = [];
     /** 入队时间戳（毫秒），0 表示不在 dirty 队列 */
     _batch_timestamp: number = 0;
     /** 脏数据玩家列表 — 下次 flush 时编码为 0x55 刷新帧推送给客户端 */
@@ -209,12 +220,12 @@ export class ROOM extends ITEM {
      * 玩家/物件离开房间
      * @param obj - 离开的对象
      * @param dir - 离开方向
-     * @param leave_msg - 离开消息
+     * @param leave_msg - 离开消息（$N=动作主体名字，非二进制模式服务端替换，二进制模式由 pack 转为模板 ID）
      */
     do_leave(
         obj: OBJ | CHARACTER | NPC | USER,
         dir: string,
-        leave_msg: string,
+        leave_msg?: string | number,
     ): boolean | undefined {
         if (this.on_leave(obj, dir) == false) {
             return false;
@@ -228,9 +239,9 @@ export class ROOM extends ITEM {
      * 玩家/物件进入房间
      * @param obj - 进入的对象
      * @param isshow - 是否显示
-     * @param in_msg - 进入消息
+     * @param in_msg - 进入消息（$N=动作主体名字，非二进制模式服务端替换，二进制模式由 pack 转为模板 ID）
      */
-    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg?: string): void {
+    do_enter(obj: OBJ | CHARACTER | NPC | USER, isshow: boolean, in_msg?: string | number): void {
         this.on_before_enter && this.on_before_enter(obj);
         if (obj.check_player()) {
             obj.send(this.to_json());
@@ -241,26 +252,62 @@ export class ROOM extends ITEM {
     }
 
     /**
+     * 同步模式下的广播：直接 socket.write，不经过 batch
+     * 仅在 BATCH_MODE === 0 时使用
+     */
+    private _direct_broadcast(payload: Buffer): void {
+        const items = this.items;
+        for (let i = 0; i < items.length; i++) {
+            const item: any = items[i];
+            if (!item.is_player || !item.socket || item.no_message) continue;
+            item.socket.write(payload);
+        }
+    }
+
+    /**
      * 房间内容物变更(核心方法)。处理物件进出房间的完整流程：
      * 通知房间内玩家、触发 on_enter/on_leave 回调、维护 items 数组。
      * @param obj - 变更对象
      * @param isin - true进入 false离开
-     * @param changed_msg - 变更消息(广播给房间内玩家)
+     * @param msg - 消息字符串（$N=动作主体名字）或模板 ID（pack --binary 转换后）
+     *              - 非二进制模式：string，服务端替换 $N 为 obj.name 后随 0x56 JSON 下发
+     *              - 二进制模式：number（模板 ID），0x57/0x58 帧携带 ID，客户端用 obj.name 替换 $N
+     *              - undefined：客户端本地生成（根据 HP/战斗状态）
      * @param dir - 移动方向
      */
     item_changed(
         obj: ITEM,
         isin: boolean,
-        changed_msg?: string,
+        msg?: string | number,
         dir?: string,
     ): boolean | undefined {
         if (!obj) return;
-        // 预编码 WebSocket 文本帧 — 同一 Buffer 复用给所有 socket，避免逐玩家重复 UTF-8 编码+帧分配+拷贝
-        let msgFrame: Buffer | undefined;
-        let changedFrame: Buffer | undefined;
+        const _batchMode = BATCH_MODE === 1;
+        // 广播 payload（0x57/0x58 格式，走二进制批处理帧合并发送）
+        let msgPayload: Buffer | undefined;
         let obj_index = -1,
             isshow = !obj.query_temp('hidden');
-        const MAX_TEXT = 30240; // 与 USER.send 的长度上限保持一致
+        const MAX_TEXT = 30240;
+        let _broadcastCount = 0;
+        const encodeJsonPayload = (json: string): Buffer | undefined => {
+            if (json.length >= MAX_TEXT) return undefined;
+            const jsonBuf = Buffer.from(json, 'utf8');
+            let len = jsonBuf.length;
+            const lenBytes: number[] = [];
+            while (len >= 0x80) { lenBytes.push((len & 0x7f) | 0x80); len >>>= 7; }
+            lenBytes.push(len & 0x7f);
+            const framed = Buffer.allocUnsafe(1 + lenBytes.length + jsonBuf.length);
+            framed[0] = 0x56;
+            for (let i = 0; i < lenBytes.length; i++) framed[1 + i] = lenBytes[i];
+            jsonBuf.copy(framed, 1 + lenBytes.length);
+            return framed;
+        };
+        // is_fighting 统一使用 is_fighting() 方法（检查 enemy 数组，避免 fight_type 残留）
+        const isFighting = typeof (obj as any).is_fighting === 'function' ? (obj as any).is_fighting() : false;
+        // 非二进制模式：消息字符串替换 $N 为 obj.name，拼入 itemadd/itemremove JSON
+        // 二进制模式：number = 模板 ID，由 0x57/0x58 帧携带，客户端替换 $N
+        const _msgIsTplId = typeof msg === 'number';
+        const _resolvedMsg = (msg && !_msgIsTplId) ? (msg as string).replace(/\$N/g, (obj as any).name || '') : undefined;
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item == obj) {
@@ -269,17 +316,31 @@ export class ROOM extends ITEM {
             }
             if (item.check_player() && isshow) {
                 item as USER;
-                if (!msgFrame) {
-                    const msg = this.item_json(obj, isin);
-                    if (msg.length < MAX_TEXT) msgFrame = encodeTextFrame(msg);
-                }
-                if (msgFrame) item.socket?.write(msgFrame);
-
-                if (changed_msg && item != obj && !item.query_setting('off_move')) {
-                    if (!changedFrame && changed_msg.length < MAX_TEXT) {
-                        changedFrame = encodeTextFrame(changed_msg);
+                if (!msgPayload) {
+                    if (_batchMode) {
+                        // 二进制模式：0x57/0x58 帧，携带模板 ID（number）或不携带（本地生成）
+                        const tplId = _msgIsTplId ? (msg as number) : undefined;
+                        if (isin) {
+                            // fallback JSON 传 _resolvedMsg：batch+string 模式下保留特定消息文本
+                            msgPayload = _encode_item_add_frame(obj, isFighting, tplId) || encodeJsonPayload(this.item_json(obj, true, _resolvedMsg));
+                        } else {
+                            msgPayload = _encode_item_leave_frame(obj, dir, isFighting, tplId);
+                        }
+                    } else {
+                        // 非二进制模式：0x56 JSON，itemadd/itemremove + 可选 msg 字段
+                        msgPayload = encodeJsonPayload(this.item_json(obj, isin, _resolvedMsg));
                     }
-                    if (changedFrame) item.socket?.write(changedFrame);
+                }
+                if (_batchMode) {
+                    if (msgPayload) { this._batch_all.push(msgPayload); this._batch_noncombat.push(msgPayload); _broadcastCount++; }
+                } else {
+                    // 同步模式：每个玩家直接 socket.write
+                    if (msgPayload) {
+                        const single = Buffer.concat([BATCH_MARKER, msgPayload]);
+                        const framed = encodeBinaryFrame(single);
+                        (item as USER).socket?.write(framed);
+                        _broadcastCount++;
+                    }
                 }
             } else {
                 if (obj.check_character() && item.check_character()) {
@@ -291,27 +352,55 @@ export class ROOM extends ITEM {
                 }
             }
         }
-
         if (isin) {
             obj.environment = this;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
                 this._items_json = null;
-                if (obj.check_player()) { this._batch_delay = Math.min(16, this._batch_delay + 1); obj.send(this.items_to_json()); }
-            } else if (obj.check_player()) {
-                if (!msgFrame) {
-                    const msg = this.item_json(obj as OBJ | CHARACTER | NPC, isin);
-                    msgFrame = encodeTextFrame(msg);
+                if (obj.check_player()) {
+                    if (_batchMode) {
+                        this._batch_delay = Math.min(16, this._batch_delay + 1);
+                        this._pending_items_send.push(obj as USER);
+                    } else {
+                        // 同步模式：立即调用 items_to_json() 并发送
+                        const ij = this.items_to_json();
+                        obj.send(ij);
+                    }
                 }
-                obj.socket?.write(msgFrame);
+            } else if (obj.check_player()) {
+                if (!msgPayload) {
+                    if (_batchMode) {
+                        const tplId = _msgIsTplId ? (msg as number) : undefined;
+                        if (isin) {
+                            msgPayload = _encode_item_add_frame(obj as OBJ | CHARACTER | NPC, isFighting, tplId) || encodeJsonPayload(this.item_json(obj as OBJ | CHARACTER | NPC, true, _resolvedMsg));
+                        } else {
+                            msgPayload = _encode_item_leave_frame(obj as OBJ | CHARACTER | NPC, dir, isFighting, tplId);
+                        }
+                    } else {
+                        msgPayload = encodeJsonPayload(this.item_json(obj as OBJ | CHARACTER | NPC, isin, _resolvedMsg));
+                    }
+                }
+                if (msgPayload) {
+                    const single = Buffer.concat([BATCH_MARKER, msgPayload]);
+                    const framed = encodeBinaryFrame(single);
+                    obj.socket?.write(framed);
+                }
             }
         } else if (obj_index > -1) {
             this.items.splice(obj_index, 1);
             this._items_json = null;
-            if (obj.check_player()) this._batch_delay = Math.max(0, this._batch_delay - 1);
-            // 离房时从脏数据列表移除（避免给已离开的玩家发刷新帧）
+            if (obj.check_player()) {
+                if (_batchMode) {
+                    this._batch_delay = Math.max(0, this._batch_delay - 1);
+                    const pendIdx = this._pending_items_send.indexOf(obj as USER);
+                    if (pendIdx !== -1) this._pending_items_send.splice(pendIdx, 1);
+                }
+            }
             if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
             obj.environment = undefined;
+        }
+        if (_batchMode && (_broadcastCount > 0 || this._pending_items_send.length > 0)) {
+            markRoomDirty(this);
         }
     }
 
@@ -319,8 +408,9 @@ export class ROOM extends ITEM {
      * 生成物件JSON消息
      * @param item - 物件
      * @param isin - 是否进入
+     * @param msg - 可选消息字符串（非二进制模式下，$N 已替换为 obj.name 的完整消息）
      */
-    item_json(item: ITEM, isin: boolean): string {
+    item_json(item: ITEM, isin: boolean, msg?: string): string {
         if (!item) return '';
         const str: string[] = [];
         if (isin) {
@@ -354,15 +444,34 @@ export class ROOM extends ITEM {
                 str.push('",n:"');
                 str.push(ch.name);
                 str.push('"');
+                // profile: per/gender/cl — 客户端用于生成面容/武器/衣着进入消息
+                str.push(',per:');
+                str.push(String(ch.per | 0));
+                str.push(',gender:');
+                str.push(String(ch.gender | 0));
+                str.push(',cl:');
+                str.push((ch.equipment && ch.equipment[1]) ? '1' : '0'); // EQUIP_TYPE.CLOTH = 1
                 if (ch.append_status) ch.append_status(str);
+            }
+            if (msg) {
+                str.push(',msg:"');
+                str.push(msg.replace(/"/g, '\\"'));
+                str.push('"');
             }
             str.push('}');
         } else {
             str.push('{"type":"itemremove",id:"');
             str.push(item.id);
-            str.push('"}');
+            str.push('"');
+            if (msg) {
+                str.push(',msg:"');
+                str.push(msg.replace(/"/g, '\\"'));
+                str.push('"');
+            }
+            str.push('}');
         }
-        return str.join('');
+        const _result = str.join('');
+        return _result;
     }
 
     /**
@@ -414,6 +523,13 @@ export class ROOM extends ITEM {
                     str.push('",n:"');
                     str.push(item.name);
                     str.push('"');
+                    // profile: per/gender/cl — 客户端用于生成面容/武器/衣着进入消息
+                    str.push(',per:');
+                    str.push(String(item.per | 0));
+                    str.push(',gender:');
+                    str.push(String(item.gender | 0));
+                    str.push(',cl:');
+                    str.push((item.equipment && item.equipment[1]) ? '1' : '0'); // EQUIP_TYPE.CLOTH = 1
                 }
                 str.push('},');
             }
@@ -738,6 +854,7 @@ export class ROOM extends ITEM {
         this._batch_delay = 0;
         this._batch_timestamp = 0;
         this._dirty_players = new Set();
+        this._pending_items_send = [];
 
         // —— 缓存清零 ——
         this.json = null;
@@ -920,7 +1037,7 @@ export class ROOM extends ITEM {
             const throwing = ch.throwing_name() || '';
 
             // 编码: [7B id][1B field_mask][fields...]
-            const packedId = CHARACTER._pack_id(ch.id);
+            const packedId = ch._get_packed_id();
             parts.push(packedId);
 
             const fmBuf = Buffer.alloc(1);
@@ -967,22 +1084,32 @@ export class ROOM extends ITEM {
         this._batch_has_combat = false;
         this._batch_timestamp = 0;
 
-        // 编码脏数据刷新帧，插入到 batch 首位
-        const refreshFrame = this._build_dirty_refresh_frame();
-        if (refreshFrame) {
-            all.unshift(refreshFrame);
-            noncombat.unshift(refreshFrame);
+        // 延迟分发 items 列表：此时所有进房玩家已 push 到 items 数组，
+        // items_to_json 只需重建一次，分发给本 tick 内所有进入的玩家
+        const pending = this._pending_items_send;
+        // 在清空 pending 之前构建 skipSet（这些玩家已通过 items_to_json 收到完整列表，
+        // 不应再收到 batch 中的 0x57 自进房帧，避免重复 itemadd 和看到自己的进入消息）
+        const skipSet = pending.length > 0 ? new Set(pending) : null;
+        if (pending.length > 0) {
+            const ij = this.items_to_json();
+            for (let i = 0; i < pending.length; i++) {
+                pending[i].send(ij);
+            }
+            pending.length = 0;
         }
+
+        // 编码脏数据刷新帧（不修改 all/noncombat 数组，由 _mergeBatchFrame 统一拼接）
+        const refreshFrame = this._build_dirty_refresh_frame();
         this._dirty_players.clear();
 
-        if (all.length === 0) return;
+        // 无内容可发送
+        if (all.length === 0 && !refreshFrame) return;
 
-        all.unshift(BATCH_MARKER);
-        const mergedAll = encodeBinaryFrame(Buffer.concat(all));
+        // 合并 batch 为单个 WebSocket 帧（单次分配，替代 unshift+concat+encodeBinaryFrame）
+        const mergedAll = _mergeBatchFrame(all, refreshFrame);
         let mergedNonCombat: Buffer | null = null;
-        if (hasCombat && noncombat.length > 0) {
-            noncombat.unshift(BATCH_MARKER);
-            mergedNonCombat = encodeBinaryFrame(Buffer.concat(noncombat));
+        if (hasCombat && (noncombat.length > 0 || refreshFrame)) {
+            mergedNonCombat = _mergeBatchFrame(noncombat, refreshFrame);
         }
 
         const items = this.items;
@@ -990,6 +1117,8 @@ export class ROOM extends ITEM {
             const item: any = items[i];
             if (!item.is_player || !item.socket) continue;
             if (item.no_message) continue;
+            // 跳过刚进房的玩家（他们已通过 items_to_json 收到完整列表，不应收到自己的 0x57 帧）
+            if (skipSet && skipSet.has(item)) continue;
             if (hasCombat && item.query_setting('no_combatmsg')) {
                 if (mergedNonCombat) {
                     item.socket.write(mergedNonCombat);
@@ -1291,6 +1420,186 @@ export class ROOM extends ITEM {
 }
 
 const BATCH_MARKER = Buffer.from([0xFE]);
+
+
+/**
+ * 合并 batch payloads + refreshFrame 为单个 WebSocket 帧（单次分配）
+ * 格式: [WS帧头][0xFE BATCH_MARKER][refreshFrame?][payload1][payload2]...
+ * 替代 all.unshift + Buffer.concat + encodeBinaryFrame 的多次分配
+ */
+function _mergeBatchFrame(buffers: Buffer[], refreshFrame: Buffer | null): Buffer {
+    // 计算总 payload 长度（BATCH_MARKER 1 字节 + refreshFrame + 各 payload）
+    let payloadLen = 1;
+    if (refreshFrame) payloadLen += refreshFrame.length;
+    for (let i = 0; i < buffers.length; i++) payloadLen += buffers[i].length;
+
+    // 计算 WebSocket 帧头长度（<126=2B, <65536=4B, 否则=10B）
+    let headerLen: number;
+    if (payloadLen < 126) headerLen = 2;
+    else if (payloadLen < 65536) headerLen = 4;
+    else headerLen = 10;
+
+    // 一次性分配 WS 帧（帧头 + payload）
+    const framed = Buffer.allocUnsafe(payloadLen + headerLen);
+    // 写入 WebSocket 帧头（FIN=1, opcode=2 Binary，无 mask）
+    framed[0] = 0x82;
+    if (payloadLen < 126) {
+        framed[1] = payloadLen;
+    } else if (payloadLen < 65536) {
+        framed[1] = 126;
+        framed.writeUInt16BE(payloadLen, 2);
+    } else {
+        framed[1] = 127;
+        framed.writeUInt32BE(0, 2);
+        framed.writeUInt32BE(payloadLen, 6);
+    }
+    // 写入 payload：BATCH_MARKER + refreshFrame + 各 buffer
+    let pos = headerLen;
+    framed[pos++] = 0xFE;
+    if (refreshFrame) {
+        refreshFrame.copy(framed, pos);
+        pos += refreshFrame.length;
+    }
+    for (let i = 0; i < buffers.length; i++) {
+        buffers[i].copy(framed, pos);
+        pos += buffers[i].length;
+    }
+    return framed;
+}
+
+// ============================================================
+// 二进制 op 编码：0x57 房间人员增量 / 0x58 房间人员离开
+// ============================================================
+
+/** 编码无符号 varint (LEB128) */
+function _encode_varint(value: number): Buffer {
+    const bytes: number[] = [];
+    let v = value >>> 0;
+    while (v >= 0x80) { bytes.push((v & 0x7f) | 0x80); v >>>= 7; }
+    bytes.push(v & 0x7f);
+    return Buffer.from(bytes);
+}
+
+/** 方向字符串 → 索引映射（1-20，0=无方向） */
+const DIR_INDEX: Record<string, number> = {
+    north: 1, south: 2, east: 3, west: 4,
+    northup: 5, southup: 6, eastup: 7, westup: 8,
+    northdown: 9, southdown: 10, eastdown: 11, westdown: 12,
+    northeast: 13, northwest: 14, southeast: 15, southwest: 16,
+    up: 17, down: 18, enter: 19, out: 20,
+};
+
+/**
+ * 编码 0x58 房间人员离开帧
+ * 格式: [0x58][uid 7B][dir_index 1B][flags 1B][可选: 2B tpl_id]
+ * dir_index: 0=无方向, 1-20=方向索引
+ * flags: bit0=is_fighting, bit1=has_tpl_id
+ * tpl_id: 2 字节模板 ID（pack --binary 转换后的数字，客户端用 obj.name 替换 $N）
+ */
+function _encode_item_leave_frame(obj: ITEM, dir?: string, isFighting?: boolean, tplId?: number): Buffer {
+    const uid = obj._get_packed_id();
+    const hasTplId = tplId !== undefined && tplId >= 0;
+    const totalLen = hasTplId ? 12 : 10;
+    const buf = Buffer.allocUnsafe(totalLen);
+    buf[0] = 0x58;
+    uid.copy(buf, 1);
+    buf[8] = dir ? (DIR_INDEX[dir] || 0) : 0;
+    let flags = 0;
+    if (isFighting) flags |= 0x01;
+    if (hasTplId) flags |= 0x02; // has_tpl_id
+    buf[9] = flags;
+    if (hasTplId) {
+        // 提取 pure_id（与 0x12 帧一致：idMask 已在 pack 注册时决定 fieldMask，帧内只需 pure_id 供客户端查表）
+        buf.writeUInt16BE(tplId! & 0xFFFF, 10);
+    }
+    return buf;
+}
+
+/**
+ * 编码 0x57 房间人员增量帧 — 替代 itemadd JSON
+ * 格式: [0x57][uid 7B][flags 1B][1B name_len][utf8 name][可选字段...][可选: 2B tpl_id]
+ * flags: bit0=is_player, bit1=has_status, bit2=has_combat, bit3=has_status_effects, bit4=is_fighting, bit5=has_tpl_id
+ * tpl_id: 2 字节模板 ID（pack --binary 转换后的数字，客户端用 obj.name 替换 $N）
+ * 返回 null 表示无法二进制编码（回退到 JSON 路径）
+ */
+function _encode_item_add_frame(obj: ITEM, isFighting?: boolean, tplId?: number): Buffer | null {
+    const uid = obj._get_packed_id();
+    const nameBuf = Buffer.from(obj.long_name(), 'utf8');
+    if (nameBuf.length > 255) return null; // 1B 长度限制
+
+    let flags = 0;
+    const parts: Buffer[] = [];
+
+    // name — 必有
+    const nameHdr = Buffer.allocUnsafe(1);
+    nameHdr[0] = nameBuf.length;
+    parts.push(nameHdr, nameBuf);
+
+    if (obj.is_player) flags |= 0x01;
+
+    if (obj.check_character()) {
+        const ch = obj as CHARACTER;
+        flags |= 0x02; // has_status
+        flags |= 0x04; // has_combat
+
+        // status: 4×varint (mp, hp, max_mp, max_hp)
+        parts.push(_encode_varint(ch.mp));
+        parts.push(_encode_varint(ch.hp));
+        parts.push(_encode_varint(ch.max_mp));
+        parts.push(_encode_varint(ch.max_hp));
+
+        // combat: w, c, th, n (各 1B len + utf8)
+        for (const s of [ch.weapon_name() || '', ch.call3(), ch.throwing_name() || '', ch.name]) {
+            const b = Buffer.from(s, 'utf8');
+            if (b.length > 255) return null;
+            const hdr = Buffer.allocUnsafe(1);
+            hdr[0] = b.length;
+            parts.push(hdr, b);
+        }
+
+        // status_effects (append_status)
+        if (ch.status && ch.status.length > 0) {
+            flags |= 0x08; // has_status_effects
+            const statusStrs: string[] = [];
+            ch.append_status(statusStrs);
+            let statusJson = statusStrs.join('');
+            if (statusJson.startsWith(',')) statusJson = statusJson.slice(1); // 去掉前导逗号
+            const statusBuf = Buffer.from(statusJson, 'utf8');
+            parts.push(_encode_varint(statusBuf.length), statusBuf);
+        }
+
+        // profile: per(1B) + gender(1B) + has_cloth(1B) — 客户端用于生成面容/武器/衣着进入消息
+        flags |= 0x40; // has_profile
+        const profBuf = Buffer.allocUnsafe(3);
+        profBuf[0] = Math.min(255, ch.per | 0);
+        profBuf[1] = ch.gender | 0;
+        profBuf[2] = (ch.equipment && ch.equipment[1]) ? 1 : 0; // EQUIP_TYPE.CLOTH = 1
+        parts.push(profBuf);
+    }
+
+    if (isFighting) flags |= 0x10; // is_fighting
+
+    // 模板 ID（2B，与 0x12 帧一致，客户端查找模板表并用 obj.name 替换 $N）
+    const hasTplId = tplId !== undefined && tplId >= 0;
+    if (hasTplId) {
+        flags |= 0x20; // has_tpl_id
+        const tplIdBuf = Buffer.allocUnsafe(2);
+        tplIdBuf.writeUInt16BE(tplId! & 0xFFFF, 0); // pure_id（与 0x12 帧一致）
+        parts.push(tplIdBuf);
+    }
+
+    // 组装
+    let totalLen = 1 + 7 + 1; // op + uid + flags
+    for (const p of parts) totalLen += p.length;
+    const buf = Buffer.allocUnsafe(totalLen);
+    let offset = 0;
+    buf[offset++] = 0x57;
+    uid.copy(buf, offset); offset += 7;
+    buf[offset++] = flags;
+    for (const p of parts) { p.copy(buf, offset); offset += p.length; }
+    return buf;
+}
+
 
 declare global {
     var ROOM: any;

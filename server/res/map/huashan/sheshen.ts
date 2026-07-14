@@ -19,11 +19,7 @@ export default class extends ROOM {
         if (!rm) return;
         if (this.owner) rm = rm.query_copy(this.owner) ?? rm;
 
-        me.moveto(
-            rm,
-            me.name + '心一横，双眼一闭就从山崖上跳了下去。',
-            me.name + '从山上跳了下来。',
-        );
+        me.moveto(rm, '$N心一横，双眼一闭就从山崖上跳了下去。', '$N从山上跳了下来。');
         if (me.query_skill('dodge', 0) >= 300) {
             me.notify('穿过层层云雾，你跳到一处平台上面。');
         } else {

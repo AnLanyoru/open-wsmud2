@@ -30,7 +30,7 @@ export default class extends ROOM {
         if (npc.environment && npc.environment.parent.id == 'home') return;
         if (!npc.hp) npc.hp = 1;
         if (npc.state) npc.set_state(null);
-        npc.moveto(this, npc.name + '离开了。', npc.name + '走了过来。');
+        npc.moveto(this, '$N离开了。', '$N走了过来。');
         npc.on_master_enter && npc.on_master_enter(me);
     }
 

@@ -940,8 +940,9 @@ class World {
     /** 服务器主心跳 */
     heart_beat(): void {
         let avtived_obj: USER | ROOM | null = null;
+        const t0 = Date.now();
         try {
-            const dt = Date.now();
+            const dt = t0;
             this.CONNECT_COUNT = 0;
             for (let i = 0; i < this.USERS.length; i++) {
                 avtived_obj = this.USERS[i];
@@ -1352,7 +1353,8 @@ function _nextDelay(): number {
 /** 定时器回调：flush 所有到期的房间，重新调度 */
 function _tick(): void {
     _flush_timer = null;
-    const now = Date.now();
+    const t0 = Date.now();
+    const now = t0;
     for (const r of _dirty_rooms) {
         if (now - r._batch_timestamp >= r._batch_delay) {
             r._batch_timestamp = 0;
@@ -1417,6 +1419,7 @@ export function unregisterDamageBroadcast(char: CHARACTER): void {
 /** 100ms 定时回调：遍历注册单位，构建帧并推入房间批处理缓冲区 */
 function _damage_tick(): void {
     if (_damage_broadcast_set.size === 0) return;
+    const t0 = Date.now();
     for (const char of _damage_broadcast_set) {
         // 惰性清理：无 damages 或无 environment 时注销
         if (!char.damages || !char.environment) {
@@ -1437,6 +1440,13 @@ function _damage_tick(): void {
         _damage_timer = null;
     }
 }
+
+// ============================================================
+// 批处理模式配置（1=分批默认，0=同步）— 由环境变量 BATCH_MODE 控制
+// metrics 监控代码由 pack.mjs --metrics 注入，源码不含埋点
+// ============================================================
+
+export const BATCH_MODE: number = process.env.BATCH_MODE === '0' ? 0 : 1;
 
 // ============================================================
 // 导出单例

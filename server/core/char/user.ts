@@ -380,7 +380,7 @@ export class USER extends CHARACTER {
 
         if (needEnter) {
             // 环境丢失后恢复：需要完整进入房间流程（加入items、通知其他玩家）
-            (this.environment as ROOM).do_enter(this, true, this.name + '重新连线。');
+            (this.environment as ROOM).do_enter(this, true, '$N重新连线。');
         } else {
             // 环境正常：仅刷新客户端数据
             this.send((this.environment as ROOM).to_json());
@@ -415,7 +415,7 @@ export class USER extends CHARACTER {
         const rm = this.environment;
         if (rm) {
             this.team_out('离开了游戏，自动退出队伍');
-            rm.item_changed(this, false, this.name + '离开了游戏。');
+            rm.item_changed(this, false, '$N离开了游戏。');
             this.environment = rm;
             this.clear_follow();
             this.environment.clear_copy(this);
@@ -572,7 +572,7 @@ export class USER extends CHARACTER {
         if (rm!.is_copy()) {
             let copy_room = rm!.query_copy2(this);
             if (copy_room) {
-                this.moveto(copy_room, '', this.name + '连线进入这个世界。');
+                this.moveto(copy_room, undefined, '$N连线进入这个世界。');
             } else {
                 if (this.query_temp('new')) {
                     this.set_temp('new', 1);
@@ -583,7 +583,7 @@ export class USER extends CHARACTER {
                 this.moveto(copy_room);
             }
         } else {
-            this.moveto(rm, '', this.name + '连线进入这个世界。');
+            this.moveto(rm, undefined, '$N连线进入这个世界。');
         }
         this.check_state();
         if (
@@ -1205,7 +1205,7 @@ export class USER extends CHARACTER {
     /** 回到自己的家 */
     go_home(): void {
         const my_room = this.query_home();
-        this.moveto(my_room!, this.name + '向里面走去。');
+        this.moveto(my_room!, '$N向里面走去。');
     }
 
     /**

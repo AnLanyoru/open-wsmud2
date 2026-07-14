@@ -1,8 +1,6 @@
 import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
-import { EQUIP_TYPE } from '../../../core/const.js';
 import { WORLD } from '../../../core/world.js';
-import { CHARACTER } from '../../../core/char/character.js';
 
 export default class extends COMMAND {
     command = 'go';
@@ -50,7 +48,7 @@ export default class extends COMMAND {
             if (next_room.is_copy() || next_room.no_fight)
                 return me.notify('你现在正在被追杀，不能进入安全区和副本区域。');
         }
-        me.moveto(next_room, sendOutMessage(me, dir), sendInMessage(me), dir);
+        me.moveto(next_room, undefined, undefined, dir);
     }
 }
 
@@ -102,107 +100,4 @@ for (var i = 0; i < doors.length; i++) {
         OUTER_DOORS[doors_short[i]] = doors[i];
     }
     OUTER_DOORS[doors[i]] = doors[i];
-}
-
-function sendOutMessage(player: CHARACTER, dir: string) {
-    dir = dirs[dir] || '';
-    if (player.is_fighting()) {
-        return player.name + '往' + dir + '落荒而逃了。';
-    }
-    var eq = (player.hp * 100) / player.max_hp;
-    if (eq < 5) {
-        return player.name + '撑起满是<HIR>鲜血</HIR>的躯体，一瘸一拐地朝' + dir + '挪去。';
-    } else if (eq < 10) {
-        return player.name + '一边擦着嘴角的<HIR>鲜血</HIR>，一边朝' + dir + '走去。';
-    } else if (eq < 30) {
-        return player.name + '灰头土脸、狼狈不堪地向' + dir + '离去。';
-    } else if (eq < 50) {
-        return player.name + '一声不吭的转身朝' + dir + '走去，脸色好像有些难看。';
-    }
-    return player.name + '往' + dir + '离开。';
-}
-
-function sendInMessage(player: CHARACTER, dir?: string) {
-    if (player.fight_type) {
-        return player.name + '跌跌撞撞地跑了过来，模样有些狼狈。';
-    }
-    var eq = (player.hp * 100) / player.max_hp;
-    if (eq < 5) {
-        return player.name + '撑着满是<HIR>鲜血</HIR>的躯体，一瘸一拐地挪了过来。';
-    } else if (eq < 10) {
-        return player.name + '一边擦着嘴角的<HIR>鲜血</HIR>，一边走了过来，龇牙咧嘴的。';
-    } else if (eq < 30) {
-        return player.name + '灰头土脸、狼狈不堪地走了过来。';
-    } else if (eq < 50) {
-        return player.name + '像斗败了的公鸡，垂头丧气地走了过来。';
-    }
-
-    var face = getFace(player) + '的' + player.name;
-    var weapon = player.weapon_name();
-    if (weapon) face += '手执' + weapon;
-    if (!player.get_equipment(EQUIP_TYPE.CLOTH)) {
-        //  && !player.get_equipment(EQUIP_TYPE.PANTS)
-        face += '全身清洁溜溜的';
-    }
-    return face + '走了过来。';
-}
-
-var dirs = {
-    north: '北方',
-    south: '南方',
-    east: '东方',
-    west: '西方',
-    northup: '北边',
-    southup: '南边',
-    eastup: '东边',
-    westup: '西边',
-    northdown: '北边',
-    southdown: '南边',
-    eastdown: '东边',
-    westdown: '西边',
-    northeast: '东北',
-    northwest: '西北',
-    southeast: '东南',
-    southwest: '西南',
-    up: '上面',
-    down: '下面',
-    enter: '里面',
-    out: '外面',
-};
-var face1 = [
-    '眉歪眼斜',
-    '贼眉鼠眼',
-    '尖嘴猴腮',
-    '相貌平平',
-    '膀大腰圆',
-    '一表人才',
-    '仪表堂堂',
-    '丰神如玉',
-    '气宇不凡',
-    '玉树临风',
-    '风度翩翩',
-];
-var face2 = [
-    '奇丑无比',
-    '獐头鼠目',
-    '身材干瘦',
-    '相貌平平',
-    '体态轻盈',
-    '亭亭玉立',
-    '面目姣好',
-    '容色秀丽',
-    '风情万种',
-    '清丽绝俗',
-    '美若天仙',
-];
-
-function getFace(player: CHARACTER) {
-    var v = parseInt((player.per || 20) / 4);
-    if (player.gender == 1) {
-        if (v > face1.length - 1) v = face1.length - 1;
-        return face1[v];
-    } else {
-        if (v > face2.length - 1) v = face2.length - 1;
-        return face2[v];
-    }
 }

@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 /**
- * wsmud 负载测试模拟器 v3.0
+ * wsmud 负载测试模拟器 v4.0
  *
- * 直接对接游戏服务器 WebSocket 协议，模拟真实玩家行为：
- *   1. 客户端生成 session token（AES-128-CBC，匹配服务端 USERLOGIN.check_session）
- *   2. WebSocket 连接游戏服务器
- *   3. 发送 testrole 命令一键建角
- *   4. 按频率发送真实游戏命令
- *   5. 采集 RTT / 吞吐 / 错误 / 资源 指标
+ * 持续压力测试：不断从预制流程池中随机抽取流程执行，定时采集服务端 /metrics。
+ * 客户端自身性能数据不再测量。
  *
  * 用法:
  *   1. 修改文件顶部 CONFIG 对象（服务器、玩家数、账号等）
  *   2. node tools/load-test.mjs
- *   3. 也可用 CLI 参数临时覆盖: node tools/load-test.mjs --players 100 --duration 60
+ *   3. 也可用 CLI 参数临时覆盖: node tools/load-test.mjs --players 100
  *
  * 前置条件:
  *   - 游戏服务器已启动（默认 ws://127.0.0.1:31300）
@@ -20,7 +16,6 @@
  */
 
 import { performance } from 'perf_hooks';
-import v8 from 'v8';
 import { WebSocket } from 'ws';
 import os from 'os';
 import fs from 'fs';
@@ -44,15 +39,16 @@ const FAMILY_MAP = {
 const WEAPON_TYPES = ['sword', 'blade', 'unarmed', 'staff', 'club', 'whip', 'throwing'];
 
 /**
- * 预置流程池 — 指令用 ; 分割即为多步流程，玩家随机抽取并逐步执行
+ * 预置流程池 — 指令用 ; 分割即为多步流程，玩家随机抽取并逐步执行。
+ * 走完一组自动抽下一组，永不停歇。
  */
 const COMMAND_POOL = [
-    ['jh fam 5 start;go east;go north;kill random;kill random;kill random', { weight: 5 }],
-    ['jh fam 4 start;go west;go south;go west;go west;kill random;kill random;kill random', { weight: 5 }],
-    ['jh fam 3 start;go westup;go north;go north;go east;kill random;kill random;kill random', { weight: 3 }],
-    ['jh fam 2 start;go north;go west;kill random;kill random;kill random', { weight: 2 }],
-    ['jh fam 2 start;go north;go east;kill random;kill random;kill random', { weight: 2 }],
-    ['jh fam 1 start;go west;go west;kill random;kill random;kill random', { weight: 5 }],
+    ['jh fam 5 start;go east;go north', { weight: 5 }],
+    ['jh fam 4 start;go west;go south;go west;go west', { weight: 5 }],
+    ['jh fam 3 start;go westup;go north;go north;go east', { weight: 3 }],
+    ['jh fam 2 start;go north;go west', { weight: 2 }],
+    ['jh fam 2 start;go north;go east', { weight: 2 }],
+    ['jh fam 1 start;go west;go west', { weight: 5 }],
 ];
 
 /** 加权展开：每条记录是分号分隔的步骤数组 */
@@ -84,17 +80,6 @@ function formatBytes(bytes) {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
-function formatMs(ms) {
-    if (ms < 1000) return ms.toFixed(1) + ' ms';
-    return (ms / 1000).toFixed(2) + ' s';
-}
-
-function calcPercentile(sorted, p) {
-    if (!sorted.length) return 0;
-    const idx = Math.min(sorted.length - 1, Math.floor(sorted.length * p));
-    return sorted[idx];
-}
-
 // ============================================================
 // ⚙️  配置 —— 直接改这里就能跑，无需命令行参数
 // ============================================================
@@ -104,10 +89,12 @@ const CONFIG = {
     port: 31300,           // 连网关，不直连游戏服务器
 
     // ---- 测试参数 ----
-    players: 5,           // 模拟玩家数
+    players: 1000,           // 模拟玩家数
     batchSize: 20,        // 每批并发连接数
     batchInterval: 100,   // 批次间隔（毫秒）
     stepDelay: 500,       // 流程步骤间隔（毫秒）
+    duration: 0,          // 测试持续时间（秒），0 = 持续到 Ctrl+C
+    metricsOutput: '',    // 测试结束时把 /metrics 写到该文件
 
     // ---- 账号 ----
     // 默认使用本地账号: localhost1, localhost2... 密码均为 localhost
@@ -139,7 +126,6 @@ function readEnv(key) {
         if (eqIdx === -1) continue;
         const k = trimmed.substring(0, eqIdx).trim();
         if (k !== key) continue;
-        // dotenv 不剥引号，保持一致
         return trimmed.substring(eqIdx + 1).trim();
     }
     return '';
@@ -155,15 +141,12 @@ class SessionGenerator {
      * @param {string} md5Prefix - MD5 加盐前缀
      */
     constructor(desiv, md5Prefix) {
-        // desiv 可能已经是 Buffer（从 JS config 导入）或 string（从 .env 读取）
         this.desiv = typeof desiv === 'string' ? Buffer.from(desiv, 'utf8') : desiv;
         this.md5Prefix = md5Prefix;
     }
 
     /**
      * 计算服务端 MD5(password + md5Prefix)
-     * @param {string} password - 明文密码
-     * @returns {string} 大写 MD5 十六进制
      */
     hashPassword(password) {
         return crypto.createHash('md5')
@@ -174,9 +157,6 @@ class SessionGenerator {
 
     /**
      * AES-128-CBC 加密
-     * @param {string} plaintext - 明文
-     * @param {string} key - 密钥（取前 16 字节）
-     * @returns {string} base64 密文
      */
     encrypt(plaintext, key) {
         if (key.length > 16) key = key.slice(0, 16);
@@ -191,16 +171,10 @@ class SessionGenerator {
      * 生成 session token
      * 加密格式与 api/base.js 的 encryptUser 完全一致:
      *   plaintext = id%name%pwd%timestamp%level
-     *
-     * @param {number} userId - 账号 ID
-     * @param {string} username - 用户名
-     * @param {string} password - 明文密码
-     * @param {number} level - 用户等级 (0=普通)
-     * @returns {{ sessionKey: string, cert: string }}
      */
     generateToken(userId, username, password, level = 0) {
         const pwdMD5 = this.hashPassword(password);
-        const sessionKey = crypto.randomBytes(8).toString('hex'); // 16 hex chars
+        const sessionKey = crypto.randomBytes(8).toString('hex');
         const plaintext = `${userId}%${username}%${pwdMD5}%${Date.now()}%${level}`;
         const cert = this.encrypt(plaintext, sessionKey);
         return { sessionKey, cert };
@@ -229,102 +203,24 @@ class SimPlayer {
 
         // 连接状态
         this.socket = null;
-        this.connected = false;       // WS 连接已建立
-        this.authenticated = false;   // session 验证通过
-        this.loggedIn = false;        // 角色已创建，进入游戏
-        this.loginFailed = false;     // 登录失败
+        this.connected = false;
 
-        // 统计
+        // 统计（仅操作计数，不做性能测量）
         this.commandsSent = 0;
-        this.bytesIn = 0;
-        this.bytesOut = 0;
-        this.messagesReceived = 0;
-        this.latencies = [];          // ping-pong RTT (ms)
         this.errors = 0;
-        this.connectTime = 0;         // 连接建立耗时 (ms)
-        this.loginTime = 0;           // 登录耗时 (ms)
-        this.msgLog = [];             // 5人以下时记录完整消息
-        this.flow = null;             // 当前执行的流程步骤数组
-        this.flowStep = 0;            // 当前步骤下标
+
+        // 流程状态
+        this.flow = null;
+        this.flowStep = 0;
     }
 
-    /** 获取下一步指令：流程走完返回 null，不自动抽新流程 */
+    /** 获取下一步指令：流程走完自动抽新流程，永远返回有效指令 */
     nextCommand() {
-        if (!this.flow) {
+        if (!this.flow || this.flowStep >= this.flow.length) {
             this.flow = randChoice(WEIGHTED_FLOWS);
             this.flowStep = 0;
         }
-        if (this.flowStep >= this.flow.length) return null;
         return this.flow[this.flowStep++];
-    }
-}
-
-// ============================================================
-// 性能分析器
-// ============================================================
-
-class Profiler {
-    constructor() {
-        this.startTime = performance.now();
-        this.startCpu = process.cpuUsage();
-        this.evLoopDelays = [];
-        this._timer = null;
-        this._running = false;
-    }
-
-    start() {
-        this._running = true;
-        this._timer = setInterval(() => {
-            if (!this._running) return;
-            const t0 = performance.now();
-            setImmediate(() => {
-                const delay = performance.now() - t0;
-                this.evLoopDelays.push(delay);
-                if (this.evLoopDelays.length > 1000) this.evLoopDelays.shift();
-            });
-        }, 100);
-    }
-
-    stop() {
-        this._running = false;
-        if (this._timer) { clearInterval(this._timer); this._timer = null; }
-    }
-
-    /** @returns {{ avg: number, max: number, p50: number, p95: number, p99: number }} */
-    getEvLoopStats() {
-        if (!this.evLoopDelays.length) return { avg: 0, max: 0, p50: 0, p95: 0, p99: 0 };
-        const sorted = [...this.evLoopDelays].sort((a, b) => a - b);
-        return {
-            avg: sorted.reduce((a, b) => a + b, 0) / sorted.length,
-            max: sorted[sorted.length - 1],
-            p50: calcPercentile(sorted, 0.5),
-            p95: calcPercentile(sorted, 0.95),
-            p99: calcPercentile(sorted, 0.99),
-        };
-    }
-
-    getReport() {
-        const elapsed = (performance.now() - this.startTime) / 1000;
-        const cpuTotal = process.cpuUsage(this.startCpu);
-        const mem = process.memoryUsage();
-        const safeElapsed = Math.max(elapsed, 0.001);
-        return {
-            elapsed,
-            cpu: {
-                userMs: (cpuTotal.user / 1000).toFixed(1),
-                systemMs: (cpuTotal.system / 1000).toFixed(1),
-                userPct: (cpuTotal.user / 1000 / safeElapsed * 100).toFixed(1) + '%',
-                systemPct: (cpuTotal.system / 1000 / safeElapsed * 100).toFixed(1) + '%',
-            },
-            memory: {
-                rss: formatBytes(mem.rss),
-                heapTotal: formatBytes(mem.heapTotal),
-                heapUsed: formatBytes(mem.heapUsed),
-                external: formatBytes(mem.external),
-            },
-            heapLimit: formatBytes(v8.getHeapStatistics().heap_size_limit),
-            evLoopDelay: this.getEvLoopStats(),
-        };
     }
 }
 
@@ -340,55 +236,24 @@ class LoadTestEngine {
         this.batchSize = options.batchSize || 20;
         this.stepDelay = options.stepDelay || 500;
         this.batchInterval = options.batchInterval || 100;
+        this.duration = options.duration || 0;
+        this.metricsOutput = options.metricsOutput || '';
 
-        // Session 生成器
         this.sessionGen = new SessionGenerator(options.desiv, options.md5Prefix);
 
-        this.profiler = new Profiler();
         this.players = [];
         this.running = false;
-        this._ending = false;   // 是否正在主动断开（测试结束）
+        this._ending = false;
+        this._startTime = 0;
 
-        // 实时统计
+        // 仅保留操作级统计
         this.stats = {
             connects: 0,
             connectFails: 0,
-            authOk: 0,
-            authFail: 0,
-            logins: 0,
-            loginFails: 0,
             disconnects: 0,
             totalCommands: 0,
-            totalMessages: 0,
-            totalBytesIn: 0,
-            totalBytesOut: 0,
             errors: 0,
         };
-
-        // ping 追踪
-        this._pendingPings = new Map();
-
-        // 吞吐采样：每秒记录一次
-        this._throughputSamples = [];
-        this._tpLastBytesIn = 0;
-        this._tpLastBytesOut = 0;
-        this._tpTimer = null;
-    }
-
-    _startThroughputSampler() {
-        this._tpLastBytesIn = this.stats.totalBytesIn;
-        this._tpLastBytesOut = this.stats.totalBytesOut;
-        this._tpTimer = setInterval(() => {
-            const inDelta = this.stats.totalBytesIn - this._tpLastBytesIn;
-            const outDelta = this.stats.totalBytesOut - this._tpLastBytesOut;
-            this._throughputSamples.push({ bytesIn: inDelta, bytesOut: outDelta });
-            this._tpLastBytesIn = this.stats.totalBytesIn;
-            this._tpLastBytesOut = this.stats.totalBytesOut;
-        }, 1000);
-    }
-
-    _stopThroughputSampler() {
-        if (this._tpTimer) { clearInterval(this._tpTimer); this._tpTimer = null; }
     }
 
     // ============================================================
@@ -433,20 +298,19 @@ class LoadTestEngine {
         console.log(`[配置] ${this.playerCount} 玩家, 批次=${this.batchSize}, 步骤间隔=${this.stepDelay}ms`);
         console.log(`[Session] DESIV=${this.sessionGen.desiv.length}bytes, MD5前缀=${this.sessionGen.md5Prefix}`);
 
-        this.profiler.start();
         this.running = true;
+        this._startTime = performance.now();
 
-        // ---- 第1步: 批量连接 + 认证 + 建角 ----
-        console.log(`\n[步骤1] 连接 WebSocket，认证并创建角色...`);
+        // ---- 第1步: 批量连接 + 认证 ----
+        console.log(`\n[步骤1] 连接 WebSocket 并认证...`);
         await this._batchConnect(wsUrl);
 
         const connected = this.players.filter(p => p.connected).length;
-        console.log(`\n[结果] 连接=${connected} 失败=${this.stats.connectFails}`);
+        console.log(`[结果] 连接=${connected} 失败=${this.stats.connectFails}`);
 
         if (connected === 0) {
             console.error('[错误] 无玩家成功连接，退出测试');
             this.running = false;
-            this.profiler.stop();
             return;
         }
 
@@ -459,62 +323,73 @@ class LoadTestEngine {
         }
         await new Promise(r => setTimeout(r, this.stepDelay));
 
-        // ---- 第3步: 每人抽一个流程执行 ----
-        console.log(`\n[步骤3] ${connected} 个玩家各抽取一个流程执行...`);
+        // ---- 第3步: 持续压力测试 ----
+        // 每个玩家不断从流程池抽取流程逐步执行，走完自动抽下一组
+        console.log(`\n[步骤3] 持续压力测试 — 不断抽取预制流程执行（Ctrl+C 停止）...`);
         console.log('-'.repeat(70));
 
-        this._startThroughputSampler();
-        const flowStart = performance.now();
-        let activePlayers = this.players.filter(p => p.connected && p.socket?.readyState === WebSocket.OPEN);
-        let lastPrintSec = 0;
+        const metricsUrl = `http://127.0.0.1:${this.port + 1}/metrics`;
+        let round = 0;
 
-        while (activePlayers.length > 0 && this.running) {
-            const promises = [];
-            for (const p of activePlayers) {
-                promises.push(this._sendCommand(p));
-            }
-            await Promise.allSettled(promises);
-
-            activePlayers = activePlayers.filter(p => p.flow && p.flowStep < p.flow.length);
-
-            const elapsedSec = Math.round((performance.now() - flowStart) / 1000);
-            if (elapsedSec - lastPrintSec >= 5 || activePlayers.length === 0) {
-                lastPrintSec = elapsedSec;
-                const rateSec = Math.max(1, elapsedSec);
-                console.log(
-                    `  [${elapsedSec}s] 在线:${activePlayers.length} | ` +
-                    `实时吞吐 下行 ${formatBytes(Math.round(this.stats.totalBytesIn / rateSec))}/s  ` +
-                    `上行 ${formatBytes(Math.round(this.stats.totalBytesOut / rateSec))}/s | ` +
-                    `累计 收 ${formatBytes(this.stats.totalBytesIn)} 发 ${formatBytes(this.stats.totalBytesOut)}`,
-                );
-            }
-
-            if (activePlayers.length > 0) {
-                await new Promise(r => setTimeout(r, this.stepDelay));
-            }
-        }
-
-        this._stopThroughputSampler();
-
-        // ---- 第4步: 保活等待手动停止 ----
-        console.log('\n[完成] 所有玩家流程执行完毕，连接保持中 (Ctrl+C 退出)...');
-        const keepAlive = setInterval(() => {
+        // 命令发送定时器：每步所有在线玩家各发一条指令
+        const cmdTimer = setInterval(() => {
+            round++;
             for (const p of this.players) {
                 if (p.socket?.readyState === WebSocket.OPEN) {
-                    try { p.socket.send('ping'); } catch (_) {}
+                    this._sendFlowCommand(p);
                 }
             }
-        }, 30000);
+        }, this.stepDelay);
 
+        // metrics 采集定时器：每 5 步采集一次服务端指标
+        const metricsTimer = setInterval(async () => {
+            try {
+                const m = await fetch(metricsUrl).then(r => r.json());
+                const elapsed = Math.round((performance.now() - this._startTime) / 1000);
+                const online = this.players.filter(p => p.socket?.readyState === WebSocket.OPEN).length;
+                console.log(
+                    `  [${elapsed}s 轮次:${round}] ` +
+                    `在线:${online} 房间:${m.runRooms} ` +
+                    `evP95=${m.evLoopP95}ms hb=${m.lastHbCost}ms flush=${m.lastFlushCost}ms ` +
+                    `itemBc=${m.itemChangedBroadcasts} ` +
+                    `命令:${this.stats.totalCommands} 错误:${this.stats.errors}`
+                );
+            } catch (_) { /* metrics 端点暂不可用则跳过 */ }
+        }, this.stepDelay * 5);
+
+        // 等待 Ctrl+C 或 duration 超时
         await new Promise(r => {
             const onSig = () => {
                 process.removeListener('SIGINT', onSig);
-                clearInterval(keepAlive);
+                clearInterval(cmdTimer);
+                clearInterval(metricsTimer);
                 r();
             };
             process.on('SIGINT', onSig);
+
+            if (this.duration > 0) {
+                setTimeout(() => {
+                    process.removeListener('SIGINT', onSig);
+                    clearInterval(cmdTimer);
+                    clearInterval(metricsTimer);
+                    console.log(`\n[超时] duration=${this.duration}s 已到，停止测试`);
+                    r();
+                }, this.duration * 1000);
+            }
         });
 
+        // ---- 采集最终 metrics ----
+        if (this.metricsOutput) {
+            try {
+                const m = await fetch(metricsUrl).then(r => r.json());
+                fs.writeFileSync(this.metricsOutput, JSON.stringify(m, null, 2), 'utf8');
+                console.log(`[metrics] 已保存到 ${this.metricsOutput}`);
+            } catch (e) {
+                console.error(`[metrics] 采集失败: ${e.message}`);
+            }
+        }
+
+        // ---- 断开 ----
         console.log('\n[断开] 关闭所有连接...');
         this._ending = true;
         for (const p of this.players) {
@@ -523,8 +398,6 @@ class LoadTestEngine {
             }
         }
         await new Promise(r => setTimeout(r, 500));
-
-        this.profiler.stop();
     }
 
     // ============================================================
@@ -550,7 +423,6 @@ class LoadTestEngine {
      * 连接单个玩家 — 纯发送模式，不处理服务端消息
      */
     _connectOne(wsUrl, player) {
-        const connectStart = performance.now();
         return new Promise((resolve) => {
             const timeout = setTimeout(() => {
                 this.stats.connectFails++;
@@ -564,7 +436,6 @@ class LoadTestEngine {
 
                 ws.on('open', () => {
                     player.connected = true;
-                    player.connectTime = performance.now() - connectStart;
                     this.stats.connects++;
 
                     const token = this.sessionGen.generateToken(
@@ -575,7 +446,7 @@ class LoadTestEngine {
                     resolve(true);
                 });
 
-                ws.on('message', () => {});  // 忽略消息，网关统计
+                ws.on('message', () => {});  // 忽略消息
 
                 ws.on('error', () => {
                     this.stats.errors++;
@@ -596,75 +467,26 @@ class LoadTestEngine {
         });
     }
 
-    /**
-     * 处理登录阶段的服务端消息
-     */
     // ============================================================
     // 发送命令
     // ============================================================
 
-    /** 发送并记录 */
+    /** 发送字符串到玩家 socket */
     _send(player, data) {
         player.socket.send(data);
-        if (this.playerCount <= 5) {
-            player.msgLog.push({ time: Date.now(), dir: 'send', data });
-        }
     }
 
-    async _sendCommand(player) {
+    /** 发送玩家当前流程的下一步指令（走完自动抽新流程） */
+    _sendFlowCommand(player) {
         const cmd = player.nextCommand();
-        if (!cmd) return;  // 流程已走完
         try {
-            this._send(player, cmd);
+            player.socket.send(cmd);
             player.commandsSent++;
-            const bytes = Buffer.byteLength(cmd, 'utf8');
-            player.bytesOut += bytes;
             this.stats.totalCommands++;
-            this.stats.totalBytesOut += bytes;
         } catch (_) {
             this.stats.errors++;
             player.errors++;
         }
-    }
-
-    // ============================================================
-    // 进度输出
-    // ============================================================
-
-    _printFlowProgress(remaining) {
-        const done = this.players.filter(p => p.loggedIn).length - remaining;
-        console.log(
-            `[流程] 已完成:${done} 剩余:${remaining} ` +
-            `命令:${this.stats.totalCommands} 消息:${this.stats.totalMessages} ` +
-            `收:${formatBytes(this.stats.totalBytesIn)} 发:${formatBytes(this.stats.totalBytesOut)}`,
-        );
-    }
-
-    _printProgress(elapsed) {
-        const mem = process.memoryUsage();
-        const conn = this.players.filter(p => p.connected).length;
-        const loggedIn = this.players.filter(p => p.loggedIn).length;
-
-        let rttStr = '';
-        const allLat = this.players.flatMap(p => p.latencies);
-        if (allLat.length > 0) {
-            const sorted = [...allLat].sort((a, b) => a - b);
-            const avg = (sorted.reduce((a, b) => a + b, 0) / sorted.length).toFixed(0);
-            const p99 = calcPercentile(sorted, 0.99).toFixed(0);
-            rttStr = ` RTT_avg=${avg}ms p99=${p99}ms`;
-        }
-
-        console.log(
-            `[${elapsed.toFixed(1)}s] ` +
-            `在线:${conn} 已登录:${loggedIn} ` +
-            `命令:${this.stats.totalCommands} ` +
-            `消息:${this.stats.totalMessages} ` +
-            `收:${formatBytes(this.stats.totalBytesIn)} ` +
-            `发:${formatBytes(this.stats.totalBytesOut)} ` +
-            `堆:${formatBytes(mem.heapUsed)} ` +
-            `RSS:${formatBytes(mem.rss)}` +
-            rttStr,
-        );
     }
 
     // ============================================================
@@ -688,26 +510,9 @@ class LoadTestEngine {
     }
 
     generateReport() {
-        const perfReport = this.profiler.getReport();
+        const elapsed = ((performance.now() - this._startTime) / 1000).toFixed(1);
 
-        // RTT 统计
-        const allLat = this.players.flatMap(p => p.latencies).sort((a, b) => a - b);
-        const rttStats = allLat.length > 0 ? {
-            平均延迟: calcPercentile(allLat, 0.5).toFixed(1) + 'ms',
-            P50: calcPercentile(allLat, 0.5).toFixed(1) + 'ms',
-            P95: calcPercentile(allLat, 0.95).toFixed(1) + 'ms',
-            P99: calcPercentile(allLat, 0.99).toFixed(1) + 'ms',
-            最大延迟: allLat[allLat.length - 1]?.toFixed(1) + 'ms',
-            样本数: allLat.length,
-        } : { 平均延迟: '无数据', P50: '无数据', P95: '无数据', P99: '无数据', 最大延迟: '无数据', 样本数: 0 };
-
-        // 连接耗时
-        const connectTimes = this.players.filter(p => p.connectTime > 0).map(p => p.connectTime);
-        const loginTimes = this.players.filter(p => p.loggedIn).map(p => p.loginTime);
-
-        const activePlayers = this.players.filter(p => p.loggedIn).length || 1;
-
-        // 门派分布 → 中文
+        // 门派/武器分布
         const familiesCN = {};
         const weaponsCN = {};
         for (const p of this.players) {
@@ -724,37 +529,12 @@ class LoadTestEngine {
                 步骤间隔: this.stepDelay + 'ms',
                 并发批次: this.batchSize,
             },
-            客户端性能: {
-                总耗时: perfReport.elapsed.toFixed(1) + '秒',
-                CPU用户态: perfReport.cpu.userPct,
-                CPU内核态: perfReport.cpu.systemPct,
-                物理内存RSS: perfReport.memory.rss,
-                堆内存已用: perfReport.memory.heapUsed,
-                堆内存上限: perfReport.memory.heapTotal,
-                堆内存总上限: perfReport.heapLimit,
-                事件循环延迟: {
-                    平均: perfReport.evLoopDelay.avg.toFixed(2) + 'ms',
-                    P50: perfReport.evLoopDelay.p50.toFixed(2) + 'ms',
-                    P95: perfReport.evLoopDelay.p95.toFixed(2) + 'ms',
-                    P99: perfReport.evLoopDelay.p99.toFixed(2) + 'ms',
-                    最大: perfReport.evLoopDelay.max.toFixed(2) + 'ms',
-                },
-            },
-            网络通信: {
-                往返延迟RTT: rttStats,
-                总接收数据: formatBytes(this.stats.totalBytesIn),
-                总发送数据: formatBytes(this.stats.totalBytesOut),
-                人均接收: formatBytes(this.stats.totalBytesIn / activePlayers),
-                人均发送: formatBytes(this.stats.totalBytesOut / activePlayers),
-                峰值下行速率: formatBytes(Math.max(0, ...this._throughputSamples.map(s => s.bytesIn))) + '/s',
-                峰值上行速率: formatBytes(Math.max(0, ...this._throughputSamples.map(s => s.bytesOut))) + '/s',
-                平均下行速率: formatBytes(this._throughputSamples.length
-                    ? Math.round(this._throughputSamples.reduce((a, s) => a + s.bytesIn, 0) / this._throughputSamples.length) : 0) + '/s',
-                平均上行速率: formatBytes(this._throughputSamples.length
-                    ? Math.round(this._throughputSamples.reduce((a, s) => a + s.bytesOut, 0) / this._throughputSamples.length) : 0) + '/s',
+            测试结果: {
+                总耗时: elapsed + '秒',
+                发送命令总数: this.stats.totalCommands,
+                错误次数: this.stats.errors,
             },
             连接统计: {
-                计划连接数: this.playerCount,
                 连接成功: this.stats.connects,
                 连接失败: this.stats.connectFails,
                 中途断线: this.stats.disconnects,
@@ -763,134 +543,34 @@ class LoadTestEngine {
                 门派: familiesCN,
                 武器: weaponsCN,
             },
-            活动统计: {
-                发送命令总数: this.stats.totalCommands,
-                收到消息总数: this.stats.totalMessages,
-                人均发送命令: (this.stats.totalCommands / activePlayers).toFixed(1) + '条',
-                人均收到消息: (this.stats.totalMessages / activePlayers).toFixed(1) + '条',
-                错误次数: this.stats.errors,
-            },
-            ...(this.playerCount <= 5 ? {
-                消息记录: this.players.map(p => ({
-                    玩家: p.username,
-                    门派: this._familyName(p.familyKey),
-                    武器: this._weaponName(p.weaponType),
-                    消息: p.msgLog.map(m => ({
-                        时间: new Date(m.time).toISOString().slice(11, 23),
-                        方向: m.dir === 'send' ? '发出' : '收到',
-                        内容: m.data,
-                    })),
-                })),
-            } : {}),
         };
     }
 
     printReport() {
         const r = this.generateReport();
-
-        console.log('\n' + '═'.repeat(64));
-        console.log('                  ⚔️  负载测试报告  ⚔️');
-        console.log('═'.repeat(64));
-
-        // ── 测试配置 ──
         const cfg = r.测试配置;
-        console.log('\n┌─ 测试配置 ─────────────────────────────────────────────┐');
-        console.log(`│  目标服务器:  ${cfg.目标服务器}`);
-        console.log(`│  模拟玩家:    ${cfg.模拟玩家数} 人    步骤间隔: ${cfg.步骤间隔}`);
-        console.log(`│  并发批次:    ${cfg.并发批次} 人/批`);
-        console.log('└────────────────────────────────────────────────────────┘');
-
-        // ── 连接统计 ──
+        const res = r.测试结果;
         const conn = r.连接统计;
-        const connOk = conn.连接成功;
-        const connTotal = conn.计划连接数;
-        const loginOk = conn.登录成功;
-        console.log('\n┌─ 连接结果 ─────────────────────────────────────────────┐');
-        console.log(`│  WebSocket 连接:  ${connOk}/${connTotal} 成功${conn.连接失败 > 0 ? `  (${conn.连接失败} 失败)` : '  ✅'}`,);
-        console.log(`│  Session 认证:   ${conn.认证成功} 成功 / ${conn.认证失败} 失败`);
-        console.log(`│  角色登录:       ${loginOk} 成功 / ${conn.登录失败} 失败`);
-        if (conn.中途断线 > 0) console.log(`│  中途断线:       ${conn.中途断线} 次  ⚠️`);
-        console.log(`│  平均连接耗时:   ${conn.平均连接耗时}    平均登录耗时: ${conn.平均登录耗时}`);
-        console.log('└────────────────────────────────────────────────────────┘');
+        const dist = r.玩家分布;
 
-        // ── 客户端性能 ──
-        const perf = r.客户端性能;
-        console.log('\n┌─ 压测客户端自身性能 ──────────────────────────────────┐');
-        console.log(`│  总耗时:         ${perf.总耗时}`);
-        console.log(`│  CPU 占用:       用户态 ${perf.CPU用户态}    内核态 ${perf.CPU内核态}`);
-        console.log(`│  内存:           RSS ${perf.物理内存RSS}    堆 ${perf.堆内存已用} / ${perf.堆内存上限}`);
-        const ev = perf.事件循环延迟;
-        console.log(`│  事件循环延迟:   平均 ${ev.平均}  P50 ${ev.P50}  P95 ${ev.P95}  P99 ${ev.P99}  最大 ${ev.最大}`);
-        console.log('└────────────────────────────────────────────────────────┘');
+        console.log('\n' + '═'.repeat(56));
+        console.log('               ⚔️  负载测试报告  ⚔️');
+        console.log('═'.repeat(56));
 
-        // ── 网络 ──
-        const net = r.网络通信;
-        const rtt = net.往返延迟RTT;
-        console.log('\n┌─ 网络通信 ─────────────────────────────────────────────┐');
-        if (rtt.样本数 > 0) {
-            console.log(`│  往返延迟(RTT):  平均 ${rtt.平均延迟}  P50 ${rtt.P50}  P95 ${rtt.P95}  P99 ${rtt.P99}`);
-            console.log(`│                  最大 ${rtt.最大延迟}  (${rtt.样本数} 个样本)`);
-        } else {
-            console.log(`│  往返延迟(RTT):  无数据（测试期间未收到 ping 响应）`);
-        }
-        console.log(`│  总流量:         接收 ${net.总接收数据}    发送 ${net.总发送数据}`);
-        console.log(`│  人均流量:       接收 ${net.人均接收}    发送 ${net.人均发送}`);
-        console.log(`│  峰值速率:       下行 ${net.峰值下行速率}    上行 ${net.峰值上行速率}`);
-        console.log(`│  平均速率:       下行 ${net.平均下行速率}    上行 ${net.平均上行速率}`);
-        console.log('└────────────────────────────────────────────────────────┘');
+        console.log(`\n  目标:  ${cfg.目标服务器}    玩家: ${cfg.模拟玩家数} 人`);
+        console.log(`  耗时:  ${res.总耗时}    命令: ${res.发送命令总数} 条    错误: ${res.错误次数}`);
 
-        // ── 玩家分布 ──
-        const pl = r.玩家分布;
-        const famStr = Object.entries(pl.门派).map(([k, v]) => `${k}×${v}`).join('  ');
-        const wpnStr = Object.entries(pl.武器).map(([k, v]) => `${k}×${v}`).join('  ');
-        console.log('\n┌─ 玩家分布 ─────────────────────────────────────────────┐');
-        console.log(`│  门派:  ${famStr}`);
-        console.log(`│  武器:  ${wpnStr}`);
-        console.log('└────────────────────────────────────────────────────────┘');
+        const connStr = conn.连接失败 > 0
+            ? `连接 ${conn.连接成功} / 失败 ${conn.连接失败} / 断线 ${conn.中途断线}  ⚠️`
+            : `连接 ${conn.连接成功} / 失败 ${conn.连接失败} / 断线 ${conn.中途断线}  ✅`;
+        console.log(`  ${connStr}`);
 
-        // ── 活动 ──
-        const act = r.活动统计;
-        console.log('\n┌─ 活动统计 ─────────────────────────────────────────────┐');
-        console.log(`│  发送命令:  ${act.发送命令总数} 条    收到消息: ${act.收到消息总数} 条`);
-        console.log(`│  人均命令:  ${act.人均发送命令}        人均消息: ${act.人均收到消息}`);
-        if (act.错误次数 > 0) {
-            console.log(`│  错误:      ${act.错误次数} 次  ⚠️`);
-        } else {
-            console.log(`│  错误:      ${act.错误次数} 次  ✅`);
-        }
-        console.log('└────────────────────────────────────────────────────────┘');
+        const famStr = Object.entries(dist.门派).map(([k, v]) => `${k}×${v}`).join('  ');
+        const wpnStr = Object.entries(dist.武器).map(([k, v]) => `${k}×${v}`).join('  ');
+        console.log(`  门派:  ${famStr}`);
+        console.log(`  武器:  ${wpnStr}`);
 
-        // ── 消息记录（5人以下时显示）──
-        if (r.消息记录) {
-            for (const p of r.消息记录) {
-                console.log(`\n┌─ WS消息: ${p.玩家} (${p.门派}/${p.武器}) ─${'─'.repeat(36)}┐`);
-                for (const m of p.消息) {
-                    const arrow = m.方向 === '发出' ? '→' : '←';
-                    const label = m.方向 === '发出' ? '发' : '收';
-                    console.log(`│ ${m.时间} ${arrow} [${label}] ${m.内容.slice(0, 55)}`);
-                }
-                console.log('└' + '─'.repeat(63) + '┘');
-            }
-        }
-
-        // ── 健康评估 ──
-        console.log('\n┌─ 健康评估 ─────────────────────────────────────────────┐');
-        const issues = [];
-        if (conn.连接失败 > 0) issues.push(`连接失败 ${conn.连接失败} 次`);
-        if (conn.登录失败 > 0) issues.push(`登录失败 ${conn.登录失败} 次`);
-        if (conn.中途断线 > 0) issues.push(`中途断线 ${conn.中途断线} 次`);
-        if (rtt.样本数 > 0 && parseFloat(rtt.P99) > 100) issues.push(`P99 延迟 ${rtt.P99}（偏高）`);
-
-        if (issues.length === 0) {
-            console.log('│  ✅ 所有指标正常，未发现明显问题');
-        } else {
-            for (const issue of issues) {
-                console.log(`│  ⚠️  ${issue}`);
-            }
-        }
-        console.log('└────────────────────────────────────────────────────────┘');
-
-        console.log('\n' + '═'.repeat(64));
+        console.log('\n' + '═'.repeat(56));
         return r;
     }
 }
@@ -921,29 +601,32 @@ async function main() {
 
     if (cli.help) {
         console.log(`
-wsmud 负载测试模拟器 v3.0
+wsmud 负载测试模拟器 v4.0
+
+持续压力测试：不断从预制流程池随机抽取流程执行，定时采集服务端 /metrics。
+客户端自身性能数据不再测量。
 
 用法:
   node tools/load-test.mjs                       直接跑（使用文件顶部 CONFIG）
-  node tools/load-test.mjs --players 100 --duration 60   CLI 覆盖 CONFIG
+  node tools/load-test.mjs --players 100          CLI 覆盖 CONFIG
 
 所有 CLI 参数均可覆盖文件顶部 CONFIG 对应字段:
-  --host <addr> --port <port>     服务器地址
-  --players <N> --step-delay <ms>    玩家数 & 步骤间隔
+  --host <addr> --port <port>            服务器地址
+  --players <N> --step-delay <ms>        玩家数 & 步骤间隔
   --batch-size <N> --batch-interval <ms>
+  --duration <秒>                        持续 N 秒后自动停止（默认 0 = 持续到 Ctrl+C）
+  --metrics-output <path>                测试结束时把 /metrics 写到该文件
   --account-prefix <str> --account-start <N> --account-password <pwd>
-  --accounts-file <path>          从 JSON 文件加载账号
+  --accounts-file <path>                 从 JSON 文件加载账号
   --desiv <str> --md5-prefix <str>
-  --help                          显示帮助
+  --help                                 显示帮助
 `);
         process.exit(0);
     }
 
     // ---- 合并配置: CONFIG（文件顶部）< CLI ----
-    // kebab-case (CLI) → camelCase (CONFIG) 自动映射
     const C = (cliKey, fallback) => {
         if (cli[cliKey] !== undefined) return cli[cliKey];
-        // batch-size → batchSize, account-prefix → accountPrefix
         const configKey = cliKey.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
         return CONFIG[configKey] ?? fallback;
     };
@@ -954,6 +637,8 @@ wsmud 负载测试模拟器 v3.0
     const batchSize = C('batch-size', 20);
     const batchInterval = C('batch-interval', 100);
     const stepDelay = C('step-delay', 500);
+    const duration = C('duration', 0);
+    const metricsOutput = C('metrics-output', '');
 
     // 加密参数：CLI → CONFIG → .env
     const desiv = cli.desiv || CONFIG.desiv || readEnv('DESIV');
@@ -997,7 +682,7 @@ wsmud 负载测试模拟器 v3.0
 
     // ---- 启动 ----
     console.log('╔══════════════════════════════════════════════════════════════╗');
-    console.log('║            wsmud 负载测试模拟器 v3.0                        ║');
+    console.log('║            wsmud 负载测试模拟器 v4.0                        ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
     console.log(`  系统: ${os.type()} ${os.arch()}, ${os.cpus().length} CPU, ${formatBytes(os.totalmem())} RAM`);
     console.log(`  Node: ${process.version}`);
@@ -1006,6 +691,7 @@ wsmud 负载测试模拟器 v3.0
         players: playerCount,
         host, port,
         batchSize, batchInterval, stepDelay,
+        duration, metricsOutput,
         desiv, md5Prefix,
     });
 

@@ -2,14 +2,16 @@
  * scripts/pack.mjs — 编译打包脚本
  *
  * 用法:
- *   node scripts/pack.mjs           正常编译（不打包二进制）
- *   node scripts/pack.mjs --binary  编译 + send_room → send_room_b 转换
+ *   node scripts/pack.mjs                       正常编译（不打包二进制）
+ *   node scripts/pack.mjs --binary              编译 + send_room → send_room_b 转换
+ *   node scripts/pack.mjs --binary --metrics    编译 + 二进制 + 注入 metrics HTTP 服务器
  *
  * 流程:
  *   1. tsc 编译 server/ → server/dist/
  *   2. server/dist/core/ → core/,  server/dist/res/ → res/ (保持原名)
- *   3. 若 --binary: 扫描 core/ + res/ 中的 send_room/send_combat 字面量，
- *      注册模板、替换为 _b 版本、生成客户端模板数据文件
+ *   3. 若 --metrics: 注入 metrics HTTP 服务器代码到 core/world.js
+ *   4. 若 --binary: 扫描 core/ + res/ 中的 send_room/send_combat/moveto/do_enter/do_leave/item_changed
+ *      字面量，注册模板、替换为模板 ID、生成客户端模板数据文件
  */
 
 import { execSync } from 'child_process';
@@ -21,6 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const IS_BINARY = args.includes('--binary');
+const IS_METRICS = args.includes('--metrics');
 
 const SERVER_DIR = path.join(ROOT, 'server');
 const DIST_DIR = path.join(SERVER_DIR, 'dist');
@@ -75,6 +78,190 @@ for (const entry of remainingFiles) {
 
 // 清理 dist
 fs.rmSync(DIST_DIR, { recursive: true, force: true });
+
+// ============================================================
+// Step 2.5: 注入 metrics 监控（可选，仅 --metrics 时启用）
+// 源码不含任何 metrics 代码，由 pack 注入完整的 metrics 基础设施：
+//   1. _perf 对象 + _perfTracker 导出 + getPerfMetrics() 到 world.js
+//   2. _startMetricsServer() HTTP 服务器 + 启动调用
+//   3. 关键函数埋点注入到 room.js / character.js
+// ============================================================
+
+if (IS_METRICS) {
+    console.log('[pack] Injecting metrics...');
+
+    // --- 2.5.1: 注入 metrics 基础设施到 world.js ---
+    const worldJsPath = path.join(CORE_DIR, 'world.js');
+    if (fs.existsSync(worldJsPath)) {
+        let worldJs = fs.readFileSync(worldJsPath, 'utf8');
+
+        // 在 BATCH_MODE 导出行之后注入 _perf 对象、getPerfMetrics、_startMetricsServer
+        const metricsInfraCode = `
+// ============================================================
+// metrics 基础设施 — 由 pack.mjs --metrics 注入
+// ============================================================
+const _perf = {
+    lastHbCost: 0, lastFlushCost: 0, lastDamageTickCost: 0, lastItemChangedCost: 0,
+    hbCount: 0, flushCount: 0, damageTickCount: 0,
+    itemChangedCount: 0, itemChangedBroadcasts: 0,
+    createShadowCount: 0, roomCreateCount: 0,
+    movetoCount: 0, movetoCosts: [],
+    movetoStageUs: { room_lookup: 0, shadow_check: 0, do_leave: 0, do_enter: 0, notify_follower: 0 },
+    itemJsonCount: 0, itemJsonUs: 0,
+    itemsToJsonCount: 0, itemsToJsonUs: 0,
+    toJsonCount: 0, toJsonUs: 0,
+    sendExitsCount: 0, sendExitsUs: 0,
+    socketWriteCount: 0, socketWriteUs: 0,
+    flushBatchCount: 0, flushBatchUs: 0,
+    startTime: Date.now(),
+    _evLoopCheckTime: 0, _evLoopDelays: [],
+};
+export const _perfTracker = _perf;
+
+const _evLoopSampler = setInterval(() => {
+    _perf._evLoopCheckTime = Date.now();
+    setImmediate(() => {
+        const delay = Date.now() - _perf._evLoopCheckTime;
+        _perf._evLoopDelays.push(delay);
+        if (_perf._evLoopDelays.length > 100) _perf._evLoopDelays.shift();
+    });
+}, 200);
+_evLoopSampler.unref?.();
+
+export function getPerfMetrics() {
+    const delays = _perf._evLoopDelays;
+    let p95 = 0;
+    if (delays.length) {
+        const sorted = [...delays].sort((a, b) => a - b);
+        p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
+    }
+    return {
+        ts: Date.now(),
+        uptime: Math.floor((Date.now() - _perf.startTime) / 1000),
+        onlineUsers: WORLD.CONNECT_COUNT,
+        runRooms: WORLD.RUN_ROOMS.length,
+        heartbeatInterval: WORLD.heartbeat_interval,
+        lastHbCost: _perf.lastHbCost, lastFlushCost: _perf.lastFlushCost,
+        lastDamageTickCost: _perf.lastDamageTickCost, lastItemChangedCost: _perf.lastItemChangedCost,
+        hbCount: _perf.hbCount, flushCount: _perf.flushCount, damageTickCount: _perf.damageTickCount,
+        itemChangedCount: _perf.itemChangedCount, itemChangedBroadcasts: _perf.itemChangedBroadcasts,
+        createShadowCount: _perf.createShadowCount, roomCreateCount: _perf.roomCreateCount,
+        movetoCount: _perf.movetoCount, movetoCosts: _perf.movetoCosts,
+        movetoStageUs: { ..._perf.movetoStageUs },
+        itemJsonCount: _perf.itemJsonCount, itemJsonUs: _perf.itemJsonUs,
+        itemsToJsonCount: _perf.itemsToJsonCount, itemsToJsonUs: _perf.itemsToJsonUs,
+        toJsonCount: _perf.toJsonCount, toJsonUs: _perf.toJsonUs,
+        sendExitsCount: _perf.sendExitsCount, sendExitsUs: _perf.sendExitsUs,
+        socketWriteCount: _perf.socketWriteCount, socketWriteUs: _perf.socketWriteUs,
+        flushBatchCount: _perf.flushBatchCount, flushBatchUs: _perf.flushBatchUs,
+        batchMode: BATCH_MODE,
+        memory: process.memoryUsage(),
+        evLoopP95: p95,
+    };
+}
+
+let _metricsServer = null;
+async function _startMetricsServer(port) {
+    try {
+        const http = await import('http');
+        _metricsServer = http.createServer((req, res) => {
+            if (req.url === '/metrics' || req.url === '/') {
+                res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.end(JSON.stringify(getPerfMetrics(), null, 2));
+                return;
+            }
+            res.statusCode = 404;
+            res.end('404');
+        });
+        _metricsServer.listen(port, '127.0.0.1');
+        console.log(\`[metrics] http://127.0.0.1:\${port}/metrics\`);
+    } catch (e) {
+        console.log('[metrics] 启动失败', e);
+    }
+}
+`;
+        worldJs = worldJs.replace(
+            /(export const BATCH_MODE[^;]+;)/,
+            `$1\n${metricsInfraCode}`
+        );
+
+        // 在 startup 方法中 on_startup() 调用之后注入启动调用
+        worldJs = worldJs.replace(
+            /(this\.on_startup\(\);)/,
+            `$1\n        _startMetricsServer(parseInt(String(this.SERVER.port), 10) + 1);`
+        );
+
+        fs.writeFileSync(worldJsPath, worldJs);
+        console.log('[pack]   Injected metrics infrastructure into world.js');
+    }
+
+    // --- 2.5.2: 注入埋点到 room.js ---
+    const roomJsPath = path.join(CORE_DIR, 'room', 'room.js');
+    if (fs.existsSync(roomJsPath)) {
+        let roomJs = fs.readFileSync(roomJsPath, 'utf8');
+
+        // 添加 _perfTracker import
+        roomJs = roomJs.replace(
+            /(import \{[^}]*markRoomDirty[^}]*\} from '\.\.\/world\.js';)/,
+            `$1\nimport { _perfTracker } from '../world.js';`
+        );
+
+        // item_changed: 在 _batchMode 声明后插入计时
+        roomJs = roomJs.replace(
+            /(const _batchMode = BATCH_MODE === 1;)/,
+            `$1\n        const _t0 = Date.now();`
+        );
+
+        // item_changed 结尾: 在方法末尾（markRoomDirty if 块之后）插入埋点
+        roomJs = roomJs.replace(
+            /(markRoomDirty\(this\);\n        \}\n)(    \})/,
+            `$1        const _cost = Date.now() - _t0;\n        if (_cost > 5 || _broadcastCount > 10) {\n            _perfTracker.lastItemChangedCost = _cost;\n            _perfTracker.itemChangedCount++;\n            _perfTracker.itemChangedBroadcasts += _broadcastCount;\n        }\n$2`
+        );
+
+        // _flush_batch: 在方法开头插入计时，在方法结尾插入埋点
+        roomJs = roomJs.replace(
+            /(_flush_batch\(\) \{)/,
+            `$1\n        const _t0 = Date.now();`
+        );
+
+        // create_shadow: 插入计数
+        roomJs = roomJs.replace(
+            /(create_shadow\(\) \{[\s\S]*?)(return shadow;)/,
+            `$1        _perfTracker.createShadowCount++;\n        $2`
+        );
+
+        // ROOM.CREATE: 插入计数
+        roomJs = roomJs.replace(
+            /(room\.create\(path\);\n)(\s+return room;)/,
+            `$1        _perfTracker.roomCreateCount++;\n$2`
+        );
+
+        fs.writeFileSync(roomJsPath, roomJs);
+        console.log('[pack]   Injected metrics probes into room.js');
+    }
+
+    // --- 2.5.3: 注入埋点到 character.js ---
+    const charJsPath = path.join(CORE_DIR, 'char', 'character.js');
+    if (fs.existsSync(charJsPath)) {
+        let charJs = fs.readFileSync(charJsPath, 'utf8');
+
+        // 添加 _perfTracker import
+        charJs = charJs.replace(
+            /(import \{[^}]*markRoomDirty[^}]*\} from '\.\.\/world\.js';)/,
+            `$1\nimport { _perfTracker } from '../world.js';`
+        );
+
+        // moveto: 在方法开头插入计数
+        charJs = charJs.replace(
+            /(moveto\(rm, leave_msg, in_msg, dir\) \{)/,
+            `$1\n        _perfTracker.movetoCount++;`
+        );
+
+        fs.writeFileSync(charJsPath, charJs);
+        console.log('[pack]   Injected metrics probes into character.js');
+    }
+}
 
 // ============================================================
 // Step 3: If --binary, transform send_room → send_room_b
@@ -324,6 +511,67 @@ if (IS_BINARY) {
     collectContextStrs(CORE_DIR);
     collectContextStrs(RES_DIR);
     console.log(`[pack]   Found ${ctxStrCount} context strings (total: ${templateMap.size})`);
+
+    // ============================================================
+    // Pass 1.6: 收集 moveto/do_enter/do_leave/item_changed 中的消息字符串
+    // 这些字符串用 $N 标记动作主体名字，注册到 templateMap 复用 $N 机制
+    // ============================================================
+
+    /** 匹配 .moveto( / .do_enter( / .do_leave( / .item_changed( 调用中的字符串字面量参数 */
+    const MOVE_CALL_RE = /\.(?:moveto|do_enter|do_leave|item_changed)\s*\(/g;
+    const STR_ARG_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1/g;
+    /** Pass 1.6 注册的移动消息字符串集合 — Pass 3 仅替换这些字符串，避免误替换 dir 参数 */
+    const moveStrSet = new Set();
+
+    console.log('[pack]   Pass 1.6: scanning moveto/do_enter/do_leave/item_changed strings...');
+    let moveStrCount = 0;
+
+    function collectMoveStrs(dir) {
+        if (!fs.existsSync(dir)) return;
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const full = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                collectMoveStrs(full);
+            } else if (entry.name.endsWith('.js')) {
+                const content = fs.readFileSync(full, 'utf8');
+                let m;
+                MOVE_CALL_RE.lastIndex = 0;
+                while ((m = MOVE_CALL_RE.exec(content)) !== null) {
+                    // 从调用起始位置开始，追踪括号深度找到调用结束
+                    const callStart = m.index + m[0].length - 1; // 指向 '('
+                    let depth = 1;
+                    let pos = callStart + 1;
+                    while (pos < content.length && depth > 0) {
+                        if (content[pos] === '(') depth++;
+                        else if (content[pos] === ')') depth--;
+                        if (depth === 0) break;
+                        pos++;
+                    }
+                    if (depth !== 0) continue;
+                    const callBody = content.slice(callStart + 1, pos);
+                    // 收集调用体中的所有字符串字面量
+                    STR_ARG_RE.lastIndex = 0;
+                    let sm;
+                    while ((sm = STR_ARG_RE.exec(callBody)) !== null) {
+                        const literal = unescapeJS(sm[2], sm[1]);
+                        // 仅注册包含 $N 或中文字符的消息字符串，排除 dir 参数（纯 ASCII 标识符如 'goto'、'east'）
+                        if (literal.length > 0 && (literal.includes('$N') || /[\u4e00-\u9fff]/.test(literal))) {
+                            if (!templateMap.has(literal)) {
+                                registerTemplate(literal);
+                                moveStrCount++;
+                            }
+                            moveStrSet.add(literal);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    collectMoveStrs(CORE_DIR);
+    collectMoveStrs(RES_DIR);
+    console.log(`[pack]   Found ${moveStrCount} move message strings (total: ${templateMap.size})`);
 
     // ============================================================
     // Pass 2: 扫描 _tmpl('...') 标记 — 替换为模板 ID
@@ -589,6 +837,37 @@ ${serverLines.join('\n')}
                     return _;
                 });
 
+                // 7) moveto/do_enter/do_leave/item_changed 调用中的字符串参数 → 模板 ID
+                //    仅替换 moveStrSet 中的消息字符串，避免误替换 dir 参数
+                const MOVE_RE = /\.(?:moveto|do_enter|do_leave|item_changed)\s*\(/g;
+                let moveMatch;
+                while ((moveMatch = MOVE_RE.exec(content)) !== null) {
+                    const callStart = moveMatch.index + moveMatch[0].length - 1; // 指向 '('
+                    let depth = 1;
+                    let pos = callStart + 1;
+                    while (pos < content.length && depth > 0) {
+                        if (content[pos] === '(') depth++;
+                        else if (content[pos] === ')') depth--;
+                        if (depth === 0) break;
+                        pos++;
+                    }
+                    if (depth !== 0) continue;
+                    const callBody = content.slice(callStart + 1, pos);
+                    // 仅替换 moveStrSet 中的字符串字面量（消息字符串），保留 dir 参数
+                    const newBody = callBody.replace(STR_RE, (_, quote, rawStr) => {
+                        const literal = unescapeJS(rawStr, quote);
+                        if (moveStrSet.has(literal)) {
+                            return String(templateMap.get(literal));
+                        }
+                        return _;
+                    });
+                    if (newBody !== callBody) {
+                        content = content.slice(0, callStart + 1) + newBody + content.slice(pos);
+                        // 调整 regex 位置（内容长度可能变化）
+                        MOVE_RE.lastIndex = callStart + 1 + newBody.length + 1;
+                    }
+                }
+
                 if (content !== preContent) changed = true;
 
                 if (changed) {
@@ -723,4 +1002,7 @@ ${serverLines.join('\n')}
     }
 }
 
-console.log(`[pack] Done. Mode: ${IS_BINARY ? 'binary' : 'normal'}`);
+const modeParts = [];
+if (IS_BINARY) modeParts.push('binary');
+if (IS_METRICS) modeParts.push('metrics');
+console.log(`[pack] Done. Mode: ${modeParts.length ? modeParts.join('+') : 'normal'}`);

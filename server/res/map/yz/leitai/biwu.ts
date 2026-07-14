@@ -79,11 +79,11 @@ function arenaDieHandle(this: CHARACTER, killer?: CHARACTER) {
 
     // 5秒后双双返回入场房间
     this.call_out(function () {
-        loser.moveto(loser.query_temp('enter_room'), undefined, loser.name + '走了进来。', 'out');
+        loser.moveto(loser.query_temp('enter_room'), undefined, '$N走了进来。', 'out');
         winner.moveto(
             winner.query_temp('enter_room'),
             undefined,
-            winner.name + '走了进来。',
+            '$N走了进来。',
             'out',
         );
     }, 5000);

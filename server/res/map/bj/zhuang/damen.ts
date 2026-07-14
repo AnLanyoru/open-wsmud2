@@ -23,7 +23,7 @@ export default class extends ROOM {
             me.send_room(
                 '$N在墙前站定,深吸一口气，猛然跃起。\n只见$N足尖在墙上一点,已悠然飘落院中！',
             );
-            me.moveto('bj/zhuang/dayuan', '', me.name + '跳了进来。');
+            me.moveto('bj/zhuang/dayuan', '', '$N跳了进来。');
         } else {
             me.send_room('$N在墙前站定,深吸一口气，猛然跃起，可还差一大截呢,看来是轻功不够好。');
         }

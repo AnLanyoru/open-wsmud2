@@ -4,7 +4,7 @@
 
 import { BASE } from './base.js';
 
-import { UTIL } from './util.js';
+import { UTIL, ID_CHARS } from './util.js';
 
 import type { ROOM } from './room/room.js';
 import type { ActionDef, ActionMap } from '../types/base.js';
@@ -433,11 +433,39 @@ export class ITEM extends BASE {
 
     // ============ ID / 缓存 ============
 
+    /** 7B ID 编码缓存（lazy，首次调用 _get_packed_id 时初始化） */
+    _packed_id_buf: Buffer | null = null;
+
     /**
      * 创建对象 ID
      */
     create_id(): void {
-        this.id = (UTIL as { create_id(): string }).create_id();
+        this.id = UTIL.create_id();
+        this._packed_id_buf = null;
+    }
+
+    /**
+     * 将自身 id 编码为固定 7 字节 Buffer（lazy 缓存）
+     * 用于二进制帧 0x53/0x54/0x55/0x57/0x58 的 uid 字段
+     * ID 在 create_id()/loadData 时设置一次后不可变，缓存安全
+     */
+    _get_packed_id(): Buffer {
+        let buf = this._packed_id_buf;
+        if (buf === null) {
+            const id = this.id;
+            buf = Buffer.alloc(7);
+            // 前 4 字符 → 6-bit 索引打包为 24-bit BE
+            let packed = 0;
+            for (let i = 0; i < 4; i++) {
+                packed = (packed << 6) | ID_CHARS.indexOf(id[i]);
+            }
+            buf[0] = (packed >> 16) & 0xFF;
+            buf[1] = (packed >> 8) & 0xFF;
+            buf[2] = packed & 0xFF;
+            buf.writeInt32BE(parseInt(id.slice(4), 16) || 0, 3);
+            this._packed_id_buf = buf;
+        }
+        return buf;
     }
 
     /**

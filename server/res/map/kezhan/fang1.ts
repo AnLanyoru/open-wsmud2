@@ -39,7 +39,7 @@ export default class extends ROOM {
 
 function check_moveout(me) {
     if (!me.query_temp('kezhan')) {
-        me.moveto('yz/kedian', null, me.name + '走了下来。');
+        me.moveto('yz/kedian', undefined, '$N走了下来。');
         me.send_room('店小二对$N说道：这位客官，你需要付钱才可以继续住店。');
         return false;
     }

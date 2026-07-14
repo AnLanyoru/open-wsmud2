@@ -14,7 +14,7 @@ export default class extends COMMAND {
         home: function (me: USER) {
             let home = me.query_temp('home');
             if (!home) {
-                me.moveto('yz/home', me.name + '离开了。', me.name + '走了过来。', 'goto');
+                me.moveto('yz/home', '$N离开了。', '$N走了过来。', 'goto');
                 me.notify('你还没购买房屋，和管家谈谈购买吧。');
             } else {
                 me.go_home();
@@ -30,7 +30,7 @@ export default class extends COMMAND {
         bp: function (me: USER) {
             let home = me.query_temp('pt');
             if (!home) {
-                me.moveto('yz/banghui', me.name + '离开了。', me.name + '走了过来。', 'goto');
+                me.moveto('yz/banghui', '$N离开了。', '$N走了过来。', 'goto');
                 me.notify('你还加入任何帮会，先和帮会管理员聊聊吧。');
             } else {
                 let rm = WORLD.getRoom('banghui/yuanzi');
@@ -39,7 +39,7 @@ export default class extends COMMAND {
                 if (!my_room) {
                     my_room = rm.create_copy2(me);
                 }
-                me.moveto(my_room, me.name + '离开了。', me.name + '走了进来。', 'goto');
+                me.moveto(my_room, '$N离开了。', '$N走了进来。', 'goto');
             }
             return true;
         },
@@ -51,7 +51,7 @@ export default class extends COMMAND {
             if (!area) return me.notify_fail('你无门无派，不知道师父在哪里。');
             let room_path = find_room(area, master);
             if (!room_path) return me.notify_fail('你的师父现在不在' + area.name + '。');
-            me.moveto(room_path, me.name + '离开了。', me.name + '走了进来。');
+            me.moveto(room_path, '$N离开了。', '$N走了进来。');
             // WORLD.COMMANDS.get('cha')!.render_skill(me,);
             return true;
         },
@@ -66,7 +66,7 @@ export default class extends COMMAND {
             let room_path = find_room(area, 'pub/mpguanli#' + family.id);
             if (!room_path) return me.notify_fail('门派管理不知道跑哪里去了。');
 
-            me.moveto(room_path, me.name + '离开了。', me.name + '走了进来。', 'goto');
+            me.moveto(room_path, '$N离开了。', '$N走了进来。', 'goto');
             return true;
         },
 
@@ -81,7 +81,7 @@ export default class extends COMMAND {
             if (!room) return me.send('门派战争已经结束了。');
             if (me.level < 1 && me.exp < 1000000)
                 return me.send('那里正在进行门派战争，你实力不够还是不要掺和了。');
-            me.moveto(room, me.name + '离开了。', me.name + '走了进来。', 'goto');
+            me.moveto(room, '$N离开了。', '$N走了进来。', 'goto');
             return true;
         },
 
@@ -99,8 +99,8 @@ export default class extends COMMAND {
             }
             me.moveto(
                 pt.get_room(WORLD.getRoom(fam.area?.first)),
-                me.name + '走了。',
-                me.name + '来了。',
+                '$N走了。',
+                '$N来了。',
                 'goto',
             );
             me.notify('<cyn>你已进入帮派战区域，本周已参与' + count + '/7次。</cyn>');
@@ -109,15 +109,15 @@ export default class extends COMMAND {
 
         wd1: function (me) {
             let level = me.query_temp('wd_level', 0);
-            if (level < 99) me.moveto('wudao/ta', me.name + '走了。', null, 'goto');
-            else me.moveto('wudao/ta2', me.name + '走了。', null, 'goto');
+            if (level < 99) me.moveto('wudao/ta', '$N走了。', '', 'goto');
+            else me.moveto('wudao/ta2', '$N走了。', '', 'goto');
 
             return true;
         },
 
         wd2: function (me) {
             if (me.query_temp('wd_level', 0) < 99) return me.send('你要去哪里？');
-            me.moveto('wudao/ding', me.name + '走了。', null, 'goto');
+            me.moveto('wudao/ding', '$N走了。', '', 'goto');
             return true;
         },
 
