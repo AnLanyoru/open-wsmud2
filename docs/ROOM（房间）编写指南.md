@@ -1495,7 +1495,7 @@ on_leave(me: CHARACTER, dir: string) {
 
 服务器支持运行时热更新房间文件（不重启服务器）。更新后，现有玩家会被迁移到新房间对象，保持其状态。`update()` 方法处理此流程。
 
-### 14.13 OBJECT 和 CHARACTER 的 `is` 方法
+### 14.13 OBJ 和 CHARACTER 的 `is` 方法
 
 `ITEM.is()` 方法可用于按路径比较对象：
 
