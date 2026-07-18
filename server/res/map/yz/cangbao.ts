@@ -10,5 +10,6 @@ export default class extends ROOM {
     constructor() {
         super();
         this.set_npc('pub/paimai');
+        this.set_npc('pub/zi');
     }
 }
