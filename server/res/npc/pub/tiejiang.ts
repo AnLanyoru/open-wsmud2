@@ -5,6 +5,7 @@ import { UTIL } from '../../../core/util/util.js';
 import { EQUIP_TYPE, WEAPON_TYPE } from '../../../core/const.js';
 import DuanZaoCommand from '../../cmd/obj/duanzao.js';
 import type { USER } from '../../../core/char/user.js';
+import { EQUIPMENT } from '../../../core/item/equipment.js';
 
 export default class extends NPC {
     name = '铁匠';
@@ -115,7 +116,7 @@ export default class extends NPC {
         }
         me.wait_input = undefined;
         if (me.remove_obj(item, 10)) {
-            var obj = OBJ.CREATE('eq/cp#' + arg);
+            var obj = OBJ.CREATE('eq/cp#' + arg) as EQUIPMENT;
             obj.set_temp('name', str);
 
             let duanzao_command = WORLD.COMMANDS.get('duanzao') as DuanZaoCommand | undefined;
