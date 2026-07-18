@@ -78,21 +78,21 @@ export default class extends NPC {
         }
     }
 
-    dzwq(arg, me, str) {
+    dzwq(arg: string, me: USER, str: string) {
         if (str == 'cancle') {
             me.notify('铁匠说道：好吧，可惜了。');
-            me.wait_input = null;
+            me.wait_input = undefined;
             me.remove_temp('dz');
             return;
         }
         str = str.split(' ')[1];
         if (!arg) {
-            me.wait_input = null;
+            me.wait_input = undefined;
             return me.notify('铁匠说道：你要先告诉我锻造的武器类型。');
         }
         var type = WEAPON_TYPE[arg.toUpperCase()];
         if (!type) {
-            me.wait_input = null;
+            me.wait_input = undefined;
             return me.notify('铁匠摇头道：我不会锻造这种武器。');
         }
         if (!/^[\u4E00-\u9FA5]{2,5}$/.test(str)) {
@@ -110,10 +110,10 @@ export default class extends NPC {
 
         var item = me.find_obj_bypath('st/yuanjing');
         if (!item || item.count < 10) {
-            me.wait_input = null;
+            me.wait_input = undefined;
             return me.notify('铁匠说道：材料不够就别来烦我。');
         }
-        me.wait_input = null;
+        me.wait_input = undefined;
         if (me.remove_obj(item, 10)) {
             var obj = OBJ.CREATE('eq/cp#' + arg);
             obj.set_temp('name', str);
