@@ -800,10 +800,11 @@ export function ProcessBinary(data) {
                     if (excludeSelf && aId === Process.player) break;
                     if (aId === Process.player && Setting.no_mcmsg) break;
                     // 视角转换：玩家是 A 或 T 时替换名字为"你"
+                    // 注意：名字为空字符串时禁止 split('')，否则会把每个字符之间都插入"你"
                     const aName = (fieldMask & 0x01) ? sparse[popcntBelow(fieldMask, 0x01)] : '';
                     const tName = (fieldMask & 0x20) ? sparse[popcntBelow(fieldMask, 0x20)] : '';
-                    if (aId && aId === Process.player) text = text.split(aName).join('你');
-                    if (tId && tId === Process.player) text = text.split(tName).join('你');
+                    if (aId && aId === Process.player && aName) text = text.split(aName).join('你');
+                    if (tId && tId === Process.player && tName) text = text.split(tName).join('你');
                     if (Setting.show_binary) {
                         // 调试输出：字段值来自 cur_room.items 缓存（非帧内下发），帧仅携带 idMask + 7B ID
                         const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'T_WEAPON', 'A_THROW', 'T_NAME', '(reserved)', 'T_CALL3'];
