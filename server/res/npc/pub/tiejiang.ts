@@ -34,10 +34,6 @@ export default class extends NPC {
             WORLD.COMMANDS.get('unjinglian')!.enter(me);
         });
         this.add_action('dz', '锻造武器', function (me, arg) {
-            // me.send_commands('dz1 ' + this.id, "锻造武器",
-            //     'dz2 ' + this.id, "重铸武器",
-            //     'dz3 ' + this.id, "武器改名",
-            //     'dz4 ' + this.id, "更改武器类型");
             WORLD.COMMANDS.get('duanzao')!.enter(me);
         });
     }
