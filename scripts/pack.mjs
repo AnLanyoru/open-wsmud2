@@ -155,6 +155,7 @@ export function getPerfMetrics() {
         socketWriteCount: _perf.socketWriteCount, socketWriteUs: _perf.socketWriteUs,
         flushBatchCount: _perf.flushBatchCount, flushBatchUs: _perf.flushBatchUs,
         batchMode: BATCH_MODE,
+        wsBatchMode: WS_BATCH_MODE,
         memory: process.memoryUsage(),
         evLoopP95: p95,
     };

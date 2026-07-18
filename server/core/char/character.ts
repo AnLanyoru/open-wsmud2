@@ -5,7 +5,7 @@
 import { ITEM } from '../item.js';
 import { OBJ } from '../item/obj.js';
 import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
-import { WORLD } from '../world.js';
+import { WORLD, BATCH_MODE } from '../world.js';
 import { UTIL, ID_CHARS } from '../util.js';
 import {
     WEAPON_TYPE,
@@ -35,7 +35,7 @@ import type { GameSocket } from '../world.js';
 import type { COMMAND } from '../command.js';
 import type { UserState } from './user.js';
 import { BASE } from '../base.js';
-import { encodeBinaryFrame } from '../net-ws.js';
+import { encodeBinaryFrame, encodeTextFrame } from '../net-ws.js';
 import { markRoomDirty, flushRoomNow, registerDamageBroadcast, unregisterDamageBroadcast } from '../world.js';
 import { SkillsMap } from './skills_map.js';
 import type { PropMap } from '../../types/props.js';
@@ -944,11 +944,25 @@ export class CHARACTER extends ITEM {
     }
 
     /**
-     * 结束绝招同步帧 — 立刻 flush 房间 batch，确保绝招消息无延迟送达所有人。
+     * 结束绝招同步帧 — 立刻 flush 房间 batch，确保绝招消息无延迟送达。
+     * 仅在绝招成功释放时调用（use_pfm 返回 true 路径），失败分支不调用。
+     * 绝招最小使用间隔 500ms，flush 频率上限 = 1/500ms = 2/秒，不影响 16ms 推送架构。
      */
     end_burst(): void {
         const room = this.environment as ROOM;
-        if (!room || room._batch_all.length === 0) return;
+        if (!room) return;
+        // batch 帧或任一玩家 _notify_buffer 有内容时才 flush（覆盖纯文本型绝招）
+        if (room._batch_all.length === 0) {
+            const items = room.items;
+            let hasNotify = false;
+            for (let i = 0; i < items.length; i++) {
+                const it: any = items[i];
+                if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0) {
+                    hasNotify = true; break;
+                }
+            }
+            if (!hasNotify) return;
+        }
         flushRoomNow(room);
     }
 
@@ -962,14 +976,31 @@ export class CHARACTER extends ITEM {
             markRoomDirty(room);
             return;
         }
-        for (let i = 0; i < list.length; i++) {
-            const item: any = list[i];
-            if (!item.is_player) continue;
-            if (item === this || item === target) {
-                if (!item.query_setting('no_mcmsg'))
+        // 文本路径：batch 模式编码一次推送各玩家 _notify_buffer，同步模式逐个发送
+        if (BATCH_MODE === 1) {
+            const room = this.environment as ROOM;
+            const frame = encodeTextFrame(payload);
+            for (let i = 0; i < list.length; i++) {
+                const item: any = list[i];
+                if (!item.is_player || !item.socket || item.is_faint) continue;
+                if (item === this || item === target) {
+                    if (!item.query_setting('no_mcmsg'))
+                        item._notify_buffer.push(frame);
+                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
+                    item._notify_buffer.push(frame);
+                }
+            }
+            markRoomDirty(room);
+        } else {
+            for (let i = 0; i < list.length; i++) {
+                const item: any = list[i];
+                if (!item.is_player) continue;
+                if (item === this || item === target) {
+                    if (!item.query_setting('no_mcmsg'))
+                        item.notify(payload);
+                } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
                     item.notify(payload);
-            } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                item.notify(payload);
+                }
             }
         }
     }
@@ -989,13 +1020,29 @@ export class CHARACTER extends ITEM {
             markRoomDirty(room);
             return;
         }
-        for (let i = 0; i < list.length; i++) {
-            if (!list[i].is_player) continue;
-            if (list[i] === this) {
-                if (!excludeself)
+        // 文本路径：batch 模式编码一次推送各玩家 _notify_buffer，同步模式逐个发送
+        if (BATCH_MODE === 1) {
+            const room = this.environment as ROOM;
+            const frame = encodeTextFrame(payload);
+            for (let i = 0; i < list.length; i++) {
+                const item: any = list[i];
+                if (!item.is_player || !item.socket || item.is_faint) continue;
+                if (item === this) {
+                    if (!excludeself) item._notify_buffer.push(frame);
+                } else if (!item.no_message) {
+                    item._notify_buffer.push(frame);
+                }
+            }
+            markRoomDirty(room);
+        } else {
+            for (let i = 0; i < list.length; i++) {
+                if (!list[i].is_player) continue;
+                if (list[i] === this) {
+                    if (!excludeself)
+                        list[i].notify(payload);
+                } else if (!list[i].no_message) {
                     list[i].notify(payload);
-            } else if (!list[i].no_message) {
-                list[i].notify(payload);
+                }
             }
         }
     }
@@ -1132,13 +1179,11 @@ export class CHARACTER extends ITEM {
     /**
      * 执行命令字符串（解析并分发）
      *
-     * 玩家指令即时反馈：指令执行后立刻 flush 房间 batch，不等 0-16ms 延迟。
-     * perform 命令已内置 begin_burst/end_burst（use_pfm 中），跳过。
+     * 房间消息统一走 16ms 定时器推送，不在命令末尾立即 flush。
      */
     command(req: string): void {
         if (this.wait_input) {
             this.wait_input.apply(this, [this, req]);
-            this._flush_cmd_batch();
             return;
         }
         let cmd = '';
@@ -1157,19 +1202,11 @@ export class CHARACTER extends ITEM {
         }
         if (!cmd) cmd = req;
         this.do_command(cmd, pars);
-        // perform 命令已内置 begin_burst/end_burst，跳过
-        if (cmd !== 'perform') {
-            this._flush_cmd_batch();
-        }
     }
 
-    /** 玩家指令执行后立刻 flush 房间 batch，提供即时反馈 */
+    /** @deprecated 房间消息统一走 16ms 定时器推送，不再立即 flush */
     private _flush_cmd_batch(): void {
-        const room = this.environment;
-        if (!room) return;
-        // batch 为空且无脏玩家时跳过，避免无意义 flush
-        if (room._batch_all.length === 0 && room._dirty_players.size === 0) return;
-        flushRoomNow(room);
+        // no-op: 保留空函数体避免子类调用断裂
     }
 
     /**
@@ -3750,10 +3787,13 @@ export class CHARACTER extends ITEM {
      */
     use_pfm(target: CHARACTER, pfm: PERFORM, level: number, sktype: string): boolean {
         if (!pfm) return false;
-        let isrelease = this.check_pfm_use(target, pfm, level, sktype);
+        const isrelease = this.check_pfm_use(target, pfm, level, sktype);
         if (isrelease !== false) {
             this.add_mp(-(pfm.query_mp(this, level) || 0));
             this.set_temp('used_pfm', pfm.id, 20000);
+            // 绝招成功释放：立即 flush 房间 batch，确保绝招特效无延迟送达。
+            // 失败分支（isrelease === false）不调用，避免绕过 16ms 推送。
+            this.end_burst();
             return true;
         }
         return false;

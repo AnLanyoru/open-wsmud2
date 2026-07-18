@@ -117,8 +117,8 @@ export class ROOM extends ITEM {
     _batch_noncombat: Buffer[] = [];
     /** 批次中是否包含战斗消息 */
     _batch_has_combat: boolean = false;
-    /** 动态推送延迟（毫秒），由玩家进出维护：min(16, 玩家数) */
-    _batch_delay: number = 0;
+    /** 固定 16ms 推送周期，对齐浏览器 60Hz 渲染帧 */
+    _batch_delay: number = 16;
     /**
      * 文本帧（itemadd/itemremove/移动消息）缓冲区 — 延迟到 tick flush 合并发送
      * 存储格式：裸 WebSocket payload（已 encodeTextFrame），flush 时 Buffer.concat 合并
@@ -359,7 +359,6 @@ export class ROOM extends ITEM {
                 this._items_json = null;
                 if (obj.check_player()) {
                     if (_batchMode) {
-                        this._batch_delay = Math.min(16, this._batch_delay + 1);
                         this._pending_items_send.push(obj as USER);
                     } else {
                         // 同步模式：立即调用 items_to_json() 并发送
@@ -391,9 +390,14 @@ export class ROOM extends ITEM {
             this._items_json = null;
             if (obj.check_player()) {
                 if (_batchMode) {
-                    this._batch_delay = Math.max(0, this._batch_delay - 1);
                     const pendIdx = this._pending_items_send.indexOf(obj as USER);
                     if (pendIdx !== -1) this._pending_items_send.splice(pendIdx, 1);
+                    // 离房前 flush 该玩家的 notify 文本帧，避免消息丢失
+                    const player = obj as any;
+                    if (player._notify_buffer && player._notify_buffer.length > 0 && player.socket) {
+                        player.socket.write(Buffer.concat(player._notify_buffer));
+                        player._notify_buffer.length = 0;
+                    }
                 }
             }
             if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
@@ -851,7 +855,7 @@ export class ROOM extends ITEM {
         this._batch_all = [];
         this._batch_noncombat = [];
         this._batch_has_combat = false;
-        this._batch_delay = 0;
+        this._batch_delay = 16;
         this._batch_timestamp = 0;
         this._dirty_players = new Set();
         this._pending_items_send = [];
@@ -993,8 +997,7 @@ export class ROOM extends ITEM {
                 newRoom.items.push(items[i]);
                 items[i].environment = newRoom;
                 if (items[i].is_player) {
-                    newRoom._batch_delay = Math.min(16, newRoom._batch_delay + 1);
-                    oldroom._batch_delay = Math.max(0, oldroom._batch_delay - 1);
+                    // 固定 16ms 推送周期，不再随玩家数动态调整
                 }
                 // 迁移脏标记：从旧房间脏列表移除（新房间靠 items_to_json 下发全量数据）
                 if (items[i].check_character?.()) {
@@ -1102,8 +1105,19 @@ export class ROOM extends ITEM {
         const refreshFrame = this._build_dirty_refresh_frame();
         this._dirty_players.clear();
 
-        // 无内容可发送
-        if (all.length === 0 && !refreshFrame) return;
+        // 无内容可发送（batch 帧和 notify buffer 均为空）
+        if (all.length === 0 && !refreshFrame) {
+            // 仍需检查是否有玩家有待发送的 notify 文本帧
+            const items0 = this.items;
+            for (let i = 0; i < items0.length; i++) {
+                const it: any = items0[i];
+                if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0) {
+                    it.socket?.write(Buffer.concat(it._notify_buffer));
+                    it._notify_buffer.length = 0;
+                }
+            }
+            return;
+        }
 
         // 合并 batch 为单个 WebSocket 帧（单次分配，替代 unshift+concat+encodeBinaryFrame）
         const mergedAll = _mergeBatchFrame(all, refreshFrame);
@@ -1119,20 +1133,41 @@ export class ROOM extends ITEM {
             if (item.no_message) continue;
             // 跳过刚进房的玩家（他们已通过 items_to_json 收到完整列表，不应收到自己的 0x57 帧）
             if (skipSet && skipSet.has(item)) continue;
+
+            let frame: Buffer | null;
             if (hasCombat && item.query_setting('no_combatmsg')) {
-                if (mergedNonCombat) {
-                    item.socket.write(mergedNonCombat);
-                }
+                frame = mergedNonCombat;
             } else {
-                item.socket.write(mergedAll);
+                frame = mergedAll;
+            }
+
+            // 合并 notify 文本帧 + batch 二进制帧为单次 socket.write
+            // 注意：不直接 push 到 _notify_buffer（避免突变原数组，异常时残留 batch 帧）
+            const notifyBuf = item._notify_buffer;
+            if (notifyBuf && notifyBuf.length > 0) {
+                const parts = frame ? [...notifyBuf, frame] : notifyBuf;
+                item.socket.write(Buffer.concat(parts));
+                notifyBuf.length = 0;
+            } else if (frame) {
+                item.socket.write(frame);
             }
         }
     }
 
     /**
      * 销毁房间(清空物品和所有者)
+     * 销毁前 flush 所有玩家的 _notify_buffer，避免文本帧丢失
      */
     destroy(): void {
+        // 兜底：flush 房内玩家的 notify 缓冲（正常路径由 replaceRoom 迁移，此处防御直接 destroy）
+        const items = this.items;
+        for (let i = 0; i < items.length; i++) {
+            const it: any = items[i];
+            if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0 && it.socket) {
+                it.socket.write(Buffer.concat(it._notify_buffer));
+                it._notify_buffer.length = 0;
+            }
+        }
         this.items.length = 0;
         this.owner = null;
     }

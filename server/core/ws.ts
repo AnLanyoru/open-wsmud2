@@ -3,7 +3,7 @@
  * 封装网络层并桥接到 WORLD
  */
 
-import { WORLD, BATCH_MODE } from './world.js';
+import { WORLD, WS_BATCH_MODE } from './world.js';
 import wsServer from './net-ws.js';
 import type { WsSocket } from './net-ws.js';
 
@@ -41,9 +41,13 @@ server.onSocketIn = function (this: void, socket: WsSocket): void {
 };
 
 /**
- * 接收消息回调 — 根据模式切换：
- *   BATCH_MODE=1（默认）入队后分批处理，每批 20ms 让出事件循环
- *   BATCH_MODE=0   同步模式：直接调用 WORLD.request，便于 A/B 对比
+ * 接收消息回调 — 入口层批处理开关：
+ *   WS_BATCH_MODE=1（默认）入队后分批处理，每批 20ms 让出事件循环
+ *   WS_BATCH_MODE=0   同步模式：直接调用 WORLD.request，指令即时处理
+ *   与 BATCH_MODE 解耦：BATCH_MODE 控制房间层（socket.write 合并），
+ *   WS_BATCH_MODE 控制入口层（指令调度）。
+ *   组合 BATCH_MODE=1 + WS_BATCH_MODE=0 即"混合模式"：
+ *     指令同步执行 → 消息立即入房间 _batch_all → 0-16ms 后 _flush_batch 合并推送。
  */
 
 const _msgQueue: Array<[string, WsSocket]> = [];
@@ -72,8 +76,8 @@ function _processMsgBatch(): void {
 }
 
 server.onReceive = function (this: void, msg: string, socket: WsSocket): void {
-    if (BATCH_MODE === 0) {
-        // 同步模式：直接处理，不排队不分批
+    if (WS_BATCH_MODE === 0) {
+        // 入口同步：直接处理，不排队不分批
         WORLD.request(msg, socket);
         return;
     }

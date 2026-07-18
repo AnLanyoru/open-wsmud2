@@ -11,8 +11,9 @@ import { SKILL } from '../skill/skill.js';
 import type { FAMILY } from '../skill/family.js';
 import type { AREA } from '../room/area.js';
 import { FOLLOWER } from './follower.js';
-import { WORLD } from '../world.js';
+import { WORLD, BATCH_MODE, markRoomDirty } from '../world.js';
 import { UTIL } from '../util.js';
+import { encodeTextFrame } from '../net-ws.js';
 import { WEAPON_TYPE } from '../const.js';
 import type { GameSocket } from '../world.js';
 import type { NPC } from './npc.js';
@@ -249,13 +250,26 @@ export class USER extends CHARACTER {
     no_combatmsg: boolean = false;
     /** 命令JSON缓存 */
     commands_json: string | null = null;
+
     // ============ 消息发送 ============
 
     /**
+     * notify 文本帧缓冲区 — 延迟到房间 flush 时与 binary batch 帧一起发送，保证消息顺序。
+     * 存储 encodeTextFrame 编码后的完整 WebSocket 文本帧，flush 时 Buffer.concat 合并。
+     */
+    _notify_buffer: Buffer[] = [];
+
+    /**
      * 通知消息(玩家状态)
+     * batch 模式下推入 _notify_buffer 延迟发送，与房间 _batch_all 同步 flush，消除顺序混乱。
      */
     notify(text: string): void {
-        if (this.socket && this.socket.send && !this.is_faint && text && text.length < 30240) {
+        if (!this.socket || !this.socket.send || this.is_faint || !text || text.length >= 30240) return;
+        const room = this.environment as ROOM;
+        if (room && BATCH_MODE === 1) {
+            this._notify_buffer.push(encodeTextFrame(text));
+            markRoomDirty(room);
+        } else {
             this.socket.send(text);
         }
     }
@@ -451,6 +465,8 @@ export class USER extends CHARACTER {
             }
         }
         this.disconnect_time = Date.now();
+        // 断线/顶号时清空 notify 缓冲，避免残留帧占用内存（后续 flush 因 socket 为空会跳过）
+        this._notify_buffer.length = 0;
         if (this.socket) {
             const socket = this.socket;
             this.socket = undefined;

@@ -1446,6 +1446,11 @@ function _damage_tick(): void {
 // metrics 监控代码由 pack.mjs --metrics 注入，源码不含埋点
 // ============================================================
 
+// 入口层批处理（ws.ts _msgQueue + setImmediate 分批调度）：1=开（默认），0=同步执行
+// 解耦后支持：BATCH_MODE=1 + WS_BATCH_MODE=0 = 混合模式（指令同步 + 房间消息16ms集中推送）
+export const WS_BATCH_MODE: number = process.env.WS_BATCH_MODE === '0' ? 0 : 1;
+
+// 房间层批处理（0x12/0x55/0x57/0x58 帧合并推送）：1=开（默认），0=每玩家直接 socket.write
 export const BATCH_MODE: number = process.env.BATCH_MODE === '0' ? 0 : 1;
 
 // ============================================================
