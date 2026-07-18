@@ -951,13 +951,13 @@ export class CHARACTER extends ITEM {
     end_burst(): void {
         const room = this.environment as ROOM;
         if (!room) return;
-        // batch 帧或任一玩家 _notify_buffer 有内容时才 flush（覆盖纯文本型绝招）
-        if (room._batch_all.length === 0) {
+        // batch 帧或任一玩家 notify 缓冲有内容时才 flush（覆盖纯文本型绝招）
+        if (room._batch_all_payloads.length === 0) {
             const items = room.items;
             let hasNotify = false;
             for (let i = 0; i < items.length; i++) {
                 const it: any = items[i];
-                if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0) {
+                if (it.is_player && it._notify_markers && it._notify_markers.length > 0) {
                     hasNotify = true; break;
                 }
             }
@@ -971,23 +971,28 @@ export class CHARACTER extends ITEM {
         const list = this.environment!.items;
         if (typeof payload !== 'string') {
             const room = this.environment as ROOM;
-            room._batch_all.push(payload);
+            room._batch_all_payloads.push(payload);
+            room._batch_all_combat.push(1);
             room._batch_has_combat = true;
             markRoomDirty(room);
             return;
         }
-        // 文本路径：batch 模式编码一次推送各玩家 _notify_buffer，同步模式逐个发送
+        // 文本路径：batch 模式按玩家入并行 notify 缓冲（带 marker），同步模式逐个发送
         if (BATCH_MODE === 1) {
             const room = this.environment as ROOM;
             const frame = encodeTextFrame(payload);
+            const marker = room._batch_all_payloads.length;
             for (let i = 0; i < list.length; i++) {
                 const item: any = list[i];
                 if (!item.is_player || !item.socket || item.is_faint) continue;
                 if (item === this || item === target) {
-                    if (!item.query_setting('no_mcmsg'))
-                        item._notify_buffer.push(frame);
+                    if (!item.query_setting('no_mcmsg')) {
+                        item._notify_markers.push(marker);
+                        item._notify_frames.push(frame);
+                    }
                 } else if (!item.no_message && !item.query_setting('no_combatmsg')) {
-                    item._notify_buffer.push(frame);
+                    item._notify_markers.push(marker);
+                    item._notify_frames.push(frame);
                 }
             }
             markRoomDirty(room);
@@ -1015,22 +1020,27 @@ export class CHARACTER extends ITEM {
         if (typeof payload !== 'string') {
             // 二进制路径：excludeself 已编码进 op 高位（0x92），客户端按标记跳过
             const room = this.environment as ROOM;
-            room._batch_all.push(payload as Buffer);
-            room._batch_noncombat.push(payload as Buffer);
+            room._batch_all_payloads.push(payload as Buffer);
+            room._batch_all_combat.push(0);
             markRoomDirty(room);
             return;
         }
-        // 文本路径：batch 模式编码一次推送各玩家 _notify_buffer，同步模式逐个发送
+        // 文本路径：batch 模式按玩家入并行 notify 缓冲（带 marker），同步模式逐个发送
         if (BATCH_MODE === 1) {
             const room = this.environment as ROOM;
             const frame = encodeTextFrame(payload);
+            const marker = room._batch_all_payloads.length;
             for (let i = 0; i < list.length; i++) {
                 const item: any = list[i];
                 if (!item.is_player || !item.socket || item.is_faint) continue;
                 if (item === this) {
-                    if (!excludeself) item._notify_buffer.push(frame);
+                    if (!excludeself) {
+                        item._notify_markers.push(marker);
+                        item._notify_frames.push(frame);
+                    }
                 } else if (!item.no_message) {
-                    item._notify_buffer.push(frame);
+                    item._notify_markers.push(marker);
+                    item._notify_frames.push(frame);
                 }
             }
             markRoomDirty(room);
@@ -3065,8 +3075,8 @@ export class CHARACTER extends ITEM {
             commonMsg.writeDoubleBE(baseValues[v], cpos);
         // 写入批处理缓冲区（原始 payload，flush 时统一编码）
         const room = this.environment as ROOM;
-        room._batch_all.push(commonMsg);
-        room._batch_noncombat.push(commonMsg);
+        room._batch_all_payloads.push(commonMsg);
+        room._batch_all_combat.push(0);
         markRoomDirty(room);
     }
 

@@ -47,7 +47,7 @@ server.onSocketIn = function (this: void, socket: WsSocket): void {
  *   与 BATCH_MODE 解耦：BATCH_MODE 控制房间层（socket.write 合并），
  *   WS_BATCH_MODE 控制入口层（指令调度）。
  *   组合 BATCH_MODE=1 + WS_BATCH_MODE=0 即"混合模式"：
- *     指令同步执行 → 消息立即入房间 _batch_all → 0-16ms 后 _flush_batch 合并推送。
+ *     指令同步执行 → 消息立即入房间 _batch_all_payloads → 0-16ms 后 _flush_batch 合并推送。
  */
 
 const _msgQueue: Array<[string, WsSocket]> = [];

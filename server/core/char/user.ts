@@ -254,20 +254,28 @@ export class USER extends CHARACTER {
     // ============ 消息发送 ============
 
     /**
-     * notify 文本帧缓冲区 — 延迟到房间 flush 时与 binary batch 帧一起发送，保证消息顺序。
-     * 存储 encodeTextFrame 编码后的完整 WebSocket 文本帧，flush 时 Buffer.concat 合并。
+     * notify 文本帧并行缓冲区 — 延迟到房间 flush 时与 binary batch 帧交错发送，保证消息顺序。
+     * marker = 入队时 room._batch_all_payloads.length，标记该文本帧在 binary 序列中的相对位置，
+     * flush 时按 marker 切分 binary batch，确保 text 与 binary 按调用顺序输出。
+     *
+     * 并行数组方案：_notify_markers (number[]) + _notify_frames (Buffer[])，
+     * 替代 { marker, frame } 对象数组，零对象分配（万/秒级广播下避免 GC 压力）。
+     * 两数组长度始终相等，同步 push 同步清空。
      */
-    _notify_buffer: Buffer[] = [];
+    _notify_markers: number[] = [];
+    _notify_frames: Buffer[] = [];
 
     /**
      * 通知消息(玩家状态)
-     * batch 模式下推入 _notify_buffer 延迟发送，与房间 _batch_all 同步 flush，消除顺序混乱。
+     * batch 模式下推入并行缓冲区（marker + frame）延迟发送，与房间 _batch_all_payloads 同步 flush，
+     * flush 时按 marker 与 binary 子帧交错，消除顺序混乱。
      */
     notify(text: string): void {
         if (!this.socket || !this.socket.send || this.is_faint || !text || text.length >= 30240) return;
         const room = this.environment as ROOM;
         if (room && BATCH_MODE === 1) {
-            this._notify_buffer.push(encodeTextFrame(text));
+            this._notify_markers.push(room._batch_all_payloads.length);
+            this._notify_frames.push(encodeTextFrame(text));
             markRoomDirty(room);
         } else {
             this.socket.send(text);
@@ -466,7 +474,8 @@ export class USER extends CHARACTER {
         }
         this.disconnect_time = Date.now();
         // 断线/顶号时清空 notify 缓冲，避免残留帧占用内存（后续 flush 因 socket 为空会跳过）
-        this._notify_buffer.length = 0;
+        this._notify_markers.length = 0;
+        this._notify_frames.length = 0;
         if (this.socket) {
             const socket = this.socket;
             this.socket = undefined;

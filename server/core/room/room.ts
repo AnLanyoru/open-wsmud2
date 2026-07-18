@@ -111,17 +111,20 @@ export class ROOM extends ITEM {
 
     // ============ 广播批处理缓冲区 ============
 
-    /** 全量帧 payload 缓冲区 */
-    _batch_all: Buffer[] = [];
-    /** 非战斗帧缓冲区（排除 combat 消息，供 no_combatmsg 玩家） */
-    _batch_noncombat: Buffer[] = [];
+    /**
+     * 二进制子帧并行缓冲区（按调用顺序，两数组长度始终相等）—
+     * 用并行数组替代 { payload, isCombat } 对象，消除每帧对象分配（万/秒级广播下避免 GC 压力）。
+     * V8 走 PACKED_ELEMENTS 快路径，number push 是值类型不产生堆对象。
+     */
+    _batch_all_payloads: Buffer[] = [];
+    _batch_all_combat: number[] = [];  // 0=非战斗, 1=战斗；用 number[] 而非 boolean[] 以走 V8 快路径
     /** 批次中是否包含战斗消息 */
     _batch_has_combat: boolean = false;
     /** 固定 16ms 推送周期，对齐浏览器 60Hz 渲染帧 */
     _batch_delay: number = 16;
     /**
      * 文本帧（itemadd/itemremove/移动消息）缓冲区 — 延迟到 tick flush 合并发送
-     * 存储格式：裸 WebSocket payload（已 encodeTextFrame），flush 时 Buffer.concat 合并
+     * 存储格式：裸 WebSocket payload（已 encodeTextFrame），flush 时按 marker 与 binary 帧交错
      */
     _text_batch: Buffer[] = [];
     /**
@@ -332,7 +335,11 @@ export class ROOM extends ITEM {
                     }
                 }
                 if (_batchMode) {
-                    if (msgPayload) { this._batch_all.push(msgPayload); this._batch_noncombat.push(msgPayload); _broadcastCount++; }
+                    if (msgPayload) {
+                        this._batch_all_payloads.push(msgPayload);
+                        this._batch_all_combat.push(0);
+                        _broadcastCount++;
+                    }
                 } else {
                     // 同步模式：每个玩家直接 socket.write
                     if (msgPayload) {
@@ -394,9 +401,13 @@ export class ROOM extends ITEM {
                     if (pendIdx !== -1) this._pending_items_send.splice(pendIdx, 1);
                     // 离房前 flush 该玩家的 notify 文本帧，避免消息丢失
                     const player = obj as any;
-                    if (player._notify_buffer && player._notify_buffer.length > 0 && player.socket) {
-                        player.socket.write(Buffer.concat(player._notify_buffer));
-                        player._notify_buffer.length = 0;
+                    if (player._notify_markers && player._notify_markers.length > 0 && player.socket) {
+                        const frames = player._notify_frames;
+                        const out: Buffer[] = [];
+                        for (let k = 0; k < frames.length; k++) out.push(frames[k]);
+                        player.socket.write(Buffer.concat(out));
+                        player._notify_markers.length = 0;
+                        player._notify_frames.length = 0;
                     }
                 }
             }
@@ -852,8 +863,8 @@ export class ROOM extends ITEM {
         this._isolate_events();
 
         // —— 批处理缓冲区清零（必须创建自有属性，避免 Object.create 原型链共享） ——
-        this._batch_all = [];
-        this._batch_noncombat = [];
+        this._batch_all_payloads = [];
+        this._batch_all_combat = [];
         this._batch_has_combat = false;
         this._batch_delay = 16;
         this._batch_timestamp = 0;
@@ -1077,13 +1088,19 @@ export class ROOM extends ITEM {
      * 首字节 0xFE 为批处理标记，供客户端识别合并帧。
      * 全量下发给所有玩家，主视角消息也统一走批处理。
      * 刷新帧 (0x55) 作为合并帧的首子帧，确保后续 0x12 帧使用最新缓存。
+     *
+     * 顺序保证：玩家 _notify_markers 标记每个文本帧在 binary 序列中的相对位置，
+     * flush 时按 marker 切分 binary 子帧，与文本帧按调用顺序交错输出。
+     * 并行数组方案：_batch_all_payloads / _batch_all_combat 及 _notify_markers / _notify_frames
+     * 走 V8 PACKED_ELEMENTS 快路径，零对象分配。
      */
     _flush_batch(): void {
-        const all = this._batch_all;
-        const noncombat = this._batch_noncombat;
+        const payloads = this._batch_all_payloads;
+        const combatFlags = this._batch_all_combat;
         const hasCombat = this._batch_has_combat;
-        this._batch_all = [];
-        this._batch_noncombat = [];
+        const n = payloads.length;
+        this._batch_all_payloads = [];
+        this._batch_all_combat = [];
         this._batch_has_combat = false;
         this._batch_timestamp = 0;
 
@@ -1101,71 +1118,104 @@ export class ROOM extends ITEM {
             pending.length = 0;
         }
 
-        // 编码脏数据刷新帧（不修改 all/noncombat 数组，由 _mergeBatchFrame 统一拼接）
+        // 编码脏数据刷新帧（作为首个 binary batch 的首子帧，确保后续 0x12 帧使用最新缓存）
         const refreshFrame = this._build_dirty_refresh_frame();
         this._dirty_players.clear();
 
         // 无内容可发送（batch 帧和 notify buffer 均为空）
-        if (all.length === 0 && !refreshFrame) {
+        if (n === 0 && !refreshFrame) {
             // 仍需检查是否有玩家有待发送的 notify 文本帧
             const items0 = this.items;
             for (let i = 0; i < items0.length; i++) {
                 const it: any = items0[i];
-                if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0) {
-                    it.socket?.write(Buffer.concat(it._notify_buffer));
-                    it._notify_buffer.length = 0;
+                if (it.is_player && it._notify_markers && it._notify_markers.length > 0) {
+                    const frames = it._notify_frames;
+                    const out: Buffer[] = [];
+                    for (let k = 0; k < frames.length; k++) out.push(frames[k]);
+                    it.socket?.write(Buffer.concat(out));
+                    it._notify_markers.length = 0;
+                    it._notify_frames.length = 0;
                 }
             }
             return;
         }
 
-        // 合并 batch 为单个 WebSocket 帧（单次分配，替代 unshift+concat+encodeBinaryFrame）
-        const mergedAll = _mergeBatchFrame(all, refreshFrame);
-        let mergedNonCombat: Buffer | null = null;
-        if (hasCombat && (noncombat.length > 0 || refreshFrame)) {
-            mergedNonCombat = _mergeBatchFrame(noncombat, refreshFrame);
-        }
-
+        // 为每个玩家构建输出：按 _notify_markers 与 binary 子帧交错
+        // marker = 入队时 _batch_all_payloads.length，表示该文本帧在 binary 序列中的位置
         const items = this.items;
         for (let i = 0; i < items.length; i++) {
             const item: any = items[i];
             if (!item.is_player || !item.socket) continue;
             if (item.no_message) continue;
             // 跳过刚进房的玩家（他们已通过 items_to_json 收到完整列表，不应收到自己的 0x57 帧）
-            if (skipSet && skipSet.has(item)) continue;
-
-            let frame: Buffer | null;
-            if (hasCombat && item.query_setting('no_combatmsg')) {
-                frame = mergedNonCombat;
-            } else {
-                frame = mergedAll;
+            // 同时清空可能残留的 notify 缓冲，避免 marker 跨 tick 引用已清空的 binary 序列导致越界
+            if (skipSet && skipSet.has(item)) {
+                item._notify_markers.length = 0;
+                item._notify_frames.length = 0;
+                continue;
             }
 
-            // 合并 notify 文本帧 + batch 二进制帧为单次 socket.write
-            // 注意：不直接 push 到 _notify_buffer（避免突变原数组，异常时残留 batch 帧）
-            const notifyBuf = item._notify_buffer;
-            if (notifyBuf && notifyBuf.length > 0) {
-                const parts = frame ? [...notifyBuf, frame] : notifyBuf;
-                item.socket.write(Buffer.concat(parts));
-                notifyBuf.length = 0;
-            } else if (frame) {
-                item.socket.write(frame);
+            const noCombat = hasCombat && item.query_setting('no_combatmsg');
+            const markers = item._notify_markers;
+            const frames = item._notify_frames;
+            const output: Buffer[] = [];
+            let binaryStart = 0;
+            let refreshAttached = false;
+
+            // 收集 payloads[binaryStart, endIdx) 内的 binary 子帧（按 noCombat 过滤）合并为单个 WS 帧
+            const flushBinary = (endIdx: number) => {
+                if (endIdx <= binaryStart) return;
+                const batch: Buffer[] = [];
+                for (let j = binaryStart; j < endIdx; j++) {
+                    if (noCombat && combatFlags[j]) continue;
+                    batch.push(payloads[j]);
+                }
+                binaryStart = endIdx;
+                if (batch.length === 0) return;
+                // refreshFrame 只附在首个实际输出的 binary batch 前
+                const merged = _mergeBatchFrame(batch, !refreshAttached ? refreshFrame : null);
+                refreshAttached = true;
+                output.push(merged);
+            };
+
+            // 遍历该玩家的 notify 标记，按 marker 在 binary 序列中插入文本帧
+            if (markers && markers.length > 0) {
+                for (let j = 0; j < markers.length; j++) {
+                    flushBinary(markers[j]);
+                    output.push(frames[j]);
+                }
+                markers.length = 0;
+                frames.length = 0;
+            }
+            flushBinary(n);
+
+            // 无 binary 输出但有 refreshFrame（文本-only 玩家也需更新缓存）
+            if (!refreshAttached && refreshFrame) {
+                output.push(_mergeBatchFrame([], refreshFrame));
+            }
+
+            if (output.length > 0) {
+                item.socket.write(Buffer.concat(output));
             }
         }
     }
 
     /**
      * 销毁房间(清空物品和所有者)
-     * 销毁前 flush 所有玩家的 _notify_buffer，避免文本帧丢失
+     * 销毁前 flush 所有玩家的 notify 缓冲，避免文本帧丢失
      */
     destroy(): void {
         // 兜底：flush 房内玩家的 notify 缓冲（正常路径由 replaceRoom 迁移，此处防御直接 destroy）
         const items = this.items;
         for (let i = 0; i < items.length; i++) {
             const it: any = items[i];
-            if (it.is_player && it._notify_buffer && it._notify_buffer.length > 0 && it.socket) {
-                it.socket.write(Buffer.concat(it._notify_buffer));
-                it._notify_buffer.length = 0;
+            if (it.is_player && it._notify_markers && it._notify_markers.length > 0 && it.socket) {
+                const frames = it._notify_frames;
+                const out: Buffer[] = [];
+                for (let k = 0; k < frames.length; k++) out.push(frames[k]);
+                it.socket.write(Buffer.concat(out));
+                it._notify_markers.length = 0;
+                it._notify_frames.length = 0;
             }
         }
         this.items.length = 0;

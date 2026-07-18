@@ -1430,7 +1430,8 @@ function _damage_tick(): void {
         const frame = char._build_damage_frame();
         if (frame) {
             const room = char.environment as ROOM;
-            room._batch_all.push(frame);
+            room._batch_all_payloads.push(frame);
+            room._batch_all_combat.push(0);
             markRoomDirty(room);
         }
     }
