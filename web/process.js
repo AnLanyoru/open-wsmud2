@@ -1,16 +1,16 @@
 import MessageQueue from './message.js';
-import {connectServer, hide2show, isConnected, onLogin, SendCommand, showLoader, GameClient} from './client.js';
+import { connectServer, hide2show, isConnected, onLogin, SendCommand, showLoader, GameClient } from './client.js';
 import Combat from './combat.js';
 import Setting from './setting.js';
 import MAP from './map.js';
 import SCRIPT from './script.js';
-import {roles} from './login/index.js';
-import {SERVERS} from "./login/server.js";
+import { roles } from './login/index.js';
+import { SERVERS } from "./login/server.js";
 import FloatDialog from './floatdialog.js';
 import { format, ready as templatesReady, getMask, getPartName } from './templates.js';
 
 const MessageContent = () => $(".content-message");
-const MessagePage = {append: (div) => $(".content-message").append(div)};
+const MessagePage = { append: (div) => $(".content-message").append(div) };
 
 const Process = {
     itemsElement: null,
@@ -109,7 +109,7 @@ const Process = {
             Dialog.skills.isShow = false;
         }
         console.log("重新连接到", serv.Name);
-        if (!data.pid) Process.die({relive: true});
+        if (!data.pid) Process.die({ relive: true });
         connectServer(serv, data.pid);
     }
     ,
@@ -168,14 +168,14 @@ const Process = {
             if (id == Process.player) {
                 var name = $(this).find(".item-name").html();
 
-                var cmds = [{cmd: "look " + id, name: "查看"},
-                    {cmd: "dazuo", name: "打坐"},
-                    {cmd: "liaoshang", name: "疗伤"}];
+                var cmds = [{ cmd: "look " + id, name: "查看" },
+                { cmd: "dazuo", name: "打坐" },
+                { cmd: "liaoshang", name: "疗伤" }];
                 if (Dialog.team.items && Dialog.team.items.length) {
-                    cmds.push({cmd: "team out", name: "退出队伍"});
+                    cmds.push({ cmd: "team out", name: "退出队伍" });
                     if (Dialog.team.isCap) {
-                        cmds.push({cmd: "team dismiss", name: "解散队伍"});
-                        cmds.push({cmd: "team set", name: "更改分配方式"});
+                        cmds.push({ cmd: "team dismiss", name: "解散队伍" });
+                        cmds.push({ cmd: "team set", name: "更改分配方式" });
                     }
                 }
                 Process.item({
@@ -427,11 +427,18 @@ const Process = {
             return;
         }
         var html = ["<div class='item-commands'>"];
-        if (!data.items.length) data.items = [data.items];
-        for (var i = 0; i < data.items.length; i++) {
-            html.push("<span cmd='" + data.items[i].cmd + "'>");
-            html.push(data.items[i].name);
-            html.push("</span>");
+        if (!Array.isArray(data.items)) data.items = [data.items];
+        const data_items = data.items
+        for (var i = 0; i < data_items.length; i++) {
+            const item_per = data_items[i]
+            if (item_per.cmd) {
+                html.push("<span cmd='" + item_per.cmd + "'>");
+                html.push(item_per.name);
+                html.push("</span>");
+            } else {
+                html.push(item_per.text);
+            }
+            if (item_per.br == true) html.push("<br>")
         }
         html.push("</div>");
         ReceiveMessage(html.join(""));
@@ -561,7 +568,7 @@ const Process = {
     }, addAction: function (data) {
         Combat.AddObj(data.id, data.name, data.distime);
     }, removeAction: function (data) {
-        Combat.DisObj({id: data.id, remove: true});
+        Combat.DisObj({ id: data.id, remove: true });
     }
 };
 
@@ -584,10 +591,10 @@ function read7BId(data, pos, dv) {
     const ts = dv.getInt32(pos);
     pos += 4;
     const id = ID_CHARS[(first4 >> 18) & 0x3F]
-             + ID_CHARS[(first4 >> 12) & 0x3F]
-             + ID_CHARS[(first4 >> 6) & 0x3F]
-             + ID_CHARS[first4 & 0x3F]
-             + ts.toString(16);
+        + ID_CHARS[(first4 >> 12) & 0x3F]
+        + ID_CHARS[(first4 >> 6) & 0x3F]
+        + ID_CHARS[first4 & 0x3F]
+        + ts.toString(16);
     return { id, next: pos };
 }
 
@@ -674,8 +681,8 @@ function _genInMessage(item, isFighting) {
 }
 
 /** 面容描述词表（与服务端原 go.ts face1/face2 一致） */
-var _face1 = ['眉歪眼斜','贼眉鼠眼','尖嘴猴腮','相貌平平','膀大腰圆','一表人才','仪表堂堂','丰神如玉','气宇不凡','玉树临风','风度翩翩'];
-var _face2 = ['奇丑无比','獐头鼠目','身材干瘦','相貌平平','体态轻盈','亭亭玉立','面目姣好','容色秀丽','风情万种','清丽绝俗','美若天仙'];
+var _face1 = ['眉歪眼斜', '贼眉鼠眼', '尖嘴猴腮', '相貌平平', '膀大腰圆', '一表人才', '仪表堂堂', '丰神如玉', '气宇不凡', '玉树临风', '风度翩翩'];
+var _face2 = ['奇丑无比', '獐头鼠目', '身材干瘦', '相貌平平', '体态轻盈', '亭亭玉立', '面目姣好', '容色秀丽', '风情万种', '清丽绝俗', '美若天仙'];
 
 /** 根据 per（容貌）和 gender（性别）生成面容描述 — 与服务端原 go.ts getFace 一致 */
 function _getFace(item) {
@@ -815,7 +822,7 @@ export function ProcessBinary(data) {
                             fbit <<= 1;
                         }
                         const opHex = '0x' + (excludeSelf ? 0x92 : 0x12).toString(16);
-                        text += ` <hib>(b-${opHex} tid:${tid} idMask:0x${idMask.toString(16)} aId:${aId||'-'} tId:${tId||'-'}${hurtPart ? ' hurtPart:' + hurtPart : ''}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
+                        text += ` <hib>(b-${opHex} tid:${tid} idMask:0x${idMask.toString(16)} aId:${aId || '-'} tId:${tId || '-'}${hurtPart ? ' hurtPart:' + hurtPart : ''}${fields.length ? ' ' + fields.join(' ') : ''}${args.length ? ' args:[' + args.join(',') + ']' : ''})</hib>`;
                     }
                     Process.message.push(text);
                     Process.message.scroll2end();
