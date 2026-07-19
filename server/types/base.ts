@@ -138,5 +138,5 @@ export type RecoverEntry =
           name: string;
           count: number;
           value: number;
-          extra?: number;
+          extra?: any;
       };

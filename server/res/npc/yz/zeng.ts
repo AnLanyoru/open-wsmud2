@@ -1,4 +1,6 @@
 import { NPC } from '../../../core/char/npc.js';
+import { WORLD } from '../../../core/world.js';
+import type { USER } from '../../../core/char/user.js';
 
 export default class extends NPC {
     name = '曾柔';
@@ -14,9 +16,8 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.add_action('dz', '定制衣服', function (me: any, arg) {
-            // todo
+        this.add_action('dz', '我要定制成衣', function (me: USER): void {
+            WORLD.COMMANDS.get('duanzao')?.enter(me, 'clothing');
         });
     }
-
 }

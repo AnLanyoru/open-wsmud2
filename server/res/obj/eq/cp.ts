@@ -1,63 +1,90 @@
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import { EQUIP_TYPE, WEAPON_TYPE } from '../../../core/const.js';
+import { OBJ } from '../../../core/item/obj.js';
+import type { CHARACTER } from '../../../core/char/character.js';
+import type { USER } from '../../../core/char/user.js';
+import { WORLD } from '../../../core/world.js';
+import { GRADE_COLORS } from '../../../core/const.js';
+import { FORGE_TYPES } from '../../cmd/obj/duanzao.js';
+import { rebuild_custom_prop } from '../../cmd/obj/reforge.js';
+import { UTIL } from '../../../core/util.js';
 
-const TYPE_INFO = {
-    sword: {
-        name: '长剑',
-        desc: '一把手工锻造的长剑',
-        unit: '把',
-        weapon_type: WEAPON_TYPE.SWORD,
-    },
-    blade: {
-        name: '长刀',
-        desc: '一把手工锻造的长刀',
-        unit: '把',
-        weapon_type: WEAPON_TYPE.BLADE,
-    },
-    club: {
-        name: '长棍',
-        desc: '一根手工锻造的长棍',
-        unit: '根',
-        weapon_type: WEAPON_TYPE.CLUB,
-    },
-    staff: {
-        name: '长杖',
-        desc: '一根手工锻造的长杖',
-        unit: '根',
-        weapon_type: WEAPON_TYPE.STAFF,
-    },
-    whip: {
-        name: '长鞭',
-        desc: '一根手工锻造的长鞭',
-        unit: '根',
-        weapon_type: WEAPON_TYPE.WHIP,
-    },
-    none: {
-        name: '拳套',
-        desc: '一副手工锻造的拳套',
-        unit: '副',
-        weapon_type: WEAPON_TYPE.NONE,
-    },
-};
+export default class CustomEquipment extends EQUIPMENT {
+    name = '未命名装备';
+    grade = 5;
+    value = 1000000;
+    transable = false;
+    no_fenjie = false;
+    no_jinglian = false;
+    hole_count = 4;
 
-export default class extends EQUIPMENT {
-    unit = '把';
-    name = '自制武器';
-    desc = '一把手工锻造的武器';
-    value = 100000;
-    eq_type = EQUIP_TYPE.WEAPON;
-    weapon_type = WEAPON_TYPE.SWORD;
+    constructor() {
+        super();
+        this.add_action('reforge', '重铸', function (this: EQUIPMENT, me: USER): void {
+            WORLD.COMMANDS.get('reforge')?.enter(me, this.id);
+        });
+        this.add_action('cp_rename', '改名', function (this: CustomEquipment, me: USER): void {
+            if (this.is_locked) return me.notify(this.color_name + '处于锁定状态，无法改名。');
+            me.notify('请在房间频道说出新的名字，名字必须为2至5个汉字。');
+            me.wait_input = (player: USER, input: string): void => this.rename(player, input);
+            me.send_commands('cancle', '取消改名');
+        });
+    }
 
-    on_create(path, par) {
-        if (par) {
-            const key = par.substring(1);
-            const info = TYPE_INFO[key];
-            if (info) {
-                this.name = info.name;
-                this.desc = info.desc;
-                this.unit = info.unit;
-                this.weapon_type = info.weapon_type;
-            }
+    on_create(_path: string, par?: string): void {
+        const key = par?.substring(1) ?? '';
+        const type = FORGE_TYPES[key];
+        if (!type) return;
+        this.name = type.name;
+        this.eq_type = type.eqType;
+        this.weapon_type = type.weaponType ?? '';
+        this.unit = type.unit;
+        rebuild_custom_prop(this);
+    }
+
+    on_clone(): void {
+        this.original_prop = null;
+        this.prop = {};
+    }
+
+    on_reload(_me?: CHARACTER): void {
+        const savedName = this.query_temp<string>('cp_name', '');
+        if (savedName) this.name = savedName;
+        const color = GRADE_COLORS[this.grade] ?? 'wht';
+        this.color_name = '<' + color + '>' + this.name + '</' + color + '>';
+        rebuild_custom_prop(this);
+    }
+
+    levelchange_prop(): void {
+        rebuild_custom_prop(this);
+    }
+
+    clone(me?: CHARACTER): EQUIPMENT {
+        const obj = OBJ.CREATE(this.path) as CustomEquipment;
+        this.copy_temp_to(obj);
+        obj.level = this.level;
+        obj.st_prop = this.st_prop ? this.st_prop.map(stone => ({ ...stone, prop: { ...stone.prop } })) : null;
+        obj.hole_count = this.hole_count;
+        obj.on_reload(me);
+        obj.level_up(this.level);
+        return obj;
+    }
+
+    rename(me: USER, input: string): void {
+        if (input === 'cancle') {
+            me.wait_input = undefined;
+            me.notify('你取消了改名。');
+            return;
         }
+        const name = input.includes(' ') ? input.slice(input.indexOf(' ') + 1).trim() : input.trim();
+        if (!/^[\u4E00-\u9FA5]{2,5}$/.test(name)) return me.notify('装备名字必须是2至5个汉字。');
+        if (!UTIL.check_word(name)) return me.notify('你不能使用这个名字。');
+        this.name = name;
+        this.set_temp('cp_name', name);
+        const color = GRADE_COLORS[this.grade] ?? 'wht';
+        this.color_name = '<' + color + '>' + name + '</' + color + '>';
+        this.level_up(this.level);
+        me.wait_input = undefined;
+        me.items_changed(this);
+        me.notify('改名成功。');
     }
 }

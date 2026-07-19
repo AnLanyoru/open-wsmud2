@@ -1,7 +1,5 @@
 import { NPC } from '../../../core/char/npc.js';
 import { WORLD } from '../../../core/world.js';
-import { OBJ } from '../../../core/item/obj.js';
-import { UTIL } from '../../../core/util.js';
 import type { USER } from '../../../core/char/user.js';
 
 export default class extends NPC {
@@ -19,9 +17,8 @@ export default class extends NPC {
 
     constructor() {
         super();
-        this.add_action('makeac', '定制首饰', (me, arg) => {
-            // todo
+        this.add_action('makeac', '我要定制首饰或暗器', (me: USER): void => {
+            WORLD.COMMANDS.get('duanzao')?.enter(me, 'accessory');
         });
     }
-
 }

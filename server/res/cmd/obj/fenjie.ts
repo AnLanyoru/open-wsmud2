@@ -4,7 +4,15 @@ import { WORLD } from '../../../core/world.js';
 import { RecoverType } from '../../../core/const.js';
 import { OBJ } from '../../../core/item/obj.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import type DuanZaoCommand from './duanzao.js';
+import {
+    CUSTOM_PATH,
+    CUSTOM_PROP_COUNT,
+    CUSTOM_PROPS,
+    query_material_count,
+    query_prop_key,
+    query_prop_level,
+    query_wash_count,
+} from './reforge.js';
 
 export default class extends COMMAND {
     command = 'fenjie';
@@ -50,7 +58,7 @@ export default class extends COMMAND {
     }
 
     fenjie2(player: CHARACTER, obj: EQUIPMENT, isok: string): void {
-        let count: number = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 6][obj.level];
+        let count: number = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 6][obj.level] ?? 1;
         let props = obj.prop;
         if (!props) {
             player.send('无法拆解。');
@@ -58,24 +66,19 @@ export default class extends COMMAND {
         }
         let sts: OBJ[] = [];
         let st_names: string[] = [];
-        const duanzao = WORLD.COMMANDS.get('duanzao') as DuanZaoCommand;
-        if (obj.path.startsWith('eq/cp') || obj.path.startsWith('eq/zb')) {
-            obj.forEach_temp((key, level) => {
-                if (!level || typeof level !== 'number') return;
-                let prop = duanzao.PROPS![key];
-                if (!prop) return;
-                let st = OBJ.CREATE('st/p#' + key, duanzao.sum_needs!(prop, level));
+        if (obj.path.startsWith(CUSTOM_PATH)) {
+            for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
+                const key = query_prop_key(obj, i);
+                const level = query_prop_level(obj, i);
+                if (!key || !CUSTOM_PROPS[key] || level < 1) continue;
+                let st = OBJ.CREATE('st/p#' + key, query_material_count(level));
                 sts.push(st);
                 st_names.push(st.unit_name());
-            });
-            count += 8;
-            count += obj.query_temp('sc', 0) ?? 0;
+            }
+            count += 8 + query_wash_count(obj);
         } else {
-            let active_props = duanzao.PROPS!;
-            const def_prop = duanzao.DEFAULT_PROPS![obj.eq_type];
             for (let prop in props) {
-                if (!(prop in active_props)) continue;
-                if (def_prop && def_prop === prop) continue;
+                if (!(prop in CUSTOM_PROPS)) continue;
                 let st = OBJ.CREATE('st/p#' + prop, obj.query_temp(prop, 1));
                 sts.push(st);
                 st_names.push(st.unit_name());
@@ -109,7 +112,7 @@ export default class extends COMMAND {
         for (let st of sts) {
             player.add_obj(st);
             player.send('你获得' + st.unit_name() + '。');
-            rec_items.push(st.path);
+            rec_items.push(st.path, st.count);
         }
 
         if (player.check_player())
