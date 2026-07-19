@@ -323,12 +323,16 @@ export function rebuild_custom_prop(obj: EQUIPMENT): void {
     if (obj.level > 0) EQUIPMENT.prototype.levelchange_prop.call(obj);
     obj.score = query_custom_base_score(obj);
     const ownerId = obj.query_temp<string>('cp_owner_id', '');
+    const cpDesc = obj.query_temp<string>('cp_desc', '');
     const owner = query_owner_name(ownerId, obj);
     const forgeKey = obj.path.split('#')[1] ?? '';
-    const part = FORGE_TYPES[forgeKey]?.name ?? obj.parts[obj.eq_type] ?? '装备';
     const weaponName = query_weapon_name(obj.weapon_type);
-    const weaponType = weaponName ? '一' + obj.unit + weaponName + '，是' : '';
-    obj.desc = '这是' + weaponType + owner + '的专属' + part + '，基础评分' + obj.score + '，当前评分' + query_custom_score(obj);
+    const [weaponType, part] = weaponName
+        ? [`是一${obj.unit}${weaponName}，`, '武器']
+        : ['', FORGE_TYPES[forgeKey]?.name ?? obj.parts[obj.eq_type] ?? '装备'];
+    obj.desc = cpDesc
+        ? `这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}` :
+        `${cpDesc}\n这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}`;
     obj.refresh();
 }
 
