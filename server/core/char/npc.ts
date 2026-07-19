@@ -239,11 +239,12 @@ export class NPC extends CHARACTER {
             cmd: 'look ' + this.id,
             name: '查看',
         });
-        if (!this.no_fight)
+        if (!this.no_fight) {
             json.commands.push({
                 cmd: 'fight ' + this.id,
                 name: '比试',
             });
+        }
         json.commands.push({
             cmd: 'kill ' + this.id,
             name: '击杀',
@@ -388,12 +389,8 @@ export class NPC extends CHARACTER {
             if (this.mp < this.max_mp) {
                 this.add_mp(int(this.max_mp / 2));
             }
-            if (this.chat_msg) {
-                if (this.random(10) > 8)
-                    this.send_message(
-                        this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)],
-                    );
-            }
+            if (this.chat_msg && this.random(10) > 8)
+                this.send_message(this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)]);
             if (this.on_heart_beat) this.on_heart_beat(dt);
         } else if (this.hp <= 0) {
             const eny = this.query_enemy();
