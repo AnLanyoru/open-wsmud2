@@ -430,12 +430,12 @@ const Process = {
         if (!Array.isArray(data.items)) data.items = [data.items];
         const data_items = data.items
         for (var i = 0; i < data_items.length; i++) {
-            const item_per = data_items[i]
-            html.push("<span cmd='" + item_per.cmd + "'>");
-            html.push(item_per.name);
-            html.push("</span>");
-            if (item_per.text) html.push(item_per.text);
-            if (item_per.br) html.push("<br>")
+            const {cmd, name, text, br} = data_items[i]
+            html.push("<span cmd='" + cmd + "'>",
+                name,
+                "</span>");
+            if (text) html.push(text);
+            if (br) html.push("<br>")
         }
         html.push("</div>");
         ReceiveMessage(html.join(""));

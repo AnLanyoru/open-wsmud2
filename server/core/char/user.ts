@@ -372,10 +372,10 @@ export class USER extends CHARACTER {
         for (let i = 0; i < args.length; i++) {
             if (i > 0) str.push(',');
             const [cmd, name, text, br] = args[i]
-            str.push('{cmd:"', cmd, '",name:"', name);
-            if (text) str.push('",text:"', text);
-            if (br)   str.push('",br:1');
-            str.push('"}');
+            str.push('{cmd:"', cmd, '",name:"', name, '"');
+            if (text) str.push(',text:"', text, '"');
+            if (br)   str.push(',br:1');
+            str.push('}');
         }
         str.push(']}');
         this.send(str.join(''));

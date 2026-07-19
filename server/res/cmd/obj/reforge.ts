@@ -68,11 +68,13 @@ export default class extends COMMAND {
             if (!key) continue;
             count++;
             const level = query_prop_level(obj, i);
-            me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
-            me.notify('<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')');
+            cmd_and_text.push(
+                ['reforge ' + obj.id + ' replace ' + i, '替换'],
+                ['reforge ' + obj.id + ' upgrade ' + i, '升级', '<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')', true]);
         }
-        me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
-        if (count < CUSTOM_PROP_COUNT) me.send_commands('reforge ' + obj.id + ' add', '增加新的属性');
+        cmd_and_text.push(['reforge ' + obj.id + ' wash', '洗练一次']);
+        if (count < CUSTOM_PROP_COUNT) cmd_and_text.push(['reforge ' + obj.id + ' add', '增加新的属性']);
+        me.send_cmd_and_text(...cmd_and_text)
     }
 
     add(me: USER, obj: EQUIPMENT, key?: string): void {
