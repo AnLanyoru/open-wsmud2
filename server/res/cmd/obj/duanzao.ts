@@ -2,7 +2,7 @@ import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
 import { OBJ } from '../../../core/item/obj.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import { EQUIP_TYPE, FORGE_TYPES, WEAPON_TYPE } from '../../../core/const.js';
+import { EQUIP_TYPE, FORGE_TYPES, FORGE_WEAPON_TYPES, WEAPON_TYPE } from '../../../core/const.js';
 import { UTIL } from '../../../core/util.js';
 import { WORLD } from '../../../core/world.js';
 import { rebuild_custom_prop } from './reforge.js';
@@ -13,7 +13,7 @@ interface ForgeNpc extends NPC {
 }
 
 const GROUPS: Record<string, string[]> = {
-    weapon: ['sword', 'blade', 'club', 'staff', 'whip', 'unarmed'],
+    weapon: FORGE_WEAPON_TYPES,
     clothing: ['cloth', 'shoes', 'head', 'cape', 'wrist', 'waist'],
     accessory: ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin','throwing'],
 };

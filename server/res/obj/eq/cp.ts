@@ -3,7 +3,7 @@ import { OBJ } from '../../../core/item/obj.js';
 import type { CHARACTER } from '../../../core/char/character.js';
 import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
-import { FORGE_TYPES, GRADE_COLORS } from '../../../core/const.js';
+import { EQUIP_TYPE, FORGE_TYPES, FORGE_WEAPON_TYPES, GRADE_COLORS } from '../../../core/const.js';
 import { query_custom_score, rebuild_custom_prop } from '../../cmd/obj/reforge.js';
 import { UTIL } from '../../../core/util.js';
 
@@ -45,7 +45,50 @@ export default class CustomEquipment extends EQUIPMENT {
         this.eq_type = type.eqType;
         this.weapon_type = type.weaponType ?? '';
         this.unit = type.unit;
+        if (type.eqType === EQUIP_TYPE.WEAPON) {
+            this.add_action('cp_retype', '更改类型', function (this: CustomEquipment, me: USER, target?: string): void {
+                this.retype(me, target);
+            });
+        }
         rebuild_custom_prop(this);
+    }
+
+    retype(me: USER, target?: string): void {
+        if (this.eq_type !== EQUIP_TYPE.WEAPON) return me.notify('只有自制武器可以更改类型。');
+        if (this.is_locked) return me.notify(this.color_name + '处于锁定状态，无法更改类型。');
+        const current = this.path.split('#')[1] ?? '';
+        if (!target) {
+            const commands: string[] = [];
+            for (const key of FORGE_WEAPON_TYPES) {
+                if (key === current) continue;
+                const type = FORGE_TYPES[key];
+                commands.push('packitem cp_retype ' + this.id + ' ' + key, type.forge_show ?? type.name);
+            }
+            me.notify('请选择要将' + this.color_name + '更改成的武器类型。');
+            me.send_commands(...commands);
+            return;
+        }
+        const confirmed = target.endsWith('_ok');
+        const key = confirmed ? target.slice(0, -3) : target;
+        const type = FORGE_TYPES[key];
+        if (!FORGE_WEAPON_TYPES.includes(key) || !type || key === current) {
+            return me.notify('不能更改成这种武器类型。');
+        }
+        if (!confirmed) {
+            me.notify('是否确认将' + this.color_name + '更改为' + (type.forge_show ?? type.name) + '？需要消耗1块<hio>元晶</hio>。');
+            me.send_commands('packitem cp_retype ' + this.id + ' ' + key + '_ok', '确定更改');
+            return;
+        }
+        const crystal = me.find_obj_bypath('st/yuanjing');
+        if (!crystal?.count || !me.remove_obj(crystal, 1)) return me.notify('你没有元晶。');
+        this.path = 'eq/cp#' + key;
+        this.eq_type = type.eqType;
+        this.weapon_type = type.weaponType ?? '';
+        this.unit = type.unit;
+        rebuild_custom_prop(this);
+        me.items_changed(this);
+        WORLD.STATS.updateWeapon(me, this);
+        me.notify('武器类型已更改为' + (type.forge_show ?? type.name) + '。');
     }
 
     on_clone(): void {

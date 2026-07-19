@@ -127,6 +127,8 @@ export const FORGE_TYPES: Record<string, ForgeType> = {
     throwing: { name: '暗器', eqType: EQUIP_TYPE.THROWING, weaponType: WEAPON_TYPE.THROWING, unit: '件' },
 };
 
+export const FORGE_WEAPON_TYPES = ['sword', 'blade', 'club', 'staff', 'whip', 'unarmed'];
+
 /**
  * 属性名称映射表 — key 为属性内部标识，value 为中文显示名
  */
