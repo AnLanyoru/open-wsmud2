@@ -41,8 +41,6 @@ export default class extends COMMAND {
             default:
                 return me.notify('没有这个重铸操作。');
         }
-        me.notify(obj.desc);
-        me.send_commands('reforge ' + obj.id, '继续重铸');
     }
 
     show(me: USER, obj: EQUIPMENT): void {
@@ -70,7 +68,7 @@ export default class extends COMMAND {
             const level = query_prop_level(obj, i);
             cmd_and_text.push(
                 ['reforge ' + obj.id + ' replace ' + i, '替换'],
-                ['reforge ' + obj.id + ' upgrade ' + i, '升级', '<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')', true]);
+                ['reforge ' + obj.id + ' upgrade ' + i, '升级', format_custom_prop(key, level) + ' (' + level + ')', true]);
         }
         cmd_and_text.push(['reforge ' + obj.id + ' wash', '洗练一次']);
         if (count < CUSTOM_PROP_COUNT) cmd_and_text.push(['reforge ' + obj.id + ' add', '增加新的属性']);
@@ -98,7 +96,7 @@ export default class extends COMMAND {
         const target = level + 1;
         if (target > query_upgrade_limit(obj)) return me.notify('当前洗练次数不足以继续升级这条属性。');
         if (confirm !== 'ok') {
-            me.notify('是否确认提升词条为<hio>' + format_custom_prop(key, target) + '</hio>？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
+            me.notify('是否确认提升词条为' + format_custom_prop(key, target) + '？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
             return me.send_commands('reforge ' + obj.id + ' upgrade ' + index + ' ok', '确定提升');
         }
         if (!consume_material(me, key, target)) return me.notify('对应属性材料不足。');
@@ -107,6 +105,8 @@ export default class extends COMMAND {
         me.items_changed(obj);
         WORLD.STATS.updateWeapon(me, obj);
         me.notify('词条提升成功。');
+        me.notify(obj.get_desc(me));
+        me.send_commands('reforge ' + obj.id, '继续重铸');
     }
 
     replace(me: USER, obj: EQUIPMENT, index: number, key?: string, confirm?: string): void {
@@ -116,7 +116,7 @@ export default class extends COMMAND {
         if (!key) return send_replace_choices(me, obj, index, oldKey, oldLevel);
         if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
         if (confirm !== 'ok') {
-            me.notify('是否确认将词条<hio>' + format_custom_prop(oldKey, oldLevel) + '</hio>替换为<hio>' + format_custom_prop(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
+            me.notify('是否确认将词条' + format_custom_prop(oldKey, oldLevel) + '替换为' + format_custom_prop(key, 1) + '，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
             return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
         }
         const stone = me.find_obj_bypath('st/p#' + key);
@@ -133,6 +133,8 @@ export default class extends COMMAND {
         me.items_changed(obj);
         WORLD.STATS.updateWeapon(me, obj);
         me.notify('词条替换成功。');
+        me.notify(obj.get_desc(me));
+        me.send_commands('reforge ' + obj.id, '继续重铸');
     }
 
     wash(me: USER, obj: EQUIPMENT, confirm?: string): void {
@@ -147,6 +149,8 @@ export default class extends COMMAND {
         me.items_changed(obj);
         WORLD.STATS.updateWeapon(me, obj);
         me.notify('洗练成功，当前已洗练<hio>' + query_wash_count(obj) + '</hio>次。');
+        me.notify(obj.get_desc(me));
+        me.send_commands('reforge ' + obj.id, '继续重铸');
     }
 }
 
@@ -394,7 +398,7 @@ function format_entry(key: string, level: number): string {
 }
 
 function format_custom_prop(key: string, level: number): string {
-    return (PROPERTIES[key] ?? key) + '：' + format_entry(key, level);
+    return '<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, level) + '</hio>';
 }
 
 function find_equipment(me: USER, id: string): EQUIPMENT | undefined {
