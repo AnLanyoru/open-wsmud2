@@ -25,12 +25,12 @@ export const CATEGORY_NAMES: Record<CustomPropCategory, string> = {
     rare: '稀有属性',
     special: '特殊属性',
 };
-const CATEGORY_SCORES: Record<CustomPropCategory, number> = {
-    base: 1,
-    acquired: 3,
-    advanced: 5,
-    rare: 7,
-    special: 10,
+const CATEGORY_SCORES: Record<CustomPropCategory, (lv: number) => number> = {
+    base: (lv: number) => 10 + (lv * 5),
+    acquired: (lv: number) => 20 + (lv * 6),
+    advanced: (lv: number) => 30 + (lv * 7),
+    rare: (lv: number) => 40 + (lv * 8),
+    special: (lv: number) => 50 + (lv * 10),
 };
 const OWNER_NAME_TTL = 300000;
 const OWNER_NAME_CACHE_LIMIT = 5000;
@@ -144,7 +144,8 @@ export function query_custom_base_score(obj: EQUIPMENT): number {
     for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
         const def = CUSTOM_PROPS[query_prop_key(obj, i)];
         if (!def) continue;
-        score += query_prop_level(obj, i) * CATEGORY_SCORES[def.category];
+        const lv = query_prop_level(obj, i)
+        score += CATEGORY_SCORES[def.category](lv);
     }
     return score;
 }
@@ -160,7 +161,7 @@ export function query_custom_score(obj: EQUIPMENT): number {
 export function rebuild_custom_prop(obj: EQUIPMENT): void {
     const prop: Record<string, number> = {};
     const fixed = query_fixed_prop(obj.eq_type);
-    prop[fixed] = 210 + query_wash_count(obj);
+    prop[fixed] = 450 + query_wash_count(obj);
     for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
         const key = query_prop_key(obj, i);
         const level = query_prop_level(obj, i);
@@ -316,9 +317,19 @@ export default class extends COMMAND {
 
     show(me: USER, obj: EQUIPMENT): void {
         const limits = query_category_limits(obj);
-        const ability = query_wash_count(obj) >= 25 ? '1条特殊能力槽位已开放' : '特殊能力槽位将在洗练25次后开放';
+        const wash_count = query_wash_count(obj)
+        const ability = wash_count >= 25 ? '1条特殊能力槽位已开放' : '特殊能力槽位将在洗练25次后开放';
         me.notify(
-            obj.color_name + '可装配的4条属性最多包含' + limits.base + '条基础属性、' + limits.acquired + '条后天属性、' + limits.advanced + '条高级属性、' + limits.rare + '条稀有属性、' + limits.special + '条特殊属性，' + ability + '，词条可升级次数<hio>' + query_upgrade_limit(obj) + '</hio>。',
+            obj.color_name
+            + '已洗练' + wash_count + '次'
+            + '，可装配的4条属性最多包含'
+            + limits.base + '条基础属性、'
+            + limits.acquired + '条后天属性、'
+            + limits.advanced + '条高级属性、'
+            + limits.rare + '条稀有属性、'
+            + limits.special + '条特殊属性，'
+            + ability
+            + '，词条可升级次数<hio>' + query_upgrade_limit(obj) + '</hio>。',
         );
         let count = 0;
         for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
