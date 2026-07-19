@@ -67,7 +67,7 @@ export default class extends COMMAND {
             if (!key) continue;
             count++;
             const level = query_prop_level(obj, i);
-            me.notify('<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, level) + '</hio>(' + level + ')');
+            me.notify('<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')');
             me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
         }
         me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
@@ -95,7 +95,7 @@ export default class extends COMMAND {
         const target = level + 1;
         if (target > query_upgrade_limit(obj)) return me.notify('当前洗练次数不足以继续升级这条属性。');
         if (confirm !== 'ok') {
-            me.notify('是否确认提升词条为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, target) + '</hio>？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
+            me.notify('是否确认提升词条为<hio>' + format_custom_prop(key, target) + '</hio>？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
             return me.send_commands('reforge ' + obj.id + ' upgrade ' + index + ' ok', '确定提升');
         }
         if (!consume_material(me, key, target)) return me.notify('对应属性材料不足。');
@@ -113,7 +113,7 @@ export default class extends COMMAND {
         if (!key) return send_choices(me, obj, 'replace', index);
         if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
         if (confirm !== 'ok') {
-            me.notify('是否确认将词条<hio>' + (PROPERTIES[oldKey] ?? oldKey) + '：' + format_entry(oldKey, oldLevel) + '</hio>替换为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
+            me.notify('是否确认将词条<hio>' + format_custom_prop(oldKey, oldLevel) + '</hio>替换为<hio>' + format_custom_prop(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
             return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
         }
         const stone = me.find_obj_bypath('st/p#' + key);
@@ -390,6 +390,10 @@ function format_entry(key: string, level: number): string {
     return prefix + format_value(key, level);
 }
 
+function format_custom_prop(key: string, level: number): string {
+    return (PROPERTIES[key] ?? key) + '：' + format_entry(key, level);
+}
+
 function find_equipment(me: USER, id: string): EQUIPMENT | undefined {
     const obj = me.find_obj(id);
     if (!obj?.check_equipment() || !is_custom_equipment(obj)) return undefined;
@@ -435,7 +439,7 @@ function send_choices(me: USER, obj: EQUIPMENT, operation: 'add' | 'replace', in
         found = true;
         me.send_commands(
             'reforge ' + obj.id + ' ' + operation + ' ' + (operation === 'replace' ? index + ' ' : '') + key,
-            '使用' + stone.color_name + (operation === 'add' ? '重铸后' : '替换为') + (PROPERTIES[key] ?? key) + '：' + format_entry(key, operation === 'add' ? 0 : 1),
+            '使用' + stone.color_name + (operation === 'add' ? '重铸后' : '替换为') + format_custom_prop(key, operation === 'add' ? 0 : 1),
         );
     }
     if (!found) me.notify('你没有符合当前部位和类别上限的属性材料。');
