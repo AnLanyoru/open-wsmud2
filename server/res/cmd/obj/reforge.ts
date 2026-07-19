@@ -245,8 +245,8 @@ export default class extends COMMAND {
             if (!key) continue;
             count++;
             const level = query_prop_level(obj, i);
-            me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
             me.notify('<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, level) + '</hio>(' + level + ')');
+            me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
         }
         me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
         if (count < CUSTOM_PROP_COUNT) me.send_commands('reforge ' + obj.id + ' add', '增加新的属性');
