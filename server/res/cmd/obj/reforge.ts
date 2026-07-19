@@ -5,6 +5,149 @@ import { PROPERTIES } from '../../../core/const.js';
 import { WORLD } from '../../../core/world.js';
 import type { PropMap } from '../../../types/props.js';
 
+export default class extends COMMAND {
+    command = 'reforge';
+    regex = /^(\w+)(?:\s(\w+))?(?:\s(\w+))?(?:\s(\w+))?(?:\s(\w+))?$/;
+    allow_fight = false;
+
+    enter(me: USER, id: string, operation?: string, arg1?: string, arg2?: string, confirm?: string): void {
+        const obj = find_equipment(me, id);
+        if (!obj) return me.notify('你只能重铸自己背包中的自制装备。');
+        if (!operation) return this.show(me, obj);
+        if (obj.is_locked) return me.notify(obj.color_name + '处于锁定状态，无法重铸。');
+        switch (operation) {
+            case 'add':
+                this.add(me, obj, arg1);
+                break;
+            case 'upgrade': {
+                const index = Number(arg1);
+                if (!Number.isInteger(index) || index < 0 || index >= CUSTOM_PROP_COUNT) {
+                    return me.notify('没有这条属性。');
+                }
+                this.upgrade(me, obj, index, arg2);
+                break;
+            }
+            case 'replace': {
+                const index = Number(arg1);
+                if (!Number.isInteger(index) || index < 0 || index >= CUSTOM_PROP_COUNT) {
+                    return me.notify('没有这条属性。');
+                }
+                this.replace(me, obj, index, arg2, confirm);
+                break;
+            }
+            case 'wash':
+                this.wash(me, obj, arg1);
+                break;
+            default:
+                return me.notify('没有这个重铸操作。');
+        }
+        me.notify(obj.desc);
+        me.send_commands('reforge ' + obj.id, '继续重铸');
+    }
+
+    show(me: USER, obj: EQUIPMENT): void {
+        const limits = query_category_limits(obj);
+        const wash_count = query_wash_count(obj)
+        const ability = wash_count >= 25 ? '1条特殊能力槽位已开放' : '特殊能力槽位将在洗练25次后开放';
+        me.notify(
+            obj.color_name
+            + '已洗练' + wash_count + '次'
+            + '，可装配的4条属性最多包含'
+            + limits.base + '条基础属性、'
+            + limits.acquired + '条后天属性、'
+            + limits.advanced + '条高级属性、'
+            + limits.rare + '条稀有属性、'
+            + limits.special + '条特殊属性，'
+            + ability
+            + '，词条可升级次数<hio>' + query_upgrade_limit(obj) + '</hio>。',
+        );
+        let count = 0;
+        for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
+            const key = query_prop_key(obj, i);
+            if (!key) continue;
+            count++;
+            const level = query_prop_level(obj, i);
+            me.notify('<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, level) + '</hio>(' + level + ')');
+            me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
+        }
+        me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
+        if (count < CUSTOM_PROP_COUNT) me.send_commands('reforge ' + obj.id + ' add', '增加新的属性');
+    }
+
+    add(me: USER, obj: EQUIPMENT, key?: string): void {
+        const slot = first_empty_slot(obj);
+        if (slot < 0) return me.notify('这件装备已经有四条附加属性。');
+        if (!key) return send_choices(me, obj, 'add');
+        if (!can_select(obj, key)) return me.notify('当前部位不能添加这个属性，或对应类别已达到上限。');
+        if (!consume_material(me, key, 1)) return me.notify('你缺少一块<hio>' + query_material_name(key) + '</hio>。');
+        obj.set_temp('cp_p' + slot, key);
+        obj.set_temp('cp_l' + slot, 1);
+        rebuild_custom_prop(obj);
+        me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
+        me.notify('重铸成功，' + (PROPERTIES[key] ?? key) + '提升为' + format_entry(key, 1) + '。');
+    }
+
+    upgrade(me: USER, obj: EQUIPMENT, index: number, confirm?: string): void {
+        const key = query_prop_key(obj, index);
+        const level = query_prop_level(obj, index);
+        if (!key || level < 1) return me.notify('没有这条属性。');
+        const target = level + 1;
+        if (target > query_upgrade_limit(obj)) return me.notify('当前洗练次数不足以继续升级这条属性。');
+        if (confirm !== 'ok') {
+            me.notify('是否确认提升词条为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, target) + '</hio>？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
+            return me.send_commands('reforge ' + obj.id + ' upgrade ' + index + ' ok', '确定提升');
+        }
+        if (!consume_material(me, key, target)) return me.notify('对应属性材料不足。');
+        obj.set_temp('cp_l' + index, target);
+        rebuild_custom_prop(obj);
+        me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
+        me.notify('词条提升成功。');
+    }
+
+    replace(me: USER, obj: EQUIPMENT, index: number, key?: string, confirm?: string): void {
+        const oldKey = query_prop_key(obj, index);
+        const oldLevel = query_prop_level(obj, index);
+        if (!oldKey || oldLevel < 1) return me.notify('没有这条属性。');
+        if (!key) return send_choices(me, obj, 'replace', index);
+        if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
+        if (confirm !== 'ok') {
+            me.notify('是否确认将词条<hio>' + (PROPERTIES[oldKey] ?? oldKey) + '：' + format_entry(oldKey, oldLevel) + '</hio>替换为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两黄金和一块新属性材料。');
+            return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
+        }
+        const stone = me.find_obj_bypath('st/p#' + key);
+        if (!stone?.count) return me.notify('你缺少新的属性材料。');
+        if (!me.add_money(-REPLACE_COST)) return me.notify('你没有100两黄金。');
+        if (!me.remove_obj(stone, 1)) {
+            me.add_money(REPLACE_COST);
+            return me.notify('属性材料扣除失败。');
+        }
+        me.add_obj('st/p#' + oldKey, query_material_count(oldLevel));
+        obj.set_temp('cp_p' + index, key);
+        obj.set_temp('cp_l' + index, 1);
+        rebuild_custom_prop(obj);
+        me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
+        me.notify('词条替换成功。');
+    }
+
+    wash(me: USER, obj: EQUIPMENT, confirm?: string): void {
+        if (confirm !== 'ok') {
+            me.notify('洗练一次消耗1块<hio>元晶</hio>，并使固定属性提升1点。');
+            return me.send_commands('reforge ' + obj.id + ' wash ok', '确定洗练');
+        }
+        const crystal = me.find_obj_bypath('st/yuanjing');
+        if (!crystal?.count || !me.remove_obj(crystal, 1)) return me.notify('你没有元晶。');
+        obj.add_temp('cp_sc', 1);
+        rebuild_custom_prop(obj);
+        me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
+        me.notify('洗练成功，当前已洗练<hio>' + query_wash_count(obj) + '</hio>次。');
+    }
+}
+
+
 export type CustomPropCategory = 'base' | 'acquired' | 'advanced' | 'rare' | 'special';
 
 export interface CustomPropDef {
@@ -296,136 +439,4 @@ function send_choices(me: USER, obj: EQUIPMENT, operation: 'add' | 'replace', in
         );
     }
     if (!found) me.notify('你没有符合当前部位和类别上限的属性材料。');
-}
-
-export default class extends COMMAND {
-    command = 'reforge';
-    regex = /^(\w+)(?:\s(\w+))?(?:\s(\w+))?(?:\s(\w+))?(?:\s(\w+))?$/;
-    allow_fight = false;
-
-    enter(me: USER, id: string, operation?: string, arg1?: string, arg2?: string, confirm?: string): void {
-        const obj = find_equipment(me, id);
-        if (!obj) return me.notify('你只能重铸自己背包中的自制装备。');
-        if (!operation) return this.show(me, obj);
-        if (obj.is_locked) return me.notify(obj.color_name + '处于锁定状态，无法重铸。');
-        switch (operation) {
-            case 'add':
-                this.add(me, obj, arg1);
-                break;
-            case 'upgrade':
-                this.upgrade(me, obj, Number(arg1), arg2);
-                break;
-            case 'replace':
-                this.replace(me, obj, Number(arg1), arg2, confirm);
-                break;
-            case 'wash':
-                this.wash(me, obj, arg1);
-                break;
-            default:
-                return me.notify('没有这个重铸操作。');
-        }
-        me.notify(obj.desc);
-        me.send_commands('reforge ' + obj.id, '继续重铸');
-    }
-
-    show(me: USER, obj: EQUIPMENT): void {
-        const limits = query_category_limits(obj);
-        const wash_count = query_wash_count(obj)
-        const ability = wash_count >= 25 ? '1条特殊能力槽位已开放' : '特殊能力槽位将在洗练25次后开放';
-        me.notify(
-            obj.color_name
-            + '已洗练' + wash_count + '次'
-            + '，可装配的4条属性最多包含'
-            + limits.base + '条基础属性、'
-            + limits.acquired + '条后天属性、'
-            + limits.advanced + '条高级属性、'
-            + limits.rare + '条稀有属性、'
-            + limits.special + '条特殊属性，'
-            + ability
-            + '，词条可升级次数<hio>' + query_upgrade_limit(obj) + '</hio>。',
-        );
-        let count = 0;
-        for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
-            const key = query_prop_key(obj, i);
-            if (!key) continue;
-            count++;
-            const level = query_prop_level(obj, i);
-            me.notify('<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, level) + '</hio>(' + level + ')');
-            me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
-        }
-        me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
-        if (count < CUSTOM_PROP_COUNT) me.send_commands('reforge ' + obj.id + ' add', '增加新的属性');
-    }
-
-    add(me: USER, obj: EQUIPMENT, key?: string): void {
-        const slot = first_empty_slot(obj);
-        if (slot < 0) return me.notify('这件装备已经有四条附加属性。');
-        if (!key) return send_choices(me, obj, 'add');
-        if (!can_select(obj, key)) return me.notify('当前部位不能添加这个属性，或对应类别已达到上限。');
-        if (!consume_material(me, key, 1)) return me.notify('你缺少一块<hio>' + query_material_name(key) + '</hio>。');
-        obj.set_temp('cp_p' + slot, key);
-        obj.set_temp('cp_l' + slot, 1);
-        rebuild_custom_prop(obj);
-        me.items_changed(obj);
-        WORLD.STATS.updateWeapon(me, obj);
-        me.notify('重铸成功，' + (PROPERTIES[key] ?? key) + '提升为' + format_entry(key, 1) + '。');
-    }
-
-    upgrade(me: USER, obj: EQUIPMENT, index: number, confirm?: string): void {
-        const key = query_prop_key(obj, index);
-        const level = query_prop_level(obj, index);
-        if (!key || level < 1) return me.notify('没有这条属性。');
-        const target = level + 1;
-        if (target > query_upgrade_limit(obj)) return me.notify('当前洗练次数不足以继续升级这条属性。');
-        if (confirm !== 'ok') {
-            me.notify('是否确认提升词条为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, target) + '</hio>？需要' + target + '块<hio>' + query_material_name(key) + '</hio>。');
-            return me.send_commands('reforge ' + obj.id + ' upgrade ' + index + ' ok', '确定提升');
-        }
-        if (!consume_material(me, key, target)) return me.notify('对应属性材料不足。');
-        obj.set_temp('cp_l' + index, target);
-        rebuild_custom_prop(obj);
-        me.items_changed(obj);
-        WORLD.STATS.updateWeapon(me, obj);
-        me.notify('词条提升成功。');
-    }
-
-    replace(me: USER, obj: EQUIPMENT, index: number, key?: string, confirm?: string): void {
-        const oldKey = query_prop_key(obj, index);
-        const oldLevel = query_prop_level(obj, index);
-        if (!oldKey || oldLevel < 1) return me.notify('没有这条属性。');
-        if (!key) return send_choices(me, obj, 'replace', index);
-        if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
-        if (confirm !== 'ok') {
-            me.notify('是否确认将词条<hio>' + (PROPERTIES[oldKey] ?? oldKey) + '：' + format_entry(oldKey, oldLevel) + '</hio>替换为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两黄金和一块新属性材料。');
-            return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
-        }
-        const stone = me.find_obj_bypath('st/p#' + key);
-        if (!stone?.count) return me.notify('你缺少新的属性材料。');
-        if (!me.add_money(-REPLACE_COST)) return me.notify('你没有100两黄金。');
-        if (!me.remove_obj(stone, 1)) {
-            me.add_money(REPLACE_COST);
-            return me.notify('属性材料扣除失败。');
-        }
-        me.add_obj('st/p#' + oldKey, query_material_count(oldLevel));
-        obj.set_temp('cp_p' + index, key);
-        obj.set_temp('cp_l' + index, 1);
-        rebuild_custom_prop(obj);
-        me.items_changed(obj);
-        WORLD.STATS.updateWeapon(me, obj);
-        me.notify('词条替换成功。');
-    }
-
-    wash(me: USER, obj: EQUIPMENT, confirm?: string): void {
-        if (confirm !== 'ok') {
-            me.notify('洗练一次消耗1块<hio>元晶</hio>，并使固定属性提升1点。');
-            return me.send_commands('reforge ' + obj.id + ' wash ok', '确定洗练');
-        }
-        const crystal = me.find_obj_bypath('st/yuanjing');
-        if (!crystal?.count || !me.remove_obj(crystal, 1)) return me.notify('你没有元晶。');
-        obj.add_temp('cp_sc', 1);
-        rebuild_custom_prop(obj);
-        me.items_changed(obj);
-        WORLD.STATS.updateWeapon(me, obj);
-        me.notify('洗练成功，当前已洗练<hio>' + query_wash_count(obj) + '</hio>次。');
-    }
 }
