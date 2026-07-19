@@ -2,6 +2,7 @@ import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
 import { PROPERTIES } from '../../../core/const.js';
+import { WORLD } from '../../../core/world.js';
 import type { PropMap } from '../../../types/props.js';
 
 export type CustomPropCategory = 'base' | 'acquired' | 'advanced' | 'rare' | 'special';
@@ -24,6 +25,18 @@ export const CATEGORY_NAMES: Record<CustomPropCategory, string> = {
     rare: '稀有属性',
     special: '特殊属性',
 };
+const CATEGORY_SCORES: Record<CustomPropCategory, number> = {
+    base: 1,
+    acquired: 3,
+    advanced: 5,
+    rare: 7,
+    special: 10,
+};
+const OWNER_NAME_TTL = 300000;
+const OWNER_NAME_CACHE_LIMIT = 5000;
+const OWNER_NAMES = new Map<string, { name: string; expires: number }>();
+const OWNER_NAME_QUERIES = new Map<string, Promise<void>>();
+const OWNER_EQUIPMENT = new Map<string, Set<EQUIPMENT>>();
 
 const ALL_PARTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const EFFICIENCY_PARTS = ALL_PARTS;
@@ -126,6 +139,24 @@ export function query_fixed_prop(eqType: number): keyof PropMap {
     return 'fy';
 }
 
+export function query_custom_base_score(obj: EQUIPMENT): number {
+    let score = 450 + query_wash_count(obj);
+    for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
+        const def = CUSTOM_PROPS[query_prop_key(obj, i)];
+        if (!def) continue;
+        score += query_prop_level(obj, i) * CATEGORY_SCORES[def.category];
+    }
+    return score;
+}
+
+export function query_custom_score(obj: EQUIPMENT): number {
+    let score = query_custom_base_score(obj) + obj.level * obj.grade * 10;
+    if (obj.st_prop) {
+        for (const stone of obj.st_prop) score += stone.grade * 10;
+    }
+    return score;
+}
+
 export function rebuild_custom_prop(obj: EQUIPMENT): void {
     const prop: Record<string, number> = {};
     const fixed = query_fixed_prop(obj.eq_type);
@@ -139,14 +170,64 @@ export function rebuild_custom_prop(obj: EQUIPMENT): void {
     obj.prop = prop as PropMap;
     obj.original_prop = prop as PropMap;
     if (obj.level > 0) EQUIPMENT.prototype.levelchange_prop.call(obj);
-    obj.score = Object.values(obj.prop).reduce((sum, value) => sum + (typeof value === 'number' ? value : 0), 0);
-    obj.desc = '这是' + obj.name + '的专属装备，当前评分' + obj.score;
+    obj.score = query_custom_base_score(obj);
+    const ownerId = obj.query_temp<string>('cp_owner_id', '');
+    const owner = query_owner_name(ownerId, obj);
+    const part = obj.parts[obj.eq_type] ?? '装备';
+    obj.desc = '这是' + owner + '的专属' + part + '，基础评分' + obj.score + '，当前评分' + query_custom_score(obj);
     obj.refresh();
+}
+
+function query_owner_name(ownerId: string, obj: EQUIPMENT): string {
+    if (!ownerId) return '未知侠士';
+    const user = WORLD.getUser(ownerId);
+    if (user?.name) {
+        OWNER_NAMES.set(ownerId, { name: user.name, expires: Date.now() + OWNER_NAME_TTL });
+        return user.name;
+    }
+    const cached = OWNER_NAMES.get(ownerId);
+    if (cached && cached.expires > Date.now()) return cached.name;
+    if (cached) OWNER_NAMES.delete(ownerId);
+    let equipment = OWNER_EQUIPMENT.get(ownerId);
+    if (!equipment) {
+        equipment = new Set<EQUIPMENT>();
+        OWNER_EQUIPMENT.set(ownerId, equipment);
+    }
+    equipment.add(obj);
+    if (!OWNER_NAME_QUERIES.has(ownerId)) {
+        const query = WORLD.DB.getRoleNameByID(ownerId)
+            .then(row => {
+                const name = row?.name ?? '未知侠士';
+                if (OWNER_NAMES.size >= OWNER_NAME_CACHE_LIMIT) {
+                    const oldest = OWNER_NAMES.keys().next().value;
+                    if (oldest) OWNER_NAMES.delete(oldest);
+                }
+                OWNER_NAMES.set(ownerId, { name, expires: Date.now() + OWNER_NAME_TTL });
+                const items = OWNER_EQUIPMENT.get(ownerId);
+                OWNER_EQUIPMENT.delete(ownerId);
+                if (items) for (const item of items) rebuild_custom_prop(item);
+            })
+            .catch(error => {
+                OWNER_EQUIPMENT.delete(ownerId);
+                console.error('查询自制装备主人名称失败', ownerId, error);
+            })
+            .finally(() => OWNER_NAME_QUERIES.delete(ownerId));
+        OWNER_NAME_QUERIES.set(ownerId, query);
+    }
+    return cached?.name ?? '未知侠士';
 }
 
 export function query_material_name(key: string): string {
     const def = CUSTOM_PROPS[key];
-    return def ? CATEGORY_NAMES[def.category] + '：' + (PROPERTIES[key] ?? key) : key;
+    if (!def) return key;
+    return CATEGORY_NAMES[def.category] + '：' + (PROPERTIES[key] ?? key) + (is_percentage_prop(key) ? '%' : '');
+}
+
+function is_percentage_prop(key: string): boolean {
+    const def = CUSTOM_PROPS[key];
+    if (!def) return false;
+    if (def.category === 'advanced' || def.category === 'rare') return true;
+    return ['bj_per', 'busy_per', 'diff_downside_per', 'distime_per'].includes(key);
 }
 
 function format_value(key: string, level: number): string {
@@ -262,6 +343,7 @@ export default class extends COMMAND {
         obj.set_temp('cp_l' + slot, 1);
         rebuild_custom_prop(obj);
         me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
         me.notify('重铸成功，' + (PROPERTIES[key] ?? key) + '提升为' + format_entry(key, 1) + '。');
     }
 
@@ -279,6 +361,7 @@ export default class extends COMMAND {
         obj.set_temp('cp_l' + index, target);
         rebuild_custom_prop(obj);
         me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
         me.notify('词条提升成功。');
     }
 
@@ -304,6 +387,7 @@ export default class extends COMMAND {
         obj.set_temp('cp_l' + index, 1);
         rebuild_custom_prop(obj);
         me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
         me.notify('词条替换成功。');
     }
 
@@ -317,6 +401,7 @@ export default class extends COMMAND {
         obj.add_temp('cp_sc', 1);
         rebuild_custom_prop(obj);
         me.items_changed(obj);
+        WORLD.STATS.updateWeapon(me, obj);
         me.notify('洗练成功，当前已洗练<hio>' + query_wash_count(obj) + '</hio>次。');
     }
 }

@@ -4,6 +4,7 @@ import { OBJ } from '../../../core/item/obj.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
 import { EQUIP_TYPE, WEAPON_TYPE } from '../../../core/const.js';
 import { UTIL } from '../../../core/util.js';
+import { WORLD } from '../../../core/world.js';
 import { rebuild_custom_prop } from './reforge.js';
 
 interface ForgeType {
@@ -102,6 +103,7 @@ export default class extends COMMAND {
         const obj = OBJ.CREATE('eq/cp#' + key) as EQUIPMENT;
         obj.name = name;
         obj.set_temp('cp_name', name);
+        obj.set_temp('cp_owner_id', me.id);
         obj.color_name = '<hio>' + name + '</hio>';
         rebuild_custom_prop(obj);
         if (!me.remove_obj(crystal, 10)) return me.notify('元晶扣除失败。');
@@ -110,6 +112,7 @@ export default class extends COMMAND {
             me.add_obj('st/yuanjing', 10);
             return me.notify('制作失败，已退还10块元晶。');
         }
+        WORLD.STATS.updateWeapon(me, obj);
         me.notify('制作完成，你获得了' + obj.unit_name() + '。');
     }
 }

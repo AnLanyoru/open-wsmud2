@@ -58,6 +58,7 @@ STATS.loadTopUser = function (data, npc) {
             let obj = OBJ.CREATE(item[0]) as EQUIPMENT;
             if (!obj) continue;
             obj.load_db(item);
+            obj.on_load(npc);
             npc.equipment[i] = obj;
         }
     }

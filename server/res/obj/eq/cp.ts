@@ -5,7 +5,7 @@ import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
 import { GRADE_COLORS } from '../../../core/const.js';
 import { FORGE_TYPES } from '../../cmd/obj/duanzao.js';
-import { rebuild_custom_prop } from '../../cmd/obj/reforge.js';
+import { query_custom_score, rebuild_custom_prop } from '../../cmd/obj/reforge.js';
 import { UTIL } from '../../../core/util.js';
 
 export default class CustomEquipment extends EQUIPMENT {
@@ -49,6 +49,7 @@ export default class CustomEquipment extends EQUIPMENT {
     on_reload(_me?: CHARACTER): void {
         const savedName = this.query_temp<string>('cp_name', '');
         if (savedName) this.name = savedName;
+        if (_me?.check_player() && !this.query_temp<string>('cp_owner_id', '')) this.set_temp('cp_owner_id', _me.id);
         const color = GRADE_COLORS[this.grade] ?? 'wht';
         this.color_name = '<' + color + '>' + this.name + '</' + color + '>';
         rebuild_custom_prop(this);
@@ -56,6 +57,15 @@ export default class CustomEquipment extends EQUIPMENT {
 
     levelchange_prop(): void {
         rebuild_custom_prop(this);
+    }
+
+    query_score(): number {
+        return query_custom_score(this);
+    }
+
+    get_desc(me: CHARACTER): string {
+        rebuild_custom_prop(this);
+        return super.get_desc(me);
     }
 
     clone(me?: CHARACTER): EQUIPMENT {
@@ -85,6 +95,7 @@ export default class CustomEquipment extends EQUIPMENT {
         this.level_up(this.level);
         me.wait_input = undefined;
         me.items_changed(this);
+        WORLD.STATS.updateWeapon(me, this);
         me.notify('改名成功。');
     }
 }

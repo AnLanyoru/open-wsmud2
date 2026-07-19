@@ -81,6 +81,9 @@ export default {
             [uid, server]);
 
     },
+    getRoleNameByID: function (id) {
+        return db.get("select name from players where id=?", [id]);
+    },
     addRole: function (role) {
 
         return db.query("insert into players(userid,id,name,title,level,sid,data) values(?,?,?,?,?,?,?)",
