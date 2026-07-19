@@ -236,7 +236,7 @@ function create_prop_defs(): Record<string, CustomPropDef> {
         { key: 'releasetime', category: 'special', base: 900, step: 100, parts: [0, 5, 7, 8] },
         { key: 'diff_sh', category: 'special', base: 2000, step: 2000, parts: [1, 2, 3, 4, 9] },
     ];
-    const result: Record<string, CustomPropDef> = {};
+    const result: Record<string, CustomPropDef> = Object.create(null);
     for (const def of defs) result[def.key] = def;
     return result;
 }

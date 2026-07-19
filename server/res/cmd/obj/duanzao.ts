@@ -12,11 +12,11 @@ interface ForgeNpc extends NPC {
     query_duanzao_message(stage: string, typeName?: string, itemName?: string): string;
 }
 
-const GROUPS: Record<string, string[]> = {
+const GROUPS: Record<string, string[]> = Object.assign(Object.create(null), {
     'pub/tiejiang': FORGE_WEAPON_TYPES,
     'yz/zeng': ['cloth', 'shoes', 'head', 'cape', 'wrist', 'waist'],
-    'pub/zi': ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin','throwing'],
-};
+    'pub/zi': ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin', 'throwing'],
+});
 
 export default class extends COMMAND {
     command = 'duanzao';
@@ -115,6 +115,7 @@ export default class extends COMMAND {
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
             if (!item.check_npc()) continue;
+            if (!GROUPS[item.path]) continue;
             const npc = item as ForgeNpc;
             if (typeof npc.query_duanzao_message === 'function') return npc;
         }

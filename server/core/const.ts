@@ -105,7 +105,7 @@ export interface ForgeType {
 /**
  * 锻造装备类型映射表 — key 为类型标识，用于自制装备 path 参数（eq/cp#key）
  */
-export const FORGE_TYPES: Record<string, ForgeType> = {
+export const FORGE_TYPES: Record<string, ForgeType> = Object.assign(Object.create(null), {
     sword: { name: '剑', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.SWORD, unit: '把' },
     blade: { name: '刀', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.BLADE, unit: '柄' },
     club: { name: '棍', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.CLUB, unit: '根' },
@@ -125,7 +125,7 @@ export const FORGE_TYPES: Record<string, ForgeType> = {
     bracelet: { name: '手镯', eqType: EQUIP_TYPE.WRIST, unit: '只' },
     hairpin: { name: '簪子', eqType: EQUIP_TYPE.HEAD, unit: '支' },
     throwing: { name: '暗器', eqType: EQUIP_TYPE.THROWING, weaponType: WEAPON_TYPE.THROWING, unit: '件' },
-};
+});
 
 export const FORGE_WEAPON_TYPES = ['sword', 'blade', 'club', 'staff', 'whip', 'unarmed'];
 
