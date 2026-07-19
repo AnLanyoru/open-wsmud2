@@ -113,7 +113,7 @@ export default class extends COMMAND {
         if (!key) return send_choices(me, obj, 'replace', index);
         if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
         if (confirm !== 'ok') {
-            me.notify('是否确认将词条<hio>' + (PROPERTIES[oldKey] ?? oldKey) + '：' + format_entry(oldKey, oldLevel) + '</hio>替换为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两黄金和一块新属性材料。');
+            me.notify('是否确认将词条<hio>' + (PROPERTIES[oldKey] ?? oldKey) + '：' + format_entry(oldKey, oldLevel) + '</hio>替换为<hio>' + (PROPERTIES[key] ?? key) + '：' + format_entry(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
             return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
         }
         const stone = me.find_obj_bypath('st/p#' + key);
