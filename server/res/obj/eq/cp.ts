@@ -3,8 +3,7 @@ import { OBJ } from '../../../core/item/obj.js';
 import type { CHARACTER } from '../../../core/char/character.js';
 import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
-import { GRADE_COLORS } from '../../../core/const.js';
-import { FORGE_TYPES } from '../../cmd/obj/duanzao.js';
+import { FORGE_TYPES, GRADE_COLORS } from '../../../core/const.js';
 import { query_custom_score, rebuild_custom_prop } from '../../cmd/obj/reforge.js';
 import { UTIL } from '../../../core/util.js';
 

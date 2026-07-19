@@ -1,7 +1,7 @@
 import { COMMAND } from '../../../core/command.js';
 import type { CmdAndText, USER } from '../../../core/char/user.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import { PROPERTIES, WEAPON_TYPE } from '../../../core/const.js';
+import { FORGE_TYPES, PROPERTIES, WEAPON_TYPE } from '../../../core/const.js';
 import { WORLD } from '../../../core/world.js';
 import type { PropMap } from '../../../types/props.js';
 
@@ -324,7 +324,8 @@ export function rebuild_custom_prop(obj: EQUIPMENT): void {
     obj.score = query_custom_base_score(obj);
     const ownerId = obj.query_temp<string>('cp_owner_id', '');
     const owner = query_owner_name(ownerId, obj);
-    const part = obj.parts[obj.eq_type] ?? '装备';
+    const forgeKey = obj.path.split('#')[1] ?? '';
+    const part = FORGE_TYPES[forgeKey]?.name ?? obj.parts[obj.eq_type] ?? '装备';
     const weaponName = query_weapon_name(obj.weapon_type);
     const weaponType = weaponName ? '一' + obj.unit + weaponName + '，是' : '';
     obj.desc = '这是' + weaponType + owner + '的专属' + part + '，基础评分' + obj.score + '，当前评分' + query_custom_score(obj);

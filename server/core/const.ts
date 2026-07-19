@@ -87,6 +87,47 @@ export const WEAPON_SKILLS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * 锻造装备类型定义
+ */
+export interface ForgeType {
+    /** 打造类型显示 */
+    forge_show?: string;
+    /** 显示名（兼作自制装备部位名） */
+    name: string;
+    /** 装备部位编号（对应 EQUIP_TYPE） */
+    eqType: number;
+    /** 武器类型（仅武器/暗器需要，非武器留空） */
+    weaponType?: string;
+    /** 量词 */
+    unit: string;
+}
+
+/**
+ * 锻造装备类型映射表 — key 为类型标识，用于自制装备 path 参数（eq/cp#key）
+ */
+export const FORGE_TYPES: Record<string, ForgeType> = {
+    sword: { name: '剑', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.SWORD, unit: '把' },
+    blade: { name: '刀', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.BLADE, unit: '柄' },
+    club: { name: '棍', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.CLUB, unit: '根' },
+    staff: { name: '杖', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.STAFF, unit: '根' },
+    whip: { forge_show: '鞭', name: '鞭子', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.WHIP, unit: '条' },
+    unarmed: { forge_show: '拳', name: '拳铠', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.NONE, unit: '副' },
+    none: { name: '拳套', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.NONE, unit: '副' },
+    cloth: { name: '衣服', eqType: EQUIP_TYPE.CLOTH, unit: '件' },
+    shoes: { name: '鞋', eqType: EQUIP_TYPE.SHOES, unit: '双' },
+    head: { name: '帽子', eqType: EQUIP_TYPE.HEAD, unit: '顶' },
+    cape: { name: '披风', eqType: EQUIP_TYPE.CAPE, unit: '件' },
+    wrist: { name: '护手', eqType: EQUIP_TYPE.WRIST, unit: '对' },
+    waist: { name: '腰带', eqType: EQUIP_TYPE.WAIST, unit: '条' },
+    ring: { name: '戒指', eqType: EQUIP_TYPE.RING, unit: '枚' },
+    necklace: { name: '项链', eqType: EQUIP_TYPE.NECKLACE, unit: '条' },
+    jewels: { name: '饰品', eqType: EQUIP_TYPE.JEWELS, unit: '件' },
+    bracelet: { name: '手镯', eqType: EQUIP_TYPE.WRIST, unit: '只' },
+    hairpin: { name: '簪子', eqType: EQUIP_TYPE.HEAD, unit: '支' },
+    throwing: { name: '暗器', eqType: EQUIP_TYPE.THROWING, weaponType: WEAPON_TYPE.THROWING, unit: '件' },
+};
+
+/**
  * 属性名称映射表 — key 为属性内部标识，value 为中文显示名
  */
 export const PROPERTIES = {

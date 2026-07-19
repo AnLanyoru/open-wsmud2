@@ -2,48 +2,20 @@ import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
 import { OBJ } from '../../../core/item/obj.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import { EQUIP_TYPE, WEAPON_TYPE } from '../../../core/const.js';
+import { EQUIP_TYPE, FORGE_TYPES, WEAPON_TYPE } from '../../../core/const.js';
 import { UTIL } from '../../../core/util.js';
 import { WORLD } from '../../../core/world.js';
 import { rebuild_custom_prop } from './reforge.js';
 import type { NPC } from '../../../core/char/npc.js';
 
-interface ForgeType {
-    name: string;
-    eqType: number;
-    weaponType?: string;
-    unit: string;
-}
-
 interface ForgeNpc extends NPC {
     query_duanzao_message(stage: string, typeName?: string, itemName?: string): string;
 }
 
-export const FORGE_TYPES: Record<string, ForgeType> = {
-    sword: { name: '剑', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.SWORD, unit: '把' },
-    blade: { name: '刀', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.BLADE, unit: '把' },
-    club: { name: '棍', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.CLUB, unit: '根' },
-    staff: { name: '杖', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.STAFF, unit: '根' },
-    whip: { name: '鞭', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.WHIP, unit: '条' },
-    unarmed: { name: '拳套', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.NONE, unit: '副' },
-    none: { name: '拳套', eqType: EQUIP_TYPE.WEAPON, weaponType: WEAPON_TYPE.NONE, unit: '副' },
-    cloth: { name: '衣服', eqType: EQUIP_TYPE.CLOTH, unit: '件' },
-    shoes: { name: '鞋', eqType: EQUIP_TYPE.SHOES, unit: '双' },
-    head: { name: '帽子', eqType: EQUIP_TYPE.HEAD, unit: '顶' },
-    cape: { name: '披风', eqType: EQUIP_TYPE.CAPE, unit: '件' },
-    wrist: { name: '护手', eqType: EQUIP_TYPE.WRIST, unit: '对' },
-    waist: { name: '腰带', eqType: EQUIP_TYPE.WAIST, unit: '条' },
-    ring: { name: '戒指', eqType: EQUIP_TYPE.RING, unit: '枚' },
-    necklace: { name: '项链', eqType: EQUIP_TYPE.NECKLACE, unit: '条' },
-    jewels: { name: '饰品', eqType: EQUIP_TYPE.JEWELS, unit: '件' },
-    bracelet: { name: '手镯', eqType: EQUIP_TYPE.WRIST, unit: '只' },
-    throwing: { name: '暗器', eqType: EQUIP_TYPE.THROWING, weaponType: WEAPON_TYPE.THROWING, unit: '件' },
-};
-
 const GROUPS: Record<string, string[]> = {
     weapon: ['sword', 'blade', 'club', 'staff', 'whip', 'unarmed'],
     clothing: ['cloth', 'shoes', 'head', 'cape', 'wrist', 'waist'],
-    accessory: ['ring', 'necklace', 'jewels', 'bracelet', 'throwing'],
+    accessory: ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin','throwing'],
 };
 
 const GROUP_NPCS: Record<string, string> = {
@@ -93,7 +65,7 @@ export default class extends COMMAND {
         if (!crystal || crystal.count < 10) return me.notify(npc.query_duanzao_message('material_lack'));
         me.notify(npc.query_duanzao_message('choose'));
         const commands: string[] = [];
-        for (const key of types) commands.push('duanzao ' + key, FORGE_TYPES[key].name);
+        for (const key of types) commands.push('duanzao ' + key, FORGE_TYPES[key].forge_show ?? FORGE_TYPES[key].name);
         me.send_commands(...commands);
     }
 
