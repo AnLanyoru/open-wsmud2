@@ -23,11 +23,13 @@ export default class CustomEquipment extends EQUIPMENT {
         });
         this.add_action('cp_rename', '改名', function (this: CustomEquipment, me: USER): void {
             if (this.is_locked) return me.notify(this.color_name + '处于锁定状态，无法改名。');
-            me.notify('请在房间频道说出新的名字，名字必须为2至5个汉字。');
+            me.notify('请在房间频道说出新的名字，名字必须为2至5个汉字，装备改名需要花费100两<hiy>黄金</hiy>。');
             me.wait_input = (player: USER, input: string): void => this.rename(player, input);
             me.send_commands('cancle', '取消改名');
         });
         this.add_action('cp_engrave', '镌刻', function (this: CustomEquipment, me: USER): void {
+            const isAllow = me.query_temp("allow_engrave", 0) || me.user_level
+            if (!isAllow) return me.notify("你不能镌刻")
             if (this.is_locked) return me.notify(this.color_name + '处于锁定状态，无法镌刻。');
             me.notify('请在房间频道说出镌刻内容，内容必须为1至20个汉字。');
             me.wait_input = (player: USER, input: string): void => this.engrave(player, input);
@@ -93,6 +95,7 @@ export default class CustomEquipment extends EQUIPMENT {
         const name = input.includes(' ') ? input.slice(input.indexOf(' ') + 1).trim() : input.trim();
         if (!/^[\u4E00-\u9FA5]{2,5}$/.test(name)) return me.notify('装备名字必须是2至5个汉字。');
         if (!UTIL.check_word(name)) return me.notify('你不能使用这个名字。');
+        if (!me.add_money(-1000000)) return me.notify('你的钱不够，装备改名需要100两<hiy>黄金</hiy>。');
         this.name = name;
         this.set_temp('cp_name', name);
         const color = GRADE_COLORS[this.grade] ?? 'wht';
