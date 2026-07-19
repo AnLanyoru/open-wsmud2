@@ -431,14 +431,11 @@ const Process = {
         const data_items = data.items
         for (var i = 0; i < data_items.length; i++) {
             const item_per = data_items[i]
-            if (item_per.cmd) {
-                html.push("<span cmd='" + item_per.cmd + "'>");
-                html.push(item_per.name);
-                html.push("</span>");
-            } else {
-                html.push(item_per.text);
-            }
-            if (item_per.br == true) html.push("<br>")
+            html.push("<span cmd='" + item_per.cmd + "'>");
+            html.push(item_per.name);
+            html.push("</span>");
+            if (item_per.text) html.push(item_per.text);
+            if (item_per.br) html.push("<br>")
         }
         html.push("</div>");
         ReceiveMessage(html.join(""));

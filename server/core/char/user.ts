@@ -74,6 +74,8 @@ export interface StudyingBook {
     max_level: number;
 }
 
+export type CmdAndText = [cmd: string, name: string, text?: string, br?: boolean]
+
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {
     /** 状态 id */
@@ -356,6 +358,23 @@ export class USER extends CHARACTER {
             str.push(args[i]);
             str.push('",name:"');
             str.push(args[i + 1]);
+            str.push('"}');
+        }
+        str.push(']}');
+        this.send(str.join(''));
+    }
+
+    /**
+     * 发送命令按钮列表
+     */
+    send_cmd_and_text(...args: CmdAndText[]): void {
+        const str: string[] = ['{type:"cmds",items:['];
+        for (let i = 0; i < args.length; i++) {
+            if (i > 0) str.push(',');
+            const [cmd, name, text, br] = args[i]
+            str.push('{cmd:"', cmd, '",name:"', name);
+            if (text) str.push('",text:"', text);
+            if (br)   str.push('",br:1');
             str.push('"}');
         }
         str.push(']}');

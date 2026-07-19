@@ -1,5 +1,5 @@
 import { COMMAND } from '../../../core/command.js';
-import type { USER } from '../../../core/char/user.js';
+import type { CmdAndText, USER } from '../../../core/char/user.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
 import { PROPERTIES } from '../../../core/const.js';
 import { WORLD } from '../../../core/world.js';
@@ -62,13 +62,14 @@ export default class extends COMMAND {
             + '，词条可升级次数<hio>' + query_upgrade_limit(obj) + '</hio>。',
         );
         let count = 0;
+        const cmd_and_text: CmdAndText[] = []
         for (let i = 0; i < CUSTOM_PROP_COUNT; i++) {
             const key = query_prop_key(obj, i);
             if (!key) continue;
             count++;
             const level = query_prop_level(obj, i);
-            me.notify('<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')');
             me.send_commands('reforge ' + obj.id + ' replace ' + i, '替换', 'reforge ' + obj.id + ' upgrade ' + i, '升级');
+            me.notify('<hio>' + format_custom_prop(key, level) + '</hio>(' + level + ')');
         }
         me.send_commands('reforge ' + obj.id + ' wash', '洗练一次');
         if (count < CUSTOM_PROP_COUNT) me.send_commands('reforge ' + obj.id + ' add', '增加新的属性');
@@ -77,7 +78,7 @@ export default class extends COMMAND {
     add(me: USER, obj: EQUIPMENT, key?: string): void {
         const slot = first_empty_slot(obj);
         if (slot < 0) return me.notify('这件装备已经有四条附加属性。');
-        if (!key) return send_choices(me, obj, 'add');
+        if (!key) return send_add_choices(me, obj);
         if (!can_select(obj, key)) return me.notify('当前部位不能添加这个属性，或对应类别已达到上限。');
         if (!consume_material(me, key, 1)) return me.notify('你缺少一块<hio>' + query_material_name(key) + '</hio>。');
         obj.set_temp('cp_p' + slot, key);
@@ -110,7 +111,7 @@ export default class extends COMMAND {
         const oldKey = query_prop_key(obj, index);
         const oldLevel = query_prop_level(obj, index);
         if (!oldKey || oldLevel < 1) return me.notify('没有这条属性。');
-        if (!key) return send_choices(me, obj, 'replace', index);
+        if (!key) return send_replace_choices(me, obj, index, oldKey, oldLevel);
         if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
         if (confirm !== 'ok') {
             me.notify('是否确认将词条<hio>' + format_custom_prop(oldKey, oldLevel) + '</hio>替换为<hio>' + format_custom_prop(key, 1) + '</hio>，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
@@ -430,17 +431,30 @@ function consume_material(me: USER, key: string, count: number): boolean {
     return !!stone && stone.count >= count && !!me.remove_obj(stone, count);
 }
 
-function send_choices(me: USER, obj: EQUIPMENT, operation: 'add' | 'replace', index = -1): void {
-    let found = false;
+function send_add_choices(me: USER, obj: EQUIPMENT): void {
+    const choice_list: string[] = []
+    for (const key in CUSTOM_PROPS) {
+        if (!can_select(obj, key)) continue;
+        const stone = me.find_obj_bypath('st/p#' + key);
+        if (!stone?.count) continue;
+        choice_list.push(
+            'reforge ' + obj.id + ' add ' + key,
+            '使用' + stone.color_name + '重铸后' + format_custom_prop(key, 1));
+    }
+    if (choice_list.length < 1) return me.notify('你没有符合当前部位和类别上限的属性材料。');
+    me.send_commands(...choice_list);
+}
+
+function send_replace_choices(me: USER, obj: EQUIPMENT, index: number, old_key: string, old_lv: number): void {
+    const choice_list: string[] = []
     for (const key in CUSTOM_PROPS) {
         if (!can_select(obj, key, index)) continue;
         const stone = me.find_obj_bypath('st/p#' + key);
         if (!stone?.count) continue;
-        found = true;
-        me.send_commands(
-            'reforge ' + obj.id + ' ' + operation + ' ' + (operation === 'replace' ? index + ' ' : '') + key,
-            '使用' + stone.color_name + (operation === 'add' ? '重铸后' : '替换为') + format_custom_prop(key, operation === 'add' ? 0 : 1),
-        );
+        choice_list.push(
+            'reforge ' + obj.id + ' replace ' + index + ' ' + key,
+            '将' + format_custom_prop(old_key, old_lv) + '替换为' + format_custom_prop(key, 1));
     }
-    if (!found) me.notify('你没有符合当前部位和类别上限的属性材料。');
+    if (choice_list.length < 1) return me.notify('你没有符合当前部位和类别上限的属性材料。');
+    me.send_commands(...choice_list);
 }
