@@ -54,7 +54,7 @@ const float_css = `
 .float-dialog .fb-actions>.fb-action>.action-desc::-webkit-scrollbar {
     display: none;
 }
-.float-dialog .action-desc .float-cmd {
+.float-dialog .action-desc span[cmd] {
     display: inline-block;
     border: solid 1px var(--border-secondary);
     color: var(--text-muted2);
@@ -67,7 +67,7 @@ const float_css = `
     white-space: nowrap;
     transition: background-color 0.15s, color 0.15s;
 }
-.float-dialog .action-desc .float-cmd:hover {
+.float-dialog .action-desc span[cmd]:hover {
     background-color: var(--bg-surface2);
     color: var(--text-secondary);
 }
@@ -171,7 +171,7 @@ const float_css = `
 .float-dialog-unified .fb-actions>.fb-action>.action-desc::-webkit-scrollbar {
     display: none;
 }
-.float-dialog-unified .action-desc .float-cmd {
+.float-dialog-unified .action-desc span[cmd] {
     display: inline-block;
     border: solid 1px var(--border-secondary);
     color: var(--text-muted2);
@@ -184,7 +184,7 @@ const float_css = `
     white-space: nowrap;
     transition: background-color 0.15s, color 0.15s;
 }
-.float-dialog-unified .action-desc .float-cmd:hover {
+.float-dialog-unified .action-desc span[cmd]:hover {
     background-color: var(--bg-surface2);
     color: var(--text-secondary);
 }
@@ -249,16 +249,22 @@ const FloatDialog = {
     createFloatWindow(dialog) {
         this.currentDialogData = dialog;
 
-        let cmdsHTML = '';
+        // 直接复用 process.js cmds 的 item-commands HTML
+        let descHTML = dialog.text || '';
         if (dialog.cmds.length) {
-            cmdsHTML = ' ' + dialog.cmds.map((c, i) =>
-                '<span class="float-cmd" data-ci="' + i + '">' + c.name + '</span>'
-            ).join('');
+            descHTML += "<div class='item-commands'>";
+            for (var i = 0; i < dialog.cmds.length; i++) {
+                const {cmd, name, text, br} = dialog.cmds[i];
+                descHTML += "<span cmd='" + cmd + "'>" + name + "</span>";
+                if (text) descHTML += text;
+                if (br) descHTML += "<br>";
+            }
+            descHTML += "</div>";
         }
 
         let inner = '<div class="float-dialog-header">对话</div>' +
             '<div class="fb-actions"><div class="fb-action">' +
-            '<span class="action-desc">' + dialog.text + '\n' + cmdsHTML + '</span>' +
+            '<span class="action-desc">' + descHTML + '</span>' +
             '<span class="action-name float-ignore-btn">忽<br>略</span>' +
             '</div></div>';
 
@@ -290,12 +296,9 @@ const FloatDialog = {
 
         // Command clicks — event delegation on the dialog
         el.addEventListener('click', (e) => {
-            let cmdEl = e.target.closest('.float-cmd');
+            let cmdEl = e.target.closest('[cmd]');
             if (cmdEl) {
-                let ci = parseInt(cmdEl.getAttribute('data-ci'));
-                if (ci >= 0 && ci < dialog.cmds.length) {
-                    SendCommand(dialog.cmds[ci].cmd);
-                }
+                SendCommand(cmdEl.getAttribute('cmd'));
                 FloatDialog.dismissCurrent();
                 FloatDialog.updateWarn();
                 return;
@@ -461,14 +464,20 @@ const FloatDialog = {
         let itemsHTML = '';
         for (let di = 0; di < this.pendingDialogs.length; di++) {
             let d = this.pendingDialogs[di];
-            let cmdsHTML = '';
+            // 直接复用 process.js cmds 的 item-commands HTML
+            let descHTML = d.text || '';
             if (d.cmds.length) {
-                cmdsHTML = ' ' + d.cmds.map((c, ci) =>
-                    '<span class="float-cmd" data-di="' + di + '" data-ci="' + ci + '">' + c.name + '</span>'
-                ).join('');
+                descHTML += "<div class='item-commands'>";
+                for (var ci = 0; ci < d.cmds.length; ci++) {
+                    const {cmd, name, text, br} = d.cmds[ci];
+                    descHTML += "<span cmd='" + cmd + "'>" + name + "</span>";
+                    if (text) descHTML += text;
+                    if (br) descHTML += "<br>";
+                }
+                descHTML += "</div>";
             }
             itemsHTML += '<div class="fb-action" data-di="' + di + '">' +
-                '<span class="action-desc">' + d.text + "\n" + cmdsHTML + '</span>' +
+                '<span class="action-desc">' + descHTML + '</span>' +
                 '<span class="action-name unified-ignore-one">忽<br>略</span>' +
                 '</div>';
         }
@@ -517,22 +526,16 @@ const FloatDialog = {
 
         // Event delegation for command clicks and ignore clicks
         unified.addEventListener('click', (e) => {
-            let cmdEl = e.target.closest('.float-cmd');
+            let cmdEl = e.target.closest('[cmd]');
             if (cmdEl) {
-                let di = parseInt(cmdEl.getAttribute('data-di'));
-                let ci = parseInt(cmdEl.getAttribute('data-ci'));
-                if (di >= 0 && di < FloatDialog.pendingDialogs.length) {
-                    let cmd = FloatDialog.pendingDialogs[di].cmds[ci];
-                    if (cmd) SendCommand(cmd.cmd);
-                }
+                let fbAction = cmdEl.closest('.fb-action');
+                let di = parseInt(fbAction.getAttribute('data-di'));
+                SendCommand(cmdEl.getAttribute('cmd'));
                 FloatDialog.pendingDialogs.splice(di, 1);
-                cmdEl.closest('.fb-action').remove();
-                // Re-index
+                fbAction.remove();
+                // Re-index remaining fb-action data-di
                 unified.querySelectorAll('.fb-action').forEach((fb, i) => {
                     fb.setAttribute('data-di', i);
-                    fb.querySelectorAll('.float-cmd').forEach((sp) => {
-                        sp.setAttribute('data-di', i);
-                    });
                 });
                 checkFade();
                 if (!FloatDialog.pendingDialogs.length) close();
@@ -548,9 +551,6 @@ const FloatDialog = {
                 fbAction.remove();
                 unified.querySelectorAll('.fb-action').forEach((fb, i) => {
                     fb.setAttribute('data-di', i);
-                    fb.querySelectorAll('.float-cmd').forEach((sp) => {
-                        sp.setAttribute('data-di', i);
-                    });
                 });
                 checkFade();
                 if (!FloatDialog.pendingDialogs.length) close();
