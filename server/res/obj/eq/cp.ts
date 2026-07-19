@@ -27,6 +27,12 @@ export default class CustomEquipment extends EQUIPMENT {
             me.wait_input = (player: USER, input: string): void => this.rename(player, input);
             me.send_commands('cancle', '取消改名');
         });
+        this.add_action('cp_engrave', '镌刻', function (this: CustomEquipment, me: USER): void {
+            if (this.is_locked) return me.notify(this.color_name + '处于锁定状态，无法镌刻。');
+            me.notify('请在房间频道说出镌刻内容，内容必须为1至20个汉字。');
+            me.wait_input = (player: USER, input: string): void => this.engrave(player, input);
+            me.send_commands('cancle', '取消镌刻');
+        });
     }
 
     on_create(_path: string, par?: string): void {
@@ -96,5 +102,24 @@ export default class CustomEquipment extends EQUIPMENT {
         me.items_changed(this);
         WORLD.STATS.updateWeapon(me, this);
         me.notify('改名成功。');
+    }
+
+    engrave(me: USER, input: string): void {
+        if (input === 'cancle') {
+            me.wait_input = undefined;
+            me.notify('你取消了镌刻。');
+            return;
+        }
+        const desc = input.includes(' ') ? input.slice(input.indexOf(' ') + 1).trim() : input.trim();
+        const cleanDesc = desc.replace(/[\u0000-\u001F\u007F\u2000-\u202F]/g, '');
+        const reg = /^[\u4E00-\u9FA5\u3000-\u3003\u3008-\u3011\u3014-\u3017\uFF01-\uFF0F\uFF1A-\uFF1F\u2014\u2018\u2019\u201C\u201D\u2026\u00B7]{1,20}$/;
+        if (!reg.test(cleanDesc))
+            return me.notify('镌刻内容必须是1至20个汉字或中文符号。');
+        if (!UTIL.check_word(desc))
+            return me.notify('你不能使用这个镌刻内容。');
+        this.set_temp('cp_desc', desc);
+        me.wait_input = undefined;
+        me.items_changed(this);
+        me.notify('镌刻成功。');
     }
 }
