@@ -1,7 +1,7 @@
 import { COMMAND } from '../../../core/command.js';
 import type { CmdAndText, USER } from '../../../core/char/user.js';
 import { EQUIPMENT } from '../../../core/item/equipment.js';
-import { PROPERTIES } from '../../../core/const.js';
+import { PROPERTIES, WEAPON_TYPE } from '../../../core/const.js';
 import { WORLD } from '../../../core/world.js';
 import type { PropMap } from '../../../types/props.js';
 
@@ -325,8 +325,21 @@ export function rebuild_custom_prop(obj: EQUIPMENT): void {
     const ownerId = obj.query_temp<string>('cp_owner_id', '');
     const owner = query_owner_name(ownerId, obj);
     const part = obj.parts[obj.eq_type] ?? '装备';
-    obj.desc = '这是' + owner + '的专属' + part + '，基础评分' + obj.score + '，当前评分' + query_custom_score(obj);
+    const weaponName = query_weapon_name(obj.weapon_type);
+    const weaponType = weaponName ? '一' + obj.unit + weaponName + '，是' : '';
+    obj.desc = '这是' + weaponType + owner + '的专属' + part + '，基础评分' + obj.score + '，当前评分' + query_custom_score(obj);
     obj.refresh();
+}
+
+function query_weapon_name(type: string): string {
+    if (type === WEAPON_TYPE.SWORD) return '剑';
+    if (type === WEAPON_TYPE.BLADE) return '刀';
+    if (type === WEAPON_TYPE.CLUB) return '棍';
+    if (type === WEAPON_TYPE.STAFF) return '杖';
+    if (type === WEAPON_TYPE.WHIP) return '鞭';
+    if (type === WEAPON_TYPE.NONE) return '拳套';
+    if (type === WEAPON_TYPE.THROWING) return '暗器';
+    return '';
 }
 
 function query_owner_name(ownerId: string, obj: EQUIPMENT): string {
