@@ -308,11 +308,24 @@ export default class extends COMMAND {
         if (!obj) return me.notify('你只能重铸自己背包中的自制装备。');
         if (!operation) return this.show(me, obj);
         if (obj.is_locked) return me.notify(obj.color_name + '处于锁定状态，无法重铸。');
-        if (operation === 'add') return this.add(me, obj, arg1);
-        if (operation === 'upgrade') return this.upgrade(me, obj, Number(arg1), arg2);
-        if (operation === 'replace') return this.replace(me, obj, Number(arg1), arg2, confirm);
-        if (operation === 'wash') return this.wash(me, obj, arg1);
-        me.notify('没有这个重铸操作。');
+        switch (operation) {
+            case 'add':
+                this.add(me, obj, arg1);
+                break;
+            case 'upgrade':
+                this.upgrade(me, obj, Number(arg1), arg2);
+                break;
+            case 'replace':
+                this.replace(me, obj, Number(arg1), arg2, confirm);
+                break;
+            case 'wash':
+                this.wash(me, obj, arg1);
+                break;
+            default:
+                return me.notify('没有这个重铸操作。');
+        }
+        me.notify(obj.desc);
+        me.send_commands('reforge ' + obj.id, '继续重铸');
     }
 
     show(me: USER, obj: EQUIPMENT): void {
