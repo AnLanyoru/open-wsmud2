@@ -283,16 +283,26 @@ export class USER extends CHARACTER {
     }
 
     /**
-     * 直接发送消息(无视状态)
+     * 发送消息 — batch 模式下进入文本缓冲，与 notify 一起按 marker 与 binary 帧交错，
+     * 避免与 notify 顺序错乱（send 用于 cmds 按钮组/warn/任务奖励等需与 notify 排序的消息）。
+     * 无房间或非 batch 模式下 fallback 到 socket.send 直发。
      */
     send(text: string): void {
-        if (this.socket && text && text.length < 30240) {
+        if (!this.socket || !text || text.length >= 30240) return;
+        const room = this.environment as ROOM;
+        if (room && BATCH_MODE === 1) {
+            this._notify_markers.push(room._batch_all_payloads.length);
+            this._notify_frames.push(encodeTextFrame(text));
+            markRoomDirty(room);
+        } else {
             this.socket.send?.(text);
         }
     }
 
     /**
-     * 发送二进制数据(无视状态)
+     * 发送二进制数据(无视状态) — 单播直发，绕过 batch 缓冲
+     * 注意：不进入房间共享 _batch_all_payloads（那会导致广播给房间所有玩家），
+     * 因为 sendBinary 在 user 上是 per-player 语义。如需 batch 排序请使用 _broadcast_combat 等广播方法。
      */
     sendBinary(data: Buffer): void {
         if (this.socket && data && data.length < 30240) {
@@ -305,8 +315,8 @@ export class USER extends CHARACTER {
      * @returns boolean 是否发送成功(总是返回false，方便调用时直接return)
      */
     notify_fail(text: string): boolean {
-        if (this.socket && this.socket.send && !this.is_faint) {
-            this.socket.send(text);
+        if (this.socket && !this.is_faint) {
+            this.notify(text);
         }
         return false;
     }
@@ -469,7 +479,8 @@ export class USER extends CHARACTER {
     disconnect(isreplace?: boolean): void {
         if (this.environment && this.socket) {
             if (isreplace) {
-                this.send('<RED>有人使用你的角色从别的地址登陆游戏，请重新登陆</RED>');
+                // 顶号提示必须立即送达，绕过 batch（_notify_frames 马上会被清空，走 batch 会丢失）
+                this.socket.send?.('<RED>有人使用你的角色从别的地址登陆游戏，请重新登陆</RED>');
             }
         }
         this.disconnect_time = Date.now();
