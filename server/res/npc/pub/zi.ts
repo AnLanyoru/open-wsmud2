@@ -18,7 +18,7 @@ export default class extends NPC {
     constructor() {
         super();
         this.add_action('makeac', '我要定制首饰或暗器', (me: USER): void => {
-            WORLD.COMMANDS.get('duanzao')?.enter(me, 'accessory');
+            WORLD.COMMANDS.get('duanzao')?.enter(me);
         });
     }
 

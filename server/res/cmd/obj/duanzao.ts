@@ -13,15 +13,9 @@ interface ForgeNpc extends NPC {
 }
 
 const GROUPS: Record<string, string[]> = {
-    weapon: FORGE_WEAPON_TYPES,
-    clothing: ['cloth', 'shoes', 'head', 'cape', 'wrist', 'waist'],
-    accessory: ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin','throwing'],
-};
-
-const GROUP_NPCS: Record<string, string> = {
-    weapon: 'pub/tiejiang',
-    clothing: 'yz/zeng',
-    accessory: 'pub/zi',
+    'pub/tiejiang': FORGE_WEAPON_TYPES,
+    'yz/zeng': ['cloth', 'shoes', 'head', 'cape', 'wrist', 'waist'],
+    'pub/zi': ['ring', 'necklace', 'jewels', 'bracelet', 'hairpin','throwing'],
 };
 
 export default class extends COMMAND {
@@ -43,10 +37,14 @@ export default class extends COMMAND {
     }
 
     enter(me: USER, arg?: string): void {
-        if (!arg || GROUPS[arg]) return this.show_types(me, arg ?? 'weapon');
-        const group = this.query_group(arg);
-        const npc = group ? this.find_npc(me, group) : undefined;
+        const npc = this.find_npc(me);
         if (!npc) return me.notify('这里没有人可以帮你打造装备。');
+        if (!arg) return this.show_types(me, npc);
+        const types = GROUPS[npc.path];
+        if (!types?.includes(arg)) {
+            me.wait_input = undefined;
+            return me.notify(npc.query_duanzao_message('invalid_type'));
+        }
         const type = FORGE_TYPES[arg];
         if (!type) {
             me.wait_input = undefined;
@@ -55,15 +53,13 @@ export default class extends COMMAND {
         const crystal = me.find_obj_bypath('st/yuanjing');
         if (!crystal || crystal.count < 10) return me.notify(npc.query_duanzao_message('material_lack'));
         me.notify(npc.query_duanzao_message('name', type.name));
-        me.wait_input = (player: USER, input: string): void => this.finish(player, arg, input);
+        me.wait_input = (player: USER, input: string): void => this.finish(player, npc, arg, input);
         me.send_commands('cancle', '我不制作了');
     }
 
-    show_types(me: USER, group: string): void {
-        const types = GROUPS[group];
+    show_types(me: USER, npc: ForgeNpc): void {
+        const types = GROUPS[npc.path];
         if (!types) return me.notify('没有这类制作服务。');
-        const npc = this.find_npc(me, group);
-        if (!npc) return me.notify('这里没有人可以帮你打造装备。');
         const crystal = me.find_obj_bypath('st/yuanjing');
         if (!crystal || crystal.count < 10) return me.notify(npc.query_duanzao_message('material_lack'));
         me.notify(npc.query_duanzao_message('choose'));
@@ -72,12 +68,11 @@ export default class extends COMMAND {
         me.send_commands(...commands);
     }
 
-    finish(me: USER, key: string, input: string): void {
-        const group = this.query_group(key);
-        const npc = group ? this.find_npc(me, group) : undefined;
-        if (!npc) {
+    finish(me: USER, npc: ForgeNpc, key: string, input: string): void {
+        const types = GROUPS[npc.path];
+        if (!types?.includes(key)) {
             me.wait_input = undefined;
-            return me.notify('这里没有人可以帮你打造装备。');
+            return me.notify(npc.query_duanzao_message('invalid_type'));
         }
         if (input === 'cancle') {
             me.wait_input = undefined;
@@ -114,16 +109,15 @@ export default class extends COMMAND {
         me.notify(npc.query_duanzao_message('success', type.name, obj.unit_name()));
     }
 
-    query_group(key: string): string | undefined {
-        return Object.keys(GROUPS).find(group => GROUPS[group].includes(key));
-    }
-
-    find_npc(me: USER, group: string): ForgeNpc | undefined {
-        const path = GROUP_NPCS[group];
-        const npc = path ? me.environment?.find_by_path(path) : undefined;
-        if (!npc?.check_npc()) return undefined;
-        const forgeNpc = npc as ForgeNpc;
-        if (typeof forgeNpc.query_duanzao_message !== 'function') return undefined;
-        return forgeNpc;
+    find_npc(me: USER): ForgeNpc | undefined {
+        const items = me.environment?.items;
+        if (!items) return undefined;
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item.check_npc()) continue;
+            const npc = item as ForgeNpc;
+            if (typeof npc.query_duanzao_message === 'function') return npc;
+        }
+        return undefined;
     }
 }
