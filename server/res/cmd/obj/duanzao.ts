@@ -44,11 +44,14 @@ export default class extends COMMAND {
 
     enter(me: USER, arg?: string): void {
         if (!arg || GROUPS[arg]) return this.show_types(me, arg ?? 'weapon');
-        const type = FORGE_TYPES[arg];
-        if (!type) return me.notify('不能制作这种装备。');
         const group = this.query_group(arg);
         const npc = group ? this.find_npc(me, group) : undefined;
-        if (!npc) return me.notify('这里不能制作这种装备。');
+        if (!npc) return me.notify('这里没有人可以帮你打造装备。');
+        const type = FORGE_TYPES[arg];
+        if (!type) {
+            me.wait_input = undefined;
+            return me.notify(npc.query_duanzao_message('invalid_type'));
+        }
         const crystal = me.find_obj_bypath('st/yuanjing');
         if (!crystal || crystal.count < 10) return me.notify(npc.query_duanzao_message('material_lack'));
         me.notify(npc.query_duanzao_message('name', type.name));
@@ -60,7 +63,7 @@ export default class extends COMMAND {
         const types = GROUPS[group];
         if (!types) return me.notify('没有这类制作服务。');
         const npc = this.find_npc(me, group);
-        if (!npc) return me.notify('这里没有能够提供这类制作服务的人。');
+        if (!npc) return me.notify('这里没有人可以帮你打造装备。');
         const crystal = me.find_obj_bypath('st/yuanjing');
         if (!crystal || crystal.count < 10) return me.notify(npc.query_duanzao_message('material_lack'));
         me.notify(npc.query_duanzao_message('choose'));
