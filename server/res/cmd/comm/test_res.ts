@@ -451,6 +451,7 @@ export default class extends COMMAND {
     allow_state = true;
     allow_busy = true;
     allow_die = true;
+    allow_level: number = 6;
     /** 匹配 0-6 个数字参数：test_res / test_res 0 / test_res 1 0 等 */
     regex = /^(\d+)?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?$/;
 

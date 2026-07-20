@@ -13,11 +13,14 @@ export default class extends USERTASK {
         return `<hic>请使用指令 <hiy>test_res</hiy> 打开测试资源菜单。</hic><br><mem>点击领取按钮可获得 100 块<hio>元晶</hio>和10万块<hig>玄晶</hig>（可无限领取）。</mem>`;
     }
 
-    query_state(_me: CHARACTER): number | undefined {
+    query_state(me: CHARACTER): number | undefined {
+        
+        if (me.user_level<6) return 0;
         return 2;
     }
 
     on_finish(me: CHARACTER, _par?: string): boolean {
+        if (me.user_level<6) return false;
         const obj = me.add_obj('st/yuanjing', 100);
         if (obj) {
             me.notify(`<hig>你领取了 100 块元晶。</hig>`);
