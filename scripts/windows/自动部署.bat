@@ -1,119 +1,197 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 :: ==============================================
-::   ·ÅÖÃÔÚ²¿Êð°üÍ¬Ä¿Â¼ ¡ª ×Ô¶¯²¿Êð (Windows)
-::   ½âÑ¹ fast_start.tar ²¢Æô¶¯·þÎñ
+::   æ”¾ç½®åœ¨éƒ¨ç½²åŒ…åŒç›®å½• â€” è‡ªåŠ¨éƒ¨ç½² (Windows)
+::   è§£åŽ‹ fast_start.tar å¹¶å¯åŠ¨æœåŠ¡
+::
+::   æœ¬è„šæœ¬ä¸ºè‡ªåŒ…å«ç‰ˆæœ¬ï¼Œæ— éœ€å…¶ä»–ä¾èµ–ï¼Œå¯ç›´æŽ¥éš tar åˆ†å‘ã€‚
+::   ä½¿ç”¨ PID æ–‡ä»¶ç®¡ç†è¿›ç¨‹ï¼Œé¿å…è¯¯æ€å…¶ä»– node è¿›ç¨‹ã€‚
 :: ==============================================
 
 set "SCRIPT_DIR=%~dp0"
 set "PACKAGE_NAME=fast_start.tar"
+set "PID_DIR=%TEMP%\open-wsmud2"
 
 echo ============================================
-echo   ×Ô¶¯²¿Êð open-wsmud2 (Windows)
+echo   è‡ªåŠ¨éƒ¨ç½² open-wsmud2 (Windows)
 echo ============================================
 echo.
 
-:: --- ¼ì²é/°²×° Node.js ---
+:: --- æ£€æµ‹/å®‰è£… Node.js ---
 where node >nul 2>nul
 if %errorlevel% neq 0 (
-    echo [WARN] Î´¼ì²âµ½ Node.js£¬³¢ÊÔ×Ô¶¯°²×°...
+    echo [WARN] æœªæ£€æµ‹åˆ° Node.jsï¼Œå°è¯•è‡ªåŠ¨å®‰è£…...
 
-    :: ·½·¨1: winget (Windows 10/11 ×Ô´ø)
+    :: æ–¹æ³•1: winget (Windows 10/11 è‡ªå¸¦)
     where winget >nul 2>nul
-    if %errorlevel% equ 0 (
-        echo [INFO] Í¨¹ý winget °²×° Node.js...
+    if !errorlevel! equ 0 (
+        echo [INFO] é€šè¿‡ winget å®‰è£… Node.js...
         winget install OpenJS.NodeJS.LTS --silent --accept-package-agreements
-        if %errorlevel% equ 0 (
-            echo [INFO] Node.js °²×°Íê³É£¬ÇëÖØÐÂÔËÐÐ±¾½Å±¾
+        if !errorlevel! equ 0 (
+            echo [INFO] Node.js å®‰è£…å®Œæˆï¼Œè¯·é‡æ–°æ‰“å¼€å‘½ä»¤è¡Œè¿è¡Œæœ¬è„šæœ¬
             pause
             exit /b 0
         )
     )
 
-    :: ·½·¨2: choco
+    :: æ–¹æ³•2: choco
     where choco >nul 2>nul
-    if %errorlevel% equ 0 (
-        echo [INFO] Í¨¹ý Chocolatey °²×° Node.js...
+    if !errorlevel! equ 0 (
+        echo [INFO] é€šè¿‡ Chocolatey å®‰è£… Node.js...
         choco install nodejs-lts -y
-        if %errorlevel% equ 0 (
-            echo [INFO] Node.js °²×°Íê³É£¬ÇëÖØÐÂÔËÐÐ±¾½Å±¾
+        if !errorlevel! equ 0 (
+            echo [INFO] Node.js å®‰è£…å®Œæˆï¼Œè¯·é‡æ–°æ‰“å¼€å‘½ä»¤è¡Œè¿è¡Œæœ¬è„šæœ¬
             pause
             exit /b 0
         )
     )
 
-    :: ÎÞ·¨×Ô¶¯°²×°
-    echo [ERROR] ÎÞ·¨×Ô¶¯°²×° Node.js
-    echo   ÇëÊÖ¶¯ÏÂÔØ°²×°: https://nodejs.org/
+    echo [ERROR] æ— æ³•è‡ªåŠ¨å®‰è£… Node.js
+    echo   è¯·æ‰‹åŠ¨ä¸‹è½½å®‰è£…: https://nodejs.org/ (éœ€è¦ 24+)
     pause
     exit /b 1
 )
 echo [INFO] Node.js
 node -v
-
-:: --- ±àÒë¹¤¾ßÌáÐÑ ---
-echo [INFO] ×¢Òâ: better-sqlite3 ÐèÒª C++ ±àÒë¹¤¾ß
-echo       Èç°²×°Ê§°ÜÇëÔËÐÐ: npm install -g windows-build-tools
 echo.
 
-:: --- ¼ì²é²¿Êð°ü ---
+:: --- ç¼–è¯‘å·¥å…·æç¤º (better-sqlite3 éœ€è¦ C++ ç¼–è¯‘å·¥å…·) ---
+where cl >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [INFO] æ³¨æ„: better-sqlite3 éœ€è¦ C++ ç¼–è¯‘å·¥å…·
+    echo       è‹¥ npm install å¤±è´¥ï¼Œè¯·å®‰è£… Visual Studio Build Tools
+    echo       æˆ–è¿è¡Œ: npm install -g windows-build-tools
+    echo.
+)
+
+:: --- æ£€æŸ¥éƒ¨ç½²åŒ… ---
 if not exist "%SCRIPT_DIR%%PACKAGE_NAME%" (
-    echo [ERROR] Î´ÕÒµ½ %PACKAGE_NAME%
-    echo   ÇëÈ·±£±¾½Å±¾Óë %PACKAGE_NAME% ÔÚÍ¬Ò»Ä¿Â¼ÏÂ¡£
+    echo [ERROR] æœªæ‰¾åˆ° %PACKAGE_NAME%
+    echo   è¯·ç¡®ä¿æœ¬è„šæœ¬ä¸Ž %PACKAGE_NAME% åœ¨åŒä¸€ç›®å½•ä¸‹ã€‚
     pause
     exit /b 1
 )
 
-:: --- ±¸·ÝÏÖÓÐÎÄ¼þ ---
+:: --- æ ¡éªŒåŒ…å®Œæ•´æ€§ ---
+echo [INFO] æ ¡éªŒåŒ…å®Œæ•´æ€§...
+tar -tf "%SCRIPT_DIR%%PACKAGE_NAME%" >nul 2>nul
+if %errorlevel% neq 0 (
+    echo [ERROR] åŒ…æ–‡ä»¶æŸåæˆ–æ— æ•ˆ: %PACKAGE_NAME%
+    pause
+    exit /b 1
+)
+echo   æ ¡éªŒé€šè¿‡ã€‚
+echo.
+
+:: --- å¤‡ä»½çŽ°æœ‰éƒ¨ç½² ---
 if exist "%SCRIPT_DIR%web.js" (
-    echo [INFO] ±¸·ÝÏÖÓÐ²¿Êð...
+    echo [INFO] å¤‡ä»½çŽ°æœ‰éƒ¨ç½²...
     for /f "tokens=1-4 delims=/-: " %%a in ('echo %date% %time%') do (
         set "TIMESTAMP=%%a%%b%%c-%%d"
     )
     set "BACKUP_DIR=%SCRIPT_DIR%backup-!TIMESTAMP!"
     mkdir "!BACKUP_DIR!" 2>nul
-    for %%f in (web.js main.mjs config.js package.json package-lock.json) do (
+    for %%f in (web.js main.mjs config.js package.json package-lock.json .env) do (
         if exist "%SCRIPT_DIR%%%f" copy "%SCRIPT_DIR%%%f" "!BACKUP_DIR!\" >nul 2>nul
     )
-    for %%d in (node_modules os world www api web data) do (
+    :: ç¼–è¯‘äº§ç‰©ç›®å½•ä¸º core/ res/ (è€Œéžæ—§ç‰ˆ os/ world/)
+    for %%d in (node_modules core res www api web data) do (
         if exist "%SCRIPT_DIR%%%d" xcopy "%SCRIPT_DIR%%%d" "!BACKUP_DIR!\%%d\" /E /I /Q >nul 2>nul
     )
-    echo [INFO] ±¸·Ýµ½: !BACKUP_DIR!
+    echo   å¤‡ä»½åˆ°: !BACKUP_DIR!
 )
-
-:: --- ½âÑ¹ ---
 echo.
-echo [1/3] ½âÑ¹ %PACKAGE_NAME% ...
+
+:: --- è§£åŽ‹ ---
+echo [1/3] è§£åŽ‹ %PACKAGE_NAME% ...
 cd /d "%SCRIPT_DIR%"
 tar -xf "%PACKAGE_NAME%"
 if %errorlevel% neq 0 (
-    echo [ERROR] ½âÑ¹Ê§°Ü£¬°ü¿ÉÄÜÒÑËð»µ£¡
+    echo [ERROR] è§£åŽ‹å¤±è´¥ï¼ŒåŒ…å¯èƒ½æŸåï¼
     pause
     exit /b %errorlevel%
 )
-echo   ½âÑ¹Íê³É¡£
+echo   è§£åŽ‹å®Œæˆã€‚
 echo.
 
-:: --- °²×°ÒÀÀµ (Ê¼ÖÕÖ´ÐÐ£¬È·±£Ô­ÉúÄ£¿é±àÒëÕýÈ·) ---
-echo [2/3] °²×°ÒÀÀµ (Ä¿±êÆ½Ì¨Ô­Éú±àÒë)...
+:: --- å®‰è£…ä¾èµ– (å§‹ç»ˆæ‰§è¡Œï¼Œç¡®ä¿åŽŸç”Ÿæ¨¡å—ç¼–è¯‘æ­£ç¡®) ---
+echo [2/3] å®‰è£…ä¾èµ– (ç›®æ ‡å¹³å°åŽŸç”Ÿç¼–è¯‘)...
 if exist "%SCRIPT_DIR%package-lock.json" (
     call npm ci --production 2>nul || call npm install --production
 ) else (
     call npm install --production
 )
-echo   ÒÀÀµ¾ÍÐ÷¡£
+if %errorlevel% neq 0 (
+    echo [ERROR] ä¾èµ–å®‰è£…å¤±è´¥ï¼
+    echo   better-sqlite3 éœ€è¦ç¼–è¯‘å·¥å…·ï¼Œè¯·å®‰è£… Visual Studio Build Tools
+    pause
+    exit /b %errorlevel%
+)
+echo   ä¾èµ–å°±ç»ªã€‚
 echo.
 
-:: --- Æô¶¯·þÎñ ---
-echo [3/3] Æô¶¯·þÎñ...
+:: --- å¯åŠ¨æœåŠ¡ ---
+echo [3/3] å¯åŠ¨æœåŠ¡...
 echo.
 
-echo Æô¶¯ Web ·þÎñÆ÷ (http://localhost:8088)...
-start "open-wsmud Web" /B node "%SCRIPT_DIR%web.js"
+mkdir "%PID_DIR%" 2>nul
 
-echo Æô¶¯ÓÎÏ··þÎñÆ÷...
-node "%SCRIPT_DIR%main.mjs"
+:: åœæ­¢æ—§æœåŠ¡ (åŸºäºŽ PID æ–‡ä»¶ï¼Œé¿å…è¯¯æ€å…¶ä»– node è¿›ç¨‹)
+call :stop_old_services
+
+:: å¯åŠ¨ Web æœåŠ¡å™¨ (åŽå°è¿è¡Œï¼Œè®°å½• PIDï¼Œè¾“å‡ºé‡å®šå‘åˆ°æ—¥å¿—)
+echo [INFO] å¯åŠ¨ Web æœåŠ¡å™¨ (http://localhost:8088)...
+if not exist "%SCRIPT_DIR%log" mkdir "%SCRIPT_DIR%log"
+for /f %%i in ('powershell -NoProfile -Command "(Start-Process -FilePath 'node' -ArgumentList 'web.js' -WorkingDirectory '%SCRIPT_DIR%' -RedirectStandardOutput 'log\web.log' -RedirectStandardError 'log\web.err' -WindowStyle Hidden -PassThru).Id"') do set "WEB_PID=%%i"
+if defined WEB_PID (
+    echo !WEB_PID!> "%PID_DIR%\web.pid"
+    echo   Web PID: !WEB_PID!
+) else (
+    echo [WARN] Web æœåŠ¡å™¨ PID èŽ·å–å¤±è´¥
+)
+
+:: å¯åŠ¨æ¸¸æˆæœåŠ¡å™¨ (åŽå°è¿è¡Œï¼Œè®°å½• PID)
+echo [INFO] å¯åŠ¨æ¸¸æˆæœåŠ¡å™¨...
+for /f %%i in ('powershell -NoProfile -Command "(Start-Process -FilePath 'node' -ArgumentList 'main.mjs' -WorkingDirectory '%SCRIPT_DIR%' -RedirectStandardOutput 'log\game.log' -RedirectStandardError 'log\game.err' -WindowStyle Hidden -PassThru).Id"') do set "GAME_PID=%%i"
+if defined GAME_PID (
+    echo !GAME_PID!> "%PID_DIR%\game.pid"
+    echo   Game PID: !GAME_PID!
+) else (
+    echo [WARN] æ¸¸æˆæœåŠ¡å™¨ PID èŽ·å–å¤±è´¥
+)
 
 echo.
-echo ·þÎñÒÑÍ£Ö¹¡£
+echo ============================================
+echo   [OK] éƒ¨ç½²å®Œæˆï¼ŒæœåŠ¡å·²å¯åŠ¨
+echo   Web æœåŠ¡å™¨: http://localhost:8088
+echo   æ—¥å¿—æ–‡ä»¶:   %SCRIPT_DIR%log\
+echo   PID æ–‡ä»¶:   %PID_DIR%\
+echo.
+echo   åœæ­¢æœåŠ¡: è¿è¡Œ stop.bat æˆ– è‡ªåŠ¨æ›´æ–°.bat
+echo   æŸ¥çœ‹æ—¥å¿—: type log\web.log  /  type log\game.log
+echo ============================================
 pause
+exit /b 0
+
+:: ============================================================
+:: å­ä¾‹ç¨‹: åœæ­¢æ—§æœåŠ¡ (åŸºäºŽ PID æ–‡ä»¶)
+:: ============================================================
+:stop_old_services
+if exist "%PID_DIR%\web.pid" (
+    for /f %%i in (%PID_DIR%\web.pid) do (
+        taskkill /PID %%i /F /T 2>nul
+    )
+    del "%PID_DIR%\web.pid" 2>nul
+)
+if exist "%PID_DIR%\game.pid" (
+    for /f %%i in (%PID_DIR%\game.pid) do (
+        taskkill /PID %%i /F /T 2>nul
+    )
+    del "%PID_DIR%\game.pid" 2>nul
+)
+:: å…œåº•: ä»…æ¸…ç†å¯èƒ½æ®‹ç•™çš„æœ¬é¡¹ç›®è¿›ç¨‹ (æŒ‰å‘½ä»¤è¡ŒåŒ¹é…ï¼Œä¸å½±å“å…¶ä»– node è¿›ç¨‹)
+for /f "tokens=2" %%a in ('tasklist /v /fo csv ^| findstr "node.exe" ^| findstr "web.js" 2^>nul') do taskkill /PID %%a /F /T 2>nul
+for /f "tokens=2" %%a in ('tasklist /v /fo csv ^| findstr "node.exe" ^| findstr "main.mjs" 2^>nul') do taskkill /PID %%a /F /T 2>nul
+timeout /t 1 /nobreak >nul
+goto :eof

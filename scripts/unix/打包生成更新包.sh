@@ -2,6 +2,10 @@
 # ==============================================
 #   打包更新资源包 (macOS / Linux)
 #   编译 → 部署 → 打包 → release.tar (不含 node_modules)
+#
+#   用法:
+#     bash 打包生成更新包.sh              # 普通编译
+#     bash 打包生成更新包.sh --binary     # 启用二进制协议 (send_room → send_room_b)
 # ==============================================
 set -e
 
@@ -10,6 +14,21 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 OUTPUT_DIR="$SCRIPT_DIR"
 PACKAGE_NAME="release.tar"
 
+# 解析 --binary 标志
+for arg in "$@"; do
+    case "$arg" in
+        --binary) BUILD_FLAGS="--binary" ;;
+        --metrics) BUILD_FLAGS="$BUILD_FLAGS --metrics" ;;
+        -h|--help)
+            echo "用法: bash 打包生成更新包.sh [--binary] [--metrics]"
+            echo "  --binary   启用二进制协议转换"
+            echo "  --metrics  注入性能监控埋点 (调试用)"
+            exit 0
+            ;;
+    esac
+done
+export BUILD_FLAGS
+
 # 加载共享函数库
 source "$SCRIPT_DIR/../lib/common.sh"
 
@@ -17,6 +36,7 @@ echo "============================================"
 echo "  打包更新资源包"
 echo "  目标平台: $(uname -s)"
 echo "  输出: $PACKAGE_NAME (不含 node_modules)"
+[ -n "$BUILD_FLAGS" ] && echo "  构建标志: $BUILD_FLAGS"
 echo "============================================"
 echo ""
 

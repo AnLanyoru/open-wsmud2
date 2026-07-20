@@ -15,6 +15,12 @@ log_info()  { echo -e "${GREEN}[INFO]${NC}  $1"; }
 log_warn()  { echo -e "${YELLOW}[WARN]${NC}  $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# --- Node.js 最低版本 ---
+NODE_MIN=24
+
+# --- 构建标志 (由调用者通过 BUILD_FLAGS 传入，如 "--binary") ---
+BUILD_FLAGS="${BUILD_FLAGS:-}"
+
 # --- 项目根目录 ---
 # 调用者通过 PROJECT_ROOT 传入；若未设定则自动探测 (package.json 所在目录)
 detect_root() {
@@ -37,7 +43,7 @@ detect_root() {
 # --- 预检 (开发机用: 仅检查) ---
 check_node() {
     if ! command -v node &>/dev/null; then
-        log_error "未找到 Node.js，请先安装 Node.js 18+"
+        log_error "未找到 Node.js，请先安装 Node.js ${NODE_MIN}+"
         log_error "  https://nodejs.org/ 或使用系统包管理器安装"
         exit 1
     fi
@@ -54,12 +60,11 @@ check_npm() {
 
 # --- 安装 Node.js (服务器上自动部署用) ---
 install_node() {
-    local NODE_MIN=24
     log_warn "未检测到 Node.js，正在自动安装..."
 
     # 方法1: nvm
     if [ -s "$HOME/.nvm/nvm.sh" ]; then
-        log_info "检测到 nvm，安装 Node.js $NODE_MIN..."
+        log_info "检测到 nvm，安装 Node.js ${NODE_MIN}..."
         export NVM_DIR="$HOME/.nvm"
         source "$NVM_DIR/nvm.sh"
         nvm install $NODE_MIN
@@ -70,13 +75,13 @@ install_node() {
 
     # 方法2: nodesource (Linux 官方推荐，版本可控)
     if [ "$(uname -s)" = "Linux" ]; then
-        log_info "通过 NodeSource 安装 Node.js 24.x..."
+        log_info "通过 NodeSource 安装 Node.js ${NODE_MIN}.x..."
         if command -v curl &>/dev/null; then
-            curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash - 2>/dev/null && \
+            curl -fsSL "https://deb.nodesource.com/setup_${NODE_MIN}.x" | sudo -E bash - 2>/dev/null && \
                 sudo apt-get install -y nodejs 2>/dev/null && \
                 log_info "Node.js $(node -v) 安装完成" && return 0
 
-            curl -fsSL https://rpm.nodesource.com/setup_24.x | sudo -E bash - 2>/dev/null && \
+            curl -fsSL "https://rpm.nodesource.com/setup_${NODE_MIN}.x" | sudo -E bash - 2>/dev/null && \
                 sudo yum install -y nodejs 2>/dev/null && \
                 log_info "Node.js $(node -v) 安装完成" && return 0
         fi
@@ -117,11 +122,11 @@ ensure_node() {
     if command -v node &>/dev/null; then
         local ver
         ver=$(node -v | sed 's/v//' | cut -d. -f1)
-        if [ "$ver" -ge 24 ] 2>/dev/null; then
+        if [ "$ver" -ge "$NODE_MIN" ] 2>/dev/null; then
             log_info "Node.js $(node -v)"
             return 0
         fi
-        log_warn "Node.js $(node -v) 版本过低，需要 >= 24"
+        log_warn "Node.js $(node -v) 版本过低，需要 >= ${NODE_MIN}"
     fi
     install_node
 }
@@ -164,6 +169,28 @@ ensure_build_tools() {
     install_build_tools
 }
 
+# --- 构建核心: 调用 scripts/pack.mjs (编译 + 部署 + 可选 binary) ---
+# pack.mjs 是项目规范的构建入口 (参见 package.json 的 build/build-b 脚本)
+#   - 默认: tsc 编译 server/ → 复制到 core/ res/
+#   - --binary: 额外执行 send_room → send_room_b 二进制协议转换
+#   - --metrics: 注入性能监控埋点 (调试用)
+run_pack() {
+    local root="$1"
+    cd "$root"
+    log_info "运行 pack.mjs (编译 + 部署)${BUILD_FLAGS:+，标志: $BUILD_FLAGS}..."
+    node scripts/pack.mjs $BUILD_FLAGS
+    echo ""
+}
+
+# --- 构建前端 ---
+run_vite() {
+    local root="$1"
+    cd "$root"
+    log_info "构建前端..."
+    npx vite build
+    echo ""
+}
+
 # --- 构建 (首次部署用: 含 npm install) ---
 build_full() {
     local root="$1"
@@ -173,62 +200,48 @@ build_full() {
     npm install
     echo ""
 
-    log_info "编译 TypeScript..."
-    cd "$root/server"
-    rm -rf dist
-    npx tsc --outDir dist 2>/dev/null || log_warn "存在类型错误，JS 输出正常，继续..."
-    cd "$root"
-    echo ""
-
-    log_info "运行部署 (core/ res/ 保持原名)..."
-    node server/scripts/deploy.mjs
-    echo ""
-
-    log_info "构建前端..."
-    npx vite build
-    echo ""
+    run_pack "$root"
+    run_vite "$root"
 }
 
 # --- 构建 (更新用: 跳过 npm install) ---
 build_light() {
     local root="$1"
-    cd "$root"
-
-    log_info "编译 TypeScript..."
-    cd "$root/server"
-    rm -rf dist
-    npx tsc --outDir dist 2>/dev/null || log_warn "存在类型错误，JS 输出正常，继续..."
-    cd "$root"
-    echo ""
-
-    log_info "运行部署 (core/ res/ 保持原名)..."
-    node server/scripts/deploy.mjs
-    echo ""
-
-    log_info "构建前端..."
-    npx vite build
-    echo ""
+    run_pack "$root"
+    run_vite "$root"
 }
 
 # --- 公用 tar 排除项 ---
 # 注意:
 #   - 不打包 node_modules/ (含 better-sqlite3 原生模块，必须由目标机器编译)
 #   - 不打包 .env (避免覆盖服务器配置)
+#   - 不打包 data/ 下的运行时数据 (database.db, 玩家数据, def 种子)
 TAR_EXCLUDES=(
     --exclude='*.ts'
     --exclude='*.map'
     --exclude='.git'
     --exclude='.idea'
     --exclude='.vscode'
+    --exclude='.trae'
+    --exclude='.claude'
     --exclude='log'
     --exclude='auto_test'
+    --exclude='bench'
     --exclude='tools'
     --exclude='old'
     --exclude='server'
     --exclude='scripts'
+    --exclude='docs'
+    --exclude='new_data'
+    --exclude='web_preview'
     --exclude='node_modules'
     --exclude='.env'
     --exclude='*.tar'
+    --exclude='data/database.db'
+    --exclude='data/1'
+    --exclude='data/100'
+    --exclude='data/def'
+    --exclude='backup-*'
 )
 
 # 打包文件列表 (不含 node_modules — 原生模块需在目标平台编译)
@@ -308,8 +321,12 @@ start_services() {
     game_pid=$(cat "$PID_DIR/game.pid")
     log_info "服务已启动 (Web PID: $web_pid, Game PID: $game_pid)"
 
-    # 等待任意一个退出
-    wait -n 2>/dev/null || true
+    # 等待任意一个退出 (兼容 bash 3.2 macOS，回退到轮询)
+    if ! wait -n 2>/dev/null; then
+        while kill -0 "$web_pid" 2>/dev/null && kill -0 "$game_pid" 2>/dev/null; do
+            sleep 1
+        done
+    fi
     stop_services
     log_info "服务已停止。"
 }
