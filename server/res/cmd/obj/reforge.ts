@@ -331,8 +331,8 @@ export function rebuild_custom_prop(obj: EQUIPMENT): void {
         ? [`是一${obj.unit}${weaponName}，`, '武器']
         : ['', FORGE_TYPES[forgeKey]?.name ?? obj.parts[obj.eq_type] ?? '装备'];
     obj.desc = cpDesc
-        ? `这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}` :
-        `${cpDesc}\n这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}`;
+        ? `${cpDesc}\n这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}`
+        : `这${weaponType}是${owner}的专属${part}，基础评分${obj.score}，当前评分${query_custom_score(obj)}`;
     obj.refresh();
 }
 
