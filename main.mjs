@@ -51,16 +51,23 @@ for (const item in __PATH) {
     __PATH[item] = path.join(__dirname, __PATH[item]);
 }
 
-await readdir(__PATH.BASE);
-const { WORLD } = await import('./core/world.js');
-await __CONFIG.init();
-await WORLD.startup(process.argv[2]);
+try {
+    await readdir(__PATH.BASE);
+    const { WORLD } = await import('./core/world.js');
+    await __CONFIG.init();
+    await WORLD.startup(process.argv[2]);
+} catch (e) {
+    console.error('========== 启动失败 ==========');
+    console.error(e && e.stack ? e.stack : e);
+    console.error('==============================');
+    process.exit(1);
+}
 
 process.on('uncaughtException', (error) => {
-    console.error('未捕获的异常:', error);
+    console.error('未捕获的异常:', error && error.stack ? error.stack : error);
 });
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('未处理的Promise拒绝:', reason);
+    console.error('未处理的Promise拒绝:', reason && reason.stack ? reason.stack : reason);
 });
 
 let isShuttingDown = false;

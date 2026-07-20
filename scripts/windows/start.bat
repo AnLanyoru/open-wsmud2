@@ -71,6 +71,59 @@ if defined GAME_PID (
     echo [WARN] 游戏服务器 PID 获取失败
 )
 
+:: --- 等待启动并检查进程是否存活 ---
+echo [INFO] 等待服务初始化 (3秒)...
+timeout /t 3 /nobreak >nul
+
+set "STARTUP_FAILED=0"
+if defined GAME_PID (
+    tasklist /FI "PID eq %GAME_PID%" 2>nul | findstr %GAME_PID% >nul
+    if errorlevel 1 (
+        echo [ERROR] 游戏服务器启动失败！PID %GAME_PID% 已退出
+        set "STARTUP_FAILED=1"
+        if exist "log\game.err" (
+            echo --- game.err 内容 ---
+            type "log\game.err"
+            echo --------------------
+        )
+        if exist "log\game.log" (
+            echo --- game.log 最后 30 行 ---
+            powershell -NoProfile -Command "Get-Content 'log\game.log' -Tail 30"
+            echo ----------------------------
+        )
+    ) else (
+        echo   [OK] 游戏服务器运行中 (PID %GAME_PID%)
+    )
+)
+if defined WEB_PID (
+    tasklist /FI "PID eq %WEB_PID%" 2>nul | findstr %WEB_PID% >nul
+    if errorlevel 1 (
+        echo [ERROR] Web 服务器启动失败！PID %WEB_PID% 已退出
+        set "STARTUP_FAILED=1"
+        if exist "log\web.err" (
+            echo --- web.err 内容 ---
+            type "log\web.err"
+            echo --------------------
+        )
+        if exist "log\web.log" (
+            echo --- web.log 最后 30 行 ---
+            powershell -NoProfile -Command "Get-Content 'log\web.log' -Tail 30"
+            echo ----------------------------
+        )
+    ) else (
+        echo   [OK] Web 服务器运行中 (PID %WEB_PID%)
+    )
+)
+
+if "%STARTUP_FAILED%"=="1" (
+    echo.
+    echo ============================================
+    echo   [失败] 部分服务启动失败，请查看上方日志
+    echo ============================================
+    pause
+    exit /b 1
+)
+
 echo.
 echo ============================================
 echo   [OK] 服务已启动
