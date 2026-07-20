@@ -1146,7 +1146,6 @@ export class ROOM extends ITEM {
         for (let i = 0; i < items.length; i++) {
             const item: any = items[i];
             if (!item.is_player || !item.socket) continue;
-            if (item.no_message) continue;
             // 跳过刚进房的玩家（他们已通过 items_to_json 收到完整列表，不应收到自己的 0x57 帧）
             // 同时清空可能残留的 notify 缓冲，避免 marker 跨 tick 引用已清空的 binary 序列导致越界
             if (skipSet && skipSet.has(item)) {
@@ -1168,6 +1167,7 @@ export class ROOM extends ITEM {
                 const batch: Buffer[] = [];
                 for (let j = binaryStart; j < endIdx; j++) {
                     if (noCombat && combatFlags[j]) continue;
+                    if (item.no_message && !combatFlags[j] && (payloads[j][0] & 0x7f) === 0x12) continue;
                     batch.push(payloads[j]);
                 }
                 binaryStart = endIdx;
