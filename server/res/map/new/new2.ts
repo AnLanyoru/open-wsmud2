@@ -146,9 +146,7 @@ function ask6(me: CHARACTER) {
     me.call_out(function (this: CHARACTER) {
         if (this.moveto('yz/kedian', undefined, '$N风尘仆仆的走了进来.') != false) {
             if (fb) {
-                if ('clear_copy' in fb) {
-                    (fb as any).clear_copy(me);
-                }
+                fb.clear_copy(me);
             }
             var obj = me.add_obj('cash/new_box');
             if (obj) {
