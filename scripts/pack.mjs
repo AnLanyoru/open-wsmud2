@@ -752,7 +752,8 @@ ${serverLines.join('\n')}
                         let argsStr = content.slice(matchEnd, parenEnd).trim();
                         // 去掉首尾逗号和空白（处理多行格式和尾逗号）
                         argsStr = argsStr.replace(/^,\s*/, '').replace(/\s*,\s*$/, '');
-                        const newCall = `.${funcName}(${id}${argsStr ? ', ' + argsStr : ''}${exprs.length ? ', ' + exprs.join(', ') : ''})`;
+                        const targetArg = argsStr || 'undefined';
+                        const newCall = `.${funcName}(${id}, ${targetArg}${exprs.length ? ', ' + exprs.join(', ') : ''})`;
                         content = content.slice(0, btMatch.index) + newCall + content.slice(parenEnd + 1);
                         CALL_BT_RE.lastIndex = btMatch.index + newCall.length;
                     }
