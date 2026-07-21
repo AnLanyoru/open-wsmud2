@@ -31,6 +31,7 @@ export default class extends COMMAND {
             if (!other_target || !other_target.check_character()) {
                 return me.notify('这里没有这个人。');
             }
+            target = other_target;
             if (target.master == me.id) {
                 isfollower = true;
             } else {
@@ -41,7 +42,6 @@ export default class extends COMMAND {
                         return me.notify('你只能查看自己师父的技能。');
                 }
             }
-            target = other_target;
         }
         this.render_skill(me, target, isfollower);
     }
