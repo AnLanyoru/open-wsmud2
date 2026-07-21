@@ -44,17 +44,16 @@ export default class UpdateCmd extends COMMAND {
      * @returns {Promise<void>}
      */
     do_update(me: CHARACTER | null, arg: string): Promise<void> {
-        arg = arg.replace(/\\/g, '/');
-        if (arg.startsWith('doc/')) return Promise.resolve();
+        arg = arg.replace(/\\/g, '/').replace(/^([^/\s]+)\s+/, '$1/');
+        if (arg.startsWith('doc/')) return Promise.reject(new Error('不支持更新文档资源'));
         var index = arg.indexOf('/');
         if (index == -1) {
-            this.notify(me, '路径不合理');
-            return Promise.resolve();
+            return Promise.reject(new Error('路径不合理'));
         }
         var path = __PATH.WORLD + arg.slice(0, index + 1);
         var fname = arg.slice(index + 1);
         return BASE.UPDATE(path, fname).then(() => {
-            BASE.CREATE(path, fname);
+            BASE.CREATE(path, fname, true);
         });
     }
 

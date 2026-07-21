@@ -996,6 +996,7 @@ export class ROOM extends ITEM {
                 const newRm = ROOM.CREATE(active.path);
                 active.replaceRoom(rm, newRm);
                 newRm.owner = key;
+                newRm.refresh({});
                 if (!active.copy_rooms) active.copy_rooms = {};
                 active.copy_rooms[key] = newRm;
             }
@@ -1012,7 +1013,7 @@ export class ROOM extends ITEM {
             }
             active.replaceRoom(oldroom, active);
         }
-        active.refresh(true);
+        active.refresh({});
     }
 
     /**

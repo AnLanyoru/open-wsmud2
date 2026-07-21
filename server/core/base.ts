@@ -13,6 +13,7 @@ interface ResourceObj {
     path?: string;
 
     create?(fname: string, ctor?: string): void;
+    update?(fname: string, ctor?: string): void;
 }
 
 /** 资源类构造函数（ES class） */
@@ -476,7 +477,7 @@ export class BASE {
      * @param fname - 文件名（可能带 #参数）
      * @returns 新创建的对象
      */
-    static CREATE(path: string, fname: string): ResourceObj | undefined {
+    static CREATE(path: string, fname: string, update: boolean = false): ResourceObj | undefined {
         const ary = BASE.PATH_REG.exec(fname);
         if (!ary) {
             console.error('path %s is incorrect:', path + fname);
@@ -487,7 +488,7 @@ export class BASE {
         const fkey = path + fname;
         let func = BASE.ITEMS[fkey];
         if (func) {
-            return BASE.NEW(fname, func, paras);
+            return BASE.NEW(fname, func, paras, update);
         }
 
         // For files with # parameters, try the base path
@@ -495,7 +496,7 @@ export class BASE {
             const baseKey = path + fname.substring(0, fname.lastIndexOf('/'));
             func = BASE.ITEMS[baseKey];
             if (func) {
-                return BASE.NEW(fname, func, paras);
+                return BASE.NEW(fname, func, paras, update);
             }
         }
 
@@ -509,10 +510,19 @@ export class BASE {
      * @param par - 构造参数
      * @returns 新创建的对象
      */
-    static NEW(fname: string, func: CtorFunc, par?: string): ResourceObj {
+    static NEW(
+        fname: string,
+        func: CtorFunc,
+        par?: string,
+        update: boolean = false,
+    ): ResourceObj {
         const obj = new func(par);
         obj.path = fname;
-        obj.create?.(fname, par);
+        if (update && obj.update) {
+            obj.update(fname, par);
+        } else {
+            obj.create?.(fname, par);
+        }
         return obj;
     }
 
