@@ -11,7 +11,7 @@ export default class extends COMMAND {
     /**
      * @param me - 执行命令的角色
      */
-    enter(me: USER, par: string) {
+    async enter(me: USER, par: string) {
         if (me.id) return me.send('{"type":"regist","result":"请刷新页面重新操作"}');
         let pars = par.split(' ');
         let name = pars[0],
@@ -54,7 +54,7 @@ export default class extends COMMAND {
         if (!me.ip_address) return me.send('{"type":"regist","result":"注册信息错误"}');
         if (!WORLD.USERLOGIN.check_user(me, me.userid)) return;
 
-        const userData = WORLD.DB.getUserByID(me.userid);
+        const userData = await WORLD.DB.getUserByID(me.userid);
         if (!userData) return me.send('{"type":"regist","result":"账号信息错误"}');
         if (userData.pwd !== me.password)
             return me.send(
