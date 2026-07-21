@@ -12,7 +12,7 @@ export default class extends COMMAND {
      */
     enter(me: USER, objid: string, par: string) {
         var obj = me.find_obj(objid, me.environment);
-        if (!obj || !obj.check_npc() || !obj.check_follower()) return me.notify('你要问谁什么？');
+        if (!obj || !obj.check_npc() && !obj.check_follower()) return me.notify('你要问谁什么？');
         if (!obj.on_ask) return me.notify('你要问谁什么？');
         if (!par || par.length > 10) return me.notify('你要问什么？');
         par = UTIL.htmlEncode(UTIL.replace_word(par));
