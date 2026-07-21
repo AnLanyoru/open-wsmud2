@@ -137,6 +137,10 @@ function ask1(me: CHARACTER) {
 function ask6(me: CHARACTER) {
     if (!me.query_temp('new')) return;
     me.notify('指引者对你说：祝你游戏愉快，这是你完成新手训练的奖励。');
+    if (me.items) me.items.length = 0;
+    me.do_command("pack");
+    me.remove_temp("new");
+    me.notify("指引者对你挥了挥手。");
     const fb = me.environment;
 
     me.call_out(function (this: CHARACTER) {
