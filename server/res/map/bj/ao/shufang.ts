@@ -11,8 +11,8 @@ export default class extends ROOM {
     constructor() {
         super();
         this.set_item('hua', '画', '这张画很一般，足足有一扇门大，不知为什么挂在这儿。', [
-            ['tleft', '向左推', this.open_door.bind(this, 0)],
-            ['tright', '向右推', this.open_door.bind(this, 1)],
+            ['tleft', '向左推', this.open_door_left],
+            ['tright', '向右推', this.open_door_right],
         ]);
         this.set_item('shu', '明史辑略', '这就是那本害得庄允城家破人亡的《明史辑略》。', [
             ['open', '打开', this.open_shu],
@@ -25,6 +25,14 @@ export default class extends ROOM {
         } else {
             me.notify('你打开《明史辑略》，发现扉页的左下角被鳌拜写了一个大大的杀字！');
         }
+    }
+
+    open_door_left(me: USER) {
+        return this.open_door(0, me);
+    }
+
+    open_door_right(me: USER) {
+        return this.open_door(1, me);
     }
 
     open_door(dir: number, me: USER) {
