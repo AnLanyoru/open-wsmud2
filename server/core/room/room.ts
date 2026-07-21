@@ -336,8 +336,6 @@ export class ROOM extends ITEM {
                 }
                 if (_batchMode) {
                     if (msgPayload) {
-                        this._batch_all_payloads.push(msgPayload);
-                        this._batch_all_combat.push(0);
                         _broadcastCount++;
                     }
                 } else {
@@ -413,6 +411,10 @@ export class ROOM extends ITEM {
             }
             if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
             obj.environment = undefined;
+        }
+        if (_batchMode && _broadcastCount > 0 && msgPayload) {
+            this._batch_all_payloads.push(msgPayload);
+            this._batch_all_combat.push(0);
         }
         if (_batchMode && (_broadcastCount > 0 || this._pending_items_send.length > 0)) {
             markRoomDirty(this);

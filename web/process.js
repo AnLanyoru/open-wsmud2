@@ -195,8 +195,6 @@ const Process = {
         if (w > 100) w = 100;
         return w;
     }, itemremove: function (data) {
-        var cached = lookupRoomCache(data.id);
-        if (cached) retainCache(cached);
         var item = Combat.STATUS[data.id];
         if (item) {
             // 用 StatusItem_clear 正确注销 _animId 动画，避免闭包引用已移除的 shadow 元素
@@ -215,7 +213,6 @@ const Process = {
         Process.cur_room.items.RemoveAt(x => x.id === data.id);
     }, itemadd: function (data) {
         if (Setting.off_plist && data.p && data.id != Process.player) {
-            dropRetainedCache(data.id);
             return;
         }
         var item = data, player_item;
@@ -226,13 +223,11 @@ const Process = {
             player_item = $(Process.create_roomitem(item)).appendTo(Process.itemsElement);
         }
         if (Combat.STATUS[data.id]) Process.itemremove(data);
-        dropRetainedCache(data.id);
         Combat.AppendStatusItem(item.id, player_item.find(".item-status-bar"), item.status);
         Process.cur_room.items.push(item);
         Combat._resetCDAnimations();
     }
     , items: function (room) {
-        clearRetainedCache();
         // 先清理所有状态动画，再清空 DOM，避免 tick 引用已移除的 shadow 元素
         for (var sid in Combat.STATUS) {
             Combat.StatusItem_clear(Combat.STATUS[sid]);
@@ -603,61 +598,12 @@ function read7BId(data, pos, dv) {
     return { id, next: pos };
 }
 
-const RETAINED_CACHE_TTL = 3000;
-const RETAINED_CACHE_LIMIT = 64;
-const retainedCache = new Map();
-
-function lookupRoomCache(id) {
+function lookupCache(id) {
     if (!Process.cur_room || !Process.cur_room.items) return null;
     for (let i = 0; i < Process.cur_room.items.length; i++) {
         if (Process.cur_room.items[i].id === id) return Process.cur_room.items[i];
     }
     return null;
-}
-
-function pruneRetainedCache(now) {
-    for (const [id, entry] of retainedCache) {
-        if (entry.expires > now) continue;
-        retainedCache.delete(id);
-    }
-    while (retainedCache.size > RETAINED_CACHE_LIMIT) {
-        retainedCache.delete(retainedCache.keys().next().value);
-    }
-}
-
-function retainCache(item) {
-    const now = Date.now();
-    pruneRetainedCache(now);
-    retainedCache.delete(item.id);
-    retainedCache.set(item.id, {
-        item: {
-            id: item.id,
-            name: item.name,
-            n: item.n,
-            w: item.w,
-            c: item.c,
-            th: item.th
-        },
-        expires: now + RETAINED_CACHE_TTL
-    });
-    pruneRetainedCache(now);
-}
-
-function dropRetainedCache(id) {
-    retainedCache.delete(id);
-}
-
-function clearRetainedCache() {
-    retainedCache.clear();
-}
-
-function lookupCache(id) {
-    const item = lookupRoomCache(id);
-    if (item) return item;
-    const now = Date.now();
-    pruneRetainedCache(now);
-    const retained = retainedCache.get(id);
-    return retained ? retained.item : null;
 }
 
 /** 按 8 位 fieldMask 从缓存构建 sparse 数组（A 侧字段从 aCache，T 侧从 tCache） */
