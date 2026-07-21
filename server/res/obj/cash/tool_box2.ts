@@ -31,7 +31,10 @@ export default class extends OBJ {
             );
             me.remove_temp('gjx1');
         }
-        result.push(OBJ.CREATE('sp/tool/er#5'), OBJ.CREATE('sp/tool/exp#5'));
+        result.push(
+            OBJ.CREATE('sp/tool/er#5', 5 + me.random(2)),
+            OBJ.CREATE('sp/tool/exp#5', 1 + me.random(3)),
+        );
 
         return result;
     }

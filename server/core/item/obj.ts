@@ -233,15 +233,15 @@ export class OBJ extends ITEM {
      * @param spcount - 拆分数量
      * @returns 拆分出的新物品，无需拆分返回 this，无效则返回 undefined
      */
-    uncombine(spcount?: number): ITEM {
+    uncombine(spcount?: number): ITEM | undefined {
         if (!spcount || spcount === this.count) return this;
-        if (spcount < this.count) {
+        if (spcount > 0 && spcount < this.count) {
             const item = this.clone();
             item.count = spcount;
             this.count -= spcount;
             return item;
         }
-        return undefined as any as ITEM;
+        return undefined;
     }
 
     /**

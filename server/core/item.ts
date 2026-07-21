@@ -165,7 +165,7 @@ export class ITEM extends BASE {
      * @param count - 拆分数量
      * @returns 拆分出的物品（或 this 表示不拆分）
      */
-    uncombine(count: number): ITEM {
+    uncombine(count: number): ITEM | undefined {
         return this;
     }
 
