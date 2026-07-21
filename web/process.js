@@ -216,13 +216,13 @@ const Process = {
             return;
         }
         var item = data, player_item;
+        Process.itemremove(data);
         if (!Setting.item_firstme && item.id == Process.player) {
 
             player_item = $(Process.create_roomitem(item)).prependTo(Process.itemsElement);
         } else {
             player_item = $(Process.create_roomitem(item)).appendTo(Process.itemsElement);
         }
-        if (Combat.STATUS[data.id]) Process.itemremove(data);
         Combat.AppendStatusItem(item.id, player_item.find(".item-status-bar"), item.status);
         Process.cur_room.items.push(item);
         Combat._resetCDAnimations();
@@ -1001,6 +1001,33 @@ export function ProcessBinary(data) {
                     } else {
                         ReceiveMessage(_genInMessage(item, isFighting));
                     }
+                }
+                break;
+            }
+            case 0x59: {
+                const r = read7BId(data, pos, dv);
+                pos = r.next;
+                const mask = data[pos++];
+                const item = lookupCache(r.id);
+                if (!item) {
+                    for (let i = 0; i < 5; i++) {
+                        if (!(mask & (1 << i))) continue;
+                        const value = readStr(data, pos);
+                        pos = value.next;
+                    }
+                    break;
+                }
+                const keys = ['name', 'n', 'w', 'c', 'th'];
+                for (let i = 0; i < keys.length; i++) {
+                    if (!(mask & (1 << i))) continue;
+                    const value = readStr(data, pos);
+                    pos = value.next;
+                    item[keys[i]] = value.str;
+                }
+                if (mask & 0x01) {
+                    Process.itemsElement.find(".room-item").filter(function () {
+                        return $(this).attr("itemid") === r.id;
+                    }).find(".item-name").html(item.name);
                 }
                 break;
             }

@@ -1002,7 +1002,7 @@ export class USER extends CHARACTER {
         }
         this.color_name = '';
         if (this.environment) {
-            this.environment.item_changed(this, true);
+            this.environment.item_updated(this, { name: this.long_name() });
         }
     }
 

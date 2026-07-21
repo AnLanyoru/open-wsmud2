@@ -427,6 +427,20 @@ export class ROOM extends ITEM {
      * @param isin - 是否进入
      * @param msg - 可选消息字符串（非二进制模式下，$N 已替换为 obj.name 的完整消息）
      */
+    item_updated(item: ITEM, fields: { name?: string; n?: string; w?: string; c?: string; th?: string }): void {
+        if (!item || this.items.indexOf(item) === -1 || item.is_hidden()) return;
+        this._items_json = null;
+        if (BATCH_MODE !== 1) {
+            this.item_changed(item, true);
+            return;
+        }
+        const payload = _encode_item_update_frame(item, fields);
+        if (!payload) return;
+        this._batch_all_payloads.push(payload);
+        this._batch_all_combat.push(0);
+        markRoomDirty(this);
+    }
+
     item_json(item: ITEM, isin: boolean, msg?: string): string {
         if (!item) return '';
         const str: string[] = [];
@@ -805,11 +819,15 @@ export class ROOM extends ITEM {
         this.json = null;
         this.commands_json = null;
         this.room_exits_json = null;
-        const rmname = this.parent!.name + '-' + this.name;
-        if (this.parent!.not_fb || !this.parent!.is_copy) {
-            this._room_name = rmname;
+        if (this.parent) {
+            const rmname = this.parent.name + '-' + this.name;
+            if (this.parent.not_fb || !this.parent.is_copy) {
+                this._room_name = rmname;
+            } else {
+                this._room_name = rmname + '(副本区域)';
+            }
         } else {
-            this._room_name = rmname + '(副本区域)';
+            this._room_name = this.name;
         }
         if (obj) {
             for (let i = 0; i < this.items.length; i++) {
@@ -970,10 +988,6 @@ export class ROOM extends ITEM {
         active.on_clone();
         active.initBaseRoom(file);
 
-        // 原型的影子标记需从RUN_ROOMS清除（create时被误加入）
-        const idx = WORLD.RUN_ROOMS.indexOf(this);
-        if (idx !== -1) WORLD.RUN_ROOMS.splice(idx, 1);
-
         if (!oldroom) return;
         if (oldroom.copy_rooms) {
             active.copy_rooms = {};
@@ -986,6 +1000,7 @@ export class ROOM extends ITEM {
                 active.copy_rooms[key] = newRm;
             }
             oldroom.copy_rooms = null;
+            oldroom.destroy();
         } else {
             if (ROOM.public_rooms) {
                 for (let i = 0; i < ROOM.public_rooms.length; i++) {
@@ -995,7 +1010,9 @@ export class ROOM extends ITEM {
                     }
                 }
             }
+            active.replaceRoom(oldroom, active);
         }
+        active.refresh(true);
     }
 
     /**
@@ -1004,6 +1021,8 @@ export class ROOM extends ITEM {
      * @param newRoom
      */
     replaceRoom(oldroom: Record<string, any>, newRoom: Record<string, any>): void {
+        const oldIndex = WORLD.RUN_ROOMS.indexOf(oldroom as ROOM);
+        if (oldIndex !== -1) WORLD.RUN_ROOMS.splice(oldIndex, 1);
         const items = oldroom.items;
         for (let i = 0; i < items.length; i++) {
             if (items[i].is_player || items[i].master) {
@@ -1609,6 +1628,22 @@ function _encode_item_leave_frame(obj: ITEM, dir?: string, isFighting?: boolean,
  * tpl_id: 2 字节模板 ID（pack --binary 转换后的数字，客户端用 obj.name 替换 $N）
  * 返回 null 表示无法二进制编码（回退到 JSON 路径）
  */
+function _encode_item_update_frame(item: ITEM, fields: { name?: string; n?: string; w?: string; c?: string; th?: string }): Buffer | null {
+    const values = [fields.name, fields.n, fields.w, fields.c, fields.th];
+    let mask = 0;
+    const parts: Buffer[] = [Buffer.from([0x59]), item._get_packed_id(), Buffer.allocUnsafe(1)];
+    for (let i = 0; i < values.length; i++) {
+        if (values[i] === undefined) continue;
+        const value = Buffer.from(values[i]!, 'utf8');
+        if (value.length > 255) return null;
+        mask |= 1 << i;
+        parts.push(Buffer.from([value.length]), value);
+    }
+    if (mask === 0) return null;
+    parts[2][0] = mask;
+    return Buffer.concat(parts);
+}
+
 function _encode_item_add_frame(obj: ITEM, isFighting?: boolean, tplId?: number): Buffer | null {
     const uid = obj._get_packed_id();
     const nameBuf = Buffer.from(obj.long_name(), 'utf8');

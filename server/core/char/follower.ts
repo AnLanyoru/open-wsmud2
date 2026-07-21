@@ -563,7 +563,7 @@ export class FOLLOWER extends CHARACTER {
             state.start_time = Date.now();
         }
         this.color_name = '';
-        this.environment && this.environment.item_changed(this, true);
+        this.environment && this.environment.item_updated(this, { name: this.long_name() });
         this.master_json = null;
     }
 
