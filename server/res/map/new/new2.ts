@@ -56,7 +56,7 @@ export default class extends ROOM {
                 return true;
             }
         }
-        return me.notify_fail('你先听完课再乱跑。');
+        return true;
     }
 }
 
