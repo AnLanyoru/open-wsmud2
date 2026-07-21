@@ -116,12 +116,14 @@ export default class extends COMMAND {
         if (!key) return send_replace_choices(me, obj, index, oldKey, oldLevel);
         if (!can_select(obj, key, index)) return me.notify('不能用这个属性替换当前词条。');
         if (confirm !== 'ok') {
-            me.notify('是否确认将词条' + format_custom_prop(oldKey, oldLevel) + '替换为' + format_custom_prop(key, 1) + '，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>，消耗100两<hiy>黄金</hiy>。');
+            let notice = '是否确认将词条' + format_custom_prop(oldKey, oldLevel) + '替换为' + format_custom_prop(key, 1) + '，将退回' + query_material_count(oldLevel) + '块<hio>' + query_material_name(oldKey) + '</hio>'
+            if (oldLevel > 1) notice += '，消耗100两<hiy>黄金</hiy>。';
+            me.notify(notice);
             return me.send_commands('reforge ' + obj.id + ' replace ' + index + ' ' + key + ' ok', '确定替换');
         }
         const stone = me.find_obj_bypath('st/p#' + key);
         if (!stone?.count) return me.notify('你缺少新的属性材料。');
-        if (!me.add_money(-REPLACE_COST)) return me.notify('你没有100两黄金。');
+        if (oldLevel > 1 && !me.add_money(-REPLACE_COST)) return me.notify('高级词条替换需要100两<hiy>黄金</hiy>，你的钱不够。');
         if (!me.remove_obj(stone, 1)) {
             me.add_money(REPLACE_COST);
             return me.notify('属性材料扣除失败。');
