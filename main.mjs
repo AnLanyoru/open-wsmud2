@@ -51,9 +51,10 @@ for (const item in __PATH) {
     __PATH[item] = path.join(__dirname, __PATH[item]);
 }
 
+let WORLD;
 try {
     await readdir(__PATH.BASE);
-    const { WORLD } = await import('./core/world.js');
+    ({ WORLD } = await import('./core/world.js'));
     await __CONFIG.init();
     await WORLD.startup(process.argv[2]);
 } catch (e) {
@@ -71,17 +72,16 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 let isShuttingDown = false;
-process.on('SIGINT', async () => {
+async function shutdown(signal) {
     if (isShuttingDown) return;
     isShuttingDown = true;
-    console.log('收到SIGINT信号，正在保存数据...');
-    await WORLD.close();
+    console.log(`收到${signal}信号，正在保存数据...`);
+    try {
+        if (WORLD) await WORLD.close();
+    } catch (e) {
+        console.error('关闭过程出错:', e && e.stack ? e.stack : e);
+    }
     process.exit(0);
-});
-process.on('SIGTERM', async () => {
-    if (isShuttingDown) return;
-    isShuttingDown = true;
-    console.log('收到SIGTERM信号，正在保存数据...');
-    await WORLD.close();
-    process.exit(0);
-});
+}
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
