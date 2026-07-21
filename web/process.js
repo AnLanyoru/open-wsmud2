@@ -582,7 +582,7 @@ function ReceiveMessage(x) {
 // ============================================================
 
 /** ID 字符集（与服务端 ID_CHARS 一致） */
-const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
 
 /** 从 data[pos] 读取 7 字节 ID，返回 { id, next } */
 function read7BId(data, pos, dv) {
