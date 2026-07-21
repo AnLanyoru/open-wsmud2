@@ -1133,9 +1133,12 @@ export class ROOM extends ITEM {
         // 不应再收到 batch 中的 0x57 自进房帧，避免重复 itemadd 和看到自己的进入消息）
         const skipSet = pending.length > 0 ? new Set(pending) : null;
         if (pending.length > 0) {
-            const ij = this.items_to_json();
+            const frame = encodeTextFrame(this.items_to_json());
             for (let i = 0; i < pending.length; i++) {
-                pending[i].send(ij);
+                const socket = pending[i].socket;
+                if (socket && !socket.destroyed && socket.writable && !socket.writableEnded) {
+                    socket.write(frame);
+                }
             }
             pending.length = 0;
         }
