@@ -10,7 +10,7 @@ export default class extends SKILL {
     name = '燃木刀法';
     id = 'ranmudao3';
     grade = 6;
-    family = FAMILIES.SHAOLIN;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
     desc = '少林寺七十二绝技之燃木刀法';
     can_enables = ['blade', 'parry'];

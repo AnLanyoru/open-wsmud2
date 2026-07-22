@@ -7,7 +7,7 @@ export default class extends SKILL {
     name = '天山六阳掌';
     id = 'liuyangzhang3';
     grade = 6;
-    family = FAMILIES.XIAOYAO;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
     desc = '逍遥派的天山六阳掌，绝招生死符让人谈虎色变。';
 

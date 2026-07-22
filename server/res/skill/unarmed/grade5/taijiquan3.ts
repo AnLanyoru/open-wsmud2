@@ -1,5 +1,6 @@
 import { SKILL, PERFORM } from '../../../../core/skill/skill.js';
 import { SKILL_TYPES, WEAPON_TYPE } from '../../../../core/const.js';
+import { FAMILIES } from '../../../../core/skill/family.js';
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -8,6 +9,7 @@ export default class extends SKILL {
     name = '太极拳';
     id = 'taijiquan3';
     grade = 5;
+    family = FAMILIES.MONSTER;
 
     is_hidden = true;
 

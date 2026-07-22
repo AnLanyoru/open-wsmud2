@@ -12,7 +12,7 @@ export default class extends SKILL {
     name = '独孤九剑';
     id = 'dugujiujian3';
     grade = 6;
-    family = FAMILIES.HUASHAN;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
     desc = '为独孤求败所创，以无招胜有招的宗旨胜破天下武功。';
     can_enables = ['sword', 'parry'];

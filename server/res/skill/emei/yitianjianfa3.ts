@@ -8,7 +8,7 @@ export default class extends SKILL {
     name = '倚天剑法';
     id = 'yitianjianfa3';
     grade = 6;
-    family = FAMILIES.EMEI;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
     desc = '峨眉派祖师郭襄在得到倚天剑后自创的一式剑法，招式狠辣，不留余地。';
     can_enables = ['sword'];

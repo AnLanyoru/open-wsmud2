@@ -6,9 +6,8 @@ import type { CHARACTER, CharacterStatus } from '../../../core/char/character.js
 export default class extends SKILL {
     name = '诸天化身步';
     id = 'zhutianbu3';
-    source_skill = 'zhutianbu2';
     grade = 6;
-    family = FAMILIES.EMEI;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
 
     desc = '峨眉派轻功身法，如有千万化身。';

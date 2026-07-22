@@ -25,8 +25,7 @@ export default class extends SKILL {
     id = 'beimingshengong3';
     grade = 6;
     is_hidden = true;
-    family = FAMILIES.XIAOYAO;
-    source_skill = 'beimingshengong2';
+    family = FAMILIES.MONSTER;
     force_rad = 0.8;
 
     desc = '逍遥派镇派神功，可吸取他人内力以供己用，是迅速提升功力的捷径功法。';

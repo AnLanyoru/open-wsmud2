@@ -7,9 +7,8 @@ import type { CHARACTER } from '../../../core/char/character.js';
 export default class extends SKILL {
     name = '太极剑法';
     id = 'taijijian3';
-    source_skill = 'taijijian2';
     grade = 6;
-    family = FAMILIES.WUDANG;
+    family = FAMILIES.MONSTER;
     is_hidden = true;
     desc = '由武当祖师张三丰所创，武当派不传之秘，太极三绝技之一';
     can_enables = ['sword'];
