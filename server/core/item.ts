@@ -211,9 +211,15 @@ export class ITEM extends BASE {
      * @returns 动作定义
      */
     add_action(cmd: string, name: string | null, func?: (...args: any[]) => any): ActionDef<this> {
-        if (!this.actions) this.actions = {};
+        if (!Object.prototype.hasOwnProperty.call(this, 'actions')) {
+            this.actions = this.actions ? { ...this.actions } : {};
+        } else if (!this.actions) {
+            this.actions = {};
+        }
         let act = this.actions[cmd];
         if (act) {
+            act = { ...act };
+            this.actions[cmd] = act;
             if (!name) {
                 act.action = func;
             } else {
@@ -231,7 +237,7 @@ export class ITEM extends BASE {
             };
             this.actions[cmd] = act;
         }
-        this.json = null;
+        this.action_changed();
         return act;
     }
 
@@ -241,7 +247,11 @@ export class ITEM extends BASE {
      * @param _func - （保留参数，未使用）
      */
     remove_action(name: string | string[], _func?: Function): void {
-        if (!this.actions) this.actions = {};
+        if (!Object.prototype.hasOwnProperty.call(this, 'actions')) {
+            this.actions = this.actions ? { ...this.actions } : {};
+        } else if (!this.actions) {
+            this.actions = {};
+        }
         if (typeof name === 'string') {
             delete this.actions[name];
         } else {
@@ -249,6 +259,10 @@ export class ITEM extends BASE {
                 delete this.actions[name[i]];
             }
         }
+        this.action_changed();
+    }
+
+    action_changed(): void {
         this.json = null;
     }
 

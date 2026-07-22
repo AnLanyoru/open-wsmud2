@@ -22,18 +22,8 @@ declare const __PATH: Record<string, string>;
  * @param this - 隐藏物品对象
  * @param player - 查看的玩家
  */
-function on_look_hidden_item(this: ITEM, player: USER): string {
-    if (this.json) return this.json;
-    const json: ItemCommandsJson = {
-        type: 'item',
-        desc: this.desc,
-        commands:
-            this.commands
-                ?.filter(cmd => cmd[0])
-                .map(cmd => ({ cmd: cmd[0] + ' ' + this.id, name: cmd[1] })) ?? [],
-    };
-    this.json = JSON.stringify(json);
-    return this.json;
+function on_look_hidden_item(this: ITEM, _player: USER): string {
+    return this.json || '';
 }
 
 /**
@@ -108,6 +98,7 @@ export class ROOM extends ITEM {
     owner: string | null = null;
     /** NPC生成记录 — set_npc自动记录参数，供on_clone重放 */
     _npc_records: [string, number][] = [];
+    _obj_records: [string, number][] = [];
 
     // ============ 广播批处理缓冲区 ============
 
@@ -589,13 +580,12 @@ export class ROOM extends ITEM {
      * @param names - 物品路径或[物品路径, 数量]
      */
     set_obj(...names: (string | [string, number])[]): void {
-        for (let i = 0; i < arguments.length; i++) {
-            let name = arguments[i];
+        for (let i = 0; i < names.length; i++) {
+            let name = names[i];
             if (typeof name == 'string') name = [name, 1];
-            const obj = OBJ.CREATE(name[0], name[1]);
-            if (obj) {
-                this.items.push(obj);
-            }
+            const obj_path = name[0];
+            if (!obj_path) continue;
+            this._obj_records.push([obj_path, name[1]]);
         }
     }
 
@@ -611,7 +601,7 @@ export class ROOM extends ITEM {
         let cmd_lsit: RoomAction[] = [];
         if (commands && typeof commands[0] == 'string') {
             cmd_lsit = [commands as RoomAction];
-        } else {
+        } else if (commands) {
             cmd_lsit = commands as RoomAction[];
         }
         const hidden_item: ITEM = new ITEM();
@@ -621,8 +611,15 @@ export class ROOM extends ITEM {
             desc: desc,
             commands: cmd_lsit,
             query_desc: on_look_hidden_item,
-            environment: this,
         });
+        const json: ItemCommandsJson = {
+            type: 'item',
+            desc,
+            commands: cmd_lsit
+                .filter(cmd => cmd[0])
+                .map(cmd => ({ cmd: cmd[0] + ' ' + id, name: cmd[1] })),
+        };
+        hidden_item.json = JSON.stringify(json);
 
         this.hidden_items.push(hidden_item);
         if (cmd_lsit) {
@@ -792,6 +789,11 @@ export class ROOM extends ITEM {
     /**
      * 查询命令列表JSON
      */
+    action_changed(): void {
+        super.action_changed();
+        this.commands_json = null;
+    }
+
     query_commands(): string {
         if (this.commands_json) return this.commands_json;
         const json: Record<string, any> = {};
@@ -888,6 +890,7 @@ export class ROOM extends ITEM {
         this._batch_has_combat = false;
         this._batch_delay = 16;
         this._batch_timestamp = 0;
+        this._text_batch = [];
         this._dirty_players = new Set();
         this._pending_items_send = [];
 
@@ -908,6 +911,19 @@ export class ROOM extends ITEM {
                         this.items.push(obj);
                         obj.environment = this;
                     }
+                }
+            }
+        }
+
+        const obj_records = this._obj_records;
+        this._obj_records = [];
+        if (obj_records) {
+            for (let i = 0; i < obj_records.length; i++) {
+                const [obj_path, count] = obj_records[i];
+                const obj = OBJ.CREATE(obj_path, count);
+                if (obj) {
+                    this.items.push(obj);
+                    obj.environment = this;
                 }
             }
         }
@@ -944,6 +960,24 @@ export class ROOM extends ITEM {
         }
 
         this.on_create && this.on_create();
+        if (!base_room) this.freeze_definitions();
+    }
+
+    freeze_definitions(): void {
+        if (this.actions) {
+            for (const action of Object.values(this.actions)) Object.freeze(action);
+            Object.freeze(this.actions);
+        }
+        if (this.hidden_items) {
+            for (const item of this.hidden_items) {
+                if (item.commands) {
+                    for (const command of item.commands) Object.freeze(command);
+                    Object.freeze(item.commands);
+                }
+                Object.freeze(item);
+            }
+            Object.freeze(this.hidden_items);
+        }
     }
 
     /**
@@ -980,6 +1014,7 @@ export class ROOM extends ITEM {
      */
     update(file: string): void {
         this.on_create && this.on_create();
+        this.freeze_definitions();
         const oldroom = WORLD.ROOMS.get(file);
 
         // 保存新原型，创建新的活跃房间

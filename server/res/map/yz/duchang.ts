@@ -23,6 +23,13 @@ export default class extends ROOM {
         this.add_action('rbok', '', this.rbok);
     }
 
+    on_clone() {
+        super.on_clone();
+        this.master = this.items[0] as CHARACTER | null;
+        this.stores = new Map();
+        this.rolle_handler = undefined;
+    }
+
     roll(me: CHARACTER, par?: string) {
         if (!par) {
             if (!this.master) {
@@ -85,7 +92,7 @@ export default class extends ROOM {
             );
             this.stores.set(me.id, par == 'b' ? 2 : 1);
         } else if (par == 'over') {
-            if (this.rolle_handler) me.notify('你需要等这局结束才可以。');
+            if (this.rolle_handler) return me.notify('你需要等这局结束才可以。');
             if (this.master) {
                 this.master.send_room('<hic>$N不当庄家了，你可以点击掷骰子来当庄家。</hic>');
                 this.master = null;

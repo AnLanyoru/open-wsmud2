@@ -19,6 +19,11 @@ export default class extends ROOM {
         ]);
     }
 
+    on_clone() {
+        super.on_clone();
+        this.door_dir = this.random(2);
+    }
+
     open_shu(me) {
         if (this.door_dir == 1) {
             me.notify('你打开《明史辑略》，发现扉页的右下角被鳌拜写了一个大大的杀字！');
@@ -53,7 +58,9 @@ export default class extends ROOM {
 
             me.set_temp('fb/ao/tui', 2);
         } else {
-            me.send_room('$N将画卷往左移，只听轧轧几声，一扇暗门出现在$N眼前。');
+            me.send_room(
+                `$N将画卷往${dir == 0 ? '左' : '右'}移，只听轧轧几声，一扇暗门出现在$N眼前。`,
+            );
             this.add_exit('north', 'bj/ao/anshi');
             me.set_temp('fb/ao/tui', 1);
             me.add_fbscore(10);
