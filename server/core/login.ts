@@ -46,6 +46,8 @@ export interface DecryptedSession {
     level: number;
 }
 
+const SESSION_MAX_AGE = 3600000 * 24 * 180;
+
 const USERLOGIN = {
     /** 同 ID 最大同时连接数 */
     max_idcount: 10,
@@ -84,12 +86,13 @@ const USERLOGIN = {
             const str = txt.split('%');
             if (str.length !== 5) return null;
             const id = parseInt(str[0]);
-            if (id > 0) {
+            const loginTime = parseInt(str[3]);
+            if (id > 0 && Number.isFinite(loginTime)) {
                 return {
                     id: id,
                     name: str[1],
                     pwd: str[2],
-                    loginTime: parseInt(str[3]),
+                    loginTime: loginTime,
                     level: parseInt(str[4]),
                 };
             }
@@ -129,7 +132,8 @@ const USERLOGIN = {
             // 本地连接 + localhost 用户名：提前跳过，不检查 session 格式
             if (isLocalhost && parts.length >= 2) {
                 const cookieUser = this.encryptUser(parts[0], parts[1]);
-                if (cookieUser && cookieUser.name.startsWith('localhost')) {
+                const sessionAge = cookieUser ? Date.now() - cookieUser.loginTime : -1;
+                if (cookieUser && sessionAge >= 0 && sessionAge <= SESSION_MAX_AGE && cookieUser.name.startsWith('localhost')) {
                     user.userid = -1;
                     user.user_level = 0;
                     user.password = '';
@@ -153,6 +157,13 @@ const USERLOGIN = {
                 return this.login_error(
                     user,
                     `登录参数错误，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
+                );
+            }
+            const sessionAge = Date.now() - cookieUser.loginTime;
+            if (sessionAge < 0 || sessionAge > SESSION_MAX_AGE) {
+                return this.login_error(
+                    user,
+                    `登录凭证已过期，请使用账号密码<CMD onclick=\\'hide2show("#login_panel")\\'>重新登录</CMD>`,
                 );
             }
 
