@@ -34,7 +34,7 @@ export default class extends NPC {
             ['sixiangbu', 400, 'dodge'],
             ['hujiadaofa', 400, 'blade'],
             ['lengyueshengong', 400, 'force'],
-            ['mantianxing', 400, 'throwing'],
+            ['feixingshu', 400, 'throwing'],
         );
         this.set_drop(
             {
