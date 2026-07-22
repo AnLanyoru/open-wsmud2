@@ -49,7 +49,7 @@ class RegistPage extends Page {
         var name = $("#regist_name").val().toLowerCase();
         var pwd = $("#regist_pwd1").val();
         if (!name) return showInputError("#regist_name", "请输入用户名");
-        if (!/^[a-z0-9]{5,15}$/.test(name)) return showInputError("#regist_name", "用户名需要是5-10个英文字符");
+        if (!/^[a-z][a-z0-9_]{4,14}$/.test(name)) return showInputError("#regist_name", "用户名需要5-15位，以字母开头，可包含字母、数字或下划线");
         if (!pwd) return showInputError("#regist_pwd1", "请输入密码");
         if (pwd.length < 6 || pwd.length > 20) return showInputError("#regist_pwd1", "密码长度在6到20之间");
         if (pwd != $("#regist_pwd2").val()) return showInputError("#regist_pwd2", "重复密码输入不一致，请重新输入");

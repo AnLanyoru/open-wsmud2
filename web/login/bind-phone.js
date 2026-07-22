@@ -62,13 +62,12 @@ class BindPhonePage extends Page {
             if (!/^1\d{10}$/.test(phone_no)) return Client.showInputError("#phone_no", "手机号码格式错误");
         } else {
             valid_no = $("#phone_valid").val();
-            if (!valid_no) return Client.showInputError($("#phone_valid").parent(), "请输入你接收到的六位验证码");
-            if (!/^\d{4}$/.test(valid_no)) return Client.showInputError($("#phone_valid").parent(), "请输入六位数字的验证码");
+            if (!valid_no) return Client.showInputError($("#phone_valid").parent(), "请输入绑定手机的四位尾号");
+            if (!/^\d{4}$/.test(valid_no)) return Client.showInputError($("#phone_valid").parent(), "请输入四位数字的手机尾号");
         }
         var pwd2 = $("#phone_pwd").val();
-        if (!pwd2) return Client.showInputError("#phone_pwd", "请重复输入你的新密码");
+        if (!pwd2) return Client.showInputError("#phone_pwd", "请输入密码");
         if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#phone_pwd", "密码长度在6到20之间");
-
         API.BindPhone(valid_no, phone_no, pwd2, function (x) {
             if (x.code < 1) {
                 Client.showInputError($("#phone_valid").parent(), x.result ?? "绑定失败");

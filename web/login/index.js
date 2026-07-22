@@ -20,7 +20,6 @@ const changePwd = new ChangePwd();
 const bindPhone = new BindPhone();
 const createRole = new CreateRole();
 const news = new News();
-4
 
 function showNews() {
     let nid = $(this).attr('nid');

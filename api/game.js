@@ -4,10 +4,11 @@ const {DB} = __CONFIG;
 
 class GameAPI extends APIBASE {
 
-    checkAdmin() {
+    async checkAdmin() {
         const user = this.getUser();
-        if (!user || user.level < 6) return false;
-        return true;
+        if (!user) return false;
+        const result = await DB.getUserByID(user.id);
+        return Boolean(result && result.level >= 6 && result.pwd === user.pwd);
     }
 
     async servers(user) {
@@ -33,13 +34,13 @@ class GameAPI extends APIBASE {
     }
 
     async reload() {
-        if (!this.checkAdmin()) return {code: 0, result: '无权限'};
+        if (!await this.checkAdmin()) return {code: 0, result: '无权限'};
         SERVERS = null;
         return {code: 1};
     }
 
     async add_server(data) {
-        if (!this.checkAdmin()) return {code: 0, result: '无权限'};
+        if (!await this.checkAdmin()) return {code: 0, result: '无权限'};
         const {name, ip, port, isdef, istest} = data;
         if (!name || !ip || !port) return {code: 0, result: '缺少参数'};
         const id = await DB.addServer({name, ip, port: parseInt(port), isdef: isdef ? 1 : 0, istest: istest ? 1 : 0});
@@ -48,7 +49,7 @@ class GameAPI extends APIBASE {
     }
 
     async save_server(data) {
-        if (!this.checkAdmin()) return {code: 0, result: '无权限'};
+        if (!await this.checkAdmin()) return {code: 0, result: '无权限'};
         const {id, name, ip, port, isdef, istest} = data;
         if (!id || !name || !ip || !port) return {code: 0, result: '缺少参数'};
         await DB.saveServer({id, name, ip, port: parseInt(port), isdef: isdef ? 1 : 0, istest: istest ? 1 : 0});
@@ -57,7 +58,7 @@ class GameAPI extends APIBASE {
     }
 
     async delete_server(data) {
-        if (!this.checkAdmin()) return {code: 0, result: '无权限'};
+        if (!await this.checkAdmin()) return {code: 0, result: '无权限'};
         if (!data.id) return {code: 0, result: '缺少服务器ID'};
         await DB.deleteServer(data.id);
         SERVERS = null;
@@ -65,6 +66,7 @@ class GameAPI extends APIBASE {
     }
 
     async search_role(paras) {
+        if (!await this.checkAdmin()) return {code: 0, result: '无权限'};
         const {type, value} = paras;
         if (!type || !value) return {code: 0, result: "错误参数"};
         if (!ALLOW_TYPES[type]) return {code: 0, result: "错误参数"};

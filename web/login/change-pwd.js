@@ -56,7 +56,7 @@ class ChangePwdPage extends Page {
         var pwd1 = $("#update_pwd1").val();
         var pwd2 = $("#update_pwd2").val();
         var pwd3 = $("#update_pwd3").val();
-        if (pwd1.length < 6 || pwd1.length > 20) return Client.showInputError("#update_pwd1", "密码长度在6到20之间");
+        if (!pwd1) return Client.showInputError("#update_pwd1", "请输入现在的密码");
         if (pwd2.length < 6 || pwd2.length > 20) return Client.showInputError("#update_pwd2", "密码长度在6到20之间");
         if (pwd3 != pwd2) return Client.showInputError("#update_pwd3", "两次密码输入不一致");
         var valid_no;

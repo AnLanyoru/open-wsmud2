@@ -3,6 +3,12 @@ const desvi = __CONFIG.DESIV;
 const md5add = __CONFIG.MD5;
 const SessionKey = 'u';
 const SessionToken = 'p';
+const SessionMaxAge = 3600000 * 24 * 180;
+const CookieOptions = {
+    maxAge: SessionMaxAge,
+    sameSite: 'lax',
+    path: '/',
+};
 
 class Apibase {
     constructor(req, res) {
@@ -18,18 +24,15 @@ class Apibase {
 
     signIn(id, uname, pwd, level) {
         if (!(id > 0)) return null;
+        const sessionKey = this.sessionKey();
         let key = this.req.cookies[SessionKey];
-        if (!key) {
-            key = this.sessionKey();
-            this.res.cookie(SessionKey, key, {
-                maxAge: 3600000 * 24 * 180
-            });
+        if (typeof key !== 'string' || key !== sessionKey) {
+            key = sessionKey;
+            this.res.cookie(SessionKey, key, CookieOptions);
         }
         let cert = this.encryptUser(id, uname, pwd, key, level);
         if (!cert) return null;
-        this.res.cookie(SessionToken, cert, {
-            maxAge: 3600000 * 24 * 180
-        });
+        this.res.cookie(SessionToken, cert, CookieOptions);
         return cert;
     }
 
@@ -42,9 +45,7 @@ class Apibase {
 
         let key = this.req.cookies[SessionKey];
         if (!key) {
-            this.res.cookie(SessionKey, this.sessionKey(), {
-                maxAge: 3600000 * 24 * 180
-            });
+            this.res.cookie(SessionKey, this.sessionKey(), CookieOptions);
         }
         let str = this.req.cookies[SessionToken];
         if (!str) return;
@@ -53,16 +54,19 @@ class Apibase {
     }
 
     deEncryptUser(key, cert) {
-        let txt = this.deEncrypt(key, cert);
-        let str = txt.split("%");
+        const txt = this.deEncrypt(key, cert);
+        if (!txt) return null;
+        const str = txt.split("%");
         if (str.length !== 5) return null;
-        let id = parseInt(str[0]);
-        if (id > 0)
+        const id = parseInt(str[0]);
+        const time = parseInt(str[3]);
+        const age = Date.now() - time;
+        if (id > 0 && Number.isFinite(time) && age >= 0 && age <= SessionMaxAge)
             return {
                 id: id,
                 name: str[1],
                 pwd: str[2],
-                time: parseInt(str[3]),
+                time: time,
                 level: str[4],
             };
         return null;
@@ -71,14 +75,16 @@ class Apibase {
     deEncrypt(key, str) {
 
         if (!key || !str) return;
-        if (key.length > 16) key = key.slice(0, 16);
-        key = Buffer.from(key, 'utf8');
-        let decipher = crypto.createDecipheriv('aes-128-cbc', key, desvi);
-        //decipher.setAutoPadding(true);
-        let txt = decipher.update(str, 'base64', 'utf8');
-        txt += decipher.final('utf8');
-
-        return txt;
+        try {
+            if (key.length > 16) key = key.slice(0, 16);
+            key = Buffer.from(key, 'utf8');
+            let decipher = crypto.createDecipheriv('aes-128-cbc', key, desvi);
+            let txt = decipher.update(str, 'base64', 'utf8');
+            txt += decipher.final('utf8');
+            return txt;
+        } catch (e) {
+            return;
+        }
     }
 
 

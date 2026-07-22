@@ -5,7 +5,7 @@ import path from 'path';
 import session from 'express-session';
 import pinoHttp from 'pino-http';
 import http from 'http';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,11 +21,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const HOST = __CONFIG.WEB_HOST;
 const PORT = __CONFIG.WEB_PORT;
-const API_PATHS = ['./api/user.js', './api/game.js'];
 const APIS = {
     user: UserAPI,
     game: GameAPI,
 };
+const API_METHODS = {
+    user: new Set(['login', 'regist', 'validimage', 'getphone', 'bindphone', 'resetpwd', 'changepassword']),
+    game: new Set(['servers', 'reload', 'add_server', 'save_server', 'delete_server', 'search_role']),
+};
+const GET_API_METHODS = new Set(['validimage', 'getphone', 'servers']);
 
 
 app.use(express.static(path.join(__dirname, 'www'), {fallthrough: true}));
@@ -41,7 +45,8 @@ app.use(session({
         secure: false,
         httpOnly: false,
         maxAge: 1000 * 60 * 30,
-        // sameSite: 'none'
+        sameSite: 'lax',
+        path: '/',
     }
 }));
 
@@ -64,8 +69,11 @@ app.all('/api/:className/:methodName', async (req, res) => {
     const {className, methodName} = req.params;
     try {
         const ClassModule = APIS[className];
-        if (!ClassModule)
+        if (!ClassModule || !API_METHODS[className]?.has(methodName))
             return res.status(404).json({error: 'Method not found'});
+        const expectedMethod = GET_API_METHODS.has(methodName) ? 'GET' : 'POST';
+        if (req.method !== expectedMethod)
+            return res.status(405).set('Allow', expectedMethod).json({error: 'Method not allowed'});
         const instance = new ClassModule(req, res);
         if (typeof instance[methodName] !== 'function') {
             return res.status(404).json({error: 'Method not found'});
@@ -80,57 +88,6 @@ app.all('/api/:className/:methodName', async (req, res) => {
         res.status(500).json({error: 'Internal server error'});
     }
 });
-app.all('/sse/:className/:methodName', async (req, res) => {
-    const {className, methodName} = req.params;
-    try {
-        const ClassModule = APIS[className];
-        if (!ClassModule)
-            return res.status(404).json({error: 'Method not found'});
-        const instance = new ClassModule(req, res);
-        if (typeof instance[methodName] !== 'function') {
-            return res.status(404).json({error: 'Method not found'});
-        }
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.flushHeaders();
-        const handler = await instance[methodName]({...req.query, ...req.body});
-        if (!res.writableEnded) {
-            if (handler && handler.end) {
-                const closeHandler = () => {
-                    handler.end();
-                };
-                res.on('close', closeHandler);
-            } else {
-                res.end();
-            }
-        }
-    } catch (error) {
-        console.error('API Error:', error);
-        if (!res.headersSent) {
-            res.status(500).json({error: 'Internal server error'});
-        }
-    }
-});
-
-
-async function reload_api(req, res) {
-    try {
-        for (let modulePath of API_PATHS) {
-            const resolvedPath = path.resolve(modulePath);
-            const url = pathToFileURL(resolvedPath).href;
-            const mod = await import(`${url}?update=${Date.now()}`);
-            APIS[modulePath.replace('./api/', "").replace('.js', "")] = mod.default;
-        }
-        res.json({msg: 'api reload'});
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({error: 'Internal server error'});
-    }
-}
-
-app.use("/reload", reload_api);
-
 const server = http.createServer(app);
 
 

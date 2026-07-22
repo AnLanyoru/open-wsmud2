@@ -51,9 +51,8 @@ class LoginInPage extends Page {
         var name = $("#login_name").val().toLowerCase();
         var pwd = $("#login_pwd").val();
         if (!name) return Client.showInputError("#login_name", "请输入用户名");
-        if (!/^[a-z0-9]{5,15}$/.test(name)) return Client.showInputError("#login_name", "用户名格式错误,需要5-15位字母开头的字母，数字或下划线，不区分大小写");
+        if (!/^[a-z0-9_]{3,20}$/.test(name)) return Client.showInputError("#login_name", "用户名格式错误，需要3-20位字母、数字或下划线，不区分大小写");
         if (!pwd) return Client.showInputError("#login_pwd", "请输入密码");
-        if (pwd.length < 6 || pwd.length > 20) return Client.showInputError("#login_pwd", "密码长度在6到20之间");
         Client.showLoader("正在登录", "#login_panel");
         API.Login(name, pwd, (x) => {
             if (x.code) {

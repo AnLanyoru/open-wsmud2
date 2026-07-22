@@ -1,7 +1,14 @@
 import APIBASE from './base.js';
 import svgCaptcha from 'svg-captcha';
 const {DB} = __CONFIG;
-const CODEREG = /^[A-Za-z0-9_]{3,20}$/;
+const LOGIN_USERNAME_REG = /^[a-z0-9_]{3,20}$/;
+const USERNAME_REG = /^[a-z][a-z0-9_]{4,14}$/;
+const PHONE_REG = /^1\d{10}$/;
+const PASSWORD_REG = /^.{6,20}$/;
+const PHONE_SUFFIX_REG = /^\d{4}$/;
+const normalizeUsername = value => typeof value === 'string' ? value.toLowerCase() : '';
+const isNonEmptyString = value => typeof value === 'string' && value.length > 0;
+const isValidPassword = value => typeof value === 'string' && PASSWORD_REG.test(value);
 
 class UserAPI extends APIBASE {
 
@@ -11,44 +18,42 @@ class UserAPI extends APIBASE {
         if (!code || !pwd) {
             return {code: 0, result: "用户名或密码错误"};
         }
-        code = code.toLowerCase();
-        if (!CODEREG.test(code))
+        code = normalizeUsername(code);
+        if (!LOGIN_USERNAME_REG.test(code))
             return {code: 0, result: "用户名格式错误"};
         pwd = this.MD5(pwd);
-        let result = await DB.getUserBy("name", code);
+        const result = await DB.getUserBy("name", code);
         if (!result)
             return {code: 0, result: "用户不存在"};
         if (result.pwd !== pwd)
             return {code: 0, result: "用户密码错误"};
-        let cert = this.signIn(result.id, result.name, pwd, result.level);
+        const cert = this.signIn(result.id, result.name, pwd, result.level);
         if (cert)
             return {code: 1, p: cert, u: this.sessionKey()};
         return {code: 0, result: "登陆失败"};
     }
 
     checkValCode(code) {
-        if (!code) return false;
-        let num = this.getSession("valno");
-        if (!num) return false;
-
-        return code.toLowerCase() == num.toLowerCase();
+        const num = this.getSession("valno");
+        this.deleteSession("valno");
+        return Boolean(typeof code === 'string' && typeof num === 'string' && code.toLowerCase() === num.toLowerCase());
     }
 
     async regist(user) {
         if (!user.name || !user.pwd) {
             return {code: 0, result: "注册失败，缺少数据"};
         }
-        if (user.name.length > 15 || user.name.length < 3) {
-            return {code: 0, result: "注册失败，缺少数据"};
+        user.name = normalizeUsername(user.name);
+        if (!USERNAME_REG.test(user.name)) {
+            return {code: 0, result: "用户名格式错误"};
         }
-        if (user.pwd.length < 5) {
-            return {code: 0, result: "注册失败，缺少数据"};
+        if (!isValidPassword(user.pwd)) {
+            return {code: 0, result: "密码长度在6到20之间"};
         }
         if (!this.checkValCode(user.valno)) {
             return {code: 0, result: "验证码输入错误"};
         }
         user.pwd = this.MD5(user.pwd);
-        user.name = user.name.toLowerCase();
         user.phone = user.phone ?? null;
         user.link_user = user.guider > 0 ? user.guider : 0;
         if (await DB.getUserBy("name", user.name)) {
@@ -57,20 +62,19 @@ class UserAPI extends APIBASE {
         if (!await DB.createUser(user)) {
             return {code: 0, result: "注册失败"};
         }
-        this.deleteSession("valno");
         this.signIn(user.id, user.name, user.pwd, 0);
         return {code: 1};
     }
 
     async validimage() {
         const captcha = svgCaptcha.create({
-            size: 4,           // 验证码长度
-            noise: 2,          // 干扰线条数量
-            color: true,       // 文字是否彩色
-            background: '#337AB7', // 背景色
+            size: 4,
+            noise: 2,
+            color: true,
+            background: '#337AB7',
         });
 
-        this.setSession('valno', captcha.text)
+        this.setSession('valno', captcha.text);
         return Buffer.from(captcha.data).toString('base64');
     }
 
@@ -78,7 +82,7 @@ class UserAPI extends APIBASE {
         const user = this.getUser();
         if (!user)
             return {code: 0, result: "未登录"};
-        let result = await DB.getUserBy("id", user.id);
+        const result = await DB.getUserBy("id", user.id);
         if (!result) return {code: 0, result: "不存在的用户"};
         return {code: 1, result: result.phone ? result.phone.substring(0, 3) + "********" : ""};
     }
@@ -87,52 +91,48 @@ class UserAPI extends APIBASE {
         const user = this.getUser();
         if (!user)
             return {code: 0, result: "未登录"};
-        let {code, no, pwd} = data;
-        let result = await DB.getUserBy("id", user.id);
+        const {code, no, pwd} = data;
+        const result = await DB.getUserBy("id", user.id);
         if (!result) return {code: 0, result: "不存在的用户"};
+        if (!isNonEmptyString(pwd)) return {code: 0, result: "请输入密码"};
+        if (this.MD5(pwd) !== result.pwd) return {code: 0, result: "密码错误"};
         if (result.phone) {
-            if (!code || code.length !== 4)
+            if (!PHONE_SUFFIX_REG.test(code))
                 return {code: 0, result: "手机尾号格式错误"};
             if (!result.phone.endsWith(code))
                 return {code: 0, result: "错误的手机尾号"};
-            user.phone = null;
+            result.phone = null;
         } else {
-            if (!no || !/^1\d{10}$/.test(no))
+            if (!PHONE_REG.test(no))
                 return {code: 0, result: "手机号格式错误"};
-            user.phone = no;
+            result.phone = no;
         }
-        pwd = this.MD5(pwd);
-        if (pwd !== user.pwd)
-            return {code: 0, result: "密码错误"};
-        if (await DB.updateUser(user))
+        if (await DB.updateUser(result))
             return {code: 1};
-        return {code: 0};
+        return {code: 0, result: "绑定修改失败"};
     }
 
-    async resetpwd(paras) {
-        let {
-            name, phone, vcode, pwd
-        } = paras;
-        if (!name || !phone || !pwd)
-            return {code: 0};
+    async resetpwd(data) {
+        let {name, phone, pwd} = data;
+        const failure = {code: 0, result: "密码重置失败"};
+        name = normalizeUsername(name);
+        if (!LOGIN_USERNAME_REG.test(name) || !PHONE_REG.test(phone) || !isValidPassword(pwd))
+            return failure;
         const result = await DB.getUserBy("name", name);
-        if (!result)
-            return {code: 0, result: "账号不存在"};
-        if (!result.phone || result.phone !== phone) {
-            return {code: 0, result: "手机号验证失败"};
-        }
-        pwd = this.MD5(pwd);
-        result.pwd = pwd;
-        if (!await DB.updateUser(result)) {
-            return {code: 0, result: "密码重置失败。"};
-        }
+        if (!result || !result.phone || result.phone !== phone)
+            return failure;
+        result.pwd = this.MD5(pwd);
+        if (!await DB.updateUser(result))
+            return failure;
         return {code: 1};
     }
 
     async changepassword(data) {
         let {oldpwd, pwd, no} = data;
-        if (!oldpwd || !pwd)
-            return {code: 0};
+        if (!isNonEmptyString(oldpwd) || !isNonEmptyString(pwd))
+            return {code: 0, result: "缺少参数"};
+        if (!isValidPassword(pwd))
+            return {code: 0, result: "密码长度在6到20之间"};
         oldpwd = this.MD5(oldpwd);
         pwd = this.MD5(pwd);
         const user = this.getUser();
@@ -146,31 +146,19 @@ class UserAPI extends APIBASE {
             return {code: 0, result: "原始密码输入错误。"};
         }
         if (result.phone) {
-            if (!no || no.length !== 4)
+            if (!PHONE_SUFFIX_REG.test(no))
                 return {code: 0, result: "手机尾号格式错误"};
             if (!result.phone.endsWith(no))
                 return {code: 0, result: "错误的手机尾号"};
         }
-        user.pwd = pwd;
         result.pwd = pwd;
         if (!await DB.updateUser(result)) {
             return {code: 0, result: "密码修改失败。"};
         }
-        let cert = this.signIn(user.id, user.name, pwd, user.level);
+        const cert = this.signIn(user.id, user.name, pwd, user.level);
         if (cert)
             return {code: 1, p: cert, u: this.sessionKey()};
         return {code: 0, result: "登陆凭证更新失败"};
-
-
-    }
-
-    async GetPhone2(paras) {
-        let {uid, cert} = paras;
-        debugger
-        if (!uid || cert !== 'transrole_service') return;
-        let user = await DB.getUserByID(uid);
-        if (!user) return "";
-        return user.phone;
     }
 }
 
