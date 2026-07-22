@@ -1668,7 +1668,7 @@ use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
 | `is_faint?` | `boolean` | 是否昏迷状态（无知觉） |
 | `is_miss?` | `boolean` | 是否闪避状态（敌人更难命中） |
 | `is_rash?` | `boolean` | 是否鲁莽状态（无法躲闪） |
-| `is_shadow?` | `boolean` | 是否为分身状态 |
+| `is_shadow?` | `boolean` | 是否为绝对命中状态 |
 | `ig_control?` | `boolean` | 是否免疫控制 |
 | `downside?` | `boolean` | 是否为负面状态 |
 | `override?` | `number` | 叠加模式：0=不可叠加（幂等），1=叠加层数，2=刷新持续时间 |

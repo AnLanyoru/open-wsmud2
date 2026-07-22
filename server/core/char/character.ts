@@ -231,7 +231,7 @@ export interface CharacterStatus extends StatusDef {
     is_miss?: boolean;
     /** 是否为鲁莽状态 */
     is_rash?: boolean;
-    /** 是否为分身状态 */
+    /** 是否为绝对命中状态 */
     is_shadow?: boolean;
     /** 是否免疫控制 */
     ig_control?: boolean;
@@ -436,7 +436,7 @@ export class CHARACTER extends ITEM {
     is_miss: number = 0;
     /** 无法闪避状态倒计时 */
     is_rash: number = 0;
-    /** 分身状态倒计时 */
+    /** 绝对命中状态倒计时 */
     is_shadow: number = 0;
     /** 攻击处理器（定时器句柄） */
     attack_handler: ReturnType<typeof setTimeout> | null = null;
