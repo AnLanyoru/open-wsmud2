@@ -164,6 +164,7 @@ export default class extends SKILL {
                     id: 'gui',
                     name: '鬼影',
                     duration: time,
+                    is_shadow: true,
                     desc: '鬼影相随，攻击必中',
                     start_msg: '<mag>$N的身形变得若隐若现，鬼影幢幢，仿佛与虚空融为一体！</mag>',
                     finish_msg: '<cyn>$N的鬼影渐渐敛去，身形重新凝实。</cyn>',
