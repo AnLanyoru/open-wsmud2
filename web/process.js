@@ -499,9 +499,13 @@ const Process = {
                 }
             }
         }
-        // 新格式战斗文本：服务端只发第三人称，客户端根据 A/T 判断视角
+        // 新格式战斗文本：服务端发第三人称 + $P/$p 占位符，客户端根据 A/T 判断视角
         if (data.s) {
             var s = data.s;
+            // 解析代词占位符：$P=攻击者代词 $p=目标代词
+            // 自身为 A/T 时替换为"你"，否则用服务端提供的第三人称代词
+            s = s.split('$P').join(data.A === Process.name ? '你' : (data.P || ''));
+            s = s.split('$p').join(data.T === Process.name ? '你' : (data.p || ''));
             if (data.A && data.A === Process.name) s = s.split(data.A).join('你');
             if (data.T && data.T === Process.name) s = s.split(data.T).join('你');
             Process.message.push(s);
@@ -614,12 +618,12 @@ function buildSparseFromCache(fieldMask, aId, tId) {
     // FMASK 位顺序: A_NAME(0x01) A_WEAPON(0x02) A_CALL3(0x04) T_WEAPON(0x08) A_THROW(0x10) T_NAME(0x20) [0x40保留] T_CALL3(0x80)
     if (fieldMask & 0x01) sparse.push(aCache ? (aCache.n || aCache.name) : '');           // A_NAME (纯名字)
     if (fieldMask & 0x02) sparse.push(aCache ? (aCache.w || '手') : '手');  // A_WEAPON
-    if (fieldMask & 0x04) sparse.push(aCache ? (aCache.c || '') : '');     // A_CALL3
+    if (fieldMask & 0x04) sparse.push((aId && aId === Process.player) ? '你' : (aCache ? (aCache.c || '') : ''));     // A_CALL3
     if (fieldMask & 0x08) sparse.push(tCache ? (tCache.w || '手') : '手');  // T_WEAPON
     if (fieldMask & 0x10) sparse.push(aCache ? (aCache.th || '') : '');    // A_THROW
     if (fieldMask & 0x20) sparse.push(tCache ? (tCache.n || tCache.name) : '<hir>未知存在</hir>'); // T_NAME (纯名称)
     // 0x40 保留，不消费 sparse
-    if (fieldMask & 0x80) sparse.push(tCache ? (tCache.c || '') : '');     // T_CALL3
+    if (fieldMask & 0x80) sparse.push((tId && tId === Process.player) ? '你' : (tCache ? (tCache.c || '') : ''));     // T_CALL3
     return sparse;
 }
 

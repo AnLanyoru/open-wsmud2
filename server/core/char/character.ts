@@ -706,7 +706,8 @@ export class CHARACTER extends ITEM {
     // send_*_b 是 pack.js --binary 编译时替换的二进制版本，
     // 将消息构造下沉到客户端，服务端只发模板 ID + 实体字段。
 
-    /** 构建战斗/房间消息 JSON */
+    /** 构建战斗/房间消息 JSON
+     *  P/p 字段携带 A/T 的第三人称代词，供客户端将 \uE000/\uE001 标记替换为"你"或代词 */
     _build_msg(text: string, target?: ITEM): string {
         const rendered = format_msg(this, text, target);
         // 转义字符串中的特殊字符，防止 JSON 断裂
@@ -715,6 +716,7 @@ export class CHARACTER extends ITEM {
             .replace(/"/g, '\\"')
             .replace(/\n/g, '\\n')
             .replace(/\r/g, '\\r');
+        const tCall3 = target && (target as any).check_character?.() ? (target as any).call3() : '';
         return (
             '{"type":"combat","s":"' +
             s +
@@ -722,6 +724,10 @@ export class CHARACTER extends ITEM {
             this.name +
             '","T":"' +
             (target?.name ?? '') +
+            '","P":"' +
+            this.call3() +
+            '","p":"' +
+            tCall3 +
             '"}'
         );
     }
@@ -3986,9 +3992,13 @@ export class CHARACTER extends ITEM {
 /**
  * 将消息模板中的 $ 占位符替换为实际值（始终第三人称）。
  *
+ * $P/$p 不在此处解析，保留占位符原样输出，
+ * 由客户端根据视角替换为"你"或第三人称代词（他/她/它）。
+ * JSON 中的 P/p 字段携带代词值供客户端使用。
+ *
  * 新消息格式仅为一种渲染结果，客户端根据消息中的 A/T 字段判断视角：
- * - 自身为 A → 将 A 名字替换为"你"
- * - 自身为 T → 将 T 名字替换为"你"
+ * - 自身为 A → 将 A 名字替换为"你"，$P 替换为"你"
+ * - 自身为 T → 将 T 名字替换为"你"，$p 替换为"你"
  * - 否则 → 直接显示
  */
 function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
@@ -4014,12 +4024,17 @@ function format_msg(me: CHARACTER, text: string, target?: ITEM): string {
                     }
                     break;
                 case 'P':
-                    str.push(me.call3());
+                    // 保留占位符，由客户端根据视角替换为"你"或第三人称代词
+                    str.push('$P');
                     break;
                 case 'p':
                     if (target) {
-                        // 角色用第三人称代词，物品直接用名字
-                        str.push(target.check_character() ? target.call3() : target.name);
+                        // 角色保留占位符（客户端替换），物品直接用名字
+                        if (target.check_character()) {
+                            str.push('$p');
+                        } else {
+                            str.push(target.name);
+                        }
                     } else {
                         str.push('<hir>未知存在</hir>');
                         console.warn('[format_msg] $p 占位符缺少 target，消息文本:', text);
