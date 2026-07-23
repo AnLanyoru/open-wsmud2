@@ -1,7 +1,6 @@
 import type { USER } from '../../../core/char/user.js';
-import type Heilong from '../../npc/bj/lm/heilong.js';
 import { ROOM } from '../../../core/room/room.js';
-import { queryLongmaiRoom, queryLongmaiState } from './shimen.js';
+import { queryLongmaiRoom } from './shimen.js';
 
 export default class extends ROOM {
     name = '镇锁台';
@@ -30,8 +29,7 @@ export default class extends ROOM {
     }
 
     unlockDimai(me: USER) {
-        const state = queryLongmaiState(me);
-        if (!state?.query_temp('lm_wuxing_done', 0)) return me.notify('地脉锁纹丝不动。你隐约感觉五行殿中的地气尚未流转至此。');
+        if (!this.fb_query_temp('lm_wuxing_done', me, 0)) return me.notify('地脉锁纹丝不动。你隐约感觉五行殿中的地气尚未流转至此。');
         this.unlock(me, 1, '地脉锁');
     }
 
@@ -45,44 +43,39 @@ export default class extends ROOM {
     }
 
     unlockLongyin(me: USER) {
-        const state = queryLongmaiState(me);
-        if (!state?.query_temp('lm_echo_done', 0)) return me.notify('龙吟锁中余响纷乱。你隐约感觉回音廊中的声纹尚未寻得归处。');
+        if (!this.fb_query_temp('lm_echo_done', me, 0)) return me.notify('龙吟锁中余响纷乱。你隐约感觉回音廊中的声纹尚未寻得归处。');
         this.unlock(me, 4, '龙吟锁');
     }
 
     unlock(me: USER, bit: number, name: string) {
-        const state = queryLongmaiState(me);
-        if (!state) return me.notify('铜锁没有反应。');
-        const locks = state.query_temp('lm_locks', 0);
+        const locks = this.fb_query_temp('lm_locks', me, 0);
         if (locks & bit) return me.notify(name + '已经解除。');
         const next = locks | bit;
-        state.set_temp('lm_locks', next);
+        this.fb_set_temp('lm_locks', next, me);
         me.send_room('$N转动' + name + '，锁舌应声弹开。');
         if (next !== 7) return me.notify('你隐约感觉仍有别处传来的禁制气息牵系着石门。');
-        this.release(me, state, bit);
+        this.release(me, bit);
     }
 
-    release(me: USER, state: ROOM, lastBit: number) {
-        if (state.query_temp('lm_released', 0)) return me.notify('你隐约感觉石台上的锁脉气息已经尽数消散。');
-        state.set_temp('lm_released', 1);
+    release(me: USER, lastBit: number) {
+        if (this.fb_query_temp('lm_released', me, 0)) return me.notify('你隐约感觉石台上的锁脉气息已经尽数消散。');
+        this.fb_set_temp('lm_released', 1, me);
         const well = queryLongmaiRoom('longmai/suolongjing', me);
-        const dragon = well?.find_by_path('bj/lm/heilong') as Heilong | undefined;
-        if (!well || !dragon) {
-            state.set_temp('lm_released', 0);
+        if (!well || !well.find_by_path('bj/lm/heilong')) {
+            this.fb_set_temp('lm_released', 0, me);
             return me.notify('锁龙井中的封印没有响应。');
         }
         const moved = me.moveto(well, '$N踏入锁龙井。', '$N从镇锁台走了进来。', 'north');
         if (moved === false || me.environment !== well) {
-            state.set_temp('lm_locks', state.query_temp('lm_locks', 0) & ~lastBit);
-            state.set_temp('lm_released', 0);
+            this.fb_set_temp('lm_locks', this.fb_query_temp('lm_locks', me, 0) & ~lastBit, me);
+            this.fb_set_temp('lm_released', 0, me);
             return me.notify('石门刚刚松动便再度闭合，最后一道铜锁也退回原位，可以重新尝试。');
         }
         me.send_room('三道铜锁同时崩开，通往锁龙井的石门轰然下沉。');
-        dragon.on_free(me);
     }
 
     check(me: USER) {
-        const locks = queryLongmaiState(me)?.query_temp('lm_locks', 0) || 0;
+        const locks = this.fb_query_temp('lm_locks', me, 0);
         me.notify('地脉锁' + (locks & 1 ? '锁舌已松，纹路归于黯淡。' : '纹路仍随地气微微明灭。'));
         me.notify('兵魂锁' + (locks & 2 ? '煞气已散，锁芯悄然停转。' : '锁芯仍传出若有若无的兵戈之声。'));
         me.notify('龙吟锁' + (locks & 4 ? '余音已歇，锁簧不再震颤。' : '锁簧之中仍有杂乱余音盘旋。'));
@@ -93,7 +86,7 @@ export default class extends ROOM {
     }
 
     on_leave(me: USER, dir: string) {
-        const locks: number = queryLongmaiState(me)?.query_temp('lm_locks', 0) || 0;
+        const locks = this.fb_query_temp('lm_locks', me, 0);
         if (dir === 'north' && locks !== 7) {
             return me.notify_fail('北面的石门沉重如山。你隐约感觉仍有未散的锁脉气息将其牢牢牵住。');
         }

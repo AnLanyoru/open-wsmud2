@@ -6,10 +6,6 @@ export function queryLongmaiRoom(path: string, me: USER) {
     return WORLD.getRoom(path)?.query_copy2(me);
 }
 
-export function queryLongmaiState(me: USER) {
-    return queryLongmaiRoom('longmai/shimen', me);
-}
-
 export default class extends ROOM {
     name = '入口石室';
     desc =

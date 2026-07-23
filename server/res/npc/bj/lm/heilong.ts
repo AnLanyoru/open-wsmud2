@@ -4,6 +4,7 @@ import { UTIL } from '../../../../core/util/util.js';
 import { EVENTS } from '../../../../core/task/events.js';
 import { COMMAND } from '../../../../core/command.js';
 import type { USER } from '../../../../core/char/user.js';
+import type { CORPSE } from '../../../../core/item/corpse.js';
 
 export default class extends MONSTER {
     name = '黑龙';
@@ -46,69 +47,74 @@ export default class extends MONSTER {
             ['bite', 380],
             ['heilong', 380, ['bite', 'dodge', 'parry']],
         );
-        this.add_action('free', '放了它', this.free_me);
-    }
-
-    free_me(me: USER) {
-        me.send(
-            this.name +
-                '挣扎双翼连接的锁链哗啦作响：狡猾的人类，又想骗我什么？这根柱子灵纹封印，单靠蛮力无法破坏。',
-        );
+        this.add_action('free', null, this.free_me);
     }
 
     on_create() {
         this.hp = 55000;
     }
 
-    on_kill(me) {
-        if (this.is_free) return false;
-        if (!this.fight_type) {
-            this.environment?.fb_set_temp('kill_hl', 1, me);
-            me.send(this.name + '轻蔑道：找死！\n');
-            this.do_kill(me);
-        }
-    }
-
-    heart_beat(dt: number) {
-        if (this.fight_type > 0) {
-            this.fight_time++;
-            if (this.fight_time > 60) {
-                const enemies = this.enemy ? [...this.enemy] : [];
-                this.end_fight();
-                for (const enemy of enemies) enemy.end_fight();
-                this.fight_time = 0;
-                this.is_free = false;
-                this.mp = this.max_mp;
-                this.hp = 55000;
-                this.send_room(
-                    '\n<yel>$N挣脱攻势退回盘龙柱旁，玄铁锁链重新绷紧。此次挑战已超时，可以再次尝试。</yel>',
-                );
-            }
-        } else {
-            this.fight_time = 0;
-            this.mp = this.max_mp;
-            this.hp = this.is_free ? 5000000 : 55000;
-        }
-    }
-
     on_enter(me: USER) {
-        let room = this.environment;
-        if (!room) return;
-        if (room.fb_query_temp('kill_hl', me)) {
-            this.do_kill(me);
-        } else {
-            me.send(this.name + '虚弱的抬起脑袋看着你：人类，你想做什么？');
-            me.send_commands('kill ' + this.id, '击杀它', 'free ' + this.id, '放了它');
+        if (this.is_free) return;
+        const route = this.environment?.fb_query_temp('lm_route', me, '') as string;
+        if (route === 'kill') {
+            me.send('黑龙抬起头，玄铁锁链上的暗纹沿着旧痕缓缓亮起。');
+            if (!this.fight_type) this.do_kill(me);
+            return;
         }
+        if (route === 'free') return me.send('井底只余锁链轻响，先前的选择已不可回头。');
+        me.send('黑龙虚弱地抬起头，玄铁锁链深处有两缕黯淡灵纹彼此纠缠。');
+        me.send_commands('kill ' + this.id, '击杀它', 'free ' + this.id, '解救它');
+    }
+
+    on_kill(me: USER) {
+        const room = this.environment;
+        if (!room || room.fb_query_temp('lm_locks', me, 0) !== 7) {
+            me.notify('玄铁锁链骤然绷紧，井壁深处的暗纹将杀意悄然吞没。');
+            return false;
+        }
+        const route = room.fb_query_temp('lm_route', me, '') as string;
+        if (route === 'free') {
+            me.notify('锁链残纹已循另一道气息沉寂，再无回转余地。');
+            return false;
+        }
+        const selected = !route;
+        if (selected) room.fb_set_temp('lm_route', 'kill', me);
+        try {
+            this.send_room('$N眼底掠过一线寒芒，盘龙柱上的锁链随之寸寸绷直。');
+            this.do_kill(me);
+        } catch (error) {
+            if (selected) room.fb_set_temp('lm_route', '', me);
+            throw error;
+        }
+        return false;
+    }
+
+    free_me(me: USER) {
+        this.on_free(me);
     }
 
     on_free(me: USER) {
         if (this.is_free) return me.notify('黑龙身上的封印已经解除。');
+        const room = this.environment;
+        if (!room || room.fb_query_temp('lm_locks', me, 0) !== 7) {
+            return me.notify('几道锁纹明灭不定，似乎仍缺了一线契机。');
+        }
+        const route = room.fb_query_temp('lm_route', me, '') as string;
+        if (route === 'kill') return me.notify('锁链暗纹已染上杀意，再难引向别处。');
+        if (route === 'free') return me.notify('锁链间的气息已经散尽。');
+        room.fb_set_temp('lm_route', 'free', me);
         this.is_free = true;
-        this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
-        this.settleReward(me);
-        this.settleWorldReward(me);
-        this.call_out(this.to_next, 3000, me);
+        try {
+            this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
+            this.settleReward(me);
+            this.settleWorldReward(me);
+            this.call_out(this.to_next, 3000, me);
+        } catch (error) {
+            this.is_free = false;
+            room.fb_set_temp('lm_route', '', me);
+            throw error;
+        }
     }
 
     to_next(me: USER) {
@@ -135,8 +141,43 @@ export default class extends MONSTER {
         this.destroy();
     }
 
+    heart_beat(dt: number) {
+        if (this.fight_type > 0) {
+            this.fight_time++;
+            if (this.fight_time > 60) {
+                const enemies = this.enemy ? [...this.enemy] : [];
+                this.end_fight();
+                for (const enemy of enemies) enemy.end_fight();
+                this.fight_time = 0;
+                this.mp = this.max_mp;
+                this.hp = 55000;
+                this.send_room('\n<yel>$N退回盘龙柱旁，玄铁锁链在幽暗中重新绷紧。</yel>');
+            }
+        } else {
+            this.fight_time = 0;
+            this.mp = this.max_mp;
+            this.hp = this.is_free ? this.max_hp : 55000;
+        }
+    }
+
+    on_died(killer: USER | undefined, corpse: CORPSE) {
+        if (!killer?.check_player()) return;
+        if (corpse.environment?.fb_query_temp('lm_route', killer, '') !== 'kill') return;
+        if (killer.query_temp('jd_longmai_kill_done', 0)) return;
+        killer.set_temp('jd_longmai_kill_done', 1);
+        killer.save();
+        killer.notify('井底最后一缕龙息归于沉寂，盘龙柱上的暗纹也随之隐没。');
+    }
+
     settleReward(me: USER) {
-        if (me.query_temp('jd_longmai_reward', 0)) return;
+        if (me.query_temp('jd_longmai_free_done', 0) || me.query_temp('jd_longmai_reward', 0)) {
+            if (!me.query_temp('jd_longmai_free_done', 0)) {
+                me.set_temp('jd_longmai_free_done', 1);
+                me.save();
+            }
+            return;
+        }
+        me.set_temp('jd_longmai_free_done', 1);
         me.set_temp('jd_longmai_reward', 1);
         me.add_title('黑龙使', 'lm');
         const eqs = [
@@ -146,7 +187,7 @@ export default class extends MONSTER {
             'eq/lv2/lm_pifeng',
             'eq/lv2/lm_pei',
         ];
-        me.notify('你释放了被锁禁的黑龙，获得称号【黑龙使】。');
+        me.notify('你解救了被封印的黑龙，获得称号【黑龙使】。');
         const obj = me.add_obj(eqs.random());
         if (obj) {
             me.send('你从松动的锁龙柱下找到' + obj.unit_name(1) + '。');
@@ -158,11 +199,11 @@ export default class extends MONSTER {
         if (!WORLD.DATA.query_temp('longmai')) {
             WORLD.DATA.set_temp('longmai', 1, UTIL.diff_time(20));
             WORLD.DATA.set_temp('study_per', 50, 3600000 * 2);
-            COMMAND.DO('rumor', '听说' + me.name + '解锁了龙脉，所有人的学习效率增加了。');
+            COMMAND.DO('rumor', '听说' + me.name + '解除了龙脉封印，所有人的学习效率增加了。');
             EVENTS.add({
                 id: 'longmai',
-                name: '龙脉解锁',
-                desc: me.name + '解锁了龙脉，接下来的两小时所有人的学习效率+50%。',
+                name: '龙脉解封',
+                desc: me.name + '解除了龙脉封印，接下来的两小时所有人的学习效率+50%。',
                 time: Date.now() + 3600000 * 2,
                 grade: 1,
             });
