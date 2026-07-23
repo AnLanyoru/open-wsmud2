@@ -33,7 +33,7 @@
 
 **重要原则**：
 
-- 物品文件是**类定义**，不是实例。引擎加载后存放在 `WORLD.OBJ_STROE` 中作为原型。
+- 物品文件是**类定义**，不是实例。引擎加载后存放在 `WORLD.OBJ_STORE` 中作为原型。
 - 运行时实例通过 `Object.create(base)` 原型克隆创建（见 `OBJ.CREATE` 方法）。
 - 每个物品文件只导出一个匿名类，类名固定为 `default`。
 - 回调方法 `on_use`、`on_create`、`on_study` 等定义在类的原型上，由引擎在适当时机调用。
@@ -146,6 +146,14 @@ BASE
 | `transable` | `boolean` | `false` | 是否可交易/出售 |
 | `showAction` | `boolean` | `false` | 是否显示快捷使用按钮 |
 | `distime` | `number` | `0` | 使用冷却时间（毫秒） |
+| `distype` | `string` | 未定义 | 冷却分组标识；相同值共享使用冷却 |
+| `action_msg` | `string` | 未定义 | 使用动作文字，默认 `"用"` |
+| `allow_die` | `boolean` | 未定义 | 是否允许死亡状态使用 |
+| `allow_fight` | `boolean` | 未定义 | 是否允许战斗中使用 |
+| `allow_busy` | `boolean` | 未定义 | 是否允许忙乱状态使用 |
+| `allow_faint` | `boolean` | 未定义 | 是否允许昏迷状态使用 |
+| `no_consume` | `boolean` | 未定义 | 为 `true` 时成功使用后不扣除物品；默认会扣除 1 个 |
+| `no_drop` | `boolean` | `false` | 是否禁止丢弃 |
 | `otype` | `number` | `0` | 物件类型标识 |
 | `temp` | `object` | `{}` | 临时数据存储（会持久化到数据库） |
 | `items` | `ITEM[]` | `null` | 子物品列表（容器用） |
@@ -154,7 +162,6 @@ BASE
 | `is_shortcut` | `boolean` | `false` | 是否为快捷栏物品（装备专用） |
 | `eq_type` | `number` | `0` | 装备槽位类型（装备专用） |
 | `is_open` | `boolean` | `false` | 容器是否已打开 |
-| `distype` | `string` | 未定义 | 冷却分组标识，同类物品使用相同 `distype` 共享冷却 |
 | `skill` | `string` | 未定义 | 技能书记录的技能 ID |
 | `combine_to` | `string` | 未定义 | 合成目标物品路径（残页合成用） |
 | `combine_count` | `number` | 未定义 | 合成所需数量 |
@@ -229,8 +236,10 @@ on_reload?(me: CHARACTER): void;
 on_use?(me: CHARACTER, par?: string): boolean | void;
 ```
 
-- 返回 `false` 阻止物品消耗（不移除物品）
-- 返回 `undefined`/`true` 表示正常使用并消耗
+- 返回 `false` 会立即终止本次使用：不移除物品，也不会进入后续快捷栏刷新与冷却设置
+- 返回 `undefined`/`true` 表示使用成功；默认移除 1 个物品
+- 对可重复使用的物品设置 `no_consume = true`，成功使用后不会移除，但仍会执行后续快捷栏刷新与冷却设置
+- `no_consume` 与返回 `false` 不等价：前者表示成功但不消耗，后者表示中止本次使用
 - `par` 为可选附加参数
 - 当 `showAction = true` 且 `distime > 0` 时，客户端会显示快捷按钮和冷却
 
@@ -1264,10 +1273,10 @@ export default class extends OBJ {
         super();
         // 添加额外命令
         this.add_action('sbook', '存到技能仓库', (me) => {
-            WORLD.COMMANDS.sbook.enter(me, this.id);
+            WORLD.COMMANDS.get('sbook')?.enter(me, this.id);
         });
         this.add_action('split', '拆分', (me) => {
-            WORLD.COMMANDS.sbook.split_book(me, this);
+            WORLD.COMMANDS.get('sbook')?.split_book(me, this);
         });
     }
 
@@ -1813,10 +1822,10 @@ this.drop_list = [
 constructor() {
     super();
     this.add_action('sbook', '存到技能仓库', (me) => {
-        WORLD.COMMANDS.sbook.enter(me, this.id);
+        WORLD.COMMANDS.get('sbook')?.enter(me, this.id);
     });
     this.add_action('split', '拆分', (me) => {
-        WORLD.COMMANDS.sbook.split_book(me, this);
+        WORLD.COMMANDS.get('sbook')?.split_book(me, this);
     });
 }
 ```
@@ -2037,7 +2046,7 @@ on_use(me) {
 
 - 物品加载失败会在服务器日志中输出错误
 - 使用 `OBJ.CREATE("路径")` 如果路径不存在会抛出 `没有物品定义` 异常
-- `WORLD.OBJ_STROE` 是一个 Map，可以用 `WORLD.OBJ_STROE.has("路径")` 检查物品是否已加载
+- `WORLD.OBJ_STORE` 是一个 Map，可以用 `WORLD.OBJ_STORE.has("路径")` 检查物品是否已加载
 
 ### otype 选择指南
 
@@ -2081,7 +2090,7 @@ OBJ 继承自 ITEM，因此拥有完整的 temp 操作接口：
 | `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
 | `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+| `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
 **物品 temp 的典型用途：**
 - 记录物品使用次数或剩余使用次数
@@ -2106,7 +2115,7 @@ var c = this.temp["charge"]; // 禁止！
 2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
 3. **时间单位为毫秒**：`time` 参数是**毫秒**。例如 1 小时 = `3600000`。
 4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值。
-5. **`remove_temp` 设为 `null`**：不删除键名，用于 JSON 序列化兼容。
+5. **`remove_temp` 删除键**：同时删除临时值及其过期时间记录。
 6. **物品 temp 持久化**：物品的 `temp` 数据会随物品序列化存储到数据库。`format_temp()` 在保存时会丢弃即将过期（120秒内）的条目。
 
 ---

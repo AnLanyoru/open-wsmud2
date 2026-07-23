@@ -149,7 +149,7 @@ server/res/skill/
 | `weapon_vs_weapon_actions` | `string[]` | 武器对武器招架描述 |
 | `weapon_vs_unarmed_actions` | `string[]` | 武器对空手招架描述 |
 | `unarmed_vs_weapon_actions` | `string[]` | 空手对武器招架描述 |
-| `pfm_set` | `PerformData` | 绝招字典（原始定义） |
+| `pfm_set` | `Record<string, Partial<PERFORM>>` | 绝招字典（原始定义） |
 | `pfm` | `Record<string, PERFORM>` | 绝招字典（运行时实例） |
 
 **核心方法：**
@@ -195,7 +195,7 @@ import {FAMILIES} from "../../../core/skill/family.js";
 
 // 类型导入（只用于类型标注，编译时被擦除）
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap, LearnCondition } from "../../../core/skill/skill.js";
+import type {EnablePropMap, LearnCondition } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 ```
 
@@ -211,7 +211,7 @@ import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 > **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。**
 
-SKILL 中需特别注意：`learn_condition` 标注 `LearnCondition`、`pfm_set` 标注 `PerformData`；`query_prop`/`query_enable_prop` 覆写方法标注参数和返回类型；`pfm_set` 回调函数标注参数类型。
+SKILL 中需特别注意：`learn_condition` 标注 `LearnCondition`、`pfm_set` 标注 `Record<string, Partial<PERFORM>>`；`query_prop`/`query_enable_prop` 覆写方法标注参数和返回类型；`pfm_set` 回调函数标注参数类型。
 
 ---
 
@@ -263,7 +263,7 @@ export default class extends SKILL {
 **文件位置：** `server/res/skill/base/sword.ts`
 
 ```typescript
-import {PERFORM, SKILL} from "../../../core/skill/skill.js";
+import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES, WEAPON_TYPE} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
@@ -321,7 +321,7 @@ export default class extends SKILL {
 ### 6.3 基本刀法 (blade)
 
 ```typescript
-import {PERFORM, SKILL} from "../../../core/skill/skill.js";
+import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
@@ -447,7 +447,7 @@ export default class extends SKILL {
 ### 6.6 基本拳脚 (unarmed)
 
 ```typescript
-import {PERFORM, SKILL} from "../../../core/skill/skill.js";
+import {SKILL} from "../../../core/skill/skill.js";
 import {SKILL_TYPES} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
@@ -532,7 +532,7 @@ constructor() {
 ```typescript
 import {SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -763,9 +763,9 @@ can_enables = ["club"];
 - 可以被装备为默认内功
 
 ```typescript
-import {SKILL} from "../../../core/skill/skill.js";
+import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -781,7 +781,7 @@ export default class extends SKILL {
         skill: { force: 300 }
     };
 
-    pfm_set: PerformData = {
+    pfm_set: Record<string, Partial<PERFORM>> = {
         xi: {
             name: "紫气东来",
             distime: 60000,
@@ -959,10 +959,10 @@ parry_actions = [
 
 ### 12.1 基础结构
 
-绝招定义在 `pfm_set: PerformData` 字段中，每个绝招是一个 `PERFORM` 的 partial 对象，必须通过 `PERFORM.fromPlain()` 转换。
+绝招定义在 `pfm_set: Record<string, Partial<PERFORM>>` 字段中，每个绝招是一个 `PERFORM` 的 partial 对象，必须通过 `PERFORM.fromPlain()` 转换。
 
 ```typescript
-pfm_set: PerformData = {
+pfm_set: Record<string, Partial<PERFORM>> = {
     绝招key: {
         name: "绝招名称",           // 显示名称（必填）
         mp: 20,                     // 内力消耗基础值（必填）
@@ -1903,9 +1903,9 @@ desc?: string;   // 无实际效果，仅用于显示说明
  * 华山剑法 — 华山派入门剑法
  * 文件位置: server/res/skill/huashan/huashanjianfa.ts
  */
-import {SKILL} from "../../../core/skill/skill.js";
+import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -1934,7 +1934,7 @@ export default class extends SKILL {
     };
 
     // 绝招
-    pfm_set: PerformData = {
+    pfm_set: Record<string, Partial<PERFORM>> = {
         jiang: {
             name: "剑掌五连环",
             distime: 10000,
@@ -1978,10 +1978,10 @@ export default class extends SKILL {
  * 降龙十八掌 — 丐帮镇帮之宝
  * 文件位置: server/res/skill/gaibang/xianglongzhang.ts
  */
-import {SKILL} from "../../../core/skill/skill.js";
+import {PERFORM, SKILL} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -2021,7 +2021,7 @@ export default class extends SKILL {
         skill: { unarmed: 500 }
     };
 
-    pfm_set: PerformData = {
+    pfm_set: Record<string, Partial<PERFORM>> = {
         // === 绝招1：降龙（单次强攻+debuff）===
         qi: {
             name: "降龙",
@@ -2181,7 +2181,7 @@ import {SKILL, PERFORM} from "../../../core/skill/skill.js";
 import {FAMILIES} from "../../../core/skill/family.js";
 import {WEAPON_TYPE} from "../../../core/const.js";
 import type { PropMap } from "../../../types/props.js";
-import type {PerformData, EnablePropMap } from "../../../core/skill/skill.js";
+import type {EnablePropMap } from "../../../core/skill/skill.js";
 import type { CHARACTER, DoAttackPar } from "../../../core/char/character.js";
 
 export default class extends SKILL {
@@ -2220,7 +2220,7 @@ export default class extends SKILL {
     };
 
     // ========== 绝招 ==========
-    pfm_set: PerformData = {
+    pfm_set: Record<string, Partial<PERFORM>> = {
         // 绝招1：狂风骤雨（多段攻击）
         zhouyu: {
             name: "狂风骤雨",

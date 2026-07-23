@@ -35,14 +35,15 @@
   │
   └── Phase 2 (CREATE): 再次递归扫描，对每个文件调用 BASE.CREATE()
         │
-        └── 触发 new RoomClass() → constructor() → initBaseRoom(path)
+        └── 触发 new RoomClass() → constructor() → ROOM.create(path)
               │
-              ├── WORLD.ROOMS[path] = this           ← 注册到世界房间表
-              ├── 查找父区域：getAreaByPath(path)     ← 匹配 area.room_path 前缀
-              ├── this.parent = area                  ← 关联区域
-              ├── area.rooms.push(this)               ← 加入区域房间列表
-              ├── WORLD.RUN_ROOMS.push(this)          ← 加入运行列表（接收心跳）
-              └── this.on_create?.()                  ← 触发创建回调
+              ├── WORLD.ROOM_STORE.set(path, this)    ← 保存干净资源原型
+              ├── Object.create(this) → on_clone()    ← 创建基础运行房间
+              ├── active.on_create?.()                ← 初始化该运行房间
+              ├── WORLD.ROOMS.set(path, active)       ← 注册基础运行房间
+              ├── active.parent = area                ← 关联区域
+              ├── area.rooms.push(active)             ← 加入区域房间列表
+              └── 非副本区域时加入 WORLD.RUN_ROOMS    ← 接收心跳
 ```
 
 ---
@@ -52,7 +53,7 @@
 > **类型标注、temp 操作方法等通用约束详见 [全局开发约束.md](全局开发约束.md)。以下仅列出 ROOM 特有的注意事项。**
 
 - **`exits` 需标注 `Record<string, string>`**，`hidden_items` 需标注 `ITEM[] | null`
-- **ROOM 的 temp 方法有覆写版本**，详见下方 [4.10 临时数据操作规范](#410-临时数据temp操作规范)
+- **ROOM 的副本共享 temp 使用 `fb_*` 方法**，详见下方 [4.10 临时数据操作规范](#410-临时数据temp操作规范)
 
 ---
 
@@ -189,9 +190,9 @@ import {ROOM} from "../../../core/room/room.js";
 
 ### 4.10 临时数据（temp）操作规范
 
-> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。** 以下仅说明 ROOM 特有的签名差异。
+> **通用 temp 操作约束（禁止直接访问 temp、必须提供默认值、时间单位等）详见 [全局开发约束.md](全局开发约束.md) 第二条。** 以下仅说明 ROOM 的副本入口共享方法。
 
-**重要**：ROOM 覆写了 ITEM 的 temp 方法，**签名不同**——需要额外的 `me` 参数来按玩家隔离副本数据：
+**重要**：ROOM 的普通 temp 方法继承自 ITEM；需要按队伍定位副本入口共享数据时，应调用 `fb_query_temp`、`fb_set_temp`、`fb_add_temp`。
 
 #### 普通房间（继承自 ITEM，与 USER/CHARACTER/NPC 签名相同）
 
@@ -200,26 +201,22 @@ import {ROOM} from "../../../core/room/room.js";
 | `query_temp` | `<T>(name: string, def?: T) => T` | 读取房间自身临时值。**必须提供默认值**。 |
 | `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入房间自身临时值。`time` 为有效期（**毫秒**）。 |
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，不删除键名）。 |
+| `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
-#### 副本房间（ROOM 覆写版本，需要 `me` 参数做玩家隔离）
+#### 副本入口共享状态（按队伍 ID 定位）
 
 | 方法 | 签名 | 说明 |
 |------|------|------|
-| `query_temp` | `<T>(name: string, me: USER, def?: T) => T \| undefined` | 按玩家查询副本临时数据。**`me` 是第二个参数**。 |
-| `set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 按玩家设置副本临时数据。**`me` 是第三个参数**。 |
-| `add_temp` | `(name: string, value: number, me: USER, time?: number) => number` | 按玩家累加副本临时数据。**`me` 是第三个参数**。 |
+| `fb_query_temp` | `(name: string, me: USER, def?: unknown) => unknown` | 使用 `me.query_teamid()` 定位入口克隆后查询。 |
+| `fb_set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 在入口克隆设置共享值。 |
+| `fb_add_temp` | `(name: string, value: number, me: USER, time?: number) => number \| undefined` | 在入口克隆累加共享值。 |
 
-> **注意**：ROOM 没有覆写 `remove_temp`，副本房间使用继承自 ITEM 的版本（设为 `null`）。
+> **注意**：`fb_*` 固定使用 `query_teamid()`，不会自动跟随 AREA 自定义的 `query_owner()`。owner 不是队伍 ID 时，应先取得目标克隆，再调用普通 temp API。
 
 ```typescript
-// ✅ 正确：副本房间按玩家隔离操作 temp
-const firstRoom = this.query_fb_first(me.query_teamid());
-if (firstRoom) {
-    firstRoom.set_temp("boss_killed", true, me, 3600000);  // me 是第3个参数
-    const killed = firstRoom.query_temp("boss_killed", me, false);  // me 是第2个参数
-    firstRoom.add_temp("kill_count", 1, me);               // me 是第3个参数
-}
+this.fb_set_temp("boss_killed", true, me, 3600000);
+const killed = this.fb_query_temp("boss_killed", me, false);
+this.fb_add_temp("kill_count", 1, me);
 ```
 
 ---
@@ -402,7 +399,7 @@ on_enter(me: CHARACTER) {
 
 **触发时机：** 每个游戏心跳 tick 结束时（约每秒 1-4 次，取决于服务器配置）。
 
-**要求：** 房间必须位于 `WORLD.RUN_ROOMS` 中（所有基础房间和副本房间默认在其中）。只需定义此方法，无需设置 `is_heartbeat` 属性（后者仅为文档标记，引擎不读取）。
+**要求：** 房间必须位于 `WORLD.RUN_ROOMS` 中。普通区域的基础运行房间默认加入；副本区域的基础运行房间不加入，只有实际克隆出的副本房间加入。只需定义此方法，无需设置 `is_heartbeat` 属性（后者仅为文档标记，引擎不读取）。
 
 **用途：** 周期性逻辑——回血回蓝、超时检测、NPC 行为。
 
@@ -459,9 +456,9 @@ on_relive?(obj: CHARACTER, is_relive_here: boolean): boolean | void {
 
 **签名：** `on_create?: () => void`
 
-**触发时机：** 房间创建完成并注册到 `WORLD.ROOMS` 之后。
+**触发时机：** 资源定义生成基础运行房间前，以及每次 `ROOM.CREATE()` 克隆房间时。回调执行时房间尚未完成 `initBaseRoom()` 注册。
 
-**用途：** 初始化复杂状态、注册全局事件。
+**用途：** 初始化每个运行房间都需要的状态。不要在这里重复注册全局事件；房间热更新和副本克隆都会再次调用。
 
 ### 6.8 `on_set_difficulty(type)`
 
@@ -740,17 +737,17 @@ this.refresh(true); // 通知房间内玩家刷新
 
 设置副本难度。触发 `on_set_difficulty` 回调。
 
-#### `query_temp(name, me, def?)`
+#### `fb_query_temp(name, me, def?)`
 
-查询副本临时数据（按玩家隔离）。
+按 `me.query_teamid()` 查询副本入口克隆上的共享临时数据。
 
-#### `set_temp(name, value, me, time?)`
+#### `fb_set_temp(name, value, me, time?)`
 
-设置副本临时数据（按玩家隔离）。`time` 为可选有效期（毫秒）。
+在副本入口克隆上设置共享临时数据。`time` 为可选有效期（毫秒）。
 
-#### `add_temp(name, value, me, time?)`
+#### `fb_add_temp(name, value, me, time?)`
 
-累加副本临时数据（按玩家隔离）。
+在副本入口克隆上累加共享临时数据。
 
 ### 7.7 其他
 
@@ -955,26 +952,30 @@ export default class extends ROOM {
 **创建副本流程：**
 
 ```typescript
-// 在 WORLD 的副本命令中（简化示意）
-const area = AREA.Get("some_fb");  // 获取副本区域定义
-const firstRoom = WORLD.getRoom(area.first);  // 获取入口房间
-const copyRoom = firstRoom.create_copy(playerId, difficulty);
-player.moveto(copyRoom.path);
+// 在既有副本进入命令中（简化示意）
+const area = AREA.Get("some_fb");
+const firstRoom = area?.first ? WORLD.getRoom(area.first) : undefined;
+const copyRoom = firstRoom?.create_copy2(me, difficulty);
+if (copyRoom) me.moveto(copyRoom);
 ```
 
-这会在每个区域房间上创建一个副本实例，所有副本房间的 `owner` 设为 `playerId`。
+这会按 `area.query_owner(me)` 得到的 owner 为区域及子区域的每个房间创建独立克隆。克隆沿用资源 `path`，所以必须把具体 ROOM 对象传给 `moveto()`，不能再用 `copyRoom.path` 查询实例。
 
 **副本临时数据隔离：**
 ```typescript
-// 设置按玩家隔离的临时数据（自动关联到该玩家的副本入口房间）
-this.set_temp("boss_killed", true, me, 3600000); // 1小时过期
-const killed = this.query_temp("boss_killed", me, false);
+this.set_temp("boss_killed", true, 3600000);
+const killed = this.query_temp("boss_killed", false);
+
+this.fb_set_temp("boss_killed", true, me, 3600000);
+const sharedKilled = this.fb_query_temp("boss_killed", me, false);
 ```
 
 **清除副本：**
 ```typescript
-this.clear_copy(me); // 清除该玩家的副本实例
+area.clear_copy(me);
 ```
+
+完整的房间原型、克隆隔离、热更新和清理约束见 [副本编写指南.md](副本编写指南.md)。
 
 ### 10.3 区域入口房间
 
@@ -1141,7 +1142,7 @@ export default class extends ROOM {
     constructor() {
         super();
         this.add_action("diao", "钓鱼", function(me: CHARACTER): void {
-            WORLD.COMMANDS['diaoyu'].enter(me);
+            WORLD.COMMANDS.get('diaoyu')?.enter(me);
         });
     }
 }
@@ -1150,7 +1151,7 @@ export default class extends ROOM {
 **要点：**
 - `add_action("diao", "钓鱼", handler)` 在客户端显示一个"钓鱼"按钮。
 - 点击按钮时，客户端发送 `diao` 命令，服务器执行 handler 函数。
-- `can_diaoyu = true` 标记可钓鱼，但钓鱼逻辑在 `WORLD.COMMANDS['diaoyu']` 中。
+- `can_diaoyu = true` 标记可钓鱼，但钓鱼逻辑通过 `WORLD.COMMANDS.get('diaoyu')` 取得。
 
 ### 12.5 有心跳的房间
 
@@ -1180,7 +1181,7 @@ export default class WuMiaoRoom extends ROOM {
 **要点：**
 - `on_heart_beat` 直接作为类方法定义，不需要在 constructor 中设置。
 - 不需要设置 `is_heartbeat = true`（该属性仅为文档标记）。
-- 所有基础房间和副本房间都会接收心跳。
+- 普通区域的基础运行房间会接收心跳；副本区域的基础运行房间不接收，实际克隆出的副本房间会接收。
 - 不要在心跳中做耗时操作，会影响服务器性能。
 
 ### 12.6 完整的复杂房间

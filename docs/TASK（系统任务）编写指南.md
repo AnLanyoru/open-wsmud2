@@ -53,7 +53,7 @@ TASK 文件位于 `server/res/task/` 目录，服务启动时自动预加载并�
 | 基类 | `server/core/task/task.ts` 中的 `TASK` | `server/core/task/playertask.ts` 中的 `USERTASK` |
 | 存储位置 | `WORLD.SYSTEMTASKS`（服务端全局数组） | `WORLD.TASKS`（服务端全局数组） |
 | 生命周期 | 服务启动时创建，关闭时销毁 | 同左 |
-| 作用范围 | 全局单例，与玩家无关 | 每个玩家独立实例 |
+| 作用范围 | 全局单例，与玩家无关 | 全局任务实例，玩家进度独立存储 |
 | 典型用途 | Boss、排行榜、货物刷新 | 师门任务、衙门追捕、成长任务 |
 
 **本文档仅针对 TASK。** 若你需要编写玩家个人任务（每个玩家各自进度），请参考 USERTASK 相关文档。
@@ -228,18 +228,16 @@ loadResource()  [world.ts]
     ▼
 update命令(do_update)
     │
-    ├─ BASE.UPDATE(__PATH.WORLD + "task/", "xxx")
-    │   ├─ 重新 import（带 ?update=时间戳 避免缓存）
-    │   └─ 新类定义存入 BASE.ITEMS
-    │
-    └─ BASE.CREATE(__PATH.WORLD + "task/", "xxx")
-        └─ BASE.NEW → new constructor() → obj.path = "xxx" → create()
-            └─ TASK.create()
-                ├─ startup()       ─── 新实例调用 startup()
-                └─ push to SYSTEMTASKS
+    └─ BASE.UPDATE(__PATH.WORLD + "task/", "xxx")
+        ├─ 重新 import（带 ?update=时间戳避免缓存）
+        ├─ 实例化新类并设置 path
+        └─ 调用新实例的 TASK.update(path)
+            ├─ 按 path 查找旧任务并调用 oldtask.stop()
+            ├─ 用新实例替换 WORLD.SYSTEMTASKS 中的旧实例
+            └─ newTask.startup(oldtask) 迁移状态并重新启动
 ```
 
-> **注意**：热更新会创建一个新实例并将它推入 `SYSTEMTASKS`，旧的实例仍然存在但不会被主动清理。如果旧实例上有定时器正在运行，它们仍会继续执行。在 `startup()` 开始时通过 `oldtask` 参数可以拿到旧实例进行状态迁移，然后在 `stop()` 中清理旧实例的定时器。
+> **注意**：引擎会在调用新实例 `startup(oldtask)` 前调用旧实例 `stop()`，并把旧实例从 `WORLD.SYSTEMTASKS` 中替换掉。业务仍必须在 `stop()` 中清理全部定时器、NPC 和监听器；基类不会自动追踪这些资源。
 
 ### 停止/关闭流程
 
@@ -438,8 +436,8 @@ let uid = this.create_uid();
 |------|------|------|
 | `WORLD.SYSTEMTASKS` | `TASK[]` | 所有已注册的系统任务实例 |
 | `WORLD.USERS` | `USER[]` | 当前所有在线玩家 |
-| `WORLD.ROOMS` | `Record<string, ROOM>` | 所有房间（路径 → 房间实例） |
-| `WORLD.COMMANDS` | `Record<string, COMMAND>` | 所有命令实例 |
+| `WORLD.ROOMS` | `Map<string, ROOM>` | 基础运行房间（路径 → 房间实例），使用 `.get(path)` 查询 |
+| `WORLD.COMMANDS` | `Map<string, COMMAND>` | 命令实例，使用 `.get(name)` 查询 |
 | `WORLD.DATA` | `object` | 全局持久化数据对象 |
 | `WORLD.STATS` | `object` | 排行榜/统计信息 |
 | `WORLD.USER_EVENTS` | `EventItem[]` | 活动事件列表 |
@@ -533,7 +531,7 @@ EVENTS.remove('boss_challenge_1');
 
 ## 11. WORLD.DATA 全局持久化数据
 
-`WORLD.DATA` 是一个单例对象，用于存储服务端全局的临时/持久化数据（如活动状态、BOSS次数等）。数据会被持久化保存到 `data.js` 文件。
+`WORLD.DATA` 是一个单例对象，用于存储服务端全局的临时/持久化数据（如活动状态、BOSS次数等）。数据会通过 `WORLD.DB.saveData()` 持久化到数据库。
 
 ### 导入
 
@@ -546,7 +544,7 @@ EVENTS.remove('boss_challenge_1');
 | `query_temp(name, def?)` | `<T>(name: string, def?: T): T` | 查询临时数据。支持过期时间检查。 |
 | `set_temp(name, value, time?)` | `(name: string, value: unknown, time?: number): void` | 设置临时数据，可指定过期时间（毫秒）。 |
 | `add_temp(name, value, time?)` | `(name: string, value: number, time?: number): number` | 累加数值型数据，返回累加后的值。 |
-| `remove_temp(name)` | `(name: string): void` | 移除临时数据（设为 null）。 |
+| `remove_temp(name)` | `(name: string): void` | 删除临时值及其过期时间记录。 |
 
 ### 示例
 
@@ -601,7 +599,7 @@ me.remove_temp("bcc");
 
 ### 12.2 全局临时数据（WORLD.DATA）
 
-全服共享，持久化在 `data.js` 中：
+全服共享，持久化在数据库中：
 
 ```typescript
 WORLD.DATA.set_temp("xy_status", 1);
@@ -614,7 +612,7 @@ WORLD.DATA.remove_temp("xy_status");
 | 对象 | 作用范围 | 持久化位置 | 典型用途 |
 |------|---------|-----------|---------|
 | `me.query_temp()` | 单个玩家 | 该玩家的角色存档 | 玩家 BOSS 次数、报名状态 |
-| `WORLD.DATA.query_temp()` | 全服共享 | `data.js` | BOSS 刷新状态、活动计数器 |
+| `WORLD.DATA.query_temp()` | 全服共享 | 数据库 | BOSS 刷新状态、活动计数器 |
 
 ---
 
@@ -844,7 +842,7 @@ export default class extends TASK {
                     from_name: "综合榜奖励",
                     content: "你目前在综合榜排名第" + (i + 1) + "，请再接再厉。",
                     attach: [
-                        WORLD.COMMANDS.reward.score_reward!(i)
+                        WORLD.COMMANDS.get('reward')?.score_reward?.(i)
                     ]
                 }));
             }
@@ -866,7 +864,7 @@ export default class extends TASK {
                     from_name: "高手榜奖励",
                     content: "你目前在高手榜排名第" + (i + 1) + "。",
                     attach: [
-                        WORLD.COMMANDS.reward?.top_reward?.(i)
+                        WORLD.COMMANDS.get('reward')?.top_reward?.(i)
                     ]
                 }));
             }
@@ -1015,8 +1013,9 @@ export default class extends TASK {
 
     clearyz() {
         // 调用邮件和商店清理命令
-        WORLD.COMMANDS['checkorg']?.cmd_clearmail?.();
-        WORLD.COMMANDS['checkorg']?.cmd_clearstore?.();
+        const checkorg = WORLD.COMMANDS.get('checkorg');
+        checkorg?.cmd_clearmail?.();
+        checkorg?.cmd_clearstore?.();
     }
 
     async check_file() {
@@ -1370,9 +1369,10 @@ update task/msg
 ### 热更新内部流程
 
 1. `BASE.UPDATE(path, fname)` 重新 import 模块（带缓存破坏参数 `?update=时间戳`）
-2. 新的类定义存入 `BASE.ITEMS`
-3. `BASE.CREATE` 创建新实例 → 自动调用 `create()` → 调用 `startup()`
-4. 新实例被推入 `WORLD.SYSTEMTASKS`
+2. 新的类定义存入 `BASE.ITEMS` 并实例化，资源加载器调用新实例的 `update(path)`
+3. `TASK.update(path)` 按资源 path 查找旧任务并先调用 `oldtask.stop()`
+4. 用新实例替换 `WORLD.SYSTEMTASKS` 中的旧实例；不存在旧任务时才追加
+5. 调用 `newTask.startup(oldtask)`，由新实例迁移所需状态并重新建立定时器
 
 ### 状态迁移
 
@@ -1394,16 +1394,9 @@ startup(oldtask?: TASK) {
 
 ### 热更新时旧实例的处理
 
-- 旧实例上的定时器**不会**被自动清理--如果新实例重设了相同的定时器，两个定时器会同时运行。
-- 建议在 `startup()` 开始时先清除 `this` 上的旧定时器：
-
-```typescript
-startup() {
-    if (this.time_handler) clearTimeout(this.time_handler);
-    if (this.handler) clearTimeout(this.handler);
-    // ... 然后设置新的定时器
-}
-```
+- `TASK.update()` 会调用旧实例的 `stop()`，但 `TASK.stop()` 默认不做清理；子类必须覆写并清除旧实例保存的全部定时器、NPC 和监听器。
+- `call_out()` 和 `call_interval()` 只是 `setTimeout` / `setInterval` 的便捷封装，不会把句柄自动登记给 TASK。只有业务保存句柄并在 `stop()` 中显式清除，热更新时才能可靠停止旧回调。
+- `startup(oldtask)` 运行在新实例上，清理 `this.time_handler` 不能替代清理旧实例；清理职责属于旧实例的 `stop()`。
 
 ---
 
@@ -1439,29 +1432,11 @@ boss.on_died = (me: USER, corpse: CORPSE) => {
 };
 ```
 
-### 3. 热更新后出现重复任务
+### 3. 热更新后出现重复执行
 
-**问题**：每次 `update task/xxx` 都创建一个新实例推入 `SYSTEMTASKS`，旧实例未被移除。
+**问题**：`stop()` 未清理旧实例的全部定时器或监听器。虽然 `TASK.update()` 已替换 `WORLD.SYSTEMTASKS` 中的实例，旧回调仍持有旧实例并继续执行。
 
-**解决**：在 `create()` 中（或 `startup()` 开头）检查是否已存在同名任务：
-
-```typescript
-startup() {
-    // 查找是否已在列表中
-    let existing = TASK.GET("my_task");
-    if (existing && existing !== this) {
-        existing.stop();
-        // 替换
-        let idx = WORLD.SYSTEMTASKS.indexOf(existing);
-        if (idx >= 0) WORLD.SYSTEMTASKS[idx] = this;
-    }
-
-    // 清理当前定时器
-    if (this.time_handler) clearTimeout(this.time_handler);
-
-    // ... 设置新定时器
-}
-```
+**解决**：保存每个异步句柄，并在旧实例的 `stop()` 中逐一清理。不要在 `startup()` 中自行替换 `WORLD.SYSTEMTASKS`，该步骤已由 `TASK.update()` 完成。
 
 ### 4. 忘记 return false 导致任务错误注册
 
@@ -1538,7 +1513,7 @@ stop() {
 
 | 对象 | 作用范围 | 持久化位置 | 典型用途 |
 |------|---------|-----------|---------|
-| `WORLD.DATA` | 全服共享 | `data.js` | BOSS 刷新状态、活动计数器 |
+| `WORLD.DATA` | 全服共享 | 数据库 | BOSS 刷新状态、活动计数器 |
 | `me.query_temp()` | 单个玩家 | 该玩家的角色存档 | 玩家 BOSS 次数、报名状态 |
 
 ```typescript

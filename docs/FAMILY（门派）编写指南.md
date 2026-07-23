@@ -188,9 +188,9 @@ set_titles(...args: string[]): void
 #### 查询方法
 
 ```typescript
-query_title(level: number): string    // 按索引查询称谓
-query_skill(grade: number): SKILL     // 随机查询指定品级的技能
-query_skills(grade: number): SKILL[]  // 查询指定品级的所有技能
+query_title(level: number): string                // 按索引查询称谓
+query_skill(grade: number): SKILL | undefined     // 随机查询指定品级的技能；该品级无技能时返回 undefined
+query_skills(grade: number): SKILL[]              // 查询指定品级的所有技能
 add_gongji(me, count: number): void   // 增加门派贡献
 send(str: string): void              // 向所有在线门派成员发送消息
 send_channel(me, msg: string): void  // 发送门派频道消息
@@ -218,7 +218,7 @@ FAMILY 的 temp 方法借用自 `ITEM.prototype`，因此签名与 ITEM 体系�
 | `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**。过期自动返回默认值。 |
 | `set_temp` | `(name: string, value: any, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+| `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
 **核心约束：**
 
@@ -226,7 +226,7 @@ FAMILY 的 temp 方法借用自 `ITEM.prototype`，因此签名与 ITEM 体系�
 2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined`。
 3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**。门派战 30 分钟倒计时 = `1800000`。
 4. **过期机制**：值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值。
-5. **`remove_temp` 设为 `null`**：不删除键名。
+5. **`remove_temp` 删除键**：同时删除临时值及其过期时间记录。
 6. **FAMILY 的 temp 数据持久化**：FAMILY 的 `temp` 和 `tops`（排行榜）会通过 `FAMILY.SAVE()` / `FAMILY.LOAD()` 进行序列化和反序列化，跨服务器重启持久化。
 
 ---
@@ -864,8 +864,11 @@ const fam = this.family || FAMILIES.NONE;
 ### 11.4 在 FAMILY 中查询技能
 
 ```typescript
-// 随机获取一个 3 品技能
+// 随机获取一个 3 品技能；该品级没有技能时返回 undefined
 const skill = FAMILIES.SHAOLIN.query_skill(3);
+if (skill) {
+    console.log(skill.name);
+}
 
 // 获取所有 5 品技能
 const skills = FAMILIES.SHAOLIN.query_skills(5);
@@ -1374,7 +1377,7 @@ FAMILY.LOAD(data);  // 从 JSON 恢复
 |------|------|------|
 | `set_titles` | `(...titles: string[]): void` | 设置称谓层级 |
 | `query_title` | `(level: number): string` | 查询称谓 |
-| `query_skill` | `(grade: number): SKILL` | 随机查询技能 |
+| `query_skill` | `(grade: number): SKILL \| undefined` | 随机查询技能；目标品级无技能时返回 `undefined` |
 | `query_skills` | `(grade: number): SKILL[]` | 查询所有该品级技能 |
 | `add_gongji` | `(me, count: number): void` | 增加功绩 |
 | `send` | `(str: string): void` | 门派广播 |

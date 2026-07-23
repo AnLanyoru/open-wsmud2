@@ -43,7 +43,7 @@ NPC（Non-Player Character，非玩家角色）是 MUD 游戏世界中的核心�
 - **任务 NPC** —— 配合任务系统，推进剧情
 - **闲聊 NPC** —— 提供随机对话，丰富世界氛围
 
-每个 NPC 都是一个 TypeScript 类文件，放在 `server/res/npc/` 目录下。引擎在启动时自动发现并加载这些文件，将其注册到全局 NPC 模板缓存 `WORLD.NPC_STROE` 中。
+每个 NPC 都是一个 TypeScript 类文件，放在 `server/res/npc/` 目录下。引擎在启动时自动发现并加载这些文件，将其注册到全局 NPC 模板缓存 `WORLD.NPC_STORE` 中。
 
 ---
 
@@ -189,7 +189,7 @@ NPC 类继承自 CHARACTER，CHARACTER 继承自 ITEM，ITEM 继承自 BASE。�
 | `no_fight` | `boolean` | `false` | 是否禁止战斗。为 true 时玩家无法 fight/kill 此 NPC |
 | `no_refresh` | `boolean` | `false` | 是否禁止死后重生。为 true 时 NPC 死亡后不会在房间刷新 |
 | `chat_msg` | `string[]` | `undefined` | 闲聊消息列表 |
-| `chat_chance` | `number` | `0` | 闲聊触发概率百分比（0-100），当前版本未主动使用 |
+| `chat_chance` | `number` | `0` | 当前无效：`set_chat_msg()` 不保存该值，`do_chat_msg()` 也不读取该值 |
 | `sell_list` | `OBJ[]` | `undefined` | 出售物品列表（通过 `set_goods()` 设置） |
 | `die_room` | `ROOM` | `undefined` | 死亡时所在房间，重生时使用（自动设置） |
 | `master` | `string` | `undefined` | 主人玩家 ID，用于随从/任务 NPC |
@@ -338,9 +338,9 @@ this.set_chat_msg([
 
 参数：
 - `items`：闲聊消息字符串数组
-- `chance`：（可选）触发概率百分比，当前版本未使用
+- `chance`：（可选）当前无效。`set_chat_msg()` 不会保存该参数，`do_chat_msg()` 也不会读取 `chat_chance`
 
-NPC 的心跳循环中，非战斗状态下随机触发闲聊消息。
+NPC 的心跳循环会在非战斗且存活时调用闲聊逻辑。当前实现一旦调用 `do_chat_msg()` 就直接从 `chat_msg` 中等概率随机选取一条发送，没有按 `chat_chance` 再做概率判定，因此不要依赖 `chance` 控制频率。
 
 #### `this.set_ask(name, func)`
 
@@ -731,7 +731,7 @@ this.set_npc("pub/mpguanli#HUASHAN");  // 华山派的门派管理员
 当房间调用 `set_npc()` 时，引擎执行以下步骤：
 
 1. `_NPC.CLONE(obj_path)` 被调用
-2. `CHARACTER.GET_BASE(path)` 从 `WORLD.NPC_STROE` 获取 NPC 模板（缓存中不存在时触发懒加载）
+2. `CHARACTER.GET_BASE(path)` 从 `WORLD.NPC_STORE` 获取 NPC 模板（缓存中不存在时触发懒加载）
 3. `Object.create(base)` 创建原型继承实例
 4. `clone()` 方法被调用，深度复制 `temp`、`prop`、`skills`、`equipment`、`items`
 5. 生成新的唯一 ID
@@ -755,7 +755,7 @@ this.set_npc("pub/mpguanli#HUASHAN");  // 华山派的门派管理员
   → 再次遍历，对每个文件调用 BASE.CREATE(__PATH.NPC, fname)
   → 实例化 NPC 类（调用 constructor → NPC.create()）
   → NPC.create() 调用 CHARACTER.create()
-  → WORLD.NPC_STROE.set(this.path, this) 注册模板
+  → WORLD.NPC_STORE.set(this.path, this) 注册模板
 ```
 
 所以 NPC 的 `constructor()` 在**启动时**被调用一次（模板实例化），而不是每次放置时都被调用。
@@ -765,7 +765,7 @@ this.set_npc("pub/mpguanli#HUASHAN");  // 华山派的门派管理员
 ```
 房间初始化/任务创建
   → NPC.CLONE(path) 或 NPC.CREATE(path, room)
-  → CHARACTER.GET_BASE(path) 从 NPC_STROE 获取模板
+  → CHARACTER.GET_BASE(path) 从 NPC_STORE 获取模板
   → Object.create(base) 创建克隆
   → clone() 深度复制属性、技能、装备
   → init() 初始化 → recount() 计算数值
@@ -1662,7 +1662,7 @@ update npc pub/xiaoer
 1. `BASE.UPDATE(__PATH.NPC, "pub/xiaoer")` 重新动态导入编译后的 JS 文件（带 `?update=时间戳` 缓存破坏）
 2. 新构造函数替换 `BASE.ITEMS` 中的旧构造函数
 3. `BASE.CREATE(__PATH.NPC, "pub/xiaoer")` 实例化新模板
-4. `NPC.create()` → `CHARACTER.create()` → `WORLD.NPC_STROE.set(this.path, this)` 更新缓存
+4. `NPC.create()` → `CHARACTER.create()` → `WORLD.NPC_STORE.set(this.path, this)` 更新缓存
 5. 如果管理员在 NPC 所在的房间，旧 NPC 被销毁，`NPC.CREATE(path, room)` 创建新实例
 
 ### 16.3 使用 `update` 命令重新放置 NPC
@@ -1705,16 +1705,16 @@ constructor() {
 }
 ```
 
-### 16.5 使用 `WORLD.NPC_STROE` 检查已加载的 NPC
+### 16.5 使用 `WORLD.NPC_STORE` 检查已加载的 NPC
 
 在服务器控制台或通过 `eval` 命令（需管理员权限）：
 
 ```typescript
 // 查看所有已加载的 NPC 路径
-Array.from(WORLD.NPC_STROE.keys()).forEach(k => console.log(k));
+Array.from(WORLD.NPC_STORE.keys()).forEach(k => console.log(k));
 
 // 查看特定 NPC 模板
-const npc = WORLD.NPC_STROE.get("pub/xiaoer");
+const npc = WORLD.NPC_STORE.get("pub/xiaoer");
 console.log(npc.name, npc.path);
 ```
 

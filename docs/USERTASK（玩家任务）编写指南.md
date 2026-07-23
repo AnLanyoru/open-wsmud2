@@ -255,7 +255,7 @@ USER 继承自 CHARACTER → ITEM，因此拥有完整的 temp 操作接口：
 | `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动返回默认值。 |
 | `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+| `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
 **核心约束：**
 
@@ -269,7 +269,7 @@ USER 继承自 CHARACTER → ITEM，因此拥有完整的 temp 操作接口：
    ```
 3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数是**毫秒**（不是秒）。例如 24 小时 = `86400000`。
 4. **过期机制**：当值以 `{v, e}` 格式存储且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
-5. **`remove_temp` 设为 `null`**：不会真正删除键名。
+5. **`remove_temp` 删除键**：同时删除临时值及其过期时间记录。
 6. **单例模式中玩家数据隔离**：USERTASK 是单例，所有玩家状态**必须**通过 `me.set_temp()` / `me.query_temp()` 存储（每个玩家独立），**禁止**将玩家进度存储在任务实例的 `this` 属性上。
 
 #### 奖励发放
@@ -1079,13 +1079,18 @@ const dirs = [
 **方式一：通过命令触发**
 
 ```typescript
-// 在命令文件中：
-import {USERTASK} from "../../core/task/playertask.js";
-COMMAND.add("start_quest", {
-    exec: (me) => {
+// 在 server/res/cmd/ 下新增一个命令资源文件：
+import { COMMAND } from "../../core/command.js";
+import { USERTASK } from "../../core/task/playertask.js";
+import type { CHARACTER } from "../../core/char/character.js";
+
+export default class extends COMMAND {
+    command = "start_quest";
+
+    enter(me: CHARACTER): void {
         USERTASK.RUN("hunt", me);
     }
-});
+}
 ```
 
 **方式二：通过 NPC 交互触发**
@@ -1137,39 +1142,38 @@ if (task) {
 ### 13.1 添加测试命令
 
 ```typescript
-// 在开发环境添加调试命令：
-COMMAND.add("test_task", {
-    exec: function(me) {
-        // 查看所有任务
-        for (let task of WORLD.TASKS) {
+// 在 server/res/cmd/admin/ 下添加仅开发环境使用的命令资源：
+export default class extends COMMAND {
+    command = "test_task";
+    allow_level = 6;
+
+    enter(me: CHARACTER): void {
+        for (const task of WORLD.TASKS) {
             me.notify(`任务: ${task.id}, path: ${task.path}`);
         }
-        // 启动特定任务
         USERTASK.RUN("hunt", me);
-        // 强制完成任务
-        let t = USERTASK.GET("hunt");
-        if (t) t.on_finish?.(me);
+        const task = USERTASK.GET("hunt");
+        task?.on_finish?.(me);
     }
-});
+}
 ```
 
 ### 13.2 查看玩家 temp 数据
 
 ```typescript
-// 管理命令中查看玩家 temp：
-COMMAND.add("check_temp", {
-    exec: function(me, targetId) {
-        let target = WORLD.getUser(targetId);
-        if (target) {
-            me.notify(JSON.stringify(target.temp, null, 2));
-        }
-    }
-});
+// 管理命令的 enter() 中查看玩家 temp：
+enter(me: CHARACTER, targetId: string): void {
+    const target = WORLD.getUser(targetId);
+    if (!target) return;
+    const entries: Array<[string, unknown]> = [];
+    target.forEach_temp((key, value) => entries.push([key, value]));
+    me.notify(JSON.stringify(Object.fromEntries(entries), null, 2));
+}
 ```
 
 ### 13.3 热更新测试
 
-1. 确保 TypeScript 编译运行中（`npm run dev` 或类似）
+1. 在项目根目录运行 `npm --prefix server run build -- --watch` 启动服务端 TypeScript 编译监听；需要启动完整服务时另行运行 `npm start`
 2. 修改 `server/res/task/` 下的 `.ts` 文件
 3. 保存后引擎自动检测文件变化并热更新
 4. `on_create()` 会被调用（检查控制台日志中是否有错误）

@@ -105,7 +105,7 @@ ROOM extends ITEM extends BASE (server/core/room/room.ts)
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `id` | `string` | `""` | **必填**。区域唯一标识，如 `"huashan"`、`"lw"`。用于 `AREA.Get_FB(id)` 查找 |
+| `id` | `string` | `""` | **必填**。区域唯一标识，如 `"huashan"`、`"lw"`。用于 `AREA.Get(id)` 查找 |
 | `name` | `string` | `""` | **必填**。区域显示名称，如 `"华山派"`、`"树林"` |
 | `desc` | `string` | `""` | 区域描述文本，显示在详情面板中 |
 | `is_area` | `boolean` | `false` | 是否为大地图可见区域。**门派/公共区域必须设为 `true`** |
@@ -423,7 +423,7 @@ const JDS: Record<string, number> = {
 1. 玩家从客户端点击"进入副本"
 2. 引擎调用 `cr` 命令（`server/res/cmd/action/cr.ts`）
 3. 检查 `is_unlock()`、精力值、队伍状态等前置条件
-4. 通过 `ROOM.create_copy(ownerId, diffType)` 为该玩家/队伍创建一份独立的副本房间
+4. 从基础房间调用 `create_copy2(me, diffType)`，按 `AREA.query_owner(me)` 为玩家/队伍创建一组独立的副本房间
 5. 每份副本房间由 `copy_rooms` 映射管理（`ownerId → ROOM`）
 6. 副本房间在 `is_copy_room = true` 且房间名附加"(副本区域)"标记
 7. 玩家通过 `cr`（完成副本）命令结算奖励并清理副本
@@ -502,7 +502,7 @@ export default class extends AREA {
 | `query_temp` | `<T>(name: string, def?: T) => T` | 读取临时值。**必须提供默认值**，避免 `undefined`。若值已过期则自动返回默认值。 |
 | `set_temp` | `(name: string, value: number\|string, time?: number) => void` | 写入临时值。`time` 为有效期（**毫秒**），省略则永久有效。 |
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
-| `remove_temp` | `(name: string) => void` | 移除临时值（设为 `null`，**不删除键名**，保留用于 JSON 序列化）。 |
+| `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
 #### 副本房间专用接口（ROOM，需要 `me` 参数做玩家隔离）
 
@@ -517,9 +517,9 @@ export default class extends AREA {
 ```typescript
 // ✅ 正确：通过副本入口房间操作按玩家隔离的 temp
 const entryRoom = WORLD.getRoom(area.first);
-entryRoom.set_temp("boss_killed", true, me, 3600000);  // 设置，有效期1小时
-const val = entryRoom.query_temp("boss_killed", me, false);  // 查询
-entryRoom.add_temp("monster_count", 1, me);            // 累加
+entryRoom?.fb_set_temp("boss_killed", true, me, 3600000);
+const val = entryRoom?.fb_query_temp("boss_killed", me, false);
+entryRoom?.fb_add_temp("monster_count", 1, me);
 
 // ✅ 正确：玩家自身的 temp 操作
 me.set_temp("xy_bm", 1, 3600000);   // 报名标记，1小时有效
@@ -536,7 +536,7 @@ const bm = me.temp["xy_bm"];    // 禁止！
 2. **`query_temp` 必须提供默认值**：防止 key 不存在时返回 `undefined` 导致 NaN 或运行时错误。例如 `me.query_temp("count", 0)` 而非 `me.query_temp("count")`。
 3. **时间单位为毫秒**：`set_temp` / `add_temp` 的 `time` 参数单位是**毫秒**（不是秒）。例如 1 小时 = `3600000`。
 4. **过期机制**：当值以 `{v, e}` 格式存储（带过期时间）且 `Date.now() > e` 时，`query_temp` 自动返回默认值并将该键置为 `null`。
-5. **`remove_temp` 设为 `null`**：不会删除键名，这是为了 JSON 序列化时保留键位的兼容性设计。
+5. **`remove_temp` 删除键**：同时删除临时值及其过期时间记录。
 
 ---
 
@@ -671,10 +671,7 @@ on_enter(me: CHARACTER) {
 
 // 离开时清理副本
 on_leave(me: CHARACTER) {
-    const copy_room = this.rooms[0]?.query_copy2(me);
-    if (copy_room) {
-        copy_room.clear_copy(me);
-    }
+    this.clear_copy(me);
 }
 ```
 
@@ -862,11 +859,8 @@ export default class extends ROOM {
     }
 
     // 击败 BOSS 后标记副本完成（示例）
-    on_boss_defeated(me: CHARACTER) {
-        const first = this.query_fb_first(me.query_teamid());
-        if (first) {
-            first.set_temp("boss_killed", true, me);
-        }
+    on_boss_defeated(me: CHARACTER): void {
+        this.fb_set_temp("boss_killed", true, me);
     }
 }
 ```
