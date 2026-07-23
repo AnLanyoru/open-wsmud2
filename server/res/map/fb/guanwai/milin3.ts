@@ -10,6 +10,6 @@ export default class extends ROOM {
 
     constructor() {
         super();
-        this.set_npc('bj/guanwai/xiong');
+        this.set_npc('bj/guanwai/hu');
     }
 }

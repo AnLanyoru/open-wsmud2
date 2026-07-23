@@ -23,10 +23,10 @@ export default class extends AREA {
     room_path = 'fb/guanwai/';
     map = [
         { n: '大门坎子', id: 'fb/guanwai/damen', p: [0, 0] },
-        { n: '松花江上', id: 'fb/guanwai/jiang', p: [-1, 0] },
+        { n: '松花江上', id: 'fb/guanwai/jiang', p: [-1, 0], exits: [] },
         { n: '船厂', id: 'fb/guanwai/chuanchang', p: [-2, 0], exits: ['e'] },
         { n: '雪地', id: 'fb/guanwai/xuedi', p: [-2, 1] },
-        { n: '荒地', id: 'fb/guanwai/huangdi', p: [-3, 1] },
+        { n: '荒地', id: 'fb/guanwai/huangdi', p: [-1, 1] },
         { n: '山神庙', id: 'fb/guanwai/shanshenmiao', p: [-2, -1] },
         { n: '二门坎子', id: 'fb/guanwai/ermenkan', p: [1, -1] },
         { n: '满天星', id: 'fb/guanwai/mantianxing', p: [2, -1] },

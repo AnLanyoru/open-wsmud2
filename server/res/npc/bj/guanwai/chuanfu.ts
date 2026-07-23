@@ -42,7 +42,11 @@ export default class extends NPC {
     }
 
     on_leave(me: USER, dir: string): boolean | void {
-        if (dir == 'east' || dir == 'west') {
+        const env = this.environment;
+        if (
+            (env?.path == 'fb/guanwai/damen' && dir == 'west') ||
+            (env?.path == 'fb/guanwai/chuanchang' && dir == 'east')
+        ) {
             me.notify('船夫对你说道：江面化冻了，没船可不行。');
             me.send_commands(
                 'ask ' + this.id + ' about 过江',
@@ -50,22 +54,37 @@ export default class extends NPC {
                 'ask ' + this.id + ' about 船厂',
                 '询问船厂',
             );
-            me.set_temp('fb/guanwai/jiang', dir);
             return false;
         }
     }
 
     on_accept(me: USER, obj: string, count: number): boolean | void {
         if (obj != 'money' || count != 10000) return;
-        const dir = me.query_temp('fb/guanwai/jiang');
         const env = this.environment;
-        if ((dir != 'east' && dir != 'west') || !env?.owner) return false;
-        const path = dir == 'east' ? 'fb/guanwai/damen' : 'fb/guanwai/chuanchang';
-        const room = env.parent?.rooms?.find(item => item.path == path)?.query_copy(env.owner);
-        if (!room || me.moveto(room) == false) return false;
-        me.send_room(
-            '船夫带着$N上了船，船夫辨着水势掌舵，一声「起锚」船就张帆离岸了......',
-        );
+        if (!env?.owner || (env.path != 'fb/guanwai/damen' && env.path != 'fb/guanwai/chuanchang'))
+            return false;
+        const river = env.parent?.rooms
+            ?.find(item => item.path == 'fb/guanwai/jiang')
+            ?.query_copy(env.owner);
+        if (!river || me.moveto(river, '$N跟着船夫登上小船。', '$N乘着小船驶入江心。') == false)
+            return false;
+        this.moveto(river, '$N解开缆绳，撑船离岸。', '$N掌着舵驶入江心。');
+        me.send_room('船夫辨着水势掌舵，一声「起锚」，小船便张帆向对岸驶去......');
+        const path = env.path == 'fb/guanwai/damen' ? 'fb/guanwai/chuanchang' : 'fb/guanwai/damen';
+        this.call_out(this.arrive, 3000, me, { path, owner: env.owner });
         return true;
+    }
+
+    arrive(me?: USER, target?: { path: string; owner: string }) {
+        if (!me || !target) return;
+        const env = this.environment;
+        if (!env || me.environment !== env || env.path != 'fb/guanwai/jiang') return;
+        const room = env.parent?.rooms
+            ?.find(item => item.path == target.path)
+            ?.query_copy(target.owner);
+        if (!room) return;
+        me.send_room('小船穿过风雪靠上对岸，船夫收起风帆，将跳板搭上岸边。');
+        me.moveto(room, '$N踏上跳板离开了小船。', '$N从松花江上的小船走了下来。');
+        this.moveto(room, '$N撑着船靠上了岸。', '$N收起风帆，从船上走了下来。');
     }
 }
