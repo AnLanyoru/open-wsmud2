@@ -504,15 +504,15 @@ export default class extends AREA {
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值型临时值，返回累加后的值。 |
 | `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
-#### 副本房间专用接口（ROOM，需要 `me` 参数做玩家隔离）
+#### 副本入口共享接口（ROOM，需要 `me` 参数定位 owner）
 
-副本房间的 temp 方法覆写自 ROOM 类，**必须传入 `me` 参数**以按玩家隔离数据：
+ROOM 的普通 temp 方法继承自 ITEM。需要从任意副本房间访问入口克隆上的共享状态时，应使用 `fb_*` 专用接口；它们通过 `AREA.first` 定位入口克隆，从副本克隆调用时优先沿用当前房间 owner，从基础房间调用时使用 `AREA.query_owner(me)`：
 
 | 方法 | 签名 | 说明 |
 |------|------|------|
-| `query_temp` | `<T>(name: string, me: USER, def?: T) => T \| undefined` | 按玩家查询副本临时数据 |
-| `set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 按玩家设置副本临时数据 |
-| `add_temp` | `(name: string, value: number, me: USER, time?: number) => number` | 按玩家累加副本临时数据 |
+| `fb_query_temp` | `(name: string, me: USER, def?: unknown) => unknown` | 按 AREA owner 查询入口共享临时数据 |
+| `fb_set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 按 AREA owner 设置入口共享临时数据 |
+| `fb_add_temp` | `(name: string, value: number, me: USER, time?: number) => number` | 按 AREA owner 累加入口共享临时数据 |
 
 ```typescript
 // ✅ 正确：通过副本入口房间操作按玩家隔离的 temp

@@ -1322,8 +1322,8 @@ export class ROOM extends ITEM {
      * @param id - 队伍/用户ID
      */
     query_fb_first(id: string): ROOM | undefined {
-        if (!this.parent || !this.parent.is_copy || !this.parent.rooms) return;
-        return this.parent.rooms[0].query_copy(id);
+        if (!this.parent?.is_copy || !this.parent.first) return;
+        return WORLD.getRoom(this.parent.first)?.query_copy(id);
     }
 
     /**
@@ -1473,25 +1473,29 @@ export class ROOM extends ITEM {
     // ============ 静态方法 ============
 
     /**
-     * 查询副本临时数据(按队伍隔离，委托给队长 USER 实例)
+     * 查询副本入口共享临时数据
      */
     fb_query_temp(name: string, me: USER, def?: any): any {
-        const first = this.query_fb_first(me.query_teamid());
+        const owner = this.owner || this.parent?.query_owner(me);
+        if (!owner) return;
+        const first = this.query_fb_first(owner);
         if (!first) return;
         return first.query_temp(name, def);
     }
 
     /**
-     * 设置副本临时数据(按队伍隔离)
+     * 设置副本入口共享临时数据
      */
     fb_set_temp(name: string, value: unknown, me: USER, time?: number): void {
-        const first = this.query_fb_first(me.query_teamid());
+        const owner = this.owner || this.parent?.query_owner(me);
+        if (!owner) return;
+        const first = this.query_fb_first(owner);
         if (!first) return;
         first.set_temp(name, value, time);
     }
 
     /**
-     * 累加副本临时数据(按队伍隔离)
+     * 累加副本入口共享临时数据
      */
     fb_add_temp(name: string, value: number, me: USER, time?: number): number {
         const val = (this.fb_query_temp(name, me, 0) as number) + value;

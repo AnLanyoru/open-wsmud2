@@ -203,15 +203,15 @@ import {ROOM} from "../../../core/room/room.js";
 | `add_temp` | `(name: string, value: number, time?: number) => number` | 累加数值，返回累加后的值。 |
 | `remove_temp` | `(name: string) => void` | 删除临时值及其过期时间记录。 |
 
-#### 副本入口共享状态（按队伍 ID 定位）
+#### 副本入口共享状态（按 AREA owner 定位）
 
 | 方法 | 签名 | 说明 |
 |------|------|------|
-| `fb_query_temp` | `(name: string, me: USER, def?: unknown) => unknown` | 使用 `me.query_teamid()` 定位入口克隆后查询。 |
+| `fb_query_temp` | `(name: string, me: USER, def?: unknown) => unknown` | 使用当前克隆 owner 或 `AREA.query_owner(me)` 定位入口克隆后查询。 |
 | `fb_set_temp` | `(name: string, value: unknown, me: USER, time?: number) => void` | 在入口克隆设置共享值。 |
 | `fb_add_temp` | `(name: string, value: number, me: USER, time?: number) => number \| undefined` | 在入口克隆累加共享值。 |
 
-> **注意**：`fb_*` 固定使用 `query_teamid()`，不会自动跟随 AREA 自定义的 `query_owner()`。owner 不是队伍 ID 时，应先取得目标克隆，再调用普通 temp API。
+> **注意**：`fb_*` 使用 `AREA.first` 定位入口克隆。从副本克隆调用时优先沿用当前房间 owner，从基础房间调用时使用 `AREA.query_owner(me)`。默认 AREA owner 是队伍 ID；自定义 owner 的持久副本会自动按其 owner 规则隔离。
 
 ```typescript
 this.fb_set_temp("boss_killed", true, me, 3600000);
