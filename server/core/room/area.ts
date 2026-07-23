@@ -97,7 +97,7 @@ export class AREA extends BASE {
 
     // ============ 动态属性(由资源文件设置) ============
 
-    /** 进阶难度索引 */
+    /** 禁地索引 */
     jd_index?: number;
     /** 只能通过索引解锁的关卡 */
     unlock_index?: number;
