@@ -2,6 +2,7 @@ import { COMMAND } from '../../../core/command.js';
 import { CHARACTER } from '../../../core/char/character.js';
 import type { USER } from '../../../core/char/user.js';
 import { UTIL } from '../../../core/util/util.js';
+import type { OBJ } from '../../../core/item/obj.js';
 
 export default class extends COMMAND {
     command = 'give';
@@ -44,7 +45,7 @@ export default class extends COMMAND {
             return player.notify(target.name + '不要你的钱。');
         }
 
-        var obj = player.find_obj(objid);
+        var obj = player.find_obj(objid) as OBJ | undefined;
         if (!obj) {
             return player.notify('你要给' + target.name + '什么东西？');
         }
