@@ -11,17 +11,17 @@ export default class extends AREA {
     is_copy = true;
     not_fb = true;
     is_show = true;
-    is_multi = true;
+    is_multi = false;
     is_diffi = false;
-    expend = 10;
-    exp = 1900;
-    pot = 1900;
-    score = 100;
     count_key = 'jd_longmai';
     map = [
-        { n: '龙脉石室', id: 'longmai/shimen', p: [0, 0] },
-        { n: '幽暗甬道', id: 'longmai/yongdao', p: [0, -1] },
-        { n: '锁龙井', id: 'longmai/suolongjing', p: [0, -2] },
+        { n: '入口石室', id: 'longmai/shimen', p: [0, 0], exits: ['n'] },
+        { n: '残碑厅', id: 'longmai/canbeit', p: [0, -1], exits: ['s', 'n'] },
+        { n: '兵俑甬道', id: 'longmai/yongdao', p: [0, -2], exits: ['s', 'n'] },
+        { n: '五行殿', id: 'longmai/wuxingdian', p: [0, -3], exits: ['s', 'n'] },
+        { n: '回音廊', id: 'longmai/huiyinlang', p: [0, -4], exits: ['s', 'n'] },
+        { n: '镇锁台', id: 'longmai/zhensuotai', p: [0, -5], exits: ['s', 'n'] },
+        { n: '锁龙井', id: 'longmai/suolongjing', p: [0, -6] },
     ];
 
     query_owner(me: USER) {
@@ -35,6 +35,14 @@ export default class extends AREA {
         if (!copyRoom) return false;
         me.moveto(copyRoom, '$N走了。', '$N来了。');
         return false;
+    }
+
+    on_login(me: USER) {
+        const room = WORLD.getRoom(this.first);
+        if (!room) return;
+        const copyRoom = room.query_copy2(me) || room.create_copy2(me);
+        if (!copyRoom || me.environment === copyRoom) return;
+        me.moveto(copyRoom, undefined, '$N连线进入这个世界。');
     }
 
     on_leaved(me: USER) {

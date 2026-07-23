@@ -73,9 +73,19 @@ export default class extends MONSTER {
         if (this.fight_type > 0) {
             this.fight_time++;
             if (this.fight_time > 60) {
-                this.destroy('\n<yel>' + this.name + '身躯腾空而起，随即遁入深潭。</yel>');
+                const enemies = this.enemy ? [...this.enemy] : [];
+                this.end_fight();
+                for (const enemy of enemies) enemy.end_fight();
+                this.fight_time = 0;
+                this.is_free = false;
+                this.mp = this.max_mp;
+                this.hp = 55000;
+                this.send_room(
+                    '\n<yel>$N挣脱攻势退回盘龙柱旁，玄铁锁链重新绷紧。此次挑战已超时，可以再次尝试。</yel>',
+                );
             }
         } else {
+            this.fight_time = 0;
             this.mp = this.max_mp;
             this.hp = this.is_free ? 5000000 : 55000;
         }
@@ -93,10 +103,11 @@ export default class extends MONSTER {
     }
 
     on_free(me: USER) {
+        if (this.is_free) return me.notify('黑龙身上的封印已经解除。');
         this.is_free = true;
         this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
-
-        me.add_fbscore(100);
+        this.settleReward(me);
+        this.settleWorldReward(me);
         this.call_out(this.to_next, 3000, me);
     }
 
@@ -110,21 +121,24 @@ export default class extends MONSTER {
     }
 
     to_next2(me: USER) {
-        if (!this.is_here(me)) return this.destroy(this.name + '飞走了。');
-        this.send_room(
-            '$N悬在半空低头审视着$n，最终什么也没说，庞大身躯骤然腾空，转瞬间便消失在锁龙井深处。',
-            me,
-        );
+        if (this.is_here(me)) {
+            this.send_room(
+                '$N悬在半空低头审视着$n，最终什么也没说，庞大身躯骤然腾空，转瞬间便消失在锁龙井深处。',
+                me,
+            );
+        } else {
+            this.send_room('$N在半空盘旋一周，庞大身躯骤然腾空，转瞬间便消失在锁龙井深处。');
+        }
         this.send_room(
             '布满裂痕的柱体在巨力撕扯下迸出蛛网般的碎纹，"咔嚓" 声中裂成无数碎石裂片，混着玄铁锁链的残片砸落满地，扬起的烟尘里再无半分龙脉气息。',
-            me,
         );
         this.destroy();
+    }
 
-        let items = me.team || [me];
-        const jdIndex = me.environment?.parent?.jd_index;
-        if (jdIndex === undefined || jdIndex < 0)
-            return me.send('<hir>龙脉副本配置错误！</hir>');
+    settleReward(me: USER) {
+        if (me.query_temp('jd_longmai_reward', 0)) return;
+        me.set_temp('jd_longmai_reward', 1);
+        me.add_title('黑龙使', 'lm');
         const eqs = [
             'eq/lv2/lm_cloth',
             'eq/lv2/lm_tou',
@@ -132,21 +146,15 @@ export default class extends MONSTER {
             'eq/lv2/lm_pifeng',
             'eq/lv2/lm_pei',
         ];
-        for (let item of items) {
-            if (item.environment !== me.environment) continue;
-            if (!item.check_player()) continue;
-            if (!item.query_temp('fb_sao' + jdIndex, 0)) {
-                item.notify('你释放了被锁禁的黑龙，获得称号【黑龙使】。');
-                item.add_title('黑龙使', 'lm');
-                item.notify('<hic>单人(普通)模式扫荡解锁。</hic>');
-                item.set_temp('fb_sao' + jdIndex, 1);
-                let obj = item.add_obj(eqs.random());
-                if (obj) {
-                    item.send('你从碎裂的锁龙柱下找到' + obj.unit_name(1) + '。');
-                }
-            }
+        me.notify('你释放了被锁禁的黑龙，获得称号【黑龙使】。');
+        const obj = me.add_obj(eqs.random());
+        if (obj) {
+            me.send('你从松动的锁龙柱下找到' + obj.unit_name(1) + '。');
         }
+        me.save();
+    }
 
+    settleWorldReward(me: USER) {
         if (!WORLD.DATA.query_temp('longmai')) {
             WORLD.DATA.set_temp('longmai', 1, UTIL.diff_time(20));
             WORLD.DATA.set_temp('study_per', 50, 3600000 * 2);

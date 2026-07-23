@@ -13,7 +13,6 @@ export default class extends SKILL {
     desc = '慈航静斋的镇派宝典，以心剑合一为至高境界';
     can_enables = ['force'];
     on_disenable(me: CHARACTER, type: string): void {
-
         me.remove_status("lingxi", true);
     }
 

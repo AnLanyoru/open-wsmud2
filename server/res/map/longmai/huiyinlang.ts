@@ -1,0 +1,69 @@
+import type { USER } from '../../../core/char/user.js';
+import { ROOM } from '../../../core/room/room.js';
+import { queryLongmaiState } from './shimen.js';
+
+const ORDER = ['石磬', '铁链', '井壁'];
+const SOUNDS: Record<string, string> = {
+    shiqing: '石磬',
+    tielian: '铁链',
+    jingbi: '井壁',
+};
+
+export default class extends ROOM {
+    name = '回音廊';
+    desc =
+        "弧形长廊将细微声响层层折回，廊中悬着石磬与铁链，尽头露出一段井壁。地面刻着「刀痕有深浅，余音亦有来处」。可<cmd cmd='look huibi'>查看回音壁(huibi)</cmd>。";
+    exits = { south: 'longmai/wuxingdian', north: 'longmai/zhensuotai' };
+
+    constructor() {
+        super();
+        for (const id of Object.keys(SOUNDS)) {
+            const sound = SOUNDS[id];
+            this.set_item(id, sound, '可以敲击发声的' + sound + '。', [
+                ['strike', '敲击', this.strike],
+            ]);
+        }
+        this.set_item('huibi', '回音壁', '壁上刀痕深浅相续：浅处散着白色石屑，中段嵌有暗红铁锈，幽深裂纹则一直没入井壁。你隐约感觉刀痕深浅与声纹流转有着关联。', [
+            ['check', '查看', this.check],
+        ]);
+    }
+
+    strike(me: USER, id: string) {
+        const sound = SOUNDS[id];
+        if (!sound) return;
+        const state = queryLongmaiState(me);
+        if (!state) return me.notify('长廊没有回音。');
+        if (state.query_temp('lm_echo_done', 0)) return me.notify('你隐约感觉廊中诸般余音早已归入一声龙吟。');
+        const step = state.query_temp('lm_echo_step', 0);
+        if (ORDER[step] !== sound) {
+            const errors = state.add_temp('lm_echo_errors', 1);
+            state.set_temp('lm_echo_step', 0);
+            if (errors === 1) return me.notify('杂音彼此冲撞，声纹尽数散去。你隐约感觉刀痕深浅并非偶然，近旁残迹亦在暗示声音的来处。');
+            if (errors === 2) return me.notify('余音再度消散。最浅的刀痕与细白石屑似乎有着关联，清越之声隐隐萦绕其间。');
+            return me.notify('声纹倏然归寂。你隐约感觉浅处石屑、中段铁锈与幽深井隙各藏一声，刀痕愈深，余音也愈沉。');
+        }
+        const next = step + 1;
+        state.set_temp('lm_echo_step', next);
+        if (next < ORDER.length) return me.notify(sound + '的回音嵌入石壁，声纹仍向廊深处缓缓游走。');
+        state.set_temp('lm_echo_done', 1);
+        me.send_room('$N敲响井壁，三重回音合成一声低沉龙吟，北面的石门随之开启。');
+    }
+
+    check(me: USER) {
+        const state = queryLongmaiState(me);
+        if (!state) return;
+        if (state.query_temp('lm_echo_done', 0)) return me.notify('你隐约感觉廊中余音已汇作低沉龙吟，北面的禁制随之沉寂。');
+        const step = state.query_temp('lm_echo_step', 0);
+        me.notify(
+            step
+                ? '你隐约感觉已有余音栖入石壁，却尚未与廊中回响相合。'
+                : '你隐约感觉声纹空寂，廊中诸声尚未彼此呼应。',
+        );
+    }
+
+    on_leave(me: USER, dir: string) {
+        if (dir === 'north' && !queryLongmaiState(me)?.query_temp('lm_echo_done', 0)) {
+            return me.notify_fail('回音石门紧闭。你隐约感觉它与廊中尚未相合的余音有着关联。');
+        }
+    }
+}
