@@ -1,6 +1,6 @@
 import { OBJ } from '../../../../core/item/obj.js';
+import type { CHARACTER } from '../../../../core/char/character.js';
 import { ITEM } from '../../../../core/item.js';
-import { CHARACTER } from '../../../../core/char/character.js';
 
 export default class extends OBJ {
     unit = '本';
@@ -31,11 +31,12 @@ export default class extends OBJ {
                 return me.notify('你还是等凑齐八本经书再撕吧。');
             }
             me.send_room('$N将八本四十二章经的封皮撕开，每本书都掉了一块羊皮出来。');
-            me.notify('你把地图上画的内容牢牢记在脑中，然后点火把地图烧掉了。');
-            for (var i = 0; i < items.length; i++) {
+            me.notify('你将八块羊皮仔细拼合，得到了一张完整的龙脉地图。');
+            for (var i = 0; i < 8; i++) {
                 me.remove_obj(items[i], 1);
             }
-            me.set_temp('map42', 1);
+            me.add_obj('sp/bj/map');
+            me.send('<hiy>八卷经书拼合成了一张完整的龙脉地图。</hiy>');
         });
         this.add_action('he', '兑换', function (this: OBJ, me: CHARACTER, par: string) {
             me.send('如果你有多余的其他经书，可以每五本兑换一本其他经书。');

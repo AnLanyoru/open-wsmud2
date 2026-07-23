@@ -553,6 +553,7 @@ const FBS: Record<string, number | AREA> = {
 };
 const JDS: Record<string, number> = {
     heiying: 0,
+    longmai: 1,
 
     // gmp: 4,
     // gumen: 5,

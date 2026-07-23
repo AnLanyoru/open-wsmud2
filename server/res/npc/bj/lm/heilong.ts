@@ -122,8 +122,9 @@ export default class extends MONSTER {
         this.destroy();
 
         let items = me.team || [me];
-        let index = me.environment?.parent?.fb_index;
-        if (!index) return me.send('<hir>龙脉副本配置错误！</hir>');
+        const jdIndex = me.environment?.parent?.jd_index;
+        if (jdIndex === undefined || jdIndex < 0)
+            return me.send('<hir>龙脉副本配置错误！</hir>');
         const eqs = [
             'eq/lv2/lm_cloth',
             'eq/lv2/lm_tou',
@@ -134,11 +135,11 @@ export default class extends MONSTER {
         for (let item of items) {
             if (item.environment !== me.environment) continue;
             if (!item.check_player()) continue;
-            if (!item.query_temp('fb_sao' + index, 0)) {
+            if (!item.query_temp('fb_sao' + jdIndex, 0)) {
                 item.notify('你释放了被锁禁的黑龙，获得称号【黑龙使】。');
                 item.add_title('黑龙使', 'lm');
                 item.notify('<hic>单人(普通)模式扫荡解锁。</hic>');
-                item.set_temp('fb_sao' + index, 1);
+                item.set_temp('fb_sao' + jdIndex, 1);
                 let obj = item.add_obj(eqs.random());
                 if (obj) {
                     item.send('你从碎裂的锁龙柱下找到' + obj.unit_name(1) + '。');
