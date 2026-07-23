@@ -266,6 +266,7 @@ export class USER extends CHARACTER {
      */
     _notify_markers: number[] = [];
     _notify_frames: Buffer[] = [];
+    direct_send: boolean = false;
 
     /**
      * 通知消息(玩家状态)
@@ -275,7 +276,7 @@ export class USER extends CHARACTER {
     notify(text: string): void {
         if (!this.socket || !this.socket.send || this.is_faint || !text || text.length >= 30240) return;
         const room = this.environment as ROOM;
-        if (room && room.items.includes(this) && BATCH_MODE === 1) {
+        if (room && !this.direct_send && BATCH_MODE === 1) {
             this._notify_markers.push(room._batch_all_payloads.length);
             this._notify_frames.push(encodeTextFrame(text));
             markRoomDirty(room);
@@ -292,7 +293,7 @@ export class USER extends CHARACTER {
     send(text: string): void {
         if (!this.socket || !text || text.length >= 30240) return;
         const room = this.environment as ROOM;
-        if (room && room.items.includes(this) && BATCH_MODE === 1) {
+        if (room && !this.direct_send && BATCH_MODE === 1) {
             this._notify_markers.push(room._batch_all_payloads.length);
             this._notify_frames.push(encodeTextFrame(text));
             markRoomDirty(room);

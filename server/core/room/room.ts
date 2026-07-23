@@ -350,6 +350,7 @@ export class ROOM extends ITEM {
         }
         if (isin) {
             obj.environment = this;
+            if (obj.check_player()) (obj as USER).direct_send = false;
             if (obj_index == -1) {
                 this.items.push(obj as CHARACTER | OBJ | NPC);
                 this._items_json = null;
@@ -385,6 +386,7 @@ export class ROOM extends ITEM {
             this.items.splice(obj_index, 1);
             this._items_json = null;
             if (obj.check_player()) {
+                (obj as USER).direct_send = true;
                 if (_batchMode) {
                     const pendIdx = this._pending_items_send.indexOf(obj as USER);
                     if (pendIdx !== -1) this._pending_items_send.splice(pendIdx, 1);
