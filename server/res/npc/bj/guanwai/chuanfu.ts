@@ -1,4 +1,5 @@
 import { NPC } from '../../../../core/char/npc.js';
+import { USER } from '../../../../core/char/user.js';
 
 export default class extends NPC {
     name = '船夫';
@@ -34,11 +35,13 @@ export default class extends NPC {
             me.notify('船夫说道：江对岸有个旧船厂，过了船厂就是白茫茫的雪地，进山的人都要小心。');
         });
     }
-    ask_about_guojiang(me) {
+
+    ask_about_guojiang(me: USER) {
         me.notify('船夫说道：坐船到江对面一两黄金，风雪再大也给你送过去。');
         me.send_commands('give ' + this.id + ' 10000 money', '交钱坐船');
     }
-    on_leave(me, dir) {
+
+    on_leave(me: USER, dir: string): boolean | void {
         if (dir == 'east' || dir == 'west') {
             me.notify('船夫对你说道：江面化冻了，没船可不行。');
             me.send_commands(
@@ -52,14 +55,17 @@ export default class extends NPC {
         }
     }
 
-    on_accept(me, obj, count) {
-        if (obj == 'money' && count == 10000) {
-            if (me.moveto('bj/guanwai/jiang') != false) {
-                me.send_room(
-                    '船夫带着$N上了船，船夫辨着水势掌舵，一声「起锚」船就张帆离岸了......',
-                );
-                return true;
-            }
-        }
+    on_accept(me: USER, obj: string, count: number): boolean | void {
+        if (obj != 'money' || count != 10000) return;
+        const dir = me.query_temp('fb/guanwai/jiang');
+        const env = this.environment;
+        if ((dir != 'east' && dir != 'west') || !env?.owner) return false;
+        const path = dir == 'east' ? 'fb/guanwai/damen' : 'fb/guanwai/chuanchang';
+        const room = env.parent?.rooms?.find(item => item.path == path)?.query_copy(env.owner);
+        if (!room || me.moveto(room) == false) return false;
+        me.send_room(
+            '船夫带着$N上了船，船夫辨着水势掌舵，一声「起锚」船就张帆离岸了......',
+        );
+        return true;
     }
 }
