@@ -12,6 +12,10 @@ export default class extends SKILL {
 
     desc = '慈航静斋的镇派宝典，以心剑合一为至高境界';
     can_enables = ['force'];
+    on_disenable(me: CHARACTER, type: string): void {
+
+        me.remove_status("lingxi", true);
+    }
 
     query_enable_prop(lv: number): EnablePropMap {
         const gjMz = Math.floor(lv * 3) + 100;
@@ -81,6 +85,8 @@ export default class extends SKILL {
             distime: 30000,
             enable_skill: 'force',
             mp: 1150,
+            allow_busy: true,
+            allow_faint: true,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const duration = lingxi_duration(lv);
 
@@ -128,7 +134,7 @@ export default class extends SKILL {
                 };
                 const weapon = me.query_weapon();
                 if (weapon && weapon.weapon_type === 'sword') {
-                    prop.diff_fy_per = int(swordPer/2);
+                    prop.diff_fy_per = int(swordPer / 2);
                     prop.add_sh_per = swordPer;
                 }
                 const beforeBuffCd = this.query_distime(me, lv) - 3;
