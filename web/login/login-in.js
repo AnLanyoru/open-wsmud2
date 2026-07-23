@@ -28,8 +28,6 @@ class LoginInPage extends Page {
                         style="margin-left:0.5rem">登陆</span></li>
                 <li class="panel_item" command="ToRegist"><span class="glyphicon glyphicon-edit"></span><span
                         style="margin-left:0.5rem">注册</span></li>
-                <li class="panel_item" command="Forget"><span class="glyphicon glyphicon-question-sign"></span><span
-                        style="margin-left:0.5rem">忘记密码</span></li>
             </ul>
         </div>
 `;

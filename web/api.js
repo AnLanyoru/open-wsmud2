@@ -22,9 +22,6 @@ export default {
     BindPhone: function (code, no, pwd, cb) {
         return Util.Post('api/user/bindphone', {code: code, no: no, pwd: pwd}, cb);
     },
-    ResetPasswordByPhone: function (name, phone, pwd, cb) {
-        return Util.Post('api/user/resetpwd', {name: name, phone: phone, pwd: pwd}, cb);
-    },
     GetServer: function (cb) {
         return Util.Get('api/game/servers', cb);
     }

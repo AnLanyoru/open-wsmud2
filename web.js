@@ -26,7 +26,7 @@ const APIS = {
     game: GameAPI,
 };
 const API_METHODS = {
-    user: new Set(['login', 'regist', 'validimage', 'getphone', 'bindphone', 'resetpwd', 'changepassword']),
+    user: new Set(['login', 'regist', 'validimage', 'getphone', 'bindphone', 'changepassword']),
     game: new Set(['servers', 'reload', 'add_server', 'save_server', 'delete_server', 'search_role']),
 };
 const GET_API_METHODS = new Set(['validimage', 'getphone', 'servers']);

@@ -3,7 +3,6 @@ import Server from './server.js';
 import Util from '../utils/util.js';
 import Regist from './regist.js';
 import Roles from './roles.js';
-import ResetPwd from './reset-pwd.js';
 import ChangePwd from './change-pwd.js';
 import BindPhone from './bind-phone.js';
 import CreateRole from './create-role.js';
@@ -15,7 +14,6 @@ const server = new Server();
 const loginIn = new LoginIn();
 const regist = new Regist();
 const roles = new Roles();
-const resetPwd = new ResetPwd();
 const changePwd = new ChangePwd();
 const bindPhone = new BindPhone();
 const createRole = new CreateRole();
@@ -38,7 +36,6 @@ class LoginPage extends Page {
         ${bindPhone.template}
 
         ${changePwd.template}
-        ${resetPwd.template}
         
        ${regist.template}
        ${roles.template}
@@ -78,9 +75,6 @@ class LoginPage extends Page {
             case "ToLogin":
                 Client.hide2show($("#login_panel"));
                 break;
-            case "Forget":
-                Client.hide2show($("#reset_panel"));
-                break;
             case "CancleRegist":
                 Client.hide2show($("#login_panel"));
                 break;
@@ -99,9 +93,6 @@ class LoginPage extends Page {
                 break;
             case "LoginIn":
                 loginIn.loginIn();
-                break;
-            case "ResetPwd":
-                resetPwd.reset();
                 break;
             case "AddRole":
                 roles.addRole();

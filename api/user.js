@@ -112,21 +112,6 @@ class UserAPI extends APIBASE {
         return {code: 0, result: "绑定修改失败"};
     }
 
-    async resetpwd(data) {
-        let {name, phone, pwd} = data;
-        const failure = {code: 0, result: "密码重置失败"};
-        name = normalizeUsername(name);
-        if (!LOGIN_USERNAME_REG.test(name) || !PHONE_REG.test(phone) || !isValidPassword(pwd))
-            return failure;
-        const result = await DB.getUserBy("name", name);
-        if (!result || !result.phone || result.phone !== phone)
-            return failure;
-        result.pwd = this.MD5(pwd);
-        if (!await DB.updateUser(result))
-            return failure;
-        return {code: 1};
-    }
-
     async changepassword(data) {
         let {oldpwd, pwd, no} = data;
         if (!isNonEmptyString(oldpwd) || !isNonEmptyString(pwd))
