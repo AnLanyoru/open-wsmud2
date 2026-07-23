@@ -11,7 +11,7 @@ const SOUNDS: Record<string, string> = {
 export default class extends ROOM {
     name = '回音廊';
     desc =
-        "弧形长廊将细微声响层层折回，廊中悬着石磬与铁链，尽头露出一段井壁。地面刻着「刀痕有深浅，余音亦有来处」。可<cmd cmd='look huibi'>查看回音壁(huibi)</cmd>。";
+        "弧形长廊将细微声响层层折回，廊中悬着一面<cmd cmd='look shiqing'>石磬</cmd>与一条<cmd cmd='look tielian'>锈蚀铁链</cmd>，尽头露出的<cmd cmd='look jingbi'>幽深井壁</cmd>仿佛也能传回声响。地面刻着「刀痕有深浅，余音亦有来处」，一旁的<cmd cmd='look huibi'>回音壁</cmd>上遍布深浅不一的旧痕。";
     exits = { south: 'longmai/wuxingdian', north: 'longmai/zhensuotai' };
 
     constructor() {

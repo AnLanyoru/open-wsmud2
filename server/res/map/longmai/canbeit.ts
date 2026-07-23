@@ -3,7 +3,7 @@ import { ROOM } from '../../../core/room/room.js';
 export default class extends ROOM {
     name = '残碑厅';
     desc =
-        "厅中五块残碑按环形倒伏，中央立着一方可反复辨读的<cmd cmd='look canbei'>残碑(canbei)</cmd>。";
+        "厅中五块残碑按环形倒伏，中央立着一方可反复辨读的<cmd cmd='look canbei'>残碑</cmd>。";
     exits = { south: 'longmai/shimen', north: 'longmai/yongdao' };
 
     constructor() {

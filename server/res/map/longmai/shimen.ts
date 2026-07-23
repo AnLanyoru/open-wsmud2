@@ -9,7 +9,7 @@ export function queryLongmaiRoom(path: string, me: USER) {
 export default class extends ROOM {
     name = '入口石室';
     desc =
-        "石门之后是一座宽阔石室，地面沟槽盘曲相承，北壁留有一篇<cmd cmd='look shike'>石刻(shike)</cmd>，北侧门洞前伏着一只石甲蝎。";
+        "石门之后是一座宽阔石室，地面沟槽盘曲相承，北壁留有一篇<cmd cmd='look shike'>斑驳石刻</cmd>，北侧门洞前伏着一只石甲蝎。";
     exits = { north: 'longmai/canbeit' };
 
     constructor() {

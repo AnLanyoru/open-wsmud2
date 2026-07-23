@@ -4,7 +4,7 @@ import { ROOM } from '../../../core/room/room.js';
 export default class extends ROOM {
     name = '兵俑甬道';
     desc =
-        "甬道两侧立着披甲兵俑，残破铁甲下传出关节摩擦的细响。墙上的<cmd cmd='look daohen'>刀痕(daohen)</cmd>深浅相续，仿佛仍藏着未散的余音。";
+        "甬道两侧立着披甲兵俑，残破铁甲下传出关节摩擦的细响。墙上的<cmd cmd='look daohen'>层叠刀痕</cmd>深浅相续，仿佛仍藏着未散的余音。";
     exits = { south: 'longmai/canbeit', north: 'longmai/wuxingdian' };
 
     constructor() {

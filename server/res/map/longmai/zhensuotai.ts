@@ -5,7 +5,7 @@ import { queryLongmaiRoom } from './shimen.js';
 export default class extends ROOM {
     name = '镇锁台';
     desc =
-        "石台上的铜锁各缠异纹，一引地脉，一含兵煞，一藏龙吟，锁脉尽头皆没入北面的石门。可<cmd cmd='look sansuo'>查看铜锁(sansuo)</cmd>。";
+        "石台上盘踞着三道铜锁：<cmd cmd='look dimai'>地脉锁</cmd>环绕相生异纹，<cmd cmd='look binghun'>兵魂锁</cmd>暗含森然煞气，<cmd cmd='look longyin'>龙吟锁</cmd>内有声纹盘绕。<cmd cmd='look sansuo'>三道锁脉</cmd>的尽头皆没入北面的石门。";
     exits = { south: 'longmai/huiyinlang', north: 'longmai/suolongjing' };
 
     constructor() {

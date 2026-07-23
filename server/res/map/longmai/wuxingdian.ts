@@ -13,7 +13,7 @@ const ELEMENTS: Record<string, string> = {
 export default class extends ROOM {
     name = '五行殿';
     desc =
-        "殿内分列金、木、水、火、土五枚石印，石门上写着「循残碑生息，方见地脉流转」。可<cmd cmd='look shimen'>查看石门(shimen)</cmd>感应机关。";
+        "殿内依次分列<cmd cmd='look jin'>金印</cmd>、<cmd cmd='look mu'>木印</cmd>、<cmd cmd='look shui'>水印</cmd>、<cmd cmd='look huo'>火印</cmd>与<cmd cmd='look tu'>土印</cmd>，北面的<cmd cmd='look shimen'>石门</cmd>上刻着「循残碑生息，方见地脉流转」。";
     exits = { south: 'longmai/yongdao', north: 'longmai/huiyinlang' };
 
     constructor() {
