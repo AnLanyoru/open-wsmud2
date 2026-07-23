@@ -1741,18 +1741,20 @@ return OBJ.create_by_odds([
 var item = OBJ.CREATE("drug/yao#0");    // count 默认为 1
 var item = OBJ.CREATE("drug/yao#0", 5); // 创建 5 个（堆叠）
 
-// 克隆到容器
-OBJ.clone_to("money/gold", me.items, 10);  // 给玩家 10 两黄金
-OBJ.clone_to("eq/lv0/jian", container);     // 给容器放一把铁剑
+// 克隆到普通容器
+OBJ.clone_to("eq/lv0/jian", container);
 ```
 
 ### 添加到玩家背包
 
+玩家背包必须通过角色提供的 `add_obj()`、`remove_obj()` 管理。不要对玩家调用 `push_item()`、`remove_item()`，不要直接修改 `me.items`，也不要将 `me.items` 传给 `OBJ.clone_to()`。这些底层容器接口不会完整执行玩家背包刷新、快捷操作通知等专属流程。
+
 ```typescript
-// 创建并添加物品到玩家背包
-var item = OBJ.CREATE("drug/yao#1", 3);
-me.add_obj(item);  // 自动堆叠并触发 on_init/on_reload
+var item = me.add_obj("drug/yao#1", 3);
+me.remove_obj(item, 1);
 ```
+
+`add_obj()` 可以直接接收资源路径，也可以接收已经创建的物品实例；`remove_obj()` 可以接收物品实例或物品 ID。它们会处理堆叠、玩家背包数据更新和物品操作通知。
 
 ### 克隆已有物品
 
