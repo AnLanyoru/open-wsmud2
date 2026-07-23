@@ -74,8 +74,16 @@ function fb_saodang(me, path, isdiff, count) {
     if (me.is_full(-10)) return me.notify('你身上东西太多了!');
     let area = next_room.parent;
     if (!area) return me.notify('区域错误');
+    const is_jd = area.jd_index! >= 0;
     let unlock_name = isdiff ? 'fb_sao1' : 'fb_sao0';
-    if (area.unlock_index) {
+    if (is_jd) {
+        const diff = isdiff ? 1 : 0;
+        if (!(queryJdSaoMask(me, area) & (1 << diff))) {
+            return me.notify(
+                '你需要' + area.name + (isdiff ? '(困难)' : '(普通)') + '单人模式完成100%才可以扫荡副本!',
+            );
+        }
+    } else if (area.unlock_index) {
         if (me.query_temp('fb_sao' + area.fb_index, 0) !== (isdiff ? 2 : 1))
             return me.notify(
                 '你需要' +
@@ -131,7 +139,9 @@ function fb_quick(me, area, isdiff) {
     me.add_temp('fb_count_day', 1, UTIL.diff_time());
 
     var diff = isdiff ? 1 : 0;
-    if (area.is_record(diff)) {
+    if (area.jd_index! >= 0) {
+        me.add_temp(area.count_key ?? 'jd_' + area.id, 1);
+    } else if (area.is_record(diff)) {
         ('');
         me.add_temp('fbc_' + diff + '_' + area.fb_index, 1);
     }
@@ -328,9 +338,22 @@ function fb_over(me) {
         me.add_temp('fb_count', 1);
         me.add_temp('fb_count_day', 1, UTIL.diff_time());
         var unlock = me.query_temp('fb', 0);
+        const is_jd = area.jd_index! >= 0;
         if (p >= 100) {
-            let is_first_k = false;
-            if (fb.parent.unlock_index) {
+            if (is_jd) {
+                me.add_temp(area.count_key ?? 'jd_' + area.id, 1);
+                if (!me.team && diff < 2) {
+                    const mask = queryJdSaoMask(me, area);
+                    const bit = 1 << diff;
+                    if (!(mask & bit)) {
+                        me.set_temp('jd_sao_' + area.id, mask | bit);
+                        me.notify(
+                            '<hic>禁地单人' + (diff == 1 ? '(困难)' : '(普通)') + '模式扫荡解锁。</hic>',
+                        );
+                    }
+                }
+            } else if (fb.parent.unlock_index) {
+                let is_first_k = false;
                 if (!me.team && diff === 0) {
                     if (!me.query_temp('fb_sao' + fb.parent.fb_index, 0)) {
                         me.notify('<hic>单人(普通)模式扫荡解锁。</hic>');
@@ -344,7 +367,9 @@ function fb_over(me) {
                         is_first_k = true;
                     }
                 }
+                if (is_first_k) fb_first_check(me, fb, area, diff);
             } else {
+                let is_first_k = false;
                 if (unlock === fb.parent.fb_index) {
                     me.set_temp('fb', unlock + 1);
                     me.notify('<hig>完成度100%，解锁下个副本。</hig>');
@@ -365,10 +390,9 @@ function fb_over(me) {
                         is_first_k = true;
                     }
                 }
+                if (is_first_k) fb_first_check(me, fb, area, diff);
             }
-
-            if (is_first_k) fb_first_check(me, fb, area, diff);
-        } else {
+        } else if (!is_jd) {
             me.notify('完成度未满100%，未能解锁下个副本。');
         }
         me.add_exp(exp, pot);
@@ -380,7 +404,7 @@ function fb_over(me) {
                 me.follow_targets.length = 0;
             }
         }
-        if (!me.team && fb.parent.is_record(diff)) {
+        if (!is_jd && !me.team && fb.parent.is_record(diff)) {
             me.add_temp('fbc_' + diff + '_' + fb.parent.fb_index, 1);
         }
 
@@ -408,6 +432,18 @@ function fb_over(me) {
     } else {
         me.notify('你现在还不能离开副本。');
     }
+}
+
+function queryJdSaoMask(me, area: AREA): number {
+    let mask = Number(me.query_temp('jd_sao_' + area.id, 0)) || 0;
+    if (
+        !(mask & 1) &&
+        area.jd_index !== undefined &&
+        me.query_temp('jd_sao_' + area.jd_index, Number(0)) === 1
+    ) {
+        mask |= 1;
+    }
+    return mask;
 }
 
 function fb_first_check(me, fb, area, diff) {

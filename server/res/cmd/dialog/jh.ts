@@ -16,7 +16,7 @@ export default class extends COMMAND {
     fbs: AREA[] = [];
     families: AREA[] = [];
     areas: AREA[] = [];
-    regex = /^(\w+)?\s?(lock|\d+)?(?:\s(start[1|2|3]?))?$/;
+    regex = /^(\w+)?\s?(lock|\d+)?(?:\s(start[123]?))?$/;
 
     /**
      * @param me - 执行命令的角色
@@ -197,12 +197,13 @@ export default class extends COMMAND {
                     if (!fb || !fb.id) return me.notify('没有这个禁地区域。');
                     if (!(fb.jd_index! >= 0)) return me.notify('没有这个禁地区域。');
                     if (fb.is_lock) return me.notify('暂未开放，正在修复');
-                    let diff = 0;
-                    if (me.team) diff = 2;
+                    let diff = isstart == 'start2' ? 1 : isstart == 'start3' ? 2 : 0;
+                    if (isstart == 'start' && me.team) diff = 2;
                     if (!me.isenable_area!(fb)) return me.notify('未解锁区域');
 
                     if (fb.is_copy && !fb.not_fb) {
-                        //禁地类型的副本
+                        if (diff == 1 && !fb.is_diffi) return me.notify(fb.name + '没有困难模式!');
+                        if (diff == 2 && !fb.is_multi) return me.notify(fb.name + '没有组队模式!');
                         this.enter_ar_fb(me, fb, diff);
                     } else {
                         if (fb.on_enter(me) == false) {
@@ -248,22 +249,16 @@ export default class extends COMMAND {
                     me.query_jingli!(),
             );
         }
-        const can_sd = me.query_temp('fb_sao' + fb.fb_index, Number(0)) === 1;
-
-        if (can_sd) {
-            let sd_diff = diff;
-            if (sd_diff === 2) sd_diff = 0;
-            return me.send_commands(
-                'cr ' + fb.id + ' ' + diff + ' 0',
-                '进入副本',
-                'cr ' + fb.id + ' ' + sd_diff + ' 1',
-                '扫荡一次',
-                'cr ' + fb.id + ' ' + sd_diff + ' 10',
-                '扫荡十次',
-            );
-        } else {
-            return me.send_commands('cr ' + fb.id + ' ' + diff + ' 0', '进入副本');
-        }
+        const can_sd = diff < 2 && (queryJdSaoMask(me, fb) & (1 << diff)) !== 0;
+        if (!can_sd) return me.send_commands('cr ' + fb.id + ' ' + diff + ' 0', '进入副本');
+        return me.send_commands(
+            'cr ' + fb.id + ' ' + diff + ' 0',
+            '进入副本',
+            'cr ' + fb.id + ' ' + diff + ' 1',
+            '扫荡一次',
+            'cr ' + fb.id + ' ' + diff + ' 10',
+            '扫荡十次',
+        );
     }
 
     return_famdesc(me: USER, index: number): void {
@@ -344,6 +339,9 @@ export default class extends COMMAND {
             actions: fb.query_actions(me),
             reward: '掉落或解谜奖励：\n' + this.fb_drops(fb),
         };
+        if (fb.is_copy && !fb.not_fb) {
+            obj.diffs = [1, fb.is_diffi ? 1 : 0, fb.is_multi ? 1 : 0];
+        }
 
         fb.json = JSON.stringify(obj);
         me.send(fb.json);
@@ -479,6 +477,7 @@ export default class extends COMMAND {
 
                         this.areas[index] = area;
                         map.areas[index] = area.name;
+                        FBS[area.id] = area;
                     }
                 }
             }
@@ -495,6 +494,18 @@ export default class extends COMMAND {
         }
         return null;
     }
+}
+
+function queryJdSaoMask(me: CHARACTER, area: AREA): number {
+    let mask = Number(me.query_temp('jd_sao_' + area.id, 0)) || 0;
+    if (
+        !(mask & 1) &&
+        area.jd_index !== undefined &&
+        me.query_temp('jd_sao_' + area.jd_index, Number(0)) === 1
+    ) {
+        mask |= 1;
+    }
+    return mask;
 }
 
 AREA.Get_FB = function (this: void, id: string): AREA | undefined {

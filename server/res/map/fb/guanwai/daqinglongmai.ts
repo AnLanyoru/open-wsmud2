@@ -40,8 +40,8 @@ export default class extends ROOM {
         if (!me.find_obj_bypath('sp/bj/map')) return;
         if (me.str + me.query_prop('str') <= 50) return;
         const area = room.parent;
-        if (!area || area.on_enter(me) !== false) return me.notify('龙脉开启失败。');
-        if (me.environment?.parent !== area || !me.environment.owner) return me.notify('龙脉开启失败。');
-        me.enable_area();
+        if (!area) return me.notify('龙脉开启失败。');
+        me.enable_area(area);
+        WORLD.COMMANDS.get('cr')!.enter(me, 'longmai 0 0');
     }
 }

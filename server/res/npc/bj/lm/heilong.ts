@@ -107,6 +107,7 @@ export default class extends MONSTER {
         this.is_free = true;
         try {
             this.send_room('$N猛地昂起头颅，修长的龙身顺着石柱盘旋，玄铁锁链在龙爪的撕扯接连崩裂。');
+            me.add_fbscore(100, 100);
             this.settleReward(me);
             this.settleWorldReward(me);
             this.call_out(this.to_next, 3000, me);
@@ -163,6 +164,7 @@ export default class extends MONSTER {
     on_died(killer: USER | undefined, corpse: CORPSE) {
         if (!killer?.check_player()) return;
         if (corpse.environment?.fb_query_temp('lm_route', killer, '') !== 'kill') return;
+        killer.add_fbscore(100, 100);
         if (killer.query_temp('jd_longmai_kill_done', 0)) return;
         killer.set_temp('jd_longmai_kill_done', 1);
         killer.save();

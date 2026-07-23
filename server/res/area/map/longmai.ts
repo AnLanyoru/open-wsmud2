@@ -1,6 +1,4 @@
-import type { USER } from '../../../core/char/user.js';
 import { AREA } from '../../../core/room/area.js';
-import { WORLD } from '../../../core/world.js';
 
 export default class extends AREA {
     id = 'longmai';
@@ -9,10 +7,10 @@ export default class extends AREA {
     first = 'longmai/shimen';
     room_path = 'longmai/';
     is_copy = true;
-    not_fb = true;
     is_show = true;
     is_multi = false;
     is_diffi = false;
+    score = 100;
     count_key = 'jd_longmai';
     map = [
         { n: '入口石室', id: 'longmai/shimen', p: [0, 0], exits: ['n'] },
@@ -23,29 +21,4 @@ export default class extends AREA {
         { n: '镇锁台', id: 'longmai/zhensuotai', p: [0, -5], exits: ['s', 'n'] },
         { n: '锁龙井', id: 'longmai/suolongjing', p: [0, -6] },
     ];
-
-    query_owner(me: USER) {
-        return me.id;
-    }
-
-    on_enter(me: USER) {
-        const room = WORLD.getRoom(this.first);
-        if (!room) return false;
-        const copyRoom = room.query_copy2(me) || room.create_copy2(me);
-        if (!copyRoom) return false;
-        me.moveto(copyRoom, '$N走了。', '$N来了。');
-        return false;
-    }
-
-    on_login(me: USER) {
-        const room = WORLD.getRoom(this.first);
-        if (!room) return;
-        const copyRoom = room.query_copy2(me) || room.create_copy2(me);
-        if (!copyRoom || me.environment === copyRoom) return;
-        me.moveto(copyRoom, undefined, '$N连线进入这个世界。');
-    }
-
-    on_leaved(me: USER) {
-        this.clear_copy(me);
-    }
 }

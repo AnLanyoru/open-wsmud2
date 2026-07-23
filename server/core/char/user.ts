@@ -1509,8 +1509,8 @@ export class USER extends CHARACTER {
     // ============ 区域解锁 ============
 
     /** 解锁当前区域 */
-    enable_area(): void {
-        const area = (this.environment as ROOM).parent!;
+    enable_area(target?: AREA): void {
+        const area = target || (this.environment as ROOM).parent!;
         const jd_idx = area.jd_index!;
         if (!(jd_idx >= 0)) return;
         if (!this.query_bool('fb2', jd_idx)) {

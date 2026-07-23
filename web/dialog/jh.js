@@ -213,7 +213,7 @@ const jh_ar = {
     onClickItem: jh_fam.onClickItem,
     append_status: jh_fb.append_status,
     append_actions: jh_fam.append_actions,
-    fb_models: ['普通', '普通', '组队'],
+    fb_models: ['普通', '<red>困难</red>', '<cyn>组队</cyn>'],
     onDetail: function (data) {
         var fb = this.items[data.index];
         if (!fb) return;
@@ -221,6 +221,7 @@ const jh_ar = {
         fb.desc = data.desc;
         fb.actions = data.actions;
         fb.status = data.status;
+        fb.diffs = data.diffs;
         fb.reward = data.reward;
         return this.showDetail(fb);
     }, update_unlock: function (unlock) {
@@ -263,7 +264,14 @@ const jh_ar = {
         this.append_actions(html, fb);
         if (fb.unlock) {
             html.push('<div class="item-commands">');
-            html.push(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
+            if (fb.diffs) {
+                for (let i = 0; i < fb.diffs.length; i++) {
+                    if (fb.diffs[i])
+                        html.push('<span cmd="jh ar ', fb.index, ' start', i + 1, '">', jh_fb.fb_buttons[i], '</span>');
+                }
+            } else {
+                html.push(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
+            }
             let cmds = [];
             Dialog.extend.append(cmds, 'map', fb);
             for (let item of cmds) {
@@ -279,10 +287,15 @@ const jh_ar = {
     },
     append_footer: function () {
         let fb = this.items[this.selected_index];
-        if (fb.unlock)
-            Dialog.footerElement.find('.item-commands').html(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
-        else
-            Dialog.footerElement.find('.item-commands').empty();
+        if (!fb.unlock) return Dialog.footerElement.find('.item-commands').empty();
+        if (!fb.diffs)
+            return Dialog.footerElement.find('.item-commands').html(`<span cmd="jh ar ${fb.index} start">进入地图</span>`);
+        let html = [];
+        for (let i = 0; i < fb.diffs.length; i++) {
+            if (fb.diffs[i])
+                html.push('<span cmd="jh ar ', fb.index, ' start', i + 1, '">', jh_fb.fb_buttons[i], '</span>');
+        }
+        Dialog.footerElement.find('.item-commands').html(html.join(""));
     }
 };
 const MAP_TYPES = {
