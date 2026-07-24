@@ -383,6 +383,7 @@ export class ROOM extends ITEM {
                 }
             }
         } else if (obj_index > -1) {
+            if (_batchMode && obj.check_player()) this._flush_player(obj as USER);
             this.items.splice(obj_index, 1);
             this._items_json = null;
             if (obj.check_player()) {
@@ -390,19 +391,12 @@ export class ROOM extends ITEM {
                 if (_batchMode) {
                     const pendIdx = this._pending_items_send.indexOf(obj as USER);
                     if (pendIdx !== -1) this._pending_items_send.splice(pendIdx, 1);
-                    // 离房前 flush 该玩家的 notify 文本帧，避免消息丢失
-                    const player = obj as any;
-                    if (player._notify_markers && player._notify_markers.length > 0 && player.socket) {
-                        const frames = player._notify_frames;
-                        const out: Buffer[] = [];
-                        for (let k = 0; k < frames.length; k++) out.push(frames[k]);
-                        player.socket.write(Buffer.concat(out));
-                        player._notify_markers.length = 0;
-                        player._notify_frames.length = 0;
-                    }
                 }
             }
-            if (obj.check_character()) this._dirty_players.delete(obj as CHARACTER);
+            if (obj.check_character()) {
+                this._dirty_players.delete(obj as CHARACTER);
+                (obj as CHARACTER)._dirty_fields = 0;
+            }
             obj.environment = undefined;
         }
         if (_batchMode && _broadcastCount > 0 && msgPayload) {
@@ -1084,7 +1078,7 @@ export class ROOM extends ITEM {
      * field_mask 沿用 8 位 FMASK，字段编码: [1B len][utf8]
      * A_NAME/T_NAME 都映射 cache.n (纯名字)，name 字段仅供房间列表显示
      */
-    _build_dirty_refresh_frame(): Buffer | null {
+    _build_dirty_refresh_frame(clear: boolean = true): Buffer | null {
         const dirty = this._dirty_players;
         if (dirty.size === 0) return null;
 
@@ -1130,7 +1124,7 @@ export class ROOM extends ITEM {
             }
 
             // 清除脏标记
-            (ch as any)._dirty_fields = 0;
+            if (clear) (ch as any)._dirty_fields = 0;
             count++;
         }
         if (count === 0) return null;
@@ -1140,6 +1134,69 @@ export class ROOM extends ITEM {
         header[0] = 0x55;
         header[1] = count;
         return Buffer.concat([header, ...parts]);
+    }
+
+    _flush_player(player: USER): void {
+        const socket = player.socket;
+        const pendingIndex = this._pending_items_send.indexOf(player);
+        const writable = socket && !socket.destroyed && socket.writable && !socket.writableEnded;
+        if (pendingIndex !== -1) {
+            if (writable) {
+                const hasRoomMessage = this._batch_all_payloads.some(
+                    (payload, index) =>
+                        (payload[0] & 0x7f) === 0x12 &&
+                        !(player.no_message && !this._batch_all_combat[index]),
+                );
+                const output = hasRoomMessage
+                    ? [encodeTextFrame(this.items_to_json()), ...player._notify_frames]
+                    : player._notify_frames;
+                if (output.length) socket.write(Buffer.concat(output));
+            }
+            this._pending_items_send.splice(pendingIndex, 1);
+            player._notify_markers.length = 0;
+            player._notify_frames.length = 0;
+            return;
+        }
+
+        if (!writable) {
+            player._notify_markers.length = 0;
+            player._notify_frames.length = 0;
+            return;
+        }
+
+        const payloads = this._batch_all_payloads;
+        const combatFlags = this._batch_all_combat;
+        const markers = player._notify_markers;
+        const frames = player._notify_frames;
+        const output: Buffer[] = [];
+        const refreshFrame = this._build_dirty_refresh_frame(false);
+        const noCombat = this._batch_has_combat && player.query_setting('no_combatmsg');
+        let binaryStart = 0;
+        let refreshAttached = false;
+
+        const flushBinary = (endIndex: number) => {
+            if (endIndex <= binaryStart) return;
+            const batch: Buffer[] = [];
+            for (let i = binaryStart; i < endIndex; i++) {
+                if (noCombat && combatFlags[i]) continue;
+                if (player.no_message && !combatFlags[i] && (payloads[i][0] & 0x7f) === 0x12) continue;
+                batch.push(payloads[i]);
+            }
+            binaryStart = endIndex;
+            if (!batch.length) return;
+            output.push(_mergeBatchFrame(batch, refreshAttached ? null : refreshFrame));
+            refreshAttached = true;
+        };
+
+        for (let i = 0; i < markers.length; i++) {
+            flushBinary(markers[i]);
+            output.push(frames[i]);
+        }
+        markers.length = 0;
+        frames.length = 0;
+        flushBinary(payloads.length);
+        if (!refreshAttached && refreshFrame) output.push(_mergeBatchFrame([], refreshFrame));
+        if (output.length) socket.write(Buffer.concat(output));
     }
 
     /**
