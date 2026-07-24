@@ -866,6 +866,9 @@ class World {
 
         this.status = __CONFIG.CONNECT_LEVEL ?? 0;
         this.on_startup();
+        // @metrics-start world-start-server
+        // _startMetricsServer(parseInt(String(this.SERVER.port), 10) + 1);
+        // @metrics-end world-start-server
         if (this.status > 0) {
             console.log('当前允许级别' + this.status + '账号登陆');
         }
@@ -969,6 +972,10 @@ class World {
             );
             this.log(null, e.message, e.stack);
         }
+        // @metrics-start world-heartbeat-probe
+        // _perf.lastHbCost = Date.now() - t0;
+        // _perf.hbCount++;
+        // @metrics-end world-heartbeat-probe
     }
 
     /**
@@ -1363,6 +1370,10 @@ function _tick(): void {
         }
     }
     _schedule();
+    // @metrics-start world-flush-probe
+    // _perf.lastFlushCost = Date.now() - t0;
+    // _perf.flushCount++;
+    // @metrics-end world-flush-probe
 }
 
 /** 调度下一次 tick（无 dirty 则不调度） */
@@ -1440,6 +1451,10 @@ function _damage_tick(): void {
         clearInterval(_damage_timer);
         _damage_timer = null;
     }
+    // @metrics-start world-damage-probe
+    // _perf.lastDamageTickCost = Date.now() - t0;
+    // _perf.damageTickCount++;
+    // @metrics-end world-damage-probe
 }
 
 // ============================================================
@@ -1449,10 +1464,101 @@ function _damage_tick(): void {
 
 // 入口层批处理（ws.ts _msgQueue + setImmediate 分批调度）：1=开（默认），0=同步执行
 // 解耦后支持：BATCH_MODE=1 + WS_BATCH_MODE=0 = 混合模式（指令同步 + 房间消息16ms集中推送）
-export const WS_BATCH_MODE: number = process.env.WS_BATCH_MODE === '0' ? 0 : 1;
+export let WS_BATCH_MODE: number = process.env.WS_BATCH_MODE === '0' ? 0 : 1;
 
 // 房间层批处理（0x12/0x55/0x57/0x58 帧合并推送）：1=开（默认），0=每玩家直接 socket.write
-export const BATCH_MODE: number = process.env.BATCH_MODE === '0' ? 0 : 1;
+export let BATCH_MODE: number = process.env.BATCH_MODE === '0' ? 0 : 1;
+
+export type BatchModeName = 'BATCH_MODE' | 'WS_BATCH_MODE';
+
+export function setBatchMode(name: BatchModeName, value: number): number {
+    const mode = value === 0 ? 0 : 1;
+    if (name === 'BATCH_MODE') BATCH_MODE = mode;
+    else WS_BATCH_MODE = mode;
+    process.env[name] = String(mode);
+    return mode;
+}
+
+// @metrics-start world-infrastructure
+// const _perf = {
+//     lastHbCost: 0, lastFlushCost: 0, lastDamageTickCost: 0, lastItemChangedCost: 0,
+//     hbCount: 0, flushCount: 0, damageTickCount: 0,
+//     itemChangedCount: 0, itemChangedBroadcasts: 0,
+//     createShadowCount: 0, roomCreateCount: 0,
+//     movetoCount: 0, movetoCosts: [] as number[],
+//     movetoStageUs: { room_lookup: 0, shadow_check: 0, do_leave: 0, do_enter: 0, notify_follower: 0 },
+//     itemJsonCount: 0, itemJsonUs: 0,
+//     itemsToJsonCount: 0, itemsToJsonUs: 0,
+//     toJsonCount: 0, toJsonUs: 0,
+//     sendExitsCount: 0, sendExitsUs: 0,
+//     socketWriteCount: 0, socketWriteUs: 0,
+//     flushBatchCount: 0, flushBatchUs: 0,
+//     startTime: Date.now(),
+//     _evLoopCheckTime: 0, _evLoopDelays: [] as number[],
+// };
+// export const _perfTracker = _perf;
+// const _evLoopSampler = setInterval(() => {
+//     _perf._evLoopCheckTime = Date.now();
+//     setImmediate(() => {
+//         const delay = Date.now() - _perf._evLoopCheckTime;
+//         _perf._evLoopDelays.push(delay);
+//         if (_perf._evLoopDelays.length > 100) _perf._evLoopDelays.shift();
+//     });
+// }, 200);
+// _evLoopSampler.unref?.();
+// export function getPerfMetrics() {
+//     const delays = _perf._evLoopDelays;
+//     let p95 = 0;
+//     if (delays.length) {
+//         const sorted = [...delays].sort((a, b) => a - b);
+//         p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
+//     }
+//     return {
+//         ts: Date.now(),
+//         uptime: Math.floor((Date.now() - _perf.startTime) / 1000),
+//         onlineUsers: WORLD.CONNECT_COUNT,
+//         runRooms: WORLD.RUN_ROOMS.length,
+//         heartbeatInterval: WORLD.heartbeat_interval,
+//         lastHbCost: _perf.lastHbCost, lastFlushCost: _perf.lastFlushCost,
+//         lastDamageTickCost: _perf.lastDamageTickCost, lastItemChangedCost: _perf.lastItemChangedCost,
+//         hbCount: _perf.hbCount, flushCount: _perf.flushCount, damageTickCount: _perf.damageTickCount,
+//         itemChangedCount: _perf.itemChangedCount, itemChangedBroadcasts: _perf.itemChangedBroadcasts,
+//         createShadowCount: _perf.createShadowCount, roomCreateCount: _perf.roomCreateCount,
+//         movetoCount: _perf.movetoCount, movetoCosts: _perf.movetoCosts,
+//         movetoStageUs: { ..._perf.movetoStageUs },
+//         itemJsonCount: _perf.itemJsonCount, itemJsonUs: _perf.itemJsonUs,
+//         itemsToJsonCount: _perf.itemsToJsonCount, itemsToJsonUs: _perf.itemsToJsonUs,
+//         toJsonCount: _perf.toJsonCount, toJsonUs: _perf.toJsonUs,
+//         sendExitsCount: _perf.sendExitsCount, sendExitsUs: _perf.sendExitsUs,
+//         socketWriteCount: _perf.socketWriteCount, socketWriteUs: _perf.socketWriteUs,
+//         flushBatchCount: _perf.flushBatchCount, flushBatchUs: _perf.flushBatchUs,
+//         batchMode: BATCH_MODE,
+//         wsBatchMode: WS_BATCH_MODE,
+//         memory: process.memoryUsage(),
+//         evLoopP95: p95,
+//     };
+// }
+// let _metricsServer: import('http').Server | null = null;
+// async function _startMetricsServer(port: number) {
+//     try {
+//         const http = await import('http');
+//         _metricsServer = http.createServer((req, res) => {
+//             if (req.url === '/metrics' || req.url === '/') {
+//                 res.setHeader('Content-Type', 'application/json; charset=utf-8');
+//                 res.setHeader('Access-Control-Allow-Origin', '*');
+//                 res.end(JSON.stringify(getPerfMetrics(), null, 2));
+//                 return;
+//             }
+//             res.statusCode = 404;
+//             res.end('404');
+//         });
+//         _metricsServer.listen(port, '127.0.0.1');
+//         console.log(`[metrics] http://127.0.0.1:${port}/metrics`);
+//     } catch (e) {
+//         console.log('[metrics] ????', e);
+//     }
+// }
+// @metrics-end world-infrastructure
 
 // ============================================================
 // 导出单例

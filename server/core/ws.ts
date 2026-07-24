@@ -64,7 +64,7 @@ function _processMsgBatch(): void {
         const entry = _msgQueue[_msgIndex];
         _msgIndex++;
         WORLD.request(entry[0], entry[1]);
-        if (Date.now() - t0 >= _MSG_TIMESLICE_MS) break;
+        if (WS_BATCH_MODE === 1 && Date.now() - t0 >= _MSG_TIMESLICE_MS) break;
     }
     if (_msgIndex < _msgQueue.length) {
         _msgScheduled = true;

@@ -9,7 +9,7 @@
  * 流程:
  *   1. tsc 编译 server/ → server/dist/
  *   2. server/dist/core/ → core/,  server/dist/res/ → res/ (保持原名)
- *   3. 若 --metrics: 注入 metrics HTTP 服务器代码到 core/world.js
+ *   3. 若 --metrics: 编译前严格校验并取消 TS 源码中的 metrics 标记注释
  *   4. 若 --binary: 扫描 core/ + res/ 中的 send_room/send_combat/moveto/do_enter/do_leave/item_changed
  *      字面量，注册模板、替换为模板 ID、生成客户端模板数据文件
  */
@@ -32,6 +32,90 @@ const RES_DIR = path.join(ROOT, 'res');
 const WEB_DIR = path.join(ROOT, 'web');
 const WWW_DIR = path.join(ROOT, 'www');
 
+const METRICS_SOURCES = new Map([
+    [path.join(SERVER_DIR, 'core', 'world.ts'), [
+        'world-start-server',
+        'world-heartbeat-probe',
+        'world-flush-probe',
+        'world-damage-probe',
+        'world-infrastructure',
+    ]],
+    [path.join(SERVER_DIR, 'core', 'room', 'room.ts'), [
+        'room-import',
+        'room-create-probe',
+        'room-item-changed-start',
+        'room-item-changed-end',
+        'room-item-json-start',
+        'room-item-json-end',
+        'room-items-json-start',
+        'room-items-json-end',
+        'room-send-exits-start',
+        'room-send-exits-end',
+        'room-to-json-start',
+        'room-to-json-end',
+        'room-flush-start',
+        'room-flush-early-end',
+        'room-socket-write-start',
+        'room-socket-write-end',
+        'room-flush-end',
+        'room-shadow-probe',
+    ]],
+    [path.join(SERVER_DIR, 'core', 'char', 'character.ts'), [
+        'character-import',
+        'character-moveto-start',
+        'character-room-lookup',
+        'character-shadow-check',
+        'character-do-leave',
+        'character-do-enter',
+        'character-notify-follower',
+        'character-moveto-end',
+    ]],
+]);
+
+function activateMetricsSource(filePath, expectedMarkers) {
+    const source = fs.readFileSync(filePath, 'utf8');
+    const lines = source.split('\n');
+    const seen = new Set();
+    const output = [];
+    let activeMarker = null;
+
+    for (const line of lines) {
+        const start = line.match(/^\s*\/\/ @metrics-start ([a-z0-9-]+)\s*$/);
+        const end = line.match(/^\s*\/\/ @metrics-end ([a-z0-9-]+)\s*$/);
+        if (start) {
+            const marker = start[1];
+            if (activeMarker !== null) throw new Error(`${filePath}: metrics ???? ${activeMarker} -> ${marker}`);
+            if (!expectedMarkers.includes(marker)) throw new Error(`${filePath}: ???? metrics ?? ${marker}`);
+            if (seen.has(marker)) throw new Error(`${filePath}: metrics ???? ${marker}`);
+            activeMarker = marker;
+            seen.add(marker);
+            continue;
+        }
+        if (end) {
+            const marker = end[1];
+            if (activeMarker !== marker) throw new Error(`${filePath}: metrics ??????? ${marker}`);
+            activeMarker = null;
+            continue;
+        }
+        if (activeMarker !== null) {
+            if (/^\s*$/.test(line)) {
+                output.push(line);
+                continue;
+            }
+            const uncommented = line.match(/^(\s*)\/\/(?: (.*)|$)/);
+            if (!uncommented) throw new Error(`${filePath}: ${activeMarker} ????????`);
+            output.push(uncommented[1] + (uncommented[2] ?? ''));
+            continue;
+        }
+        output.push(line);
+    }
+
+    if (activeMarker !== null) throw new Error(`${filePath}: metrics ????? ${activeMarker}`);
+    const missing = expectedMarkers.filter(marker => !seen.has(marker));
+    if (missing.length > 0) throw new Error(`${filePath}: ?? metrics ?? ${missing.join(', ')}`);
+    return { source, activated: output.join('\n') };
+}
+
 // ============================================================
 // Step 1: Compile TypeScript
 // ============================================================
@@ -39,15 +123,29 @@ const WWW_DIR = path.join(ROOT, 'www');
 console.log('[pack] Compiling TypeScript...');
 fs.rmSync(DIST_DIR, { recursive: true, force: true });
 
+const metricsSourceBackups = new Map();
 try {
+    if (IS_METRICS) {
+        console.log('[pack] Activating metrics source markers...');
+        for (const [filePath, expectedMarkers] of METRICS_SOURCES) {
+            const { source, activated } = activateMetricsSource(filePath, expectedMarkers);
+            metricsSourceBackups.set(filePath, source);
+            fs.writeFileSync(filePath, activated);
+        }
+    }
     execSync('npx tsc -p server/tsconfig.json', {
         cwd: ROOT,
         stdio: 'inherit',
     });
 } catch (e) {
-    console.error('[pack] TypeScript compilation failed');
-    process.exit(1);
+    console.error('[pack] TypeScript compilation failed', e);
+    process.exitCode = 1;
+} finally {
+    for (const [filePath, source] of metricsSourceBackups) {
+        fs.writeFileSync(filePath, source);
+    }
 }
+if (process.exitCode) process.exit(process.exitCode);
 
 // ============================================================
 // Step 2: 复制到输出目录（保持 core/ res/ 原名，不破坏 import 路径）
@@ -78,191 +176,6 @@ for (const entry of remainingFiles) {
 
 // 清理 dist
 fs.rmSync(DIST_DIR, { recursive: true, force: true });
-
-// ============================================================
-// Step 2.5: 注入 metrics 监控（可选，仅 --metrics 时启用）
-// 源码不含任何 metrics 代码，由 pack 注入完整的 metrics 基础设施：
-//   1. _perf 对象 + _perfTracker 导出 + getPerfMetrics() 到 world.js
-//   2. _startMetricsServer() HTTP 服务器 + 启动调用
-//   3. 关键函数埋点注入到 room.js / character.js
-// ============================================================
-
-if (IS_METRICS) {
-    console.log('[pack] Injecting metrics...');
-
-    // --- 2.5.1: 注入 metrics 基础设施到 world.js ---
-    const worldJsPath = path.join(CORE_DIR, 'world.js');
-    if (fs.existsSync(worldJsPath)) {
-        let worldJs = fs.readFileSync(worldJsPath, 'utf8');
-
-        // 在 BATCH_MODE 导出行之后注入 _perf 对象、getPerfMetrics、_startMetricsServer
-        const metricsInfraCode = `
-// ============================================================
-// metrics 基础设施 — 由 pack.mjs --metrics 注入
-// ============================================================
-const _perf = {
-    lastHbCost: 0, lastFlushCost: 0, lastDamageTickCost: 0, lastItemChangedCost: 0,
-    hbCount: 0, flushCount: 0, damageTickCount: 0,
-    itemChangedCount: 0, itemChangedBroadcasts: 0,
-    createShadowCount: 0, roomCreateCount: 0,
-    movetoCount: 0, movetoCosts: [],
-    movetoStageUs: { room_lookup: 0, shadow_check: 0, do_leave: 0, do_enter: 0, notify_follower: 0 },
-    itemJsonCount: 0, itemJsonUs: 0,
-    itemsToJsonCount: 0, itemsToJsonUs: 0,
-    toJsonCount: 0, toJsonUs: 0,
-    sendExitsCount: 0, sendExitsUs: 0,
-    socketWriteCount: 0, socketWriteUs: 0,
-    flushBatchCount: 0, flushBatchUs: 0,
-    startTime: Date.now(),
-    _evLoopCheckTime: 0, _evLoopDelays: [],
-};
-export const _perfTracker = _perf;
-
-const _evLoopSampler = setInterval(() => {
-    _perf._evLoopCheckTime = Date.now();
-    setImmediate(() => {
-        const delay = Date.now() - _perf._evLoopCheckTime;
-        _perf._evLoopDelays.push(delay);
-        if (_perf._evLoopDelays.length > 100) _perf._evLoopDelays.shift();
-    });
-}, 200);
-_evLoopSampler.unref?.();
-
-export function getPerfMetrics() {
-    const delays = _perf._evLoopDelays;
-    let p95 = 0;
-    if (delays.length) {
-        const sorted = [...delays].sort((a, b) => a - b);
-        p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
-    }
-    return {
-        ts: Date.now(),
-        uptime: Math.floor((Date.now() - _perf.startTime) / 1000),
-        onlineUsers: WORLD.CONNECT_COUNT,
-        runRooms: WORLD.RUN_ROOMS.length,
-        heartbeatInterval: WORLD.heartbeat_interval,
-        lastHbCost: _perf.lastHbCost, lastFlushCost: _perf.lastFlushCost,
-        lastDamageTickCost: _perf.lastDamageTickCost, lastItemChangedCost: _perf.lastItemChangedCost,
-        hbCount: _perf.hbCount, flushCount: _perf.flushCount, damageTickCount: _perf.damageTickCount,
-        itemChangedCount: _perf.itemChangedCount, itemChangedBroadcasts: _perf.itemChangedBroadcasts,
-        createShadowCount: _perf.createShadowCount, roomCreateCount: _perf.roomCreateCount,
-        movetoCount: _perf.movetoCount, movetoCosts: _perf.movetoCosts,
-        movetoStageUs: { ..._perf.movetoStageUs },
-        itemJsonCount: _perf.itemJsonCount, itemJsonUs: _perf.itemJsonUs,
-        itemsToJsonCount: _perf.itemsToJsonCount, itemsToJsonUs: _perf.itemsToJsonUs,
-        toJsonCount: _perf.toJsonCount, toJsonUs: _perf.toJsonUs,
-        sendExitsCount: _perf.sendExitsCount, sendExitsUs: _perf.sendExitsUs,
-        socketWriteCount: _perf.socketWriteCount, socketWriteUs: _perf.socketWriteUs,
-        flushBatchCount: _perf.flushBatchCount, flushBatchUs: _perf.flushBatchUs,
-        batchMode: BATCH_MODE,
-        wsBatchMode: WS_BATCH_MODE,
-        memory: process.memoryUsage(),
-        evLoopP95: p95,
-    };
-}
-
-let _metricsServer = null;
-async function _startMetricsServer(port) {
-    try {
-        const http = await import('http');
-        _metricsServer = http.createServer((req, res) => {
-            if (req.url === '/metrics' || req.url === '/') {
-                res.setHeader('Content-Type', 'application/json; charset=utf-8');
-                res.setHeader('Access-Control-Allow-Origin', '*');
-                res.end(JSON.stringify(getPerfMetrics(), null, 2));
-                return;
-            }
-            res.statusCode = 404;
-            res.end('404');
-        });
-        _metricsServer.listen(port, '127.0.0.1');
-        console.log(\`[metrics] http://127.0.0.1:\${port}/metrics\`);
-    } catch (e) {
-        console.log('[metrics] 启动失败', e);
-    }
-}
-`;
-        worldJs = worldJs.replace(
-            /(export const BATCH_MODE[^;]+;)/,
-            `$1\n${metricsInfraCode}`
-        );
-
-        // 在 startup 方法中 on_startup() 调用之后注入启动调用
-        worldJs = worldJs.replace(
-            /(this\.on_startup\(\);)/,
-            `$1\n        _startMetricsServer(parseInt(String(this.SERVER.port), 10) + 1);`
-        );
-
-        fs.writeFileSync(worldJsPath, worldJs);
-        console.log('[pack]   Injected metrics infrastructure into world.js');
-    }
-
-    // --- 2.5.2: 注入埋点到 room.js ---
-    const roomJsPath = path.join(CORE_DIR, 'room', 'room.js');
-    if (fs.existsSync(roomJsPath)) {
-        let roomJs = fs.readFileSync(roomJsPath, 'utf8');
-
-        // 添加 _perfTracker import
-        roomJs = roomJs.replace(
-            /(import \{[^}]*markRoomDirty[^}]*\} from '\.\.\/world\.js';)/,
-            `$1\nimport { _perfTracker } from '../world.js';`
-        );
-
-        // item_changed: 在 _batchMode 声明后插入计时
-        roomJs = roomJs.replace(
-            /(const _batchMode = BATCH_MODE === 1;)/,
-            `$1\n        const _t0 = Date.now();`
-        );
-
-        // item_changed 结尾: 在方法末尾（markRoomDirty if 块之后）插入埋点
-        roomJs = roomJs.replace(
-            /(markRoomDirty\(this\);\n        \}\n)(    \})/,
-            `$1        const _cost = Date.now() - _t0;\n        if (_cost > 5 || _broadcastCount > 10) {\n            _perfTracker.lastItemChangedCost = _cost;\n            _perfTracker.itemChangedCount++;\n            _perfTracker.itemChangedBroadcasts += _broadcastCount;\n        }\n$2`
-        );
-
-        // _flush_batch: 在方法开头插入计时，在方法结尾插入埋点
-        roomJs = roomJs.replace(
-            /(_flush_batch\(\) \{)/,
-            `$1\n        const _t0 = Date.now();`
-        );
-
-        // create_shadow: 插入计数
-        roomJs = roomJs.replace(
-            /(create_shadow\(\) \{[\s\S]*?)(return shadow;)/,
-            `$1        _perfTracker.createShadowCount++;\n        $2`
-        );
-
-        // ROOM.CREATE: 插入计数
-        roomJs = roomJs.replace(
-            /(room\.create\(path\);\n)(\s+return room;)/,
-            `$1        _perfTracker.roomCreateCount++;\n$2`
-        );
-
-        fs.writeFileSync(roomJsPath, roomJs);
-        console.log('[pack]   Injected metrics probes into room.js');
-    }
-
-    // --- 2.5.3: 注入埋点到 character.js ---
-    const charJsPath = path.join(CORE_DIR, 'char', 'character.js');
-    if (fs.existsSync(charJsPath)) {
-        let charJs = fs.readFileSync(charJsPath, 'utf8');
-
-        // 添加 _perfTracker import
-        charJs = charJs.replace(
-            /(import \{[^}]*markRoomDirty[^}]*\} from '\.\.\/world\.js';)/,
-            `$1\nimport { _perfTracker } from '../world.js';`
-        );
-
-        // moveto: 在方法开头插入计数
-        charJs = charJs.replace(
-            /(moveto\(rm, leave_msg, in_msg, dir\) \{)/,
-            `$1\n        _perfTracker.movetoCount++;`
-        );
-
-        fs.writeFileSync(charJsPath, charJs);
-        console.log('[pack]   Injected metrics probes into character.js');
-    }
-}
 
 // ============================================================
 // Step 3: If --binary, transform send_room → send_room_b

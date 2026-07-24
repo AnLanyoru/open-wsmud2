@@ -13,6 +13,9 @@ import { NPC } from '../char/npc.js';
 import type { USER } from '../char/user.js';
 import { ItemCommandsJson } from '../char/follower.js';
 import { BATCH_MODE, markRoomDirty } from '../world.js';
+// @metrics-start room-import
+// import { _perfTracker } from '../world.js';
+// @metrics-end room-import
 
 // 声明全局 __PATH (由服务器启动时设置)
 declare const __PATH: Record<string, string>;
@@ -160,6 +163,9 @@ export class ROOM extends ITEM {
         const room = Object.create(base) as ROOM;
         room.on_clone();
         room.create(path);
+        // @metrics-start room-create-probe
+        // _perfTracker.roomCreateCount++;
+        // @metrics-end room-create-probe
         return room;
     }
 
@@ -277,6 +283,9 @@ export class ROOM extends ITEM {
     ): boolean | undefined {
         if (!obj) return;
         const _batchMode = BATCH_MODE === 1;
+        // @metrics-start room-item-changed-start
+        // const _metricsItemChangedStart = Date.now();
+        // @metrics-end room-item-changed-start
         // 广播 payload（0x57/0x58 格式，走二进制批处理帧合并发送）
         let msgPayload: Buffer | undefined;
         let obj_index = -1,
@@ -406,6 +415,14 @@ export class ROOM extends ITEM {
         if (_batchMode && (_broadcastCount > 0 || this._pending_items_send.length > 0)) {
             markRoomDirty(this);
         }
+        // @metrics-start room-item-changed-end
+        // const _metricsItemChangedCost = Date.now() - _metricsItemChangedStart;
+        // if (_metricsItemChangedCost > 5 || _broadcastCount > 10) {
+        //     _perfTracker.lastItemChangedCost = _metricsItemChangedCost;
+        //     _perfTracker.itemChangedCount++;
+        //     _perfTracker.itemChangedBroadcasts += _broadcastCount;
+        // }
+        // @metrics-end room-item-changed-end
     }
 
     /**
@@ -430,6 +447,9 @@ export class ROOM extends ITEM {
 
     item_json(item: ITEM, isin: boolean, msg?: string): string {
         if (!item) return '';
+        // @metrics-start room-item-json-start
+        // const _metricsItemJsonStart = process.hrtime.bigint();
+        // @metrics-end room-item-json-start
         const str: string[] = [];
         if (isin) {
             str.push('{"type":"itemadd",');
@@ -489,6 +509,10 @@ export class ROOM extends ITEM {
             str.push('}');
         }
         const _result = str.join('');
+        // @metrics-start room-item-json-end
+        // _perfTracker.itemJsonCount++;
+        // _perfTracker.itemJsonUs += Number((process.hrtime.bigint() - _metricsItemJsonStart) / 1000n);
+        // @metrics-end room-item-json-end
         return _result;
     }
 
@@ -497,6 +521,9 @@ export class ROOM extends ITEM {
      */
     items_to_json(): string {
         if (this._items_json !== null) return this._items_json;
+        // @metrics-start room-items-json-start
+        // const _metricsItemsJsonStart = process.hrtime.bigint();
+        // @metrics-end room-items-json-start
         const str: string[] = ['{"type":"items","items":['];
         for (let i = 0; i < this.items.length; i++) {
             const item: Record<string, any> = this.items[i];
@@ -554,6 +581,10 @@ export class ROOM extends ITEM {
         }
         str.push('0]}');
         this._items_json = str.join('');
+        // @metrics-start room-items-json-end
+        // _perfTracker.itemsToJsonCount++;
+        // _perfTracker.itemsToJsonUs += Number((process.hrtime.bigint() - _metricsItemsJsonStart) / 1000n);
+        // @metrics-end room-items-json-end
         return this._items_json;
     }
 
@@ -728,7 +759,14 @@ export class ROOM extends ITEM {
      * @param player
      */
     send_exits(player: Record<string, any>): void {
+        // @metrics-start room-send-exits-start
+        // const _metricsSendExitsStart = process.hrtime.bigint();
+        // @metrics-end room-send-exits-start
         player.send(this.exitsto_roomjson());
+        // @metrics-start room-send-exits-end
+        // _perfTracker.sendExitsCount++;
+        // _perfTracker.sendExitsUs += Number((process.hrtime.bigint() - _metricsSendExitsStart) / 1000n);
+        // @metrics-end room-send-exits-end
     }
 
     /**
@@ -756,6 +794,9 @@ export class ROOM extends ITEM {
      */
     to_json(): string {
         if (this.json) return this.json;
+        // @metrics-start room-to-json-start
+        // const _metricsToJsonStart = process.hrtime.bigint();
+        // @metrics-end room-to-json-start
         const obj: Record<string, any> = {};
         obj.type = 'room';
         obj.path = this.path;
@@ -779,6 +820,10 @@ export class ROOM extends ITEM {
             });
         }
         this.json = JSON.stringify(obj);
+        // @metrics-start room-to-json-end
+        // _perfTracker.toJsonCount++;
+        // _perfTracker.toJsonUs += Number((process.hrtime.bigint() - _metricsToJsonStart) / 1000n);
+        // @metrics-end room-to-json-end
         return this.json;
     }
 
@@ -1211,6 +1256,9 @@ export class ROOM extends ITEM {
      * 走 V8 PACKED_ELEMENTS 快路径，零对象分配。
      */
     _flush_batch(): void {
+        // @metrics-start room-flush-start
+        // const _metricsFlushStart = process.hrtime.bigint();
+        // @metrics-end room-flush-start
         const payloads = this._batch_all_payloads;
         const combatFlags = this._batch_all_combat;
         const hasCombat = this._batch_has_combat;
@@ -1256,12 +1304,17 @@ export class ROOM extends ITEM {
                     it._notify_frames.length = 0;
                 }
             }
+            // @metrics-start room-flush-early-end
+            // _perfTracker.flushBatchCount++;
+            // _perfTracker.flushBatchUs += Number((process.hrtime.bigint() - _metricsFlushStart) / 1000n);
+            // @metrics-end room-flush-early-end
             return;
         }
 
         // 为每个玩家构建输出：按 _notify_markers 与 binary 子帧交错
         // marker = 入队时 _batch_all_payloads.length，表示该文本帧在 binary 序列中的位置
         const items = this.items;
+        const sharedOutputs: Array<Buffer | null | undefined> = new Array(4);
         for (let i = 0; i < items.length; i++) {
             const item: any = items[i];
             if (!item.is_player || !item.socket) continue;
@@ -1276,6 +1329,24 @@ export class ROOM extends ITEM {
             const noCombat = hasCombat && item.query_setting('no_combatmsg');
             const markers = item._notify_markers;
             const frames = item._notify_frames;
+            if (!markers || markers.length === 0) {
+                const outputKey = (noCombat ? 2 : 0) | (item.no_message ? 1 : 0);
+                let sharedOutput = sharedOutputs[outputKey];
+                if (sharedOutput === undefined) {
+                    const batch: Buffer[] = [];
+                    for (let j = 0; j < n; j++) {
+                        if (noCombat && combatFlags[j]) continue;
+                        if (item.no_message && !combatFlags[j] && (payloads[j][0] & 0x7f) === 0x12) continue;
+                        batch.push(payloads[j]);
+                    }
+                    sharedOutput = batch.length > 0 || refreshFrame
+                        ? _mergeBatchFrame(batch, refreshFrame)
+                        : null;
+                    sharedOutputs[outputKey] = sharedOutput;
+                }
+                if (sharedOutput) item.socket.write(sharedOutput);
+                continue;
+            }
             const output: Buffer[] = [];
             let binaryStart = 0;
             let refreshAttached = false;
@@ -1314,9 +1385,20 @@ export class ROOM extends ITEM {
             }
 
             if (output.length > 0) {
+                // @metrics-start room-socket-write-start
+                // const _metricsSocketWriteStart = process.hrtime.bigint();
+                // @metrics-end room-socket-write-start
                 item.socket.write(Buffer.concat(output));
+                // @metrics-start room-socket-write-end
+                // _perfTracker.socketWriteCount++;
+                // _perfTracker.socketWriteUs += Number((process.hrtime.bigint() - _metricsSocketWriteStart) / 1000n);
+                // @metrics-end room-socket-write-end
             }
         }
+        // @metrics-start room-flush-end
+        // _perfTracker.flushBatchCount++;
+        // _perfTracker.flushBatchUs += Number((process.hrtime.bigint() - _metricsFlushStart) / 1000n);
+        // @metrics-end room-flush-end
     }
 
     /**
@@ -1499,6 +1581,9 @@ export class ROOM extends ITEM {
         if (shadow) {
             this.shadow_rooms.push(shadow);
         }
+        // @metrics-start room-shadow-probe
+        // if (shadow) _perfTracker.createShadowCount++;
+        // @metrics-end room-shadow-probe
         return shadow;
     }
 

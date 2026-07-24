@@ -6,6 +6,9 @@ import { ITEM } from '../item.js';
 import { OBJ } from '../item/obj.js';
 import { PERFORM, SKILL, SkillItem } from '../skill/skill.js';
 import { WORLD, BATCH_MODE } from '../world.js';
+// @metrics-start character-import
+// import { _perfTracker } from '../world.js';
+// @metrics-end character-import
 import { UTIL, ID_CHARS } from '../util.js';
 import {
     WEAPON_TYPE,
@@ -2538,6 +2541,11 @@ export class CHARACTER extends ITEM {
         in_msg?: string | number,
         dir?: string,
     ): boolean | undefined {
+        // @metrics-start character-moveto-start
+        // const _metricsMovetoStart = process.hrtime.bigint();
+        // let _metricsStageStart = _metricsMovetoStart;
+        // _perfTracker.movetoCount++;
+        // @metrics-end character-moveto-start
         const cur_room = this.environment;
         let next_room: ROOM | undefined = typeof rm === 'string' ? undefined : rm;
         if (typeof rm === 'string') {
@@ -2554,6 +2562,10 @@ export class CHARACTER extends ITEM {
                 }
             }
         }
+        // @metrics-start character-room-lookup
+        // _perfTracker.movetoStageUs.room_lookup += Number((process.hrtime.bigint() - _metricsStageStart) / 1000n);
+        // _metricsStageStart = process.hrtime.bigint();
+        // @metrics-end character-room-lookup
         if (!next_room) return false;
 
         if (next_room.is_full()) {
@@ -2563,16 +2575,36 @@ export class CHARACTER extends ITEM {
                 return false;
             }
         }
+        // @metrics-start character-shadow-check
+        // _perfTracker.movetoStageUs.shadow_check += Number((process.hrtime.bigint() - _metricsStageStart) / 1000n);
+        // _metricsStageStart = process.hrtime.bigint();
+        // @metrics-end character-shadow-check
         if (cur_room) {
             if (cur_room.do_leave(this, dir!, leave_msg!) === false) {
                 return false;
             }
         }
+        // @metrics-start character-do-leave
+        // _perfTracker.movetoStageUs.do_leave += Number((process.hrtime.bigint() - _metricsStageStart) / 1000n);
+        // _metricsStageStart = process.hrtime.bigint();
+        // @metrics-end character-do-leave
         next_room.do_enter(this, true, in_msg);
+        // @metrics-start character-do-enter
+        // _perfTracker.movetoStageUs.do_enter += Number((process.hrtime.bigint() - _metricsStageStart) / 1000n);
+        // _metricsStageStart = process.hrtime.bigint();
+        // @metrics-end character-do-enter
         this.notify_follower(dir);
+        // @metrics-start character-notify-follower
+        // _perfTracker.movetoStageUs.notify_follower += Number((process.hrtime.bigint() - _metricsStageStart) / 1000n);
+        // @metrics-end character-notify-follower
         if (cur_room && next_room.parent !== cur_room.parent) {
             cur_room.parent!.on_leaved?.(this);
         }
+        // @metrics-start character-moveto-end
+        // const _metricsMovetoCost = Number((process.hrtime.bigint() - _metricsMovetoStart) / 1000n);
+        // _perfTracker.movetoCosts.push(_metricsMovetoCost);
+        // if (_perfTracker.movetoCosts.length > 100) _perfTracker.movetoCosts.shift();
+        // @metrics-end character-moveto-end
     }
 
     /**
