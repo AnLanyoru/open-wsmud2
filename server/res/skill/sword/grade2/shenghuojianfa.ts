@@ -55,7 +55,9 @@ export default class extends SKILL {
                         });
                     }
                 }
-                me.end_attack(target);
+                for (var e = 0; e < enemies.length; e++) {
+                    me.end_attack(enemies[e]);
+                }
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 return '圣火焚天，对附近所有敌人每人连续攻击三次，势不可挡。';

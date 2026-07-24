@@ -94,7 +94,9 @@ export default class extends SKILL {
                     me.add_hp(heal);
                     me.send_combat(`<hio>$N长春真气流转，化伤为生！</hio>\n`, target);
                 }
-                me.end_attack(target);
+                for (const enemy of enemies) {
+                    me.end_attack(enemy);
+                }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const pct = buchang_dmg_pct(lv);

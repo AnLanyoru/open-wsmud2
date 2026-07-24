@@ -241,7 +241,9 @@ export default class extends SKILL {
                     );
                 }
 
-                me.end_attack(target);
+                for (const enemy of enemies) {
+                    me.end_attack(enemy);
+                }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const mpPct = posui9_mp_pct(lv);

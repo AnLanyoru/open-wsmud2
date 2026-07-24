@@ -225,7 +225,10 @@ export default class extends SKILL {
                     }
                 }
 
-                me.end_attack(target);
+                for (let i = 0; i < enemies.length; i++) {
+                    const enemy = enemies[i];
+                    if (enemy) me.end_attack(enemy);
+                }
             },
             query_desc: function (_me: CHARACTER, _lv: number): string {
                 let desc =

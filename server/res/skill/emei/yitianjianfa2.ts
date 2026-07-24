@@ -98,7 +98,9 @@ export default class extends SKILL {
                         gj = Math.floor((gj * dmgPer) / 100);
                     }
                 }
-                me.end_attack(target);
+                for (let i = 0; i < enemies.length; i++) {
+                    me.end_attack(enemies[i]);
+                }
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const mzBonus = 15 + Math.floor(lv / 100);
