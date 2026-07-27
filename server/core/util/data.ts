@@ -17,6 +17,8 @@ interface DBInterface {
 
     getRoleNameByID(id: string): Promise<{ name: string } | undefined>;
 
+    existsRoleName(name: string): Promise<{ name: string } | undefined>;
+
     addRole(role: RoleData): Promise<RoleData>;
 
     deleteRole(userid: number, roleid: string): Promise<boolean>;
@@ -108,6 +110,10 @@ const db = {
      */
     getRoles(userid: number, server: number): Promise<RoleData[]> {
         return DB.getRoles(userid, server);
+    },
+
+    existsRoleName(name: string): Promise<{ name: string } | undefined> {
+        return DB.existsRoleName(name);
     },
 
     /**

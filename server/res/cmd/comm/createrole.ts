@@ -33,6 +33,9 @@ export default class extends COMMAND {
         if (WORLD.find_user(name)) {
             return me.send('{"type":"regist","result":"这个名字已经有人用了"}');
         }
+        if (await WORLD.DB.existsRoleName(name)) {
+            return me.send('{"type":"regist","result":"这个名字已经有人用了"}');
+        }
 
         if (str < 15 || str > 30) {
             return me.send('{"type":"regist","result":"力量属性需要在15-30之间。"}');
@@ -100,11 +103,16 @@ export default class extends COMMAND {
                 me.wait_input = undefined;
                 me.do_login();
             } else {
+                me.id = '';
                 return me.send('{"type":"regist","result":"创建角色失败"}');
             }
         } catch (err: any) {
-            if (err.errno == 1062) {
-                me.id = '';
+            me.id = '';
+            if (
+                err.errno == 1062 ||
+                err.code === 'SQLITE_CONSTRAINT_UNIQUE' ||
+                err.code === 'SQLITE_CONSTRAINT_PRIMARYKEY'
+            ) {
                 return me.send('{"type":"regist","result":"角色名称重复，请重新输入"}');
             } else {
                 console.log('角色创建失败', err);
