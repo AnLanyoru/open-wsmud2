@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 2700;
     pot = 2700;
@@ -40,6 +39,6 @@ export default class extends AREA {
         { n: '洪荒古泽', id: 'fb/yunmeng/honghuangguze', p: [1, -5] },
         { n: '洪荒古泽', id: 'fb/yunmeng/huozhao4', p: [1, -6], exits: ['s'] },
         { n: '围墙', id: 'fb/yunmeng/weiqiang', p: [2, -2] },
-        { n: '茅屋', id: 'fb/yunmeng/maowu', p: [3, -2], exits: ['2'] },
+        { n: '茅屋', id: 'fb/yunmeng/maowu', p: [3, -2] },
     ];
 }
