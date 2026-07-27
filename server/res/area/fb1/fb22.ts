@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 3100;
     pot = 3100;
@@ -19,11 +18,7 @@ export default class extends AREA {
         'st/st_red',
         'st/st_yel',
         'st/st_gre',
-        'st/st_red',
         'book/bc#qingfushenfa',
-        'st/st_blu',
-        'st/st_yel',
-        'st/st_gre',
         'drug/huoyan',
         'book/bc#qishangquan',
         'eq/lv4/lihuozhu',
