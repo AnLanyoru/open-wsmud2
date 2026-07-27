@@ -152,7 +152,17 @@ class BossTask extends TASK {
     create_boss2?(user: USER): boolean;
 
     create_boss(player_level?: number) {
-        let max_level = this.boss_levels[Number(WORLD.DATA.query_temp('fb_index', 0))];
+        const value = Number(WORLD.DATA.query_temp('fb_index', 0));
+        const index = Number.isFinite(value)
+            ? Math.max(0, Math.min(Math.floor(value), this.boss_levels.length - 1))
+            : 0;
+        const level_count = Math.min(
+            this.paths.length,
+            this.levels.length,
+            this.boss_min_fb.length,
+            this.player_levels.length,
+        );
+        let max_level = Math.max(1, Math.min(this.boss_levels[index], level_count));
         let boss_max = 0;
         let boss_min = 0;
         if (player_level) {
@@ -161,7 +171,8 @@ class BossTask extends TASK {
             if (max_level > boss_max) max_level = boss_max;
         }
 
-        const level = this.random(max_level - boss_min) + boss_min;
+        const level =
+            max_level > boss_min ? this.random(max_level - boss_min) + boss_min : boss_min;
 
         if (!this.paths[level]) return console.log(level, max_level, ' boss 创建失败');
         const diff_level = this.levels[level];
