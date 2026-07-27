@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 4300;
     pot = 4300;
