@@ -1319,8 +1319,11 @@ export class ROOM extends ITEM {
             const item: any = items[i];
             if (!item.is_player || !item.socket) continue;
             // 跳过刚进房的玩家（他们已通过 items_to_json 收到完整列表，不应收到自己的 0x57 帧）
-            // 同时清空可能残留的 notify 缓冲，避免 marker 跨 tick 引用已清空的 binary 序列导致越界
             if (skipSet && skipSet.has(item)) {
+                const frames = item._notify_frames;
+                if (frames.length > 0 && item.socket.writable && !item.socket.writableEnded) {
+                    item.socket.write(Buffer.concat(frames));
+                }
                 item._notify_markers.length = 0;
                 item._notify_frames.length = 0;
                 continue;
