@@ -4,7 +4,7 @@ import { CORPSE } from '../../../../core/item/corpse.js';
 export default class extends NPC {
     name = '史松';
     desc = '这是一个精壮汉子，军官模样，腰间围一条长鞭。';
-    title = '黑龙鞭';
+    title = '<hic>黑龙鞭</hic>';
     gender = 1;
     age = 42;
     per = 33;

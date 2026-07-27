@@ -4,7 +4,7 @@ import type { USER } from '../../../../core/char/user.js';
 export default class extends NPC {
     name = '张淡月';
     desc = '这是一个黑衣大汉,脸色大变,身子发颤,似乎恐惧已极';
-    title = '神龙教黑龙使';
+    title = '<hic>神龙教黑龙使</hic>';
     gender = 1;
     age = 55;
     per = 26;

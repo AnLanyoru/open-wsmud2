@@ -4,7 +4,7 @@ export default class extends NPC {
     name = '吴六奇';
     desc =
         '这个老叫花，便是天下闻名的“铁丐”吴六奇，向来嫉恶如仇。他在官居广东提督之时，手握一省重兵，受了查伊璜的劝导，心存反清复明之志，暗入天地会，任职洪顺堂香主。';
-    title = '铁丐';
+    title = '<hic>铁丐</hic>';
     gender = 1;
     age = 55;
     per = 22;

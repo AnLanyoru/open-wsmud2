@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '许雪亭';
     desc = '这是个五十来岁的高瘦汉子，着一袭青衣，昂然挺立。';
-    title = '神龙教青龙使';
+    title = '<hic>神龙教青龙使</hic>';
     gender = 1;
     age = 55;
     per = 26;

@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '徐天川';
     desc = '他是青木堂数一数二的好手，手上功夫十分了得，尤其擅使一套猴拳。';
-    title = '天地会青木堂护法';
+    title = '<hic>天地会青木堂护法</hic>';
     gender = 1;
     age = 55;
     per = 22;

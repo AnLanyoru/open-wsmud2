@@ -4,7 +4,7 @@ import { CHARACTER } from '../../../core/char/character.js';
 export default class extends NPC {
     name = '史青山';
     desc = '他就是扬州城的守备，曾经是武当山的俗家弟子，不知为何吃上了朝廷饭。';
-    title = '扬州守备';
+    title = '<hiy>扬州守备</hiy>';
     gender = 1;
     age = 35;
     per = 22;

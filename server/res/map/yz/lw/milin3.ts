@@ -199,7 +199,7 @@ export default class DeepMiLinRoom extends ROOM {
         if (npc.fight_type) return;
 
         npc.send_room(msg, me);
-        npc.name = '<wht>月夜狼王<wht>';
+        npc.name = '<wht>月夜狼王</wht>';
         npc.desc = '一只巨大的银色巨狼，是森林中的狼王吃了月饼或者见到什么不该见到的东西变成的';
         var lv = me.skill_limit();
         if (me.level < 3) {

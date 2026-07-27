@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '赵三拳';
     desc = '流氓巷里的流氓头领，神神秘秘的整天在巷子最里面不知道在干嘛';
-    title = '流氓头领';
+    title = '<hiy>流氓头领</hiy>';
     gender = 1;
     age = 32;
     per = 22;

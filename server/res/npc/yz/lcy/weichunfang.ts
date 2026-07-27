@@ -4,7 +4,7 @@ import { USER } from '../../../../core/char/user.js';
 export default class extends NPC {
     name = '韦春芳';
     desc = '韦春芳是当朝鹿鼎公兼天地会总舵主韦小宝他娘，虽是徐娘半老，但风韵尤存。';
-    title = '丽春院老板娘';
+    title = '<him>丽春院老板娘</him>';
     gender = 2;
     age = 42;
     per = 33;

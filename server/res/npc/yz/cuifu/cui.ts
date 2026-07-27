@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '崔员外';
     desc = '崔府的主人，满脸肥肉，据说他鱼肉乡里，坏事做尽';
-    title = '财主';
+    title = '<hiy>财主</hiy>';
     gender = 1;
     age = 55;
     per = 15;

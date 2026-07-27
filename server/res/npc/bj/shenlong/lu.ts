@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '陆高轩';
     desc = '他天庭饱满,地阔方圆,容貌颇为英俊.然而满面愁容,恰似顷刻间便有杀身之祸一般.';
-    title = '神龙教军师';
+    title = '<hic>神龙教军师</hic>';
     gender = 1;
     age = 37;
     per = 26;

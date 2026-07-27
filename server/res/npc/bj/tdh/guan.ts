@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class GuanFuZi extends NPC {
     name = '关安基';
     desc = '只见他长长的胡子飘在胸前，模样甚是威严。因此人称关夫子。';
-    title = '关夫子';
+    title = '<hic>关夫子</hic>';
     gender = 1;
     age = 35;
     per = 26;

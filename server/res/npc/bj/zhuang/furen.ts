@@ -4,7 +4,7 @@ import type { USER } from '../../../../core/char/user.js';
 export default class extends NPC {
     name = '庄夫人';
     desc = '只见她约莫二十六七年纪,全身缟素,不施脂粉,脸色苍白';
-    title = '庄家三少奶奶';
+    title = '<hiw>庄家三少奶奶</hiw>';
     gender = 2;
     age = 26;
     per = 32;

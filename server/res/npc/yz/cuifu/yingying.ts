@@ -3,7 +3,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '崔莺莺';
     desc = '她长得极美，尤其是那对眼睛，媚得直可以勾人魂魄。';
-    title = '财主女儿';
+    title = '<him>财主女儿</him>';
     gender = 2;
     age = 17;
     per = 34;

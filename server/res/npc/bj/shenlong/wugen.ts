@@ -4,7 +4,7 @@ import { NPC } from '../../../../core/char/npc.js';
 export default class extends NPC {
     name = '无根道长';
     desc = '这是个五十来岁的黑须道长,相貌威武,眼中略带杀气。';
-    title = '神龙教赤龙使';
+    title = '<hic>神龙教赤龙使</hic>';
     gender = 1;
     age = 55;
     per = 26;
