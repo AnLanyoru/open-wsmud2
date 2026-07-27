@@ -2,10 +2,14 @@ import { ROOM } from '../../../../core/room/room.js';
 
 export default class extends ROOM {
     name = '星宿海';
-    desc =
-        '这里是星宿海的尽头。因为附近有野羊出没，所以星宿派弟子常常在此烤羊肉串吃。当打不到野羊时，他们就抢山下牧人的羊。';
+    desc = '盐碱荒滩上散着几堆篝火，浑浊水洼映出铅灰天空，星宿弟子的号声从北方传来。';
     exits = {
         northeast: 'fb/xingxiu/xxh5',
         northwest: 'fb/xingxiu/xxh4',
     };
+
+    constructor() {
+        super();
+        this.set_npc('fb/xingxiu/azi');
+    }
 }
