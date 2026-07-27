@@ -15,7 +15,7 @@ export default class extends ROOM {
     }
 
     unlock_men(me) {
-        if (this.query_exits('enter')) return me.notify('这扇门已经是打开的。');
+        if (this.query_exits('south')) return me.notify('这扇门已经是打开的。');
         var obj = me.find_obj_bypath('sp/bj/laofangkey');
         if (!obj) return me.notify('你不会撬锁。');
         this.add_exit('south', 'bj/ao/laofang');
