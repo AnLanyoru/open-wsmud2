@@ -441,7 +441,7 @@ export class BASE {
     static ITEMS: Record<string, CtorFunc> = {};
 
     /** 文件路径解析正则: 路径/#参数 */
-    static PATH_REG: RegExp = /^(\w+(?:\/\w+)*)(#\w+)?$/;
+    static PATH_REG: RegExp = /^([\p{L}\p{N}_]+(?:\/[\p{L}\p{N}_]+)*)(#[\p{L}\p{N}_]+)?$/u;
 
     /**
      * 加载 extends 补丁文件 — 仅执行其副作用，不产生对象实例。
