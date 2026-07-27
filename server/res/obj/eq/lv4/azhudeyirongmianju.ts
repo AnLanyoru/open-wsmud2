@@ -9,5 +9,6 @@ export default class extends EQUIPMENT {
     grade = 4;
     hole_count = 3;
     eq_type = EQUIP_TYPE.HEAD;
-    // Special effects: 使用后你可以易容成当前房间的某一个人
+    eq_msg = '$N将$o覆在脸上，转眼便化作一名天龙寺僧人。';
+    uneq_msg = '$N揭下$o，恢复了本来面目。';
 }
