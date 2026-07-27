@@ -305,14 +305,7 @@ function fb_start(me, path) {
 function fb_over(me) {
     if (!me.environment || !me.environment.is_fb()) return;
     var area = me.environment.parent;
-    var score = me.query_fbscore();
-    var max_score = area.score || 100;
-    var max_exp = area.query_exp();
-    var p = int((score * 100) / max_score);
-    if (p <= 0) p = 0;
-    if (p > 100) p = 100;
-    var exp = (max_exp * p) / 100;
-    var pot = (max_exp * p) / 100;
+    var { p, exp, pot } = query_fb_reward(me, area);
 
     var fb = me.environment;
     var diff = fb.fb_query_temp('diff', me) || 0;
@@ -515,24 +508,31 @@ function team_name(tms) {
     return str.join('，');
 }
 
+function query_fb_reward(me, area) {
+    var score = me.query_fbscore();
+    var max_score = area.score || 100;
+    var max_exp = area.query_exp();
+    var p = int((score * 100) / max_score);
+    if (p <= 0) p = 0;
+    if (p > 100) p = 100;
+    var exp = (max_exp * p) / 100;
+    var pot = (max_exp * p) / 100;
+    return { p, exp, pot };
+}
+
 function fb_confirm_over(me) {
     if (!me.environment) return;
     var area = me.environment.parent;
     if (!area) return;
-    var score = me.query_fbscore();
-    var max_score = area.score || 100;
-    var p = parseInt((score * 100) / max_score);
-    if (p <= 0) p = 0;
-    if (p > 100) p = 100;
+    var { p, exp, pot } = query_fb_reward(me, area);
 
-    var exp = 1200;
     var str: string[] = ['当前副本：'];
     str.push(area.name);
     if (exp > 0) {
         str.push('\n将获得经验：');
         str.push(String(exp));
         str.push('，潜能：');
-        str.push(String(exp));
+        str.push(String(pot));
     }
     str.push('\n完成度：');
     if (p < 30) {
