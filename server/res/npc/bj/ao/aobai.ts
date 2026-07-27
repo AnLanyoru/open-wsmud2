@@ -39,8 +39,11 @@ export default class AoBai extends NPC {
                 max: 15,
             },
             {
-                obj: ['eq/lv0/cloth', 'eq/lv0/mugun', 'eq/lv0/jian', 'sp/bj/laofangkey'],
+                obj: ['eq/lv0/cloth', 'eq/lv0/mugun', 'eq/lv0/jian'],
                 odds: 8000,
+            },
+            {
+                obj: 'sp/bj/laofangkey',
             },
             {
                 obj: ['book/bc#hunyuanyiqi', 'book/bc#feiyanzoubi', 'book/bc#fuhuquan'],

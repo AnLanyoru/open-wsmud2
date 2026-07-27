@@ -1,3 +1,4 @@
+import type { USER } from '../../../../core/char/user.js';
 import { ROOM } from '../../../../core/room/room.js';
 
 export default class extends ROOM {
@@ -9,5 +10,11 @@ export default class extends ROOM {
     constructor() {
         super();
         this.set_npc('bj/tdh/huoji', 'bj/tdh/xu');
+    }
+
+    on_leave(me: USER, dir: string) {
+        if (dir === 'west' && (this.find_by_path('bj/tdh/huoji') || this.find_by_path('bj/tdh/xu'))) {
+            return me.notify_fail('药铺中的天地会众拦住去路。');
+        }
     }
 }

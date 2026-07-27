@@ -25,6 +25,7 @@ export default class extends ROOM {
     }
 
     open_shu(me) {
+        me.set_temp('fb/ao/shu', 1);
         if (this.door_dir == 1) {
             me.notify('你打开《明史辑略》，发现扉页的右下角被鳌拜写了一个大大的杀字！');
         } else {
@@ -41,6 +42,9 @@ export default class extends ROOM {
     }
 
     open_door(dir: number, me: USER) {
+        if (!me.query_temp('fb/ao/shu')) {
+            return me.notify('画卷左右皆可移动，还是先从书房里找找机关线索。');
+        }
         var fb = me.query_temp('fb/ao/tui');
         if (fb == 1) {
             return me.notify('门已经被你打开了，不要乱推，小心中暗器。');
