@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 2600;
     pot = 2600;
@@ -38,7 +37,7 @@ export default class extends AREA {
             exits: ['s1d', 'ne'],
         },
         { n: '铁梁峡', id: 'fb/songshan/tieliang', p: [1, -4] },
-        { n: '朝天门', id: 'fb/songshan/chaotianmen', p: [1, -5] },
+        { n: '朝天门', id: 'fb/songshan/chaotianmen', p: [2, -5] },
         {
             n: '峻极山门',
             id: 'fb/songshan/shanmen',
