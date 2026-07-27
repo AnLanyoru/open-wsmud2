@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 3600;
     pot = 3600;
@@ -58,7 +57,7 @@ export default class extends AREA {
             exits: ['w', 'e'],
         },
         {
-            n: '烈火期',
+            n: '烈火旗',
             id: 'fb/guangming/qi_liehuo',
             p: [1, -2],
             exits: ['s', 'w', 'e'],
