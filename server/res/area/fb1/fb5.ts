@@ -16,9 +16,9 @@ export default class extends AREA {
     room_path = 'yz/by/';
     ss_title = '扬州守备';
     map = [
-        { n: '大门', id: 'yz/lcy/dating', p: [0, 0] },
-        { n: '兵营', id: 'yz/lcy/erlou', p: [0, 1], exits: ['n', 's'] },
-        { n: '兵器库', id: 'yz/lcy/fang1', p: [0, 2] },
+        { n: '大门', id: 'yz/by/damen', p: [0, 0] },
+        { n: '兵营', id: 'yz/by/bingying', p: [0, 1], exits: ['n', 's'] },
+        { n: '兵器库', id: 'yz/by/bingqiku', p: [0, 2] },
     ];
     drops = [
         'book/book#blade',
