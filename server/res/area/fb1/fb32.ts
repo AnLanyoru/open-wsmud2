@@ -7,7 +7,6 @@ export default class extends AREA {
     score = 100;
     is_show = true;
     is_copy = true;
-    is_lock = true;
     expend = 10;
     exp = 4100;
     pot = 4100;
@@ -19,21 +18,16 @@ export default class extends AREA {
         'eq/lv5/tianlongzhurixue',
         'eq/lv5/nilinshouhuan',
     ];
-    first = 'fb/xiake/shimen';
+    first = 'fb/xiake/shibi';
     room_path = 'fb/xiake/';
     map = [
         { n: '石壁', id: 'fb/xiake/shibi', p: [0, 0], exits: ['e', 's'] },
-        { n: '石门', id: 'fb/xiake/shimen', p: [1, 0] },
+        { n: '岛主石门', id: 'fb/xiake/shimen', p: [1, 0] },
         { n: '内厅', id: 'fb/xiake/neiting', p: [0, 1] },
-        {
-            n: '石洞',
-            id: 'fb/xiake/hole',
-            p: [2, 2],
-            exits: ['e', 's', 'n', 'w', 'nw2'],
-        },
-        { n: '石室', id: 'fb/xiake/room_1', p: [3, 2] },
-        { n: '石室', id: 'fb/xiake/room_2', p: [2, 3] },
-        { n: '石室', id: 'fb/xiake/room_3', p: [1, 2] },
-        { n: '石室', id: 'fb/xiake/room_4', p: [2, 1] },
+        { n: '石洞', id: 'fb/xiake/hole', p: [2, 2], exits: ['e', 's', 'n', 'w', 'nw'] },
+        { n: '剑痕石室', id: 'fb/xiake/room_1', p: [3, 2] },
+        { n: '掌影石室', id: 'fb/xiake/room_2', p: [2, 3] },
+        { n: '身法石室', id: 'fb/xiake/room_3', p: [1, 2] },
+        { n: '经脉石室', id: 'fb/xiake/room_4', p: [2, 1] },
     ];
 }
