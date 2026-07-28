@@ -5,7 +5,7 @@ import { SKILL } from '../../../../core/skill/skill.js';
 export default class extends ROOM {
     name = '巷子深处';
     desc =
-        "这里是流氓巷的最里面，这里的小流氓反而变少了，四周看上去也有些整洁，有块空地上放着一个<cmd cmd='look shinian'>石撵</cmd>，四周地面磨得的光亮，看上去像是经常被拖动的样子。北面好像有个仓库，有个大铁门锁着。";
+        "这里是流氓巷的最里面，这里的小流氓反而变少了，四周看上去也有些整洁，有块空地上放着一个<cmd cmd='look shinian'>石撵</cmd>，四周地面磨得的光亮，看上去像是经常被拖动的样子。北面好像有个仓库，有个<cmd cmd='look men'>大铁门</cmd>锁着。";
     exits = { west: 'yz/lmw/xiangzi2', east: 'yz/lmw/fang' };
 
     constructor() {

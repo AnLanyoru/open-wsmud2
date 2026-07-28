@@ -3,7 +3,7 @@ import type { USER } from '../../../../core/char/user.js';
 
 export default class extends ROOM {
     name = '石山';
-    desc = '灰白石山被风雪磨得光滑，岩壁下有一道覆冰裂隙，隐约能听见洞内传来沉重呼吸声。';
+    desc = "灰白石山被风雪磨得光滑，岩壁下有一道通往<cmd cmd='look cave'>石洞</cmd>的覆冰裂隙，隐约能听见洞内传来沉重呼吸声。";
     exits = {
         south: 'fb/binghuo/conglin2',
         west: 'fb/binghuo/shishan2',

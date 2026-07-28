@@ -3,7 +3,7 @@ import type { USER } from '../../../../core/char/user.js';
 
 export default class extends ROOM {
     name = '后殿';
-    desc = '后殿供桌上摆着一只旧瓷碗，墙后传来空洞回声，似乎藏着通往内院的密道。';
+    desc = "后殿供桌上摆着一只<cmd cmd='look bowl'>旧瓷碗</cmd>，墙后传来空洞回声，似乎藏着通往内院的密道。";
     exits = {
         west: 'fb/heimu/chengdedian',
     };

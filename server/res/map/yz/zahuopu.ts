@@ -3,7 +3,7 @@ import { ROOM } from '../../../core/room/room.js';
 export default class extends ROOM {
     name = '杂货铺';
     desc =
-        '这是一家小小的杂货铺，大箱小箱堆满了一地，都是一些日常用品。杨掌柜懒洋洋地躺在一只躺椅上，招呼着过往行人。据说私底下他也卖一些贵重的东西。摊上立着一块招牌(zhaopai)。';
+        "这是一家小小的杂货铺，大箱小箱堆满了一地，都是一些日常用品。杨掌柜懒洋洋地躺在一只躺椅上，招呼着过往行人。据说私底下他也卖一些贵重的东西。摊上立着一块<cmd cmd='look zhaopai'>招牌</cmd>。";
     exits = { north: 'yz/dongdajie1', up: 'yz/garments' };
     no_fight = true;
 

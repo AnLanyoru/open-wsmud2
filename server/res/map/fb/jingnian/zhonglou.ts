@@ -3,7 +3,7 @@ import { ROOM } from '../../../../core/room/room.js';
 
 export default class extends ROOM {
     name = '钟楼';
-    desc = "古钟悬在横梁之间，<cmd cmd='look bell'>钟声</cmd>可提示黑影动向；楼窗外是刻有长生二字的深谷。";
+    desc = "古钟悬在横梁之间，<cmd cmd='look bell'>钟声</cmd>可提示黑影动向；<cmd cmd='look window'>楼窗</cmd>外是刻有长生二字的深谷。";
     exits = {
         southeast: 'fb/jingnian/baishi',
     };

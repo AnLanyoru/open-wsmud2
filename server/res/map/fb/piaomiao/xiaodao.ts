@@ -3,7 +3,7 @@ import type { USER } from '../../../../core/char/user.js';
 
 export default class extends ROOM {
     name = '小路';
-    desc = '花园后的石径盘旋向上，云雾遮住远峰，李秋水白衣飘飞，拦在闭关室前。';
+    desc = "花园后的石径盘旋向上，云雾遮住远峰，李秋水白衣飘飞，拦在闭关室前，受伤的<cmd cmd='look tonglao'>天山童姥</cmd>倒在一旁。";
     exits = {
         north: 'fb/piaomiao/biguan',
         south: 'fb/piaomiao/huayuan',

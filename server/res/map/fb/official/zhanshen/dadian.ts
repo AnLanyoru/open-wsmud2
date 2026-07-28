@@ -15,7 +15,7 @@ const DIRECTION_NAMES: Record<string, string> = {
 
 export default class extends ROOM {
     name = '战神大殿';
-    desc = "大殿高阔得不似人间建筑，中央<cmd cmd='look statue'>战神像</cmd>俯瞰众生，<cmd cmd='look vine'>蔓藤</cmd>攀上石阶，瀑布下有<cmd cmd='look pool'>深潭</cmd>，西侧可见<cmd cmd='look mine'>矿坑</cmd>，南侧<cmd cmd='look fire_cave'>融火窟</cmd>赤光翻涌，地面嵌着<cmd cmd='look disk'>五行圆盘</cmd>。";
+    desc = "大殿高阔得不似人间建筑，中央<cmd cmd='look statue'>战神像</cmd>俯瞰众生，<cmd cmd='look vine'>蔓藤</cmd>攀上石阶，瀑布下有<cmd cmd='look pool'>深潭</cmd>，西侧可见<cmd cmd='look mine'>矿坑</cmd>，南侧<cmd cmd='look fire_cave'>融火窟</cmd>赤光翻涌，地面嵌着<cmd cmd='look disk'>五行圆盘</cmd>和<cmd cmd='look bagua'>八卦暗道</cmd>。";
     exits = {
         west: 'fb/official/zhanshen/shouwei2',
         east: 'fb/official/zhanshen/daohuang',
