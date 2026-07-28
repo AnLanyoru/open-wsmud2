@@ -3,7 +3,8 @@ import type { USER } from '../../../../core/char/user.js';
 
 export default class extends ROOM {
     name = '桃花林';
-    desc = '桃树密密匝匝，落英遮住所有道路。一株古桃树的枝条依次指向东、北、西三方。';
+    desc =
+        "桃树密密匝匝，落英遮住所有道路。一株<cmd cmd='look tree'>古桃树</cmd>的枝条依次指向东、北、西三方。";
 
     constructor() {
         super();
