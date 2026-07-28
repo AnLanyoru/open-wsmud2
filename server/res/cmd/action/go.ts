@@ -76,24 +76,24 @@ var doors = [
     'out',
 ];
 var doors_short = [
-    's',
-    'n',
     'w',
+    'n',
+    's',
     'e',
-    'se',
-    'sw',
     'nw',
+    'sw',
     'ne',
+    'se',
     'd',
     'u',
+    'wd',
+    'nd',
     'sd',
     'ed',
-    'nd',
-    'wd',
-    'su',
-    'eu',
     'wu',
     'nu',
+    'su',
+    'eu',
 ];
 for (var i = 0; i < doors.length; i++) {
     if (i < doors_short.length) {
