@@ -4,15 +4,14 @@ const jh_fam = {
     selected_index: 0,
     type: "fam",
     onDetail: function (data) {
-        var fb = this.items[data.index];
+        var fb = this.items && this.items[data.index];
         if (!fb) return;
         fb.type = '门派';
         fb.desc = data.desc;
         fb.sp = data.sp;
         fb.actions = data.actions;
         fb.skills = data.skills;
-        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
-            return this.showDetail(fb);
+        return Dialog.jh.showDetail(this, data.index);
     },
     showDetail: function (fb) {
         var html = ["<pre><hig>"];
@@ -81,10 +80,17 @@ const jh_fam = {
             this.selectedItem.addClass("selected");
             this.selected_index = index;
         }
-    }, onClickItem: function (index) {
+    }, onClickItem: function (index, navigate) {
         const item = this.items[index];
-        if (!item.desc) SendCommand("jh " + this.type + " " + index);
-        else this.showDetail(item);
+        if (!item) return;
+        if (navigate) Dialog.jh.navigation_target = {t: this.type, index: index};
+        if (!item.desc) {
+            Dialog.jh.pending_requests[this.type + ':' + index] = true;
+            SendCommand("jh " + this.type + " " + index);
+        } else {
+            if (navigate) Dialog.jh.navigation_target = null;
+            this.showDetail(item);
+        }
         this.select(index);
     },
     append_footer: function () {
@@ -100,15 +106,14 @@ const jh_fb = {
     select: jh_fam.select,
     onClickItem: jh_fam.onClickItem,
     onDetail: function (data) {
-        var fb = this.items[data.index];
+        var fb = this.items && this.items[data.index];
         if (!fb) return;
         fb.type = '副本';
         fb.desc = data.desc;
         fb.reward = data.reward;
         fb.diffs = data.diffs;
         fb.status = data.status;
-        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
-            return this.showDetail(fb);
+        return Dialog.jh.showDetail(this, data.index);
     }, update_unlock: function (unlock) {
         this.unlock = unlock;
         for (let i = 0; i < this.items.length; i++) {
@@ -217,7 +222,7 @@ const jh_ar = {
     append_actions: jh_fam.append_actions,
     fb_models: ['普通', '<red>困难</red>', '<cyn>组队</cyn>'],
     onDetail: function (data) {
-        var fb = this.items[data.index];
+        var fb = this.items && this.items[data.index];
         if (!fb) return;
         fb.type = '禁地';
         fb.desc = data.desc;
@@ -225,8 +230,7 @@ const jh_ar = {
         fb.status = data.status;
         fb.diffs = data.diffs;
         fb.reward = data.reward;
-        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
-            return this.showDetail(fb);
+        return Dialog.jh.showDetail(this, data.index);
     }, update_unlock: function (unlock) {
         for (let i = 0; i < this.items.length; i++) {
             this.items[i].unlock = (unlock & Math.pow(2, i)) !== 0;
@@ -311,8 +315,12 @@ export default {
         Dialog.injectStyle(jh_css);
     },
     close: function () {
+        this.navigation_target = null;
         this.element.remove();
         this.isShow = false;
+    },
+    hide: function () {
+        this.navigation_target = null;
     },
     onData: function (data) {
         if (data.close) {
@@ -320,7 +328,14 @@ export default {
         }
         if (data.desc !== undefined) {
             const dialog = MAP_TYPES[data.t];
-            return dialog && dialog.onDetail(data);
+            if (!dialog) return;
+            if (!dialog.items) {
+                this.pending_details[data.t + ':' + data.index] = data;
+                if (Dialog.isShow && Dialog.curItem === "jh" && this.isShow)
+                    this.pending_navigation = {t: data.t, index: data.index};
+                return;
+            }
+            return dialog.onDetail(data);
         }
 
         if (data.unlock !== undefined || data.unlock2 !== undefined) {
@@ -348,6 +363,27 @@ export default {
         jh_ar.items = data.areas.map(function (x) {
             return {name: x, unlock: false};
         });
+        const details = Object.values(this.pending_details);
+        this.pending_details = {};
+        for (const detail of details) {
+            const dialog = MAP_TYPES[detail.t];
+            const item = dialog && dialog.items[detail.index];
+            if (!item) continue;
+            item.type = dialog.name;
+            item.desc = detail.desc;
+            item.sp = detail.sp;
+            item.actions = detail.actions;
+            item.skills = detail.skills;
+            item.reward = detail.reward;
+            item.diffs = detail.diffs;
+            item.status = detail.status;
+        }
+        const pending = this.pending_navigation;
+        this.pending_navigation = null;
+        if (pending && MAP_TYPES[pending.t].items[pending.index]) {
+            this.navigation_target = pending;
+            return this.showDetail(MAP_TYPES[pending.t], pending.index, false);
+        }
         this.selected_item.show(this.listElement, this.descElement);
     },
     show: function () {
@@ -371,7 +407,34 @@ export default {
         this.create_footer();
     },
     selected_item: null,
+    navigation_target: null,
+    pending_navigation: null,
+    pending_details: {},
+    pending_requests: {},
     footers: [jh_fam, jh_fb, jh_ar],
+    showDetail: function (dialog, index, received = true) {
+        const key = dialog.type + ':' + index;
+        const requested = received && this.pending_requests[key];
+        if (requested) delete this.pending_requests[key];
+        const target = this.navigation_target;
+        let navigate = !requested;
+        if (target) {
+            if (target.t !== dialog.type || target.index != index) return;
+            this.navigation_target = null;
+            navigate = true;
+        } else if (requested) {
+            navigate = this.selected_item === dialog && dialog.selected_index == index;
+        }
+        if (!Dialog.isShow || Dialog.curItem !== "jh" || !this.isShow) return;
+        if (navigate && this.selected_item !== dialog) {
+            dialog.selected_index = index;
+            this.selected_item = dialog;
+            this.create_footer();
+            return dialog.show(this.listElement, this.descElement);
+        }
+        if (navigate || this.selected_item === dialog && dialog.selected_index == index)
+            dialog.showDetail(dialog.items[index]);
+    },
     create_footer: function () {
         var html = [];
         for (var i = 0; i < this.footers.length; i++) {
@@ -387,7 +450,7 @@ export default {
         if (elem.is(".selected")) return;
         let index = elem.attr("index");
         if (index !== undefined)
-            Dialog.jh.selected_item.onClickItem(index);
+            Dialog.jh.selected_item.onClickItem(index, true);
     },
     update_lock: function (data) {
         if (data.unlock >= 0 && jh_fb.items) {
@@ -405,6 +468,7 @@ export default {
     footerChanged: function (index) {
         let item = this.footers[index];
         if (item == this.selected_item) return;
+        this.navigation_target = null;
         this.selected_item = item;
         Dialog.footerElement.find('.item-commands').empty();
         item.show(this.listElement, this.descElement);
