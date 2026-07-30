@@ -11,7 +11,8 @@ const jh_fam = {
         fb.sp = data.sp;
         fb.actions = data.actions;
         fb.skills = data.skills;
-        return this.showDetail(fb);
+        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
+            return this.showDetail(fb);
     },
     showDetail: function (fb) {
         var html = ["<pre><hig>"];
@@ -106,7 +107,8 @@ const jh_fb = {
         fb.reward = data.reward;
         fb.diffs = data.diffs;
         fb.status = data.status;
-        return this.showDetail(fb);
+        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
+            return this.showDetail(fb);
     }, update_unlock: function (unlock) {
         this.unlock = unlock;
         for (let i = 0; i < this.items.length; i++) {
@@ -223,7 +225,8 @@ const jh_ar = {
         fb.status = data.status;
         fb.diffs = data.diffs;
         fb.reward = data.reward;
-        return this.showDetail(fb);
+        if (Dialog.jh.selected_item === this && this.selected_index == data.index)
+            return this.showDetail(fb);
     }, update_unlock: function (unlock) {
         for (let i = 0; i < this.items.length; i++) {
             this.items[i].unlock = (unlock & Math.pow(2, i)) !== 0;
@@ -315,7 +318,10 @@ export default {
         if (data.close) {
             return Dialog.isShow && Dialog.hide();
         }
-        if (data.desc) return this.selected_item.onDetail(data);
+        if (data.desc !== undefined) {
+            const dialog = MAP_TYPES[data.t];
+            return dialog && dialog.onDetail(data);
+        }
 
         if (data.unlock !== undefined || data.unlock2 !== undefined) {
             return this.update_lock(data);
