@@ -47,19 +47,21 @@ export default class ShouXiCommand extends COMMAND {
         }
         var val = 10000 + me.level * 10000;
 
-        me.set_temp('qingan', 1, UTIL.diff_time());
         //UTIL.add_task(me, 'qa', 1);
         if (userexp < me.exp) {
-            me.send_room(`$N向$n拱手道：${npc.name}${ch}好。`, npc);
+            me.send_room(`$N向${npc.name}拱手道：${npc.name}${ch}好。`);
 
             // if (WORLD.is_server(me) && userexp < me.exp * 0.9) {
 
             //     WORLD.DATA.add_temp(fam.id + '_greetings', parseInt(val / 2));
             // }
         } else {
-            me.send_room(`$N向$n恭恭敬敬的一鞠躬：${npc.name}${ch}，神功盖世，千秋万代。`, npc);
+            me.send_room(
+                `$N向${npc.name}恭恭敬敬的一鞠躬：${npc.name}${ch}，神功盖世，千秋万代。`,
+            );
         }
         me.add_exp(val, val);
+        me.set_temp('qingan', 1, UTIL.diff_time());
     }
 
     check_power(me, npc) {
