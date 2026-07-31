@@ -4,6 +4,7 @@ database.db
 data/database.db
 .env
 /www/
+/new_www/
 data/100/
 data/1/
 data/def/
