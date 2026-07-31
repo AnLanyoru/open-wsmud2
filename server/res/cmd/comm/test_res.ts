@@ -29,6 +29,7 @@ const need_test_objs: TestResRoot = {
         '悟道之戒(测试)': ['eq/test/xuexidazuo', 1],
     },
     随从礼包: ['sp/npc#shuang', 10],
+    武道书: ['book/wudao', 100],
     技能传功玉简: {
         'base/ (基本)': {
             基本拳脚: ['book/fbk#unarmed', 1],
