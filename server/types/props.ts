@@ -147,6 +147,10 @@ export interface SkillSlotDef {
     count?: number;
     /** 进阶条件（返回所需物品列表） */
     query_needs?: (grade: number) => Array<{ path: string; count: number }>;
+    /** 通用武道词条适用的基本技能位置 */
+    enables?: string[];
+    /** 仅允许在指定品级进阶时选择 */
+    grade?: number;
 }
 
 /** 战斗属性元组 [name, val] */
