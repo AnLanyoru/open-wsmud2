@@ -9,7 +9,7 @@ import type { FAMILY } from './family.js';
 import type { CHARACTER, DoAttackPar } from '../char/character.js';
 import { PROPERTIES, SKILL_TYPES, WEAPON_SKILLS } from '../const.js';
 import { SkillsMap } from '../char/skills_map.js';
-import type { PropMap } from '../../types/props.js';
+import type { PropMap, SkillSlotDef } from '../../types/props.js';
 import { LearnCondition } from '../../types/events.js';
 
 export type SkillSet = [skill_name: string, level: number, enable_base?: string | string[]][];
@@ -114,7 +114,7 @@ export class SKILL extends BASE {
     /** 绝招字典(运行时-处理后的PERFORM实例) */
     pfm: Record<string, PERFORM> = {};
     /** 进阶属性槽位(由资源文件设置) */
-    slots: any[] | null = null;
+    slots: SkillSlotDef[] | null = null;
 
     // ============ 配置属性(由资源文件设置) ============
 
@@ -442,9 +442,14 @@ export class SKILL extends BASE {
      * 获取技能颜色名称
      * @param me
      */
-    query_color_name(me?: CHARACTER): string {
-        const desc = level_color[this.query_grade(me)] || 'wht';
-        return '<' + desc + '>' + this.name + '</' + desc + '>';
+    query_color_name(me?: CHARACTER, grade?: number): string {
+        return this.query_color_text(this.name, grade ?? this.query_grade(me));
+    }
+
+    /** 使用技能品级颜色包装任意文本 */
+    query_color_text(text: string, grade: number): string {
+        const desc = level_color[grade] || 'wht';
+        return '<' + desc + '>' + text + '</' + desc + '>';
     }
 
     // ============ 进阶属性 ============
@@ -1039,6 +1044,8 @@ export class SKILL extends BASE {
         }
         const sk = me.skills?.get(this.id);
         if (sk && sk.addin && sk.addin.length) {
+            str.push('\n');
+            str.push('<');
             str.push(isEnable ? cc : 'blk');
             str.push('>');
 
@@ -1051,7 +1058,8 @@ export class SKILL extends BASE {
                         str.push(item.name);
                         str.push(' ');
                     }
-                    str.push(item.format(parseInt(item.value(lv, grdTotal))));
+                    const value = parseInt(String(item.value(lv, grdTotal)));
+                    str.push(item.format ? item.format(value) : `${item.prop}：+${value}`);
                     str.push('\n');
                 }
             }
@@ -1086,7 +1094,7 @@ export class SKILL extends BASE {
      * 查询进阶属性槽位
      * @param index - 槽位索引
      */
-    query_slot(index: number): any {
+    query_slot(index: number): SkillSlotDef | undefined {
         if (index < 500) {
             return SKILL.PROPERTIES ? SKILL.PROPERTIES[index] : undefined;
         } else {
@@ -1095,7 +1103,7 @@ export class SKILL extends BASE {
     }
 
     /** 通用属性槽位(由外部注册) */
-    static PROPERTIES: any[] = [];
+    static PROPERTIES: SkillSlotDef[] = [];
 
     /**
      * 查询绝招描述

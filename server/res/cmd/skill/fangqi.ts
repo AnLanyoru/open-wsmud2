@@ -27,7 +27,12 @@ export default class extends COMMAND {
                 return me.notify('你需要先取消融合才可以遗忘技能。');
             }
             if (skill.addin && skill.addin.length > 0) {
-                return me.notify('你需要先取消进阶才可以遗忘技能。');
+                me.send('你需要先重置武道进阶才可以遗忘技能。');
+                const prefix = me.master ? 'dc ' + me.id + ' ' : '';
+                return me.send_commands(
+                    prefix + 'wudao ' + skillid + ' reset',
+                    '<hir>重置武道</hir>',
+                );
             }
         }
 

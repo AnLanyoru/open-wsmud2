@@ -19,3 +19,4 @@ data/def/
 /templates-data.json
 server/dist/
 bench/
+dist/
