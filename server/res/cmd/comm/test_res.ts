@@ -452,7 +452,6 @@ export default class extends COMMAND {
     allow_state = true;
     allow_busy = true;
     allow_die = true;
-    allow_level: number = 6;
     /** 匹配 0-6 个数字参数：test_res / test_res 0 / test_res 1 0 等 */
     regex = /^(\d+)?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?(?:\s+(\d+))?$/;
 
@@ -463,8 +462,10 @@ export default class extends COMMAND {
      * - test_res 1 0      → 进入路径 [1, 0]
      * - test_res 1 0 2    → 进入路径 [1, 0, 2]
      */
-    enter(me: USER, ...args: string[]): void {
-        if (!me.is_player) return;
+    enter(me: USER, ...args: string[]): boolean | void {
+        if (!me.is_player) return false;
+        if (!me.query_temp("tester", 0)) return false;
+
 
         // 过滤出有效数字作为路径索引
         const indices = args.filter((s): s is string => s !== undefined && s !== '').map(Number);

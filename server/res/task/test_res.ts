@@ -15,12 +15,12 @@ export default class extends USERTASK {
 
     query_state(me: CHARACTER): number | undefined {
         
-        if (me.user_level<6) return 0;
+        if (!me.query_temp("tester", 0)) return 0;
         return 2;
     }
 
     on_finish(me: CHARACTER, _par?: string): boolean {
-        if (me.user_level<6) return false;
+        if (!me.query_temp("tester", 0)) return false;
         const obj = me.add_obj('st/yuanjing', 100);
         if (obj) {
             me.notify(`<hig>你领取了 100 块元晶。</hig>`);
