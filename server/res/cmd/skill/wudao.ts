@@ -135,6 +135,16 @@ export default class extends COMMAND {
         );
         if (!target_skill) return this.enter_addin(me, skillid, choice, confirm);
 
+        if (skill.level < 1000) {
+            if (skill.addin?.length) {
+                me.send('技能达到1000级后才可以进阶。');
+                const commands: string[] = [];
+                this.append_manage_commands(commands, skill_base, skill);
+                return me.send_commands(...commands);
+            }
+            return me.notify('技能达到1000级后才可以进阶。');
+        }
+
         const need_count = target_skill.grade === 4 ? 50 : 100;
         const button =
             '进阶为' +
@@ -153,8 +163,6 @@ export default class extends COMMAND {
             this.append_manage_commands(commands, skill_base, skill);
             return me.send_commands(...commands);
         }
-        if (skill.level < 1000) return me.notify('技能达到1000级后才可以进阶。');
-
         const pages = me.find_obj_bypath('book/up');
         if (!pages || pages.count < need_count) {
             return me.notify('你的<hiz>门派进阶残页</hiz>不足' + need_count + '份。');
@@ -198,6 +206,15 @@ export default class extends COMMAND {
         const skill = me.skills!.get(skillid)!;
         const skillBase = SKILL.get(skillid)!;
         if (skillBase.type !== SKILL_TYPES.SKILL) return me.notify('基础技能无法使用武道进阶。');
+        if (skill.level < 1000) {
+            if (skill.addin?.length && choice === undefined) {
+                me.send('技能达到1000级后才可以继续武道进阶。');
+                const commands: string[] = [];
+                this.append_manage_commands(commands, skillBase, skill);
+                return me.send_commands(...commands);
+            }
+            return me.notify('技能达到1000级后才可以进行武道进阶。');
+        }
 
         const currentGrade = skillBase.query_grade(me);
         if (currentGrade >= 5) {
@@ -350,6 +367,15 @@ export default class extends COMMAND {
         const removeFrom = addins.length - removeCount;
         const currentGrade = base.query_grade(me);
         const refund = this.query_addin_refund(base, skill, removeFrom, currentGrade);
+        const targetGrade = currentGrade - removeCount;
+        const convertedLevel = this.convert_level(skill.level, currentGrade, targetGrade);
+        const skillLimit = Math.max(0, Math.floor(me.skill_limit()));
+        const newLevel = Math.min(convertedLevel, skillLimit);
+        const overflowPot =
+            convertedLevel > skillLimit
+                ? this.query_level_potential(convertedLevel, targetGrade) -
+                  this.query_level_potential(skillLimit, targetGrade)
+                : 0;
 
         if (confirm !== 'ok') {
             const effectiveLevel = me.query_skill(base.id);
@@ -358,6 +384,12 @@ export default class extends COMMAND {
             me.send(
                 `${base.query_color_name(me)}当前已领悟的武道：\n${allLines}\n` +
                     `<hir>将要移除的武道：</hir>\n${removeLines}\n` +
+                    `等级折算：${base.query_color_text(String(skill.level), currentGrade)}级 → ` +
+                    `${base.query_color_text(String(newLevel), targetGrade)}级\n` +
+                    (overflowPot > 0
+                        ? `<hiy>折算等级${convertedLevel}级超过当前技能上限${skillLimit}级，` +
+                          `超出部分返还${overflowPot}点潜能。</hiy>\n`
+                        : '') +
                     `返还：${this.format_needs(me, refund, currentGrade)}`,
             );
             const action = mode === 'down' ? '降低一级武道进阶' : '完全重置武道进阶';
@@ -370,8 +402,6 @@ export default class extends COMMAND {
         const oldStoredLevel = skill.level;
         const oldEffectiveLevel = me.query_skill(base.id);
         const oldScore = base.query_score(oldStoredLevel, me);
-        const targetGrade = currentGrade - removeCount;
-        const newLevel = this.convert_level(oldStoredLevel, currentGrade, targetGrade);
 
         base.release_prop(me, oldEffectiveLevel);
         skill.addin!.splice(removeFrom, removeCount);
@@ -380,6 +410,7 @@ export default class extends COMMAND {
         const newScore = base.query_score(newLevel, me);
         base.attach_prop(me, me.query_skill(base.id));
         me.add_score(newScore - oldScore);
+        if (overflowPot > 0) me.pot += overflowPot;
 
         for (const need of refund) {
             if (!me.add_obj(need.path, need.count)) {
@@ -398,7 +429,9 @@ export default class extends COMMAND {
             `<hiy>你的${base.query_color_name(me)}已${action}，等级由` +
                 `${base.query_color_text(String(oldStoredLevel), currentGrade)}级折算为` +
                 `${base.query_color_text(String(newLevel), targetGrade)}级，返还` +
-                `${this.format_needs(me, refund, targetGrade)}。</hiy>`,
+                `${this.format_needs(me, refund, targetGrade)}` +
+                (overflowPot > 0 ? `，并返还超出技能上限部分${overflowPot}点潜能` : '') +
+                `。</hiy>`,
         );
     }
 
@@ -419,7 +452,7 @@ export default class extends COMMAND {
             const value = Math.trunc(slot.value(level, valueGrade));
             const desc = slot.format ? slot.format(value) : `${slot.prop}：+${value}`;
             const name = this.query_choice_name(base, { index, slot });
-            lines.push(base.query_color_text(`◆${name} ${desc}`, initialGrade + i + 1));
+            lines.push(base.query_color_text(`　◆${name} ${desc}`, initialGrade + i + 1));
         }
         return lines.join('\n');
     }
@@ -525,5 +558,10 @@ export default class extends COMMAND {
         if (level <= 100) return level;
         const converted = 10000 + ((level * level - 10000) * (oldGrade + 1)) / (newGrade + 1);
         return Math.floor(Math.sqrt(converted));
+    }
+
+    private query_level_potential(level: number, grade: number): number {
+        if (level <= 100) return 0;
+        return Math.floor((((100 + level) * (level - 100)) / 2) * (grade + 1) * 5);
     }
 }
