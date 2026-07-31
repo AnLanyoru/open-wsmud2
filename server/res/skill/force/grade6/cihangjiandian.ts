@@ -57,7 +57,6 @@ export default class extends SKILL {
         const awePct = awe_pct(lv);
         const enemies = me.get_nearby_enemies();
         if (!enemies.length) return;
-        me.send_room('<hio>$N慈航剑气凌然，一股无形的威压笼罩四野，周遭之敌无不心神震颤！</hio>');
         for (const enemy of enemies) {
             enemy.add_status(
                 {
