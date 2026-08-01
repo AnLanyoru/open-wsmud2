@@ -18,8 +18,6 @@ export default class extends NPC {
     max_mp = 400;
     hp = 400;
     max_hp = 400;
-    sell_list: OBJ[] = [];
-
     constructor() {
         super();
         this.skill_map(
