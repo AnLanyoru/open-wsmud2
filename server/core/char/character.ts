@@ -3860,7 +3860,10 @@ export class CHARACTER extends ITEM {
             }
         }
         if (target && target.parry_skill && target.parry_skill.on_parry_pfm) {
-            return target.parry_skill.on_parry_pfm(target, this, pfm, lv, sk);
+            // on_parry_pfm 返回 true 仅表示本次绝招已被化解；返回 false 时
+            // 仍须继续执行绝招本体，不能把“未招架”误判为“释放失败”。
+            const parried = target.parry_skill.on_parry_pfm(target, this, pfm, lv, sk);
+            if (parried) return true;
         }
         if (pfm.is_weapon && pfm.origin_skill != this.attack_skill.id) {
             this.remove_status('weapon', true);

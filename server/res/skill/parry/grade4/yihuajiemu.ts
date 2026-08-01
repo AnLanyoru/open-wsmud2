@@ -81,7 +81,7 @@ export default class extends SKILL {
         level: number,
         sk?: string,
     ): boolean {
-        if (!me.query_temp('yihua', 0)) return false;
+        if (!me.query_status('yihua')) return false;
         me.remove_status('yihua', true);
         me.send_room(
             `<mag>$N真气牵引，使出移花接木大法，$n的${pfm.name}犹如石沉大海，再无声息。</mag>`,

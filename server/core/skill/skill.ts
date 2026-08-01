@@ -249,7 +249,7 @@ export class SKILL extends BASE {
      *  触发时机：do_attack() 末尾，攻击未被闪避时
      *  触发条件：par.no_append_target 时跳过；受击方无 fight_type 时跳过；仅 parry_skill 注册有效 */
     on_parry_over?(target: CHARACTER, me: CHARACTER, par: DoAttackPar): void;
-    /** [招架] 绝招招架回调（返回是否招架成功）
+    /** [招架] 绝招招架回调（true 表示绝招已被化解，false 表示继续释放）
      *  触发时机：perform 判定招架时
      *  触发条件：仅 parry_skill 注册有效
      *  @param sk 基础技能 sid */
