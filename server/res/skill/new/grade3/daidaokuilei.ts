@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: '护体',
             distime: 50000,
             enable_skill: 'force',
-            mp: 510,
+            mp: 10,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(
@@ -55,7 +55,7 @@ export default class extends SKILL {
             name: '铁壁冲撞',
             distime: 27000,
             enable_skill: 'force',
-            mp: 510,
+            mp: 10,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N机关轰鸣，整个身躯如一堵铁墙般朝$n猛撞过去！</HIR>', target);
                 me.do_attack({ target, gj: Math.floor(me.gj * 2.5), mz: me.mz });

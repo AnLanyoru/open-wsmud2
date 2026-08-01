@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: '烈焰',
             distime: 30000,
             enable_skill: 'bite',
-            mp: 34170,
+            mp: 3000,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N周身腾起滔天烈焰，化作一道火柱朝$n席卷而去！</HIR>', target);
@@ -64,7 +64,7 @@ export default class extends SKILL {
             name: '怒吼',
             distime: 7000,
             enable_skill: 'bite',
-            mp: 44880,
+            mp: 2400,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(
                     '<HIR>$N一声怒吼，周身烈焰暴涨，炽热的气浪朝$n猛扑而去！</HIR>',

@@ -143,6 +143,8 @@ export class ROOM extends ITEM {
     biwu_step?: number;
     /** 是否禁止战斗 */
     no_fight?: boolean;
+    /** 是否允许使用个人仓库 */
+    allow_store?: boolean;
     /** 是否无法复活 */
     no_relive?: boolean;
 

@@ -9,11 +9,14 @@ import { OBJ } from '../../../core/item/obj.js';
 export default class extends COMMAND {
     command = 'store';
     regex = /^(?:(\d+)\s)?(\w+)$/;
+    allow_fight = false;
 
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me: USER | FOLLOWER, count: string, arg: string) {
+        if (!me.environment?.allow_store) return me.notify('这里没有仓库。');
+
         if (arg && arg.length < 2) {
             count = arg;
             arg = '';
@@ -43,11 +46,14 @@ export default class extends COMMAND {
                 if (!store_item) return me.notify('你的仓库放不下那么多东西了。');
                 //  old_item.count += move_count;
             }
-            let move_count = move_item.count;
-            if (count !== undefined) {
-                move_count = parseInt(count);
+            const move_count = count === undefined ? move_item.count : Number(count);
+            if (
+                !Number.isSafeInteger(move_count) ||
+                move_count < 1 ||
+                move_count > move_item.count
+            ) {
+                return me.notify('存入数量不正确。');
             }
-            if (!(move_count <= move_item.count)) return me.notify('你要存什么东西？');
 
             move_item = me.remove_item_byid(arg, move_count);
             if (move_item?.combined && store_item) {
@@ -86,6 +92,8 @@ export default class extends COMMAND {
                     move_item.id +
                     '",store:' +
                     move_count +
+                    ',otype:' +
+                    move_item.otype +
                     ',sum:' +
                     target.stores.length +
                     '}',
@@ -96,7 +104,7 @@ export default class extends COMMAND {
         var str = ['{"type":"dialog","dialog":"list","stores":['];
         if (me.max_store_count > 200) {
             var otype = parseInt(count ?? 0);
-            if (!(otype >= 0)) otype = 0;
+            if (!(otype >= 0 && otype <= 4)) otype = 0;
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 if (item.otype !== otype) continue;
@@ -108,6 +116,8 @@ export default class extends COMMAND {
             str.push(String(me.max_store_count));
             str.push(',sum:');
             str.push(String(items.length));
+            str.push(',filtered:1,otype:');
+            str.push(String(otype));
         } else {
             for (var i = 0; i < items.length; i++) {
                 if (i > 0) str.push(',');
@@ -116,6 +126,7 @@ export default class extends COMMAND {
             str.push(']');
             str.push(',max_store_count:');
             str.push(String(me.max_store_count));
+            str.push(',filtered:0,otype:0');
         }
         str.push('}');
 
@@ -154,6 +165,10 @@ export default class extends COMMAND {
                         store_item.id +
                         '",store:' +
                         move_item.count +
+                        ',otype:' +
+                        store_item.otype +
+                        ',sum:' +
+                        target.stores.length +
                         '}',
                 );
                 me.items.splice(i, 1);

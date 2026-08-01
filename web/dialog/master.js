@@ -47,7 +47,11 @@ export default {
             return this.createSkillItems(this.items);
         }
         if (!data.master && !data.follower) return;
-        Dialog.show("master");
+        // Dialog.show toggles the current dialog when it is called without data.
+        // Cached or repeated `cha <target>` responses can reach onData while the
+        // master dialog is already current, so do not accidentally close it.
+        if (!Dialog.isShow || Dialog.curItem !== "master")
+            Dialog.show("master");
         this.master = data.master || data.follower;
         this.is_follower = !!data.follower;
         var skills = {};
