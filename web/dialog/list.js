@@ -12,12 +12,24 @@ export default {
         this.hide();
     },
     updateitem: function (data) {
-        if (data.store) {
-            if (!this.stores || !this.isShow)
-                return Dialog.pack.onData({remove: data.store, id: data.id});
+        if (data.store !== undefined && data.store !== 0) {
+            if (!this.stores || !this.isShow) {
+                var result = Dialog.pack.onData({remove: data.store, id: data.id});
+                // 取出到一个新堆叠时，增量消息没有完整物品元数据，刷新背包以免漏项。
+                if (data.store < 0) SendCommand('pack');
+                return result;
+            }
             var item = this.find_item(1, data.id);
             var store_item = this.find_item(3, data.storeid);
+            var update_store = !this.is_store_filtered
+                || data.otype === undefined
+                || data.otype === this.selected_type;
             if (!item) {
+                if (!store_item) {
+                    SendCommand('pack');
+                    if (this.is_store_filtered) SendCommand('store ' + this.selected_type);
+                    return;
+                }
                 item = Object.assign({}, store_item);
                 item.id = data.id;
                 item.count = (-data.store);
@@ -25,17 +37,20 @@ export default {
             } else {
                 item.count -= data.store;
             }
-            if (!store_item) {
-                store_item = Object.assign({}, item);
-                store_item.id = data.storeid;
-                store_item.count = data.store;
-                this.stores.push(store_item);
-            } else {
-                store_item.count += data.store;
+            if (update_store) {
+                if (!store_item) {
+                    store_item = Object.assign({}, item);
+                    store_item.id = data.storeid;
+                    store_item.count = data.store;
+                    this.stores.push(store_item);
+                } else {
+                    store_item.count += data.store;
+                }
+                if (store_item.count <= 0) this.stores.Remove(store_item);
             }
-            this.store_count = data.sum ?? this.stores.length;
-            if (store_item.count == 0) this.stores.Remove(store_item);
-            if (item.count == 0) Dialog.pack.items.Remove(item);
+            if (data.sum !== undefined) this.store_count = data.sum;
+            else if (!this.is_store_filtered) this.store_count = this.stores.length;
+            if (item.count <= 0) Dialog.pack.items.Remove(item);
 
         } else if (data.sell) {
             var item = this.find_item(2, data.id);
@@ -107,13 +122,20 @@ export default {
             this.typeElement.show();
             this.isstore = true;
             this.stores = Dialog.pack.formatItems(data.stores);
-            if (data.sum > 0) {
+            this.is_store_filtered = data.filtered !== undefined
+                ? Boolean(data.filtered)
+                : data.max_store_count > 200;
+            var selected_type = parseInt(data.otype);
+            this.selected_type = selected_type >= 0 && selected_type <= 4 ? selected_type : 0;
+            var type_elems = this.typeElement.children();
+            type_elems.removeClass('select');
+            $(type_elems[this.selected_type]).addClass('select');
+            if (this.is_store_filtered) {
                 this.typeElement.show();
-                this.store_count = data.sum;
             } else {
                 this.typeElement.hide();
-                this.store_count = data.stores.length;
             }
+            this.store_count = data.sum ?? data.stores.length;
             this.create_items(this.stores, this.leftElement, 3,
                 Math.max(data.max_store_count, 100));
             this.leftElement[0].scrollTop = 0;
@@ -156,6 +178,7 @@ export default {
         let index = parseInt(type);
         let store = Dialog.list;
         if (!store.stores) return;
+        if (!(index >= 0 && index <= 4)) return;
         if (index === store.selected_type) return;
         let type_elems = store.typeElement.children();
         $(type_elems[store.selected_type]).removeClass('select');
