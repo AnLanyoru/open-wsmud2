@@ -106,6 +106,11 @@ const FAMILY_EQUIPMENT: Record<string, FamilyEquipmentDef[]> = {
     SHASHOU: [{ path: 'eq/shashou/qianyu', weapon: true }],
 };
 
+// 武馆弟子可从全部门派装备中随机刷新，包含杀手楼的千羽。
+FAMILY_EQUIPMENT.NONE = Object.entries(FAMILY_EQUIPMENT)
+    .filter(([family]) => family !== 'NONE')
+    .flatMap(([, equipment]) => equipment);
+
 function equipmentSet(family: string, names: string[]): FamilyEquipmentDef[] {
     return names.map((name, index) => ({ path: `eq/${family}/${name}`, weapon: index === 0 }));
 }
