@@ -1,7 +1,11 @@
 import { NPC } from '../../../core/char/npc.js';
 import { FAMILIES } from '../../../core/skill/family.js';
 import { USERTASK } from '../../../core/task/playertask.js';
+import { TASK } from '../../../core/task/task.js';
+import { UTIL } from '../../../core/util/util.js';
+import type { OBJ } from '../../../core/item/obj.js';
 import type ShiMenTask from '../../task/sm_task.js';
+import GoodsTask, { FAMILY_REFRESH_KEY } from '../../task/goods_task.js';
 import type { USER } from '../../../core/char/user.js';
 
 export default class extends NPC {
@@ -14,6 +18,7 @@ export default class extends NPC {
     max_mp = 400;
     hp = 400;
     max_hp = 400;
+    sell_list: OBJ[] = [];
 
     constructor() {
         super();
@@ -30,6 +35,76 @@ export default class extends NPC {
         );
         this.add_action('job_fam', '门派职位', this.job_fam);
         this.add_action('job_up_ok', null, this.job_up_ok);
+        this.add_action('sm_exchange', '师门兑换', this.open_family_shop);
+        this.add_action('sm_refresh', '刷新物资', this.show_family_refresh);
+        this.add_action('sm_refresh_ok', null, this.refresh_family_shop);
+    }
+
+    private check_family(me: USER): boolean {
+        if (me.family !== this.family) {
+            me.notify(`${this.name}对你说道：这位${me.call()}并非本派弟子，不能兑换本门物资。`);
+            return false;
+        }
+        return true;
+    }
+
+    open_family_shop(me: USER) {
+        if (!this.check_family(me)) return;
+        const task = TASK.GET('goods') as GoodsTask | undefined;
+        if (!task) return me.notify('师门物资暂未送达，请联系管理员。');
+        task.query_family_goods(me);
+        me.do_command('list', this.id);
+    }
+
+    show_family_refresh(me: USER) {
+        if (!this.check_family(me)) return;
+        const count = Number(me.query_temp(FAMILY_REFRESH_KEY, 0)) || 0;
+        if (count >= REFRESH_COSTS.length) {
+            return me.notify(`${this.name}对你说道：今日可以调拨的物资已经全部送来了。`);
+        }
+        const cost = REFRESH_COSTS[count];
+        me.notify(`${this.name}对你说道：第${count + 1}次重新调拨物资需要${cost}点师门功绩。`);
+        me.send_commands(`sm_refresh_ok ${this.id}`, `消耗${cost}功绩刷新`);
+    }
+
+    refresh_family_shop(me: USER) {
+        if (!this.check_family(me)) return;
+        const task = TASK.GET('goods') as GoodsTask | undefined;
+        if (!task) return me.notify('师门物资暂未送达，请联系管理员。');
+
+        const count = Number(me.query_temp(FAMILY_REFRESH_KEY, 0)) || 0;
+        if (count >= REFRESH_COSTS.length) {
+            return me.notify(`${this.name}对你说道：今日可以调拨的物资已经全部送来了。`);
+        }
+        const cost = REFRESH_COSTS[count];
+        const gongji = Number(me.query_temp('gongji', 0)) || 0;
+        if (gongji < cost) {
+            return me.notify(`刷新需要${cost}点师门功绩，你目前只有${gongji}点。`);
+        }
+
+        me.add_temp('gongji', -cost);
+        const newCount = me.add_temp(FAMILY_REFRESH_KEY, 1, UTIL.diff_time(5));
+        task.refresh_family_goods(me, newCount);
+        me.notify(`<hiy>你消耗${cost}点师门功绩，刷新了本门物资。</hiy>`);
+        me.do_command('list', this.id);
+    }
+
+    on_sell(me: USER): OBJ[] {
+        if (!this.check_family(me)) return [];
+        const task = TASK.GET('goods') as GoodsTask | undefined;
+        return task?.query_family_goods(me) ?? [];
+    }
+
+    before_sell_item(me: USER, sellitem: OBJ, buyCount: number): boolean {
+        if (!this.check_family(me)) return false;
+        const cost = sellitem.value * buyCount;
+        const gongji = Number(me.query_temp('gongji', 0)) || 0;
+        if (gongji < cost) {
+            me.notify(`兑换这些物品需要${cost}点师门功绩，你目前只有${gongji}点。`);
+            return false;
+        }
+        me.add_temp('gongji', -cost);
+        return true;
     }
 
     job_fam(me: USER, par: string) {
@@ -108,3 +183,4 @@ export default class extends NPC {
 const NEEDS_GJ = [500, 5000, 10000, 50000, 100000];
 const NEEDS_LEVEL = [0, 3, 4, 5, 6];
 const NEEDS_LEVEL_DESC: (string | null)[] = [null, '宗师', '武圣', '武帝', '武神'];
+const REFRESH_COSTS = [200, 400, 600, 800, 1000, 1200];

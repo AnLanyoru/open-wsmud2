@@ -13,11 +13,14 @@ export default class extends EQUIPMENT {
         if (par) {
             par = par.slice(1);
             lv = parseInt(par);
-            if (!(lv >= 2 && lv <= 5)) return;
+            if (!(lv >= 1 && lv <= 5)) return;
         }
         this.grade = lv;
         this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
+            case 1:
+                this.prop = { gj: 10 };
+                break;
             case 2:
                 this.prop = { gj: 55, str: 10 };
                 this.desc = '逍遥弟子的铁手印，轻巧灵动，初试锋芒。';

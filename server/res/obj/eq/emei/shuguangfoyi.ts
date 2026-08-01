@@ -12,11 +12,14 @@ export default class extends EQUIPMENT {
         if (par) {
             par = par.slice(1);
             lv = parseInt(par);
-            if (!(lv >= 2 && lv <= 5)) return;
+            if (!(lv >= 1 && lv <= 5)) return;
         }
         this.grade = lv;
         this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
+            case 1:
+                this.prop = { fy: 10, max_hp: 50 };
+                break;
             case 2:
                 this.prop = { fy: 120, max_hp: 500 };
                 this.desc = '峨眉弟子的素衣，一尘不染，初悟佛缘。';

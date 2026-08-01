@@ -12,11 +12,14 @@ export default class extends EQUIPMENT {
         if (par) {
             par = par.slice(1);
             lv = parseInt(par);
-            if (!(lv >= 2 && lv <= 5)) return;
+            if (!(lv >= 1 && lv <= 5)) return;
         }
         this.grade = lv;
         this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
+            case 1:
+                this.prop = { fy: 12 };
+                break;
             case 2:
                 this.prop = { fy: 120, int: 5 };
                 this.desc = '武当道童的灰布袍，初入道门，太极始悟。';

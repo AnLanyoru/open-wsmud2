@@ -3,6 +3,7 @@ import { UTIL } from '../../../core/util/util.js';
 import { OBJ } from '../../../core/item/obj.js';
 import type { USER } from '../../../core/char/user.js';
 import { CHARACTER } from '../../../core/char/character.js';
+import { WORLD } from '../../../core/world.js';
 
 export default class extends COMMAND {
     command = 'buy';
@@ -67,6 +68,7 @@ export default class extends COMMAND {
                     `$N从$n兑换了${UTIL.to_c(buy_count)}${sell_obj.unit}${sell_obj.color_name}。`,
                     target,
                 );
+                recordZhuGuoPurchase(me, sell_obj, buy_count);
             }
             let money_name = sellitem.currency === 'jungong' ? 'jungong' : 'gongji';
             me.send(
@@ -100,6 +102,8 @@ export default class extends COMMAND {
                     target,
                 );
 
+                recordZhuGuoPurchase(me, sell_obj, buy_count);
+
                 if (target.on_sell_item) target.on_sell_item(me, sell_obj, buy_count);
             }
         } else {
@@ -115,6 +119,7 @@ export default class extends COMMAND {
                         `$N从$n购买了${UTIL.to_c(buy_count)}${sell_obj.unit}${sell_obj.color_name}。`,
                         target,
                     );
+                    recordZhuGuoPurchase(me, sell_obj, buy_count);
                 }
 
                 me.send(
@@ -128,5 +133,18 @@ export default class extends COMMAND {
             }
         }
         // me.send('你给他' + UTIL.moneyToStr(need_money) + "。");
+    }
+}
+
+/** 当铺和门派管理员共用购买指令，在成功交付后累计朱果提供的经验。 */
+function recordZhuGuoPurchase(me: USER, sellObj: OBJ, buyCount: number): void {
+    if (!(sellObj.path === 'drug/exp' || sellObj.path.startsWith('drug/exp#'))) return;
+    const exp = Number((sellObj as OBJ & { exp?: number }).exp) || 0;
+    if (!(exp > 0 && buyCount > 0)) return;
+
+    const total = me.add_temp('zg_exp', exp * buyCount);
+    const serverMax = Number(WORLD.DATA.query_temp('zg_max', 0)) || 0;
+    if (total > serverMax) {
+        WORLD.DATA.set_temp('zg_max', total);
     }
 }
