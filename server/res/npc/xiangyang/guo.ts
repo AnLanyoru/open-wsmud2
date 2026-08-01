@@ -63,27 +63,73 @@ export default class extends NPC {
             me.do_command('list', this.id);
         });
 
-        // 捐献军饷 — 3两黄金兑换1点军功，补到本周上限
+        // 捐献军饷 — 先展示兑换明细，确认后再扣款并补到本周上限。
         this.add_action('xy_jx', '捐献军饷', function (this: NPC, me: USER) {
             const task = TASK.GET('xiangyang') as XiangYangTask | undefined;
             const max = task?.jg_limit(me) ?? 0;
             if (!(max > 0)) return me.notify('你还是先历练历练再来捐献军饷吧。');
             const current = me.query_temp('jg_week', 0);
             if (current >= max) return me.notify('你本周的军功已经达到上限，无需再捐。');
-            let least_num = max - current;
-            let rate = 3 * least_num; // 3 gold = 300 silver
-            let need_money = rate * 10000;
-            if (me.money < need_money)
-                return me.notify(`你没有足够的黄金，获得${least_num}点军功需要捐献${rate}两黄金。`);
+            const leastNum = max - current;
+            const gold = 3 * leastNum;
+            const needMoney = gold * 10000;
+            const jungong = Number(me.query_temp('jg', 0)) || 0;
+            if (me.money < needMoney)
+                return me.notify(`你没有足够的黄金，获得${leastNum}点军功需要捐献${gold}两黄金。`);
 
-            me.add_money(-need_money);
-            const newWeek = me.add_temp('jg_week', least_num, UTIL.diff_week_time());
-            const newJg = me.add_temp('jg', least_num);
+            me.set_temp(
+                'xy_jx_confirm',
+                { max, current, leastNum, gold, needMoney },
+                60000,
+            );
+            me.notify(
+                '<hiy>请确认捐献军饷：\n' +
+                    `消耗：${gold}两黄金\n` +
+                    `获得：${leastNum}点军功\n` +
+                    `本周军功：${current}/${max} → ${max}/${max}\n` +
+                    `持有军功：${jungong} → ${jungong + leastNum}</hiy>`,
+            );
+            me.send_commands(
+                'xy_jx_ok ' + this.id,
+                `确认捐献${gold}两黄金`,
+                'look ' + this.id,
+                '取消',
+            );
+        });
+
+        this.add_action('xy_jx_ok', null, function (this: NPC, me: USER) {
+            const confirm = me.query_temp('xy_jx_confirm') as
+                | {
+                      max: number;
+                      current: number;
+                      leastNum: number;
+                      gold: number;
+                      needMoney: number;
+                  }
+                | undefined;
+            if (!confirm) return me.notify('捐献确认已过期，请重新选择捐献军饷。');
+
+            const task = TASK.GET('xiangyang') as XiangYangTask | undefined;
+            const max = task?.jg_limit(me) ?? 0;
+            const current = Number(me.query_temp('jg_week', 0)) || 0;
+            if (max !== confirm.max || current !== confirm.current) {
+                me.remove_temp('xy_jx_confirm');
+                return me.notify('你的本周军功进度已经变化，请重新确认捐献信息。');
+            }
+            if (me.money < confirm.needMoney) {
+                me.remove_temp('xy_jx_confirm');
+                return me.notify(`你没有足够的黄金，本次捐献需要${confirm.gold}两黄金。`);
+            }
+
+            me.remove_temp('xy_jx_confirm');
+            me.add_money(-confirm.needMoney);
+            const newWeek = me.add_temp('jg_week', confirm.leastNum, UTIL.diff_week_time());
+            const newJg = me.add_temp('jg', confirm.leastNum);
             me.notify(
                 '<hiy>你捐献了' +
-                    rate +
+                    confirm.gold +
                     '两黄金，获得' +
-                    least_num +
+                    confirm.leastNum +
                     '点军功。本周已获得' +
                     newWeek +
                     '/' +
