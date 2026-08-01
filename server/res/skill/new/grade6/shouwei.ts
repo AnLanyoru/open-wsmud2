@@ -10,7 +10,7 @@ export default class extends SKILL {
     grade = 6;
 
     desc = '古老神殿的守卫者，身披神甲，手持巨刃，如不动明王般守护着神殿的每一寸土地';
-    can_enables = [];
+    can_enables = ['force', 'blade'];
 
     query_prop(lv: number): PropMap {
         return {
@@ -50,7 +50,7 @@ export default class extends SKILL {
         zhuan: {
             name: '旋转',
             distime: 27000,
-            enable_skill: 'force',
+            enable_skill: 'blade',
             mp: 510,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N将手中巨刃抡圆，如旋风般朝$n狂斩而去！</HIR>', target);

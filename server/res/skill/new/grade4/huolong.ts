@@ -10,7 +10,7 @@ export default class extends SKILL {
     grade = 4;
 
     desc = '上古火龙，吞吐烈焰，爪牙皆可伤人，中者火毒攻心，气血难复';
-    can_enables = [];
+    can_enables = ["force"];
 
     query_prop(lv: number): PropMap {
         return {
@@ -99,6 +99,7 @@ export default class extends SKILL {
                             id: 'busy',
                             name: '忙乱',
                             duration: 4000,
+                            is_busy: true,
                             downside: true,
                         },
                         me,

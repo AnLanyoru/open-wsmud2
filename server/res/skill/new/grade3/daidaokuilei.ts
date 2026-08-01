@@ -10,7 +10,7 @@ export default class extends SKILL {
     grade = 3;
 
     desc = '远古机关术打造的带刀傀儡，刀枪不入，不知疲倦，是守卫秘境的恐怖存在';
-    can_enables = [];
+    can_enables = ['force'];
 
     query_prop(lv: number): PropMap {
         return {

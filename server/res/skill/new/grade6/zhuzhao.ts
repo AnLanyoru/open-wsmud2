@@ -10,7 +10,7 @@ export default class extends SKILL {
     grade = 6;
 
     desc = '上古太阳星中诞生的至阳生灵，掌控烈焰之力，其光灼灼，其势煌煌，万物莫能挡';
-    can_enables = [];
+    can_enables = ['bite'];
 
     query_prop(lv: number): PropMap {
         return {
@@ -26,7 +26,7 @@ export default class extends SKILL {
         yan: {
             name: '烈焰',
             distime: 30000,
-            enable_skill: 'force',
+            enable_skill: 'bite',
             mp: 34170,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -62,7 +62,7 @@ export default class extends SKILL {
         hou: {
             name: '怒吼',
             distime: 7000,
-            enable_skill: 'force',
+            enable_skill: 'bite',
             mp: 44880,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(
@@ -70,7 +70,7 @@ export default class extends SKILL {
                     target,
                 );
                 me.add_status({
-                    id: 'zhuzhao_nouhou',
+                    id: 'nu',
                     name: '蓄力',
                     duration: 3000,
                     prop: {

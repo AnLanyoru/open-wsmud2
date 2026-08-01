@@ -10,7 +10,7 @@ export default class extends SKILL {
     grade = 6;
 
     desc = '传说中掌控昼夜更替的远古凶兽，人面蛇身，目开为昼，目闭为夜，其威能深不可测';
-    can_enables = [];
+    can_enables = ['bite'];
 
     query_prop(lv: number): PropMap {
         return {
@@ -26,7 +26,7 @@ export default class extends SKILL {
         long: {
             name: '烛龙之眼',
             distime: 28500,
-            enable_skill: 'force',
+            enable_skill: 'bite',
             mp: 33660,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -60,7 +60,7 @@ export default class extends SKILL {
         zhao: {
             name: '爪击',
             distime: 28500,
-            enable_skill: 'force',
+            enable_skill: 'bite',
             mp: 17850,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
@@ -79,13 +79,13 @@ export default class extends SKILL {
         hou: {
             name: '怒吼',
             distime: 6650,
-            enable_skill: 'force',
+            enable_skill: 'bite',
             mp: 44880,
             release_time: 2000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N仰天发出一声震天怒吼，声浪如实质般轰向$n！</HIR>', target);
                 me.add_status({
-                    id: 'zhujiuyin_nouhou',
+                    id: 'nu',
                     name: '蓄力',
                     duration: 3000,
                     prop: {
