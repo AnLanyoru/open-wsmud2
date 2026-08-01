@@ -55,7 +55,6 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 // 切换阴阳形态：如果当前是九烛则切九幽，否则切九烛
                 const isJiuzhu = me.query_temp('yyjz_jz', 0);
-                const duration = zhuanyang_duration(lv);
 
                 if (isJiuzhu) {
                     // 切换到九幽（攻击形态）
@@ -71,14 +70,14 @@ export default class extends SKILL {
                     me.add_status({
                         id: 'force',
                         name: '九幽',
-                        duration: duration,
+                        duration: 0,
                         override: 2,
                         prop: {
                             gj_per: gjPer,
                             diff_fy_per: gjPer,
                             gjsd_per: speedPer,
                         },
-                        on_attach: (p: CHARACTER) => p.set_temp('yyjz_jy', 1, duration),
+                        on_attach: (p: CHARACTER) => p.set_temp('yyjz_jy', 1),
                         on_expire: (p: CHARACTER) => p.remove_temp('yyjz_jy'),
                         finish_msg: '<hio>$N周身九幽之气如潮退去，复转如常。</hio>',
                     });
@@ -92,13 +91,13 @@ export default class extends SKILL {
                     me.add_status({
                         id: 'force',
                         name: '九烛',
-                        duration: duration,
+                        duration: 0,
                         override: 2,
                         prop: {
                             hp_per: hpPer,
                             diff_sh_per: hpPer,
                         },
-                        on_attach: (p: CHARACTER) => p.set_temp('yyjz_jz', 1, duration),
+                        on_attach: (p: CHARACTER) => p.set_temp('yyjz_jz', 1),
                         on_expire: (p: CHARACTER) => p.remove_temp('yyjz_jz'),
                         finish_msg: '<hio>$N周身九烛之光渐黯。</hio>',
                     });
@@ -148,17 +147,7 @@ export default class extends SKILL {
                 );
 
                 for (const enemy of enemies) {
-                    enemy.add_status(
-                        {
-                            id: 'faint',
-                            name: '昏迷',
-                            desc: '被阴阳九转定乾坤之力封印',
-                            is_faint: true,
-                            downside: true,
-                            duration: duration,
-                        },
-                        me,
-                    );
+                    enemy.set_releasetime(duration);
                 }
 
                 me.end_attack(target);
