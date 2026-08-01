@@ -1,4 +1,4 @@
-import { SKILL, PERFORM } from '../../../../core/skill/skill.js';
+import { SKILL } from '../../../../core/skill/skill.js';
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
@@ -64,11 +64,9 @@ export default class extends SKILL {
             mp: 90,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const effectPer: number = get_douzhuan_effect_per(lv);
-                const lastInfo = me.query_temp('sk/dz/last_pfm', null) as {
-                    name: string;
-                    level: number;
-                } | null;
-                const pfmName: string = lastInfo ? lastInfo.name : '绝招';
+                const lastPfmId = target.query_temp('used_pfm', '') as string;
+                const [skillId, pfmKey] = lastPfmId.split('/');
+                const pfmName = SKILL.get(skillId)?.get_pfm(pfmKey)?.name || '绝招';
                 me.send_room(
                     `<HIO>$N眸光一闪，已窥破$n武学关窍，竟以彼之道还施彼身——「${pfmName}」之势反卷而回！</HIO>`,
                     target,
@@ -90,20 +88,6 @@ export default class extends SKILL {
             },
         },
     };
-
-    on_parry_pfm(
-        me: CHARACTER,
-        target: CHARACTER,
-        pfm: PERFORM,
-        level: number,
-        _sk?: string,
-    ): boolean {
-        // 记录敌人使用的绝招信息，供斗转使用
-        if (pfm.name) {
-            me.set_temp('sk/dz/last_pfm', { name: pfm.name, level: level }, 30000);
-        }
-        return false; // 不阻止绝招
-    }
 
     on_parry_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar): void {
         if (!par.is_parried) return;

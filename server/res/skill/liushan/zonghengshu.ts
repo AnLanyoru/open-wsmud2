@@ -54,7 +54,6 @@ export default class extends SKILL {
             mp: 130,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                const time = query_zhs_duration(lv);
                 const blockCount = query_zhs_block_count(lv) + me.query_prop('zhs_kh_count');
 
                 me.send_room(
@@ -65,20 +64,16 @@ export default class extends SKILL {
                 me.add_status({
                     id: 'zhs_kh',
                     name: '开合之道',
-                    duration: time,
-                    desc: '抵挡即将到来的' + blockCount + '次攻击',
-                    on_attach: function (p: CHARACTER): void {
-                        p.set_temp('zhs_kh', blockCount, time);
-                    },
-                    on_expire: function (p: CHARACTER): void {
-                        p.remove_temp('zhs_kh');
-                    },
+                    duration: 0,
+                    max_count: blockCount,
+                    count: blockCount,
+                    desc: '抵挡即将到来的攻击',
                 });
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const time = query_zhs_duration(lv);
                 const blockCount = query_zhs_block_count(lv);
-                return toSec(time) + '秒内你将抵挡即将到来的' + blockCount + '次攻击。';
+                return '你将抵挡即将到来的' + blockCount + '次攻击。';
             },
         },
     };
@@ -88,24 +83,17 @@ export default class extends SKILL {
         me: CHARACTER,
         target: CHARACTER,
         pfm: PERFORM,
-        level: number,
-        sk?: string,
+        _level: number,
+        _sk?: string,
     ): boolean {
-        const remain = me.query_temp('zhs_kh', 0);
+        const remain = me.query_status('zhs_kh') || 0;
         if (remain <= 0) return false;
 
-        me.set_temp('zhs_kh', remain - 1);
+        me.remove_status('zhs_kh');
         me.send_room(
-            '<HIC>$N双臂开合，以纵横术「开合之道」将$n的' +
-                pfm.name +
-                '尽数化解，攻势如泥牛入海，杳无踪迹。</HIC>',
+            `<HIC>$N双臂开合，经纬纵横，丈量天地，将$n的${pfm.name}尽数化解，$n的攻势如泥牛入海，杳无踪迹。</HIC>`,
             target,
         );
-
-        if (remain <= 1) {
-            me.remove_temp('zhs_kh');
-            me.remove_status('zhs_kh', true);
-        }
         return true;
     }
 }
