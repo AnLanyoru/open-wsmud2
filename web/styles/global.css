@@ -431,37 +431,37 @@ mem {
    颜色类 (grade / color tags / glyphicon)
    ======================================== */
 .grade0 {
-    --border-color: #C0C0C0;
+    --border-color: var(--mud-wht);
     border-color: var(--border-color);
 }
 
 .grade1 {
-    --border-color: #00FF00;
+    --border-color: var(--mud-hig);
     border-color: var(--border-color);
 }
 
 .grade2 {
-    --border-color: #00FFFF;
+    --border-color: var(--mud-hic);
     border-color: var(--border-color);
 }
 
 .grade3 {
-    --border-color: #FFFF00;
+    --border-color: var(--mud-hiy);
     border-color: var(--border-color);
 }
 
 .grade4 {
-    --border-color: #912CEE;
+    --border-color: var(--mud-hiz);
     border-color: var(--border-color);
 }
 
 .grade5 {
-    --border-color: #FFA500;
+    --border-color: var(--mud-hio);
     border-color: var(--border-color);
 }
 
 .grade6 {
-    --border-color: #FF4500;
+    --border-color: var(--mud-ord);
     border-color: var(--border-color);
 }
 
@@ -707,7 +707,7 @@ DEL {
 }
 
 line {
-    color: #008080;
+    color: var(--mud-cyn);
     height: 30px;
     line-height: 30px;
     width: 100%;
@@ -718,7 +718,7 @@ line {
 
 line::before {
     content: '';
-    border-top: 1px solid #008080;
+    border-top: 1px solid var(--mud-cyn);
     width: 45%;
     height: 2px;
     position: absolute;
@@ -728,7 +728,7 @@ line::before {
 
 line::after {
     content: '';
-    border-top: 1px solid #008080;
+    border-top: 1px solid var(--mud-cyn);
     width: 45%;
     height: 2px;
     position: absolute;
@@ -832,7 +832,7 @@ line::after {
     font-size: 1rem;
     line-height: 1.2em;
     padding-top: 0.6rem;
-    color: #808000;
+    color: var(--mud-yel);
     cursor: pointer;
 }
 

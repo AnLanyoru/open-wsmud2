@@ -40,7 +40,7 @@ const party_css = `
 .dialog-party>.party-notice {
     padding-top: 0.25em;
     padding-bottom: 0.25em;
-    color: #00FFFF;
+    color: var(--mud-hic);
     line-height: 2em;
 }
 

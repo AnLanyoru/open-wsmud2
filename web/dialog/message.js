@@ -299,7 +299,7 @@ const message_css = `
 }
 
 .dialog-message>.message-list>.message-item>.message-title {
-    color: #FFFF00;
+    color: var(--mud-hiy);
     line-height: 2em;
 }
 
@@ -371,7 +371,7 @@ const message_css = `
     width: 2em;
     display: inline-block;
     text-align: center;
-    color: #FFFF00
+    color: var(--mud-hiy)
 }
 
 .dialog-team>.team-item>.team-name {
@@ -428,7 +428,7 @@ const message_css = `
 }
 
 .detail-item>.detail-name {
-    color: #FFFF00;
+    color: var(--mud-hiy);
 }
 
 .detail-item>.detail-time {

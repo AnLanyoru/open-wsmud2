@@ -50,11 +50,11 @@ const paimai_css = `
     width: 4em;
     border-left: 1px solid var(--border-primary);
     text-align: center;
-    color: #008080
+    color: var(--mud-cyn)
 }
 
 .dialog-pms>.pm-item>.pm-add:hover {
-    background-color: #333;
+    background-color: var(--bg-surface2);
 }
 `;
 

@@ -324,15 +324,15 @@ const stats_css = `
 
 
 .dialog-stats>.top1>.top-sc {
-    color: #FFA500;
+    color: var(--mud-hio);
 }
 
 .dialog-stats>.top2>.top-sc {
-    color: #912CEE;
+    color: var(--mud-hiz);
 }
 
 .dialog-stats>.top3>.top-sc {
-    color: #FFD700;
+    color: var(--mud-hij);
 }
 
 .dialog-stats>.top-item>.top-name {

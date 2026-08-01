@@ -17,7 +17,7 @@ const task_css = `
 }
 
 .dialog-tasks>.none {
-    border-left-color: #808080
+    border-left-color: var(--mud-hik)
 }
 
 
@@ -27,12 +27,12 @@ const task_css = `
 }
 
 .dialog-tasks>.over {
-    border-left-color: #008080
+    border-left-color: var(--mud-cyn)
 }
 
 .dialog-tasks>.none>.task-btn {
-    border-left-color: #808080;
-    color: #808080;
+    border-left-color: var(--mud-hik);
+    color: var(--mud-hik);
 }
 
 .dialog-tasks>.finish>.task-btn {
@@ -42,8 +42,8 @@ const task_css = `
 }
 
 .dialog-tasks>.over>.task-btn {
-    border-left-color: #008080;
-    color: #008080;
+    border-left-color: var(--mud-cyn);
+    color: var(--mud-cyn);
 }
 
 .task-item h3 {

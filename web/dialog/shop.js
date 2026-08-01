@@ -208,8 +208,8 @@ const shop_css = `
 
 .shop-item-title>.discount-tag {
 
-    background: linear-gradient(135deg, #ff3e3e 0%, #ff9100 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--mud-hir) 0%, var(--mud-hio) 100%);
+    color: var(--mud-hiw);
     width: 4em;
     font-weight: bold;
     text-align: center;
@@ -228,10 +228,10 @@ const shop_css = `
 }
 
 .dialog-shop>.shop-item .shop-label {
-    background: linear-gradient(110deg, transparent 0%, rgba(255, 159, 28, 0.8) 50%, transparent 100%);
+    background: linear-gradient(110deg, transparent 0%, var(--mud-hio) 50%, transparent 100%);
 
     animation: shine 3s infinite linear;
-    color: #fff;
+    color: var(--mud-hiw);
     font-size: 12px;
     padding: 2px 8px;
     border-radius: 4px;
@@ -262,12 +262,12 @@ const shop_css = `
 .dialog-shop-footer>span {
     line-height: 1.8em;
     margin-left: 1em;
-    color: #808000;
+    color: var(--dialog-title-color);
     display: inline-block;
     padding-right: 1em;
     text-align: center;
     text-decoration: underline;
-    border-right: 1px solid #808000;
+    border-right: 1px solid var(--dialog-title-color);
 }
 
 `;
