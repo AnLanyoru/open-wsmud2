@@ -19,9 +19,9 @@ export default class extends SKILL {
         '$N暴喝一声，$W自上而下<HIY>泰山压顶</HIY>般劈落，剑气如山，直取$n$l',
     ];
     parry_actions = [
-        '$N$W横举，一招「<HIY>嵩岳巍峨</HIY>」，如山岳般沉稳地架住$P的攻势\n',
-        '$N$W一沉一引，以<HIY>千钧之力</HIY>将$P的兵器压向一旁\n',
-        '$N剑势<HIY>端严雄浑</HIY>，$W大开大阖之间将$P的进攻尽数封挡\n',
+        '$n$W横举，一招「<HIY>嵩岳巍峨</HIY>」，如山岳般沉稳地架住$P的攻势\n',
+        '$n$W一沉一引，以<HIY>千钧之力</HIY>将$P的兵器压向一旁\n',
+        '$n剑势<HIY>端严雄浑</HIY>，$W大开大阖之间将$P的进攻尽数封挡\n',
     ];
     slots = [
         {

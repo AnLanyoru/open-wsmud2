@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = 'daidaokuilei';
     grade = 3;
 
+    family = FAMILIES.MONSTER;
     desc = '远古机关术打造的带刀傀儡，刀枪不入，不知疲倦，是守卫秘境的恐怖存在';
     can_enables = ['force'];
 

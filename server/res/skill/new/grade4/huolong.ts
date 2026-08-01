@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = 'huolong';
     grade = 4;
 
+    family = FAMILIES.MONSTER;
     desc = '上古火龙，吞吐烈焰，爪牙皆可伤人，中者火毒攻心，气血难复';
     can_enables = ["force"];
 

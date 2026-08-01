@@ -9,8 +9,8 @@ export default class extends SKILL {
     id = 'riyuequan';
     grade = 5;
 
-    // 原始描述：日月神教镇教拳法，融日之刚猛与月之阴柔于一体，拳出如日月同辉，威不可挡
-    desc = '日月神教NPC使用的拳脚';
+    family = FAMILIES.MONSTER;
+    desc = '日月神教镇教拳法，融日之刚猛与月之阴柔于一体，拳出如日月同辉，威不可挡';
     can_enables = ['unarmed', 'parry'];
     attack_actions = [
         '$N右拳高举，如旭日东升，一招「<HIC>日升月恒</HIC>」带着煌煌之威砸向$n的$l',
@@ -22,8 +22,8 @@ export default class extends SKILL {
         '$N双拳齐出，一明一暗，正是「<HIC>日月并行</HIC>」，攻势如潮水般涌向$n的$l',
     ];
     parry_actions = [
-        '$N双拳交错，以日之刚猛与月之阴柔交替化解$P的攻势\n',
-        '$N拳法陡变，以日月经天之势格挡$P的攻击\n',
+        '$n双拳交错，以日之刚猛与月之阴柔交替化解$P的攻势\n',
+        '$n拳法陡变，以日月经天之势格挡$P的攻击\n',
     ];
 
     query_enable_prop(lv: number): EnablePropMap {

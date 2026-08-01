@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = 'shouwei';
     grade = 6;
 
+    family = FAMILIES.MONSTER;
     desc = '古老神殿的守卫者，身披神甲，手持巨刃，如不动明王般守护着神殿的每一寸土地';
     can_enables = ['force', 'blade'];
 

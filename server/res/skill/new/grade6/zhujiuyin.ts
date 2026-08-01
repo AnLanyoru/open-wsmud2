@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = 'zhujiuyin';
     grade = 6;
 
+    family = FAMILIES.MONSTER;
     desc = '传说中掌控昼夜更替的远古凶兽，人面蛇身，目开为昼，目闭为夜，其威能深不可测';
     can_enables = ['bite'];
 

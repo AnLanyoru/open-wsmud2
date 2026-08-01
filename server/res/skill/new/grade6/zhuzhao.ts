@@ -9,6 +9,7 @@ export default class extends SKILL {
     id = 'zhuzhao';
     grade = 6;
 
+    family = FAMILIES.MONSTER;
     desc = '上古太阳星中诞生的至阳生灵，掌控烈焰之力，其光灼灼，其势煌煌，万物莫能挡';
     can_enables = ['bite'];
 
