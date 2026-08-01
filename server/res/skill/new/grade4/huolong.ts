@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: '火毒攻击',
             distime: 60000,
             enable_skill: 'force',
-            mp: 510,
+            mp: 30,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N张口喷出一道炽热的火焰，$n被火海吞没！</HIR>', target);
@@ -50,10 +50,10 @@ export default class extends SKILL {
                                     dmg,
                                     999999,
                                     '',
-                                    '<HIR>$n体内火毒发作，痛不欲生！</HIR>',
+                                    '<HIR>$N体内火毒发作，痛不欲生！</HIR>',
                                 );
                             },
-                            finish_msg: '<HIW>$n体内的火毒终于被逼出体外。</HIW>',
+                            finish_msg: '<HIW>$N体内的火毒终于被逼出体外。</HIW>',
                         },
                         me,
                     );
@@ -69,7 +69,7 @@ export default class extends SKILL {
             name: '撕咬',
             distime: 7000,
             enable_skill: 'force',
-            mp: 510,
+            mp: 30,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N发出震天咆哮，疯狂的扑向$n，利爪獠牙齐施！</HIR>', target);
                 for (var i = 0; i < 5; i++) {
@@ -85,7 +85,7 @@ export default class extends SKILL {
             name: '威慑',
             distime: 20000,
             enable_skill: 'force',
-            mp: 510,
+            mp: 30,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N仰天发出一声震天巨吼，$n被龙威震慑，心神剧震！</HIR>', target);
                 me.do_attack({

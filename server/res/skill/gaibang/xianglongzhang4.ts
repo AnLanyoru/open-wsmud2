@@ -141,22 +141,19 @@ export default class extends SKILL {
                 const powerGj = int((me.max_mp * totalMpPercent) / 100);
 
                 me.send_room(
-                    '<ored>$N面容肃穆，双掌缓缓合拢，周身真气如百川归海般向掌心汇聚。刹那间，数十式掌法合为一体——$N猛地双掌齐出，一道毁天灭地的掌劲轰然爆发！</ored>',
+                    '<hir>$N面容肃穆，双掌缓缓合拢，周身真气如百川归海般向掌心汇聚，猛地双掌齐出，一道毁天灭地的掌劲轰然爆发！</hir>',
                     target,
                 );
 
                 const sh = me.do_attack({
                     target: target,
-                    gj: me.gj,
+                    gj: me.gj * (lv/200 + 5),
                     mz: me.mz,
                     no_weapon: true,
                     diff_fy: hasXlz ? 100 : 0,
                     no_dodge: hasXlz ? true : false,
                     no_parry: hasXlz ? true : false,
                     power_gj: powerGj,
-                    attack_msg: '<ored>$N将毕生功力聚于一掌，掌劲如山崩海啸般向$n席卷而去！</ored>',
-                    damage_msg:
-                        '<ored>「破灭」！$N毁天灭地的一掌正中$n，劲力贯体而过，$n身后的地面被余劲震出数丈宽的深坑！</ored>',
                     miss_msg:
                         '<cyn>$n拼尽全力向旁闪避，破灭掌劲擦身而过，身后的墙壁轰然倒塌！</cyn>',
                 });

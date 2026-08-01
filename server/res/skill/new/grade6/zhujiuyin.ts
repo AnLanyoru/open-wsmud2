@@ -28,7 +28,7 @@ export default class extends SKILL {
             name: '烛龙之眼',
             distime: 28500,
             enable_skill: 'bite',
-            mp: 33660,
+            mp: 2100,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room(
@@ -62,7 +62,7 @@ export default class extends SKILL {
             name: '爪击',
             distime: 28500,
             enable_skill: 'bite',
-            mp: 17850,
+            mp: 1600,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 me.send_room('<HIR>$N探出巨爪，以泰山压顶之势朝$n猛拍而下！</HIR>', target);
