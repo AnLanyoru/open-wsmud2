@@ -105,6 +105,7 @@ export default class extends SKILL {
             name: '天地决',
             distime: 60000,
             enable_skill: 'force',
+            use_type: 2,
             mp: 3700,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 me.send_room(
