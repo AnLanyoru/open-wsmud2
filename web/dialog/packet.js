@@ -5,6 +5,7 @@ import Combat from '../combat.js';
 
 
 export default {
+    receiveInBackground: true,
     close: function () {
         this.hide();
         this.element.remove();

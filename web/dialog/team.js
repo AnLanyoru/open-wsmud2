@@ -1,4 +1,5 @@
 export default {
+    receiveInBackground: true,
     init: function () {
     },
     createElement: function () {

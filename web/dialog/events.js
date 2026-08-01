@@ -55,6 +55,13 @@ const events_css = `
 
 export default {
     unRead: 0,
+    onBackgroundData: function (data) {
+        // Event changes update the menu badge, while a full list response belongs
+        // to the event page and must not overwrite another dialog's footer.
+        if (data.items) return false;
+        this.onData(data);
+        return true;
+    },
     init: function () {
         Dialog.injectStyle(events_css);
     },

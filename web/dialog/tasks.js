@@ -97,9 +97,16 @@ export default {
     close: function () {
         this.element.remove();
         this.isShow = false;
-    }, update_item: function (data) {
+    }, pending_updates: Object.create(null),
+    update_item: function (data, render = true) {
+        if (!Array.isArray(this.items)) {
+            this.pending_updates[data.id] = data;
+            return;
+        }
+        let found = false;
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].id == data.id) {
+                found = true;
                 if (data.state) {
                     this.items[i].title = data.title;
                     this.items[i].state = data.state;
@@ -111,13 +118,24 @@ export default {
                 break;
             }
         }
-        this.create_items();
+        if (!found && data.state) {
+            this.items.push({
+                id: data.id,
+                title: data.title,
+                state: data.state,
+                desc: data.desc,
+            });
+        }
+        if (render) this.create_items();
     }, onData: function (data) {
 
         if (data.id) return this.update_item(data);
         Dialog.title("任务列表");
         Dialog.icon("exclamation-sign");
-        this.items = data.items;
+        this.items = Array.isArray(data.items) ? data.items : [];
+        const updates = Object.values(this.pending_updates);
+        this.pending_updates = Object.create(null);
+        for (const update of updates) this.update_item(update, false);
         this.create_items();
     },
     show: function () {

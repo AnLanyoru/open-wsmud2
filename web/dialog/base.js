@@ -26,6 +26,7 @@ import DialogList from './list.js';
 const Dialog = {
     isShow: false,
     curItem: null,
+    dataCache: Object.create(null),
     score: DialogScore,
     map: DialogMap,
     keys: DialogKeys,
@@ -67,10 +68,33 @@ const Dialog = {
             this.init();
             this.curItem = name;
             dialog.show(data);
+            this.flushData(name);
             Process.message.scroll2end();
         } else {
-            dialog.onData(data);
+            const isCurrent = this.isShow && this.curItem === name && dialog.isShow;
+            if (data.close && !isCurrent) return;
+            if (isCurrent || !this.isShow || dialog.receiveInBackground) {
+                dialog.onData(data);
+            } else if (!dialog.onBackgroundData || dialog.onBackgroundData(data) !== true) {
+                this.cacheData(name, data);
+            }
         }
+    },
+    cacheData: function (name, data) {
+        // A close packet belongs to the instance that initiated it. Replaying it
+        // after the user opens the page again would immediately close a new page.
+        if (data.close) return;
+        const cache = this.dataCache[name] || (this.dataCache[name] = []);
+        cache.push(data);
+        // Incremental dialogs should not be allowed to grow the cache forever.
+        if (cache.length > 100) cache.shift();
+    },
+    flushData: function (name) {
+        const cache = this.dataCache[name];
+        if (!cache || !cache.length) return;
+        delete this.dataCache[name];
+        const dialog = this[name];
+        for (const data of cache) dialog.onData(data);
     },
     select: function (name) {
         if (this.isShow && name == this.curItem) return this.hide();

@@ -23,6 +23,13 @@ export default {
     messages: [],
     isLoad: false,
     unRead: 0,
+    onBackgroundData: function (data) {
+        // Message pushes must still update the badge while another dialog is open.
+        // Request/response detail packets stay cached for the message page.
+        if (data.items) return false;
+        this.onData(data);
+        return true;
+    },
     onData: function (data) {
         if (data.receive) return this.updateMessageState(data.receive, data.index);
         if (data.items) {
