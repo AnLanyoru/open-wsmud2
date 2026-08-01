@@ -89,13 +89,13 @@ export default class extends COMMAND {
 }
 
 function on_check(this: UserState, me: USER) {
-    if (!this.queues || !this.target || !this.max_level)
+    if (!this.queues || !this.max_level)
         return me.notify_fail('<hir>练习状态异常，请联系管理解决</hir>');
     let max_level = this.max_level;
     let speed = count_speed(me);
 
     let skill = this.skill_base;
-    if (!skill) return me.notify_fail('<hir>练习状态异常，请联系管理解决</hir>');
+    if (!skill) return me.notify_fail('<hir>练习状态异常，请联系管理解决，错误：练习未引用技能</hir>');
     let pot =
         skill.query_needexp(max_level, me) - skill.query_needexp(me.query_skill(skill.id, 0), me);
     let str = [
@@ -192,7 +192,7 @@ function check_skill(me: USER, skill: SKILL, limit = true) {
 
 function do_learn(this: UserState, me: USER) {
     if (!this.skill_base || this.sum_pot === undefined)
-        return me.notify_fail('<hir>练习状态异常，请联系管理解决</hir>');
+        return me.notify_fail('<hir>练习状态异常，请联系管理解决，错误：练习未引用技能</hir>');
     if (me.pot > 0) {
         if (!check_skill(me, this.skill_base)) return false;
         var exp = count_speed(me);
