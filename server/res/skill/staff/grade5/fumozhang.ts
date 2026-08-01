@@ -47,11 +47,11 @@ export default class extends SKILL {
                         mz: me.mz,
                     })
                 ) {
-                    me.end_attack(target);
                     if (count > 5) {
                     }
                 }
                 target.remove_status('fmz', true);
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 return '罗汉伏魔，每层BUFF增加80%伤害';

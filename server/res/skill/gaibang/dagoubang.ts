@@ -53,8 +53,8 @@ export default class extends SKILL {
                         },
                         me,
                     );
-                    me.end_attack(target);
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var time = parseInt((6000 + lv * 2) / 1000);

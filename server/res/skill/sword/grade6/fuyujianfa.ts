@@ -98,10 +98,11 @@ export default class extends SKILL {
                     target,
                 );
                 me.do_attack({
-                target,
-                gj: me.gj * bounsDmg,
-                mz: me.mz * 2,
-            })
+                    target,
+                    gj: me.gj * bounsDmg,
+                    mz: me.mz * 2,
+                });
+                me.end_attack(target);
             },
             query_desc: function (_me: CHARACTER, _lv: number) {
                 return '极致的剑法，大幅度增加命中和伤害，必定触发穿透';

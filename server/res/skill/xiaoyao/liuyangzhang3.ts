@@ -84,8 +84,8 @@ export default class extends SKILL {
                             }
                         },
                     });
-                    me.end_attack(target);
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 const time = Math.max(9000, 12000 - lv);

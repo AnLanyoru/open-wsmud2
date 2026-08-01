@@ -40,7 +40,6 @@ export default class extends SKILL {
                         mz: me.mz,
                     })
                 ) {
-                    me.end_attack(target);
                     target.add_status({
                         id: 'ban',
                         name: '绊倒',
@@ -52,6 +51,7 @@ export default class extends SKILL {
                         desc: '你的躲闪降低了',
                     });
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var p = 50 + lv;

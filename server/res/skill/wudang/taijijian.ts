@@ -150,8 +150,8 @@ export default class extends SKILL {
                         },
                         me,
                     );
-                    me.end_attack(target);
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var time = 3000 + lv * 10;

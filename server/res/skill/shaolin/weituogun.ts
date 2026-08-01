@@ -45,7 +45,6 @@ export default class extends SKILL {
                         mz: me.mz,
                     })
                 ) {
-                    me.end_attack(target);
                     target.add_status({
                         id: 'busy',
                         is_busy: true,
@@ -55,6 +54,7 @@ export default class extends SKILL {
                         desc: '你手忙脚乱无法招架，攻击',
                     });
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var p = 120 + Math.round(lv / 50);

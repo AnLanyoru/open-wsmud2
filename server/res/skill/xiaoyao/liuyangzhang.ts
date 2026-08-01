@@ -78,8 +78,8 @@ export default class extends SKILL {
                             }
                         },
                     });
-                    me.end_attack(target);
                 }
+                me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 var time = 12000 - lv;
