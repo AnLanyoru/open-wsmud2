@@ -13,11 +13,15 @@ export default class extends EQUIPMENT {
         if (par) {
             par = par.slice(1);
             lv = parseInt(par);
-            if (!(lv >= 2 && lv <= 5)) return;
+            if (!(lv >= 1 && lv <= 5)) return;
         }
         this.grade = lv;
         this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
+            case 1:
+                this.prop = { gj: 20, zj: 20 };
+                this.desc = '蒙古士兵使用的粗制长枪，枪杆上满是裂纹。';
+                break;
             case 2:
                 this.prop = { gj: 60, zj: 60 };
                 this.desc = '蒙古探马的短枪，简单粗陋。';

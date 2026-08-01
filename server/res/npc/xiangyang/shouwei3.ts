@@ -23,6 +23,12 @@ export default class extends NPC {
 
     constructor() {
         super();
+        this.set_objects(
+            ['eq/xiangyang/dasongjunqiang#3', 1, 1],
+            ['eq/xiangyang/dasongjunfu#3', 1, 1],
+            ['eq/xiangyang/dasongjunmao#3', 1, 1],
+            ['eq/xiangyang/dasongjunxue#3', 1, 1],
+        );
         this.skill_map(
             ['dodge', 900],
             ['parry', 900],

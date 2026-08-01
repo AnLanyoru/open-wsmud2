@@ -61,7 +61,17 @@ export default class extends COMMAND {
 
         str.push(',seller:"');
         str.push(target.id);
-        str.push('"}');
+        str.push('"');
+
+        if (selllist.some(item => item.currency === 'jungong')) {
+            str.push(',jungong:');
+            str.push(String(me.query_temp('jg', 0) ?? 0));
+        } else if (selllist.some(item => item.currency === 'gongji')) {
+            str.push(',gongji:');
+            str.push(String(me.query_temp('gongji', 0) ?? 0));
+        }
+
+        str.push('}');
 
         me.send(str.join(''));
     }

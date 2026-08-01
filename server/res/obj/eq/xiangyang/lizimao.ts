@@ -12,11 +12,15 @@ export default class extends EQUIPMENT {
         if (par) {
             par = par.slice(1);
             lv = parseInt(par);
-            if (!(lv >= 2 && lv <= 5)) return;
+            if (!(lv >= 1 && lv <= 5)) return;
         }
         this.grade = lv;
         this.hole_count = Math.max(0, lv - 1);
         switch (lv) {
+            case 1:
+                this.prop = { fy: 8 };
+                this.desc = '蒙古士兵戴的旧毡帽，勉强可以遮风。';
+                break;
             case 2:
                 this.prop = { fy: 76, con: 6 };
                 this.desc = '蒙古牧民编的草帽，聊胜于无。';

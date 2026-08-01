@@ -1,5 +1,7 @@
 import { ItemCommandsJson } from '../../../core/char/follower.js';
+import { CHARACTER } from '../../../core/char/character.js';
 import { NPC } from '../../../core/char/npc.js';
+import { OBJ } from '../../../core/item/obj.js';
 import { TASK } from '../../../core/task/task.js';
 import { WORLD } from '../../../core/world.js';
 import { UTIL } from '../../../core/util/util.js';
@@ -18,6 +20,8 @@ export default class extends NPC {
     level = 3;
     pfm_rate = 1;
     no_fight = true;
+    sell_list: OBJ[] = [];
+    private goodsByPlayer = new WeakMap<CHARACTER, { grade: number; goods: OBJ[] }>();
     prop = {
         gj: 20000,
         fy: 20000,
@@ -29,15 +33,21 @@ export default class extends NPC {
 
     constructor() {
         super();
+        this.set_objects(
+            ['eq/xiangyang/dasongjunqiang#5', 1, 1],
+            ['eq/xiangyang/dasongjunfu#5', 1, 1],
+            ['eq/xiangyang/dasongjunmao#5', 1, 1],
+            ['eq/xiangyang/dasongjunxue#5', 1, 1],
+        );
         this.skill_map(
             ['dodge', 3000],
             ['parry', 3000],
             ['force', 3000],
             ['unarmed', 3000],
             ['club', 3000],
-            ['dagoubang', 3000, 'club'],
-            ['yijinjing', 3000, 'force'],
-            ['xianglongzhang', 3000, ['unarmed', 'parry']],
+            ['dagoubang2', 3000, 'club'],
+            ['jiuyinshengong', 3000, 'force'],
+            ['xianglongzhang2', 3000, ['unarmed', 'parry']],
             ['zhutianbu', 3000, 'dodge'],
         );
 
@@ -48,22 +58,9 @@ export default class extends NPC {
             task.bm(me);
         });
 
-        // 军功兑换 — 1点军功兑换100两白银
+        // 打开军功商店
         this.add_action('xy_jgdh', '军功兑换', function (this: NPC, me: USER) {
-            const jg = Number(me.query_temp('jg', 0)) || 0;
-            if (jg <= 0) return me.notify('你没有可兑换的军功。');
-            let num = 1;
-            me.add_temp('jg', -num);
-            me.add_money(10000 * num);
-            me.notify(
-                '<hiy>你兑换了' +
-                    num +
-                    '点军功，获得' +
-                    num +
-                    '两黄金。剩余军功：' +
-                    (jg - 1) +
-                    '。</hiy>',
-            );
+            me.do_command('list', this.id);
         });
 
         // 捐献军饷 — 3两黄金兑换1点军功，补到本周上限
@@ -102,6 +99,57 @@ export default class extends NPC {
         return false;
     }
 
+    on_clone() {
+        this.goodsByPlayer = new WeakMap<CHARACTER, { grade: number; goods: OBJ[] }>();
+    }
+
+    on_sell(me: CHARACTER): OBJ[] {
+        // 百姓与武士使用绿色装备，此后每个境界对应一个装备品级。
+        const grade = Math.max(1, Math.min(5, me.level));
+        const cached = this.goodsByPlayer.get(me);
+        if (cached?.grade === grade) return cached.goods;
+
+        const equipmentPrice = [0, 100, 200, 1000, 2000, 4000][grade];
+        const weaponPrice = [0, 150, 300, 1500, 3000, 6000][grade];
+        const goods: Array<[string, number]> = [
+            [`eq/xiangyang/menggujunqiang#${grade}`, weaponPrice],
+            [`eq/xiangyang/menggujunfu#${grade}`, equipmentPrice],
+            [`eq/xiangyang/lizimao#${grade}`, equipmentPrice],
+            [`eq/xiangyang/menggujunxue#${grade}`, equipmentPrice],
+            [`eq/xiangyang/dasongjunqiang#${grade}`, weaponPrice],
+            [`eq/xiangyang/dasongjunfu#${grade}`, equipmentPrice],
+            [`eq/xiangyang/dasongjunmao#${grade}`, equipmentPrice],
+            [`eq/xiangyang/dasongjunxue#${grade}`, equipmentPrice],
+            ['book/bc#mengguqiangfa', 100],
+            ['book/bc#zhongpingqiang', 100],
+            ['book/bc#longxianggong', 500],
+            ['money/p1w', 1],
+            ['st/xuanjing', 1],
+            ['money/gold', 1],
+        ];
+
+        const sellList = goods.map(([path, price]) => {
+            const obj = OBJ.CREATE(path);
+            obj.count = -1;
+            obj.value = price;
+            obj.currency = 'jungong';
+            return obj;
+        });
+        this.goodsByPlayer.set(me, { grade, goods: sellList });
+        return sellList;
+    }
+
+    before_sell_item(me: CHARACTER, sellitem: OBJ, buyCount: number): boolean {
+        const cost = sellitem.value * buyCount;
+        const jungong = Number(me.query_temp('jg', 0)) || 0;
+        if (jungong < cost) {
+            me.notify(`兑换这些物品需要${cost}点军功，你目前只有${jungong}点。`);
+            return false;
+        }
+        me.add_temp('jg', -cost);
+        return true;
+    }
+
     query_commands(player: USER) {
         const status = WORLD.DATA.query_temp<number>('xy_status', 0);
         const commands: { cmd: string; name: string }[] = [
@@ -113,7 +161,7 @@ export default class extends NPC {
             commands.push({ cmd: 'xy_bm ' + this.id, name: '报名守城' });
         } else {
             // 空闲时：军功兑换，捐献军饷
-            commands.push({ cmd: 'xy_jgdh ' + this.id, name: '军功兑换' });
+            commands.push({ cmd: 'xy_jgdh ' + this.id, name: '军功商店' });
             commands.push({ cmd: 'xy_jx ' + this.id, name: '捐献军饷' });
         }
 

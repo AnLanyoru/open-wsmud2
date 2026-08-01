@@ -40,8 +40,18 @@ export default {
         } else if (data.sell) {
             var item = this.find_item(2, data.id);
             if (item) {
-                item.count -= data.sell;
-                return this.create_items(this.selllist, this.leftElement, 2, this.selllist.length);
+                if (item.count !== -1) item.count -= data.sell;
+                var currency = data.gongji ?? data.jungong ?? data.yaoyuan ?? data.mvalue;
+                if (currency >= 0) {
+                    this.gongji = currency;
+                    this.show_footer(currency);
+                }
+                return this.create_items(
+                    this.selllist,
+                    this.leftElement,
+                    2,
+                    this.selllist.length,
+                );
             }
         }
         if (this.isstore && this.isShow) {
