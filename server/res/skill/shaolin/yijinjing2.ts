@@ -78,9 +78,9 @@ export default class extends SKILL {
             use_type: 2,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): boolean | void {
-                me.send_room('<hiy>$N深深地吸一口气，真力迸发，发出一声惊天动地的巨吼！</hiy>');
                 const list: CHARACTER[] = me.get_nearby_enemies();
-                if (!list.length) return false;
+                if (!list.length) return me.notify_fail('你周围没有敌人！');
+                me.send_room('<hiy>$N深深地吸一口气，真力迸发，发出一声惊天动地的巨吼！</hiy>');
                 const dmg: number = int(me.max_mp * 0.15);
                 const time: number = 7000;
                 for (let i: number = 0; i < list.length; i++) {

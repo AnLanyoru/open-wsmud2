@@ -96,11 +96,11 @@ export default class extends SKILL {
             mp: 2300,
             use_type: 2,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): boolean | void {
+                const list: CHARACTER[] = me.get_nearby_enemies();
+                if (!list.length) return me.notify_fail('你周围没有敌人！');
                 me.send_room(
                     '<hiy>$N双手合十，口诵佛号，无边佛法如怒潮般向四周席卷而去，所过之处万象俱寂！</hiy>',
                 );
-                const list: CHARACTER[] = me.get_nearby_enemies();
-                if (!list.length) return false;
                 const dmg: number = int(me.max_mp * 0.25);
                 for (let i: number = 0; i < list.length; i++) {
                     const x: CHARACTER = list[i];

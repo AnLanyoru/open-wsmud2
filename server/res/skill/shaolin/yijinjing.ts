@@ -59,9 +59,9 @@ export default class extends SKILL {
             use_type: 2,
             release_time: 1000,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                me.send_room('<hiy>$N深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼。</hiy>');
                 const list = me.get_nearby_enemies();
-                if (!list.length) return false;
+                if (!list.length) return me.notify_fail('你周围没有敌人！');
+                me.send_room('<hiy>$N深深地吸一囗气，真力迸发，发出一声惊天动地的巨吼。</hiy>');
                 var time = lv * 10 + 2000;
                 if (time > 7000) time = 7000;
                 for (var i = 0; i < list.length; i++) {

@@ -55,7 +55,7 @@ export default class extends ROOM {
                     if (speed >= 3) {
                         killer.is_busy = 1000;
                         killer.call_out(() => {
-                            killer.is_busy = 0;
+                            if (!killer.query_status('busy')) killer.is_busy = 0;
                         }, 1000);
                     }
                 }

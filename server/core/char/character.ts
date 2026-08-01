@@ -4178,6 +4178,7 @@ const _DMG_DISP_MSG = _tmpl('^\n$N对$n造成了<wht>^</wht>点伤害');
 const _DMG_DISP_MSG_CRIT = _tmpl('^\n$N对$n造成了<hir>^</hir>点暴击伤害');
 // fallback
 const _DMG_FALLBACK = _tmpl('结果造成<wht>^</wht>点伤害。');
+const _DMG_FALLBACK_CRIT = _tmpl('结果造成<hir>^</hir>点暴击伤害。');
 
 /**
  * 发送伤害消息
@@ -4207,7 +4208,7 @@ function damage_msg(
         }
         // msg 为模板 ID — 二进制路径，damage 以原始 number 传入
         const dmgTmpl = iscrit ? _DMG_DISP_MSG_CRIT : _DMG_DISP_MSG;
-        me.send_combat(dmgTmpl, ob, [msg as any], [disp, damage]);
+        me.send_combat(dmgTmpl, ob, [msg as any], damage);
         return;
     }
     // 零伤害
@@ -4242,7 +4243,8 @@ function damage_msg(
         }
     }
     // fallback
-    me.send_combat(_DMG_FALLBACK, ob, [disp, damage]);
+    const fb = iscrit ? _DMG_FALLBACK_CRIT : _DMG_FALLBACK;
+    me.send_combat(fb, ob, damage);
 }
 
 // ================================================================
