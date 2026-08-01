@@ -50,11 +50,34 @@ export default class UpdateCmd extends COMMAND {
         if (index == -1) {
             return Promise.reject(new Error('路径不合理'));
         }
+        const resource = arg.slice(0, index);
         var path = __PATH.WORLD + arg.slice(0, index + 1);
         var fname = arg.slice(index + 1);
+        const match = BASE.PATH_REG.exec(fname);
+        if (!match) {
+            return Promise.reject(new Error('路径不合理'));
+        }
+        const resourcePath = match[1];
         return BASE.UPDATE(path, fname).then(() => {
+            // 一个资源文件可通过 #参数生成多个模板。构造函数更新后，旧变体仍然
+            // 继承旧类原型，必须按源文件路径一起失效，再预热本次请求的模板。
+            if (resource === 'obj') {
+                this.clear_variants(WORLD.OBJ_STORE, resourcePath);
+            } else if (resource === 'npc') {
+                this.clear_variants(WORLD.NPC_STORE, resourcePath);
+            }
             BASE.CREATE(path, fname, true);
         });
+    }
+
+    /** 清除同一资源文件生成的基础模板及全部 #变体模板。 */
+    clear_variants<T>(store: Map<string, T>, resourcePath: string): void {
+        const variantPrefix = resourcePath + '#';
+        for (const key of store.keys()) {
+            if (key === resourcePath || key.startsWith(variantPrefix)) {
+                store.delete(key);
+            }
+        }
     }
 
     notify(me: CHARACTER | null, msg: string): void {
@@ -69,13 +92,6 @@ export default class UpdateCmd extends COMMAND {
         if (!path) return;
         this.do_update(me, 'npc/' + path)
             .then(() => {
-                // 主路径由NPC.CREATE覆盖，#变体需清除缓存
-                let prefix = path + '#';
-                for (let key of WORLD.NPC_STORE.keys()) {
-                    if (key.startsWith(prefix)) {
-                        WORLD.NPC_STORE.delete(key);
-                    }
-                }
                 if (me && me.environment) {
                     let npc = me.environment.find_obj_bypath(path!);
                     if (npc) {
@@ -92,15 +108,6 @@ export default class UpdateCmd extends COMMAND {
 
     update_obj(me: CHARACTER | null, path: string) {
         this.do_update(me, 'obj/' + path)
-            .then(() => {
-                WORLD.OBJ_STORE.delete(path);
-                let prefix = path + '#';
-                for (let key of WORLD.OBJ_STORE.keys()) {
-                    if (key.startsWith(prefix)) {
-                        WORLD.OBJ_STORE.delete(key);
-                    }
-                }
-            })
             .catch((e: any) => {
                 console.log(e);
                 this.notify(me, 'error:' + e);

@@ -7,4 +7,9 @@ export default class extends ROOM {
         west: 'fb/guanwai/milin',
         north: 'fb/guanwai/milin3',
     };
+
+    constructor() {
+        super();
+        this.set_npc('bj/guanwai/hu');
+    }
 }
