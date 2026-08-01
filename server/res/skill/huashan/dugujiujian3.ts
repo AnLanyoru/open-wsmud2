@@ -197,6 +197,7 @@ export default class extends SKILL {
                     attack_msg: msg,
                     gj: gj,
                     mz: me.mz,
+                    no_append_target: true,
                 });
                 me.end_attack(target);
                 me.set_temp('sk_dg_pr', 1, 100);
