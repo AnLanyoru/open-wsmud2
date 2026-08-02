@@ -16,12 +16,10 @@ export default class extends COMMAND {
         let target: CHARACTER | undefined = me;
         if (arg) {
             const look_target = me.find_obj(arg, me.environment);
-            if (look_target) {
-                target = look_target.check_character() ? (look_target as CHARACTER) : undefined;
+            if (look_target?.check_character()) {
+                target = look_target;
             } else if (me.user_level > 1) {
                 target = WORLD.getUser(arg);
-            } else {
-                target = undefined;
             }
             if (!target) {
                 return me.notify('你要查看谁的属性。');
