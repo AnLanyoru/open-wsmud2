@@ -52,6 +52,7 @@ var _show_moeny = function () {
     }
     str.push("</div>");
     Dialog.footer(str.join(""));
+    Dialog.pack.schedule_footer_layout();
 };
 
 var _hide = function () {

@@ -20,6 +20,9 @@ export default {
         if (!this.created) {
             Dialog.injectStyle(packet_css);
             Dialog.injectStyle(list_css);
+            $(window).on('resize.inventory-footer', function () {
+                Dialog.pack.schedule_footer_layout();
+            });
         }
         this.created = true;
     },
@@ -233,7 +236,26 @@ export default {
         str.push("</div>");
 
         Dialog.footer(str.join(""));
+        this.schedule_footer_layout();
 
+    }, schedule_footer_layout: function () {
+        if (this.footer_layout_frame) cancelAnimationFrame(this.footer_layout_frame);
+        this.footer_layout_frame = requestAnimationFrame(function () {
+            Dialog.pack.footer_layout_frame = null;
+            Dialog.pack.layout_footer();
+        });
+    }, layout_footer: function () {
+        let footer = Dialog.footerElement?.find('.inventory-footer')[0];
+        if (!footer) return;
+        let money = footer.querySelector('.inventory-footer-money');
+        let actions = footer.querySelector('.inventory-footer-actions');
+        footer.classList.remove('actions-overflow', 'money-overflow');
+        if (!money || !actions || actions.classList.contains('cleanup-actions')) return;
+
+        // 先按原来的单行样式测量；货币被挤压时，让按钮转为框外下标签。
+        if (money.scrollWidth > money.clientWidth + 1) footer.classList.add('actions-overflow');
+        // 按钮移出后货币仍然过长，才显示可横滑的渐隐提示。
+        if (money.scrollWidth > money.clientWidth + 1) footer.classList.add('money-overflow');
     }, cleanup_cmds: {cleanup: true, cancle: true, store: true, sell: true},
     footerChanged: function (cmd, elem) {
         if (this.cleanup_cmds[cmd])
@@ -482,10 +504,11 @@ const packet_css = `
 .inventory-footer {
     display: flex;
     align-items: center;
+    position: relative;
     width: 100%;
     height: 100%;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .inventory-footer > .eq-group {
@@ -517,6 +540,9 @@ const packet_css = `
     scrollbar-width: none;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
+}
+
+.inventory-footer.money-overflow > .inventory-footer-money {
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent 100%);
     mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent 100%);
 }
@@ -528,6 +554,7 @@ const packet_css = `
 
 .inventory-footer-actions {
     display: flex;
+    align-items: center;
     flex: 0 0 auto;
     min-width: 0;
     height: 100%;
@@ -547,7 +574,7 @@ const packet_css = `
     padding-left: 1em;
     border-left: 1px solid var(--border-secondary);
     color: var(--text-muted);
-    line-height: 2.5em;
+    line-height: 1.8em;
     text-align: center;
     cursor: pointer;
     user-select: none;
@@ -561,6 +588,35 @@ const packet_css = `
 .inventory-footer-actions.cleanup-actions {
     flex: 1 1 auto;
     justify-content: flex-end;
+}
+
+.inventory-footer.actions-overflow > .inventory-footer-actions {
+    position: absolute;
+    z-index: 12;
+    top: 100%;
+    right: 0.25em;
+    height: auto;
+    padding: 0;
+    overflow: visible;
+    gap: 0.25em;
+}
+
+.inventory-footer.actions-overflow > .inventory-footer-actions > span {
+    min-width: 4em;
+    margin: 0;
+    padding: 0.15em 0.8em 0.25em;
+    border: 1px solid var(--border-secondary);
+    border-radius: 0 0 0.65em 0.65em;
+    background-color: var(--dialog-footer-bg);
+    color: var(--text-muted);
+    line-height: 1.8em;
+    font-weight: normal;
+}
+
+.inventory-footer.actions-overflow > .inventory-footer-actions > span:hover,
+.inventory-footer.actions-overflow > .inventory-footer-actions > span.select {
+    background-color: var(--dialog-footer-select);
+    color: var(--text-tertiary);
 }
 
 .dialog-pack {
@@ -800,8 +856,8 @@ const list_css = `
     }
 
     .inventory-footer-actions > span {
-        margin-left: 0.5em;
-        padding-left: 0.5em;
+        margin-left: 1em;
+        padding-left: 1em;
     }
 
     .dialog-list>.otype-list {

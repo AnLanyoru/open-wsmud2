@@ -211,6 +211,7 @@ export default {
                 + "<div class='inventory-footer-actions'>"
                 + "<span cmd='#menu pack'>背包</span>"
                 + "<span cmd='" + cmd + " all'>存仓库</span></div></div>");
+            Dialog.pack.schedule_footer_layout();
         } else {
             var str = this.money_name ? ("你目前有" + money + "<hiy>"
                 + this.money_name + "</hiy>") : ("你身上有" + Util.moneyToStr(money));
