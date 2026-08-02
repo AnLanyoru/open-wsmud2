@@ -4,6 +4,11 @@ export default {
     init: function () {
         Dialog.pack.init();
     },
+    onBackgroundData: function (data) {
+        if (data.store === undefined || data.store === 0) return false;
+        this.updateitem(data);
+        return true;
+    },
     hide: function () {
         this.element.remove();
         this.isShow = false;
@@ -13,32 +18,36 @@ export default {
     },
     updateitem: function (data) {
         if (data.store !== undefined && data.store !== 0) {
+            var source_pack = this.get_source_pack(data);
             if (!this.stores || !this.isShow) {
-                var result = Dialog.pack.onData({remove: data.store, id: data.id});
+                if (!source_pack) return true;
+                var result = source_pack.updateitem({remove: data.store, id: data.id});
                 // 取出到一个新堆叠时，增量消息没有完整物品元数据，刷新背包以免漏项。
-                if (data.store < 0) SendCommand('pack');
+                if (data.store < 0) this.refresh_source_pack(data);
                 return result;
             }
-            var item = this.find_item(1, data.id);
+            var item = this.find_item(1, data.id, source_pack ? source_pack.items : []);
             var store_item = this.find_item(3, data.storeid);
             var update_store = !this.is_store_filtered
                 || data.otype === undefined
                 || data.otype === this.selected_type;
             if (!item) {
-                if (!store_item) {
-                    SendCommand('pack');
+                if (data.store > 0 || !store_item || !source_pack) {
+                    if (source_pack) this.refresh_source_pack(data);
                     if (this.is_store_filtered) SendCommand('store ' + this.selected_type);
-                    return;
+                    if (!store_item) return;
+                } else {
+                    item = Object.assign({}, store_item);
+                    item.id = data.id;
+                    item.count = (-data.store);
+                    source_pack.items.push(item);
                 }
-                item = Object.assign({}, store_item);
-                item.id = data.id;
-                item.count = (-data.store);
-                Dialog.pack.items.push(item);
             } else {
                 item.count -= data.store;
             }
             if (update_store) {
                 if (!store_item) {
+                    if (!item) return;
                     store_item = Object.assign({}, item);
                     store_item.id = data.storeid;
                     store_item.count = data.store;
@@ -50,7 +59,7 @@ export default {
             }
             if (data.sum !== undefined) this.store_count = data.sum;
             else if (!this.is_store_filtered) this.store_count = this.stores.length;
-            if (item.count <= 0) Dialog.pack.items.Remove(item);
+            if (item && item.count <= 0) source_pack.items.Remove(item);
 
         } else if (data.sell) {
             var item = this.find_item(2, data.id);
@@ -77,8 +86,13 @@ export default {
         }
         this.update_pack();
         if (data.money != undefined) this.show_footer(data.money);
-    }, find_item: function (otype, id) {
-        var items = Dialog.pack.items;
+    }, get_source_pack: function (data) {
+        if (!data.sourceid) return Dialog.pack;
+        if (Dialog.pack2?.id === data.sourceid) return Dialog.pack2;
+    }, refresh_source_pack: function (data) {
+        SendCommand(data.sourceid ? ('pack ' + data.sourceid) : 'pack');
+    }, find_item: function (otype, id, pack_items) {
+        var items = pack_items || Dialog.pack.items || [];
         if (otype == 2) items = this.selllist;
         else if (otype == 3) items = this.stores;
         for (var i = 0; i < items.length; i++) {

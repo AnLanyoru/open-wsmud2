@@ -96,6 +96,7 @@ export default class extends COMMAND {
                     move_item.otype +
                     ',sum:' +
                     target.stores.length +
+                    (me.check_player() ? '' : ',sourceid:' + JSON.stringify(me.id)) +
                     '}',
             );
         }
@@ -136,7 +137,7 @@ export default class extends COMMAND {
     store_all(target: USER, me: USER | FOLLOWER) {
         //target仓库所有人=玩家 me玩家或者随从
         // if (me !== notifier) return;
-        if (me.query_temp('store_all')) return me.send('背包的道具已经自动合并到仓库中。');
+        if (me.query_temp('store_all')) return me.send('自动存仓冷却中，请稍后再试。');
         const idToIndex = new Map();
         for (let i = 0; i < target.stores.length; i++) {
             let item = target.stores[i];
@@ -169,6 +170,7 @@ export default class extends COMMAND {
                         store_item.otype +
                         ',sum:' +
                         target.stores.length +
+                        (me.check_player() ? '' : ',sourceid:' + JSON.stringify(me.id)) +
                         '}',
                 );
                 me.items.splice(i, 1);
