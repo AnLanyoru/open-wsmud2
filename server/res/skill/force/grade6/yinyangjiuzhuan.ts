@@ -52,6 +52,7 @@ export default class extends SKILL {
             distime: 30000,
             enable_skill: 'force',
             mp: 120,
+            use_type: 2,
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 // 切换阴阳形态：如果当前是九烛则切九幽，否则切九烛
                 const isJiuzhu = me.query_temp('yyjz_jz', 0);

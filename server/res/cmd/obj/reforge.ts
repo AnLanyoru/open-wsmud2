@@ -233,7 +233,7 @@ function create_prop_defs(): Record<string, CustomPropDef> {
         { key: 'busy_per', category: 'special', base: 7, step: 1, parts: [8, 9] },
         { key: 'diff_busy', category: 'special', base: 2000, step: 100, parts: [2, 9] },
         { key: 'diff_downside_per', category: 'special', base: 7, step: 1, parts: [2, 3, 4] },
-        { key: 'distime', category: 'special', base: 1400, step: 100, parts: [3, 6, 8] },
+        { key: 'distime', category: 'special', base: 900, step: 100, parts: [3, 6, 8] },
         { key: 'distime_per', category: 'special', base: 7, step: 1, parts: [0, 3, 6] },
         { key: 'releasetime', category: 'special', base: 900, step: 100, parts: [0, 5, 7, 8] },
         { key: 'diff_sh', category: 'special', base: 2000, step: 2000, parts: [1, 2, 3, 4, 9] },
