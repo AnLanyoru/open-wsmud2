@@ -136,14 +136,16 @@ export default {
         Dialog.footerElement.find('.item-commands').empty();
         this.showChild();
     }, showChild: function () {
-        var child = Dialog[this.footerElements[this.selected_item]];
+        var childName = this.footerElements[this.selected_item];
+        var child = Dialog[childName];
         //if (this.selectedChild == child) return;
         if (this.selectedChild) this.selectedChild.inner_close();
         if (!child.element) child.element = child.createElement();
         Dialog.contentElement.empty().append(child.element);
-        child.inner_show();
-
+        this.selectedChildName = childName;
         this.selectedChild = child;
+        child.inner_show();
+        Dialog.flushData(childName);
     }, showNotice: function (nt) {
         var str = ["\n<hiy>系统公告</hiy>\n"];
         var dt = new Date(nt.time);

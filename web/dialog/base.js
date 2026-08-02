@@ -73,7 +73,10 @@ const Dialog = {
             this.flushData(name);
             Process.message.scroll2end();
         } else {
-            const isCurrent = this.isShow && this.curItem === name && dialog.isShow;
+            const isCurrent = this.isShow && dialog.isShow && (
+                this.curItem === name ||
+                (this.curItem === 'message' && this.message.selectedChildName === name)
+            );
             if (data.close && !isCurrent) return;
             if (isCurrent || !this.isShow || dialog.receiveInBackground) {
                 if (!this.isShow && dialog.cacheWhenHidden) {
