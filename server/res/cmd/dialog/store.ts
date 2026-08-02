@@ -9,14 +9,15 @@ import { OBJ } from '../../../core/item/obj.js';
 export default class extends COMMAND {
     command = 'store';
     regex = /^(?:(\d+)\s)?(\w+)$/;
-    allow_fight = false;
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
 
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me: USER | FOLLOWER, count: string, arg: string) {
-        if (!me.environment?.allow_store) return me.notify('这里没有仓库。');
-
         if (arg && arg.length < 2) {
             count = arg;
             arg = '';

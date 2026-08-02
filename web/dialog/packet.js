@@ -212,23 +212,25 @@ export default {
     show_moeny: function () {
         if (!this.isShow) return;//+ "<span cmd='sell all'>清理包裹</span></div>"
         let mstr = Util.moneyToStr(this.money);
-        let str = [];
+        let str = ['<div class="inventory-footer">'];
         for (let i = 0; i < 3; i++) {
             str.push('<span class="footer-item eq-group',
                 i === this.eq_group ? " select" : "", '" for="', i + 1, '">', i + 1, '</span>');
         }
-        str.push("<div class='obj-money'>");
         if (this.packElement.is('.cleanup')) {
-
+            str.push("<div class='inventory-footer-actions cleanup-actions'>");
             str.push("<span for='cancle' class='footer-item'>取消</span>");
             str.push("<span for='store' class='footer-item'>自动存仓</span>");
             str.push("<span for='sell' class='footer-item'>清理杂物</span>");
             str.push("<span for='cleanup' class='footer-item'>确定</span></div>");
         } else {
-            str.push("你", (mstr ? "身上有"
-                + mstr : "身上没有任何银两"));
-            str.push("<span for='cleanup' class='footer-item'>整理包裹</span></div>");
+            str.push("<div class='inventory-footer-money'>你", (mstr ? "身上有"
+                + mstr : "身上没有任何银两"), "</div>");
+            str.push("<div class='inventory-footer-actions'>");
+            str.push("<span cmd='#menu list;store'>仓库</span>");
+            str.push("<span for='cleanup' class='footer-item'>整理背包</span></div>");
         }
+        str.push("</div>");
 
         Dialog.footer(str.join(""));
 
@@ -477,6 +479,90 @@ export default {
 
 const packet_css = `
 
+.inventory-footer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.inventory-footer > .eq-group {
+    flex: 0 0 2em;
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
+    background-color: var(--bg-surface);
+    line-height: 2em;
+    margin-left: 1em;
+    text-align: center;
+    color: var(--text-tertiary);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.inventory-footer > .eq-group.select {
+    background-color: var(--dialog-footer-select);
+}
+
+.inventory-footer-money {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    color: var(--text-header);
+    padding: 0 2em 0 1em;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent 100%);
+    mask-image: linear-gradient(to right, #000 calc(100% - 3em), transparent 100%);
+}
+
+.inventory-footer-money::-webkit-scrollbar,
+.inventory-footer-actions::-webkit-scrollbar {
+    display: none;
+}
+
+.inventory-footer-actions {
+    display: flex;
+    flex: 0 0 auto;
+    min-width: 0;
+    height: 100%;
+    margin-left: auto;
+    padding-right: 10px;
+    color: var(--text-header);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.inventory-footer-actions > span {
+    display: inline-block;
+    flex: 0 0 auto;
+    margin-left: 1em;
+    padding-left: 1em;
+    border-left: 1px solid var(--border-secondary);
+    color: var(--text-muted);
+    line-height: 2.5em;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.inventory-footer-actions > .footer-item {
+    width: auto;
+    font-weight: normal;
+}
+
+.inventory-footer-actions.cleanup-actions {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+}
+
 .dialog-pack {
     min-width: 360px;
     overflow-x: auto;
@@ -696,6 +782,28 @@ const list_css = `
 }
 
 @media (max-width: 480px) {
+    .inventory-footer > .eq-group {
+        flex-basis: 1.5em;
+        width: 1.5em;
+        height: 1.5em;
+        line-height: 1.5em;
+        margin-left: 0.5em;
+    }
+
+    .inventory-footer-money {
+        padding-right: 1em;
+        padding-left: 0.5em;
+    }
+
+    .inventory-footer-actions {
+        padding-right: 4px;
+    }
+
+    .inventory-footer-actions > span {
+        margin-left: 0.5em;
+        padding-left: 0.5em;
+    }
+
     .dialog-list>.otype-list {
         width: 2.5em;
     }

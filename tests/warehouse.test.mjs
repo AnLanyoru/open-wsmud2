@@ -203,7 +203,7 @@ test('qu enforces backpack capacity but permits merging into an existing stack',
     assert.equal(storeStack.count, 1);
 });
 
-test('warehouse commands are unavailable outside warehouse rooms', () => {
+test('warehouse commands are available outside warehouse rooms', () => {
     const bagItem = makeItem({ id: 'bag1' });
     const stored = makeItem({ id: 'store1' });
     const player = makePlayer({ items: [bagItem], stores: [stored] });
@@ -212,9 +212,22 @@ test('warehouse commands are unavailable outside warehouse rooms', () => {
     new StoreCommand().enter(player, undefined, 'bag1');
     new TakeCommand().enter(player, '1 ', 'store1');
 
-    assert.equal(player.items[0], bagItem);
-    assert.equal(player.stores[0], stored);
-    assert.deepEqual(player.notifications, ['这里没有仓库。', '这里没有仓库。']);
+    assert.deepEqual(player.items.map(item => item.id), ['store1']);
+    assert.deepEqual(player.stores.map(item => item.id), ['bag1']);
+    assert.equal(player.notifications.some(message => message === '这里没有仓库。'), false);
+});
+
+test('warehouse commands remain available in all character states', () => {
+    const store = new StoreCommand();
+    const take = new TakeCommand();
+
+    for (const command of [store, take]) {
+        assert.equal(command.allow_fight, true);
+        assert.equal(command.allow_busy, true);
+        assert.equal(command.allow_state, true);
+        assert.equal(command.allow_die, true);
+        assert.equal(command.allow_faint, true);
+    }
 });
 
 test('store list responses identify filtering and the selected category', () => {

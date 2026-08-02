@@ -37,17 +37,20 @@ var _onData = function (data) {
 var _show_moeny = function () {
     if (!this.isShow) return;
     var mstr = Util.moneyToStr(this.money);
-    var str = [];
-    str.push("<div class='obj-money'>");
+    var str = ['<div class="inventory-footer">'];
     if (this.packElement.is('.cleanup')) {
+        str.push("<div class='inventory-footer-actions cleanup-actions'>");
         str.push("<span for='cancle' class='footer-item'>取消</span>");
         str.push("<span for='store' class='footer-item'>自动存仓</span>");
         str.push("<span for='sell' class='footer-item'>清理杂物</span>");
         str.push("<span for='cleanup' class='footer-item'>确定</span></div>");
     } else {
-        str.push(this.target_name, (mstr ? "身上有" + mstr : "身上没有任何银两"));
+        str.push("<div class='inventory-footer-money'>", this.target_name,
+            (mstr ? "身上有" + mstr : "身上没有任何银两"), "</div>");
+        str.push("<div class='inventory-footer-actions'>");
         str.push("<span for='cleanup' class='footer-item'>整理</span></div>");
     }
+    str.push("</div>");
     Dialog.footer(str.join(""));
 };
 

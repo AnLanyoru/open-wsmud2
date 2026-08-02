@@ -6,14 +6,15 @@ import type { OBJ } from '../../../core/item/obj.js';
 export default class extends COMMAND {
     command = 'qu';
     regex = /^(?:(\d+\s+))?(\w+)$/;
-    allow_fight = false;
+    allow_busy = true;
+    allow_state = true;
+    allow_die = true;
+    allow_faint = true;
 
     /**
      * @param {CHARACTER} me - 执行命令的角色
      */
     enter(me: USER, count: string, arg: string) {
-        if (!me.environment?.allow_store) return me.notify('这里没有仓库。');
-
         if (!arg) return me.notify('你要取什么东西？');
 
         me.items = me.items || [];

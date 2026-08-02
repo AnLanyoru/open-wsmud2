@@ -206,7 +206,11 @@ export default {
         if (this.isstore) {
             var str = this.money_name ? ("你目前有" + money + "<hiy>"
                 + this.money_name + "</hiy>") : ("你身上有" + Util.moneyToStr(money));
-            Dialog.footerElement.html("<div class='obj-money'>" + str + "<span cmd='" + cmd + " all'>存仓库</span></div>");
+            Dialog.footerElement.html("<div class='inventory-footer'>"
+                + "<div class='inventory-footer-money'>" + str + "</div>"
+                + "<div class='inventory-footer-actions'>"
+                + "<span cmd='#menu pack'>背包</span>"
+                + "<span cmd='" + cmd + " all'>存仓库</span></div></div>");
         } else {
             var str = this.money_name ? ("你目前有" + money + "<hiy>"
                 + this.money_name + "</hiy>") : ("你身上有" + Util.moneyToStr(money));
