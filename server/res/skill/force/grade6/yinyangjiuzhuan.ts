@@ -187,7 +187,7 @@ export default class extends SKILL {
 
                 // 施加镇守状态
                 me.add_status({
-                    id: 'force',
+                    id: 'ztd',
                     name: '镇天地',
                     duration: totalDuration,
                     override: 2,
