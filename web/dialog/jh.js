@@ -311,6 +311,14 @@ const MAP_TYPES = {
     ar: jh_ar
 };
 export default {
+    cacheWhenHidden: true,
+    hasCachedSnapshot: function (cache) {
+        return cache.some(function (data) {
+            return Array.isArray(data.fbs)
+                && Array.isArray(data.families)
+                && Array.isArray(data.areas);
+        });
+    },
     init: function () {
         Dialog.injectStyle(jh_css);
     },
@@ -386,7 +394,7 @@ export default {
         }
         this.selected_item.show(this.listElement, this.descElement);
     },
-    show: function () {
+    show: function (useCachedData) {
         if (this.isShow) return;
         if (!this.element)
             this.element = $("<div class='dialog-fb'><div class='fb-left'></div><div class='fb-right'></div></div>");
@@ -397,14 +405,20 @@ export default {
         Dialog.icon("home");
         this.element.appendTo(Dialog.contentElement);
         this.isShow = true;
-        if (this.isLoad) {
+        if (!this.selected_item) this.selected_item = this.footers[0];
+        if (useCachedData) {
+            this.isLoad = true;
+            SendCommand("jh fb lock");
+        } else if (this.isLoad) {
             SendCommand("jh fb lock");
         } else {
             SendCommand("jh");
             this.isLoad = true;
-            this.selected_item = this.footers[0];
         }
         this.create_footer();
+    },
+    showCached: function () {
+        this.show(true);
     },
     selected_item: null,
     navigation_target: null,

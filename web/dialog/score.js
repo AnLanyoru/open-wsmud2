@@ -1,11 +1,20 @@
 export default {
     footer: [["属性", null],
         ["详细", null], ["称号", null]],
+    cacheWhenHidden: true,
+    openWhenHidden: true,
+    hasCachedSnapshot: function (cache) {
+        return cache.some(function (data) {
+            return data.id && data.name !== undefined;
+        });
+    },
 
     selectIndex: 0,
     onData: function (data) {
         console.log(data);
         this.data = data;
+        const uidChanged = data.id && data.id != this.uid;
+        if (uidChanged) this.uid = data.id;
         this.init_elem();
         Dialog.titleElement.html(data.name);
         Dialog.icon("user");
@@ -13,8 +22,7 @@ export default {
             this.titles = data.titles;
             this.create_titles();
         } else {
-            if (data.id && data.id != this.uid) {
-                this.uid = data.id;
+            if (uidChanged) {
                 if (this.uid != Process.player) {
                     Dialog.footerElement.find(".footer-item:eq(2)").hide();
                 } else {
@@ -40,7 +48,6 @@ export default {
     },
     init_elem: function () {
         Dialog.init();
-        Dialog.curItem = "score";
         if (this.isShow) return;
         Dialog.footer("");
 
@@ -52,12 +59,15 @@ export default {
         this.footerChanged(this.selectIndex);
 
     },
-    show: function (nosend) {
-        if (nosend) return;
+    show: function () {
         if (!this.selectIndex) SendCommand("score");
         else if (this.selectIndex == 1) SendCommand("score2");
         else SendCommand("score title");
         this.init_elem();
+    },
+    showCached: function () {
+        // The full score packet initializes the panel through onData(). Replaying
+        // it first also sets uid before the selected detail tab requests score2.
     },
     close: function () {
         this.footer[this.selectIndex][1].remove();

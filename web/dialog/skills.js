@@ -6,6 +6,12 @@ import SCRIPT from '../script.js';
 export default {
     isShow: false,
     selectItem: ".dialog-skills",
+    cacheWhenHidden: true,
+    hasCachedSnapshot: function (cache) {
+        return cache.some(function (data) {
+            return Array.isArray(data.items);
+        });
+    },
     init: function () {
         if (!this.created)
             Dialog.injectStyle(skills_css);
@@ -263,7 +269,7 @@ export default {
             Dialog.title(this.title + "，等级上限" + this.limit + "级");
         }
     },
-    show: function () {
+    show: function (useCachedData) {
         if (this.isShow) return;
         this.isShow = true;
         if (!this.element) {
@@ -277,13 +283,18 @@ export default {
         this.element.appendTo(Dialog.contentElement);
         //this.container.appendTo(Dialog.contentElement);
         this.element.removeClass("hide-item");
-        if (!this.items) SendCommand("cha");
+        if (!this.items) {
+            if (!useCachedData) SendCommand("cha");
+        }
         else {
-            SendCommand("cha none");
+            if (!useCachedData) SendCommand("cha none");
             Dialog.icon("book");
             this.create_footer();
             this.createSkillItems(this.items);
         }
+    },
+    showCached: function () {
+        this.show(true);
     },
     isEnable: function (item, skills) {
         if (!item.can_enables) return false;

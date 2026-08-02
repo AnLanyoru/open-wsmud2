@@ -59,6 +59,7 @@ const Dialog = {
             dialog.created = true;
         }
         if (!data) {
+            const useCachedData = this.hasCachedSnapshot(name);
             if (this.isShow && name == this.curItem) return this.hide();
             if (this.curItem && name != this.curItem) {
                 Dialog[Dialog.curItem].close && Dialog[Dialog.curItem].close();
@@ -67,13 +68,19 @@ const Dialog = {
             }
             this.init();
             this.curItem = name;
-            dialog.show(data);
+            if (useCachedData && dialog.showCached) dialog.showCached();
+            else dialog.show(data);
             this.flushData(name);
             Process.message.scroll2end();
         } else {
             const isCurrent = this.isShow && this.curItem === name && dialog.isShow;
             if (data.close && !isCurrent) return;
             if (isCurrent || !this.isShow || dialog.receiveInBackground) {
+                if (!this.isShow && dialog.cacheWhenHidden) {
+                    this.cacheData(name, data);
+                    if (dialog.openWhenHidden) return this.show(name);
+                    return;
+                }
                 dialog.onData(data);
             } else if (!dialog.onBackgroundData || dialog.onBackgroundData(data) !== true) {
                 this.cacheData(name, data);
@@ -88,6 +95,16 @@ const Dialog = {
         cache.push(data);
         // Incremental dialogs should not be allowed to grow the cache forever.
         if (cache.length > 100) cache.shift();
+    },
+    hasCachedSnapshot: function (name) {
+        const cache = this.dataCache[name];
+        const dialog = this[name];
+        return !!(
+            cache &&
+            cache.length &&
+            dialog.hasCachedSnapshot &&
+            dialog.hasCachedSnapshot(cache)
+        );
     },
     flushData: function (name) {
         const cache = this.dataCache[name];
