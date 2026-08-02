@@ -17,6 +17,9 @@ export default {
     selectedItem: 0,
     init: function () {
         Dialog.injectStyle(stats_css);
+        $(window).on('resize.stats-footer', function () {
+            Dialog.stats.schedule_footer_layout();
+        });
     },
     close: function () {
         this.element.remove();
@@ -207,16 +210,32 @@ export default {
         if (type === 'top') this.top = undefined;
         SendCommand(str);
     }, create_footer: function () {
-        var html = [];
+        var html = ["<div class='stats-footer'>"];
         for (var i = 0; i < this.footers.length; i++) {
             var foot = this.footers[i];
             html.push("<span class='footer-item" + (foot == this.selectedItem ? " select" : "") + "' for='" + i + "''>"
                 + foot.name + "</span>");
         }
         html.push("<span class='stats-span'></span>");
+        html.push("</div>");
         Dialog.footer(html.join(""));
+        this.schedule_footer_layout();
     }, show_desc: function (msg) {
         Dialog.footerElement.find(".stats-span").html(msg);
+        this.schedule_footer_layout();
+    }, schedule_footer_layout: function () {
+        if (this.footer_layout_frame) cancelAnimationFrame(this.footer_layout_frame);
+        this.footer_layout_frame = requestAnimationFrame(function () {
+            Dialog.stats.footer_layout_frame = null;
+            Dialog.stats.layout_footer();
+        });
+    }, layout_footer: function () {
+        let footer = Dialog.footerElement?.find('.stats-footer')[0];
+        if (!footer) return;
+        let desc = footer.querySelector('.stats-span');
+        footer.classList.remove('desc-overflow');
+        if (desc && desc.textContent && desc.scrollWidth > desc.clientWidth + 1)
+            footer.classList.add('desc-overflow');
     },
     footerChanged: function (index) {
         var item = this.footers[index];
@@ -344,14 +363,69 @@ const stats_css = `
     padding-left: 3.125em;
 }
 
+.stats-footer {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    overflow: visible;
+}
+
+.stats-footer > .footer-item {
+    display: inline-block;
+    flex: 0 0 5em;
+    color: var(--text-tertiary);
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.stats-footer > .footer-item.select {
+    background-color: var(--dialog-footer-select);
+    color: var(--text-tertiary);
+}
+
 .stats-span {
-    float: right;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    margin-left: auto;
     padding-right: 10px;
     color: var(--text-header);
     line-height: 2.5em;
+    text-align: right;
+}
+
+.stats-footer.desc-overflow > .stats-span {
+    position: absolute;
+    z-index: 12;
+    top: 100%;
+    right: 0.25em;
+    max-width: calc(100% - 0.5em);
+    margin: 0;
+    padding: 0.05em 0.8em 0.1em;
+    border: 0;
+    border-radius: 0 0 0.65em 0.65em;
+    background-color: var(--dialog-footer-bg);
+    color: var(--text-muted);
+    line-height: 1.5em;
+    font-weight: normal;
+    text-align: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.stats-footer.desc-overflow > .stats-span::-webkit-scrollbar {
+    display: none;
 }
 
 @media (max-width: 480px) {
+    .stats-footer > .footer-item {
+        flex-basis: 4em;
+    }
+
     .stats-container-left>.stats-silder {
         writing-mode: vertical-rl;
         width: 2em;
