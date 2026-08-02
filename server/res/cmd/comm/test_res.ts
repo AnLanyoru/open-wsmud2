@@ -1,5 +1,6 @@
 import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
+import { OBJ } from '../../../core/item/obj.js';
 
 /**
  * TestResNode — 测试资源菜单的递归节点类型
@@ -28,9 +29,14 @@ const need_test_objs: TestResRoot = {
         盘古斧: ['eq/lv6/pangufu', 1],
         '悟道之戒(测试)': ['eq/test/xuexidazuo', 1],
     },
-    随从礼包: ['sp/npc#shuang', 10],
-    武道书: ['book/wudao', 1000],
-    门派进阶残页: ['book/up', 1000],
+    基础资源: {
+        随从礼包: ['sp/npc#shuang', 1],
+        武道书: ['book/wudao', 1000],
+        门派进阶残页: ['book/up', 1000],
+        橙色朱果: ['drug/exp#4', 10],
+        橙色养精丹: ['cash/jing#4', 10],
+        元宝: ['money/cash', 10000],
+    },
     技能传功玉简: {
         'base/ (基本)': {
             基本拳脚: ['book/fbk#unarmed', 1],
@@ -487,8 +493,14 @@ export default class extends COMMAND {
         // 叶子节点：直接领取
         if (this.isLeaf(node)) {
             const [objPath, count] = node;
-            const obj = me.add_obj(objPath, count);
+            const obj = OBJ.CREATE(objPath, count);
             if (obj) {
+                // 元宝/经验等特殊物品：通过 on_receive 直接发放（元宝/潜能等），普通物品入背包
+                if (obj.on_receive) {
+                    obj.on_receive(me);
+                } else {
+                    me.add_obj(obj);
+                }
                 const pathKeys = this.getPathKeys(path);
                 me.notify(`<hig>你领取了：${obj.unit_name(count)}。</hig>`);
             } else {
