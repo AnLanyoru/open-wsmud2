@@ -38,6 +38,7 @@ export default {
                 case "combat_size":
                 case "menu_size":
                 case "dialog_size":
+                case "w_type":
                     this.select_value(item.find(".color-item"), value);
                     break;
                 case "auto_pfm":
@@ -298,6 +299,7 @@ export default {
             case "combat_size":
             case "dialog_size":
             case "menu_size":
+            case "w_type":
                 value = elem.attr('value');
                 break;
             case "fontsize":
@@ -720,6 +722,17 @@ const setting_template = `
                     <span class="color-item" value="0.9em">0.9</span>
                     <span class="color-item" value="1em">x1</span>
                     <span class="color-item" value="1.2em">x1.2</span>
+                </span>
+            </div>
+            <div class="setting-item" for="w_type">
+                <span class="title">
+                    打开窗口时菜单栏的布局方式
+                </span>
+                <span class="color-list">
+                    <span class="color-item" value="reflow">重排</span>
+                    <span class="color-item" value="hide">隐藏</span>
+                    <span class="color-item" value="shield">遮蔽</span>
+                    <span class="color-item" value="unchanged">不变</span>
                 </span>
             </div>
             <div class="setting-item" for="top_safe_distance">

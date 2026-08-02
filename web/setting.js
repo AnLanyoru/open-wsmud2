@@ -29,6 +29,7 @@ const Setting = {
     combat_size: "1em",
     dialog_size: "1em",
     menu_size: "1em",
+    w_type: "reflow",
     action_wrap: 0,
     off_hp: 0,
     show_damage: 0,
@@ -92,6 +93,9 @@ const Setting = {
                 break;
             case "menu_size":
                 $(".bottom-bar").css("font-size", value);
+                break;
+            case "w_type":
+                window.dispatchEvent(new Event("menu-layout-change"));
                 break;
             case "fontcolor":
                 $(document.body).css("color", value);

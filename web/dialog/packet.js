@@ -252,10 +252,17 @@ export default {
         footer.classList.remove('actions-overflow', 'money-overflow');
         if (!money || !actions || actions.classList.contains('cleanup-actions')) return;
 
-        // 先按原来的单行样式测量；货币被挤压时，让按钮转为框外下标签。
-        if (money.scrollWidth > money.clientWidth + 1) footer.classList.add('actions-overflow');
-        // 按钮移出后货币仍然过长，才显示可横滑的渐隐提示。
-        if (money.scrollWidth > money.clientWidth + 1) footer.classList.add('money-overflow');
+        // 货币内容一被挤压，就提示可以横向滑动。
+        let hiddenWidth = money.scrollWidth - money.clientWidth;
+        if (hiddenWidth > 1) footer.classList.add('money-overflow');
+
+        // 超过一半货币内容被遮住时，才把操作按钮移为框外书签。
+        if (hiddenWidth > money.scrollWidth / 2) {
+            footer.classList.add('actions-overflow');
+            // 按钮移出后空间会重新分配，仅在货币仍被遮住时保留渐隐提示。
+            if (money.scrollWidth <= money.clientWidth + 1)
+                footer.classList.remove('money-overflow');
+        }
     }, cleanup_cmds: {cleanup: true, cancle: true, store: true, sell: true},
     footerChanged: function (cmd, elem) {
         if (this.cleanup_cmds[cmd])
@@ -572,12 +579,27 @@ const packet_css = `
     flex: 0 0 auto;
     margin-left: 1em;
     padding-left: 1em;
-    border-left: 1px solid var(--border-secondary);
+    border-left: 0;
     color: var(--text-muted);
     line-height: 1.8em;
     text-align: center;
     cursor: pointer;
     user-select: none;
+}
+
+.inventory-footer:not(.actions-overflow) > .inventory-footer-actions > span {
+    position: relative;
+}
+
+.inventory-footer:not(.actions-overflow) > .inventory-footer-actions > span::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 1px;
+    height: 1em;
+    background-color: var(--border-secondary);
+    transform: translateY(-50%);
 }
 
 .inventory-footer-actions > .footer-item {
@@ -604,12 +626,12 @@ const packet_css = `
 .inventory-footer.actions-overflow > .inventory-footer-actions > span {
     min-width: 4em;
     margin: 0;
-    padding: 0.15em 0.8em 0.25em;
-    border: 1px solid var(--border-secondary);
+    padding: 0.05em 0.8em 0.1em;
+    border: 0;
     border-radius: 0 0 0.65em 0.65em;
     background-color: var(--dialog-footer-bg);
     color: var(--text-muted);
-    line-height: 1.8em;
+    line-height: 1.5em;
     font-weight: normal;
 }
 
