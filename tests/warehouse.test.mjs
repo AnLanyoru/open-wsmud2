@@ -119,6 +119,48 @@ test('store removes from the backpack and reports the warehouse category and tot
     assert.match(player.notifications.at(-1), /store:2,otype:3,sum:1/);
 });
 
+test('store all sets a six-second cooldown and rejects repeated requests', () => {
+    const stored = makeItem({ id: 'store1', path: 'obj/herb', count: 5 });
+    const bagItem = makeItem({ id: 'bag1', path: 'obj/herb', count: 2 });
+    const player = makePlayer({ items: [bagItem], stores: [stored] });
+    let cooldown = 0;
+    let cooldownDuration;
+    player.query_temp = () => cooldown;
+    player.set_temp = (name, value, duration) => {
+        assert.equal(name, 'store_all');
+        cooldown = value;
+        cooldownDuration = duration;
+    };
+
+    new StoreCommand().enter(player, undefined, 'all');
+
+    assert.equal(player.items.length, 0);
+    assert.equal(stored.count, 7);
+    assert.equal(cooldownDuration, 6000);
+
+    player.items.push(makeItem({ id: 'bag2', path: 'obj/herb', count: 3 }));
+    new StoreCommand().enter(player, undefined, 'all');
+
+    assert.equal(player.items.length, 1);
+    assert.equal(stored.count, 7);
+    assert.equal(player.messages.at(-1), '自动存仓冷却中，请稍后再试。');
+});
+
+test('follower store all deltas identify the source backpack', () => {
+    const stored = makeItem({ id: 'store1', path: 'obj/herb', count: 5 });
+    const target = makePlayer({ stores: [stored] });
+    const follower = makePlayer({
+        items: [makeItem({ id: 'bag1', path: 'obj/herb', count: 2 })],
+    });
+    follower.id = 'follower1';
+    follower.check_player = () => false;
+    follower.check_follower = () => true;
+
+    new StoreCommand().store_all(target, follower);
+
+    assert.match(target.notifications.at(-1), /sourceid:"follower1"/);
+});
+
 test('warehouse commands reject zero quantities without mutating items', () => {
     const bagItem = makeItem({ id: 'bag1', count: 5 });
     const stored = makeItem({ id: 'store1', count: 5 });
@@ -196,6 +238,32 @@ if (!Array.prototype.Remove) {
 
 globalThis.navigator ??= { userAgent: '' };
 const { default: listDialog } = await import('../web/dialog/list.js');
+
+test('background store deltas update the player backpack immediately', () => {
+    const updates = [];
+    globalThis.Dialog = {
+        pack: { updateitem: data => updates.push(data) },
+    };
+    const context = { ...listDialog, stores: null, isShow: false };
+
+    assert.equal(context.onBackgroundData({id: 'bag1', store: 2}), true);
+    assert.deepEqual(updates, [{remove: 2, id: 'bag1'}]);
+});
+
+test('background follower store deltas update the matching follower backpack', () => {
+    const updates = [];
+    globalThis.Dialog = {
+        pack: { updateitem: () => assert.fail('the player backpack must not be updated') },
+        pack2: { id: 'follower1', updateitem: data => updates.push(data) },
+    };
+    const context = { ...listDialog, stores: null, isShow: false };
+
+    assert.equal(
+        context.onBackgroundData({id: 'bag1', store: 2, sourceid: 'follower1'}),
+        true,
+    );
+    assert.deepEqual(updates, [{remove: 2, id: 'bag1'}]);
+});
 
 function makeListContext({ packItems, stores, selectedType = 0, storeCount = stores.length }) {
     return {
@@ -312,12 +380,12 @@ test('an empty filtered warehouse still exposes category navigation', () => {
 test('a take response received after closing the warehouse refreshes the backpack', () => {
     const commands = [];
     globalThis.Dialog = {
-        pack: { onData: () => false },
+        pack: { updateitem: () => false },
     };
     globalThis.SendCommand = command => commands.push(command);
 
     listDialog.updateitem.call(
-        { stores: null, isShow: false },
+        { ...listDialog, stores: null, isShow: false },
         { id: 'bag-new', storeid: 'store-old', store: -1, otype: 0, sum: 0 },
     );
 
