@@ -83,8 +83,6 @@ export default class extends SKILL {
                         finish_msg: '<hio>$N周身九幽之气如潮退去，复转如常。</hio>',
                     });
                 } else {
-                    // 切换到九烛（防御形态）
-                    me.remove_temp('yyjz_jy');
                     const hpPer = jiuzhu_hp_per(lv);
 
                     me.send_room('<hio>$N掌阴阳之枢，九烛之力流转周身，固若金汤！</hio>\n', target);
@@ -190,7 +188,6 @@ export default class extends SKILL {
                     id: 'ztd',
                     name: '镇天地',
                     duration: totalDuration,
-                    override: 2,
                     prop: {
                         diff_sh_per: 50,
                     },
