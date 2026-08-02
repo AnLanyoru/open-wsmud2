@@ -213,6 +213,46 @@
     bottom: 3em;
 }
 
+.right-bar.menu-reflow-layout > .tool-item {
+    position: absolute;
+}
+
+.right-bar.menu-scroll-layout {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+}
+
+.dialog.menu-shield-active {
+    position: relative;
+    z-index: 12;
+}
+
+.dialog.menu-shield-top::after {
+    content: '';
+    position: absolute;
+    z-index: 13;
+    left: 0;
+    right: 0;
+    bottom: -1.75em;
+    height: 1.75em;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+
+.bottom-bar.menu-scroll-bottom-shield::after {
+    content: '';
+    position: absolute;
+    z-index: 12;
+    right: 0;
+    bottom: var(--menu-scroll-bottom, 3em);
+    width: var(--menu-scroll-width, 3em);
+    height: 1.75em;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0));
+}
+
 .left-bar {
     left: 0px;
     transition-property: bottom;

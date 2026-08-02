@@ -21,6 +21,7 @@ import DialogPm from './paimai.js';
 import DialogPack2 from './packet2.js';
 import DialogMaster from './master.js';
 import DialogList from './list.js';
+import * as MenuLayout from '../game/menu-layout.js';
 
 
 const Dialog = {
@@ -70,6 +71,7 @@ const Dialog = {
             this.curItem = name;
             if (useCachedData && dialog.showCached) dialog.showCached();
             else dialog.show(data);
+            MenuLayout.onDialogOpen();
             this.flushData(name);
             Process.message.scroll2end();
         } else {
@@ -125,6 +127,7 @@ const Dialog = {
         }
         this.init();
         this.curItem = name;
+        MenuLayout.onDialogOpen();
     },
     init: function () {
         if (this.isShow) return;
@@ -167,6 +170,7 @@ const Dialog = {
     close: function () {
         if (!Dialog.isShow) return;
         Dialog.isShow = false;
+        MenuLayout.onDialogClose();
         $(".content-room").removeClass("hide");
         Dialog.element.addClass("hide");
         Combat._resetCDAnimations();

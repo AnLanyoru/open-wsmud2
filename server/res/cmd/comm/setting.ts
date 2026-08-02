@@ -207,6 +207,23 @@ const setting_keys = {
         desc: '菜单栏大小',
         def: '1em',
     },
+    w_type: {
+        type: 'String',
+        length: 10,
+        desc: '',
+        def: 'reflow',
+        on_setting: function (me: USER, value: string | number) {
+            if (
+                value !== '' &&
+                value !== 'hide' &&
+                value !== 'shield' &&
+                value !== 'unchanged'
+            ) {
+                me.notify('无效设定值。');
+                return false;
+            }
+        },
+    },
     fontsize: {
         type: 'String',
         length: 10,
