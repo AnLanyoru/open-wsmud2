@@ -144,7 +144,7 @@ const Process = {
         Process.player = x.id;
         Process.level = x.level;
         Process.name = x.name;
-        document.title = x.name + " - MUD游戏";
+        document.title = x.name + " - 飘渺江湖";
         Setting.load(x.setting);
         onLogin();
         //var panel = $(".player-panel").html(CreateHeadPanel(x));

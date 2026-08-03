@@ -125,7 +125,7 @@ export default class extends COMMAND {
     }
 
     on_user_login(user: USER) {
-        user.send('欢迎登陆<HIW>MUD游戏</HIW>');
+        user.send('欢迎登陆<HIW>MUD游戏，飘渺江湖</HIW>');
 
         // 发送模板映射表（二进制协议所需）
         if (templateCount() > 0) {
