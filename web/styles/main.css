@@ -376,6 +376,10 @@
 
 .obj-money {
     float: right;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    line-height: 1;
     padding-right: 10px;
     color: var(--text-header);
 }
