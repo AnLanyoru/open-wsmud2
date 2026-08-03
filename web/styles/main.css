@@ -364,6 +364,14 @@
     line-height: 1;
 }
 
+.bottom-bar > .br-tool.dialog-close-replacement {
+    font-family: inherit;
+}
+
+.bottom-bar > .br-tool.dialog-close-replacement::before {
+    content: none;
+}
+
 
 .room-commands,
 .combat-commands {

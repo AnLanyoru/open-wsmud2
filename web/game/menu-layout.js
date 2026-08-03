@@ -33,6 +33,9 @@ function resetLayout() {
 
     const {dialog, bottomBar, rightBar} = elements();
     dialog?.classList.remove('menu-shield-active', 'menu-shield-top');
+    const dialogClose = dialog?.querySelector('.dialog-close');
+    dialogClose?.classList.remove('glyphicon-remove');
+    dialogClose?.classList.add('glyphicon-remove-circle');
     bottomBar?.classList.remove('menu-scroll-bottom-shield');
     bottomBar?.style.removeProperty('--menu-scroll-width');
     bottomBar?.style.removeProperty('--menu-scroll-bottom');
@@ -44,6 +47,12 @@ function resetLayout() {
 
     const closeTool = rightBar.querySelector('.dialog-close-tool');
     if (closeTool) closeTool.style.display = 'none';
+    const moreTool = bottomBar?.querySelector('.br-tool');
+    if (moreTool?.classList.contains('dialog-close-replacement')) {
+        moreTool.classList.remove('dialog-close-replacement');
+        moreTool.setAttribute('command', 'showtool');
+        moreTool.replaceChildren();
+    }
     rightBar.classList.remove('menu-reflow-layout', 'menu-scroll-layout');
     rightBar.style.removeProperty('height');
     rightBar.style.removeProperty('width');
@@ -141,9 +150,20 @@ function applyLayout() {
     if (layout === 'hide') {
         if (tools.length) menuHiddenByDialog = true;
         ToolAction.HideTools();
-        if (Setting.dlog_cbtn) {
+        if (Setting.dlog_cbtn == 1) {
             const closeTool = rightBar.querySelector('.dialog-close-tool');
             if (closeTool) closeTool.style.display = 'flex';
+        } else if (Setting.dlog_cbtn == 2) {
+            const moreTool = bottomBar.querySelector('.br-tool');
+            if (moreTool) {
+                moreTool.classList.add('dialog-close-replacement');
+                moreTool.setAttribute('command', 'closedialog');
+                moreTool.innerHTML = '<span class="glyphicon glyphicon-remove-circle tool-icon"></span>'
+                    + '<span class="tool-text">关闭</span>';
+            }
+            const dialogClose = dialog.querySelector('.dialog-close');
+            dialogClose?.classList.remove('glyphicon-remove-circle');
+            dialogClose?.classList.add('glyphicon-remove');
         }
     } else if (layout === 'reflow') {
         reflowMenu(dialog, bottomBar, rightBar, tools);

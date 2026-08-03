@@ -39,6 +39,7 @@ export default {
                 case "menu_size":
                 case "dialog_size":
                 case "w_type":
+                case "dlog_cbtn":
                     this.select_value(item.find(".color-item"), value);
                     break;
                 case "auto_pfm":
@@ -300,6 +301,7 @@ export default {
             case "dialog_size":
             case "menu_size":
             case "w_type":
+            case "dlog_cbtn":
                 value = elem.attr('value');
                 break;
             case "fontsize":
@@ -739,9 +741,10 @@ const setting_template = `
                 <span class="title">
                     隐藏菜单栏时显示关闭窗口按钮
                 </span>
-                <span class="switch">
-                    <span class="switch-button"></span>
-                    <span class="switch-text">关</span>
+                <span class="color-list">
+                    <span class="color-item" value="0">关闭</span>
+                    <span class="color-item" value="1">额外</span>
+                    <span class="color-item" value="2">替换</span>
                 </span>
             </div>
             <div class="setting-item" for="top_safe_distance">

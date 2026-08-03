@@ -46,6 +46,9 @@ export default class extends COMMAND {
             } else if (setting_item.type === 'Boolean') {
                 value = parseInt(value_input) || 0;
                 if (value !== 0 && value !== 1) return me.notify('无效设定值。');
+            } else if (setting_item.type === 'Number') {
+                value = Number(value_input);
+                if (!Number.isInteger(value)) return me.notify('无效设定值。');
             }
 
             if (setting_item.on_setting) {
@@ -225,8 +228,14 @@ const setting_keys = {
         },
     },
     dlog_cbtn: {
-        type: 'Boolean',
+        type: 'Number',
         desc: '隐藏菜单栏时显示关闭窗口按钮',
+        on_setting: function (me: USER, value: string | number) {
+            if (value !== 0 && value !== 1 && value !== 2) {
+                me.notify('无效设定值。');
+                return false;
+            }
+        },
     },
     fontsize: {
         type: 'String',
