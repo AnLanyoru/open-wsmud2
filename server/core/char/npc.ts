@@ -39,6 +39,8 @@ export class NPC extends CHARACTER {
     chat_chance: number = 0;
     /** 出售物品列表 */
     sell_list?: OBJ[];
+    /** NPC 商店页附加操作（仅保存 action 指令名与商店页显示名） */
+    shop_actions: { cmd: string; name: string }[] = [];
     /** 死亡后重生房间 */
     die_room?: ROOM;
     /** 是否禁止刷新（不重生） */
@@ -214,6 +216,26 @@ export class NPC extends CHARACTER {
             obj.count = -1;
             this.sell_list.push(obj);
         }
+    }
+
+    /**
+     * 将已有 NPC action 附加到商店页。
+     * @param cmd 已通过 add_action 注册的指令名
+     * @param name 商店页显示名；省略时沿用 action 名称
+     */
+    add_shop_action(cmd: string, name?: string): void {
+        const action_name = name ?? this.actions?.[cmd]?.name;
+        if (!action_name) return;
+        this.shop_actions.push({ cmd, name: action_name });
+    }
+
+    /** 查询该 NPC 显式附加到商店页的操作。 */
+    query_shop_actions(): { cmd: string; name: string }[] {
+        const actions: { cmd: string; name: string }[] = [];
+        for (const action of this.shop_actions) {
+            actions.push({ cmd: action.cmd + ' ' + this.id, name: action.name });
+        }
+        return actions;
     }
 
     /**

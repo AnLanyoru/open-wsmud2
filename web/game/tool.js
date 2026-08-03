@@ -5,10 +5,11 @@ let ToolState = 0;
 let ToolOpacity = 0;
 let ToolSpeed = 0;
 let PendingHide = false;
+let PendingShow = false;
 
 export function InitTools() {
     if (!tools) {
-        tools = $(".right-bar>.tool-item");
+        tools = $(".right-bar>.tool-item:not(.dialog-close-tool)");
         hideTool = $(".br-tool");
         bottom_tools = $('.bottom-bar>.tool-item');
     }
@@ -44,6 +45,17 @@ export function HideTools() {
     ShowTools();
 }
 
+export function OpenTools() {
+    InitTools();
+    PendingHide = false;
+    if (ToolState == 2) return;
+    if (ToolState == 1) {
+        PendingShow = true;
+        return;
+    }
+    ShowTools();
+}
+
 export function ShowToolsAnimate(type) {
     if (type == 0) {
         ToolOpacity = ToolOpacity + ToolSpeed;
@@ -60,6 +72,7 @@ export function ShowToolsAnimate(type) {
             window.setTimeout(ShowToolsAnimate.bind(null, type), 100);
         } else {
             ToolState = 2;
+            PendingShow = false;
             if (PendingHide) {
                 PendingHide = false;
                 ShowTools();
@@ -83,6 +96,10 @@ export function ShowToolsAnimate(type) {
             PendingHide = false;
             for (var i = 0; i < tools.length; i++) {
                 tools[i].style.display = "none";
+            }
+            if (PendingShow) {
+                PendingShow = false;
+                ShowTools();
             }
         }
     }

@@ -374,8 +374,11 @@ const stats_css = `
 }
 
 .stats-footer > .footer-item {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 5em;
+    height: 100%;
     color: var(--text-tertiary);
     text-align: center;
     font-weight: bold;

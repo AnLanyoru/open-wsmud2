@@ -6,7 +6,11 @@ export default {
         Dialog.injectStyle(message_css);
     },
     close: function () {
-
+        if (this.selectedChild && this.selectedChild !== this) {
+            this.selectedChild.inner_close();
+        }
+        this.selectedChild = null;
+        this.selectedChildName = null;
         this.element.remove();
         this.isShow = false;
     }, hide: function () {
@@ -139,7 +143,10 @@ export default {
         var childName = this.footerElements[this.selected_item];
         var child = Dialog[childName];
         //if (this.selectedChild == child) return;
-        if (this.selectedChild) this.selectedChild.inner_close();
+        if (this.selectedChild && this.selectedChild !== child) {
+            if (this.selectedChild === this) this.selectedChild.element.remove();
+            else this.selectedChild.inner_close();
+        }
         if (!child.element) child.element = child.createElement();
         Dialog.contentElement.empty().append(child.element);
         this.selectedChildName = childName;

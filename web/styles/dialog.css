@@ -19,11 +19,11 @@
 
 .dialog > .dialog-header {
     height: 2.5em;
-    line-height: 2.5em;
     background-color: var(--dialog-header-bg);
     padding-left: 0.5em;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .dialog > .dialog-content {
@@ -43,16 +43,18 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+    line-height: 1.25em;
 }
 
 .dialog > .dialog-header > .dialog-icon {
     color: var(--dialog-icon-color);
-    margin-top: 0.65em;
     margin-right: 0.25em;
+    top: 0;
+    line-height: 1;
 }
 
 .dialog > .dialog-header > .dialog-close {
-    line-height: 2em;
+    line-height: 1;
     color: var(--dialog-close-color);
     cursor: pointer;
     font-size: 1.25em;
@@ -98,7 +100,12 @@
 
 .dialog > .dialog-footer > .footer-item {
     color: var(--text-tertiary);
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    line-height: 1.25em;
+    vertical-align: top;
     width: 5em;
     text-align: center;
     font-weight: bold;
@@ -107,13 +114,17 @@
 
 
 .dialog > .dialog-footer > .eq-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 2em;
     height: 2em;
     border-radius: 2em;
     background-color: var(--bg-surface);
-    line-height: 2em;
+    line-height: 1;
     margin-left: 1em;
     margin-top: 0.25em;
+    vertical-align: top;
 }
 
 .dialog > .dialog-footer > .channel-item {
@@ -129,16 +140,18 @@
 
 
 .dialog > .dialog-footer > .sk-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 2em;
     height: 2em;
     border-radius: 2em;
     background-color: var(--bg-surface);
-    line-height: 2em;
-    margin-top: .25em;
+    line-height: 1;
+    margin-top: 0.25em;
     margin-right: 0.5em;
     text-align: center;
     cursor: pointer;
-    display: inline-block;
     float: right
 }
 
@@ -261,7 +274,7 @@
         margin-left: 0.5em;
         width: 1.5em;
         height: 1.5em;
-        line-height: 1.5em;
+        line-height: 1;
         margin-top: 0.5em;
     }
 }

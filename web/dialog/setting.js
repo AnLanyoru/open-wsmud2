@@ -39,6 +39,7 @@ export default {
                 case "menu_size":
                 case "dialog_size":
                 case "w_type":
+                case "dlog_cbtn":
                     this.select_value(item.find(".color-item"), value);
                     break;
                 case "auto_pfm":
@@ -300,6 +301,7 @@ export default {
             case "dialog_size":
             case "menu_size":
             case "w_type":
+            case "dlog_cbtn":
                 value = elem.attr('value');
                 break;
             case "fontsize":
@@ -735,6 +737,16 @@ const setting_template = `
                     <span class="color-item" value="unchanged">不变</span>
                 </span>
             </div>
+            <div class="setting-item" for="dlog_cbtn">
+                <span class="title">
+                    隐藏菜单栏时显示关闭窗口按钮
+                </span>
+                <span class="color-list">
+                    <span class="color-item" value="0">关闭</span>
+                    <span class="color-item" value="1">额外</span>
+                    <span class="color-item" value="2">替换</span>
+                </span>
+            </div>
             <div class="setting-item" for="top_safe_distance">
                 <span class="title">
                     顶部安全距离
@@ -956,7 +968,8 @@ const setting_css = `
 }
 
 .setting-item {
-    line-height: 2em;
+    min-height: 2em;
+    line-height: 1.25em;
     padding-left: 1em;
     border-radius: 4px;
     border-left-width: 2px;
@@ -969,9 +982,13 @@ const setting_css = `
     cursor: pointer;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .setting-item>.title {
+    display: flex;
+    align-items: center;
+    align-self: stretch;
     margin-right: 0.625em;
     flex: 1;
     text-align: left;
@@ -979,15 +996,20 @@ const setting_css = `
 }
 
 .setting-item>.color-list {
-
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
     margin-right: 1em;
 }
 .color-list>.color-item {
     width: 3em;
     height: 1.25em;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
     border: 2px solid var(--color-item-border);
-    line-height: 1.25em;
+    line-height: 1em;
     text-align: center;
     border-radius: 1em;
     box-sizing: content-box;

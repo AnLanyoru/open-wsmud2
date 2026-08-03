@@ -63,6 +63,8 @@ export default class extends COMMAND {
         str.push(target.id);
         str.push('"');
 
+        str.push(',actions:', JSON.stringify(target.query_shop_actions()));
+
         if (selllist.some(item => item.currency === 'jungong')) {
             str.push(',jungong:');
             str.push(String(me.query_temp('jg', 0) ?? 0));

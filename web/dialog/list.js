@@ -122,6 +122,8 @@ export default {
             this.money_name = null;
             this.typeElement.hide();
             this.selllist = this.formatItems(data.selllist);
+            this.seller = data.seller;
+            this.actions = Array.isArray(data.actions) ? data.actions : [];
             if (data.gongji >= 0) this.money_name = '门派功绩';
             else if (data.jungong >= 0) this.money_name = "军功";
             else if (data.yaoyuan >= 0) this.money_name = "<ord>妖元</ord>";
@@ -129,10 +131,11 @@ export default {
             this.create_items(this.selllist, this.leftElement, 2, this.selllist.length);
             Dialog.titleElement.html(data.title);
             Dialog.icon("shopping-cart");
-            if (data.seller) this.seller = data.seller;
             this.update_pack();
         } else if (data.stores) {
             this.show();
+            this.seller = null;
+            this.actions = [];
             this.typeElement.show();
             this.isstore = true;
             this.stores = Dialog.pack.formatItems(data.stores);
@@ -215,7 +218,16 @@ export default {
         } else {
             var str = this.money_name ? ("你目前有" + money + "<hiy>"
                 + this.money_name + "</hiy>") : ("你身上有" + Util.moneyToStr(money));
-            Dialog.footerElement.html("<div class='obj-money'>" + str + "<span cmd='" + cmd + " all'>清理杂物</span></div>");
+            var html = ["<div class='inventory-footer'>",
+                "<div class='inventory-footer-money'>", str, "</div>",
+                "<div class='inventory-footer-actions'>"];
+            for (const action of this.actions || []) {
+                if (!action || !action.cmd || !action.name) continue;
+                html.push("<span cmd='", action.cmd, "'>", action.name, "</span>");
+            }
+            html.push("<span cmd='", cmd, " all'>清理杂物</span></div></div>");
+            Dialog.footerElement.html(html.join(""));
+            Dialog.pack.schedule_footer_layout();
         }
     }, update_pack: function () {
         var items = Dialog.pack.items;

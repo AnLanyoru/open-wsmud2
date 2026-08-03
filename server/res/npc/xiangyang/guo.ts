@@ -139,6 +139,8 @@ export default class extends NPC {
                     '点</hiy>',
             );
         });
+        this.add_shop_action('xy_bm');
+        this.add_shop_action('xy_jx');
     }
 
     on_kill(me: USER) {

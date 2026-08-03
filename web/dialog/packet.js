@@ -256,8 +256,8 @@ export default {
         let hiddenWidth = money.scrollWidth - money.clientWidth;
         if (hiddenWidth > 1) footer.classList.add('money-overflow');
 
-        // 超过一半货币内容被遮住时，才把操作按钮移为框外书签。
-        if (hiddenWidth > money.scrollWidth / 2) {
+        // 货币内容的可见比例低于四分之三时，把操作按钮移为框外书签。
+        if (hiddenWidth > money.scrollWidth * 0.25) {
             footer.classList.add('actions-overflow');
             // 按钮移出后空间会重新分配，仅在货币仍被遮住时保留渐隐提示。
             if (money.scrollWidth <= money.clientWidth + 1)
@@ -519,12 +519,15 @@ const packet_css = `
 }
 
 .inventory-footer > .eq-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 2em;
     width: 2em;
     height: 2em;
     border-radius: 2em;
     background-color: var(--bg-surface);
-    line-height: 2em;
+    line-height: 1;
     margin-left: 1em;
     text-align: center;
     color: var(--text-tertiary);
@@ -680,6 +683,8 @@ const packet_css = `
 }
 
 .eq-list>.eq-item {
+    display: flex;
+    align-items: stretch;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
@@ -696,17 +701,23 @@ const packet_css = `
 }
 
 .eq-list>.eq-item>.eq-name {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
     white-space: nowrap;
     padding-left: 0.3125em;
+    line-height: 1.25em;
 }
 
 .eq-list>.eq-item>.eq-type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 3em;
     background-color: var(--bg-surface2);
     color: var(--text-muted);
-    line-height: 1.875em;
-    display: inline-block;
-    height: 1.875em;
-    width: 3em;
+    min-height: 1.875em;
+    line-height: 1.25em;
     text-align: center;
 }
 
@@ -864,7 +875,7 @@ const list_css = `
         flex-basis: 1.5em;
         width: 1.5em;
         height: 1.5em;
-        line-height: 1.5em;
+        line-height: 1;
         margin-left: 0.5em;
     }
 

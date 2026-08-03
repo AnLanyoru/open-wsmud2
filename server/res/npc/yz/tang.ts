@@ -33,6 +33,7 @@ export default class extends NPC {
             '唐楠说道：本当铺可以提前看货，当然要收取一点点报酬。',
         ]);
         this.add_action('refresh', '刷新货物', this.shop_refresh);
+        this.add_shop_action('refresh');
     }
 
     shop_refresh(me: USER) {

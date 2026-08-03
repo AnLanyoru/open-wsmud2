@@ -32,8 +32,9 @@ export default {
         this.element.remove();
         //Dialog.footerElement.addClass("hide");
         this.isShow = false;
+        this.selected_item = 0;
         this.skill_element_id = null;
-        this.element.removeClass("hide-item");
+        this.element.removeClass("hide-item dialog-books");
     },
     limit: 0,
     selected_item: -1,
@@ -465,7 +466,10 @@ const skills_css = `
 }
 
 .dialog-skills>.skill-item {
-    line-height: 2em;
+    display: flex;
+    align-items: center;
+    min-height: 2em;
+    line-height: 1.25em;
     padding-left: 1.5em;
     border-radius: 4px;
     border-left-width: 2px;
@@ -478,6 +482,10 @@ const skills_css = `
     cursor: pointer;
 }
 
+.dialog-skills>.skill-item.hide {
+    display: none;
+}
+
 
 .hide-item>.skill-item {
     display: none;
@@ -488,14 +496,15 @@ const skills_css = `
 }
 
 .dialog-skills>.skill-item>.skill-level {
-    float: right;
+    flex: 0 0 auto;
+    margin-left: auto;
     margin-right: 0.625em;
 }
 
 .dialog-skills>.skill-item>.enable-flag {
     display: none;
     color: var(--border-color);
-    line-height: 2em;
+    line-height: 1;
 }
 
 .dialog-skills>.enable {
@@ -517,7 +526,8 @@ const skills_css = `
 }
 
 .dialog-skills>.book-item {
-    line-height: 2em;
+    min-height: 2em;
+    line-height: 1.25em;
     padding-left: 1.5em;
     border-radius: 4px;
     border-left-width: 2px;
@@ -528,6 +538,7 @@ const skills_css = `
     cursor: pointer;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .dialog-skills>.book-item>.book-name {

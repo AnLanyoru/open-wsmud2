@@ -124,3 +124,15 @@ test('an NPC cloned from a live NPC does not reuse its cached commands', () => {
     assert.equal(commands.commands.some(item => item.cmd === `kill ${demon.id}`), true);
     assert.equal(commands.commands.some(item => item.cmd.includes(original.id)), false);
 });
+
+test('NPC shop actions include only explicitly attached actions', () => {
+    const npc = new NPC();
+    npc.id = 'seller-id';
+    npc.add_action('forge', '锻造', () => {});
+    npc.add_action('unrelated', '交谈', () => {});
+    npc.add_shop_action('forge');
+
+    assert.deepEqual(npc.query_shop_actions(), [
+        { cmd: 'forge seller-id', name: '锻造' },
+    ]);
+});
