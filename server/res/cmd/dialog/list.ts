@@ -4,7 +4,7 @@ import type { USER } from '../../../core/char/user.js';
 import { NPC } from '../../../core/char/npc.js';
 
 export default class extends COMMAND {
-    command = 'list,shop_refresh';
+    command = 'list';
 
     /**
      * @param {CHARACTER} me - 执行命令的角色

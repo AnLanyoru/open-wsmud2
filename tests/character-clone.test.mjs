@@ -125,7 +125,7 @@ test('an NPC cloned from a live NPC does not reuse its cached commands', () => {
     assert.equal(commands.commands.some(item => item.cmd.includes(original.id)), false);
 });
 
-test('NPC shop actions are explicit and include the backend refresh command', () => {
+test('NPC shop actions include only explicitly attached actions', () => {
     const npc = new NPC();
     npc.id = 'seller-id';
     npc.add_action('forge', '锻造', () => {});
@@ -133,7 +133,6 @@ test('NPC shop actions are explicit and include the backend refresh command', ()
     npc.add_shop_action('forge');
 
     assert.deepEqual(npc.query_shop_actions(), [
-        { cmd: 'shop_refresh seller-id', name: '刷新' },
         { cmd: 'forge seller-id', name: '锻造' },
     ]);
 });

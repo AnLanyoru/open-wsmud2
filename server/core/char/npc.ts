@@ -229,9 +229,9 @@ export class NPC extends CHARACTER {
         this.shop_actions.push({ cmd, name: action_name });
     }
 
-    /** 查询商店页操作；刷新由后端定义并重新执行完整的 list/on_sell 流程。 */
+    /** 查询该 NPC 显式附加到商店页的操作。 */
     query_shop_actions(): { cmd: string; name: string }[] {
-        const actions = [{ cmd: 'shop_refresh ' + this.id, name: '刷新' }];
+        const actions: { cmd: string; name: string }[] = [];
         for (const action of this.shop_actions) {
             actions.push({ cmd: action.cmd + ' ' + this.id, name: action.name });
         }
