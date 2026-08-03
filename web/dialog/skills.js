@@ -482,6 +482,10 @@ const skills_css = `
     cursor: pointer;
 }
 
+.dialog-skills>.skill-item.hide {
+    display: none;
+}
+
 
 .hide-item>.skill-item {
     display: none;
