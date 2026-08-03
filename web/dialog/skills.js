@@ -32,8 +32,9 @@ export default {
         this.element.remove();
         //Dialog.footerElement.addClass("hide");
         this.isShow = false;
+        this.selected_item = 0;
         this.skill_element_id = null;
-        this.element.removeClass("hide-item");
+        this.element.removeClass("hide-item dialog-books");
     },
     limit: 0,
     selected_item: -1,
