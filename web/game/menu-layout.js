@@ -8,6 +8,7 @@ let dialogOpen = false;
 let layoutFrame = null;
 let sizeObserver = null;
 let scrollBar = null;
+let menuHiddenByDialog = false;
 
 function elements() {
     return {
@@ -133,6 +134,7 @@ function applyLayout() {
     const tools = visibleTools(rightBar);
     const layout = LAYOUTS.has(Setting.w_type) ? Setting.w_type : DEFAULT_LAYOUT;
     if (layout === 'hide') {
+        if (tools.length) menuHiddenByDialog = true;
         ToolAction.HideTools();
     } else if (layout === 'reflow') {
         reflowMenu(dialog, bottomBar, rightBar, tools);
@@ -147,7 +149,9 @@ function scheduleLayout() {
 }
 
 export function onDialogOpen() {
+    const wasOpen = dialogOpen;
     dialogOpen = true;
+    if (!wasOpen) menuHiddenByDialog = false;
     sizeObserver?.disconnect();
     if (window.ResizeObserver) {
         const {dialog, bottomBar} = elements();
@@ -163,6 +167,10 @@ export function onDialogClose() {
     sizeObserver?.disconnect();
     sizeObserver = null;
     resetLayout();
+    if (menuHiddenByDialog) {
+        menuHiddenByDialog = false;
+        ToolAction.OpenTools();
+    }
 }
 
 window.addEventListener('resize', scheduleLayout);
