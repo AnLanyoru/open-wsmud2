@@ -34,14 +34,17 @@ export default class extends COMMAND {
         str.push('",add_sh:"');
         str.push(String(target.query_prop('add_sh_per')));
         str.push('%",diff_fy:"');
-        str.push(String(Math.floor(target.diff_fy_per * 100) / 100));
-        str.push('%",add_bj:"');
+        str.push(format_decayed_percent(target.query_prop('diff_fy_per')));
+        str.push('%');
+        str.push(format_per2(target.query_prop('diff_fy_per2')));
+        str.push('",add_bj:"');
         str.push(String(target.query_prop('add_bjsh_per') + 150));
         str.push('%",diff_sh:"');
-        str.push(String(target.query_prop('diff_sh')));
-        str.push('+');
-        str.push(String(Math.floor(target.diff_sh_per * 100) / 100));
-        str.push('%",diff_bj:"');
+        str.push(format_decayed_percent(target.query_prop('diff_sh_per')));
+        str.push('%');
+        str.push(format_fixed_value(target.query_prop('diff_sh')));
+        str.push(format_per2(target.query_prop('diff_sh_per2')));
+        str.push('",diff_bj:"');
         str.push(String(target.query_prop('diff_bj')));
         str.push('%",releasetime:"');
         str.push(String(target.query_prop('releasetime') / 1000));
@@ -86,4 +89,26 @@ export default class extends COMMAND {
         str.push('%"}');
         me.send(str.join(''));
     }
+}
+
+/** 与 CHARACTER.recount 保持一致：基础百分比在 80% 后衰减。 */
+function format_decayed_percent(base: number): string {
+    if (base > 80) base = 20 * Math.tanh((base - 80) * 0.04) + 80;
+    base = Math.round(base * 100) / 100;
+    return String(base);
+}
+
+function format_signed_number(value: number): string {
+    return (value >= 0 ? '+' : '') + String(value);
+}
+
+function format_fixed_value(value: number): string {
+    return value === 0 ? '' : format_signed_number(value);
+}
+
+/** per2 不参与衰减，作为亮青色括号补充项展示。 */
+function format_per2(extra: number): string {
+    extra = Math.round(extra * 100) / 100;
+    if (extra === 0) return '';
+    return '<hic>(' + format_signed_number(extra) + '%)</hic>';
 }

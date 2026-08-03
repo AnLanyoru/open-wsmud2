@@ -199,6 +199,79 @@
     line-height: 2em;
 }
 
+.dialog-score3 {
+    overflow-y: auto;
+    padding-right: 0.25em;
+}
+
+.dialog-score3 > .score-section {
+    padding: 0.5em 0.625em;
+    white-space: normal;
+}
+
+.dialog-score3 .score3-section-title {
+    color: var(--text-header);
+    font-weight: bold;
+    line-height: 1.8em;
+    margin-bottom: 0.25em;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.dialog-score3 .score3-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.75em;
+    row-gap: 0.125em;
+}
+
+.dialog-score3 .score3-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75em;
+    align-items: center;
+    min-height: 2.65em;
+}
+
+.dialog-score3 .score3-label {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    line-height: 1.25;
+}
+
+.dialog-score3 .title {
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    color: var(--mud-hic);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dialog-score3 .key {
+    max-width: 100%;
+    margin-top: 0.15em;
+    color: var(--dialog-title-color);
+    font-size: 0.75em;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dialog-score3 .value {
+    width: auto;
+    flex: 0 0 auto;
+    color: var(--dialog-highlight);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
 .dialog-score2 {
     min-width: 360px;
     height: 29em;

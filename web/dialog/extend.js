@@ -160,7 +160,7 @@ export default {
         Process.state({state: "正在记录你的操作命令"});
     },
     excluded: {
-        score: true, score2: true, pack: true, cha: true, tasks: true,
+        score: true, score2: true, score3: true, pack: true, cha: true, tasks: true,
         message: true, relation: true, shop: true, team: true, jh: true
     },
     excluded_check: [

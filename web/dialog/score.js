@@ -1,6 +1,6 @@
 export default {
     footer: [["属性", null],
-        ["详细", null], ["称号", null]],
+        ["详细", null], ["称号", null], ["全部", null]],
     cacheWhenHidden: true,
     openWhenHidden: true,
     hasCachedSnapshot: function (cache) {
@@ -18,7 +18,10 @@ export default {
         this.init_elem();
         Dialog.titleElement.html(data.name);
         Dialog.icon("user");
-        if (data.titles) {
+        if (data.view == "props") {
+            if (this.selectIndex != 3) this.footerChanged(3, true);
+            this.create_props(data);
+        } else if (data.titles) {
             this.titles = data.titles;
             this.create_titles();
         } else {
@@ -44,6 +47,7 @@ export default {
         this.footer[0][1] = $(this.template_score);
         this.footer[1][1] = $(this.template_score2);
         this.footer[2][1] = $(this.template_title);
+        this.footer[3][1] = $(this.template_score3);
         Dialog.injectStyle(this.css);
     },
     init_elem: function () {
@@ -62,7 +66,8 @@ export default {
     show: function () {
         if (!this.selectIndex) SendCommand("score");
         else if (this.selectIndex == 1) SendCommand("score2");
-        else SendCommand("score title");
+        else if (this.selectIndex == 2) SendCommand("score title");
+        else SendCommand("score3");
         this.init_elem();
     },
     showCached: function () {
@@ -74,7 +79,7 @@ export default {
         Dialog.footer("");
         this.isShow = false;
     },
-    footerChanged: function (item) {
+    footerChanged: function (item, skipRequest) {
         item = parseInt(item);
         this.footer[this.selectIndex][1].remove();
         this.selectIndex = item;
@@ -99,7 +104,41 @@ export default {
                 SendCommand("title " + index);
                 this.create_titles();
             }.bind(this));
+        } else if (item == 3 && skipRequest !== true) {
+            if (this.uid && Process.player != this.uid)
+                SendCommand("score3 " + this.uid);
+            else
+                SendCommand("score3");
         }
+    },
+
+    create_props: function (data) {
+        var panel = $(this.footer[3][1]);
+        var addSection = function (title, items, unmapped) {
+            if (!items || !items.length) return;
+            var section = $("<div class='score-section'></div>").appendTo(panel);
+            $("<div class='score3-section-title'></div>").text(title).appendTo(section);
+            var list = $("<div class='score3-list'></div>").appendTo(section);
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var row = $("<div class='score3-item'></div>").appendTo(list);
+                var titleText = unmapped ? item.key : item.name;
+                var label = $("<span class='score3-label'></span>").appendTo(row);
+                $("<span class='title'></span>")
+                    .text("【" + titleText + "】")
+                    .attr("title", item.key)
+                    .appendTo(label);
+                if (!unmapped)
+                    $("<span class='key'></span>").text(item.key).appendTo(label);
+                $("<span class='value'></span>")
+                    .text(String(item.value) + (item.percentage ? "%" : ""))
+                    .appendTo(row);
+            }
+        };
+        panel.empty();
+        addSection("属性加成", data.mapped, false);
+        addSection("其他属性", data.unmapped, true);
+        if (!panel.children().length) panel.append("<div class='empty'>没有属性加成</div>");
     },
 
     create_titles: function () {
@@ -335,6 +374,7 @@ export default {
     template_title: `      <div class="dialog-titles">
         </div>
 `,
+    template_score3: `<div class="dialog-score dialog-score3"></div>`,
 
 
 };
