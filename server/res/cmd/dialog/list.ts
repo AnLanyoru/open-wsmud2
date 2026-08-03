@@ -63,6 +63,24 @@ export default class extends COMMAND {
         str.push(target.id);
         str.push('"');
 
+        str.push(',actions:[');
+        if (target.actions) {
+            let action_count = 0;
+            for (const cmd in target.actions) {
+                const action = target.actions[cmd];
+                if (!action.name) continue;
+                if (action_count > 0) str.push(',');
+                str.push(
+                    JSON.stringify({
+                        cmd: cmd + ' ' + target.id,
+                        name: action.name,
+                    }),
+                );
+                action_count++;
+            }
+        }
+        str.push(']');
+
         if (selllist.some(item => item.currency === 'jungong')) {
             str.push(',jungong:');
             str.push(String(me.query_temp('jg', 0) ?? 0));
