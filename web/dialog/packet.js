@@ -519,13 +519,16 @@ const packet_css = `
 }
 
 .inventory-footer > .eq-group {
-    flex: 0 0 2em;
-    width: 2em;
-    height: 2em;
-    border-radius: 2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 1.75rem;
     background-color: var(--bg-surface);
-    line-height: 2em;
-    margin-left: 1em;
+    line-height: 1;
+    margin-left: 0.875rem;
     text-align: center;
     color: var(--text-tertiary);
     font-weight: bold;
@@ -680,6 +683,8 @@ const packet_css = `
 }
 
 .eq-list>.eq-item {
+    display: flex;
+    align-items: stretch;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
@@ -696,17 +701,23 @@ const packet_css = `
 }
 
 .eq-list>.eq-item>.eq-name {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
     white-space: nowrap;
     padding-left: 0.3125em;
+    line-height: 1.25em;
 }
 
 .eq-list>.eq-item>.eq-type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 3em;
     background-color: var(--bg-surface2);
     color: var(--text-muted);
-    line-height: 1.875em;
-    display: inline-block;
-    height: 1.875em;
-    width: 3em;
+    min-height: 1.875em;
+    line-height: 1.25em;
     text-align: center;
 }
 
@@ -861,11 +872,11 @@ const list_css = `
 
 @media (max-width: 480px) {
     .inventory-footer > .eq-group {
-        flex-basis: 1.5em;
-        width: 1.5em;
-        height: 1.5em;
-        line-height: 1.5em;
-        margin-left: 0.5em;
+        flex-basis: 1.3125rem;
+        width: 1.3125rem;
+        height: 1.3125rem;
+        line-height: 1;
+        margin-left: 0.4375rem;
     }
 
     .inventory-footer-money {

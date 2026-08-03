@@ -374,8 +374,11 @@ const stats_css = `
 }
 
 .stats-footer > .footer-item {
-    display: inline-block;
-    flex: 0 0 5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 4.375rem;
+    height: 100%;
     color: var(--text-tertiary);
     text-align: center;
     font-weight: bold;
@@ -394,7 +397,7 @@ const stats_css = `
     margin-left: auto;
     padding-right: 10px;
     color: var(--text-header);
-    line-height: 2.5em;
+    line-height: 2.1875rem;
     text-align: right;
 }
 
@@ -423,7 +426,7 @@ const stats_css = `
 
 @media (max-width: 480px) {
     .stats-footer > .footer-item {
-        flex-basis: 4em;
+        flex-basis: 3.5rem;
     }
 
     .stats-container-left>.stats-silder {

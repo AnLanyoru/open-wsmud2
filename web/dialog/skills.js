@@ -465,15 +465,18 @@ const skills_css = `
 }
 
 .dialog-skills>.skill-item {
-    line-height: 2em;
-    padding-left: 1.5em;
+    display: flex;
+    align-items: center;
+    min-height: 1.75rem;
+    line-height: 1.25em;
+    padding-left: 1.3125rem;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.4375rem;
     background-color: var(--bg-surface);
     cursor: pointer;
 }
@@ -488,14 +491,15 @@ const skills_css = `
 }
 
 .dialog-skills>.skill-item>.skill-level {
-    float: right;
-    margin-right: 0.625em;
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: 0.546875rem;
 }
 
 .dialog-skills>.skill-item>.enable-flag {
     display: none;
     color: var(--border-color);
-    line-height: 2em;
+    line-height: 1;
 }
 
 .dialog-skills>.enable {
@@ -509,7 +513,7 @@ const skills_css = `
 }
 
 .dialog-skills>.skill-item>.enable_skill {
-    margin-left: 0.5em;
+    margin-left: 0.4375rem;
 }
 
 .dialog-skills>.enable>.item-commands {
@@ -517,17 +521,19 @@ const skills_css = `
 }
 
 .dialog-skills>.book-item {
-    line-height: 2em;
-    padding-left: 1.5em;
+    min-height: 1.75rem;
+    line-height: 1.25em;
+    padding-left: 1.3125rem;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
     white-space: nowrap;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.4375rem;
     background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .dialog-skills>.book-item>.book-name {

@@ -1,3 +1,10 @@
+function refreshTypographyLayout() {
+    // 各模块在自己的布局调度器中合并下一帧的测量，这里不再额外延迟两帧。
+    window.dispatchEvent(new Event("menu-layout-change"));
+    Dialog.pack?.schedule_footer_layout?.();
+    Dialog.stats?.schedule_footer_layout?.();
+}
+
 const Setting = {
     keep_msg: 0,
     show_hpnum: 0,
@@ -76,23 +83,27 @@ const Setting = {
             case "fontsize":
                 $(".container").css("font-size", value);
                 $(".dialog-confirm").css("font-size", value);
+                refreshTypographyLayout();
                 // $(".right-bar")[0].style.bottom = ($(".combat-panel").height() + $(".bottom-bar").height()) + "px";
                 break;
             case "font":
                 if (value === 'none') value = "";
                 $(".container").css("font-family", value);
+                refreshTypographyLayout();
                 break;
             case "combat_size":
                 $(".content-bottom").css("font-size", value);
                 break;
             case "dialog_size":
                 $(".dialog").css("font-size", value);
+                refreshTypographyLayout();
                 break;
             case "show_sa":
                 Combat.refActions();
                 break;
             case "menu_size":
                 $(".bottom-bar").css("font-size", value);
+                refreshTypographyLayout();
                 break;
             case "w_type":
                 window.dispatchEvent(new Event("menu-layout-change"));

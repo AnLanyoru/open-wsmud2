@@ -956,40 +956,50 @@ const setting_css = `
 }
 
 .setting-item {
-    line-height: 2em;
-    padding-left: 1em;
+    min-height: 1.75rem;
+    line-height: 1.25em;
+    padding-left: 0.875rem;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
     border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.4375rem;
     background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .setting-item>.title {
-    margin-right: 0.625em;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    margin-right: 0.546875rem;
     flex: 1;
     text-align: left;
     white-space: initial;
 }
 
 .setting-item>.color-list {
-
-    margin-right: 1em;
+    display: flex;
+    align-items: center;
+    gap: 0.21875rem;
+    margin-right: 0.875rem;
 }
 .color-list>.color-item {
-    width: 3em;
-    height: 1.25em;
-    display: inline-block;
+    width: 2.625rem;
+    height: 1.09375rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
     border: 2px solid var(--color-item-border);
-    line-height: 1.25em;
+    line-height: 1em;
     text-align: center;
-    border-radius: 1em;
+    border-radius: 0.875rem;
     box-sizing: content-box;
 }
 

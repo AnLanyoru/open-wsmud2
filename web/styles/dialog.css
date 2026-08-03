@@ -18,12 +18,12 @@
 }
 
 .dialog > .dialog-header {
-    height: 2.5em;
-    line-height: 2.5em;
+    height: 2.1875rem;
     background-color: var(--dialog-header-bg);
-    padding-left: 0.5em;
+    padding-left: 0.4375rem;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .dialog > .dialog-content {
@@ -43,16 +43,18 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+    line-height: 1.25em;
 }
 
 .dialog > .dialog-header > .dialog-icon {
     color: var(--dialog-icon-color);
-    margin-top: 0.65em;
-    margin-right: 0.25em;
+    margin-right: 0.21875rem;
+    top: 0;
+    line-height: 1;
 }
 
 .dialog > .dialog-header > .dialog-close {
-    line-height: 2em;
+    line-height: 1;
     color: var(--dialog-close-color);
     cursor: pointer;
     font-size: 1.25em;
@@ -77,7 +79,7 @@
 .dialog > .dialog-footer {
     background-color: var(--dialog-footer-bg);
     white-space: nowrap;
-    height: 2.5em;
+    height: 2.1875rem;
     user-select: none;
     line-height: 2.5em;
 }
@@ -98,8 +100,13 @@
 
 .dialog > .dialog-footer > .footer-item {
     color: var(--text-tertiary);
-    display: inline-block;
-    width: 5em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    line-height: 1.25em;
+    vertical-align: top;
+    width: 4.375rem;
     text-align: center;
     font-weight: bold;
     cursor: pointer;
@@ -107,13 +114,17 @@
 
 
 .dialog > .dialog-footer > .eq-group {
-    width: 2em;
-    height: 2em;
-    border-radius: 2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 1.75rem;
     background-color: var(--bg-surface);
-    line-height: 2em;
-    margin-left: 1em;
-    margin-top: 0.25em;
+    line-height: 1;
+    margin-left: 0.875rem;
+    margin-top: 0.21875rem;
+    vertical-align: top;
 }
 
 .dialog > .dialog-footer > .channel-item {
@@ -129,16 +140,18 @@
 
 
 .dialog > .dialog-footer > .sk-group {
-    width: 2em;
-    height: 2em;
-    border-radius: 2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 1.75rem;
     background-color: var(--bg-surface);
-    line-height: 2em;
-    margin-top: .25em;
-    margin-right: 0.5em;
+    line-height: 1;
+    margin-top: 0.21875rem;
+    margin-right: 0.4375rem;
     text-align: center;
     cursor: pointer;
-    display: inline-block;
     float: right
 }
 
@@ -254,14 +267,14 @@
 
 @media (max-width: 480px) {
     .dialog > .dialog-footer > .footer-item {
-        width: 4em;
+        width: 3.5rem;
     }
 
     .dialog > .dialog-footer > .eq-group {
-        margin-left: 0.5em;
-        width: 1.5em;
-        height: 1.5em;
-        line-height: 1.5em;
-        margin-top: 0.5em;
+        margin-left: 0.4375rem;
+        width: 1.3125rem;
+        height: 1.3125rem;
+        line-height: 1;
+        margin-top: 0.4375rem;
     }
 }
