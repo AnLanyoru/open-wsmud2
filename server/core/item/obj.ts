@@ -190,7 +190,7 @@ export class OBJ extends ITEM {
      * 物品 JSON 序列化
      */
     item_to_json(): string {
-        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${int(this.value / 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0}]`;
+        return `["${this.name}","${this.id}",${this.count},${this.grade},"${this.unit}",${int(this.value / 10)},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count && this.combine_count > 0 ? this.combine_count : 0}]`;
     }
 
     /**
@@ -482,6 +482,6 @@ export class OBJ extends ITEM {
     }
 
     format_to_pack(): string {
-        return `[${JSON.stringify(this.color_name ?? '')},${JSON.stringify(this.id ?? '')},${this.count},${this.grade},${JSON.stringify(this.unit ?? '')},${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count ? this.combine_count > 0 : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
+        return `[${JSON.stringify(this.color_name ?? '')},${JSON.stringify(this.id ?? '')},${this.count},${this.grade},${JSON.stringify(this.unit ?? '')},${this.transable ? this.value : 0},${this.is_equipment ? 1 : 0},${this.on_use ? 1 : 0},${this.on_study ? 1 : 0},${this.on_open ? 1 : 0},${this.combine_count && this.combine_count > 0 ? this.combine_count : 0},${this.is_locked ? 1 : 0},${this.otype}]`;
     }
 }
