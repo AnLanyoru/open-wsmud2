@@ -711,6 +711,7 @@ export class SKILL extends BASE {
         str.push('","name":"');
         str.push(this.query_color_name(me));
         str.push('",grade:', String(this.query_grade(me)));
+        str.push(',"type":', String(this.type));
         str.push(',"level":');
         str.push(me.query_skill(this.id).toString());
         str.push(',"exp":');
