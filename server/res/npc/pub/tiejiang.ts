@@ -30,6 +30,9 @@ export default class extends NPC {
         this.add_action('dz', '锻造武器', function (me, arg) {
             WORLD.COMMANDS.get('duanzao')!.enter(me);
         });
+        this.add_shop_action('unxx');
+        this.add_shop_action('unjl');
+        this.add_shop_action('dz');
     }
 
     query_duanzao_message(stage: string, typeName?: string, itemName?: string): string {

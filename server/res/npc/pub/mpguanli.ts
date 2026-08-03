@@ -36,6 +36,8 @@ export default class extends NPC {
         this.add_action('sm_exchange', '师门兑换', this.open_family_shop);
         this.add_action('sm_refresh', '刷新物资', this.show_family_refresh);
         this.add_action('sm_refresh_ok', null, this.refresh_family_shop);
+        this.add_shop_action('job_fam');
+        this.add_shop_action('sm_refresh');
     }
 
     private check_family(me: USER): boolean {

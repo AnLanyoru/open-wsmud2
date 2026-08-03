@@ -4,7 +4,7 @@ import type { USER } from '../../../core/char/user.js';
 import { NPC } from '../../../core/char/npc.js';
 
 export default class extends COMMAND {
-    command = 'list';
+    command = 'list,shop_refresh';
 
     /**
      * @param {CHARACTER} me - 执行命令的角色
@@ -63,23 +63,7 @@ export default class extends COMMAND {
         str.push(target.id);
         str.push('"');
 
-        str.push(',actions:[');
-        if (target.actions) {
-            let action_count = 0;
-            for (const cmd in target.actions) {
-                const action = target.actions[cmd];
-                if (!action.name) continue;
-                if (action_count > 0) str.push(',');
-                str.push(
-                    JSON.stringify({
-                        cmd: cmd + ' ' + target.id,
-                        name: action.name,
-                    }),
-                );
-                action_count++;
-            }
-        }
-        str.push(']');
+        str.push(',actions:', JSON.stringify(target.query_shop_actions()));
 
         if (selllist.some(item => item.currency === 'jungong')) {
             str.push(',jungong:');

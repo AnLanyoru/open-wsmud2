@@ -221,9 +221,6 @@ export default {
             var html = ["<div class='inventory-footer'>",
                 "<div class='inventory-footer-money'>", str, "</div>",
                 "<div class='inventory-footer-actions'>"];
-            if (this.seller) {
-                html.push("<span cmd='list ", this.seller, "'>刷新</span>");
-            }
             for (const action of this.actions || []) {
                 if (!action || !action.cmd || !action.name) continue;
                 html.push("<span cmd='", action.cmd, "'>", action.name, "</span>");
