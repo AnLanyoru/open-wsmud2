@@ -69,6 +69,8 @@ class GameMainPage extends Page {
                         class="glyphicon glyphicon-briefcase tool-icon"></span><span class="tool-text">背包</span></span>
                 <span class="tool-item" command="score" style="display:none"><span
                         class="glyphicon glyphicon-user tool-icon"></span><span class="tool-text">属性</span></span>
+                <span command="closedialog" class="tool-item dialog-close-tool" style="display:none"><span
+                        class="glyphicon glyphicon-remove-circle tool-icon"></span><span class="tool-text">关闭</span></span>
             </div>
         </div>
         <div class="custom-panel"></div>
@@ -144,6 +146,9 @@ function HandlerMenuCommand(cmd) {
     switch (cmd) {
         case "showtool":
             ToolAction.ShowTools();
+            break;
+        case "closedialog":
+            Dialog.hide();
             break;
         case "showchat":
             return ShowChat();

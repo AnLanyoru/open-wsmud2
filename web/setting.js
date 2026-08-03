@@ -37,6 +37,7 @@ const Setting = {
     dialog_size: "1em",
     menu_size: "1em",
     w_type: "reflow",
+    dlog_cbtn: 0,
     action_wrap: 0,
     off_hp: 0,
     show_damage: 0,
@@ -106,6 +107,7 @@ const Setting = {
                 refreshTypographyLayout();
                 break;
             case "w_type":
+            case "dlog_cbtn":
                 window.dispatchEvent(new Event("menu-layout-change"));
                 break;
             case "fontcolor":

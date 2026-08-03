@@ -224,6 +224,10 @@ const setting_keys = {
             }
         },
     },
+    dlog_cbtn: {
+        type: 'Boolean',
+        desc: '隐藏菜单栏时显示关闭窗口按钮',
+    },
     fontsize: {
         type: 'String',
         length: 10,

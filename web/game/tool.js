@@ -9,7 +9,7 @@ let PendingShow = false;
 
 export function InitTools() {
     if (!tools) {
-        tools = $(".right-bar>.tool-item");
+        tools = $(".right-bar>.tool-item:not(.dialog-close-tool)");
         hideTool = $(".br-tool");
         bottom_tools = $('.bottom-bar>.tool-item');
     }

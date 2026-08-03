@@ -735,6 +735,15 @@ const setting_template = `
                     <span class="color-item" value="unchanged">不变</span>
                 </span>
             </div>
+            <div class="setting-item" for="dlog_cbtn">
+                <span class="title">
+                    隐藏菜单栏时显示关闭窗口按钮
+                </span>
+                <span class="switch">
+                    <span class="switch-button"></span>
+                    <span class="switch-text">关</span>
+                </span>
+            </div>
             <div class="setting-item" for="top_safe_distance">
                 <span class="title">
                     顶部安全距离

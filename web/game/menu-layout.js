@@ -19,7 +19,10 @@ function elements() {
 }
 
 function visibleTools(rightBar) {
-    return Array.from(rightBar.children).filter(item => getComputedStyle(item).display !== 'none');
+    return Array.from(rightBar.children).filter(item =>
+        !item.classList.contains('dialog-close-tool')
+        && getComputedStyle(item).display !== 'none'
+    );
 }
 
 function resetLayout() {
@@ -39,6 +42,8 @@ function resetLayout() {
     }
     if (!rightBar) return;
 
+    const closeTool = rightBar.querySelector('.dialog-close-tool');
+    if (closeTool) closeTool.style.display = 'none';
     rightBar.classList.remove('menu-reflow-layout', 'menu-scroll-layout');
     rightBar.style.removeProperty('height');
     rightBar.style.removeProperty('width');
@@ -136,6 +141,10 @@ function applyLayout() {
     if (layout === 'hide') {
         if (tools.length) menuHiddenByDialog = true;
         ToolAction.HideTools();
+        if (Setting.dlog_cbtn) {
+            const closeTool = rightBar.querySelector('.dialog-close-tool');
+            if (closeTool) closeTool.style.display = 'flex';
+        }
     } else if (layout === 'reflow') {
         reflowMenu(dialog, bottomBar, rightBar, tools);
     } else if (layout === 'shield') {
