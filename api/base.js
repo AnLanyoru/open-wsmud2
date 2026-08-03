@@ -155,6 +155,6 @@ class Apibase {
     }
 }
 
-const idstr = "abcdefghijklmnopqrstuvwxwz0123456789";
+const idstr = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 export default Apibase;

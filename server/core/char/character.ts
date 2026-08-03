@@ -3094,7 +3094,7 @@ export class CHARACTER extends ITEM {
      * 客户端解码:
      *   const dv = new DataView(buf);
      *   const flags = dv.getUint8(1);
-     *   const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxwz';
+     *   const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
      *   const first4 = (buf[2]<<16)|(buf[3]<<8)|buf[4];
      *   const id = ID_CHARS[first4>>18&63]+ID_CHARS[first4>>12&63]
      *            +ID_CHARS[first4>>6&63]+ID_CHARS[first4&63]
