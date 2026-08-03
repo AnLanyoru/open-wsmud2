@@ -256,8 +256,8 @@ export default {
         let hiddenWidth = money.scrollWidth - money.clientWidth;
         if (hiddenWidth > 1) footer.classList.add('money-overflow');
 
-        // 超过一半货币内容被遮住时，才把操作按钮移为框外书签。
-        if (hiddenWidth > money.scrollWidth / 2) {
+        // 货币内容的可见比例低于四分之三时，把操作按钮移为框外书签。
+        if (hiddenWidth > money.scrollWidth * 0.25) {
             footer.classList.add('actions-overflow');
             // 按钮移出后空间会重新分配，仅在货币仍被遮住时保留渐隐提示。
             if (money.scrollWidth <= money.clientWidth + 1)
