@@ -956,16 +956,16 @@ const setting_css = `
 }
 
 .setting-item {
-    min-height: 1.75rem;
+    min-height: 2em;
     line-height: 1.25em;
-    padding-left: 0.875rem;
+    padding-left: 1em;
     border-radius: 4px;
     border-left-width: 2px;
     border-left-style: solid;
     border-left-color: var(--border-secondary);
     white-space: nowrap;
     overflow-x: auto;
-    margin-bottom: 0.4375rem;
+    margin-bottom: 0.5em;
     background-color: var(--bg-surface);
     cursor: pointer;
     display: flex;
@@ -977,7 +977,7 @@ const setting_css = `
     display: flex;
     align-items: center;
     align-self: stretch;
-    margin-right: 0.546875rem;
+    margin-right: 0.625em;
     flex: 1;
     text-align: left;
     white-space: initial;
@@ -986,12 +986,12 @@ const setting_css = `
 .setting-item>.color-list {
     display: flex;
     align-items: center;
-    gap: 0.21875rem;
-    margin-right: 0.875rem;
+    gap: 0.25em;
+    margin-right: 1em;
 }
 .color-list>.color-item {
-    width: 2.625rem;
-    height: 1.09375rem;
+    width: 3em;
+    height: 1.25em;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -999,7 +999,7 @@ const setting_css = `
     border: 2px solid var(--color-item-border);
     line-height: 1em;
     text-align: center;
-    border-radius: 0.875rem;
+    border-radius: 1em;
     box-sizing: content-box;
 }
 

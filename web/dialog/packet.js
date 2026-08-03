@@ -522,13 +522,13 @@ const packet_css = `
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 1.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 1.75rem;
+    flex: 0 0 2em;
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
     background-color: var(--bg-surface);
     line-height: 1;
-    margin-left: 0.875rem;
+    margin-left: 1em;
     text-align: center;
     color: var(--text-tertiary);
     font-weight: bold;
@@ -872,11 +872,11 @@ const list_css = `
 
 @media (max-width: 480px) {
     .inventory-footer > .eq-group {
-        flex-basis: 1.3125rem;
-        width: 1.3125rem;
-        height: 1.3125rem;
+        flex-basis: 1.5em;
+        width: 1.5em;
+        height: 1.5em;
         line-height: 1;
-        margin-left: 0.4375rem;
+        margin-left: 0.5em;
     }
 
     .inventory-footer-money {

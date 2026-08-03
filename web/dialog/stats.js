@@ -377,7 +377,7 @@ const stats_css = `
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 4.375rem;
+    flex: 0 0 5em;
     height: 100%;
     color: var(--text-tertiary);
     text-align: center;
@@ -397,7 +397,7 @@ const stats_css = `
     margin-left: auto;
     padding-right: 10px;
     color: var(--text-header);
-    line-height: 2.1875rem;
+    line-height: 2.5em;
     text-align: right;
 }
 
@@ -426,7 +426,7 @@ const stats_css = `
 
 @media (max-width: 480px) {
     .stats-footer > .footer-item {
-        flex-basis: 3.5rem;
+        flex-basis: 4em;
     }
 
     .stats-container-left>.stats-silder {

@@ -18,9 +18,9 @@
 }
 
 .dialog > .dialog-header {
-    height: 2.1875rem;
+    height: 2.5em;
     background-color: var(--dialog-header-bg);
-    padding-left: 0.4375rem;
+    padding-left: 0.5em;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -48,7 +48,7 @@
 
 .dialog > .dialog-header > .dialog-icon {
     color: var(--dialog-icon-color);
-    margin-right: 0.21875rem;
+    margin-right: 0.25em;
     top: 0;
     line-height: 1;
 }
@@ -79,7 +79,7 @@
 .dialog > .dialog-footer {
     background-color: var(--dialog-footer-bg);
     white-space: nowrap;
-    height: 2.1875rem;
+    height: 2.5em;
     user-select: none;
     line-height: 2.5em;
 }
@@ -106,7 +106,7 @@
     height: 100%;
     line-height: 1.25em;
     vertical-align: top;
-    width: 4.375rem;
+    width: 5em;
     text-align: center;
     font-weight: bold;
     cursor: pointer;
@@ -117,13 +117,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 1.75rem;
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
     background-color: var(--bg-surface);
     line-height: 1;
-    margin-left: 0.875rem;
-    margin-top: 0.21875rem;
+    margin-left: 1em;
+    margin-top: 0.25em;
     vertical-align: top;
 }
 
@@ -143,13 +143,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 1.75rem;
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
     background-color: var(--bg-surface);
     line-height: 1;
-    margin-top: 0.21875rem;
-    margin-right: 0.4375rem;
+    margin-top: 0.25em;
+    margin-right: 0.5em;
     text-align: center;
     cursor: pointer;
     float: right
@@ -267,14 +267,14 @@
 
 @media (max-width: 480px) {
     .dialog > .dialog-footer > .footer-item {
-        width: 3.5rem;
+        width: 4em;
     }
 
     .dialog > .dialog-footer > .eq-group {
-        margin-left: 0.4375rem;
-        width: 1.3125rem;
-        height: 1.3125rem;
+        margin-left: 0.5em;
+        width: 1.5em;
+        height: 1.5em;
         line-height: 1;
-        margin-top: 0.4375rem;
+        margin-top: 0.5em;
     }
 }
