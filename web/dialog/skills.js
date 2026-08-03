@@ -325,12 +325,12 @@ export default {
         html.push('<div class="skill-item ');
         html.push('grade' + item.grade);
         if (!this.master) {
-            if (item.type === 0) {
-                html.push(' base');
-                if (this.selected_item == 1) html.push(' hide');
-            } else {
+            if (item.can_enables) {
                 html.push(' skill');
                 if (this.selected_item == 0) html.push(' hide');
+            } else {
+                html.push(' base');
+                if (this.selected_item == 1) html.push(' hide');
             }
         }
 
