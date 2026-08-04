@@ -126,6 +126,12 @@ export class ROOM extends ITEM {
      * 避免并发进房时每次 push 都失效缓存导致 O(N²) 重建。
      */
     _pending_items_send: USER[] = [];
+
+    /** 玩家是否正在等待本批次的最终 items 状态快照。 */
+    has_pending_items_snapshot(player: USER): boolean {
+        return BATCH_MODE === 1 && this._pending_items_send.includes(player);
+    }
+
     /** 入队时间戳（毫秒），0 表示不在 dirty 队列 */
     _batch_timestamp: number = 0;
     /** 脏数据玩家列表 — 下次 flush 时编码为 0x55 刷新帧推送给客户端 */

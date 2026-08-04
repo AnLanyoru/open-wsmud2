@@ -32,6 +32,7 @@ import type { EQUIPMENT } from '../item/equipment.js';
 import type { PfmFlagType, StatusDef } from '../../types/events.js';
 import type { ActionMap } from '../../types/base.js';
 import type { ROOM } from '../room/room.js';
+import type { USER } from './user.js';
 import { FAMILIES, type FAMILY } from '../skill/family.js';
 import type { NPC } from './npc.js';
 import type { GameSocket } from '../world.js';
@@ -2229,10 +2230,16 @@ export class CHARACTER extends ITEM {
         str.push('}');
         if (!this.environment) return;
         const msg = str.join('');
-        const items = this.environment.items;
+        const room = this.environment as ROOM;
+        const items = room.items;
         for (let i = 0; i < items.length; i++) {
             const player = items[i];
-            if (player.check_player()) {
+            // 待进房玩家会在本批次先收到包含最终状态的完整 items 快照；
+            // 同批次的状态增量已被该快照覆盖，只对该玩家省略，其他消息和接收者不受影响。
+            if (
+                player.check_player() &&
+                !room.has_pending_items_snapshot(player as USER)
+            ) {
                 player.send(msg);
             }
         }
