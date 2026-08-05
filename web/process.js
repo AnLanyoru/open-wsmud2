@@ -166,7 +166,7 @@ const Process = {
         console.log(id);
         if (id) {
             if (id == Process.player) {
-                var name = $(this).find(".item-name").html();
+                var name = $(this).find(".item-name-text").html();
 
                 var cmds = [{ cmd: "look " + id, name: "查看" },
                 { cmd: "dazuo", name: "打坐" },
@@ -294,7 +294,9 @@ const Process = {
 
 
         str.push("<span class='item-name'>");
+        str.push("<span class='item-name-text'>");
         str.push(item.name);
+        str.push('</span>');
         if (Setting.show_hpnum && item.max_hp) {
 
             str.push('<span class="progress-num">['
@@ -1031,7 +1033,7 @@ export function ProcessBinary(data) {
                 if (mask & 0x01) {
                     Process.itemsElement.find(".room-item").filter(function () {
                         return $(this).attr("itemid") === r.id;
-                    }).find(".item-name").html(item.name);
+                    }).find(".item-name-text").html(item.name);
                 }
                 break;
             }
