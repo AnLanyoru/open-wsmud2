@@ -1708,6 +1708,10 @@ export class CHARACTER extends ITEM {
         if (!skill) return;
         const baseskill = SKILL.get(skillid);
         if (!baseskill) return false;
+        if (skill.ref) return false;
+        for (const [, otherSkill] of this.skills) {
+            if (otherSkill.ref?.split('/')[0] === skillid) return false;
+        }
 
         if (baseskill.type == SKILL_TYPES.BASE) {
             if (skill.enable_skill) {
@@ -3939,6 +3943,8 @@ export class CHARACTER extends ITEM {
                 skill.type,
                 skill.pfm.query_distime(this, skill.level, skill.is_ref) + (rtime || 0),
                 true,
+                true,
+                skill.is_ref ? 'ref' : undefined,
             );
 
             return this.release_time > 0 || target.hp <= 0;
@@ -4004,7 +4010,7 @@ export class CHARACTER extends ITEM {
         this.auto_skills!.push({
             pfm: pfmitem,
             level: level,
-            id: baseSkill + '.' + pfmitem.pid,
+            id: baseSkill + '.' + (is_ref ? 'ref' : pfmitem.pid),
             type: baseSkill,
             is_ref: is_ref,
         });

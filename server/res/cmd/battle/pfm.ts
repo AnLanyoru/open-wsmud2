@@ -34,7 +34,7 @@ export default class extends COMMAND {
         let pfm = sp_skill.get_pfm(pfmid);
         if (!pfm) {
             if (pfmid == 'ref') {
-                pfm = me.query_ref_skill(baseSkill);
+                pfm = me.query_ref_skill(me.skills.get(baseSkill.enable_skill || ''));
             }
             if (!pfm) {
                 return me.notify(sp_skill.name + '没有这个绝招。');
@@ -105,7 +105,7 @@ export default class extends COMMAND {
             const distime = pfm.query_distime(me, lv, is_ref);
             const rtime = isrelease ? pfm.query_releasetime(me, lv) : 0;
 
-            pfm.change_distime(me, sk, distime + rtime, true);
+            pfm.change_distime(me, sk, distime + rtime, true, true, is_ref ? 'ref' : undefined);
             me.send(`{type:"dispfm",rtime:${rtime}}`);
             if (pfm.is_weapon && sp_skill != me.attack_skill) {
                 me.attack_skill = sp_skill;

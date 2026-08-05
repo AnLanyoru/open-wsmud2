@@ -1291,8 +1291,9 @@ export class PERFORM {
         add_time?: number,
         force_cd?: boolean,
         show_ui: boolean = true,
+        pid: string = this.pid!,
     ): void {
-        const key = baseType + '.' + this.pid;
+        const key = baseType + '.' + pid;
         const curCdEnd = me.pfm_cd.get(key);
         const now = Date.now();
         let uiTime = 0;

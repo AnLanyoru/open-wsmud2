@@ -21,6 +21,14 @@ export default class extends OBJ {
                         return me.notify_fail(
                             '请先取消' + skill.query_color_name(me) + '融合的技能。',
                         );
+                    for (const [otherId, otherSkill] of me.skills) {
+                        if (otherSkill.ref?.split('/')[0] !== key) continue;
+                        return me.notify_fail(
+                            '请先取消' +
+                                (SKILL.get(otherId)?.query_color_name(me) ?? otherId) +
+                                '融合的技能。',
+                        );
+                    }
 
                     if (skillData.addin?.length)
                         return me.notify_fail(

@@ -22,10 +22,18 @@ export default class extends COMMAND {
         if (skill_base.grade < 1 || skill_base.type === SKILL_TYPES.KNOWLEDGE) {
             return me.notify('基础和知识技能不能遗忘。');
         }
+        if (skill.ref) {
+            return me.notify('你需要先取消融合才可以遗忘技能。');
+        }
+        for (const [otherId, otherSkill] of me.skills) {
+            if (otherSkill.ref?.split('/')[0] !== skillid) continue;
+            const otherBase = SKILL.get(otherId);
+            return me.notify(
+                `${otherBase?.query_color_name(me) ?? otherId}融合了这门武功的绝招，` +
+                    '需要先取消融合才可以遗忘或重置技能。',
+            );
+        }
         if (!sid) {
-            if (skill.ref) {
-                return me.notify('你需要先取消融合才可以遗忘技能。');
-            }
             if (skill.addin && skill.addin.length > 0) {
                 me.send('你需要先重置武道进阶才可以遗忘技能。');
                 const prefix = me.master ? 'dc ' + me.id + ' ' : '';
@@ -42,7 +50,9 @@ export default class extends COMMAND {
         }
         var level = skill.level;
 
-        var exp = (((100 + level) * (level - 100)) / 2) * (skill_base.query_grade(me) + 1) * 5;
+        // 100 级后的已投入潜能由整数等级和当前未升级的经验共同组成。
+        // 遗忘时把两部分一起返还，避免未满一级的进度被直接清掉。
+        var exp = skill_base.query_needexp(level, me) + (level >= 100 ? (skill.exp ?? 0) : 0);
 
         if (skill_base.type !== SKILL_TYPES.KNOWLEDGE) {
             if (!sid) {
@@ -79,7 +89,7 @@ export default class extends COMMAND {
                 '{type:"dialog",dialog:"skills","from":"' + me.id + '",remove:"' + skillid + '"}',
             );
 
-            if (level > 100 && skill_base.type !== SKILL_TYPES.KNOWLEDGE) {
+            if (exp > 0 && skill_base.type !== SKILL_TYPES.KNOWLEDGE) {
                 me.pot += exp;
                 me.notify(
                     '<hic>你遗忘的技能' +
@@ -118,13 +128,10 @@ export default class extends COMMAND {
             return me.notify_fail('知识类技能无法重置。');
         if (skill.level <= level)
             return me.notify('你的' + skill_base.query_color_name(me) + '不用重置等级。');
-        let exp =
-            (((100 + skill.level) * (skill.level - 100)) / 2) *
-            (skill_base.query_grade(me) + 1) *
-            5;
-        if (level > 100) {
-            exp -= (((100 + level) * (level - 100)) / 2) * (skill_base.query_grade(me) + 1) * 5;
-        }
+        const exp =
+            skill_base.query_needexp(skill.level, me) +
+            (skill.exp ?? 0) -
+            skill_base.query_needexp(level, me);
 
         me.pot += exp;
         let curr_level = me.query_skill(skill_base.id, 0);

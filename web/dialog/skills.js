@@ -59,7 +59,10 @@ export default {
             if (data.is_custom)
                 html.push('<span cmd="zc ', data.id, '">推演</span>');
             html.push('<span cmd="lingwu ', data.id, '">进阶</span>');
-            html.push('<span cmd="lingwu2 ', data.id, '">融合</span>');
+            if (data.is_fused)
+                html.push('<span cmd="lingwu2 ', data.id, '">管理融合</span>');
+            else if (data.fusion_entry)
+                html.push('<span cmd="lingwu2 ', data.id, '">融合</span>');
             html.push('<span cmd="fangqi ', data.id, '">遗忘</span>');
         }
         html.push('</div>');

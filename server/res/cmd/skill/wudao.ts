@@ -6,6 +6,10 @@ import { PROPERTIES, SKILL_TYPES } from '../../../core/const.js';
 import type { SkillData } from '../../../core/char/character.js';
 import type { SkillSlotDef } from '../../../types/props.js';
 import { COMBINED as BOOK_FRAGMENT_COUNTS } from '../../obj/book/bc.js';
+import {
+    convert_skill_progress,
+    query_skill_potential,
+} from '../../../core/skill/progress.js';
 
 const WUDAO_PATH = 'book/wudao';
 
@@ -126,6 +130,18 @@ export default class extends COMMAND {
         if (!skill) return me.notify('你还不会这个技能。');
         const skill_base = SKILL.get(skillid);
         if (!skill_base) return me.notify('没有这个技能。');
+        if (skill.ref) {
+            me.send('这门武功已经融合绝招，需要先取消融合才可以调整武道进阶。');
+            return me.send_commands(`lingwu2 ${skillid}`, '<hir>管理融合</hir>');
+        }
+        for (const [otherId, otherSkill] of me.skills) {
+            if (otherSkill.ref?.split('/')[0] !== skillid) continue;
+            const otherBase = SKILL.get(otherId);
+            return me.notify(
+                `${otherBase?.query_color_name(me) ?? otherId}融合了这门武功的绝招，` +
+                    '需要先取消融合才可以调整武道进阶。',
+            );
+        }
         if (choice === 'down' || choice === 'reset') {
             return this.manage_addin(me, skill_base, skill, choice, confirm);
         }
@@ -245,12 +261,20 @@ export default class extends COMMAND {
         if (!selected) return me.notify('这个武道进阶方向不存在或已经无法选择。');
 
         const needs = this.query_needs(selected, skillBase, currentGrade);
-        const newLevel = this.convert_level(skill.level, currentGrade, currentGrade + 1);
+        const converted = convert_skill_progress(
+            skill.level,
+            skill.exp,
+            currentGrade,
+            currentGrade + 1,
+        );
+        const newLevel = converted.level;
         if (confirm !== 'ok') {
             me.send(
                 `是否确认将【${skillBase.query_color_name(me)}】进阶为【${skillBase.query_color_name(undefined, currentGrade + 1)}】` +
                     `，等级将由${skillBase.query_color_text(String(skill.level), currentGrade)}级折算为` +
-                    `${skillBase.query_color_text(String(newLevel), currentGrade + 1)}级？`,
+                    `${skillBase.query_color_text(String(newLevel), currentGrade + 1)}级` +
+                    (converted.exp > 0 ? `，并保留${converted.exp}点技能进度` : '') +
+                    `？`,
             );
             return me.send_commands(
                 `wudao ${skillid} ${slotIndex} ok`,
@@ -266,7 +290,7 @@ export default class extends COMMAND {
         if (!skill.addin) skill.addin = [];
         skill.addin.push(slotIndex);
         skill.level = newLevel;
-        skill.exp = 0;
+        skill.exp = converted.exp;
         const newScore = skillBase.query_score(skill.level, me);
         skillBase.attach_prop(me, me.query_skill(skillid));
         me.add_score(newScore - oldScore);
@@ -278,7 +302,8 @@ export default class extends COMMAND {
         me.recount();
         me.notify(
             `{type:"dialog",dialog:"skills",id:"${skillid}",name:"${skillBase.query_color_name(me)}",` +
-                `grade:${skillBase.query_grade(me)},level:${skill.level},exp:0}`,
+                `grade:${skillBase.query_grade(me)},level:${skill.level},` +
+                `exp:${this.query_progress_percent(skillBase, skill, me)}}`,
         );
         this.send_skill_detail(me, skillBase);
         me.notify(
@@ -320,11 +345,13 @@ export default class extends COMMAND {
         grade: number,
     ): void {
         const nextGrade = grade + 1;
-        const newLevel = this.convert_level(skill.level, grade, nextGrade);
+        const converted = convert_skill_progress(skill.level, skill.exp, grade, nextGrade);
+        const newLevel = converted.level;
         me.send(`【${base.query_color_name(me)}】可选择的进阶方向：`);
         me.send(
             `进阶后提升为【${base.query_color_name(undefined, nextGrade)}】` +
-                `${base.query_color_text(String(newLevel), nextGrade)}级`,
+                `${base.query_color_text(String(newLevel), nextGrade)}级` +
+                (converted.exp > 0 ? `，保留${converted.exp}点技能进度` : ''),
         );
         const commands: string[] = [];
         for (const choice of choices) {
@@ -368,14 +395,22 @@ export default class extends COMMAND {
         const currentGrade = base.query_grade(me);
         const refund = this.query_addin_refund(base, skill, removeFrom, currentGrade);
         const targetGrade = currentGrade - removeCount;
-        const convertedLevel = this.convert_level(skill.level, currentGrade, targetGrade);
+        const converted = convert_skill_progress(
+            skill.level,
+            skill.exp,
+            currentGrade,
+            targetGrade,
+        );
+        const convertedLevel = converted.level;
         const skillLimit = Math.max(0, Math.floor(me.skill_limit()));
         const newLevel = Math.min(convertedLevel, skillLimit);
-        const overflowPot =
-            convertedLevel > skillLimit
-                ? this.query_level_potential(convertedLevel, targetGrade) -
-                  this.query_level_potential(skillLimit, targetGrade)
-                : 0;
+        const reachedLimit = convertedLevel >= skillLimit;
+        const newExp = reachedLimit ? 0 : converted.exp;
+        const totalPotential =
+            query_skill_potential(skill.level, currentGrade) + (skill.exp ?? 0);
+        const overflowPot = reachedLimit
+            ? totalPotential - query_skill_potential(skillLimit, targetGrade)
+            : 0;
 
         if (confirm !== 'ok') {
             const effectiveLevel = me.query_skill(base.id);
@@ -385,7 +420,9 @@ export default class extends COMMAND {
                 `${base.query_color_name(me)}当前已领悟的武道：\n${allLines}\n` +
                     `<hir>将要移除的武道：</hir>\n${removeLines}\n` +
                     `等级折算：${base.query_color_text(String(skill.level), currentGrade)}级 → ` +
-                    `${base.query_color_text(String(newLevel), targetGrade)}级\n` +
+                    `${base.query_color_text(String(newLevel), targetGrade)}级` +
+                    (newExp > 0 ? `，保留${newExp}点技能进度` : '') +
+                    `\n` +
                     (overflowPot > 0
                         ? `<hiy>折算等级${convertedLevel}级超过当前技能上限${skillLimit}级，` +
                           `超出部分返还${overflowPot}点潜能。</hiy>\n`
@@ -406,7 +443,7 @@ export default class extends COMMAND {
         base.release_prop(me, oldEffectiveLevel);
         skill.addin!.splice(removeFrom, removeCount);
         skill.level = newLevel;
-        skill.exp = 0;
+        skill.exp = newExp;
         const newScore = base.query_score(newLevel, me);
         base.attach_prop(me, me.query_skill(base.id));
         me.add_score(newScore - oldScore);
@@ -421,7 +458,8 @@ export default class extends COMMAND {
         me.recount();
         me.notify(
             `{type:"dialog",dialog:"skills",id:"${base.id}",name:"${base.query_color_name(me)}",` +
-                `grade:${base.query_grade(me)},level:${skill.level},exp:0}`,
+                `grade:${base.query_grade(me)},level:${skill.level},` +
+                `exp:${this.query_progress_percent(base, skill, me)}}`,
         );
         this.send_skill_detail(me, base);
         const action = mode === 'down' ? '降低一级武道进阶' : '重置武道进阶';
@@ -499,6 +537,12 @@ export default class extends COMMAND {
                 id: skill.id,
                 desc: skill.query_desc(me, me.query_skill(skill.id, 1000)),
                 is_custom: skill.is_custom,
+                can_fuse:
+                    !me.skills?.get(skill.id)?.ref &&
+                    (me.skills?.get(skill.id)?.level ?? 0) >= 3000 &&
+                    skill.query_grade(me) === 5,
+                is_fused: !!me.skills?.get(skill.id)?.ref,
+                fusion_entry: skill.type === SKILL_TYPES.SKILL,
             }),
         );
     }
@@ -554,14 +598,8 @@ export default class extends COMMAND {
         return true;
     }
 
-    private convert_level(level: number, oldGrade: number, newGrade: number): number {
-        if (level <= 100) return level;
-        const converted = 10000 + ((level * level - 10000) * (oldGrade + 1)) / (newGrade + 1);
-        return Math.floor(Math.sqrt(converted));
+    private query_progress_percent(base: SKILL, skill: SkillData, me: USER): number {
+        return Math.trunc(((skill.exp ?? 0) * 100) / base.level_exp(skill.level, me));
     }
 
-    private query_level_potential(level: number, grade: number): number {
-        if (level <= 100) return 0;
-        return Math.floor((((100 + level) * (level - 100)) / 2) * (grade + 1) * 5);
-    }
 }

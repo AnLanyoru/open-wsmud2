@@ -4,6 +4,7 @@ import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
 import { SKILL } from '../../../core/skill/skill.js';
 import { SkillsMap } from '../../../core/char/skills_map.js';
+import { SKILL_TYPES } from '../../../core/const.js';
 
 export default class extends COMMAND {
     command = 'checkskill';
@@ -53,8 +54,16 @@ export default class extends COMMAND {
             id: skid,
             desc: skill_base.query_desc(target, target.query_skill(skid, 1000)),
             is_custom: skill_base.is_custom,
+            can_fuse: false,
+            is_fused: false,
+            fusion_entry: skill_base.type === SKILL_TYPES.SKILL,
         };
         if (!target.skills) target.skills = new SkillsMap();
+        const skill = target.skills.get(skid);
+        if (skill && skill_base.type === SKILL_TYPES.SKILL) {
+            obj.is_fused = !!skill.ref;
+            obj.can_fuse = !skill.ref && skill.level >= 3000 && skill_base.query_grade(target) === 5;
+        }
         return player.send(JSON.stringify(obj));
     }
 }

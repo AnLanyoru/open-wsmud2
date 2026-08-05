@@ -18,6 +18,18 @@ export default class extends COMMAND {
             var skill = SKILL.get(key);
             if (skill?.learn_condition) {
                 if (skill.learn_condition.gender && skill.learn_condition.gender != 3) {
+                    const skillData = me.skills.get(key)!;
+                    if (skillData.ref) {
+                        return me.notify('请先取消' + skill.query_color_name(me) + '融合的绝招。');
+                    }
+                    for (const [otherId, otherSkill] of me.skills) {
+                        if (otherSkill.ref?.split('/')[0] !== key) continue;
+                        return me.notify(
+                            '请先取消' +
+                                (SKILL.get(otherId)?.query_color_name(me) ?? otherId) +
+                                '融合的绝招。',
+                        );
+                    }
                     list.push(skill);
                 }
             }

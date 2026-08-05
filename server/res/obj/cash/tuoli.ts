@@ -24,6 +24,14 @@ export default class extends OBJ {
             if (skill && skill.family === me.family) {
                 if (skitem.ref)
                     return me.notify_fail('请先取消' + skill.query_color_name(me) + '融合的绝招。');
+                for (const [otherId, otherSkill] of me.skills) {
+                    if (otherSkill.ref?.split('/')[0] !== key) continue;
+                    return me.notify_fail(
+                        '请先取消' +
+                            (SKILL.get(otherId)?.query_color_name(me) ?? otherId) +
+                            '融合的绝招。',
+                    );
+                }
                 if (skitem.addin && skitem.addin.length)
                     return me.notify_fail('请先取消' + skill.query_color_name(me) + '的技能进阶。');
 
