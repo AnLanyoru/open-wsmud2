@@ -172,3 +172,22 @@ test('fusion accepts both levels at 3000 and still requires the target at grade 
     command.enter(wrongGrade, target.id, 'source3/strike', 'ok');
     assert.equal(wrongGrade.skills.get(target.id).ref, undefined);
 });
+
+test('setting cooldown supports the fused perform ref key', () => {
+    const perform = new PERFORM();
+    perform.pid = 'strike';
+    const messages = [];
+    const player = {
+        is_player: true,
+        pfm_cd: new Map(),
+        send(message) {
+            messages.push(message);
+        },
+    };
+
+    perform.set_distime(player, 'sword', 60000, 'ref');
+
+    assert.equal(player.pfm_cd.has('sword.ref'), true);
+    assert.equal(player.pfm_cd.has('sword.strike'), false);
+    assert.equal(messages[0].includes('id:"sword.ref"'), true);
+});

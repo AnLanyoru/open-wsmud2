@@ -229,5 +229,10 @@ function reset_enemy_cooldowns(target: CHARACTER, lv: number): void {
             const distime = pfmitem.query_distime(target, lv);
             pfmitem.set_distime(target, base, distime);
         }
+        const refPfm = target.query_ref_skill(target.skills.get(base_skill.enable_skill));
+        if (refPfm) {
+            const distime = refPfm.query_distime(target, lv, true);
+            refPfm.set_distime(target, base, distime, 'ref');
+        }
     }
 }
