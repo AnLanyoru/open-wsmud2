@@ -11,7 +11,7 @@
     "dev": "vite",
     "start": "concurrently \"node web.js\" \"node main.mjs\"",
     "start-b": "npm run build-b && concurrently \"node web.js\" \"node main.mjs\"",
-    "clean": "node -e \"var f=require('fs');['core','res','server/dist','www'].forEach(d=>f.rmSync(d,{recursive:true,force:true}));f.rmSync('core/templates-build.js',{force:true})\"",
+    "clean": "node -e \"var f=require('fs');['core','res','server/dist','www','node_modules'].forEach(d=>f.rmSync(d,{recursive:true,force:true}));f.rmSync('core/templates-build.js',{force:true})\"",
     "test": "npm run test:compile && node --test tests/*.test.mjs",
     "test:compile": "tsc -p server/tsconfig.json"
   },
