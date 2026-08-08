@@ -117,13 +117,13 @@ function sanqing_attack(me: CHARACTER, _over_count: number): void {
     const now_target = me.query_enemy();
     if (!now_target) return;
 
-    // 收集所有已装备的非内功技能绝招
+    // 只收集已装备的拳脚和当前武器技能绝招
     const available_pfms: Array<{
         pfm: PERFORM;
         level: number;
         sktype: string;
     }> = [];
-    const bases: string[] = ['unarmed', 'dodge', 'parry', 'throwing'];
+    const bases: string[] = ['unarmed'];
     const weapon: string = me.query_weapon_type();
     if (weapon && weapon !== WEAPON_TYPE.NONE) {
         bases.unshift(weapon);
@@ -138,8 +138,8 @@ function sanqing_attack(me: CHARACTER, _over_count: number): void {
         const sk_level: number = me.query_skill(base_skill.enable_skill, 0);
         for (const key in sp_skill.pfm) {
             const pfmitem: PERFORM = sp_skill.pfm[key];
-            // 跳过内功绝招（避免递归调用自身）
-            if (pfmitem.enable_skill === 'force') continue;
+            // 同一特殊技能可同时装备在拳脚、招架等槽位，只取当前攻击槽位的绝招。
+            if (pfmitem.enable_skill && pfmitem.enable_skill !== base) continue;
             available_pfms.push({
                 pfm: pfmitem,
                 level: sk_level,
