@@ -32,7 +32,17 @@ const need_test_objs: TestResRoot = {
     基础资源: {
         随从礼包: ['sp/npc#shuang', 1],
         武道书: ['book/wudao', 1000],
+        古籍残卷: ['book/gj', 1000],
         门派进阶残页: ['book/up', 1000],
+        门派残卷: {
+            机关术残卷: ['book/lt#GAIBANG', 100],
+            观气术残卷: ['book/lt#WUDANG', 100],
+            浩然气残卷: ['book/lt#HUASHAN', 100],
+            普渡残卷: ['book/lt#EMEI', 100],
+            赏罚论残卷: ['book/lt#SHASHOU', 100],
+            见禅心残卷: ['book/lt#SHAOLIN', 100],
+            齐逍遥残卷: ['book/lt#XIAOYAO', 100],
+        },
         橙色朱果: ['drug/exp#4', 10],
         橙色养精丹: ['cash/jing#4', 10],
         元宝: ['money/cash', 10000],
