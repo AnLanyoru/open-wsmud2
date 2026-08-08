@@ -29,7 +29,7 @@ export default class extends EQUIPMENT {
     }
     on_heart_beat_qi_bao(this: CHARACTER, dt: number): void {
         if (this.hp <= 0) return;
-        const mp = this.add_mp(int(this.max_hp * 0.05));
+        const mp = this.add_mp(int(this.max_mp * 0.05));
         if (mp > 0) {
             this.send_room('<ds-hib>$N的七宝指环发散出阵阵柔光，精神看上去好了许多</ds-hib>');
             this.notify('<hig>你恢复了' + mp + '点内力。</hig>');
