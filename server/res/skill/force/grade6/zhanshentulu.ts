@@ -177,7 +177,7 @@ export default class extends SKILL {
                             add_sh_per: -30,
                             diff_fy_per: -30,
                         },
-                        finish_msg: '<hio>$n身上的湮灭之力消散。</hio>',
+                        finish_msg: '<hio>$N身上的湮灭之力消散。</hio>',
                     },
                     me,
                 );

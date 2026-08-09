@@ -96,8 +96,8 @@ export default class extends SKILL {
                                         downside: true,
                                         desc: '摧心掌毒发作，你陷入了昏迷',
                                         start_msg:
-                                            '<hir>$n体内的阴毒猛然发作，只觉得眼前一黑，便什么也不知道了</hir>\n',
-                                        finish_msg: '<hiy>慢慢的$n又恢复了知觉...</hiy>\n',
+                                            '<hir>$N体内的阴毒猛然发作，只觉得眼前一黑，便什么也不知道了</hir>\n',
+                                        finish_msg: '<hiy>慢慢的$N又恢复了知觉...</hiy>\n',
                                     },
                                     me,
                                 );

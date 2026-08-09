@@ -70,8 +70,8 @@ export default class extends SKILL {
                             desc: '你被金刚伏魔之力震慑，心神不宁，无法行动。',
                             duration: busyTime,
                             start_msg:
-                                '<hiz>$n被$N的金刚伏魔之力所震慑，心神大乱，手足无措！</hiz>',
-                            finish_msg: '$n长长舒了一口气，终于从震慑中缓过神来。',
+                                '<hiz>$N被金刚伏魔之力所震慑，心神大乱，手足无措！</hiz>',
+                            finish_msg: '$N长长舒了一口气，终于从震慑中缓过神来。',
                         },
                         me,
                     );

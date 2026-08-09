@@ -78,7 +78,7 @@ export default class extends SKILL {
                             downside: true,
                             no_diff: true,
                             prop: prop,
-                            finish_msg: '<HIG>$n经脉中的断魂针劲渐渐消散。</HIG>',
+                            finish_msg: '<HIG>$N经脉中的断魂针劲渐渐消散。</HIG>',
                         },
                         me,
                     );
