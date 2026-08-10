@@ -1,4 +1,5 @@
 import { NPC } from '../../../core/char/npc.js';
+import type { CHARACTER } from '../../../core/char/character.js';
 import { OBJ } from '../../../core/item/obj.js';
 import type { CORPSE } from '../../../core/item/corpse.js';
 import type { USER } from '../../../core/char/user.js';
@@ -132,6 +133,19 @@ export default class extends NPC {
         const isAssassin = me.family?.id === 'SHASHOU' &&
             me.family.query_temp('ss_target') === this.family.id;
         if (isBattleEnemy || isAssassin) this.do_kill(me);
+    }
+
+    /** 叫杀黄级以上战场 NPC 时，同房间的本门战场 NPC 一同围攻。 */
+    on_kill(me: CHARACTER) {
+        if ((this.battle_grade ?? 0) < 3 || this.hp <= 0 || !this.environment) return;
+        if (this.environment.owner !== this.family.id) return;
+
+        for (const guard of this.family.npcs) {
+            if (guard === this || guard.hp <= 0 || guard.environment !== this.environment) continue;
+            if (guard.family === this.family && guard.environment.owner === this.family.id) {
+                guard.do_kill(me);
+            }
+        }
     }
 
     prepare_battle_corpse(corpse: CORPSE, eligibleIds: string[]) {

@@ -513,17 +513,18 @@ export class FAMILY extends BASE {
      */
     create_event(fam?: FAMILY): any {
         let target_fam = FAMILIES[this.battle_family!];
-        const desc = this.name + '正在和' + target_fam.name + '发生战争，击杀战场弟子会获得丰厚奖励。';
+        const desc = '你的门派正在和' + target_fam.name + '发生战争，击杀对方弟子会获得丰厚奖励。';
         return {
             id: 'family_' + this.id + '_bat',
             name: '门派战争',
             desc,
             query_desc: (me?: USER) =>
-                `${desc}\n今日已获取门派战奖励次数：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10` +
-                `\n今日贡献获取：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}`,
+                `${desc}\n<mem>今日奖励：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10　` +
+                `今日贡献：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}</mem>`,
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: '进入战场',
+            check: (me: USER) => me.family === this,
             on_command: function (me: USER) {
                 me.do_command('goto', 'fam3 ' + target_fam.id);
             },
@@ -672,20 +673,22 @@ export class FAMILY extends BASE {
         npc.battle_death_handled = true;
         const actor = this.resolve_battle_user(killer);
         const eligible = new Set<USER>();
-        const enemyFamily = this.battle_family ? FAMILIES[this.battle_family] : undefined;
-        const isEnemy = (user?: USER) => !!user && !!user.family && user.family !== this &&
-            (user.family === enemyFamily || user.family.id === 'SHASHOU');
+        const canGainMerit = (user?: USER) => {
+            const familyId = user?.family?.id;
+            return !!familyId && familyId !== this.id &&
+                (familyId === this.battle_family || familyId === 'SHASHOU');
+        };
         if ((npc.battle_grade ?? 1) >= 3 && npc.damages) {
             const minDamage = npc.max_hp * 0.03;
             for (const [id, damage] of Object.entries(npc.damages)) {
                 if (damage < minDamage) continue;
                 const user = WORLD.getUser(id);
-                if (isEnemy(user)) eligible.add(user!);
+                if (canGainMerit(user)) eligible.add(user!);
             }
-        } else if (isEnemy(actor)) {
+        } else if (canGainMerit(actor)) {
             eligible.add(actor!);
         }
-        if (eligible.size === 0 && isEnemy(actor)) eligible.add(actor!);
+        if (eligible.size === 0 && canGainMerit(actor)) eligible.add(actor!);
 
         const merit = npc.battle_role === 'boss' ? 500 : npc.battle_role === 'elder' ? 200 :
             ([0, 10, 20, 50, 100] as number[])[npc.battle_grade ?? 1] ?? 0;
@@ -695,13 +698,6 @@ export class FAMILY extends BASE {
             user.notify(`<hiy>你在门派战中获得了${merit}点门派功绩。</hiy>`);
         }
         npc.prepare_battle_corpse?.(corpse, Array.from(eligible, (user) => user.id));
-
-        if ((npc.battle_grade ?? 1) >= 3 && actor && npc.die_room) {
-            for (const guard of this.npcs) {
-                if (guard === npc || guard.hp <= 0 || guard.environment !== npc.die_room) continue;
-                if (guard.family === this && guard.environment.owner === this.id) guard.do_kill(actor);
-            }
-        }
 
         if (npc.battle_role === 'disciple' && (npc.battle_grade ?? 0) <= 4) {
             this.change_boss_command(-1);
