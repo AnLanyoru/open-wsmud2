@@ -2969,13 +2969,13 @@ export class CHARACTER extends ITEM {
         }
         this.add_enemy(target);
         this.fight_type = this.fight_type || 0;
+        if (this.force_skill && this.force_skill.on_beginfight) {
+            this.force_skill.on_beginfight(this, target);
+        }
+        if (this.attack_skill && this.attack_skill.on_beginfight) {
+            this.attack_skill.on_beginfight(this, target);
+        }
         if (type > this.fight_type) {
-            if (this.force_skill && this.force_skill.on_beginfight) {
-                this.force_skill.on_beginfight(this, target);
-            }
-            if (this.attack_skill && this.attack_skill.on_beginfight) {
-                this.attack_skill.on_beginfight(this, target);
-            }
             if (!this.fight_type) {
                 if (this.attack_handler) clearTimeout(this.attack_handler);
                 this.attack_handler = this.call_out(
