@@ -46,6 +46,7 @@ const need_test_objs: TestResRoot = {
         橙色朱果: ['drug/exp#4', 10],
         橙色养精丹: ['cash/jing#4', 10],
         元宝: ['money/cash', 10000],
+        门派功绩: ['money/gongji', 100000],
     },
     技能传功玉简: {
         'base/ (基本)': {

@@ -49,7 +49,7 @@ export default class extends FAMILY {
         ['unarmed', 800],
         ['club', 800],
         ['huntianqigong2', 800, 'force'],
-        ['xiaoyaoyou', 800, 'dodge'],
+        ['xiaoyaoyou2', 800, 'dodge'],
         ['dagoubang2', 800, 'club'],
         ['xianglongzhang2', 800, ['unarmed', 'parry']],
     ];
@@ -60,7 +60,7 @@ export default class extends FAMILY {
         ['unarmed', 5000],
         ['club', 5000],
         ['huntianqigong2', 5000, 'force'],
-        ['xiaoyaoyou', 5000, 'dodge'],
+        ['xiaoyaoyou2', 5000, 'dodge'],
         ['dagoubang2', 5000, 'club'],
         ['xianglongzhang3', 5000, ['unarmed', 'parry']],
     ];
