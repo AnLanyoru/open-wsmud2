@@ -186,8 +186,8 @@ export class SKILL extends BASE {
     // 以下标注「attackskill」的回调即按此规则选取；标注「attack_skill」的则固定取兵器技能。
     // 部分回调内功（force_skill）也会被额外调用，已标注。
 
-    /** [attackskill + force_skill] 战斗开始回调
-     *  触发时机：begin_fight() 初次进入战斗
+    /** [attackskill + force_skill] 开始攻击回调
+     *  触发时机：每次 begin_attack() 接收有效目标时，包括已在战斗中被新目标叫杀
      *  触发条件：force_skill 和 attack_skill 各自独立调用；noweapon_skill 不会被调用 */
     on_beginfight?(me: CHARACTER, target: CHARACTER): void;
     /** [attackskill + force_skill] 攻击前回调（每轮出招前）
