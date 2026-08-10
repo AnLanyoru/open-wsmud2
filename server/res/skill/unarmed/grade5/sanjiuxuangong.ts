@@ -62,6 +62,7 @@ export default class extends SKILL {
         var dr = me.query_temp('sk/sj_dr', 0);
         if (dr > 0) {
             sh = int(sh * (100 - dr) / 100);
+            me.send_room('<hiy>$N玄功护体，阵阵金光抵挡了攻势</hiy>');
             me.set_temp('sk/sj_dr', int(dr * 0.95));
         }
         return sh;
