@@ -40,41 +40,41 @@ export default class extends SKILL {
      * 灵动——战斗开始5秒内免疫控制
      * 震慑——使附近敌人躲闪和招架降低
      */
-    on_beginfight(me: CHARACTER, _target: CHARACTER): void {
+    on_beginfight(me: CHARACTER, target: CHARACTER): void {
         // 灵动
-        me.add_status({
-            id: 'cihang_lingdong',
-            name: '灵动',
-            desc: '慈航剑典护体，不受控制',
-            duration: 5000,
-            ig_control: true,
-            finish_msg: '<hic>$N的灵动剑气收敛，恢复常态。</hic>',
-        });
+        if (!me.fight_type) {
+            me.add_status({
+                id: 'cihang_lingdong',
+                name: '灵动',
+                desc: '慈航剑典护体，不受控制',
+                duration: 5000,
+                ig_control: true,
+                no_clear: true,
+                finish_msg: '<hic>$N的灵动剑气收敛，恢复常态。</hic>',
+            });
+        }
 
         // 震慑
         const lv = me.query_skill('cihangjiandian', 0);
         if (lv <= 0) return;
         const awePct = awe_pct(lv);
-        const enemies = me.get_nearby_enemies();
-        if (!enemies.length) return;
-        for (const enemy of enemies) {
-            enemy.add_status(
-                {
-                    id: 'cihang_zs',
-                    name: '震慑',
-                    desc: '被慈航剑典震慑，躲闪和招架降低',
-                    duration: 0,
-                    downside: false,
-                    no_diff: true,
-                    only_combat: true,
-                    prop: {
-                        ds_per: -awePct,
-                        zj_per: -awePct,
-                    },
+        target.add_status(
+            {
+                id: 'cihang_zs',
+                name: '震慑',
+                desc: '被慈航剑典震慑，躲闪和招架降低',
+                duration: 0,
+                downside: false,
+                only_combat: true,
+                no_clear: true,
+                prop: {
+                    ds_per: -awePct,
+                    zj_per: -awePct,
                 },
-                me,
-            );
-        }
+            },
+            me,
+        );
+
     }
 
     pfm_set: PerformData = {
@@ -93,6 +93,7 @@ export default class extends SKILL {
                     target,
                 );
 
+                me.clear_downside(true);
                 me.add_status({
                     id: 'lingxi',
                     name: '灵犀',

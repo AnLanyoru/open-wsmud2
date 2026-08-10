@@ -70,7 +70,7 @@ export default class extends SKILL {
                 if (sh && !is_parried) {
                     target.add_status(
                         {
-                            id: 'xlz_l',
+                            id: 'xlz',
                             duration: time,
                             name: '降龙',
                             downside: true,

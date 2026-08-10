@@ -42,8 +42,10 @@ export default class extends SKILL {
      * 被治疗至超过入战百分比时，加成归零——不因回血而产生负收益。
      */
     on_beginfight(me: CHARACTER, _target: CHARACTER): void {
-        const entryPercent = Math.floor((me.hp * 100) / me.max_hp);
-        me.set_temp('ef_hp', entryPercent);
+        if (!me.fight_type) {
+            const entryPercent = Math.floor((me.hp * 100) / me.max_hp);
+            me.set_temp('ef_hp', entryPercent);
+        }
     }
 
     /**

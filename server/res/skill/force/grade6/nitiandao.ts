@@ -12,6 +12,13 @@ export default class extends SKILL {
 
     desc = '岁月轮回，逆天而行';
     can_enables = ['force'];
+    attack_actions = [
+        "<hir>$N身体一侧，一掌凌空劈出，一股炽热无比的气流顿时澎湃涌至$n全身各处</hir>",
+        "<hiy>$N身形一转，拳头携着疾速旋转的气流挥出，疾如闪电，势如雷霆，击向$n</hiy>",
+        "<wht>$N双掌平平提到胸前，神色沉重的推向$n全身各处</wht>",
+        "<mag>$N一脚踢出，迅疾无比的一招突然又慢如蜗牛上树，忽快忽慢让$n完全无法招架</mag>",
+        "<him>$N嘿然一笑，双掌化爪，惊天裂空的闪电般向$n$l击去</mag>"
+    ];
 
     query_enable_prop(lv: number): EnablePropMap {
         const hpPer = 5 + Math.floor(lv / 100);
@@ -74,7 +81,9 @@ export default class extends SKILL {
                 const pct = nizhuan_pct(lv);
                 const convert = Math.floor((sh * pct) / 100);
                 if (convert > 0) {
+                    me.add_mp(convert);
                     me.add_hp(convert);
+                    me.notify('<hig>你回复了' + convert + '气血和内力。</hig>');
                 }
             }
         }
@@ -181,7 +190,7 @@ function zhenshe_slow_per(lv: number): number {
 
 /** 逆转伤害转化百分比：10 + lv / 300 */
 function nizhuan_pct(lv: number): number {
-    return 10 + lv / 300;
+    return Math.min(45, 10 + lv / 300);
 }
 
 /** 一念寂灭压制内力百分比：10 + Math.floor(lv / 400) */

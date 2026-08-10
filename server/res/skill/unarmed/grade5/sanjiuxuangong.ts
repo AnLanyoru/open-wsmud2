@@ -43,25 +43,27 @@ export default class extends SKILL {
         };
     }
 
-    // 三九玄功被动：进入战斗后获得减伤，被命中后降低
-    on_beginfight(me: CHARACTER): void {
-        var lv = me.query_skill('sanjiuxuangong', 0);
-        var dr = 50 + Math.floor(lv / 200);
-        if (dr > 75) dr = 75;
-        me.add_status({
-            id: 'sanjiu_dr',
-            name: '玄功护体',
-            duration: -1,
-            prop: {
-                diff_sh_per: dr,
-            },
-            desc: '三九玄功护体，减少' + dr + '%伤害',
-        });
+    on_disenable(me: CHARACTER, type: string): void {
+        me.remove_temp('sk/sj_dr');
     }
 
-    on_damage(me: CHARACTER, sh: number, target: CHARACTER): number {
-        // 被命中后降低减伤效果
+    // 三九玄功被动：进入战斗后获得减伤，被命中后降低
+    on_beginfight(me: CHARACTER): void {
+        if (!me.fight_type) {
+            var lv = me.query_skill('sanjiuxuangong', 0);
+            var dr = 50 + int(lv / 200);
+            if (dr > 75) dr = 75;
+            me.set_temp('sk/sj_dr', dr);
+        }
+    }
 
+    on_damage(me: CHARACTER, sh: number): number {
+        // 被命中后降低减伤效果
+        var dr = me.query_temp('sk/sj_dr', 0);
+        if (dr > 0) {
+            sh = int(sh * (100 - dr) / 100);
+            me.set_temp('sk/sj_dr', int(dr * 0.95));
+        }
         return sh;
     }
 
@@ -76,11 +78,11 @@ export default class extends SKILL {
                 var time = xiantiTime(lv);
                 var dr = xiantiDr(lv);
                 me.send_room(
-                    '<hiy>$N深吸一口气，三九玄功运转周身，真气如泉涌般自丹田蔓延至四肢百骸，浑身灵光闪烁恍若<HIC>仙体</HIC>！</hiy>',
+                    '<hiy>$N深吸一口气，玄功运转周身，真气如泉涌般自丹田蔓延至四肢百骸，浑身灵光闪烁恍若<HIC>仙体</HIC>！</hiy>',
                     target,
                 );
                 me.add_status({
-                    id: 'sanjiu_xian',
+                    id: 'force',
                     name: '仙体',
                     duration: time,
                     prop: {
@@ -113,10 +115,6 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var hp_cost = Math.floor(me.hp * 0.25);
                 me.add_hp(-hp_cost);
-                me.send_room(
-                    '<hiy>$N仰天长啸，竟以损耗自身气血为引，施展出禁忌之术——「<HIC>酒神咒</HIC>」！</hiy>',
-                    target,
-                );
                 me.send_room(
                     '<hiz>$N的气息陡然暴涨，一股毁天灭地的力量自$P体内爆发而出！</hiz>',
                     target,

@@ -35,33 +35,26 @@ export default class extends SKILL {
     /**
      * 震慑——降低附近敌人的防御和免伤
      */
-    on_beginfight(me: CHARACTER, _target: CHARACTER): void {
+    on_beginfight(me: CHARACTER, target: CHARACTER): void {
         const lv = me.query_skill('zhanshentulu', 0);
         if (lv <= 0) return;
         const awePct = zhenshe_awe_pct(lv);
-        const enemies = me.get_nearby_enemies();
-        if (!enemies.length) return;
-        me.send_room(
-            '<hio>$N战神真气汹涌而出，一股睥睨天下的磅礴威压笼罩四野，周遭之敌无不心生畏惧！</hio>',
-        );
-        for (const enemy of enemies) {
-            enemy.add_status(
-                {
-                    id: 'zstl_zs',
-                    name: '震慑',
-                    desc: '被战神图录震慑，防御和免伤降低',
-                    duration: 0,
-                    downside: true,
-                    no_diff: true,
-                    only_combat: true,
-                    prop: {
-                        fy_per: -awePct,
-                        diff_sh_per: -awePct,
-                    },
+        target.add_status(
+            {
+                id: 'zstl_zs',
+                name: '震慑',
+                desc: '被战神图录震慑，防御和免伤降低',
+                duration: 0,
+                downside: false,
+                no_diff: true,
+                only_combat: true,
+                prop: {
+                    fy_per: -awePct,
+                    diff_sh_per: -awePct,
                 },
-                me,
-            );
-        }
+            },
+            me,
+        );
     }
 
     /**

@@ -37,26 +37,21 @@ export default class extends SKILL {
         const lv = me.query_skill('changshengjue', 0);
         if (lv <= 0) return;
         const awePct = zhenshe_awe_pct(lv);
-        const enemies = me.get_nearby_enemies();
-        if (!enemies.length) return;
-        me.send_room('<hio>$N长生真气沛然流转，一股苍茫古意弥漫四野，周遭之敌无不心神震荡！</hio>');
-        for (const enemy of enemies) {
-            enemy.add_status(
-                {
-                    id: 'csj_zs',
-                    name: '震慑',
-                    desc: '被长生诀震慑',
-                    duration: 0,
-                    downside: true,
-                    no_diff: true,
-                    only_combat: true,
-                    prop: {
-                        add_sh_per: -awePct,
-                    },
+        target.add_status(
+            {
+                id: 'csj_zs',
+                name: '震慑',
+                desc: '被长生诀震慑',
+                duration: 0,
+                no_diff: true,
+                only_combat: true,
+                prop: {
+                    add_sh_per: -awePct,
                 },
-                me,
-            );
-        }
+            },
+            me,
+        );
+
     }
 
     /**
