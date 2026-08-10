@@ -217,8 +217,8 @@ export default class ShouXiCommand extends COMMAND {
             name: '门派战争',
             desc,
             query_desc: me =>
-                `${desc}\n<mem>今日奖励：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10　` +
-                `今日贡献：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}</mem>`,
+                `${desc}\n<mem>今日掉落：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10　` +
+                `今日功绩：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}</mem>`,
             time: fam.query_temp_expiry('battle'),
             grade: 2,
             command: '进入战场',

@@ -168,7 +168,7 @@ export default class extends NPC {
             if (this.user_items[me.id]) return this.user_items[me.id];
             if (claimed.has(me.id)) return;
             if (me.query_temp('mp_battle_drop', 0) >= 10) {
-                me.notify('你今天获得的门派战战利品已经达到10次上限。');
+                me.notify(`今日已获取${me.query_temp('mp_battle_drop', 0)}/10次门派掉落。`);
                 finish(me);
                 return;
             }
@@ -187,7 +187,8 @@ export default class extends NPC {
             const equipmentDrop = createBattleEquipmentDrop(equipmentPaths, grade);
             if (equipmentDrop) items.push(equipmentDrop);
             this.user_items[me.id] = items;
-            me.add_temp('mp_battle_drop', 1, UTIL.diff_time());
+            const todayDrops = me.add_temp('mp_battle_drop', 1, UTIL.diff_time());
+            me.notify(`今日已获取${todayDrops}/10次门派掉落。`);
             return items;
         };
 

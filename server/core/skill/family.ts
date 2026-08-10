@@ -519,8 +519,8 @@ export class FAMILY extends BASE {
             name: '门派战争',
             desc,
             query_desc: (me?: USER) =>
-                `${desc}\n<mem>今日奖励：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10　` +
-                `今日贡献：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}</mem>`,
+                `${desc}\n<mem>今日掉落：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10　` +
+                `今日功绩：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}</mem>`,
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: '进入战场',
@@ -695,7 +695,9 @@ export class FAMILY extends BASE {
         for (const user of eligible) {
             this.battle_context?.addScore(user, merit);
             this.battle_context?.addGongji(user, merit);
-            user.notify(`<hiy>你在门派战中获得了${merit}点门派功绩。</hiy>`);
+            const todayMerit = user.add_temp('sssc', merit, UTIL.diff_time());
+            const meritLimit = 500 + (user.query_prop('shashou') ?? 0);
+            user.notify(`<hiy>你在门派战中获得了${merit}点门派功绩（今日${todayMerit}/${meritLimit}）。</hiy>`);
         }
         npc.prepare_battle_corpse?.(corpse, Array.from(eligible, (user) => user.id));
 
