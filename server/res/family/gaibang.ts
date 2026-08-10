@@ -18,6 +18,17 @@ export default class extends FAMILY {
         ['gaibang/hongqigong', 'gaibang/xiaowu'],
     ];
     boss_guard = ['gaibang/xiaowu', 'gaibang/andao4', 'gaibang/andao3'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'gaibang/xiaowu',
+        elder_rooms: ['gaibang/xiaowu', 'gaibang/xiaowu'] as [string, string],
+        purple_rooms: ['gaibang/andao4', 'gaibang/andao3'] as [string, string],
+        random_rooms: [],
+        titles: { green: '丐帮六袋弟子', blue: '丐帮七袋弟子', yellow: '丐帮八袋弟子', purple: '丐帮九袋弟子', elder: '丐帮长老', boss: '丐帮帮主' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['gaibang/pomiao', 'gaibang/mishi', 'gaibang/andao2'];
     eqs = [];
     npc_skills: SkillSet = [

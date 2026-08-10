@@ -37,6 +37,7 @@ export default class extends NPC {
     }
 
     on_heart_beat(dt: number): void {
+        if (this.fight_type) return;
         let exits = this.environment!.move_exits;
         if (!exits || !exits.length) return;
         this.do_command('go', exits.random());

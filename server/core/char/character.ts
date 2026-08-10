@@ -3752,8 +3752,9 @@ export class CHARACTER extends ITEM {
                         registerDamageBroadcast(this);
                     }
                 }
-                const damag = (this.damages[from.id] || 0) + sh;
-                this.damages[from.id] = damag;
+                const damageOwner = from.master ? WORLD.getUser(from.master) ?? from : from;
+                const damag = (this.damages[damageOwner.id] || 0) + sh;
+                this.damages[damageOwner.id] = damag;
                 this.sum_damages = (this.sum_damages ?? 0) + sh;
             }
             this.add_hp(-sh);
@@ -3775,8 +3776,9 @@ export class CHARACTER extends ITEM {
                     registerDamageBroadcast(this);
                 }
             }
-            const damag = (this.damages[from.id] || 0) + sh;
-            this.damages[from.id] = damag;
+            const damageOwner = from.master ? WORLD.getUser(from.master) ?? from : from;
+            const damag = (this.damages[damageOwner.id] || 0) + sh;
+            this.damages[damageOwner.id] = damag;
         }
         if (this.force_skill?.on_damage) {
             sh = this.force_skill.on_damage(this, sh, from);

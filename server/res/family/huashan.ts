@@ -19,6 +19,17 @@ export default class extends FAMILY {
     ];
     boss_path = 'huashan/yuebuqun';
     boss_guard = ['huashan/keting', 'huashan/lianwu', 'huashan/yunv'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'huashan/keting',
+        elder_rooms: ['huashan/keting', 'huashan/keting'] as [string, string],
+        purple_rooms: ['huashan/lianwu', 'huashan/yunv'] as [string, string],
+        random_rooms: [],
+        titles: { green: '华山派第十六代弟子', blue: '华山派第十五代弟子', yellow: '华山派第十四代弟子', purple: '华山派第十三代弟子', elder: '华山派长老', boss: '华山派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['huashan/xiaowu', 'huashan/pingdi', 'huashan/siguoya', 'huashan/luoyan'];
     npc_skills: SkillSet = [
         ['dodge', 800],

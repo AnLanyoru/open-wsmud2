@@ -13,6 +13,7 @@ import { CORPSE } from '../item/corpse.js';
 import type { EQUIPMENT } from '../item/equipment.js';
 import type { ActionMap } from '../../types/base.js';
 import type { USER } from './user.js';
+import type { CORPSE as CorpseType } from '../item/corpse.js';
 
 // ============================================================
 // NPC 类
@@ -95,6 +96,14 @@ export class NPC extends CHARACTER {
     auto_eqs?: EQUIPMENT[];
     /** 连击次数（biwu 系统动态设置） */
     attack_count?: number;
+    /** 门派战 NPC 品级：1绿、2蓝、3黄、4紫、5橙。 */
+    battle_grade?: number;
+    /** 门派战固定角色，用于区分普通弟子、长老和掌门。 */
+    battle_role?: 'disciple' | 'elder' | 'boss';
+    /** 门派战死亡回调幂等标记。 */
+    battle_death_handled?: boolean;
+    /** 为合格贡献者安装个人尸体掉落逻辑。 */
+    prepare_battle_corpse?(corpse: CorpseType, eligibleIds: string[]): void;
 
     // ============ 运行时方法（由资源文件注入） ============
 
@@ -413,7 +422,6 @@ export class NPC extends CHARACTER {
             }
             if (this.chat_msg && this.random(10) > 8)
                 this.send_message(this.chat_msg[Math.floor(Math.random() * this.chat_msg.length)]);
-            if (this.on_heart_beat) this.on_heart_beat(dt);
         } else if (this.hp <= 0) {
             const eny = this.query_enemy();
             if (!eny) {
@@ -421,6 +429,8 @@ export class NPC extends CHARACTER {
                 this.fight_type = 0;
             }
         }
+        // 心跳回调始终触发；巡逻/移动类 NPC 应在自身回调中判断 fight_type。
+        if (this.on_heart_beat) this.on_heart_beat(dt);
     }
 
     /**

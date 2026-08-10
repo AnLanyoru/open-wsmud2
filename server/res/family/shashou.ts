@@ -99,7 +99,7 @@ export default class extends FAMILY {
 
     create_event(fam) {
         return {
-            id: this.id + '_bat',
+            id: 'family_' + this.id + '_bat',
             name: '门派战争',
             desc: '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。',
             time: Date.now() + 30 * 60000,
@@ -118,7 +118,7 @@ export default class extends FAMILY {
                 ? '杀手楼在门派战斗中帮客户占得优势，所有弟子获得鼓舞，练功效率+' + suc + '%。'
                 : '杀手楼在门派战斗中没有帮助客户取得优势。';
         return {
-            id: this.id + '_settle',
+            id: 'family_' + this.id + '_settle',
             name: '门派战争',
             desc: msg,
             time: this.query_temp_expiry('battle'),

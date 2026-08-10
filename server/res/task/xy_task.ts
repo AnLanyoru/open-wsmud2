@@ -484,6 +484,7 @@ export default class XiangYangTask extends TASK {
     }
 
     check_move(npc: NPC) {
+        if (npc.fight_type) return;
         if (npc.environment!.is('xiangyang/guangchang')) return;
         for (var i = 0; i < npc.environment!.items.length; i++) {
             const elem = npc.environment!.items[i];

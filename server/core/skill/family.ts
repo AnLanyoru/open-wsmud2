@@ -13,6 +13,40 @@ import type { USER } from '../char/user.js';
 import type { SKILL, SkillSet } from './skill.js';
 import type { AREA } from '../room/area.js';
 import type { CHARACTER } from '../char/character.js';
+import type { CORPSE } from '../item/corpse.js';
+
+export type BattleMode = 'family' | 'party';
+
+export interface BattleContext {
+    mode: BattleMode;
+    attackerId: string;
+    defenderId: string;
+    attackerName: string;
+    defenderName: string;
+    getRoom(ownerId: string, baseRoom: ROOM): ROOM | undefined;
+    addScore(actor: USER, value: number): void;
+    addGongji(actor: USER, value: number): void;
+    canEnter(actor: USER): boolean;
+}
+
+export interface FamilyBattleConfig {
+    battle_mode: 'family';
+    boss_path: string;
+    boss_room: string;
+    elder_rooms: [string, string];
+    purple_rooms: [string, string];
+    random_rooms: string[];
+    titles: {
+        green: string;
+        blue: string;
+        yellow: string;
+        purple: string;
+        elder: string;
+        boss: string;
+    };
+    reinforce_count: number;
+    random_grade_weights: [number, number, number];
+}
 
 // 懒加载 NPC 避免循环依赖: family.ts → npc.ts → character.ts (TDZ)
 let _NPC: {
@@ -41,6 +75,10 @@ export class FAMILY extends BASE {
     battle_gift: number = 0;
     /** 是否可门派战 */
     can_battle: boolean = false;
+    /** 公共门派战五档 NPC 与位置配置 */
+    battle_config?: FamilyBattleConfig;
+    /** 当前公共门派战上下文；帮派战将使用独立适配器。 */
+    battle_context?: BattleContext;
 
     // ============ 动态属性（资源文件/运行时设置） ============
 
@@ -92,8 +130,12 @@ export class FAMILY extends BASE {
     boss_guard?: string[];
     /** 守卫掌门NPC */
     battle_boss?: NPC;
-    /** 创建NPC的定时器句柄 */
-    create_handler?: ReturnType<typeof setTimeout>;
+    /** 掌门驱动的绿/蓝/黄弟子刷新心跳计数。 */
+    battle_heartbeat_count: number = 0;
+    /** 掌门号令当前层数，仅通过 NPC 生成/死亡增量维护。 */
+    battle_command_count: number = 0;
+    /** 门派战超时结算定时器句柄 */
+    battle_over_handler?: ReturnType<typeof setTimeout>;
     /** 门派所属区域 */
     area: AREA | null = null;
     /** 门派性别(用于生成名字) */
@@ -406,8 +448,11 @@ export class FAMILY extends BASE {
      */
     begin_attack(fam: FAMILY): void {
         this.battle_score = 0;
+        this.battle_heartbeat_count = 0;
+        this.battle_command_count = 0;
+        this.battle_context = this.create_battle_context(fam);
         this.set_temp('battle', 1, 3600000);
-        this.call_out(this.battle_over, 30 * 60000, 'timeout');
+        this.battle_over_handler = this.call_out(this.battle_over, 30 * 60000, 'timeout');
 
         this.area!.rooms[0].create_copy(this.id, 0);
 
@@ -419,6 +464,21 @@ export class FAMILY extends BASE {
         EVENTS.add(this.create_event());
     }
 
+    /** 创建公共门派战适配器；帮派模式可复用 NPC 核心而替换此适配器。 */
+    create_battle_context(fam: FAMILY): BattleContext {
+        return {
+            mode: 'family',
+            attackerId: fam.id,
+            defenderId: this.id,
+            attackerName: fam.name,
+            defenderName: this.name,
+            getRoom: (ownerId, baseRoom) => baseRoom.query_copy(ownerId),
+            addScore: (actor, value) => actor.family?.add_score(actor, value),
+            addGongji: (actor, value) => actor.family?.add_gongji(actor, value),
+            canEnter: (actor) => actor.family === this || actor.family === fam,
+        };
+    }
+
     /**
      * 创建门派战活动事件 — 供 EVENTS.add 注册到活动面板
      * @returns 活动事件对象
@@ -426,7 +486,7 @@ export class FAMILY extends BASE {
     create_event(fam?: FAMILY): any {
         let target_fam = FAMILIES[this.battle_family!];
         return {
-            id: this.id + '_bat',
+            id: 'family_' + this.id + '_bat',
             name: '门派战争',
             desc: '你的门派正在和' + target_fam.name + '发生战争，击杀对方弟子会获得丰厚奖励。',
             time: Date.now() + 30 * 60000,
@@ -448,45 +508,51 @@ export class FAMILY extends BASE {
         return rm.query_copy(this.id);
     }
 
-    /** 创建门派守卫NPC */
+    /** 创建掌门、两名长老与四名紫色弟子。 */
     create_guards(): void {
-        if (!this.boss_guard || !this.boss) return;
+        const config = this.battle_config;
+        if (!config || !this.boss) return;
 
-        var boss_room = this.get_room(WORLD.getRoom(this.boss_guard[0])!);
-        var npc = _NPC!.CLONE('pub/menpai');
-        npc.init_from(this, 5);
-        npc.name = this.boss.name;
-        npc.desc = this.boss.desc;
-        npc.title = '<ora>' + this.boss.title + '</ora>';
-
-        npc.age = this.boss.age;
-        npc.gender = this.boss.gender;
-        this.npcs.push(npc);
-        if (boss_room) boss_room.item_changed(npc, true);
-
-        this.battle_boss = npc;
-        for (var i = 0; i < this.boss_guard.length; i++) {
-            for (var j = 0; j < 2; j++) {
-                npc = _NPC!.CLONE('pub/menpai');
-                npc.init_from(this, i == 0 ? 4 : 3);
-                var rm = this.get_room(WORLD.getRoom(this.boss_guard[i])!);
-                if (rm) {
-                    this.npcs.push(npc);
-                    rm.item_changed(npc, true);
-                }
+        const boss = this.create_npc(5, 'boss');
+        if (boss) {
+            boss.name = this.boss.name;
+            boss.desc = this.boss.desc;
+            boss.age = this.boss.age;
+            boss.gender = this.boss.gender;
+            this.register_battle_npc(boss, config.boss_room);
+            this.battle_boss = boss;
+            boss.add_event('on_heart_beat', this.on_battle_boss_heartbeat.bind(this));
+        }
+        for (const room of config.elder_rooms) {
+            const elder = this.create_npc(5, 'elder');
+            if (elder) this.register_battle_npc(elder, room);
+        }
+        let purpleCount = 0;
+        for (const room of config.purple_rooms) {
+            for (let i = 0; i < 2; i++) {
+                const purple = this.create_npc(4, 'disciple');
+                if (purple && this.register_battle_npc(purple, room)) purpleCount++;
             }
+        }
+        this.change_boss_command(purpleCount);
+    }
+
+    /** 掌门心跳事件：累计 60 次后补刷绿/蓝/黄弟子。 */
+    on_battle_boss_heartbeat(): void {
+        if (!this.battle_boss || !this.battle_family) return;
+        this.battle_heartbeat_count++;
+        if (this.battle_heartbeat_count >= 60) {
+            this.battle_heartbeat_count = 0;
+            this.create_npcs();
         }
     }
 
     /**
-     * 移除门派 NPC — 从 npcs 列表中移除，并清除 boss 状态 buff
+     * 移除门派 NPC — 从 npcs 列表中移除；号令层数由死亡流程增量扣除
      * @param npc - 要移除的 NPC
      */
     remove_npcs(npc: NPC): void {
         this.npcs.remove(npc);
-        if (this.battle_boss) {
-            this.battle_boss.remove_status('boss');
-        }
     }
 
     /**
@@ -494,43 +560,133 @@ export class FAMILY extends BASE {
      * @param level - NPC 等级（0-2 决定品级）
      * @returns 创建的 NPC 实例
      */
-    create_npc(level: number): NPC | undefined {
+    create_npc(level: number, role: 'disciple' | 'elder' | 'boss' = 'disciple'): NPC | undefined {
         var npc = _NPC!.CLONE('pub/menpai');
-        npc.init_from(this, level);
+        npc.init_from(this, level, role);
+        npc.on_died = (killer: CHARACTER | undefined, corpse: CORPSE) =>
+            this.on_battle_npc_die(npc, killer, corpse);
         return npc;
+    }
+
+    /** 注册战场克隆体，确保副本、列表和死亡回调三者一致。 */
+    register_battle_npc(npc: NPC, roomPath: string): boolean {
+        const baseRoom = WORLD.getRoom(roomPath);
+        const room = baseRoom && this.get_room(baseRoom);
+        if (!room) return false;
+        this.npcs.push(npc);
+        room.item_changed(npc, true);
+        return true;
     }
 
     /** 持续创建门派NPC */
     create_npcs(): void {
-        if (this.npcs.length < 27 && this.area) {
-            let count = 27 - this.npcs.length;
-            for (let i = 0; i < count; i++) {
-                let lv = i > 15 ? 2 : i < 8 ? 0 : 1;
-                let rm = this.get_room(this.area.rooms.random());
-                let npc = this.create_npc(lv);
-                if (npc) this.npcs.push(npc);
-                if (rm && npc) rm.item_changed(npc, true);
+        const config = this.battle_config;
+        if (!config || !this.area || !this.battle_family) return;
+        const aliveReinforcements = this.npcs.filter(
+            (npc) => npc.hp > 0 && (npc.battle_grade ?? 0) <= 3,
+        ).length;
+        const missing = Math.max(0, config.reinforce_count - aliveReinforcements);
+        const roomPaths = config.random_rooms?.length
+            ? config.random_rooms
+            : this.area.rooms.map((room) => room.path);
+        const weights = config.random_grade_weights;
+        const totalWeight = weights.reduce((sum, value) => sum + value, 0);
+        for (let i = 0; i < missing; i++) {
+            let roll = Math.random() * totalWeight;
+            let grade = 1;
+            for (let index = 0; index < weights.length; index++) {
+                roll -= weights[index];
+                if (roll < 0) {
+                    grade = index + 1;
+                    break;
+                }
             }
-            if (this.battle_boss) {
-                this.battle_boss.add_status({
-                    id: 'boss',
-                    name: '号令',
-                    prop: {
-                        hp_per: 30,
-                        fy_per: 30,
-                        ds_per: 30,
-                        mz_per: 30,
-                    },
-                    no_clear: true,
-                    override: 1,
-                    count: count,
-                    max_count: 100,
-                    duration: 0,
-                    desc: '当你的门派还有NPC存活时，增加你的属性',
-                });
+            const npc = this.create_npc(grade);
+            if (npc && this.register_battle_npc(npc, roomPaths.random())) {
+                this.change_boss_command(1);
             }
         }
-        this.create_handler = this.call_out(this.create_npcs, 200000);
+    }
+
+    /** 按 NPC 生成/死亡增量维护掌门号令层数，不扫描全图。 */
+    change_boss_command(delta: number): void {
+        const boss = this.battle_boss;
+        this.battle_command_count = Math.max(0, this.battle_command_count + delta);
+        if (!boss || boss.hp <= 0) return;
+        const oldHpRatio = boss.max_hp > 0 ? boss.hp / boss.max_hp : 1;
+        boss.remove_status('boss', true);
+        if (this.battle_command_count > 0) {
+            boss.add_status({
+                id: 'boss',
+                name: '号令',
+                prop: { hp_per: 30, fy_per: 30, ds_per: 30, mz_per: 30 },
+                no_clear: true,
+                override: 1,
+                count: this.battle_command_count,
+                max_count: 100,
+                duration: 0,
+                desc: '每名存活的本派战场 NPC 使掌门属性提高30%。',
+            });
+        }
+        boss.recount();
+        boss.recount_max_hp();
+        boss.hp = Math.max(1, Math.min(boss.max_hp, Math.round(boss.max_hp * oldHpRatio)));
+        boss.notify_hp();
+    }
+
+    /** 战场克隆 NPC 的统一死亡流程。 */
+    on_battle_npc_die(npc: NPC, killer: CHARACTER | undefined, corpse: CORPSE): void {
+        if (npc.battle_death_handled) return;
+        npc.battle_death_handled = true;
+        const actor = this.resolve_battle_user(killer);
+        const eligible = new Set<USER>();
+        const enemyFamily = this.battle_family ? FAMILIES[this.battle_family] : undefined;
+        const isEnemy = (user?: USER) => !!user && !!user.family && user.family !== this &&
+            (user.family === enemyFamily || user.family.id === 'SHASHOU');
+        if ((npc.battle_grade ?? 1) >= 3 && npc.damages) {
+            const minDamage = npc.max_hp * 0.03;
+            for (const [id, damage] of Object.entries(npc.damages)) {
+                if (damage < minDamage) continue;
+                const user = WORLD.getUser(id);
+                if (isEnemy(user)) eligible.add(user!);
+            }
+        } else if (isEnemy(actor)) {
+            eligible.add(actor!);
+        }
+        if (eligible.size === 0 && isEnemy(actor)) eligible.add(actor!);
+
+        const merit = npc.battle_role === 'boss' ? 500 : npc.battle_role === 'elder' ? 200 :
+            ([0, 10, 20, 50, 100] as number[])[npc.battle_grade ?? 1] ?? 0;
+        for (const user of eligible) {
+            this.battle_context?.addScore(user, merit);
+            this.battle_context?.addGongji(user, merit);
+            user.notify(`<hiy>你在门派战中获得了${merit}点门派功绩。</hiy>`);
+        }
+        npc.prepare_battle_corpse?.(corpse, Array.from(eligible, (user) => user.id));
+
+        if ((npc.battle_grade ?? 1) >= 3 && actor && npc.die_room) {
+            for (const guard of this.npcs) {
+                if (guard === npc || guard.hp <= 0 || guard.environment !== npc.die_room) continue;
+                if (guard.family === this && guard.environment.owner === this.id) guard.do_kill(actor);
+            }
+        }
+
+        if (npc.battle_role === 'disciple' && (npc.battle_grade ?? 0) <= 4) {
+            this.change_boss_command(-1);
+        }
+        this.remove_npcs(npc);
+        if (npc.battle_role === 'boss' && this.battle_family) {
+            const winner = FAMILIES[this.battle_family];
+            winner?.battle_over('suc');
+            this.battle_over('die');
+        }
+    }
+
+    /** 将随从、召唤物的击杀归属到在线主人。 */
+    resolve_battle_user(actor?: CHARACTER): USER | undefined {
+        if (!actor) return;
+        if (actor.check_player()) return actor as USER;
+        return actor.master ? WORLD.getUser(actor.master) : undefined;
     }
 
     /**
@@ -542,7 +698,11 @@ export class FAMILY extends BASE {
         var fam = FAMILIES[this.battle_family];
         if (!fam) return;
         this.battle_family = null!;
-        if (this.create_handler) clearTimeout(this.create_handler);
+        this.battle_heartbeat_count = 0;
+        this.battle_command_count = 0;
+        if (this.battle_over_handler) clearTimeout(this.battle_over_handler);
+        this.battle_over_handler = undefined;
+        if (this.battle_boss) this.battle_boss.remove_status('boss', true);
         for (var i = 0; i < this.npcs.length; i++) {
             if (this.npcs[i].hp > 0) {
                 this.npcs[i].send_room('$N急匆匆的走掉了。');
@@ -591,7 +751,7 @@ export class FAMILY extends BASE {
             if (suc_type === 'suc') sc = 0;
             else if (suc_type === 'fail') sc = 50;
             else sc = this.battle_score > fam.battle_score ? 0 : 20;
-            EVENTS.remove(FAMILIES['SHASHOU'].id + '_bat');
+            EVENTS.remove('family_' + FAMILIES['SHASHOU'].id + '_bat');
             EVENTS.add(FAMILIES['SHASHOU'].finish_event(sc, this));
             FAMILIES['SHASHOU'].remove_temp('ss_target');
             if (sc > 0) {
@@ -611,9 +771,10 @@ export class FAMILY extends BASE {
         }
         if (this.battle_boss) this.battle_boss.destroy();
         this.battle_boss = undefined;
+        this.battle_context = undefined;
         this.area!.notify_update();
         this.call_out(this.clear_room, 300000);
-        EVENTS.remove(this.id + '_bat');
+        EVENTS.remove('family_' + this.id + '_bat');
     }
 
     /** 清理门派战场副本房间 */
@@ -634,7 +795,7 @@ export class FAMILY extends BASE {
                 ? '你的门派占得优势，所有弟子获得鼓舞，练功效率+' + suc + '%。'
                 : '你的门派没有取得优势。';
         return {
-            id: this.id + '_settle',
+            id: 'family_' + this.id + '_settle',
             name: '门派战争',
             desc: '你的门派和' + target_fam.name + '战斗结束了，' + msg,
             time: this.query_temp_expiry('battle'),
