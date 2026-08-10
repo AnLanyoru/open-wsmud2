@@ -20,6 +20,17 @@ export default class extends FAMILY {
     ];
     boss_path = 'emei/miejue';
     boss_guard = ['emei/qingxiu', 'emei/zoulang3', 'emei/zoulang2'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'emei/qingxiu',
+        elder_rooms: ['emei/qingxiu', 'emei/qingxiu'] as [string, string],
+        purple_rooms: ['emei/zoulang3', 'emei/zoulang2'] as [string, string],
+        random_rooms: [],
+        titles: { green: '峨眉派第六代弟子', blue: '峨眉派第五代弟子', yellow: '峨眉派第四代弟子', purple: '峨眉派第三代弟子', elder: '峨眉派长老', boss: '峨眉派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['emei/dadian', 'emei/huacang', 'emei/duguangtai', 'emei/xiuxishi'];
     npc_skills: SkillSet = [
         ['dodge', 100],
@@ -34,7 +45,7 @@ export default class extends FAMILY {
         ['yitianjianfa', 100, 'sword'],
         ['jiuyinbaiguzhao', 100, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 100],
         ['parry', 100],
         ['force', 100],
@@ -95,9 +106,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '欺人太甚，门下弟子' +
                     me.name +
@@ -111,8 +121,6 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '哼，我峨眉派还怕了你' + fam.name + '不成？');
-        }
+        this.battle_chat('哼，我峨眉派还怕了你' + fam.name + '不成？');
     }
 }

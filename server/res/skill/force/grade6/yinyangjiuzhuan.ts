@@ -214,8 +214,8 @@ export default class extends SKILL {
                             );
                             me.end_attack(t);
                         },
-                        start_msg: '<hio>$n被天地之力镇压，动弹不得！</hio>',
-                        finish_msg: '<hio>$n终于挣脱了天地之力的镇压。</hio>',
+                        start_msg: '<hio>$N被天地之力镇压，动弹不得！</hio>',
+                        finish_msg: '<hio>$N终于挣脱了天地之力的镇压。</hio>',
                     },
                     me,
                 );

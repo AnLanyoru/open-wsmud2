@@ -27,6 +27,13 @@ export default class extends COMMAND {
             return me.notify('你要攻击谁？');
         }
         if (target === me) return me.notify('你要攻击谁？');
+        if (
+            target.check_npc() &&
+            target.battle_role === 'disciple' &&
+            (target.battle_grade ?? 0) < me.level
+        ) {
+            return me.notify('对方境界低于你，你不能主动叫杀低等级弟子。');
+        }
         if (target.check_player()) {
             // me.add_temp('k_ss', 1, UTIL.diff_time());
             if (target.query_setting('ban_pk'))

@@ -17,6 +17,17 @@ export default class extends FAMILY {
         ['xiaoyao/xiaoyaozi', 'xiaoyao/shishi2'],
     ];
     boss_guard = ['xiaoyao/shishi2', 'xiaoyao/shishi', 'xiaoyao/linjian3'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'xiaoyao/shishi2',
+        elder_rooms: ['xiaoyao/shishi2', 'xiaoyao/shishi2'] as [string, string],
+        purple_rooms: ['xiaoyao/shishi', 'xiaoyao/linjian3'] as [string, string],
+        random_rooms: [],
+        titles: { green: '逍遥派第四代弟子', blue: '逍遥派第三代弟子', yellow: '逍遥派第二代弟子', purple: '逍遥派第一代弟子', elder: '逍遥派长老', boss: '逍遥派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['xiaoyao/muwu1', 'xiaoyao/muwu2', 'xiaoyao/muwu3', 'xiaoyao/liangong'];
     npc_skills: SkillSet = [
         ['dodge', 800],
@@ -33,14 +44,14 @@ export default class extends FAMILY {
         ['zhemeishou', 800, 'parry'],
         ['liuyangzhang', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
         ['unarmed', 800],
         ['blade', 800],
         ['sword', 800],
-        ['xiaowuxiang2', 800, 'force'],
+        ['xiaowuxianggong2', 800, 'force'],
         ['lingboweibu2', 800, 'dodge'],
         ['ruyidao', 800, 'blade'],
         ['zhemeishou', 800, 'parry'],
@@ -94,9 +105,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -110,8 +120,6 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '...');
-        }
+        this.battle_chat('...');
     }
 }

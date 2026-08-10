@@ -22,6 +22,17 @@ export default class extends FAMILY {
     ];
     boss_path = 'shaolin/xuannan';
     boss_guard = ['shaolin/fangzhang', 'shaolin/lianwu', 'shaolin/houdian'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'shaolin/fangzhang',
+        elder_rooms: ['shaolin/fangzhang', 'shaolin/fangzhang'] as [string, string],
+        purple_rooms: ['shaolin/lianwu', 'shaolin/houdian'] as [string, string],
+        random_rooms: [],
+        titles: { green: '少林派第四十一代弟子', blue: '少林派第四十代弟子', yellow: '少林派第三十九代弟子', purple: '少林派第三十八代弟子', elder: '少林派长老', boss: '少林派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['shaolin/daxiong', 'shaolin/gulou', 'shaolin/zhonglou', 'shaolin/liangong2'];
     npc_skills: SkillSet = [
         ['dodge', 800],
@@ -39,7 +50,7 @@ export default class extends FAMILY {
         ['shaolinshenfa', 800, 'dodge'],
         ['yizhichan', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -104,9 +115,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 '阿弥陀佛！' +
                     me.family.name +
                     '门下弟子' +
@@ -121,9 +131,7 @@ export default class extends FAMILY {
     }
 
     on_battle(_fam: FAMILY) {
-        if (this.boss) {
-            this.boss.do_command('chat', '阿弥陀佛！');
-        }
+        this.battle_chat('阿弥陀佛！');
     }
 
     create_name(npc: NPC) {

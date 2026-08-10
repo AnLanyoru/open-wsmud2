@@ -16,4 +16,31 @@ export default class extends SKILL {
     query_prop(lv: number): PropMap {
         return { diaoyu1: Math.floor(lv / 300) + 1 };
     }
+
+    slots = [
+        {
+            prop: 'lsj_wd',
+            name: '钓鱼武道',
+            value: () => 1,
+            count: 1,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: () => 'TODO：钓鱼期间获得武道残页（待实现）',
+        },
+        {
+            prop: 'lsj_qn',
+            name: '潜能增加',
+            value: lv => 1 + Math.min(lv / 200),
+            count: 3,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: val => '钓鱼时获得的潜能+' + val,
+        },
+        {
+            prop: 'lsj_ks',
+            name: '等级加速',
+            value: lv => 1 + Math.min(lv / 100),
+            count: 3,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: val => '临水经提升的速度+' + val,
+        },
+    ];
 }

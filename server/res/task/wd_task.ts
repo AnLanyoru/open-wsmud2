@@ -1,6 +1,7 @@
 import { USERTASK } from '../../core/task/playertask.js';
 import { OBJ } from '../../core/item/obj.js';
 import type { OddsEntry } from '../../core/item/obj.js';
+import { wudao_fragment, wudao_grade } from '../map/wudao/ta.js';
 
 export default class extends USERTASK {
     id = 'wudao';
@@ -110,11 +111,21 @@ export default class extends USERTASK {
             me.add_temp('wds', wd_count);
         }
 
+        // 每日奖励按最高通关层数解锁品质：每20层增加一个品质槽位。
+        // 当前层品质必掉，其余已解锁品质各有50%概率掉落；当前品质另有50%概率额外掉落。
+        const currentGrade = wudao_grade(lv);
+        const maxGrade = Math.min(5, currentGrade);
+        for (let grade = 1; grade <= maxGrade; grade++) {
+            items.push(wudao_fragment(grade, grade === currentGrade ? 10000 : 5000));
+        }
+        items.push(wudao_fragment(currentGrade, 5000));
+
         const created = OBJ.create_by_odds(items);
         for (var i = 0; i < created.length; i++) {
-            var item = me.add_obj(created[i]);
+            const reward = created[i];
+            var item = me.add_obj(reward);
             if (item) {
-                me.send('你获得了' + item.unit_name() + '。');
+                me.send('你获得了' + item.unit_name(reward.count) + '。');
             }
         }
     }

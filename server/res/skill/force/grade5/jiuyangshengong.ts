@@ -113,8 +113,8 @@ export default class extends SKILL {
                                 t.damage(dmg, me);
                                 me.end_attack(t);
                             },
-                            start_msg: '<hir>$n被九阳真焰附体，浑身灼痛难当！</hir>',
-                            finish_msg: '<hiy>$n身上的九阳真焰终于缓缓熄灭。</hiy>',
+                            start_msg: '<hir>$N被九阳真焰附体，浑身灼痛难当！</hir>',
+                            finish_msg: '<hiy>$N身上的九阳真焰终于缓缓熄灭。</hiy>',
                         },
                         me,
                     );

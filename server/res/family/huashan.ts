@@ -19,6 +19,17 @@ export default class extends FAMILY {
     ];
     boss_path = 'huashan/yuebuqun';
     boss_guard = ['huashan/keting', 'huashan/lianwu', 'huashan/yunv'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'huashan/keting',
+        elder_rooms: ['huashan/keting', 'huashan/keting'] as [string, string],
+        purple_rooms: ['huashan/lianwu', 'huashan/yunv'] as [string, string],
+        random_rooms: [],
+        titles: { green: '华山派第十六代弟子', blue: '华山派第十五代弟子', yellow: '华山派第十四代弟子', purple: '华山派第十三代弟子', elder: '华山派长老', boss: '华山派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['huashan/xiaowu', 'huashan/pingdi', 'huashan/siguoya', 'huashan/luoyan'];
     npc_skills: SkillSet = [
         ['dodge', 800],
@@ -32,7 +43,7 @@ export default class extends FAMILY {
         ['feiyanhuixiang', 800, 'dodge'],
         ['huashanquanfa', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -94,9 +105,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '欺人太甚，门下弟子' +
                     me.name +
@@ -110,8 +120,7 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', fam.boss.call() + '别冲动，这其中是不是有什么误会？');
-        }
+        const speaker = fam.query_battle_speaker();
+        this.battle_chat((speaker?.call() ?? fam.name) + '别冲动，这其中是不是有什么误会？');
     }
 }

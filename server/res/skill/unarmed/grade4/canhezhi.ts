@@ -112,8 +112,8 @@ export default class extends SKILL {
                                 downside: true,
                                 desc: '参合指力透体，你陷入了昏迷',
                                 start_msg:
-                                    '<hir>$n被$N参合指力击中，只觉眼前一黑，失去了知觉</hir>\n',
-                                finish_msg: '<hiy>$n悠悠转醒，发现自己竟昏了过去</hiy>\n',
+                                    '<hir>$N被参合指力击中，只觉眼前一黑，失去了知觉</hir>\n',
+                                finish_msg: '<hiy>$N悠悠转醒，发现自己竟昏了过去</hiy>\n',
                             },
                             me,
                         );

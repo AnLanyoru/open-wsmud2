@@ -18,6 +18,17 @@ export default class extends FAMILY {
         ['gaibang/hongqigong', 'gaibang/xiaowu'],
     ];
     boss_guard = ['gaibang/xiaowu', 'gaibang/andao4', 'gaibang/andao3'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'gaibang/xiaowu',
+        elder_rooms: ['gaibang/xiaowu', 'gaibang/xiaowu'] as [string, string],
+        purple_rooms: ['gaibang/andao4', 'gaibang/andao3'] as [string, string],
+        random_rooms: [],
+        titles: { green: '丐帮六袋弟子', blue: '丐帮七袋弟子', yellow: '丐帮八袋弟子', purple: '丐帮九袋弟子', elder: '丐帮长老', boss: '丐帮帮主' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['gaibang/pomiao', 'gaibang/mishi', 'gaibang/andao2'];
     eqs = [];
     npc_skills: SkillSet = [
@@ -31,7 +42,7 @@ export default class extends FAMILY {
         ['dagoubang', 800, 'club'],
         ['xianglongzhang', 800, ['unarmed', 'parry']],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -91,9 +102,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: CHARACTER, me: CHARACTER) {
-        if (this.boss && me.family) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker() && me.family) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -107,8 +117,7 @@ export default class extends FAMILY {
     }
 
     on_battle(fam: FAMILY) {
-        if (this.boss && fam.boss) {
-            this.boss.do_command('chat', '哈哈，' + fam.boss.call() + '且慢！');
-        }
+        const speaker = fam.query_battle_speaker();
+        this.battle_chat('哈哈，' + (speaker?.call() ?? fam.name) + '且慢！');
     }
 }

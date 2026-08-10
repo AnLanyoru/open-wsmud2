@@ -16,4 +16,31 @@ export default class extends SKILL {
     query_prop(lv: number): PropMap {
         return { kuang1: Math.floor(lv / 300) + 1 };
     }
+
+    slots = [
+        {
+            prop: 'gsj_wd',
+            name: '挖矿武道',
+            value: () => 1,
+            count: 1,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: () => 'TODO：挖矿期间获得武道残页（待实现）',
+        },
+        {
+            prop: 'gsj_qn',
+            name: '潜能增加',
+            value: lv => 1 + Math.min(lv / 200),
+            count: 3,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: val => '挖矿时获得的潜能+' + val,
+        },
+        {
+            prop: 'gsj_ks',
+            name: '等级加速',
+            value: lv => 1 + Math.min(lv / 100),
+            count: 3,
+            query_needs: () => [{ path: 'book/gj', count: 1 }],
+            format: val => '观山诀提升的速度+' + val,
+        },
+    ];
 }

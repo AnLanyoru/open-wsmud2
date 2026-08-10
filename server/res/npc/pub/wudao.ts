@@ -3,6 +3,42 @@ import { USER } from '../../../core/char/user.js';
 import type { SkillItem } from '../../../core/skill/skill.js';
 import { UTIL } from '../../../core/util/util.js';
 
+interface WuDaoGrowthPoint {
+    level: number;
+    hp: number;
+    panel: number;
+}
+
+/** 六十层起采用分段成长；相邻锚点之间按层数线性插值。 */
+const WUDAO_GROWTH: readonly WuDaoGrowthPoint[] = [
+    { level: 60, hp: 600_000, panel: 10_000 },
+    { level: 70, hp: 1_800_000, panel: 25_000 },
+    { level: 80, hp: 5_000_000, panel: 50_000 },
+    { level: 89, hp: 9_500_000, panel: 77_000 },
+    { level: 90, hp: 11_500_000, panel: 80_000 },
+    { level: 99, hp: 25_000_000, panel: 150_000 },
+];
+
+export function query_wudao_growth(level: number): { hp: number; panel: number } | undefined {
+    const first = WUDAO_GROWTH[0];
+    const last = WUDAO_GROWTH[WUDAO_GROWTH.length - 1];
+    if (level < first.level || level > last.level) return;
+
+    for (let i = 0; i < WUDAO_GROWTH.length - 1; i++) {
+        const start = WUDAO_GROWTH[i];
+        const end = WUDAO_GROWTH[i + 1];
+        if (level > end.level) continue;
+
+        const progress = (level - start.level) / (end.level - start.level);
+        return {
+            hp: Math.round(start.hp + (end.hp - start.hp) * progress),
+            panel: Math.round(start.panel + (end.panel - start.panel) * progress),
+        };
+    }
+
+    return { hp: last.hp, panel: last.panel };
+}
+
 export default class WuDaoShouHu extends NPC {
     name = '';
     desc = '他是武道塔的神秘守护者';
@@ -162,5 +198,37 @@ export default class WuDaoShouHu extends NPC {
         this.con = this.dex = this.int = this.str = 20 + parseInt(level / 3);
         this.init();
         this.recount();
+
+        const growth = query_wudao_growth(level);
+        if (growth) {
+            this.hp = this.max_hp = growth.hp;
+            this.mp = this.max_mp = Math.floor(growth.hp / 2);
+            this.calibrate_panel(growth.panel);
+        }
+    }
+
+    /**
+     * 把技能和装备形成的永久属性校准到指定五维。
+     * 补偿写入原始平值通道，后续 recount 及百分比状态仍会以新面板为基础生效。
+     */
+    private calibrate_panel(target: number): void {
+        this.calibrate_combat_prop('gj', 'gj_per', target);
+        this.calibrate_combat_prop('mz', 'mz_per', target);
+        this.calibrate_combat_prop('zj', 'zj_per', target);
+        this.calibrate_combat_prop('ds', 'ds_per', target);
+        this.calibrate_combat_prop('fy', 'fy_per', target);
+    }
+
+    private calibrate_combat_prop(
+        prop: 'gj' | 'mz' | 'zj' | 'ds' | 'fy',
+        percentageProp: 'gj_per' | 'mz_per' | 'zj_per' | 'ds_per' | 'fy_per',
+        target: number,
+    ): void {
+        // recount 最终取整，浮点边界可能残留 1 点误差，重复校准可将其消除。
+        for (let i = 0; i < 3 && this[prop] !== target; i++) {
+            const multiplier = Math.max((100 + this.query_prop(percentageProp)) / 100, 0.01);
+            this.add_prop(prop, (target - this[prop]) / multiplier);
+            this.recount();
+        }
     }
 }

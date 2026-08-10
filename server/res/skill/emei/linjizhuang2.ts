@@ -33,6 +33,7 @@ export default class extends SKILL {
             enable_skill: 'force',
             mp: 20,
             release_time: 0,
+            no_auto: true,
             use: function (me: CHARACTER, _target: CHARACTER, lv: number): void {
                 const recPer = 10 + Math.floor(lv / 100);
                 const diffPer = 20 + Math.floor(lv / 200);

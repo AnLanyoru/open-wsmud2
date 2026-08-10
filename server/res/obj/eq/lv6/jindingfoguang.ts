@@ -31,7 +31,7 @@ export default class extends EQUIPMENT {
         if (this.hp <= 0) return;
         const hp = this.do_recover(parseInt(this.max_hp * 0.05));
         if (hp > 0) {
-            this.send_room('<wb-hiy>$N的周身阵阵佛光笼罩，脸色看上去好了很多</wb-hiy>');
+            this.send_room('<ora>$N的周身阵阵佛光笼罩，脸色看上去好了很多</ora>');
             this.notify('<hig>你恢复了' + hp + '点气血。</hig>');
         }
     }

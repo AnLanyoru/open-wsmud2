@@ -29,7 +29,7 @@ export default class extends SKILL {
                 ];
             },
             format: val => {
-                return '采药或炼药期间也可以获得武道残页(仅玩家共享闭关)';
+                return 'TODO：采药或炼药期间获得武道残页（待实现）';
             },
         },
         {

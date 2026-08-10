@@ -74,7 +74,7 @@ export default class extends ROOM {
         for (var i = 0; i < items.length; i++) {
             var obj = me.add_obj(items[i]);
             if (obj) {
-                me.notify('你找到了' + items[i].unit_name() + '。');
+                me.notify('你找到了' + items[i].unit_name(items[i].count) + '。');
             }
         }
     }

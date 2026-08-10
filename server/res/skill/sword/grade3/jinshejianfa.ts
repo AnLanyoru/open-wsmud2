@@ -68,8 +68,8 @@ export default class extends SKILL {
                             duration: busy,
                             downside: true,
                             no_diff: true,
-                            start_msg: '<HIY>$n被金蛇剑光所困，只觉眼花缭乱，手忙脚乱！</HIY>\n',
-                            finish_msg: '<HIY>$n终于稳住身形，摆脱了金蛇剑法的困扰。</HIY>\n',
+                            start_msg: '<HIY>$N被金蛇剑光所困，只觉眼花缭乱，手忙脚乱！</HIY>\n',
+                            finish_msg: '<HIY>$N终于稳住身形，摆脱了金蛇剑法的困扰。</HIY>\n',
                         },
                         me,
                     );
@@ -109,8 +109,8 @@ export default class extends SKILL {
                             name: '昏迷',
                             downside: true,
                             start_msg:
-                                '<HIR>$n被金蛇剑所伤，只觉眼前一黑，便什么也不知道了。</HIR>\n',
-                            finish_msg: '<HIY>慢慢的$n又恢复了知觉...</HIY>\n',
+                                '<HIR>$N被金蛇剑所伤，只觉眼前一黑，便什么也不知道了。</HIR>\n',
+                            finish_msg: '<HIY>慢慢的$N又恢复了知觉...</HIY>\n',
                         },
                         me,
                     );

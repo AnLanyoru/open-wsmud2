@@ -5,7 +5,8 @@ import { NPC } from '../../../core/char/npc.js';
 import { USER } from '../../../core/char/user.js';
 import { COMMAND } from '../../../core/command.js';
 import type { CHARACTER } from '../../../core/char/character.js';
-import type { OBJ } from '../../../core/item/obj.js';
+import { OBJ } from '../../../core/item/obj.js';
+import { wudao_fragment } from './ta.js';
 
 export default class extends ROOM {
     name = '武道塔';
@@ -73,7 +74,23 @@ export default class extends ROOM {
         }
     }
 
-    on_reward(me: CHARACTER, lv: number) {}
+    on_reward(me: CHARACTER, lv: number) {
+        // 100～105层各发两张橙色残页，转红概率从20%起每层增加10%。
+        if (lv < 100 || lv > 105) return;
+        const redRate = 0.2 + (lv - 100) * 0.1;
+        const items = [10000, 10000].map(() =>
+            Math.random() < redRate ? wudao_fragment(6) : wudao_fragment(5),
+        );
+        for (const created of OBJ.create_by_odds(items)) {
+            const item = me.add_obj(created);
+            if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
+        }
+        if (lv === 105) {
+            const created = OBJ.create_by_odds([wudao_fragment(6)])[0];
+            const item = created && me.add_obj(created);
+            if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
+        }
+    }
 
     on_leave(me: CHARACTER, dir: string) {
         var npc = this.find_by_path('pub/wudao_boss');

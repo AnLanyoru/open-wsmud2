@@ -121,7 +121,7 @@ export default class extends SKILL {
                 const dmg = Math.floor((me.max_mp * pct) / 100);
                 me.send_room('<red>$N闭口不言，以心印心，禅意如刀，直透$n心神！</red>', target);
                 target.send('<red>你被$N的无念禅意震慑，一时无法施展绝学！</red>');
-                target.from_attack(dmg, 999999, '', '<red>$n被无念禅意震慑，心神受创！</red>');
+                target.from_attack(dmg, 0, '', '<red>$N被无念禅意震慑，心神受创！</red>');
                 target.add_status(
                     {
                         id: 'bikou',

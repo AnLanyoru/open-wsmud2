@@ -46,7 +46,7 @@ export default class extends SKILL {
                             prop: {
                                 mz_per: -50,
                             },
-                            finish_msg: '<HIW>$n的视力终于恢复。</HIW>',
+                            finish_msg: '<HIW>$N的视力终于恢复。</HIW>',
                         },
                         me,
                     );

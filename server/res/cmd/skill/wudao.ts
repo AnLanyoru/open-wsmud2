@@ -2,6 +2,7 @@ import { COMMAND } from '../../../core/command.js';
 import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
 import { SKILL } from '../../../core/skill/skill.js';
+import { OBJ } from '../../../core/item/obj.js';
 import { PROPERTIES, SKILL_TYPES } from '../../../core/const.js';
 import type { SkillData } from '../../../core/char/character.js';
 import type { SkillSlotDef } from '../../../types/props.js';
@@ -121,7 +122,7 @@ SKILL.PROPERTIES = WUDAO_SLOTS;
 export default class extends COMMAND {
     command = 'wudao,lingwu';
     allow_fight = false;
-    regex = /^(?:([\w-]+)(?:\s+(\d+|ok|down|reset))?(?:\s+(ok))?)?$/;
+    regex = /^(?:([\w-]+)(?:\s+(\d+|ok|down|reset|replace|r\d+(?:-\d+)?))?(?:\s+(ok))?)?$/;
 
     enter(me: USER, skillid?: string, choice?: string, confirm?: string) {
         if (!me.skills) return me.notify('你还不会任何技能。');
@@ -143,7 +144,21 @@ export default class extends COMMAND {
             );
         }
         if (choice === 'down' || choice === 'reset') {
+            if (skill_base.type === SKILL_TYPES.KNOWLEDGE) {
+                return me.notify('知识类技能武道只能继续进阶，不能降低或重置。');
+            }
             return this.manage_addin(me, skill_base, skill, choice, confirm);
+        }
+        if (choice === 'replace') return this.send_replace_entries(me, skill_base, skill);
+        if (choice?.startsWith('r')) {
+            if (skill_base.type !== SKILL_TYPES.KNOWLEDGE) {
+                return me.notify('只有知识类技能可以替换武道。');
+            }
+            const [replaceAt, slotIndex] = choice.slice(1).split('-').map(Number);
+            if (slotIndex === undefined) {
+                return this.send_replace_choices(me, skill_base, skill, replaceAt);
+            }
+            return this.enter_addin(me, skillid, String(slotIndex), confirm, replaceAt);
         }
 
         const target_skill = Array.from(WORLD.SKILLS.values()).find(
@@ -200,7 +215,12 @@ export default class extends COMMAND {
         const commands: string[] = [];
         for (const [id] of me.skills!) {
             const base = SKILL.get(id);
-            if (!base || base.type !== SKILL_TYPES.SKILL) continue;
+            if (
+                !base ||
+                (base.type !== SKILL_TYPES.SKILL &&
+                    !(base.type === SKILL_TYPES.KNOWLEDGE && base.slots?.length))
+            )
+                continue;
             const hasTarget = Array.from(WORLD.SKILLS.values()).some(item => item.source_skill === id);
             const skill = me.skills!.get(id)!;
             const grade = base.query_grade(me);
@@ -218,11 +238,21 @@ export default class extends COMMAND {
         me.send_commands(...commands);
     }
 
-    private enter_addin(me: USER, skillid: string, choice?: string, confirm?: string): void {
+    private enter_addin(
+        me: USER,
+        skillid: string,
+        choice?: string,
+        confirm?: string,
+        replaceAt?: number,
+    ): void {
         const skill = me.skills!.get(skillid)!;
         const skillBase = SKILL.get(skillid)!;
-        if (skillBase.type !== SKILL_TYPES.SKILL) return me.notify('基础技能无法使用武道进阶。');
-        if (skill.level < 1000) {
+        if (skillBase.type === SKILL_TYPES.KNOWLEDGE && !skillBase.slots?.length) {
+            return me.notify(`【${skillBase.name}】的武道进阶暂未开放。`);
+        }
+        if (skillBase.type !== SKILL_TYPES.SKILL && skillBase.type !== SKILL_TYPES.KNOWLEDGE)
+            return me.notify('基础技能无法使用武道进阶。');
+        if (replaceAt === undefined && skill.level < 1000) {
             if (skill.addin?.length && choice === undefined) {
                 me.send('技能达到1000级后才可以继续武道进阶。');
                 const commands: string[] = [];
@@ -233,7 +263,7 @@ export default class extends COMMAND {
         }
 
         const currentGrade = skillBase.query_grade(me);
-        if (currentGrade >= 5) {
+        if (replaceAt === undefined && currentGrade >= 5) {
             if (skill.addin?.length && choice === undefined) {
                 me.send('这门武功已经无法继续进行武道进阶了。');
                 const commands: string[] = [];
@@ -261,34 +291,50 @@ export default class extends COMMAND {
         if (!selected) return me.notify('这个武道进阶方向不存在或已经无法选择。');
 
         const needs = this.query_needs(selected, skillBase, currentGrade);
+        const replacingKnowledge = replaceAt !== undefined;
+        if (
+            replacingKnowledge &&
+            (skillBase.type !== SKILL_TYPES.KNOWLEDGE ||
+                replaceAt! < 0 ||
+                replaceAt! >= (skill.addin?.length ?? 0))
+        ) {
+            return me.notify('这个待替换的武道词条不存在。');
+        }
+        const targetGrade = replacingKnowledge ? currentGrade : currentGrade + 1;
         const converted = convert_skill_progress(
             skill.level,
             skill.exp,
             currentGrade,
-            currentGrade + 1,
+            targetGrade,
         );
         const newLevel = converted.level;
         if (confirm !== 'ok') {
             me.send(
-                `是否确认将【${skillBase.query_color_name(me)}】进阶为【${skillBase.query_color_name(undefined, currentGrade + 1)}】` +
+                    `是否确认将【${skillBase.query_color_name(me)}】${replacingKnowledge ? '替换武道为' : '进阶为'}【${skillBase.query_color_name(undefined, targetGrade)}】` +
                     `，等级将由${skillBase.query_color_text(String(skill.level), currentGrade)}级折算为` +
-                    `${skillBase.query_color_text(String(newLevel), currentGrade + 1)}级` +
+                    `${skillBase.query_color_text(String(newLevel), targetGrade)}级` +
                     (converted.exp > 0 ? `，并保留${converted.exp}点技能进度` : '') +
                     `？`,
             );
             return me.send_commands(
-                `wudao ${skillid} ${slotIndex} ok`,
-                `确认选择${skillBase.query_color_text(this.query_choice_name(skillBase, selected), currentGrade + 1)}`,
+                replacingKnowledge
+                    ? `wudao ${skillid} r${replaceAt}-${slotIndex} ok`
+                    : `wudao ${skillid} ${slotIndex} ok`,
+                `确认选择${skillBase.query_color_text(this.query_choice_name(skillBase, selected), targetGrade)}`,
             );
         }
 
         if (!this.has_needs(me, needs, currentGrade)) return;
+        const replacementRefund = replacingKnowledge
+            ? this.query_single_addin_refund(skillBase, skill, replaceAt!, currentGrade)
+            : [];
 
         const oldLevel = me.query_skill(skillid);
         const oldScore = skillBase.query_score(skill.level, me);
         skillBase.release_prop(me, oldLevel);
         if (!skill.addin) skill.addin = [];
-        skill.addin.push(slotIndex);
+        if (replacingKnowledge) skill.addin[replaceAt!] = slotIndex;
+        else skill.addin.push(slotIndex);
         skill.level = newLevel;
         skill.exp = converted.exp;
         const newScore = skillBase.query_score(skill.level, me);
@@ -297,6 +343,9 @@ export default class extends COMMAND {
         for (const need of needs) {
             const material = me.find_obj_bypath(need.path)!;
             me.remove_obj(material, need.count);
+        }
+        for (const need of replacementRefund) {
+            if (!me.add_obj(need.path, need.count)) me.notify(`<hir>退还材料失败：${need.path}。</hir>`);
         }
         me.init_skill();
         me.recount();
@@ -308,21 +357,21 @@ export default class extends COMMAND {
         this.send_skill_detail(me, skillBase);
         me.notify(
             `<hiy>你的${skillBase.query_color_name(me)}成功领悟了` +
-                `${skillBase.query_color_text(this.query_choice_name(skillBase, selected), currentGrade + 1)}` +
+                `${skillBase.query_color_text(this.query_choice_name(skillBase, selected), targetGrade)}` +
                 `，当前等级为${skill.level}级。</hiy>`,
         );
     }
 
     private query_choices(base: SKILL, skill: SkillData, grade: number): SlotChoice[] {
-        const selectedProps = new Set(
-            (skill.addin ?? []).map(index => base.query_slot(index)?.prop).filter(Boolean),
-        );
         const choices: SlotChoice[] = [];
+        const activeAddins = skill.addin ?? [];
 
-        // 未进阶时保留不同位置提供的同属性选项；选定后统一按属性排除。
+        // `count` is the maximum number of times this slot may be advanced.
         for (let i = 0; i < (base.slots?.length ?? 0); i++) {
             const slot = base.slots![i];
-            if (!slot || selectedProps.has(slot.prop)) continue;
+            if (!slot) continue;
+            const selectedCount = activeAddins.filter(index => index === 500 + i).length;
+            if (selectedCount >= (slot.count ?? 1)) continue;
             choices.push({ index: 500 + i, slot });
         }
 
@@ -331,7 +380,8 @@ export default class extends COMMAND {
             if (slot.grade !== undefined && grade < slot.grade) continue;
             const positions = slot.enables?.filter(enable => base.can_enables.includes(enable));
             if (!positions?.length) continue;
-            if (selectedProps.has(slot.prop)) continue;
+            // 通用武道固定只能选择一次；count 仅用于技能自身定义的特殊武道。
+            if (activeAddins.includes(i)) continue;
             choices.push({ index: i, slot, positions });
         }
         return choices;
@@ -369,15 +419,73 @@ export default class extends COMMAND {
         me.send_commands(...commands);
     }
 
+    private send_replace_entries(me: USER, base: SKILL, skill: SkillData): void {
+        if (base.type !== SKILL_TYPES.KNOWLEDGE) {
+            return me.notify('只有知识类技能可以替换武道。');
+        }
+        if (!skill.addin?.length) return me.notify('这门知识技能尚未领悟任何武道。');
+
+        me.send(`请选择【${base.query_color_name(me)}】要替换的武道词条：`);
+        const commands: string[] = [];
+        for (let i = 0; i < skill.addin.length; i++) {
+            const slotIndex = skill.addin[i];
+            const slot = base.query_slot(slotIndex);
+            if (!slot) continue;
+            commands.push(
+                `wudao ${base.id} r${i}`,
+                base.query_color_text(this.query_choice_name(base, { index: slotIndex, slot }), base.query_grade(me)),
+            );
+        }
+        if (!commands.length) return me.notify('这门知识技能没有可以替换的武道词条。');
+        me.send_commands(...commands);
+    }
+
+    private send_replace_choices(
+        me: USER,
+        base: SKILL,
+        skill: SkillData,
+        replaceAt: number,
+    ): void {
+        if (base.type !== SKILL_TYPES.KNOWLEDGE) {
+            return me.notify('只有知识类技能可以替换武道。');
+        }
+        const oldIndex = skill.addin?.[replaceAt];
+        const oldSlot = oldIndex === undefined ? undefined : base.query_slot(oldIndex);
+        if (oldIndex === undefined || !oldSlot) return me.notify('这个待替换的武道词条不存在。');
+
+        const grade = base.query_grade(me);
+        const choices = this.query_choices(base, skill, grade).filter(
+            choice => choice.index !== oldIndex,
+        );
+        if (!choices.length) return me.notify('当前没有可替换的新武道词条。');
+
+        me.send(`请选择用来替换【${this.query_choice_name(base, { index: oldIndex, slot: oldSlot })}】的新词条：`);
+        const commands: string[] = [];
+        for (const choice of choices) {
+            const value = Math.trunc(choice.slot.value(skill.level, grade));
+            const desc = choice.slot.format ? choice.slot.format(value) : `${choice.slot.prop}：+${value}`;
+            commands.push(
+                `wudao ${base.id} r${replaceAt}-${choice.index}`,
+                `${base.query_color_text(`${this.query_choice_name(base, choice)} ${desc}`, grade)}` +
+                    `消耗：${this.format_needs(me, this.query_needs(choice, base, grade), grade)}`,
+            );
+        }
+        me.send_commands(...commands);
+    }
+
     private append_manage_commands(commands: string[], base: SKILL, skill: SkillData): void {
         if (!skill.addin?.length) return;
         const grade = base.grade + skill.addin.length + (skill.ref ? 1 : 0);
-        commands.push(
-            `wudao ${base.id} down`,
-            base.query_color_text('降低一级武道进阶', grade),
-            `wudao ${base.id} reset`,
-            '<hir>重置武道</hir>',
-        );
+        if (base.type !== SKILL_TYPES.KNOWLEDGE) {
+            commands.push(
+                `wudao ${base.id} down`,
+                base.query_color_text('降低一级武道进阶', grade),
+                `wudao ${base.id} reset`,
+                '<hir>重置武道</hir>',
+            );
+        } else {
+            commands.push(`wudao ${base.id} replace`, '<hiy>替换武道</hiy>');
+        }
     }
 
     private manage_addin(
@@ -513,6 +621,21 @@ export default class extends COMMAND {
         return this.aggregate_needs(needs);
     }
 
+    private query_single_addin_refund(
+        base: SKILL,
+        skill: SkillData,
+        index: number,
+        currentGrade: number,
+    ): Need[] {
+        const slotIndex = skill.addin?.[index];
+        const slot = slotIndex === undefined ? undefined : base.query_slot(slotIndex);
+        if (!slot) return [];
+        const initialGrade = currentGrade - (skill.addin?.length ?? 0);
+        return this.aggregate_needs([
+            ...this.query_needs({ index: slotIndex!, slot }, base, initialGrade + index),
+        ]);
+    }
+
     private aggregate_needs(needs: Need[]): Need[] {
         const totals = new Map<string, number>();
         for (const need of needs) totals.set(need.path, (totals.get(need.path) ?? 0) + need.count);
@@ -570,18 +693,25 @@ export default class extends COMMAND {
         return needs
             .map(need => {
                 const item = me.find_obj_bypath(need.path);
+                let displayItem;
+                try {
+                    // 名称始终直接从资源路径解析，背包中是否有该物品只用于数量检查。
+                    displayItem = OBJ.CREATE(need.path);
+                } catch {
+                    displayItem = item;
+                }
                 const fragmentSkill = need.path.startsWith('book/bc#')
                     ? SKILL.get(need.path.slice('book/bc#'.length))
                     : undefined;
                 const name = fragmentSkill
                     ? fragmentSkill.query_color_text(`${fragmentSkill.name}残页`, grade)
-                    : item?.color_name ??
+                    : displayItem?.color_name ??
                       (need.path === WUDAO_PATH
                           ? '<hio>武道</hio>'
                           : need.path === 'book/up'
                             ? '<hiz>门派进阶残页</hiz>'
                             : need.path);
-                const unit = item?.unit ?? (need.path === WUDAO_PATH ? '本' : '份');
+                const unit = displayItem?.unit ?? (need.path === WUDAO_PATH ? '本' : '份');
                 return `${name}${need.count}${unit}`;
             })
             .join('、');

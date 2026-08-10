@@ -73,7 +73,7 @@ export default class extends SKILL {
                     if (hpPer <= threshold) {
                         // 执行斩杀：造成等于剩余血量的伤害
                         me.send_room('<HIR>血滴子正中$n要害，一击毙命！</HIR>', target);
-                        target.from_attack(target.hp, 9999999, '', '');
+                        target.from_attack(target.hp, 0, '', '');
                     }
                 }
 

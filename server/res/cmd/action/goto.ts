@@ -79,6 +79,11 @@ export default class extends COMMAND {
             if (!target_fam || !target_fam.battle_family) return me.send('门派战争已经结束了。');
             let room = WORLD.getRoom(target_fam.area?.first)?.query_copy(target_fam.id);
             if (!room) return me.send('门派战争已经结束了。');
+            const battleContext = target_fam.battle_context;
+            const isShashouIntervention = me.family === FAMILIES.SHASHOU &&
+                FAMILIES.SHASHOU.query_temp('ss_target') === target_fam.id;
+            if (battleContext && !battleContext.canEnter(me) && !isShashouIntervention)
+                return me.send('你不属于这场门派战争。');
             if (me.level < 1 && me.exp < 1000000)
                 return me.send('那里正在进行门派战争，你实力不够还是不要掺和了。');
             me.moveto(room, '$N离开了。', '$N走了进来。', 'goto');
@@ -88,6 +93,8 @@ export default class extends COMMAND {
         fam4: function (me: USER) {
             const pt = me.query_party?.();
             if (!pt) return me.send('你还没加入任何帮派。');
+            // 帮派战尚未启用；仅由未来 party BattleContext 适配器开放入口。
+            if (pt.battle_context?.mode !== 'party') return me.send('帮派战尚未开放。');
             if (!pt.battle_family) return me.send('你的帮派没有进攻任何门派。');
             let fam = FAMILIES[pt.battle_family];
             let count = me.query_temp('pt_mc', Number());

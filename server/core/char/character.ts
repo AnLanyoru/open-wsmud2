@@ -3675,6 +3675,7 @@ export class CHARACTER extends ITEM {
      */
     from_attack(
         sh: number,
+        /** 命中值；小于等于 0 表示必中（适用于状态/环境伤害） */
         mz: number,
         gjmsg: string,
         shmsg: string,
@@ -3752,8 +3753,9 @@ export class CHARACTER extends ITEM {
                         registerDamageBroadcast(this);
                     }
                 }
-                const damag = (this.damages[from.id] || 0) + sh;
-                this.damages[from.id] = damag;
+                const damageOwner = from.master ? WORLD.getUser(from.master) ?? from : from;
+                const damag = (this.damages[damageOwner.id] || 0) + sh;
+                this.damages[damageOwner.id] = damag;
                 this.sum_damages = (this.sum_damages ?? 0) + sh;
             }
             this.add_hp(-sh);
@@ -3775,8 +3777,9 @@ export class CHARACTER extends ITEM {
                     registerDamageBroadcast(this);
                 }
             }
-            const damag = (this.damages[from.id] || 0) + sh;
-            this.damages[from.id] = damag;
+            const damageOwner = from.master ? WORLD.getUser(from.master) ?? from : from;
+            const damag = (this.damages[damageOwner.id] || 0) + sh;
+            this.damages[damageOwner.id] = damag;
         }
         if (this.force_skill?.on_damage) {
             sh = this.force_skill.on_damage(this, sh, from);

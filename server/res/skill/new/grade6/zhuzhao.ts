@@ -46,9 +46,9 @@ export default class extends SKILL {
                             downside: true,
                             override: 1,
                             on_interval: function (t, count) {
-                                t.from_attack(dmg, 999999, '', '<HIR>$n身上的烈焰仍在燃烧！</HIR>');
+                                t.from_attack(dmg, 0, '', '<HIR>$N身上的烈焰仍在燃烧！</HIR>');
                             },
-                            finish_msg: '<HIW>$n身上的烈焰终于熄灭。</HIW>',
+                            finish_msg: '<HIW>$N身上的烈焰终于熄灭。</HIW>',
                         },
                         me,
                     );

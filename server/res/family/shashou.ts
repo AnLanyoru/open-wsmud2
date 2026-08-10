@@ -32,7 +32,7 @@ export default class extends FAMILY {
         ['taijijian', 800, 'sword'],
         ['taijiquan', 800, ['unarmed', 'parry']],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -76,9 +76,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -92,16 +91,18 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '奉陪到底');
-        }
+        this.battle_chat('奉陪到底');
     }
 
     create_event(fam) {
+        const desc = '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。';
         return {
-            id: this.id + '_bat',
+            id: 'family_' + this.id + '_bat',
             name: '门派战争',
-            desc: '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。',
+            desc,
+            query_desc: (me?: USER) =>
+                `${desc}\n今日已获取门派战奖励次数：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10` +
+                `\n今日贡献获取：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}`,
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: '进入战场',
@@ -118,7 +119,7 @@ export default class extends FAMILY {
                 ? '杀手楼在门派战斗中帮客户占得优势，所有弟子获得鼓舞，练功效率+' + suc + '%。'
                 : '杀手楼在门派战斗中没有帮助客户取得优势。';
         return {
-            id: this.id + '_settle',
+            id: 'family_' + this.id + '_settle',
             name: '门派战争',
             desc: msg,
             time: this.query_temp_expiry('battle'),

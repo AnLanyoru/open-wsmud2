@@ -211,10 +211,14 @@ export default class ShouXiCommand extends COMMAND {
         me.family.set_temp('ss_target', fam.id, 3600000);
         me.family.send_channel(me, '门下所有杀手听令，开始进攻' + fam.name);
         me.send('<cyn>已选择' + fam.name + '作为目标门派，本日已开启' + sxwar + '/5次。</cyn>');
+        const desc = '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。';
         EVENTS.add({
-            id: 'SHASHOU_bat',
+            id: 'family_SHASHOU_bat',
             name: '门派战争',
-            desc: '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。',
+            desc,
+            query_desc: me =>
+                `${desc}\n今日已获取门派战奖励次数：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10` +
+                `\n今日贡献获取：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}`,
             time: fam.query_temp_expiry('battle'),
             grade: 2,
             command: '进入战场',

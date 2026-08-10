@@ -3,6 +3,7 @@ import { CHARACTER } from '../../../core/char/character.js';
 import type { USER } from '../../../core/char/user.js';
 import { WORLD } from '../../../core/world.js';
 import { UTIL } from '../../../core/util/util.js';
+import { SKILL } from '../../../core/skill/skill.js';
 
 export default class extends COMMAND {
     command = 'wk';
@@ -99,6 +100,14 @@ function do_diaoyu(me) {
     }
 
     var exp = WORLD.DATA.get_exp(me) + WORLD.DATA.query_temp('kuang_exp', 0);
+
+    const skill = me.skills?.get('guanshanjue');
+    if (skill) {
+        const skillBase = SKILL.get('guanshanjue');
+        const speed = me.query_prop('gsj_ks');
+        if (skillBase && speed > 0) skillBase.add_exp(me, Math.floor(exp * speed));
+        // TODO: 激活挖矿武道后累计武道残页，待掉落规则确定后实现。
+    }
 
     var pot = exp + me.query_prop('gsj_qn');
     me.add_exp(exp, pot, 0);

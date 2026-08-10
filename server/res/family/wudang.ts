@@ -19,6 +19,17 @@ export default class extends FAMILY {
         ['wudang/zhangsanfeng', 'wd/xiaoyuan'],
     ];
     boss_guard = ['wd/xiaoyuan', 'wd/xiaolu2', 'wd/xiaolu'];
+    battle_config = {
+        battle_mode: 'family' as const,
+        boss_path: this.boss_path,
+        boss_room: 'wd/xiaoyuan',
+        elder_rooms: ['wd/xiaoyuan', 'wd/xiaoyuan'] as [string, string],
+        purple_rooms: ['wd/xiaolu2', 'wd/xiaolu'] as [string, string],
+        random_rooms: [],
+        titles: { green: '武当派道童', blue: '武当派第三代弟子', yellow: '武当派第二代弟子', purple: '武当派第一代弟子', elder: '武当派长老', boss: '武当派掌门' },
+        reinforce_count: 26,
+        random_grade_weights: [1, 1, 1] as [number, number, number],
+    };
     guard_rooms = ['wd/zijin', 'wd/santian', 'wd/chaotian', 'wd/hutou'];
     npc_skills: SkillSet = [
         ['dodge', 800],
@@ -35,7 +46,7 @@ export default class extends FAMILY {
         ['taijijian', 800, 'sword'],
         ['taijiquan', 800, ['unarmed', 'parry']],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -89,9 +100,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -105,8 +115,6 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '无量天尊！');
-        }
+        this.battle_chat('无量天尊！');
     }
 }

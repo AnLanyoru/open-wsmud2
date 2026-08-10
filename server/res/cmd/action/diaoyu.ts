@@ -2,6 +2,7 @@ import { COMMAND } from '../../../core/command.js';
 import { CHARACTER } from '../../../core/char/character.js';
 import { WORLD } from '../../../core/world.js';
 import { UTIL } from '../../../core/util/util.js';
+import { SKILL } from '../../../core/skill/skill.js';
 import type { USER, UserState } from '../../../core/char/user.js';
 import type { FOLLOWER } from '../../../core/char/follower.js';
 
@@ -128,6 +129,13 @@ function do_diaoyu(this: UserState, me: USER | FOLLOWER) {
         }
     }
     var exp = WORLD.DATA.get_exp(me) + WORLD.DATA.query_temp('diaoyu_exp', 0);
+    const skill = me.skills?.get('linshuijing');
+    if (skill) {
+        const skillBase = SKILL.get('linshuijing');
+        const speed = me.query_prop('lsj_ks');
+        if (skillBase && speed > 0) skillBase.add_exp(me, Math.floor(exp * speed));
+        // TODO: 激活钓鱼武道后累计武道残页，待掉落规则确定后实现。
+    }
     var pot = exp + me.query_prop('lsj_qn');
     me.add_exp(exp, pot, 0);
 }
