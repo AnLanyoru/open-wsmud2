@@ -9,7 +9,7 @@ import { UTIL } from '../../../core/util/util.js';
 import { WORLD } from '../../../core/world.js';
 import { FAMILY_EQUIPMENT } from '../../data/family_equipment.js';
 
-/** 门派战装备原始掉落率（万分比）；未命中时向低品级回落且概率翻倍。 */
+/** 门派战装备原始掉落率（万分比）；未命中时向低品级回落，回落档统一翻倍。 */
 const BATTLE_EQUIPMENT_ODDS = [0, 3000, 2000, 500, 200, 10] as const;
 
 function createBattleEquipmentDrop(paths: string[], grade: number): OBJ | undefined {
@@ -17,8 +17,8 @@ function createBattleEquipmentDrop(paths: string[], grade: number): OBJ | undefi
     const startGrade = Math.min(BATTLE_EQUIPMENT_ODDS.length - 1, Math.max(1, grade));
     for (let currentGrade = startGrade; currentGrade >= 1; currentGrade--) {
         const baseOdds = BATTLE_EQUIPMENT_ODDS[currentGrade] ?? 0;
-        const fallbackSteps = startGrade - currentGrade;
-        const odds = Math.min(10000, baseOdds * 2 ** fallbackSteps);
+        // 任何回落档都只使用该档原概率的 2 倍，不随回落层数指数增长。
+        const odds = Math.min(10000, baseOdds * (currentGrade === startGrade ? 1 : 2));
         if (Math.random() * 10000 < odds) {
             const path = paths[Math.floor(Math.random() * paths.length)];
             return OBJ.CREATE(`${path}#${currentGrade}`);
