@@ -56,7 +56,7 @@ const temps = [
             player.add_exp(1000, 1000);
             var obj = player.add_obj('eq/lv0/jian');
             if (obj) {
-                player.notify('你获得了' + obj.unit_name() + '。');
+                player.notify('你获得了' + obj.unit_name(1) + '。');
             }
         },
     },

@@ -111,7 +111,7 @@ export default class extends COMMAND {
         let rec_items: (string | number)[] = ['st/yuanjing', count];
         for (let st of sts) {
             player.add_obj(st);
-            player.send('你获得' + st.unit_name() + '。');
+            player.send('你获得' + st.unit_name(st.count) + '。');
             rec_items.push(st.path, st.count);
         }
 

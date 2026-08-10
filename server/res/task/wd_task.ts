@@ -122,9 +122,10 @@ export default class extends USERTASK {
 
         const created = OBJ.create_by_odds(items);
         for (var i = 0; i < created.length; i++) {
-            var item = me.add_obj(created[i]);
+            const reward = created[i];
+            var item = me.add_obj(reward);
             if (item) {
-                me.send('你获得了' + item.unit_name() + '。');
+                me.send('你获得了' + item.unit_name(reward.count) + '。');
             }
         }
     }

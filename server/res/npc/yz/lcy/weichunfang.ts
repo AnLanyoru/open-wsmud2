@@ -61,7 +61,7 @@ export default class extends NPC {
             var quan = me.add_obj('eq/lv1/qianjinquan');
             if (quan) {
                 me.notify('韦春芳说道：赵爷有空常来玩呀。');
-                me.notify('韦春芳给你' + quan.unit_name() + '。');
+                me.notify('韦春芳给你' + quan.unit_name(1) + '。');
                 return true;
             }
         }

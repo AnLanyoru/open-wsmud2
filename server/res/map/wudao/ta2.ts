@@ -83,12 +83,12 @@ export default class extends ROOM {
         );
         for (const created of OBJ.create_by_odds(items)) {
             const item = me.add_obj(created);
-            if (item) me.send('你获得了' + item.unit_name() + '。');
+            if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
         }
         if (lv === 105) {
             const created = OBJ.create_by_odds([wudao_fragment(6)])[0];
             const item = created && me.add_obj(created);
-            if (item) me.send('你获得了' + item.unit_name() + '。');
+            if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
         }
     }
 
