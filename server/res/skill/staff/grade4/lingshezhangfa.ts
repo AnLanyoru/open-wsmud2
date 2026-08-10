@@ -76,9 +76,9 @@ export default class extends SKILL {
                                 on_interval: function (t, count) {
                                     t.from_attack(
                                         Math.floor((3356 * count) / 3),
-                                        999999,
+                                        0,
                                         '',
-                                        '<HIR>$n伤口处的蛇毒发作，痛彻心扉！</HIR>',
+                                        '<HIR>$N伤口处的蛇毒发作，痛彻心扉！</HIR>',
                                     );
                                 },
                             },

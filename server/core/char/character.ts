@@ -3675,6 +3675,7 @@ export class CHARACTER extends ITEM {
      */
     from_attack(
         sh: number,
+        /** 命中值；小于等于 0 表示必中（适用于状态/环境伤害） */
         mz: number,
         gjmsg: string,
         shmsg: string,

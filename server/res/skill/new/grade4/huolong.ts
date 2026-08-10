@@ -48,7 +48,7 @@ export default class extends SKILL {
                             on_interval: function (t, count) {
                                 t.from_attack(
                                     dmg,
-                                    999999,
+                                    0,
                                     '',
                                     '<HIR>$N体内火毒发作，痛不欲生！</HIR>',
                                 );

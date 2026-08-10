@@ -91,7 +91,7 @@ export default class extends SKILL {
                                 var dot_sh = (me.gj * 30) / 100;
                                 p.from_attack(
                                     dot_sh,
-                                    999999,
+                                    0,
                                     '',
                                     '<hir>$N体内的玄冥寒毒发作，阴寒之力在经脉中肆虐！</hir>',
                                 );

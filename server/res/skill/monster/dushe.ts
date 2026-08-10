@@ -42,7 +42,7 @@ export default class extends SKILL {
                     on_interval: function (me, count) {
                         me.from_attack(
                             sh * count,
-                            999999,
+                            0,
                             '',
                             '<hir>$N觉得被蛇咬中的地方一阵发麻。</hir>',
                         );
