@@ -50,7 +50,7 @@ export default class extends FAMILY {
         ['shaolinshenfa', 800, 'dodge'],
         ['yizhichan', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -115,9 +115,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 '阿弥陀佛！' +
                     me.family.name +
                     '门下弟子' +
@@ -132,9 +131,7 @@ export default class extends FAMILY {
     }
 
     on_battle(_fam: FAMILY) {
-        if (this.boss) {
-            this.boss.do_command('chat', '阿弥陀佛！');
-        }
+        this.battle_chat('阿弥陀佛！');
     }
 
     create_name(npc: NPC) {

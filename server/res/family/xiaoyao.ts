@@ -44,14 +44,14 @@ export default class extends FAMILY {
         ['zhemeishou', 800, 'parry'],
         ['liuyangzhang', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
         ['unarmed', 800],
         ['blade', 800],
         ['sword', 800],
-        ['xiaowuxiang2', 800, 'force'],
+        ['xiaowuxianggong2', 800, 'force'],
         ['lingboweibu2', 800, 'dodge'],
         ['ruyidao', 800, 'blade'],
         ['zhemeishou', 800, 'parry'],
@@ -105,9 +105,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -121,8 +120,6 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '...');
-        }
+        this.battle_chat('...');
     }
 }

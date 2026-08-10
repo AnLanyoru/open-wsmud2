@@ -32,7 +32,7 @@ export default class extends FAMILY {
         ['taijijian', 800, 'sword'],
         ['taijiquan', 800, ['unarmed', 'parry']],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -76,9 +76,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -92,9 +91,7 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '奉陪到底');
-        }
+        this.battle_chat('奉陪到底');
     }
 
     create_event(fam) {

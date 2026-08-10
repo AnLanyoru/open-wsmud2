@@ -42,7 +42,7 @@ export default class extends FAMILY {
         ['dagoubang', 800, 'club'],
         ['xianglongzhang', 800, ['unarmed', 'parry']],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -102,9 +102,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: CHARACTER, me: CHARACTER) {
-        if (this.boss && me.family) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker() && me.family) {
+            this.battle_chat(
                 me.family.name +
                     '门下弟子' +
                     me.name +
@@ -118,8 +117,7 @@ export default class extends FAMILY {
     }
 
     on_battle(fam: FAMILY) {
-        if (this.boss && fam.boss) {
-            this.boss.do_command('chat', '哈哈，' + fam.boss.call() + '且慢！');
-        }
+        const speaker = fam.query_battle_speaker();
+        this.battle_chat('哈哈，' + (speaker?.call() ?? fam.name) + '且慢！');
     }
 }

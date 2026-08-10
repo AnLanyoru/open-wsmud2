@@ -43,7 +43,7 @@ export default class extends FAMILY {
         ['feiyanhuixiang', 800, 'dodge'],
         ['huashanquanfa', 800, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 800],
         ['parry', 800],
         ['force', 800],
@@ -105,9 +105,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '欺人太甚，门下弟子' +
                     me.name +
@@ -121,8 +120,7 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', fam.boss.call() + '别冲动，这其中是不是有什么误会？');
-        }
+        const speaker = fam.query_battle_speaker();
+        this.battle_chat((speaker?.call() ?? fam.name) + '别冲动，这其中是不是有什么误会？');
     }
 }

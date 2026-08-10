@@ -112,6 +112,8 @@ export class FAMILY extends BASE {
 
     /** 门派npc武功配置列表 */
     npc_skills: SkillSet = [];
+    /** 门派掌门/长老使用的进阶武功配置列表 */
+    boss_skills: SkillSet = [];
     /** 默认NPC定义 */
     def_npcs?: string[][];
     /** 掌门NPC路径 */
@@ -212,6 +214,30 @@ export class FAMILY extends BASE {
                 WORLD.USERS[i].send(str);
             }
         }
+    }
+
+    /** 门派战世界频道发言人：掌门阵亡后由首席弟子代为发话。 */
+    battle_chat(message: string): void {
+        const speaker = (this.boss?.hp ?? 0) > 0 ? this.boss : this.first_npc;
+        if (!speaker || (speaker.hp ?? 0) <= 0) return;
+        const content = JSON.stringify({
+            type: 'msg',
+            ch: 'chat',
+            content: UTIL.htmlEncode(UTIL.replace_word(message)),
+            uid: speaker.id,
+            lv: speaker.level || 0,
+            name: speaker.name,
+            lv6: 0,
+        });
+        for (const user of WORLD.USERS) {
+            if (!user.query_setting('off_chat')) user.send(content);
+        }
+    }
+
+    /** 获取当前代表门派发言的掌门或首席弟子。 */
+    query_battle_speaker(): NPC | undefined {
+        if ((this.boss?.hp ?? 0) > 0) return this.boss;
+        if ((this.first_npc?.hp ?? 0) > 0) return this.first_npc;
     }
 
     /**
@@ -410,9 +436,8 @@ export class FAMILY extends BASE {
         if (killer) {
             if (npc !== this.boss) {
                 this.on_kill?.(npc, killer);
-            } else if (this.first_npc) {
-                this.first_npc.do_command(
-                    'chat',
+            } else {
+                this.battle_chat(
                     killer.family.name +
                         '欺人太甚，门下弟子' +
                         killer.name +
@@ -425,6 +450,9 @@ export class FAMILY extends BASE {
                         '弟子格杀勿论！',
                 );
             }
+            to_fam.on_battle?.(this);
+        } else {
+            this.battle_chat(`${to_fam.name}欺人太甚，今日我${this.name}便讨教高下！`);
             to_fam.on_battle?.(this);
         }
 
@@ -517,6 +545,7 @@ export class FAMILY extends BASE {
         if (boss) {
             boss.name = this.boss.name;
             boss.desc = this.boss.desc;
+            boss.title = `<ora>${config.titles.boss}</ora>`;
             boss.age = this.boss.age;
             boss.gender = this.boss.gender;
             this.register_battle_npc(boss, config.boss_room);
@@ -619,13 +648,13 @@ export class FAMILY extends BASE {
             boss.add_status({
                 id: 'boss',
                 name: '号令',
-                prop: { hp_per: 30, fy_per: 30, ds_per: 30, mz_per: 30 },
+                prop: { fy_per: 30, ds_per: 30, mz_per: 30 },
                 no_clear: true,
                 override: 1,
                 count: this.battle_command_count,
                 max_count: 100,
                 duration: 0,
-                desc: '每名存活的本派战场 NPC 使掌门属性提高30%。',
+                desc: '每名存活的本派战场 NPC 使掌门防御、躲闪和命中提高30%。',
             });
         }
         boss.recount();

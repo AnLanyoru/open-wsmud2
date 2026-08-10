@@ -114,12 +114,8 @@ export default class extends ROOM {
         if (count > 100) count = 100;
         const lv = 1000 + count * 100;
         me.add_exp(lv, lv);
-        let items: any[] = [];
-
-        items.push({
-            obj: ['book/bc#' + FAMILIES.NONE.query_skill(this.random(count / 20) + 1)!.id],
-            odds: 2000,
-        });
+        const grade = wudao_grade(count);
+        let items: any[] = [wudao_fragment(grade)];
 
         items = OBJ.create_by_odds(items);
         for (let i = 0; i < items.length; i++) {
@@ -188,4 +184,15 @@ export default class extends ROOM {
             me.die = USER.prototype.die;
         }
     }
+}
+
+/** 武道塔层数对应的技能品质：1~19绿，20~39蓝，……，80~99橙。 */
+export function wudao_grade(level: number): number {
+    return Math.max(1, Math.min(6, Math.floor((level - 1) / 20) + 1));
+}
+
+export function wudao_fragment(grade: number, odds?: number): any {
+    const skill = FAMILIES.NONE.query_skill(grade);
+    if (!skill) return { obj: 'book/bc#invalid', odds: 0 };
+    return { obj: 'book/bc#' + skill.id, odds: odds ?? 10000 };
 }

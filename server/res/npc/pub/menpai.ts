@@ -6,6 +6,7 @@ import type { FAMILY } from '../../../core/skill/family.js';
 import type { SkillItem } from '../../../core/skill/skill.js';
 import { GRADE_COLORS } from '../../../core/const.js';
 import { UTIL } from '../../../core/util/util.js';
+import { WORLD } from '../../../core/world.js';
 import { FAMILY_EQUIPMENT } from '../../data/family_equipment.js';
 
 export default class extends NPC {
@@ -40,9 +41,16 @@ export default class extends NPC {
         this.desc = `这是${fam.name}派驻战场的${title}。`;
         this.gender = fam.gender ?? (this.random(2) + 1);
 
-        const skillLevels = [0, 200, 350, 500, 800, 1200];
-        const skillLevel = skillLevels[grade] ?? 1200;
-        const skills: SkillItem[] = fam.npc_skills.map((item) => [item[0], skillLevel, item[2]]);
+        const skillLevels = [0, 100, 500, 900, 1000];
+        const skillLevel = role === 'boss' ? 2000 : role === 'elder' ? 1500 :
+            (skillLevels[grade] ?? 1000);
+        const skillSource = (role === 'boss' || role === 'elder'
+            ? (fam.boss_skills.length ? fam.boss_skills : fam.npc_skills)
+            : fam.npc_skills) as SkillItem[];
+        const skills: SkillItem[] = skillSource.map((item) => {
+            const battleSkill = grade === 1 ? this.query_green_skill(fam, item) : item;
+            return [battleSkill[0], skillLevel, battleSkill[2]];
+        });
         this.skill_map.apply(this, skills);
         const equipment = FAMILY_EQUIPMENT[fam.id] ?? [];
         for (const item of equipment.slice(0, 2)) {
@@ -50,17 +58,62 @@ export default class extends NPC {
         }
         this.level = Math.min(6, Math.max(1, grade));
         this.str = this.con = this.dex = this.int = 20 + grade * 12;
-        this.max_mp = this.mp = [0, 2000, 5000, 10000, 20000, 40000][grade] ?? 40000;
-        this.max_hp = this.hp = [0, 5000, 12000, 30000, 80000, 160000][grade] ?? 160000;
+        const combatAttribute = role === 'boss' ? 100000 : role === 'elder' ? 50000 :
+            ([0, 500, 5000, 10000, 25000] as number[])[grade] ?? 25000;
+        const health = role === 'boss' ? 90000000 : role === 'elder' ? 50000000 :
+            ([0, 2000, 40000, 200000, 2000000] as number[])[grade] ?? 2000000;
+        this.max_mp = this.mp = Math.floor(health / 2);
         this.exp = skillLevel * skillLevel * 10;
         this.no_refresh = true;
         this.is_drop = false;
         this.record_damage = grade >= 3;
+        for (const property of ['gj', 'mz', 'zj', 'fy', 'ds'] as const) {
+            this.add_prop(property, combatAttribute);
+        }
         this.init();
         this.recount();
-        this.recount_max_hp();
+        this.calibrate_max_hp(health);
         this.hp = this.max_hp;
         this.mp = this.max_mp;
+    }
+
+    /** 绿弟子不使用紫色武功，按原技能位换成本门最高不超过黄色的武功。 */
+    private query_green_skill(fam: FAMILY, item: SkillItem): SkillItem {
+        const skill = WORLD.SKILLS.get(item[0]);
+        if (!skill || skill.grade !== 4) return item;
+
+        const requested = typeof item[2] === 'string' ? [item[2]] : item[2] ?? skill.can_enables;
+        const replacement = fam.skills
+            .filter(candidate =>
+                candidate.grade > 0 &&
+                candidate.grade < 4 &&
+                candidate.can_enables.some(enable => requested.includes(enable)),
+            )
+            .sort((a, b) => b.grade - a.grade)[0];
+        if (!replacement) return item;
+
+        const enables = requested.filter(enable => replacement.can_enables.includes(enable));
+        return [replacement.id, item[1], enables.length === 1 ? enables[0] : enables];
+    }
+
+    /** 校准技能、装备和内力转化后的气血。 */
+    private calibrate_max_hp(target: number) {
+        for (let i = 0; i < 3 && this.max_hp !== target; i++) {
+            const multiplier = Math.max((100 + this.query_prop('hp_per')) / 100, 0.01);
+            this.add_prop('max_hp', (target - this.max_hp) / multiplier);
+            this.recount_max_hp();
+        }
+    }
+
+    /** 敌方玩家进入战场时，由品级不低于玩家境界的弟子主动叫杀。 */
+    on_enter(target: NPC | USER) {
+        if (!target.check_player() || this.hp <= 0) return;
+        const me = target as USER;
+        if ((this.battle_grade ?? 0) < me.level) return;
+        const isBattleEnemy = me.family?.id === this.family.battle_family;
+        const isAssassin = me.family?.id === 'SHASHOU' &&
+            me.family.query_temp('ss_target') === this.family.id;
+        if (isBattleEnemy || isAssassin) this.do_kill(me);
     }
 
     prepare_battle_corpse(corpse: CORPSE, eligibleIds: string[]) {

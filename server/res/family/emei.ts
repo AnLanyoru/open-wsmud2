@@ -45,7 +45,7 @@ export default class extends FAMILY {
         ['yitianjianfa', 100, 'sword'],
         ['jiuyinbaiguzhao', 100, 'unarmed'],
     ];
-    boss_skills = [
+    boss_skills: SkillSet = [
         ['dodge', 100],
         ['parry', 100],
         ['force', 100],
@@ -106,9 +106,8 @@ export default class extends FAMILY {
     }
 
     on_kill(npc: NPC, me: USER) {
-        if (this.boss) {
-            this.boss.do_command(
-                'chat',
+        if (this.query_battle_speaker()) {
+            this.battle_chat(
                 me.family.name +
                     '欺人太甚，门下弟子' +
                     me.name +
@@ -122,8 +121,6 @@ export default class extends FAMILY {
     }
 
     on_battle(fam) {
-        if (this.boss) {
-            this.boss.do_command('chat', '哼，我峨眉派还怕了你' + fam.name + '不成？');
-        }
+        this.battle_chat('哼，我峨眉派还怕了你' + fam.name + '不成？');
     }
 }
