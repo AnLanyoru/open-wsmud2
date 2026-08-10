@@ -9,6 +9,24 @@ import { UTIL } from '../../../core/util/util.js';
 import { WORLD } from '../../../core/world.js';
 import { FAMILY_EQUIPMENT } from '../../data/family_equipment.js';
 
+/** 门派战装备原始掉落率（万分比）；未命中时向低品级回落且概率翻倍。 */
+const BATTLE_EQUIPMENT_ODDS = [0, 3000, 2000, 500, 200, 10] as const;
+
+function createBattleEquipmentDrop(paths: string[], grade: number): OBJ | undefined {
+    if (!paths.length) return;
+    const startGrade = Math.min(BATTLE_EQUIPMENT_ODDS.length - 1, Math.max(1, grade));
+    for (let currentGrade = startGrade; currentGrade >= 1; currentGrade--) {
+        const baseOdds = BATTLE_EQUIPMENT_ODDS[currentGrade] ?? 0;
+        const fallbackSteps = startGrade - currentGrade;
+        const odds = Math.min(10000, baseOdds * 2 ** fallbackSteps);
+        if (Math.random() * 10000 < odds) {
+            const path = paths[Math.floor(Math.random() * paths.length)];
+            return OBJ.CREATE(`${path}#${currentGrade}`);
+        }
+    }
+    return;
+}
+
 export default class extends NPC {
     name = '门派弟子';
     desc = '门派弟子';
@@ -142,18 +160,18 @@ export default class extends NPC {
             }
 
             const grade = this.battle_grade ?? 1;
-            const equipmentOdds = [0, 3000, 2000, 500, 200, 10][grade] ?? 0;
             const crystalRanges = [[0, 0], [1, 5], [6, 10], [11, 15], [16, 20], [21, 50]];
             const silverMins = [0, 10, 20, 30, 40, 50];
             const equipment = FAMILY_EQUIPMENT[this.family.id] ?? [];
-            const equipmentPaths = equipment.map((item) => `${item.path}#${grade}`);
+            const equipmentPaths = equipment.map((item) => item.path);
             const [crystalMin, crystalMax] = crystalRanges[grade] ?? [1, 1];
             const drops = [
                 { obj: 'st/xuanjing', min: crystalMin, max: crystalMax },
                 { obj: 'money/silver', min: silverMins[grade] ?? 10, max: 99 },
             ];
-            if (equipmentPaths.length) drops.push({ obj: equipmentPaths, odds: equipmentOdds } as any);
             const items = OBJ.create_by_odds(drops);
+            const equipmentDrop = createBattleEquipmentDrop(equipmentPaths, grade);
+            if (equipmentDrop) items.push(equipmentDrop);
             this.user_items[me.id] = items;
             me.add_temp('mp_battle_drop', 1, UTIL.diff_time());
             return items;
