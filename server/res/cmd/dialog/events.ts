@@ -29,7 +29,7 @@ export default class extends COMMAND {
             }
             return me.send('什么？');
         } else {
-            let str = ['{type:"dialog",dialog:"events",items:['];
+            const items: Array<[string, string | undefined, string, number, number, string]> = [];
             let now = Date.now();
             for (let i = 0; i < events.length; i++) {
                 let evt = events[i];
@@ -37,16 +37,18 @@ export default class extends COMMAND {
                 if ((evt.time ?? 0) > 0 && (evt.time ?? 0) < now) {
                     continue;
                 }
-                if (str.length > 1) str.push(',');
                 const evtTime = evt.time ?? 0;
-                str.push(
-                    `["${evt.id}","${evt.name}","${evt.query_desc?.(me) ?? ''}",${evt.query_grade?.(me) ?? 0},${evtTime},"${evt.command ?? ''}"]`,
-                );
+                items.push([
+                    evt.id,
+                    evt.name,
+                    evt.query_desc?.(me) ?? '',
+                    evt.query_grade?.(me) ?? 0,
+                    evtTime,
+                    evt.command ?? '',
+                ]);
             }
 
-            str.push(']}');
-
-            me.send(str.join(''));
+            me.send(JSON.stringify({ type: 'dialog', dialog: 'events', items }));
         }
     }
 }

@@ -95,10 +95,14 @@ export default class extends FAMILY {
     }
 
     create_event(fam) {
+        const desc = '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。';
         return {
             id: 'family_' + this.id + '_bat',
             name: '门派战争',
-            desc: '你的门派正在进攻' + fam.name + '，击杀对方弟子会获得丰厚奖励。',
+            desc,
+            query_desc: (me?: USER) =>
+                `${desc}\n今日已获取门派战奖励次数：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10` +
+                `\n今日贡献获取：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}`,
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: '进入战场',

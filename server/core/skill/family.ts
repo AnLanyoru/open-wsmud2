@@ -503,7 +503,7 @@ export class FAMILY extends BASE {
             getRoom: (ownerId, baseRoom) => baseRoom.query_copy(ownerId),
             addScore: (actor, value) => actor.family?.add_score(actor, value),
             addGongji: (actor, value) => actor.family?.add_gongji(actor, value),
-            canEnter: (actor) => actor.family === this || actor.family === fam,
+            canEnter: () => true,
         };
     }
 
@@ -513,16 +513,19 @@ export class FAMILY extends BASE {
      */
     create_event(fam?: FAMILY): any {
         let target_fam = FAMILIES[this.battle_family!];
+        const desc = this.name + '正在和' + target_fam.name + '发生战争，击杀战场弟子会获得丰厚奖励。';
         return {
             id: 'family_' + this.id + '_bat',
             name: '门派战争',
-            desc: '你的门派正在和' + target_fam.name + '发生战争，击杀对方弟子会获得丰厚奖励。',
+            desc,
+            query_desc: (me?: USER) =>
+                `${desc}\n今日已获取门派战奖励次数：${me?.query_temp('mp_battle_drop', 0) ?? 0}/10` +
+                `\n今日贡献获取：${me?.query_temp('sssc', 0) ?? 0}/${500 + (me?.query_prop('shashou') ?? 0)}`,
             time: Date.now() + 30 * 60000,
             grade: 2,
             command: '进入战场',
-            check: (me: USER) => me.family === this,
             on_command: function (me: USER) {
-                me.do_command('goto', 'fam3');
+                me.do_command('goto', 'fam3 ' + target_fam.id);
             },
         };
     }
