@@ -80,7 +80,7 @@ export default class extends SKILL {
                         },
                         desc: '被寒冰真气冻结，攻击速度减慢',
                         start_msg:
-                            '<hib>$n只觉一股彻骨寒气自$N身上涌来，经脉瞬间冰封，动作变得迟滞无比！</hib>',
+                            '<hib>$N只觉一股彻骨寒气自体内涌来，经脉瞬间冰封，动作变得迟滞无比！</hib>',
                     },
                     me,
                 );
