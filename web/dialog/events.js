@@ -64,6 +64,12 @@ export default {
     },
     init: function () {
         Dialog.injectStyle(events_css);
+        // Entering a faction war takes the player back to the game room. Close
+        // the activity dialog immediately so it does not cover the battlefield.
+        this.element = $("<div class='dialog-events'></div>").on("click", ".event-btn", function () {
+            const cmd = $(this).attr("cmd");
+            if (/^events family_.+_bat$/.test(cmd || "")) Dialog.hide();
+        });
     },
     hide: function () {
         this.element.remove();
