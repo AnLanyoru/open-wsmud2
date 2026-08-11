@@ -4,6 +4,7 @@ import { OBJ } from '../../core/item/obj.js';
 import type { CHARACTER } from '../../core/char/character.js';
 import { UTIL } from '../../core/util/util.js';
 import { FAMILIES } from '../../core/skill/family.js';
+import { SKILL } from '../../core/skill/skill.js';
 import { FAMILY_EQUIPMENT } from '../data/family_equipment.js';
 
 const FAMILY_REFRESH_KEY = 'sm_ref';
@@ -132,7 +133,8 @@ export default class extends TASK {
                 let level = this.random(me.level) + 1;
                 if (level > 6) level = 6;
                 else if (level < 1) level = 1;
-                const sk = FAMILIES.NONE.query_skill(level);
+                const sk = SKILL.random_fragment_skill(level);
+                if (!sk) continue;
                 list.push(OBJ.CREATE('book/bc#' + sk!.id, 1 + (level < 5 ? me.random(3) : 0)));
             }
         }

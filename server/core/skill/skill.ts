@@ -991,6 +991,34 @@ export class SKILL extends BASE {
         return WORLD.SKILLS.get(id);
     }
 
+    /**
+     * 查询可作为秘籍碎片公共奖励的武学池。
+     *
+     * 口径与当铺、武道塔原先使用的 FAMILIES.NONE 普通技能池一致，同时显式排除
+     * 基础/知识、门派、隐藏、自创、进阶和终极武学，避免新注册资源被意外投入公共奖励。
+     */
+    static query_fragment_pool(grade: number): SKILL[] {
+        if (!Number.isInteger(grade) || grade < 1) return [];
+        return Array.from(WORLD.SKILLS.values()).filter(
+            skill =>
+                skill.type === SKILL_TYPES.SKILL &&
+                skill.query_grade() === grade &&
+                (!skill.family || skill.family === FAMILIES.NONE) &&
+                !skill.is_hidden &&
+                !skill.is_custom &&
+                !skill.source_skill &&
+                !skill.is_ultimate &&
+                skill.can_enables.length > 0,
+        );
+    }
+
+    /** 从公共秘籍碎片池随机选取一门指定品级武学。 */
+    static random_fragment_skill(grade: number): SKILL | undefined {
+        const pool = this.query_fragment_pool(grade);
+        if (!pool.length) return;
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+
     // ============ 描述查询 ============
 
     /**

@@ -6,7 +6,7 @@ import { USER } from '../../../core/char/user.js';
 import { COMMAND } from '../../../core/command.js';
 import { USERTASK } from '../../../core/task/playertask.js';
 import { OBJ } from '../../../core/item/obj.js';
-import { FAMILIES } from '../../../core/skill/family.js';
+import { SKILL } from '../../../core/skill/skill.js';
 import type { CHARACTER } from '../../../core/char/character.js';
 
 export default class extends ROOM {
@@ -192,7 +192,7 @@ export function wudao_grade(level: number): number {
 }
 
 export function wudao_fragment(grade: number, odds?: number): any {
-    const skill = FAMILIES.NONE.query_skill(grade);
+    const skill = SKILL.random_fragment_skill(grade);
     if (!skill) return { obj: 'book/bc#invalid', odds: 0 };
     return { obj: 'book/bc#' + skill.id, odds: odds ?? 10000 };
 }
