@@ -12,4 +12,9 @@ export default class extends ROOM {
         north: 'wudao/north',
         south: 'wudao/south',
     };
+
+    constructor() {
+        super();
+        this.set_npc('pub/wudao_zhu');
+    }
 }

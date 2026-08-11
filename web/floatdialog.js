@@ -254,7 +254,8 @@ const FloatDialog = {
         if (dialog.cmds.length) {
             descHTML += "<div class='item-commands'>";
             for (var i = 0; i < dialog.cmds.length; i++) {
-                const {cmd, name, text, br} = dialog.cmds[i];
+                const {cmd, name, text, br, group} = dialog.cmds[i];
+                if (group) descHTML += "<div class='command-group-title'>" + group + "</div>";
                 descHTML += "<span cmd='" + cmd + "'>" + name + "</span>";
                 if (text) descHTML += text;
                 if (br) descHTML += "<br>";

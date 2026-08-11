@@ -435,7 +435,8 @@ const Process = {
         if (!Array.isArray(data.items)) data.items = [data.items];
         const data_items = data.items
         for (var i = 0; i < data_items.length; i++) {
-            const {cmd, name, text, br} = data_items[i]
+            const {cmd, name, text, br, group} = data_items[i]
+            if (group) html.push("<div class='command-group-title'>", group, "</div>");
             html.push("<span cmd='" + cmd + "'>",
                 name,
                 "</span>");

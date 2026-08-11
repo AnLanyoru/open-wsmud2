@@ -204,6 +204,14 @@ export class ROOM extends ITEM {
 
     /** 玩家登录回调 — 触发时机：玩家登录后进入该房间时 */
     on_login?: (user: USER) => void;
+    /** 玩家在房间内死亡前回调。 */
+    on_user_die(_user: USER, _killer?: CHARACTER): void {
+        return;
+    }
+    /** 玩家因掉线超时等原因退出世界前回调。 */
+    on_user_quit(_user: USER): void {
+        return;
+    }
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
     /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */

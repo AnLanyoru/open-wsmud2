@@ -568,6 +568,26 @@ export class CHARACTER extends ITEM {
     /** 受到伤害回调 — 触发时机：do_attack() 中对目标造成伤害后（hp 实际扣除之前） */
     on_damage?(attacker: CHARACTER, damage: number): void;
 
+    /**
+     * 专用攻击闪避/招架判定。返回 undefined 时继续使用普通命中公式。
+     * 主要供不适合无限堆高面板的玩法 NPC 使用。
+     */
+    resolve_attack_avoidance?(
+        target: CHARACTER,
+        par: DoAttackPar,
+    ): { is_dodged: boolean; is_parried: boolean } | undefined;
+
+    /**
+     * 专用受击闪避/招架判定。攻击方未覆写判定时调用；返回 undefined 使用普通公式。
+     */
+    resolve_defense_avoidance?(
+        attacker: CHARACTER,
+        par: DoAttackPar,
+    ): { is_dodged: boolean; is_parried: boolean } | undefined;
+
+    /** 标准 do_attack 完成后的最终结果回调。 */
+    on_attack_result?(attacker: CHARACTER, par: DoAttackPar, damage: number): void;
+
     /** 有角色进入房间回调 — 触发时机：其他有 HP 的角色进入本角色所在房间时 */
     on_enter?(obj: CHARACTER): void;
 
@@ -3529,9 +3549,16 @@ export class CHARACTER extends ITEM {
 
         let sh = par.gj ?? this.gj;
         const mz = par.mz ?? this.mz;
-        par.is_dodged = false;
-        par.is_parried = false;
-        if (target.is_faint || this.is_shadow) {
+        const specialAvoidance =
+            this.resolve_attack_avoidance?.(target, par) ??
+            target.resolve_defense_avoidance?.(this, par);
+        par.is_dodged = specialAvoidance?.is_dodged ?? false;
+        par.is_parried = specialAvoidance?.is_parried ?? false;
+        if (specialAvoidance) {
+            if (par.no_dodge) par.is_dodged = false;
+            if (par.no_parry || target.is_busy || target.is_faint) par.is_parried = false;
+            if (par.is_dodged) par.is_parried = false;
+        } else if (target.is_faint || this.is_shadow) {
             par.is_dodged = false;
             par.is_parried = false;
         } else if (target.is_rash) {
@@ -3654,6 +3681,7 @@ export class CHARACTER extends ITEM {
                 }
             }
         }
+        target.on_attack_result?.(this, par, sh);
         if (this.fight_type) {
             if (!par.no_append_target && target.fight_type) {
                 if (target.dodge_skill.on_dodge_over)

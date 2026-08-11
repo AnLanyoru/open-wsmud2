@@ -508,6 +508,14 @@
     color: var(--btn-bg);
 }
 
+.item-commands > .command-group-title {
+    display: block;
+    color: var(--text-secondary);
+    font-weight: bold;
+    margin-top: 0.45em;
+    margin-bottom: 0.1em;
+}
+
 .room_exits {
 }
 

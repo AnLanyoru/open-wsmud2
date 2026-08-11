@@ -1,26 +1,23 @@
 import { ROOM } from '../../../core/room/room.js';
-import { WORLD } from '../../../core/world.js';
-import { NPC } from '../../../core/char/npc.js';
+import { enter_wudao_trial, cleanup_wudao_trial, wudao_trial_heartbeat } from '../../npc/pub/wudao_ss.js';
 
 export default class extends ROOM {
     name = '朱雀台';
-    desc = '这里是武道塔顶部的北面平台，一座朱雀的雕塑凭空而立，传说中的四大守护神兽之一。';
+    desc = '这里是武道塔顶部的南面平台，一座朱雀的雕塑凭空而立，传说中的四大守护神兽之一。';
     exits = { north: 'wudao/ding' };
     max_item_count = 1;
     is_shadow = true;
     no_relive = true;
 
     on_enter(me) {
-        let npc = NPC.CLONE('pub/wudao_ss');
-        npc.init_from(me, 3);
-
-        this.item_changed(npc, true);
-        npc.do_kill(me);
+        if (me.check_player()) enter_wudao_trial(this, me, 3);
     }
 
     on_leave(me) {
-        let npc = this.find_obj_bypath('pub/wudao_ss');
-        if (npc) npc.destroy();
-        me.remove_status('ss');
+        if (me.check_player()) cleanup_wudao_trial(this, me);
     }
+
+    on_user_die(me, _killer) { cleanup_wudao_trial(this, me); }
+    on_user_quit(me) { cleanup_wudao_trial(this, me); }
+    on_heart_beat(dt) { wudao_trial_heartbeat(this, dt); }
 }

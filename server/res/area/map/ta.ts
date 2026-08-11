@@ -40,18 +40,10 @@ export default class extends AREA {
         const names = ['青龙', '白虎', '玄武', '朱雀'];
         for (let i = 0; i < 4; i++) {
             const ss = Number(WORLD.DATA.query_temp('wd_ss' + i, 0) ?? 0);
-            if (ss > 0) {
-                actions.push([
-                    'goto wd2',
-                    '前往挑战',
-                    names[i] +
-                        '试炼的记录保持者是' +
-                        WORLD.DATA.query_temp('wd_ss' + i + '_n', 0) +
-                        '：' +
-                        ss +
-                        '息',
-                ]);
-            }
+            const record = ss > 0
+                ? '记录保持者是' + WORLD.DATA.query_temp('wd_ss' + i + '_n', '') + '：' + ss + '息'
+                : '暂无纪录';
+            actions.push(['goto wd2', '前往挑战', names[i] + '试炼：' + record]);
         }
 
         return actions;
