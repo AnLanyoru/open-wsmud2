@@ -68,19 +68,10 @@ export default class extends SKILL {
                 const [skillId, pfmKey] = lastPfmId.split('/');
                 const pfmName = SKILL.get(skillId)?.get_pfm(pfmKey)?.name || '绝招';
                 me.send_room(
-                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟以彼之道还施彼身——「${pfmName}」之势反卷而回！</HIO>`,
+                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟是以彼之道还施彼身！</HIO>`,
                     target,
                 );
-                const gj: number = int((me.gj * effectPer) / 100);
-                me.do_attack({
-                    target: target,
-                    gj: gj,
-                    mz: me.mz,
-                    attack_msg: `<HIO>$N双臂圈转，将$n方才那招「${pfmName}」的劲力尽数逆转，以其人之道还治其人之身！</HIO>`,
-                    damage_msg:
-                        '<hir>$n只觉一股雄浑劲力倒灌而回，竟是自家招数的路数，避无可避，被震得气血翻涌！</hir>',
-                    miss_msg: `<cyn>$n识得这招「${pfmName}」的来路，匆忙间急闪躲避。</cyn>`,
-                });
+                // fixme: 斗转星移的效果是使用前一个攻击你的武器或拳脚绝招攻击敌人，类似小无相的无相
                 me.end_attack(target);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
@@ -97,11 +88,11 @@ export default class extends SKILL {
         if (lv <= 0) return;
         const reflectPer: number = get_xingyi_reflect_per(lv);
         const reflectDmg: number = int((me.gj * reflectPer) / 100);
+        const sh = target.damage(reflectDmg, me);
         me.send_room(
-            '<HIO>$N借力打力，将$n的攻势尽数逆转，斗转星移之下，劲力反噬而回！</HIO>',
+            `<HIO>$N斗转星移，$n的劲力莫名转向，对$n造成${sh}点伤害！</HIO>`,
             target,
         );
-        target.damage(reflectDmg, me);
         me.end_attack(target);
     }
 }
