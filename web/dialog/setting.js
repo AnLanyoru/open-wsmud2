@@ -1137,6 +1137,21 @@ const setting_css = `
     padding-left: 1em;
 }
 
+/* Make missing/invalid extension fields immediately visible when saving. */
+.extend-row.error-shake {
+    animation: extend-error-shake 0.12s linear 3;
+}
+
+.extend-row>.extend-input.error-shake {
+    box-shadow: inset 0 0 0 2px #f04b5f, 0 0 10px 2px rgba(240, 75, 95, 0.9);
+}
+
+@keyframes extend-error-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
 .extend-row>input {
     height: 2em;
 }

@@ -62,17 +62,35 @@ export default class extends SKILL {
             distime: 30000,
             enable_skill: 'parry',
             mp: 90,
-            use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
-                const effectPer: number = get_douzhuan_effect_per(lv);
+            no_copy: true,
+            use: function (me: CHARACTER, target: CHARACTER, lv: number): boolean {
                 const lastPfmId = target.query_temp('used_pfm', '') as string;
+                if (!lastPfmId) {
+                    return me.notify_fail(
+                        `<cyn>${target.name}最近没有使用武器或拳脚绝招，你无法施展斗转。</cyn>`,
+                    );
+                }
                 const [skillId, pfmKey] = lastPfmId.split('/');
-                const pfmName = SKILL.get(skillId)?.get_pfm(pfmKey)?.name || '绝招';
+                const skill = SKILL.get(skillId);
+                const pfm = skill?.get_pfm(pfmKey);
+                if (!pfm?.use) {
+                    return me.notify_fail('<cyn>对方刚才的绝招无迹可循，你无法施展斗转。</cyn>');
+                }
+                if (pfm.no_copy) {
+                    return me.notify_fail(`<cyn>「${pfm.name}」无法被斗转星移。</cyn>`);
+                }
+                if (pfm.enable_skill !== 'unarmed' && !pfm.is_weapon) {
+                    return me.notify_fail(
+                        `<cyn>「${pfm.name}」并非武器或拳脚绝招，你无法施展斗转。</cyn>`,
+                    );
+                }
+
                 me.send_room(
-                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟是以彼之道还施彼身！</HIO>`,
+                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟以彼之道还施彼身——「${pfm.name}」之势反卷而回！</HIO>`,
                     target,
                 );
-                // fixme: 斗转星移的效果是使用前一个攻击你的武器或拳脚绝招攻击敌人，类似小无相的无相
-                me.end_attack(target);
+                const effectLv = int((lv * get_douzhuan_effect_per(lv)) / 100);
+                return me.use_pfm(target, pfm, effectLv, pfm.enable_skill!);
             },
             query_desc: function (me: CHARACTER, lv: number): string {
                 return `使用前一个攻击你的武器或拳脚绝招攻击敌人，效果是你斗转星移等级的${get_douzhuan_effect_per(lv)}%`;

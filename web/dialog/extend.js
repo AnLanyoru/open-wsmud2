@@ -187,13 +187,21 @@ export default {
         this.is_record = false;
         ReceiveMessage('<cyn>已停止记录你的操作命令。</cyn>');
         this.edit_elem.find('.switch').removeClass('on');
+        // Always leave the recording state, even when no command was captured.
+        // Otherwise Process.state remains stuck at "正在记录..." indefinitely.
+        Process.state();
         if (this.record_cmds.length > 0) {
-            Dialog.show('setting');
+            // Dialog.show toggles an already-open dialog closed.  When recording
+            // was stopped from the settings dialog, that toggle discarded the
+            // destination page and left the editor inaccessible.
+            if (!(Dialog.isShow && Dialog.curItem === 'setting')) {
+                Dialog.show('setting');
+            }
             Dialog.setting.footerChanged("extend");
             this.edit_elem.show();
-            this.list_elem.hide();
+            // Keep visibility class-based so the save flow can restore the list.
+            this.list_elem.css('display', '').addClass('hide');
             this.edit_elem.find('textarea').val(this.record_cmds.join(";"));
-            Process.state();
         }
     },
     helper: "<li ecmd='show_actions'>可用命令参考</li><li ecmd='show_vars'>可用变量参考</li><li ecmd='show_paras'>参数用法参考</li>",
@@ -527,7 +535,7 @@ export default {
         func && func.apply(Dialog.extend, paras);
     }, cmd_add: function () {
         this.edit_elem.show();
-        this.list_elem.addClass('hide');
+        this.list_elem.css('display', '').addClass('hide');
         this.edit_elem.attr("sid", '-1');
         let elems = this.edit_elem.find('input, textarea');
         for (let elem of elems) {
@@ -557,7 +565,7 @@ export default {
         let item = this.selected_item;
         if (!item) return;
         this.edit_elem.show();
-        this.list_elem.addClass('hide');
+        this.list_elem.css('display', '').addClass('hide');
         this.edit_elem.attr("sid", this.setting.indexOf(item));
         let elems = this.edit_elem.find('input, textarea, select');
         for (let elem of elems) {
@@ -577,9 +585,9 @@ export default {
         for (let elem of elems) {
             item[elem.getAttribute("prop")] = elem.value;
         }
-        if (!item.name) return this.show_error('name');
+        if (!item.name || !item.name.trim()) return this.show_error('name');
         if (!item.type) return this.show_error('type');
-        if (!item.content) return this.show_error('content');
+        if (!item.content || !item.content.trim()) return this.show_error('content');
         if (item.paras) {
             if (Dialog.extend.regex[item.for]) {
                 item.check = this.match(item.paras);
@@ -589,28 +597,35 @@ export default {
             if (!item.check) return this.show_error('paras');
         }
         this.hide();
-        $(this.create_item(item, this.setting.length)).appendTo(this.list_elem);
-
         if (index < 0) {
             this.setting.push(item);
         } else {
             item.on = this.setting[index].on;
             this.setting[index] = item;
-            this.refresh_list();
         }
         this.save_extend();
+        // Re-render from the source array so every row gets a fresh, matching
+        // sid.  Appending only the newly-created row left stale indices in the
+        // DOM after add/edit/delete sequences.
+        this.refresh_list();
 
     }, cmd_remove: function () {
         let item = this.selected_item;
         if (!item) return;
         this.setting.Remove(item);
+        this.selected_item = null;
+        this.edit_button && this.edit_button.remove();
         this.refresh_list();
         this.save_extend();
     },
     show_error: function (key) {
-        let elem = this.element.find('[prop="' + key + '"]').parent();
+        let input = this.element.find('[prop="' + key + '"]');
+        let elem = input.parent();
+        input.addClass('error-shake');
         elem.addClass('error-shake');
+        input.trigger('focus');
         setTimeout(() => {
+            input.removeClass('error-shake');
             elem.removeClass('error-shake');
         }, 1500);
     }, cmd_show: function (elem, t) {

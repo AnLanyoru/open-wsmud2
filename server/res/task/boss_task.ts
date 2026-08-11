@@ -539,14 +539,21 @@ class BossTask extends TASK {
             me.notify('你身上没有足够的空间存放本次奖励。');
             return;
         }
+        let money = 0;
         for (const item of items) {
+            const itemName = item.unit_name();
             if (!me.add_obj(item)) {
                 me.notify('奖励发放失败，请整理背包后重试。');
                 return;
             }
+            if (item.is_money) money += item.value * item.count;
+            else me.notify('你获得了' + itemName + '。');
         }
+        if (money) me.notify('你获得了' + UTIL.moneyToStr(money) + '。');
         me.add_temp('bcc', 1, UTIL.diff_time());
-        me.notify('你领取了本次世界BOSS奖励。');
+        me.notify(
+            `世界BOSS快速完成，今日已完成${me.query_temp<number>('bcc', 0)}/${DAILY_LIMIT}。`,
+        );
         console.log(
             `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${damage}`,
         );

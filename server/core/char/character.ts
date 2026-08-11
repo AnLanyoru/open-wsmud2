@@ -1481,7 +1481,7 @@ export class CHARACTER extends ITEM {
             str.push('点潜能');
         }
         if (money) {
-            this.money += money;
+            this.add_money(money);
             if (exp || pot) str.push('，');
             str.push(UTIL.moneyToStr(money));
         }
