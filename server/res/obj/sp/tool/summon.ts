@@ -4,10 +4,13 @@ import type BossTask from '../../../task/boss_task.js';
 import type { CHARACTER } from '../../../../core/char/character.js';
 import type { NPC } from '../../../../core/char/npc.js';
 
+/**
+ * @deprecated 世界 BOSS 召唤令仅为历史兼容资源，后续不再扩展其掉落或战斗逻辑。
+ */
 export default class extends OBJ {
     unit = '块';
     name = '召唤令';
-    desc = '使用后可召唤出一个首领级NPC';
+    desc = '使用后可召唤出一个首领级NPC（已弃用）';
     value = 10000;
     grade = 3;
 

@@ -7,8 +7,6 @@ import { BASE } from '../base.js';
 import { WORLD } from '../world.js';
 import type { CHARACTER } from '../char/character.js';
 import type { OBJ } from '../item/obj.js';
-import type { USER } from '../char/user.js';
-import type { NPC } from '../char/npc.js';
 
 export class TASK extends BASE {
     /** 定时器句柄（子类用于存放 setTimeout/setInterval 返回值） */
@@ -89,9 +87,6 @@ export class TASK extends BASE {
 
     /** 执行定时任务（由 time 等任务子类实现） */
     run2?(): void;
-
-    /** BOSS任务：自动掉落分配 */
-    boss_auto_drops?(me: USER, boss: NPC, par: string): void;
 
     /** BOSS任务：下次运行时间 */
     next_time?: Date | null;

@@ -1,319 +1,581 @@
 import { TASK } from '../../core/task/task.js';
 import { WORLD } from '../../core/world.js';
-import { OBJ } from '../../core/item/obj.js';
+import { OBJ, type OddsEntry } from '../../core/item/obj.js';
 import { UTIL } from '../../core/util/util.js';
 import { FAMILIES } from '../../core/skill/family.js';
 import { NPC } from '../../core/char/npc.js';
 import { ROOM } from '../../core/room/room.js';
-import { EVENTS } from '../../core/task/events.js';
+import { EVENTS, type EventItem } from '../../core/task/events.js';
 import type { USER } from '../../core/char/user.js';
 import type { CORPSE } from '../../core/item/corpse.js';
 
+type BossGrade = 1 | 2 | 3 | 4 | 5;
+type BossState = 'active' | 'quick-claimable' | 'cleaned';
+type ClaimSource = 'corpse' | 'auto' | 'event';
+
+interface BossTemplateConfig {
+    id: string;
+    bit: number;
+    level: BossGrade;
+    npcPath: string;
+    difficulty: number;
+    toolGrade: 1 | 2 | 3 | 4 | 5;
+    minFbIndex: number;
+    skillLevel: number;
+}
+
+interface BossPlayerReward {
+    state: 'generated' | 'claimed';
+    damage: number;
+    damagePercent: number;
+    countsDaily: boolean;
+    items: OBJ[];
+    claimedAt?: number;
+    source?: ClaimSource;
+}
+
+interface BossRuntime {
+    batchId: string;
+    grade: BossGrade;
+    state: BossState;
+    boss: NPC;
+    room: ROOM;
+    eventId: string;
+    template: BossTemplateConfig;
+    spawnedAt: number;
+    damageSnapshot?: Readonly<Record<string, number>>;
+    rewards: Map<string, BossPlayerReward>;
+}
+
+const BOSS_LEVELS = ['', '武士', '武师', '宗师', '武圣', '武帝', '武神'];
+const EVENT_PREFIX = 'world_boss_';
+const UNLOCK_BITS_KEY = 'boss_unlock_bits';
+const DAILY_LIMIT = 5;
+const TOOL_PATHS = [
+    'sp/tool/exp',
+    'sp/tool/er2',
+    'sp/tool/diao',
+    'sp/tool/box',
+    'sp/tool/chu',
+    'sp/tool/yao',
+] as const;
+const TOOL_ODDS = [0, 4000, 2000, 500, 200, 10] as const;
+const BOSS_STONES = ['st/st_red#0', 'st/st_gre#0', 'st/st_blu#0', 'st/st_yel#0'];
+
+const BOSS_TEMPLATES: readonly BossTemplateConfig[] = [
+    {
+        id: 'zhao_sanquan',
+        bit: 0,
+        level: 1,
+        npcPath: 'yz/lm/zhao',
+        difficulty: 3,
+        toolGrade: 1,
+        minFbIndex: 1,
+        skillLevel: 100,
+    },
+    {
+        id: 'aobai',
+        bit: 1,
+        level: 1,
+        npcPath: 'bj/ao/aobai',
+        difficulty: 5,
+        toolGrade: 1,
+        minFbIndex: 4,
+        skillLevel: 200,
+    },
+    {
+        id: 'chen_jinnan',
+        bit: 2,
+        level: 1,
+        npcPath: 'bj/tdh/chen',
+        difficulty: 10,
+        toolGrade: 2,
+        minFbIndex: 6,
+        skillLevel: 300,
+    },
+    {
+        id: 'hong_antong',
+        bit: 3,
+        level: 2,
+        npcPath: 'bj/shenlong/hong',
+        difficulty: 12,
+        toolGrade: 2,
+        minFbIndex: 7,
+        skillLevel: 400,
+    },
+    {
+        id: 'grandmaster_leader',
+        bit: 4,
+        level: 3,
+        npcPath: 'pub/world_boss#3',
+        difficulty: 100,
+        toolGrade: 3,
+        minFbIndex: 8,
+        skillLevel: 1000,
+    },
+    {
+        id: 'martial_saint_leader',
+        bit: 5,
+        level: 4,
+        npcPath: 'pub/world_boss#4',
+        difficulty: 300,
+        toolGrade: 4,
+        minFbIndex: 9,
+        skillLevel: 2000,
+    },
+    {
+        id: 'martial_emperor_leader',
+        bit: 6,
+        level: 5,
+        npcPath: 'pub/world_boss#5',
+        difficulty: 500,
+        toolGrade: 5,
+        minFbIndex: 10,
+        skillLevel: 3000,
+    },
+];
+
+/** FIXME: 6级武神 BOSS 待办，当前 6 级及以上玩家仍沿用 5 级分组。 */
+function getBossGrade(userLevel: number): BossGrade | undefined {
+    if (!Number.isFinite(userLevel) || userLevel < 1) return;
+    return Math.min(5, Math.floor(userLevel)) as BossGrade;
+}
+
+function canChallengeBoss(me: USER, grade: BossGrade): boolean {
+    return getBossGrade(me.level) === grade;
+}
+
+export function calculateNextBossTime(now: Date, randomMinute: number): Date {
+    const minute = Math.max(0, Math.min(49, Math.floor(randomMinute)));
+    const hour = now.getHours();
+    if (hour === 21) {
+        const nextMinute = Math.floor(now.getMinutes() / 5) * 5 + 5;
+        return new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            21,
+            nextMinute,
+            20,
+        );
+    }
+    if (hour === 20) {
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 0, 20);
+    }
+    return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hour + 1,
+        6 + minute,
+        20,
+    );
+}
+
 class BossTask extends TASK {
     id = 'boss';
-    quickly: boolean = false;
-    boss: NPC[] | null = null;
-    boss_count = 1;
     next_time: Date | null = null;
-    user_items: Record<string, OBJ[]> | null = null;
-    levels = [3, 5, 10, 12, 20, 40];
-    player_levels = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3];
-    level_max = [
-        [0, 99],
-        [0, 3],
-        [0, 4],
-        [0, 4],
-        [0, 4],
-        [0, 4],
-    ];
-    boss_levels = [3, 3, 3, 3, 3, 3, 3, 3, 4, 4];
-    boss_min_fb = [1, 4, 6, 7];
-    paths = ['yz/lm/zhao', 'bj/ao/aobai', 'bj/tdh/chen', 'bj/shenlong/hong'];
+    runtimes = new Map<BossGrade, BossRuntime>();
+    private batchSequence = 0;
 
-    startup() {
-        // this.call_out(this.run, this.random(100000));//this.random(600000)+600000
-        this.check_time();
+    startup(): void {
+        // 清理由旧版固定 ID 和异常重启遗留的失效活动；新批次会按需重新创建。
+        for (let grade = 1; grade <= 5; grade++) {
+            EVENTS.remove('boss' + grade);
+            EVENTS.remove(EVENT_PREFIX + grade);
+        }
+        this.scheduleNext();
     }
 
-    stop() {
+    stop(): void {
         if (this.time_handler) clearTimeout(this.time_handler);
-        if (this.boss && this.boss.length) {
-            for (let i = 0; i < this.boss.length; i++) {
-                this.boss[i].destroy('$N离开了。');
-            }
-            this.boss.length = 0;
-            this.boss = null;
-        }
         this.time_handler = null;
+        for (const runtime of this.runtimes.values()) this.cleanupRuntime(runtime, 'task stopped');
+        this.runtimes.clear();
+        for (let grade = 1; grade <= 5; grade++) EVENTS.remove(EVENT_PREFIX + grade);
     }
 
-    check_time() {
-        const dt = new Date();
-        const week = dt.getDay();
-        const hour = dt.getHours();
-        if (hour == 21) {
-            const min_date = dt.getMinutes();
-            this.next_time = new Date(
-                dt.getFullYear(),
-                dt.getMonth(),
-                dt.getDate(),
-                hour,
-                parseInt((min_date + 5) / 5) * 5,
-                20,
-            );
-        } else if (hour == 20) {
-            this.next_time = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 21, 0, 20);
-        } else {
-            this.next_time = new Date(
-                dt.getFullYear(),
-                dt.getMonth(),
-                dt.getDate(),
-                hour + 1,
-                6 + this.random(50),
-                20,
-            );
-        }
-
-        this.time_handler = this.call_out(this.run, +this.next_time - +dt);
+    private scheduleNext(now = new Date()): void {
+        if (this.time_handler) clearTimeout(this.time_handler);
+        this.next_time = calculateNextBossTime(now, this.random(50));
+        this.time_handler = this.call_out(this.run, Math.max(1, +this.next_time - +now));
     }
 
-    quick() {
-        if (this.quickly) this.quickly = false;
-        else this.quickly = true;
-        this.stop();
-        this.check_time();
-    }
-
-    run() {
-        this.stop();
-        this.check_time();
-        const list = this.check_users();
-        this.boss = [];
-        for (let i = 0; i < list.length; i++) {
-            if (!list[i]) continue;
-            let level = i + 1;
-            let bs = this.create_boss(level);
-            if (!bs) return console.log('boss 创建失败');
-            this.boss.push(bs);
-            bs.event_id = 'boss' + level;
-            const rm = ROOM.RANDOM()!; //WORLD.getRoom("yz/nanmen");
-            rm.item_changed(bs, true);
-            let desc = '听说' + bs.name + '出现在' + rm.long_name() + '一带';
-            let msg = '{"type":"msg","ch":"rumor","content":"' + desc + '。"}';
-            const users = list[i];
-            if (!users) continue;
-            for (let j = 0; j < users.length; j++) {
-                users[j].send(msg);
+    run(): void {
+        this.time_handler = null;
+        this.scheduleNext();
+        const usersByGrade = this.collectEligibleUsers();
+        const usedRooms = new Set(
+            Array.from(this.runtimes.values())
+                .filter(runtime => runtime.state === 'active' && runtime.boss.environment)
+                .map(runtime => runtime.room.path),
+        );
+        for (let grade = 1 as BossGrade; grade <= 5; grade++ as BossGrade) {
+            const users = usersByGrade.get(grade);
+            if (!users?.length) continue;
+            const runtime = this.spawnBoss(grade, usedRooms);
+            if (!runtime) continue;
+            for (const user of users) {
+                user.send(
+                    JSON.stringify({
+                        type: 'msg',
+                        ch: 'rumor',
+                        content: `听说${runtime.boss.name}出现在${runtime.room.long_name()}一带。`,
+                    }),
+                );
             }
-            EVENTS.add(this.create_event(bs.event_id!, level, desc, rm));
         }
     }
 
-    create_event(evtid: string, level: number, desc: string, rm: ROOM) {
+    private collectEligibleUsers(): Map<BossGrade, USER[]> {
+        const result = new Map<BossGrade, USER[]>();
+        for (const user of WORLD.USERS) {
+            if (!user.socket || user.query_temp<number>('bcc', 0) >= DAILY_LIMIT) continue;
+            const grade = getBossGrade(user.level);
+            if (!grade) continue;
+            const users = result.get(grade) ?? [];
+            users.push(user);
+            result.set(grade, users);
+        }
+        return result;
+    }
+
+    private spawnBoss(grade: BossGrade, usedRooms: Set<string>): BossRuntime | undefined {
+        const fbIndexValue = Number(WORLD.DATA.query_temp('fb_index', 0));
+        const fbIndex = Number.isFinite(fbIndexValue) ? Math.max(0, Math.floor(fbIndexValue)) : 0;
+        const templates = BOSS_TEMPLATES.filter(
+            template => template.level === grade && template.minFbIndex <= fbIndex,
+        );
+        if (!templates.length) {
+            console.error(`[world-boss] grade=${grade} has no available template at fb_index=${fbIndex}`);
+            return;
+        }
+        const room = this.selectBossRoom(usedRooms);
+        if (!room) {
+            console.error(`[world-boss] grade=${grade} has no available room`);
+            return;
+        }
+        const template = templates[this.random(templates.length)];
+        const boss = this.createBoss(template, grade);
+        if (!boss) {
+            console.error(`[world-boss] failed to clone template=${template.npcPath}`);
+            return;
+        }
+
+        const previous = this.runtimes.get(grade);
+        if (previous) this.cleanupRuntime(previous, 'replaced');
+
+        const runtime: BossRuntime = {
+            batchId: `${Date.now().toString(36)}-${grade}-${++this.batchSequence}`,
+            grade,
+            state: 'active',
+            boss,
+            room,
+            eventId: EVENT_PREFIX + grade,
+            template,
+            spawnedAt: Date.now(),
+            rewards: new Map(),
+        };
+        boss.event_id = runtime.eventId;
+        boss.on_died = (killer: USER, corpse: CORPSE) =>
+            this.handleBossDefeated(runtime, killer, corpse);
+        boss.on_kill = (me: USER) => this.checkBossEnemy(boss, runtime.grade, me);
+        boss.on_heart_beat = () => this.recordQuickClaimUnlocks(runtime);
+        room.item_changed(boss, true);
+        usedRooms.add(room.path);
+        this.runtimes.set(grade, runtime);
+        EVENTS.add(this.createEvent(runtime));
+        console.log(
+            `[world-boss] spawned batch=${runtime.batchId} grade=${grade} template=${template.id} room=${room.path}`,
+        );
+        return runtime;
+    }
+
+    private selectBossRoom(usedRooms: Set<string>): ROOM | undefined {
+        if (!ROOM.public_rooms) ROOM.RANDOM();
+        const candidates = (ROOM.public_rooms ?? []).filter(
+            room =>
+                !usedRooms.has(room.path) &&
+                !room.no_fight &&
+                !room.is_fb() &&
+                !room.is_copy() &&
+                !room.is_full(1) &&
+                room.max_item_count > 1,
+        );
+        if (!candidates.length) return;
+        return candidates[this.random(candidates.length)];
+    }
+
+    private createBoss(template: BossTemplateConfig, grade: BossGrade): NPC | undefined {
+        const boss = NPC.CLONE(template.npcPath);
+        if (!boss) return;
+        boss.boss_index = template.bit;
+        boss.min_fbindex = template.minFbIndex;
+        for (const [skillId] of boss.skills) boss.skills.get(skillId)!.level = template.skillLevel;
+        boss.diff_level = template.difficulty;
+        boss.hp = boss.max_hp = template.difficulty * template.difficulty * 500;
+        boss.mp = boss.max_mp = boss.max_hp / 2;
+        boss.prop = {};
+        boss.level = grade;
+        boss.init();
+        boss.recount();
+        boss.pfm_rate = 1;
+        boss.record_damage = true;
+        boss.on_enter = undefined;
+        boss.no_fight = true;
+        boss.no_refresh = true;
+        boss.on_die = undefined;
+        return boss;
+    }
+
+    /** 兼容召唤令：创建一只当前世界进度已开放、但不注册活动批次的首领。 */
+    create_boss(playerLevel = 1): NPC | undefined {
+        const grade = getBossGrade(playerLevel) ?? 1;
+        const fbIndexValue = Number(WORLD.DATA.query_temp('fb_index', 0));
+        const fbIndex = Number.isFinite(fbIndexValue) ? Math.max(0, Math.floor(fbIndexValue)) : 0;
+        let templates = BOSS_TEMPLATES.filter(
+            template => template.level === grade && template.minFbIndex <= fbIndex,
+        );
+        if (!templates.length) {
+            templates = BOSS_TEMPLATES.filter(template => template.minFbIndex <= fbIndex);
+        }
+        if (!templates.length) return;
+        const template = templates[this.random(templates.length)];
+        return this.createBoss(template, template.level);
+    }
+
+    private checkBossEnemy(boss: NPC, grade: BossGrade, me: USER): boolean | void {
+        if (canChallengeBoss(me, grade)) return;
+        if (boss.family === FAMILIES.MONSTER) {
+            return me.notify_fail(boss.name + '目露凶光狠狠地瞪着你。');
+        }
+        return me.notify_fail(
+            `${boss.name}对你拱手说道：这位${me.call()}，不知${boss.callme()}有何得罪之处？`,
+        );
+    }
+
+    private createEvent(runtime: BossRuntime): EventItem {
+        const isActive = runtime.state === 'active';
+        const desc = isActive
+            ? `听说${runtime.boss.name}出现在${runtime.room.long_name()}一带，你可以前往尝试挑战，根据造成的伤害获得奖励。`
+            : `${runtime.boss.name}已被击败。你可以领取本批次奖励，每日最多领取${DAILY_LIMIT}次。`;
         return {
-            id: evtid,
-            name: BOSS_LEVELS[level] + 'BOSS挑战',
-            desc: desc + '，你可以前往尝试挑战，根据你造成的伤害可获得丰厚奖励。',
+            id: runtime.eventId,
+            name: `${BOSS_LEVELS[runtime.grade]}BOSS挑战`,
+            desc,
             time: 0,
-            grade: level,
-            command: '前往挑战',
-            check: (me: USER) => me.level === level,
-            on_command: function (me: USER) {
-                if (me.state) return me.send('你正在' + me.state.title + '。');
-                if ((me.query_temp('bcc', 0) ?? 0) >= 5)
-                    return me.send('你今日的BOSS挑战次数已满。');
-                if (!me.can_trans()) return;
-                if (rm.is_full(1)) return me.send('那里人太多了，你过不去。');
-                me.moveto(rm.path, '$N离开了。', '$N走了过来。');
-                return true;
+            grade: runtime.grade,
+            command: isActive ? '前往挑战' : '领取奖励',
+            check: (me: USER) => canChallengeBoss(me, runtime.grade),
+            on_command: (me: USER, confirmation?: string) => {
+                const current = this.runtimes.get(runtime.grade);
+                if (current !== runtime || runtime.state === 'cleaned') {
+                    me.notify('该场世界BOSS活动已经结束。');
+                    return;
+                }
+                if (!canChallengeBoss(me, runtime.grade)) {
+                    me.notify('你的等级不符合这场世界BOSS活动。');
+                    return;
+                }
+                if (runtime.state === 'active') return this.teleportToBoss(me, runtime);
+                if (confirmation !== 'ok') {
+                    me.notify(`是否确认领取${runtime.boss.name}的奖励？每日最多领取${DAILY_LIMIT}次。`);
+                    me.send_commands(`events ${runtime.eventId} ok`, '确认领取');
+                    return;
+                }
+                this.claimBossReward(me, runtime, 'event');
             },
         };
     }
 
-    check_users() {
-        const list: (USER[] | undefined)[] = [];
-        for (let i = 0; i < WORLD.USERS.length; i++) {
-            const user = WORLD.USERS[i];
-            if (!user.level) continue;
-            if (user.level > 5 && this.create_boss2?.(user)) continue;
-            if (!user.socket) continue;
-            if ((user.query_temp('bcc', 0) ?? 0) >= 5) continue;
-            let lv = user.level - 1;
-            if (lv > 4) {
-                lv = 4;
-            }
-            if (!list[lv]) list[lv] = [];
-            list[lv]!.push(user);
-        }
-        return list;
+    private teleportToBoss(me: USER, runtime: BossRuntime): boolean | void {
+        if (me.state) return me.send('你正在' + me.state.title + '。');
+        if (me.query_temp<number>('bcc', 0) >= DAILY_LIMIT)
+            return me.send('你今日的BOSS挑战次数已满。');
+        if (!me.can_trans()) return;
+        if (runtime.room.is_full(1)) return me.send('那里人太多了，你过不去。');
+        me.moveto(runtime.room.path, '$N离开了。', '$N走了过来。');
+        return true;
     }
 
-    /** BOSS任务：创建武神BOSS */
-    create_boss2?(user: USER): boolean;
-
-    create_boss(player_level?: number) {
-        const value = Number(WORLD.DATA.query_temp('fb_index', 0));
-        const index = Number.isFinite(value)
-            ? Math.max(0, Math.min(Math.floor(value), this.boss_levels.length - 1))
-            : 0;
-        const level_count = Math.min(
-            this.paths.length,
-            this.levels.length,
-            this.boss_min_fb.length,
-            this.player_levels.length,
-        );
-        let max_level = Math.max(1, Math.min(this.boss_levels[index], level_count));
-        let boss_max = 0;
-        let boss_min = 0;
-        if (player_level) {
-            boss_max = this.level_max[player_level][1];
-            boss_min = this.level_max[player_level][0];
-            if (max_level > boss_max) max_level = boss_max;
-        }
-
-        const level =
-            max_level > boss_min ? this.random(max_level - boss_min) + boss_min : boss_min;
-
-        if (!this.paths[level]) return console.log(level, max_level, ' boss 创建失败');
-        const diff_level = this.levels[level];
-        const boss = NPC.CLONE(this.paths[level]);
-        if (!boss) return;
-        boss.boss_index = level;
-        boss.min_fbindex = this.boss_min_fb[level];
-        let sk_level = (level + 1) * 100;
-        if (diff_level > 300) {
-            sk_level = (level + 1) * 130;
-        }
-        for (const [item] of boss.skills) {
-            boss.skills.get(item)!.level = sk_level;
-        }
-        boss.diff_level = diff_level;
-        boss.hp = boss.max_hp = diff_level * diff_level * 500;
-
-        boss.mp = boss.max_mp = boss.max_hp / 2;
-        boss.prop = {};
-        boss.level = player_level || this.player_levels[level];
-        if (diff_level >= 500) boss.level = 5;
-        boss.init();
-        boss.recount();
-        boss.pfm_rate = 1;
-        boss.recount();
-        boss.record_damage = true;
-        boss.on_died = this.on_died;
-        boss.on_enter = undefined;
-        boss.on_kill = this.on_kill;
-        boss.no_fight = true;
-        boss.no_refresh = true;
-        boss.on_die = undefined;
-
-        return boss;
-    }
-
-    on_kill(this: NPC, me: USER) {
-        if (me.level > this.level) {
-            if (this.family == FAMILIES.MONSTER) {
-                return me.notify_fail(this.name + '目露凶光狠狠的瞪着你。');
-            }
-            return me.notify_fail(
-                this.name +
-                    '对你拱手说道：这位' +
-                    me.call() +
-                    '，不知' +
-                    this.callme() +
-                    '有何得罪之处？',
-            );
-        }
-    }
-
-    on_died(this: NPC, me: USER, corpse: CORPSE) {
-        if (!this.is_party_boss) EVENTS.add(create_finish_event(this));
-        if (!this.damages) return;
+    private handleBossDefeated(runtime: BossRuntime, _killer: USER, corpse: CORPSE): void {
+        if (runtime.state !== 'active') return;
+        this.recordQuickClaimUnlocks(runtime);
+        runtime.damageSnapshot = Object.freeze({ ...(runtime.boss.damages ?? {}) });
+        runtime.state = 'quick-claimable';
+        corpse.items = [];
         corpse.no_alloc = true;
-        corpse.clear_items = clear_items.bind(this);
-        corpse.query_items = query_items.bind(this);
-        corpse.query_damage = query_damage.bind(this);
+        corpse.query_items = (me: USER) => this.queryCorpseReward(me, runtime);
+        corpse.clear_items = (me: USER, notTaken?: OBJ[]) => {
+            if (notTaken?.length) return;
+            this.commitReward(me, runtime, 'corpse');
+        };
+        corpse.query_damage = () => this.queryDamage(runtime);
+        EVENTS.add(this.createEvent(runtime));
+        console.log(`[world-boss] defeated batch=${runtime.batchId}`);
+    }
+
+    private queryDamage(runtime: BossRuntime): string {
+        const lines: string[] = [];
+        for (const [userId, damage] of Object.entries(runtime.damageSnapshot ?? {})) {
+            const user = WORLD.getUser(userId);
+            if (!user) continue;
+            const percent = Math.min(100, Math.max(0, (damage * 100) / runtime.boss.max_hp));
+            lines.push(`${user.name}：${damage}==${Math.floor(percent)}%`);
+        }
+        return lines.join('\n');
+    }
+
+    private recordQuickClaimUnlocks(runtime: BossRuntime): void {
+        if (runtime.state !== 'active') return;
+        for (const [userId, damage] of Object.entries(runtime.boss.damages ?? {})) {
+            if (damage < runtime.boss.max_hp * 0.1) continue;
+            const user = WORLD.getUser(userId);
+            if (!user) continue;
+            if (!user.query_bool(UNLOCK_BITS_KEY, runtime.template.bit)) {
+                user.set_bool(UNLOCK_BITS_KEY, runtime.template.bit, true);
+            }
+        }
+    }
+
+    private queryCorpseReward(me: USER, runtime: BossRuntime): OBJ[] | undefined {
+        const result = this.prepareReward(me, runtime);
+        if (typeof result === 'string') {
+            me.notify(result);
+            return;
+        }
+        return result.items;
+    }
+
+    private prepareReward(
+        me: USER,
+        runtime: BossRuntime,
+    ): BossPlayerReward | string {
+        if (runtime.state === 'cleaned') return '该场世界BOSS奖励已经失效。';
+        if (!canChallengeBoss(me, runtime.grade)) return '你的等级不符合这场世界BOSS活动。';
+        const existing = runtime.rewards.get(me.id);
+        if (existing?.state === 'claimed') return '你已经领取过该场世界BOSS奖励。';
+        if (existing) return existing;
+        const damage = runtime.damageSnapshot?.[me.id] ?? runtime.boss.damages?.[me.id] ?? 0;
+        if (!(damage > 1)) return '你没有对该世界BOSS造成有效伤害。';
+        const damagePercent = Math.min(1, Math.max(0, damage / runtime.boss.max_hp));
+        const countsDaily = damagePercent >= 0.01;
+        if (countsDaily && me.query_temp<number>('bcc', 0) >= DAILY_LIMIT)
+            return '你今日的BOSS挑战次数已满。';
+
+        const items = countsDaily
+            ? this.createFullReward(runtime, damagePercent)
+            : [OBJ.CREATE('money/silver', 1 + this.random(10))].filter(Boolean);
+        if (!items.length) return '奖励生成失败，请稍后重试。';
+        const reward: BossPlayerReward = {
+            state: 'generated',
+            damage,
+            damagePercent,
+            countsDaily,
+            items,
+        };
+        runtime.rewards.set(me.id, reward);
+        return reward;
+    }
+
+    private createFullReward(runtime: BossRuntime, damagePercent: number): OBJ[] {
+        const templateDrops = OBJ.create_by_odds(runtime.boss.drop_list ?? []);
+        const difficultyBonus = Math.max(0, runtime.template.difficulty - 20);
+        const baseDrops: OddsEntry[] = [
+            { obj: 'st/xuanjing', min: 1, max: 10 },
+            {
+                obj: BOSS_STONES,
+                odds: Math.min(10000, 5000 + difficultyBonus * 10 + damagePercent * 10000),
+            },
+        ];
+        const items = [...templateDrops, ...OBJ.create_by_odds(baseDrops)];
+        const tool = this.createToolReward(runtime.template.toolGrade);
+        if (tool) items.push(tool);
+        return items.filter(Boolean);
+    }
+
+    private createToolReward(toolGrade: 1 | 2 | 3 | 4 | 5): OBJ | undefined {
+        let selectedGrade = 0;
+        for (let grade = toolGrade; grade >= 1; grade--) {
+            const odds = grade === toolGrade ? TOOL_ODDS[grade] : Math.min(10000, TOOL_ODDS[grade] * 2);
+            if (Math.random() * 10000 < odds) {
+                selectedGrade = grade;
+                break;
+            }
+        }
+        if (!selectedGrade) return;
+        const path = TOOL_PATHS[this.random(TOOL_PATHS.length)];
+        return OBJ.CREATE(`${path}#${selectedGrade}`);
+    }
+
+    private claimBossReward(me: USER, runtime: BossRuntime, source: 'event'): void {
+        if (runtime.state !== 'quick-claimable') {
+            me.notify('当前没有可以领取的世界BOSS奖励。');
+            return;
+        }
+        if (me.query_temp<number>('bcc', 0) >= DAILY_LIMIT) {
+            me.notify('你今日的BOSS奖励领取次数已满。');
+            return;
+        }
+        const damage = runtime.damageSnapshot?.[me.id] ?? 0;
+        const unlockedByThisBatch = damage >= runtime.boss.max_hp * 0.1;
+        if (!me.query_bool(UNLOCK_BITS_KEY, runtime.template.bit) && !unlockedByThisBatch) {
+            me.notify('你尚未解锁该世界BOSS的领取奖励功能。');
+            return;
+        }
+        if (unlockedByThisBatch && !me.query_bool(UNLOCK_BITS_KEY, runtime.template.bit)) {
+            me.set_bool(UNLOCK_BITS_KEY, runtime.template.bit, true);
+        }
+        const damagePercent = Math.max(
+            0.01,
+            Math.min(1, Math.max(0, damage / runtime.boss.max_hp)),
+        );
+        const items = this.createFullReward(runtime, damagePercent);
+        if (!items.length) {
+            me.notify('奖励生成失败，请稍后重试。');
+            return;
+        }
+        if (me.is_full(items.length)) {
+            me.notify('你身上没有足够的空间存放本次奖励。');
+            return;
+        }
+        for (const item of items) {
+            if (!me.add_obj(item)) {
+                me.notify('奖励发放失败，请整理背包后重试。');
+                return;
+            }
+        }
+        me.add_temp('bcc', 1, UTIL.diff_time());
+        me.notify('你领取了本次世界BOSS奖励。');
+        console.log(
+            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${damage}`,
+        );
+    }
+
+    private commitReward(me: USER, runtime: BossRuntime, source: ClaimSource): void {
+        const reward = runtime.rewards.get(me.id);
+        if (!reward || reward.state === 'claimed') return;
+        reward.state = 'claimed';
+        reward.claimedAt = Date.now();
+        reward.source = source;
+        reward.items = [];
+        if (reward.countsDaily) me.add_temp('bcc', 1, UTIL.diff_time());
+        me.notify('你领取了本次世界BOSS奖励。');
+        console.log(
+            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${reward.damage}`,
+        );
+    }
+
+    private cleanupRuntime(runtime: BossRuntime, reason: string): void {
+        if (runtime.state === 'cleaned') return;
+        runtime.state = 'cleaned';
+        if (runtime.boss.environment) {
+            runtime.boss.end_fight();
+            runtime.boss.destroy('$N离开了。');
+        }
+        runtime.rewards.clear();
+        console.log(`[world-boss] cleaned batch=${runtime.batchId} reason=${reason}`);
     }
 }
 
 export default BossTask;
-
-const BOSSTASK = TASK.GET('boss');
-const BOSS_LEVELS = ['', '武士', '武师', '宗师', '武圣', '武帝', '武神'];
-
-function create_finish_event(boss: NPC) {
-    return {
-        id: boss.event_id ?? '',
-        name: BOSS_LEVELS[boss.level] + 'BOSS挑战',
-        desc: boss.name + '被击败了，解锁快速领取可直接领取基础掉落，并增加一次参与次数',
-        time: BOSSTASK?.next_time?.getTime() ?? 0,
-        grade: boss.level,
-        command: '领取',
-        check: (me: USER) => me.level === boss.level,
-        on_command: (me: USER) => {
-            BOSSTASK?.boss_auto_drops?.(me, boss, '');
-        },
-    };
-}
-
-function query_damage(this: NPC) {
-    const str: string[] = [];
-    for (let key in this.damages) {
-        const user = WORLD.getUser(key);
-        if (user) {
-            str.push(user.name);
-            str.push('：');
-            str.push(this.damages[key].toString());
-            str.push('==');
-            str.push(int((this.damages[key] * 100) / this.max_hp).toString());
-            str.push('%\n');
-        }
-    }
-    return str.join('');
-}
-
-const BOSS_DROPS = {
-    lv1_0: ['st/st_red#0', 'st/st_gre#0', 'st/st_blu#0', 'st/st_yel#0'],
-};
-
-function query_items(this: NPC, me: USER) {
-    if (!this.damages) return;
-
-    let sh = this.damages[me.id];
-    if (!(sh > 1)) return;
-    if (!this.user_items) this.user_items = {};
-    if (this.user_items[me.id]) return this.user_items[me.id];
-    if (me.query_temp('bcc', 0) >= 5) return;
-
-    sh = int((sh * 100) / this.max_hp);
-    if (sh < 1) {
-        this.user_items[me.id] = [OBJ.CREATE('money/silver', 1 + me.random(10))];
-        return this.user_items[me.id];
-    }
-    if (sh > 100) sh = 80;
-    let lv = this.diff_level! - 20;
-    if (lv < 0) lv = 0;
-
-    const drops = [
-        {
-            obj: 'st/xuanjing',
-            min: 1,
-            max: 10,
-        },
-        {
-            obj: BOSS_DROPS.lv1_0,
-            odds: 5000 + lv * 10 + sh * 10,
-        },
-    ];
-
-    me.add_temp('bcc', 1, UTIL.diff_time());
-    const items = OBJ.create_by_odds(drops);
-    this.user_items[me.id] = items;
-    return items;
-}
-
-function clear_items(this: NPC, me: USER) {
-    if (this.user_items) {
-        const items = this.user_items[me.id];
-        if (items) items.length = 0;
-    }
-}
