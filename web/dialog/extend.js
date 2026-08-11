@@ -1,6 +1,7 @@
 import Util from '../utils/util.js';
 import {ReceiveMessage} from '../client.js';
 import Combat from '../combat.js';
+import SCRIPT from '../script.js';
 
 export default {
     types: [
@@ -36,10 +37,11 @@ export default {
         html.push("</div>");
         this.append_edit(html);
         elem.html(html.join(""));
-        elem.on('click', '[ecmd]', this.onButtonClick);
-        elem.on('click', '.setting-item', this.onClickRow);
-        elem.on("click", ".switch", this.switchClick);
-        elem.on("change", "select", this.selectChanged);
+        elem.off('.extend');
+        elem.on('click.extend', '[ecmd]', this.onButtonClick);
+        elem.on('click.extend', '.setting-item', this.onClickRow);
+        elem.on('click.extend', '.switch', this.switchClick);
+        elem.on('change.extend', 'select', this.selectChanged);
         this.edit_elem = this.element.find('.extend-add');
         this.list_elem = this.element.find('.extend-list');
     },
@@ -47,6 +49,8 @@ export default {
         let html = [];
         this.append_settings(html);
         this.list_elem.html(html.join(""));
+        this.selected_item = null;
+        if (this.edit_button) this.edit_button.remove();
     },
     append_settings: function (html) {
         let items = this.setting, index = 0;
@@ -131,8 +135,7 @@ export default {
         }
         if (!is_open) {
             if (is_selected) {
-                Dialog.close();
-                Dialog.extend.start_record();
+                if (Dialog.extend.start_record() !== false) Dialog.close();
             } else {
                 Dialog.extend.stop_record();
             }
@@ -152,12 +155,57 @@ export default {
         return false;
     },
     start_record: function () {
-        if (this.is_record) return;
+        if (this.is_record) return false;
+        const editor = this.capture_editor();
+        if (!editor) return false;
+        this.record_editor = content => ({
+            sid: editor.sid,
+            values: {...editor.values, content}
+        });
         this.is_record = true;
         this.prev_time = 0;
         this.record_cmds = [];
         ReceiveMessage('<hic>开始记录你的操作命令。</hic>');
         Process.state({state: "正在记录你的操作命令"});
+        return true;
+    },
+    capture_editor: function () {
+        if (!this.edit_elem || !this.edit_elem.length) return null;
+        const values = {};
+        this.edit_elem.find('input, textarea, select').each(function () {
+            values[this.getAttribute('prop')] = this.value;
+        });
+        return {
+            sid: this.edit_elem.attr('sid') || '-1',
+            values
+        };
+    },
+    restore_editor: function (editor) {
+        if (!editor) return;
+        if (!(Dialog.isShow && Dialog.curItem === 'setting')) {
+            Dialog.show('setting');
+        }
+        Dialog.setting.footerChanged("extend");
+        // Rebuild the editor from the captured data instead of relying on the
+        // DOM that was hidden when recording started.
+        this.init(this.element);
+        this.edit_elem.attr('sid', editor.sid);
+        const elems = this.edit_elem.find('input, textarea, select');
+        for (const elem of elems) {
+            const prop = elem.getAttribute('prop');
+            if (prop === 'type') {
+                $(elem).val(editor.values[prop] || '').change();
+            }
+        }
+        for (const elem of elems) {
+            const prop = elem.getAttribute('prop');
+            if (prop === 'type') continue;
+            const value = editor.values[prop] ?? '';
+            $(elem).val(value);
+            if (elem.tagName === 'SELECT') $(elem).change();
+        }
+        this.edit_elem.show();
+        this.list_elem.css('display', '').addClass('hide');
     },
     excluded: {
         score: true, score2: true, score3: true, pack: true, cha: true, tasks: true,
@@ -186,25 +234,15 @@ export default {
         if (!this.is_record) return;
         this.is_record = false;
         ReceiveMessage('<cyn>已停止记录你的操作命令。</cyn>');
-        this.edit_elem.find('.switch').removeClass('on');
+        if (this.edit_elem) this.edit_elem.find('.switch').removeClass('on');
         // Always leave the recording state, even when no command was captured.
         // Otherwise Process.state remains stuck at "正在记录..." indefinitely.
         Process.state();
-        if (this.record_cmds.length > 0) {
-            // Dialog.show toggles an already-open dialog closed.  When recording
-            // was stopped from the settings dialog, that toggle discarded the
-            // destination page and left the editor inaccessible.
-            if (!(Dialog.isShow && Dialog.curItem === 'setting')) {
-                Dialog.show('setting');
-            }
-            Dialog.setting.footerChanged("extend");
-            this.edit_elem.show();
-            // Keep visibility class-based so the save flow can restore the list.
-            this.list_elem.css('display', '').addClass('hide');
-            this.edit_elem.find('textarea').val(this.record_cmds.join(";"));
-        }
+        const rebuildEditor = this.record_editor;
+        this.record_editor = null;
+        if (!rebuildEditor) return;
+        this.restore_editor(rebuildEditor(this.record_cmds.join(";")));
     },
-    helper: "<li ecmd='show_actions'>可用命令参考</li><li ecmd='show_vars'>可用变量参考</li><li ecmd='show_paras'>参数用法参考</li>",
     append_edit: function (html) {
         html.push('<div class="extend-add" style="display:none">');
         html.push('<div class="extend-row">');
@@ -237,9 +275,9 @@ export default {
         html.push('<textarea   prop="content"  class="extend-input"></textarea>');
         html.push("<div class='extend-row-header extend-menus'>");
         html.push('<span class="switch"> <span class="switch-button"> </span><span class="switch-text">开始记录</span></span>');
-        html.push("<ul class='extend-help'>");
-        html.push(this.helper);
-        html.push("</ul><button ecmd='save'>保存</button>");
+        html.push("<button type='button' ecmd='help'>扩展帮助</button>");
+        html.push("<div class='extend-help'></div>");
+        html.push("<button type='button' ecmd='save'>保存</button>");
 
         html.push("</div></div>");
 
@@ -286,7 +324,10 @@ export default {
                 reader.onload = function (event) {
                     try {
                         const jsonObj = JSON.parse(event.target.result);
-                        Dialog.extend.setting = jsonObj.items;
+                        if (!jsonObj || !Array.isArray(jsonObj.items)) {
+                            throw new Error("扩展文件格式无效");
+                        }
+                        Dialog.extend.setting = Dialog.extend.normalize_settings(jsonObj.items);
                         Dialog.extend.refresh_list();
                         Dialog.extend.save_extend();
                         ReceiveMessage("<cyn>扩展文件加载成功。</cyn>");
@@ -336,6 +377,7 @@ export default {
         }
     },
     hide: function () {
+        this.close_help();
         if (this.is_record) {
             this.stop_record();
         }
@@ -348,7 +390,7 @@ export default {
         }
         this.footer_buttons.remove();
     }, close: function () {
-
+        this.close_help();
     },
     default_extend: [
         {
@@ -379,9 +421,15 @@ export default {
         }
     ],
     init_extend: function () {
-        if (!this.setting)
-            this.setting = Util.storage.getItem('extends') ?? this.default_extend;
+        if (!this.setting) {
+            const stored = Util.storage.getItem('extends');
+            this.setting = this.normalize_settings(stored || this.default_extend);
+        }
         this.init_extend_group();
+    },
+    normalize_settings: function (settings) {
+        if (!Array.isArray(settings)) return [];
+        return settings.filter(item => item && typeof item === "object").map(item => ({...item}));
     },
     init_extend_group: function () {
         this.groups = {};
@@ -409,7 +457,7 @@ export default {
             name: item.name,
             extend: true,
             check: this.regex[item.for] ?
-                this.match(item.paras) : this.condtion(item.paras),
+                this.match(item.paras) : this.condition(item.paras),
             cmd: cmd
         });
     },
@@ -422,8 +470,8 @@ export default {
             return null;
         }
     },
-    exp_reg: /(\w+)\((>=|<=|!=|>|<)?(.+?)\)/g,
-    condtion: function (paras) {
+    exp_reg: /(\w+)\((>=|<=|!=|=|>|<)?(.+?)\)/g,
+    condition: function (paras) {
         if (!paras) return null;
         let match = null;
         let funcs = [];
@@ -444,19 +492,28 @@ export default {
             }
         }
         return funcs.length > 0 ? funcs : null;
-    }, express: {
+    },
+    // Keep the old misspelled method for extensions that call it directly.
+    condtion: function (paras) {
+        return this.condition(paras);
+    },
+    express: {
         ">=": function (prop, value, obj) {
-            return obj[prop] >= parseInt(value);
+            return obj[prop] >= parseInt(value, 10);
         }, ">": function (prop, value, obj) {
-            return obj[prop] > parseInt(value);
+            return obj[prop] > parseInt(value, 10);
         }, "<": function (prop, value, obj) {
-            return obj[prop] < parseInt(value);
+            return obj[prop] < parseInt(value, 10);
         }, "<=": function (prop, value, obj) {
-            return obj[prop] <= parseInt(value);
+            return obj[prop] <= parseInt(value, 10);
         }, "=": function (prop, value, obj) {
-            return obj[prop] = parseInt(value);
+            const actual = obj[prop];
+            const expected = typeof actual === "number" ? parseInt(value, 10) : value;
+            return actual === expected;
         }, "!=": function (prop, value, obj) {
-            return obj[prop] != parseInt(value);
+            const actual = obj[prop];
+            const expected = typeof actual === "number" ? parseInt(value, 10) : value;
+            return actual !== expected;
         },
         match: function (regex, text) {
             let result = regex.exec(text);
@@ -472,7 +529,7 @@ export default {
         def: function (prop, value, obj) {
             let str = obj[prop];
             if (typeof str === 'number')
-                return str === parseInt(value);
+                return str === parseInt(value, 10);
             else if (typeof str === 'boolean')
                 return str && str.toString() === value;
             return str && str.indexOf(value) > -1;
@@ -578,7 +635,9 @@ export default {
 
     },
     cmd_save: function () {
-        let index = parseInt(this.edit_elem.attr('sid'));
+        const rawIndex = Number(this.edit_elem.attr('sid'));
+        const index = Number.isInteger(rawIndex) && rawIndex >= 0 && rawIndex < this.setting.length
+            ? rawIndex : -1;
 
         let elems = this.edit_elem.find('input, textarea, select');
         let item = {};
@@ -592,7 +651,7 @@ export default {
             if (Dialog.extend.regex[item.for]) {
                 item.check = this.match(item.paras);
             } else {
-                item.check = this.condtion(item.paras);
+                item.check = this.condition(item.paras);
             }
             if (!item.check) return this.show_error('paras');
         }
@@ -612,7 +671,8 @@ export default {
     }, cmd_remove: function () {
         let item = this.selected_item;
         if (!item) return;
-        this.setting.Remove(item);
+        const index = this.setting.indexOf(item);
+        if (index >= 0) this.setting.splice(index, 1);
         this.selected_item = null;
         this.edit_button && this.edit_button.remove();
         this.refresh_list();
@@ -628,18 +688,52 @@ export default {
             input.removeClass('error-shake');
             elem.removeClass('error-shake');
         }, 1500);
-    }, cmd_show: function (elem, t) {
-        let infos = SCRIPT.helper[t];
-        if (!infos) return;
+    }, render_helper: function () {
         let html = [];
-        for (let i = 0; i < infos.length; i++) {
-            html.push('<li>', infos[i], '</li>');
+        const sections = [
+            ['命令参考', 'actions'],
+            ['变量参考', 'vars'],
+            ['条件参数', 'paras']
+        ];
+        for (const [title, key] of sections) {
+            html.push('<div class="fb-action"><span class="action-desc"><ul>');
+            for (const info of SCRIPT.helper[key] || []) {
+                html.push('<li>', info, '</li>');
+            }
+            html.push('</ul></span><span class="action-name">', title, '</span></div>');
         }
-        let ul = elem.parent();
-        ul.html(html.join(""));
-        ul.next().html('返回').attr('ecmd', 'return');
-    },
-    cmd_return: function (elem) {
-        elem.html('保存').attr('ecmd', 'save').prev().html(this.helper);
+        return html.join('');
+    }, cmd_help: function () {
+        this.close_help();
+        const overlay = document.createElement('div');
+        overlay.className = 'float-dialog-overlay';
+        const help = document.createElement('div');
+        help.className = 'float-dialog-unified';
+        const container = document.querySelector('.container');
+        if (container) help.style.fontSize = getComputedStyle(container).fontSize;
+        help.innerHTML = '<div class="unified-header">' +
+            '<span class="unified-title">扩展使用帮助</span>' +
+            '<span class="unified-close glyphicon glyphicon-remove-circle"></span>' +
+            '</div><div class="fb-actions">' + this.render_helper() + '</div>' +
+            '<div class="unified-fade"></div>';
+        const close = () => this.close_help();
+        overlay.addEventListener('click', close);
+        help.querySelector('.unified-close').addEventListener('click', close);
+        const fade = help.querySelector('.unified-fade');
+        const updateFade = () => {
+            const atBottom = help.scrollTop + help.clientHeight >= help.scrollHeight - 6;
+            fade.style.opacity = atBottom ? '0' : '1';
+        };
+        help.addEventListener('scroll', updateFade);
+        document.body.appendChild(overlay);
+        document.body.appendChild(help);
+        this.help_overlay = overlay;
+        this.help_window = help;
+        requestAnimationFrame(updateFade);
+    }, close_help: function () {
+        if (this.help_overlay) this.help_overlay.remove();
+        if (this.help_window) this.help_window.remove();
+        this.help_overlay = null;
+        this.help_window = null;
     }
 };

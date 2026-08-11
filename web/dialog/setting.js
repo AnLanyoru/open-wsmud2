@@ -3,6 +3,7 @@ import Setting from '../setting.js';
 import {GameClient, hide2show, ReceiveMessage} from '../client.js';
 
 export default {
+    transactionalFooter: true,
     footer: [["显示", "setting"], ["<yel>高级</yel>", "custom"]
         , ["快捷键", "keys"], ["扩展", "extend"]
     ],
@@ -127,12 +128,22 @@ export default {
         }
     },
     footerChanged: function (item) {
-
         let elem = this[item + "Element"];
-        if (!elem || elem === this.selectitem) return this.child?.command(item);
+        if (!elem || elem === this.selectitem) {
+            const result = this.child?.command(item);
+            this.select_footer(this.selected_footer);
+            return result;
+        }
+        // A child page may consume the first navigation attempt to leave its
+        // own edit state. Keep the current page reference intact in that case,
+        // otherwise later footer commands are dispatched to the wrong page.
+        if (this.child && this.child.hide() === false) {
+            this.select_footer(this.selected_footer);
+            return false;
+        }
         this.selectitem && this.selectitem.remove();
         this.selectitem = elem;
-        if (this.child && this.child.hide() === false) return;
+        this.selected_footer = item;
         this.child = null;
 
         if (item == "setting") {
@@ -147,6 +158,12 @@ export default {
             this.child.show(this.selectitem);
         }
         this.selectitem.appendTo(Dialog.contentElement);
+        this.select_footer(item);
+        return true;
+    }, select_footer: function (item) {
+        if (!Dialog.footerElement || !item) return;
+        Dialog.footerElement.find(".footer-item.select").removeClass("select");
+        Dialog.footerElement.find(".footer-item[for='" + item + "']").addClass("select");
     }, helpClick: function () {
         var elem = $(this);
         var act = elem.attr("action");
@@ -185,6 +202,7 @@ export default {
         this.selectitem?.remove();
         this.isShow = false;
         this.selectitem = null;
+        this.selected_footer = null;
         this.child = null;
     }
     , save_custom: function () {
@@ -1095,10 +1113,20 @@ const setting_css = `
 }
 
 .extend-list>.buttons>button {
-    margin: 0.5em;
-    color: var(--text-muted);
-    background-color: var(--bg-surface);
+    margin: 0.5em 0.25em;
+    padding: 0 0.9em;
+    border: 1px solid var(--btn-border);
+    border-radius: 0.25em;
+    color: var(--btn-color);
+    background-color: var(--btn-bg);
+    font: inherit;
     line-height: 2em;
+    cursor: pointer;
+}
+
+.extend-list>.buttons>button:active {
+    color: var(--btn-bg);
+    background-color: var(--btn-border);
 }
 
 
@@ -1191,9 +1219,30 @@ const setting_css = `
 }
 
 .extend-menus>button {
-    margin: 1em 0px;
-    color: var(--text-muted);
-    background-color: var(--bg-surface);
+    min-height: 2.25em;
+    margin: 1em 0.5em;
+    padding: 0.25em 0.5em;
+    border: 1px solid var(--btn-border);
+    border-radius: 0.25em;
+    color: var(--btn-color);
+    background-color: var(--btn-bg);
+    font: inherit;
+    cursor: pointer;
+}
+
+.extend-menus>button:active {
+    color: var(--btn-bg);
+    background-color: var(--btn-border);
+}
+
+.extend-menus>button[ecmd='save'] {
+    border-color: var(--dialog-highlight);
+    color: var(--dialog-highlight);
+}
+
+.extend-menus>button[ecmd='save']:active {
+    color: var(--bg-surface);
+    background-color: var(--dialog-highlight);
 }
 
 .skey-item {

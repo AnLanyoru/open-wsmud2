@@ -154,9 +154,13 @@ const Dialog = {
         var elem = $(this);
         if (elem.is(".select")) return;
         var cmd = elem.attr("for");
+        const dialog = Dialog[Dialog.curItem];
+        if (dialog.transactionalFooter) {
+            return dialog.footerChanged(cmd, elem);
+        }
         elem.parent().find(".footer-item.select").removeClass("select");
         elem.addClass("select");
-        Dialog[Dialog.curItem].footerChanged(cmd, elem);
+        dialog.footerChanged(cmd, elem);
     },
     title: function (title) {
         Dialog.titleElement.html(title);
