@@ -1,4 +1,5 @@
 import { TASK } from '../../core/task/task.js';
+import { COMMAND } from '../../core/command.js';
 import { WORLD } from '../../core/world.js';
 import { OBJ, type OddsEntry } from '../../core/item/obj.js';
 import { UTIL } from '../../core/util/util.js';
@@ -358,12 +359,12 @@ class BossTask extends TASK {
         const isActive = runtime.state === 'active';
         const desc = isActive
             ? `听说${runtime.boss.name}出现在${runtime.room.long_name()}一带，你可以前往尝试挑战，根据造成的伤害获得奖励。`
-            : `${runtime.boss.name}已被击败。你可以领取本批次奖励，每日最多领取${DAILY_LIMIT}次。`;
+            : `${runtime.boss.name}被击败了，解锁快速领取可直接领取基础掉落，并增加一次参与次数。`;
         return {
             id: runtime.eventId,
             name: `${BOSS_LEVELS[runtime.grade]}BOSS挑战`,
             desc,
-            time: 0,
+            time: this.next_time?.getTime() ?? 0,
             grade: runtime.grade,
             command: isActive ? '前往挑战' : '领取奖励',
             check: (me: USER) => canChallengeBoss(me, runtime.grade),
@@ -378,8 +379,20 @@ class BossTask extends TASK {
                     return;
                 }
                 if (runtime.state === 'active') return this.teleportToBoss(me, runtime);
+                if (me.query_temp<number>('bcc', 0) >= DAILY_LIMIT) {
+                    me.notify(`<hiy>你今日的BOSS奖励领取次数已满（${DAILY_LIMIT}/${DAILY_LIMIT}）。</hiy>`);
+                    return;
+                }
+                const damage = runtime.damageSnapshot?.[me.id] ?? 0;
+                const unlockedByThisBatch = damage >= runtime.boss.max_hp * 0.1;
+                if (!me.query_bool(UNLOCK_BITS_KEY, runtime.template.bit) && !unlockedByThisBatch) {
+                    me.notify('<hiy>你尚未解锁该世界BOSS的领取奖励功能。</hiy>');
+                    return;
+                }
                 if (confirmation !== 'ok') {
-                    me.notify(`是否确认领取${runtime.boss.name}的奖励？每日最多领取${DAILY_LIMIT}次。`);
+                    me.notify(
+                        `<hiy>是否确认领取${runtime.boss.name}的奖励？每日最多领取${DAILY_LIMIT}次。</hiy>`,
+                    );
                     me.send_commands(`events ${runtime.eventId} ok`, '确认领取');
                     return;
                 }
@@ -514,7 +527,7 @@ class BossTask extends TASK {
             return;
         }
         if (me.query_temp<number>('bcc', 0) >= DAILY_LIMIT) {
-            me.notify('你今日的BOSS奖励领取次数已满。');
+            me.notify(`<hiy>你今日的BOSS奖励领取次数已满（${DAILY_LIMIT}/${DAILY_LIMIT}）。</hiy>`);
             return;
         }
         const damage = runtime.damageSnapshot?.[me.id] ?? 0;
@@ -550,13 +563,7 @@ class BossTask extends TASK {
             else me.notify('你获得了' + itemName + '。');
         }
         if (money) me.notify('你获得了' + UTIL.moneyToStr(money) + '。');
-        me.add_temp('bcc', 1, UTIL.diff_time());
-        me.notify(
-            `世界BOSS快速完成，今日已完成${me.query_temp<number>('bcc', 0)}/${DAILY_LIMIT}。`,
-        );
-        console.log(
-            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${damage}`,
-        );
+        this.completeClaim(me, runtime, 'event', damage, true, true);
     }
 
     private commitReward(me: USER, runtime: BossRuntime, source: ClaimSource): void {
@@ -566,10 +573,29 @@ class BossTask extends TASK {
         reward.claimedAt = Date.now();
         reward.source = source;
         reward.items = [];
-        if (reward.countsDaily) me.add_temp('bcc', 1, UTIL.diff_time());
-        me.notify('你领取了本次世界BOSS奖励。');
+        this.completeClaim(me, runtime, source, reward.damage, reward.countsDaily, false);
+    }
+
+    /** 统一处理成功领取后的次数、提示、全服播报和日志。 */
+    private completeClaim(
+        me: USER,
+        runtime: BossRuntime,
+        source: ClaimSource,
+        damage: number,
+        countsDaily: boolean,
+        quickClaim: boolean,
+    ): void {
+        if (countsDaily) me.add_temp('bcc', 1, UTIL.diff_time());
+        if (quickClaim) {
+            me.notify(
+                `<hiy>世界BOSS快速完成，今日已完成${me.query_temp<number>('bcc', 0)}/${DAILY_LIMIT}。</hiy>`,
+            );
+        } else {
+            me.notify('你领取了本次世界BOSS奖励。');
+        }
+        COMMAND.DO('rumor', `${me.name}领取了${runtime.boss.name}的世界BOSS奖励。`);
         console.log(
-            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${reward.damage}`,
+            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${damage}`,
         );
     }
 
