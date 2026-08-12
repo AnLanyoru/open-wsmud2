@@ -12,6 +12,11 @@ export default {
             return Array.isArray(data.items);
         });
     },
+    onBackgroundData: function (data) {
+        if (!Dialog.master.isShow) return false;
+        Dialog.master.onData(data);
+        return true;
+    },
     init: function () {
         if (!this.created)
             Dialog.injectStyle(skills_css);

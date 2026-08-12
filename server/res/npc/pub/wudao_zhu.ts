@@ -18,12 +18,16 @@ export default class extends NPC {
     constructor() {
         super();
         this.set_ask('四方试炼', function (me: CHARACTER) {
+            const record = (type: number) => {
+                const round = Number(me.query_temp('wd_ss_best_' + type, 0));
+                return round > 0 ? '你当前记录为' + round + '息' : '你当前还未挑战';
+            };
             me.notify(
                 '<hig>一息为五秒。四方试炼会逐息增强，同时延长你的绝招冷却并削弱疗伤效果。\n' +
-                    '白虎考验招架与躲闪，每息至少成功防守一次；\n' +
-                    '朱雀考验防御与生存，每息施展破防渐强的六连击；\n' +
-                    '青龙考验命中，每息至少命中一次；\n' +
-                    '玄武考验单次攻击，每息至少突破一次固定免伤。\n' +
+                    '白虎考验招架与躲闪，每息至少成功防守一次；' + record(1) + '。\n' +
+                    '朱雀考验防御与生存，每息施展破防渐强的六连击；' + record(3) + '。\n' +
+                    '青龙考验命中，每息至少命中一次；' + record(0) + '。\n' +
+                    '玄武考验单次攻击，每息至少突破一次固定免伤；' + record(2) + '。\n' +
                     '未完成当息条件，或被神兽击杀，试炼都会结束。</hig>',
             );
         });

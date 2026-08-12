@@ -37,13 +37,17 @@ export default class extends COMMAND {
                 const new_target = WORLD.getUser(from);
                 if (new_target) target = new_target;
             }
-            if (!target) player.send('没有这个人。');
+            if (!target || !target.check_character()) {
+                return player.send('没有这个人。');
+            }
             if (
-                player.user_level < 1 &&
-                !target.is(player.query_temp('master')) &&
-                target.master !== player.id
+                target.master !== player.id &&
+                player.user_level < 4 &&
+                !target.is(player.query_temp('master'))
             ) {
-                if (!target.on_checkskill || !target.on_checkskill(player)) {
+                if (target.on_checkskill) {
+                    if (target.on_checkskill(player) === false) return;
+                } else {
                     return player.notify('你只能查看自己师父的技能。');
                 }
             }
