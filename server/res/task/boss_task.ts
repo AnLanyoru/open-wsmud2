@@ -286,9 +286,6 @@ class BossTask extends TASK {
         usedRooms.add(room.path);
         this.runtimes.set(grade, runtime);
         EVENTS.add(this.createEvent(runtime));
-        console.log(
-            `[world-boss] spawned batch=${runtime.batchId} grade=${grade} template=${template.id} room=${room.path}`,
-        );
         return runtime;
     }
 
@@ -425,7 +422,6 @@ class BossTask extends TASK {
         };
         corpse.query_damage = () => this.queryDamage(runtime);
         EVENTS.add(this.createEvent(runtime));
-        console.log(`[world-boss] defeated batch=${runtime.batchId}`);
     }
 
     private queryDamage(runtime: BossRuntime): string {
@@ -594,9 +590,6 @@ class BossTask extends TASK {
             me.notify('你领取了本次世界BOSS奖励。');
         }
         COMMAND.DO('rumor', `${me.name}领取了${runtime.boss.name}的世界BOSS奖励。`);
-        console.log(
-            `[world-boss] claimed batch=${runtime.batchId} user=${me.id} source=${source} damage=${damage}`,
-        );
     }
 
     private cleanupRuntime(runtime: BossRuntime, reason: string): void {
@@ -607,7 +600,6 @@ class BossTask extends TASK {
             runtime.boss.destroy('$N离开了。');
         }
         runtime.rewards.clear();
-        console.log(`[world-boss] cleaned batch=${runtime.batchId} reason=${reason}`);
     }
 }
 
