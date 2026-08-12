@@ -265,7 +265,6 @@ export default class extends ROOM {
 | `on_heart_beat(dt)` | `(dt: number) => void` | 房间每帧心跳回调 |
 | `on_login(user)` | `(user: USER) => void` | 玩家登录后在此房间时回调 |
 | `on_create()` | `() => void` | 房间创建时回调 |
-| `on_set_difficulty(type)` | `(type: number) => void` | 副本设置难度时回调。可用于调整 NPC 强度 |
 
 ### 4.4 房间可用方法
 
@@ -461,6 +460,8 @@ export default class extends AREA {
 | 普通 | `diff = 0` | 单人进入 | 基础难度 |
 | 困难 | `diff = 1` | 单人进入，需 `is_diffi = true` | 更高奖励 |
 | 组队 | `diff = 2` | 组队进入，需 `is_multi = true` | 多人协作 |
+
+进入副本后，所选模式统一保存在入口克隆的共享临时标记 `diff` 中。资源里的初始化、玩家交互、路线和奖励判断都应调用 `fb_query_temp('diff', me, 0)`；不要另存 `difficulty` 字段或建立副本专用的重复难度键。
 
 ### 7.4 解锁机制
 

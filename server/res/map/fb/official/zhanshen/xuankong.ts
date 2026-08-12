@@ -19,8 +19,9 @@ export default class extends ROOM {
         if (dir === 'north' && this.is_here('fb/zhanshen/chiyou')) return me.notify_fail('蚩尤以凶兵封住登天之路。');
     }
 
-    on_set_difficulty = (type: number) => {
-        if (type !== 1) return;
+    on_enter(me: USER) {
+        if (!me.is_player || this.fb_query_temp('diff', me, 0) !== 1 || this.query_temp('hard_initialized', false)) return;
+        this.set_temp('hard_initialized', true);
         const chiyou = this.find_by_path('fb/zhanshen/chiyou') as NPC | undefined;
         if (!chiyou) return;
         chiyou.name = '兵主蚩尤';
@@ -28,5 +29,5 @@ export default class extends ROOM {
         chiyou.hp = chiyou.max_hp;
         chiyou.max_mp *= 2;
         chiyou.mp = chiyou.max_mp;
-    };
+    }
 }

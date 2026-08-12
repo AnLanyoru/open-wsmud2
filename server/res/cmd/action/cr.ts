@@ -262,7 +262,6 @@ function fb_start(me, path) {
         if (!next_room) {
             return me.notify('副本创建失败。');
         }
-        next_room.fb_set_temp('diff', diff_type, me);
         if (me.team) {
             next_room.fb_set_temp(me.id, 1, me);
             for (var i = 0; i < me.team.length; i++) {

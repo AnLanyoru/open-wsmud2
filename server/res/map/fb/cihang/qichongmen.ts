@@ -8,7 +8,6 @@ export default class extends ROOM {
         north: 'fb/cihang/shanyao',
         south: 'fb/cihang/guangchang',
     };
-    difficulty = 0;
 
     constructor() {
         super();
@@ -20,13 +19,10 @@ export default class extends ROOM {
         ]);
     }
 
-    on_set_difficulty = (type: number) => {
-        this.difficulty = type;
-    };
-
     choose(me: USER, route: string) {
-        const allowed = this.difficulty === 1 ? ['jianmo', 'moshi'] : ['langzi', 'guoshi'];
-        if (!allowed.includes(route)) return me.notify(this.difficulty === 1 ? '困难慈航静斋只开放剑魔线与魔师线。' : '普通慈航静斋只开放浪子线与国师线。');
+        const diff = this.fb_query_temp('diff', me, 0);
+        const allowed = diff === 1 ? ['jianmo', 'moshi'] : ['langzi', 'guoshi'];
+        if (!allowed.includes(route)) return me.notify(diff === 1 ? '困难慈航静斋只开放剑魔线与魔师线。' : '普通慈航静斋只开放浪子线与国师线。');
         const chosen = this.fb_query_temp('cihang_route', me, '');
         if (chosen && chosen !== route) return me.notify('你已经选定其他路线，无法中途更换。');
         this.fb_set_temp('cihang_route', route, me);

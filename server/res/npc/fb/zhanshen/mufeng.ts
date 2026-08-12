@@ -26,7 +26,7 @@ export default class extends NPC {
     on_died(killer: USER | undefined, _corpse: CORPSE) {
         if (!killer || !this.die_room) return;
         this.die_room.fb_set_temp('zhanshen_wood', true, killer);
-        if (this.die_room.fb_query_temp('zhanshen_difficulty', killer, 0) === 0) {
+        if (this.die_room.fb_query_temp('diff', killer, 0) === 0) {
             killer.add_fbscore(30, 100);
             killer.notify('<hig>木凤化作一只蕴含神力的鸟窝，你将它穿戴在身上。</hig>');
         } else {

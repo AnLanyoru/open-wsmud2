@@ -214,9 +214,6 @@ export class ROOM extends ITEM {
     }
     /** 房间创建回调 — 触发时机：create() 方法末尾，房间注册到 WORLD.ROOMS 之后 */
     on_create?: () => void;
-    /** 设置难度回调 — 触发时机：副本房间创建副本时调用 set_difficulty(type) */
-    on_set_difficulty?: (type: number) => void;
-
     /** 是否为白天（资源文件注入，用于狼王等 NPC 行为） */
     is_time(): boolean {
         return false;
@@ -1555,23 +1552,23 @@ export class ROOM extends ITEM {
      */
     create_copy(id: string, diff_type: number): ROOM | undefined {
         if (!this.parent) return;
-        this.create_by_area(this.parent, id, diff_type);
-        return this.query_copy(id);
+        this.create_by_area(this.parent, id);
+        const first = this.query_copy(id);
+        first?.set_temp('diff', diff_type);
+        return first;
     }
 
     /**
      * 按区域递归创建副本
      * @param area
      * @param id
-     * @param diff_type
      */
-    create_by_area(area: Record<string, any>, id: string, diff_type?: number): void {
+    create_by_area(area: Record<string, any>, id: string): void {
         if (area.rooms) {
             for (let i = 0; i < area.rooms.length; i++) {
                 const base_room = area.rooms[i];
                 const copy_room = ROOM.CREATE(base_room.path);
                 if (!copy_room) continue;
-                if (diff_type !== undefined) copy_room.set_difficulty(diff_type);
                 if (!base_room.copy_rooms) base_room.copy_rooms = {};
                 base_room.copy_rooms[id] = copy_room;
                 copy_room.owner = id;
@@ -1683,14 +1680,6 @@ export class ROOM extends ITEM {
             }
         }
         return this.public_rooms.random();
-    }
-
-    /**
-     * 设置副本难度
-     * @param type
-     */
-    set_difficulty(type: number): void {
-        this.on_set_difficulty && this.on_set_difficulty(type);
     }
 
     /**

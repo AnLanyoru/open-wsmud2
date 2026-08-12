@@ -26,7 +26,7 @@ export default class extends NPC {
     on_died(killer: USER | undefined, _corpse: CORPSE) {
         if (!killer || !this.die_room) return;
         this.die_room.fb_set_temp('zhanshen_water', true, killer);
-        if (this.die_room.fb_query_temp('zhanshen_difficulty', killer, 0) === 0) {
+        if (this.die_room.fb_query_temp('diff', killer, 0) === 0) {
             killer.add_fbscore(30, 100);
             killer.notify('<hic>魔龙伏诛，地下河水分开一条通往彼岸的道路。</hic>');
         } else {

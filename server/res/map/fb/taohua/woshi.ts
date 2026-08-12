@@ -1,4 +1,5 @@
 import { ROOM } from '../../../../core/room/room.js';
+import type { USER } from '../../../../core/char/user.js';
 
 export default class extends ROOM {
     name = '卧室';
@@ -12,9 +13,10 @@ export default class extends ROOM {
         this.set_npc('fb/taohua/zhoubotong');
     }
 
-    on_set_difficulty = (type: number) => {
-        if (type !== 1) return;
+    on_enter(me: USER) {
+        if (!me.is_player || this.fb_query_temp('diff', me, 0) !== 1 || this.query_temp('hard_initialized', false)) return;
+        this.set_temp('hard_initialized', true);
         const npc = this.find_by_path('fb/taohua/zhoubotong');
         if (npc) npc.destroy();
-    };
+    }
 }

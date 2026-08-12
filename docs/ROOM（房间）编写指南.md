@@ -460,15 +460,7 @@ on_relive?(obj: CHARACTER, is_relive_here: boolean): boolean | void {
 
 **用途：** 初始化每个运行房间都需要的状态。不要在这里重复注册全局事件；房间热更新和副本克隆都会再次调用。
 
-### 6.8 `on_set_difficulty(type)`
-
-**签名：** `on_set_difficulty?: (type: number) => void`
-
-**触发时机：** 副本房间创建副本时调用 `set_difficulty(type)`。
-
-**用途：** 根据难度调整 NPC 强度、掉落等。
-
-### 6.9 `is_time()`
+### 6.8 `is_time()`
 
 **签名：** `is_time(): boolean`
 
@@ -733,13 +725,9 @@ this.refresh(true); // 通知房间内玩家刷新
 
 **返回：** `ROOM | undefined`
 
-#### `set_difficulty(type)`
-
-设置副本难度。触发 `on_set_difficulty` 回调。
-
 #### `fb_query_temp(name, me, def?)`
 
-按 `me.query_teamid()` 查询副本入口克隆上的共享临时数据。
+查询副本入口克隆上的共享临时数据。副本运行期难度统一保存在 `diff` 标记中。
 
 #### `fb_set_temp(name, value, me, time?)`
 

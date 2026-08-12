@@ -22,7 +22,8 @@ export default class extends NPC {
             if (room.is_here('fb/tianlong/kurong')) return;
             if (room.fb_query_temp('tianlong_reinforcements', me, false)) return;
             room.fb_set_temp('tianlong_reinforcements', true, me);
-            const paths = room.query_temp('tianlong_hard')
+            const hard = room.fb_query_temp('diff', me, 0) === 1;
+            const paths = hard
                 ? [
                       'fb/tianlong/benguo',
                       'fb/tianlong/benyin',
@@ -32,7 +33,7 @@ export default class extends NPC {
                       'fb/tianlong/benchen',
                   ]
                 : ['fb/tianlong/benguo', 'fb/tianlong/benyin', 'fb/tianlong/benkong'];
-            const scores = room.query_temp('tianlong_hard')
+            const scores = hard
                 ? [12, 12, 11, 12, 12, 11]
                 : [14, 13, 13];
             paths.forEach((path, index) => {

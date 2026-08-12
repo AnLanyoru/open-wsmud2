@@ -21,7 +21,6 @@ export default class extends ROOM {
         east: 'fb/official/zhanshen/daohuang',
         north: 'fb/official/zhanshen/shijie',
     };
-    difficulty = 0;
 
     constructor() {
         super();
@@ -57,13 +56,8 @@ export default class extends ROOM {
         ]);
     }
 
-    on_set_difficulty = (type: number) => {
-        this.difficulty = type;
-    };
-
     on_enter(me: USER) {
         if (!me.is_player) return;
-        this.fb_set_temp('zhanshen_difficulty', this.difficulty, me);
         if (this.fb_query_temp('zhanshen_guard_wave', me, 0) !== 3 || this.is_here('fb/zhanshen/shouwei')) return;
         for (let i = 0; i < 8; i++) {
             const guard = NPC.CLONE('fb/zhanshen/shouwei');
@@ -76,7 +70,7 @@ export default class extends ROOM {
 
     worship(me: USER) {
         if (!this.canEnter(me)) return;
-        if (this.difficulty !== 1) return me.notify('普通流程无需祭拜战神。');
+        if (this.fb_query_temp('diff', me, 0) !== 1) return me.notify('普通流程无需祭拜战神。');
         if (this.fb_query_temp('zhanshen_worshipped', me, false)) return me.notify('你已经完成祭拜。');
         this.fb_set_temp('zhanshen_worshipped', true, me);
         me.notify('<hio>你诵念“天地不仁，以万物为刍狗”，选择直面自身心魔，战神像随之睁开双眼。</hio>');
@@ -104,7 +98,7 @@ export default class extends ROOM {
 
     dig(me: USER) {
         if (!this.canEnter(me)) return;
-        if (this.difficulty !== 1) return me.notify('普通难度下矿坑被巨石封死。');
+        if (this.fb_query_temp('diff', me, 0) !== 1) return me.notify('普通难度下矿坑被巨石封死。');
         if (!this.fb_query_temp('zhanshen_worshipped', me, false)) return me.notify('祭拜战神后方能感知矿脉中的金行灵气。');
         if (this.fb_query_temp('zhanshen_metal', me, false) || this.is_here('fb/zhanshen/wuxingshou')) return me.notify('矿坑中的金行灵气已经散尽。');
         const beast = NPC.CLONE('fb/zhanshen/wuxingshou');
@@ -118,7 +112,7 @@ export default class extends ROOM {
 
     enterFire(me: USER) {
         if (!this.canEnter(me)) return;
-        if (this.difficulty !== 1) return me.notify('普通难度下融火窟烈焰封路。');
+        if (this.fb_query_temp('diff', me, 0) !== 1) return me.notify('普通难度下融火窟烈焰封路。');
         if (!this.fb_query_temp('zhanshen_worshipped', me, false)) return me.notify('祭拜战神后方能踏入融火窟。');
         if (this.fb_query_temp('zhanshen_fire', me, false) || this.is_here('fb/zhanshen/wuxingshou')) return me.notify('融火窟中的火行灵气已经散尽。');
         const beast = NPC.CLONE('fb/zhanshen/wuxingshou');
@@ -132,7 +126,7 @@ export default class extends ROOM {
 
     inlay(me: USER) {
         if (!this.canEnter(me)) return;
-        if (this.difficulty !== 1) return me.notify('普通难度的五行圆盘没有回应。');
+        if (this.fb_query_temp('diff', me, 0) !== 1) return me.notify('普通难度的五行圆盘没有回应。');
         if (!this.fb_query_temp('zhanshen_worshipped', me, false)) return me.notify('你尚未祭拜战神，圆盘中央土位黯淡无光。');
         if (!this.fb_query_temp('zhanshen_metal', me, false) || !this.fb_query_temp('zhanshen_wood', me, false) || !this.fb_query_temp('zhanshen_water', me, false) || !this.fb_query_temp('zhanshen_fire', me, false)) {
             return me.notify('圆盘仍缺金、木、水、火四枚五行石。');
@@ -144,7 +138,7 @@ export default class extends ROOM {
 
     jumpRiver(me: USER) {
         if (!this.canEnter(me)) return;
-        if (this.difficulty !== 0) return me.notify('困难难度的地下河被五行封印阻断。');
+        if (this.fb_query_temp('diff', me, 0) !== 0) return me.notify('困难难度的地下河被五行封印阻断。');
         if (!this.fb_query_temp('zhanshen_wood', me, false)) return me.notify('没有木凤所化鸟窝护身，无法承受地下河乱流。');
         if (!this.fb_query_temp('zhanshen_water', me, false)) return me.notify('魔龙仍盘踞水底，无法渡河。');
         const room = this.query('fb/official/zhanshen/jiuchongtian');
@@ -152,14 +146,15 @@ export default class extends ROOM {
     }
 
     on_leave(me: USER, dir: string) {
+        const diff = this.fb_query_temp('diff', me, 0);
         if (dir === 'east') {
             if (!this.fb_query_temp('zhanshen_entered', me, false)) return me.notify_fail('你尚未依孤星方位跳入暗道，无法进入真正的战神大殿。');
-            if (this.difficulty === 0) return me.notify_fail('普通流程无需挑战刀皇，请先取得木凤鸟窝并击败魔龙，再跳入地下河。');
+            if (diff === 0) return me.notify_fail('普通流程无需挑战刀皇，请先取得木凤鸟窝并击败魔龙，再跳入地下河。');
             if (!this.fb_query_temp('zhanshen_inlaid', me, false)) return me.notify_fail('五行圆盘尚未完成，刀皇殿被封印隔绝。');
         }
         if (dir === 'north') {
             if (!this.fb_query_temp('zhanshen_entered', me, false)) return me.notify_fail('你尚未依孤星方位跳入暗道，无法进入真正的战神大殿。');
-            if (this.difficulty === 0) return me.notify_fail('普通流程的天外石阶并未显现。');
+            if (diff === 0) return me.notify_fail('普通流程的天外石阶并未显现。');
             if (!this.fb_query_temp('zhanshen_daohuang', me, false)) return me.notify_fail('刀皇的无形刀意笼罩大殿，须先击败刀皇。');
         }
     }

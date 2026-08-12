@@ -16,20 +16,17 @@ export default class extends ROOM {
 
     on_enter(me: USER) {
         if (!me.is_player) return;
+        const daohuang = this.find_by_path('fb/zhanshen/daohuang') as NPC | undefined;
+        if (this.fb_query_temp('diff', me, 0) === 1 && !this.query_temp('hard_initialized', false)) {
+            this.set_temp('hard_initialized', true);
+            if (daohuang) daohuang.title = '<hio>万刀之皇</hio>';
+        }
         if (!this.fb_query_temp('zhanshen_worshipped', me, false)) {
             me.notify('你未曾祭拜战神，刀皇并未真正现身。');
             return;
         }
-        const daohuang = this.find_by_path('fb/zhanshen/daohuang') as NPC | undefined;
         if (daohuang && !daohuang.fight_type) daohuang.do_kill(me);
     }
-
-    on_set_difficulty = (type: number) => {
-        if (type !== 1) return;
-        const daohuang = this.find_by_path('fb/zhanshen/daohuang') as NPC | undefined;
-        if (!daohuang) return;
-        daohuang.title = '<hio>万刀之皇</hio>';
-    };
 
     on_leave(me: USER, dir: string) {
         if (dir === 'west' && this.is_here('fb/zhanshen/daohuang')) return me.notify_fail('刀皇的无形刀意封住退路。');

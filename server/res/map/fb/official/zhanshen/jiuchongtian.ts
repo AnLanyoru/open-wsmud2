@@ -7,7 +7,6 @@ export default class extends ROOM {
     exits = {
         south: 'fb/official/zhanshen/xuankong',
     };
-    difficulty = 0;
 
     constructor() {
         super();
@@ -16,13 +15,9 @@ export default class extends ROOM {
         ]);
     }
 
-    on_set_difficulty = (type: number) => {
-        this.difficulty = type;
-    };
-
     touch(me: USER) {
         if (this.fb_query_temp('zhanshen_title', me, false)) return me.notify('武神碑上已经留下了你的武道印记。');
-        if (this.difficulty === 0) {
+        if (this.fb_query_temp('diff', me, 0) === 0) {
             if (!this.fb_query_temp('zhanshen_wood', me, false) || !this.fb_query_temp('zhanshen_water', me, false)) return me.notify('木凤与魔龙的试炼尚未完成。');
             this.fb_set_temp('zhanshen_title', true, me);
             me.add_title('<hic>战神殿传人</hic>', 'fb_zhanshen_normal');

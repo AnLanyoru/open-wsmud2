@@ -24,10 +24,11 @@ export default class extends NPC {
         }
         if (this.die_room.fb_query_temp('tianlong_reinforcements', killer, false)) return;
         this.die_room.fb_set_temp('tianlong_reinforcements', true, killer);
-        const paths = this.die_room.query_temp('tianlong_hard')
+        const hard = this.die_room.fb_query_temp('diff', killer, 0) === 1;
+        const paths = hard
             ? ['fb/tianlong/benguo', 'fb/tianlong/benyin', 'fb/tianlong/benkong', 'fb/tianlong/benguan', 'fb/tianlong/bencan', 'fb/tianlong/benchen']
             : ['fb/tianlong/benguo', 'fb/tianlong/benyin', 'fb/tianlong/benkong'];
-        const scores = this.die_room.query_temp('tianlong_hard') ? [12, 12, 11, 12, 12, 11] : [14, 13, 13];
+        const scores = hard ? [12, 12, 11, 12, 12, 11] : [14, 13, 13];
         paths.forEach((path, index) => {
             const npc = NPC.CLONE(path);
             npc.score = scores[index];

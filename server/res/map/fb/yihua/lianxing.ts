@@ -9,19 +9,14 @@ export default class extends ROOM {
         northwest: 'fb/yihua/changlang1',
         southwest: 'fb/yihua/woshi',
     };
-    difficulty = 0;
 
     constructor() {
         super();
         this.set_npc('fb/yihua/lianxing');
     }
 
-    on_set_difficulty = (type: number) => {
-        this.difficulty = type;
-    };
-
     on_enter(me: USER) {
-        if (!me.is_player || this.difficulty !== 1 || this.fb_query_temp('yihua_dual_lords', me, false)) return;
+        if (!me.is_player || this.fb_query_temp('diff', me, 0) !== 1 || this.fb_query_temp('yihua_dual_lords', me, false)) return;
         const otherRoom = this.query('fb/yihua/yaoyue');
         const other = otherRoom?.find_by_path('fb/yihua/yaoyue') as CHARACTER | undefined;
         if (!other) return;

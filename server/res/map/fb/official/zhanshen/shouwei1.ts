@@ -9,15 +9,9 @@ export default class extends ROOM {
         southwest: 'fb/official/zhanshen/shenshi',
         east: 'fb/official/zhanshen/shouwei2',
     };
-    difficulty = 0;
-
-    on_set_difficulty = (type: number) => {
-        this.difficulty = type;
-    };
-
     on_enter(me: USER) {
         if (!me.is_player || this.fb_query_temp('zhanshen_guard_wave', me, 0) !== 1 || this.is_here('fb/zhanshen/shouwei')) return;
-        const limit = this.difficulty === 1 ? 60 : 360;
+        const limit = this.fb_query_temp('diff', me, 0) === 1 ? 60 : 360;
         this.fb_set_temp('zhanshen_guard_started', Date.now(), me);
         this.fb_set_temp('zhanshen_guard_limit', limit, me);
         this.spawn(me, 5, 1);

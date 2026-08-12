@@ -14,15 +14,16 @@ export default class extends ROOM {
         this.set_npc('fb/tianlong/benguan');
     }
 
-    on_set_difficulty = (type: number) => {
-        this.set_temp('tianlong_hard', type === 1);
+    on_enter(me: USER) {
+        if (!me.is_player || this.fb_query_temp('diff', me, 0) !== 1 || this.query_temp('hard_initialized', false)) return;
+        this.set_temp('hard_initialized', true);
         const monk = this.find_by_path('fb/tianlong/benguan');
-        if (type === 1 && monk?.check_npc()) monk.score = 0;
-    };
+        if (monk?.check_npc()) monk.score = 0;
+    }
 
     on_leave(me: USER, dir: string) {
         if (dir !== 'south' || !this.find_by_path('fb/tianlong/benguan')) return;
-        if (this.query_temp('tianlong_hard')) {
+        if (this.fb_query_temp('diff', me, 0) === 1) {
             if (hasDisguise(me)) return;
             return me.notify_fail('本观和尚看破你的身份；困难模式必须戴上阿朱的易容面具混入寺内。');
         }
