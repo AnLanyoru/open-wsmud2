@@ -8,41 +8,50 @@ import type { CHARACTER } from '../../../core/char/character.js';
 import { OBJ } from '../../../core/item/obj.js';
 import { wudao_fragment } from './ta.js';
 
+const WUDAO_TITLES: readonly string[] = [
+    '武道塔守护者',
+    '武道镇守者',
+    '武道传承者',
+    '武道统领者',
+    '武道领主',
+    '武道塔主',
+];
+const WUDAO_TITLE_TYPE = 'wudao_tower';
+
 export default class extends ROOM {
     name = '武道塔';
     desc =
         '这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。';
     exits = { up: 'wudao/up', out: 'wudao/ding' };
     max_item_count = 1;
+    is_shadow = true;
 
     on_before_enter(me: CHARACTER) {
-        var level = (me.query_temp('wd_level', 0) as number) + 1 - 100;
-        this.name = '上' + UTIL.to_c(level) + '层';
-        if (level > 5) return;
-        var npc = NPC.CLONE('pub/wudao_boss');
+        const level = Number(me.query_temp('wd_level', 0)) + 1;
+        this.name = level === 100 ? '第一百层' : '上' + UTIL.to_c(level - 100) + '层';
+        if (level < 100 || level > 105) return;
+        me.clear_combat_prop();
+        me.clear_status();
+        const npc = NPC.CLONE('pub/wudao_boss');
 
         const room = this;
         npc.die = function (this: NPC, killer?: CHARACTER) {
             if (!killer) return;
-            killer.notify('<hig>恭喜你战胜了' + this.name + '。</hig>');
-            let count = me.query_temp('wd_level', 0) as number;
-            if (count > 105) {
-                return;
-            }
-            count = me.add_temp('wd_level', 1) as number;
+            killer.notify('<hig>恭喜你战胜了' + this.long_name() + '。</hig>');
+            const count = killer.add_temp('wd_level', 1) as number;
 
-            room.on_reward(me, count);
+            room.on_reward(killer, count);
             const max = WORLD.DATA.query_temp('wudao_max', 0) as number;
             if (count > max) {
                 WORLD.DATA.set_temp('wudao_max', count);
-                WORLD.DATA.set_temp('wudao_max_user', me.name);
-                COMMAND.DO('rumor', '听说' + me.name + '战胜了' + this.name + '。');
-                if (me.environment && me.environment.parent) {
-                    me.environment.parent.notify_update();
+                WORLD.DATA.set_temp('wudao_max_user', killer.name);
+                COMMAND.DO('rumor', '听说' + killer.name + '战胜了' + this.long_name() + '。');
+                if (killer.environment && killer.environment.parent) {
+                    killer.environment.parent.notify_update();
                 }
             }
-            if (me.environment) {
-                me.environment.item_changed(this, false, '$N离开了。');
+            if (killer.environment) {
+                killer.environment.item_changed(this, false, '$N离开了。');
             }
         };
         npc.init_from(me, level);
@@ -62,38 +71,38 @@ export default class extends ROOM {
             }
             this.hp = this.max_hp;
             this.mp = this.max_mp;
-            let rm_npc = this.environment!.find_by_path('pub/wudao');
+            const rm_npc = this.environment!.find_by_path('pub/wudao_boss');
             rm_npc && rm_npc.destroy();
             this.moveto('wudao/ding');
             this.notify('<hir>你的挑战失败了。</hir>');
         };
-        let npc = this.items[0] as NPC;
+        const npc = this.find_by_path('pub/wudao_boss') as NPC | undefined;
         if (npc && !npc.is_player) {
             me.do_kill(npc);
-            npc.on_kill!(me);
+            if ('use_entry_performs' in npc) {
+                (npc as NPC & { use_entry_performs: (target: CHARACTER) => void }).use_entry_performs(me);
+            }
         }
     }
 
     on_reward(me: CHARACTER, lv: number) {
-        // 100～105层各发两张橙色残页，转红概率从20%起每层增加10%。
         if (lv < 100 || lv > 105) return;
-        const redRate = 0.2 + (lv - 100) * 0.1;
-        const items = [10000, 10000].map(() =>
-            Math.random() < redRate ? wudao_fragment(6) : wudao_fragment(5),
-        );
+        const title = WUDAO_TITLES[lv - 100];
+        me.add_title?.(title, WUDAO_TITLE_TYPE);
+        me.notify('你获得了称号【' + title + '】。');
+
+        const potential = lv === 100 ? 500_000 : (lv - 100) * 1_000_000;
+        me.add_exp(undefined, potential);
+
+        const items = [{ obj: 'st/yuanjing', count: 1 }, wudao_fragment(6)];
         for (const created of OBJ.create_by_odds(items)) {
             const item = me.add_obj(created);
-            if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
-        }
-        if (lv === 105) {
-            const created = OBJ.create_by_odds([wudao_fragment(6)])[0];
-            const item = created && me.add_obj(created);
             if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
         }
     }
 
     on_leave(me: CHARACTER, dir: string) {
-        var npc = this.find_by_path('pub/wudao_boss');
+        const npc = this.find_by_path('pub/wudao_boss');
         if (dir == 'up') {
             if (npc) {
                 return me.notify_fail(npc.name + '对你说道：打败我，你就可以上去。');
@@ -112,9 +121,10 @@ export default class extends ROOM {
                 }
             }
             if ((me.query_temp('wd_level', 0) as number) >= 105) {
-                return me.notify_fail('暂未开放。');
+                me.moveto('wudao/ding');
+            } else {
+                me.moveto('wudao/ta2');
             }
-            me.moveto('wudao/ta2');
 
             return false;
         } else {
