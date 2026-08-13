@@ -40,6 +40,7 @@ export default class extends SKILL {
         lueying: {
             name: '掠影',
             distime: 45000,
+            distime_key: 'jhb_cd',
             enable_skill: 'dodge',
             mp: 60,
             release_time: 1000,
@@ -56,7 +57,6 @@ export default class extends SKILL {
                     id: 'jhb_ly',
                     name: '掠影',
                     duration: duration,
-                    is_miss: true,
                     finish_msg: '$N的掠影身法已散，身形不再飘忽难测。',
                 });
 
@@ -72,13 +72,14 @@ export default class extends SKILL {
         },
     };
 
-    /** 掠过：每次成功闪避扣除一次掠影次数 */
-    on_dodge_over(target: CHARACTER, me: CHARACTER, _par: DoAttackPar): void {
-        const remaining = me.query_temp('jhb_ly', 0);
+    /** 掠过：普通闪避判定失败后触发掠影，攻击结算完成时扣除次数 */
+    on_dodge_over(target: CHARACTER, _me: CHARACTER, par: DoAttackPar): void {
+        if (!par.jhb_dodged) return;
+        const remaining = target.query_temp('jhb_ly', 0);
         if (remaining > 0) {
-            me.set_temp('jhb_ly', remaining - 1);
+            target.set_temp('jhb_ly', remaining - 1);
             if (remaining <= 1) {
-                me.remove_status('jhb_ly');
+                target.remove_status('jhb_ly');
             }
         }
     }

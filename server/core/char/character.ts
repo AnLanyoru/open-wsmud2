@@ -175,6 +175,8 @@ export interface DoAttackPar {
     add_bjsh_per?: number;
     /** 自定义暴击判定函数 */
     cirt?: (target: CHARACTER, part: AttackPart | null, bj_per: number) => boolean;
+    /** 掠影在普通闪避判定失败后强制触发的闪避标记 */
+    jhb_dodged?: boolean;
     /** 内功附加伤害（输出回写供 on_force_parry 读取） */
     power_gj?: number;
     /** 忽视防御百分比（0-100） */
@@ -3567,13 +3569,7 @@ export class CHARACTER extends ITEM {
                 target.is_busy || par.no_parry
                     ? false
                     : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
-        } else if (this.is_miss && !par.no_dodge) {
-            par.is_dodged = true;
-            par.is_parried =
-                target.is_busy || par.no_parry
-                    ? false
-                    : Math.random() * (target.zj / 2) + target.zj / 2 > mz;
-        } else if (target.is_miss || par.no_dodge) {
+        } else if (this.is_miss || par.no_dodge) {
             par.is_dodged = false;
             par.is_parried =
                 target.is_busy || par.no_parry
@@ -3585,6 +3581,18 @@ export class CHARACTER extends ITEM {
         } else {
             par.is_dodged = Math.random() * (target.ds / 2) + target.ds / 2 > mz;
             par.is_parried = Math.random() * (target.zj / 2) + target.zj / 2 > mz;
+        }
+        // 掠影在普通闪避判定失败后才介入，强制将本次攻击判定为闪避。
+        if (
+            !par.is_dodged &&
+            !par.no_dodge &&
+            target.query_temp('jhb_ly', 0) > 0 &&
+            !target.is_rash &&
+            !target.is_faint &&
+            !this.is_shadow
+        ) {
+            par.is_dodged = true;
+            par.jhb_dodged = true;
         }
         if (par.is_dodged) {
             if (par.on_dodge) par.on_dodge(target);
