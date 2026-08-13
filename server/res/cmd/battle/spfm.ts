@@ -31,4 +31,30 @@ export default class extends COMMAND {
 
         me.send('<cyn>你的乾坤一掷每次使用将消耗' + arg + '个铜板。</cyn>');
     }
+
+    set_hswj(me, arg) {
+        const gods = ['祝融', '芙蓉', '石廪', '天柱', '紫盖'];
+        const godProps: Record<string, string> = {
+            祝融: '攻击',
+            芙蓉: '命中',
+            石廪: '防御',
+            天柱: '招架',
+            紫盖: '闪避',
+        };
+        if (!arg || !gods.includes(arg)) {
+            me.remove_temp('hswj_wsf_god');
+            return me.send(
+                '<cyn>可选神峰：' +
+                    gods.map(god => god + '（' + godProps[god] + '）').join('、') +
+                    '；不指定则随机。</cyn>',
+            );
+        }
+        const skill = me.skills?.get('hengshanwushenjian');
+        if (!skill?.addin?.length) return me.send('<cyn>衡山五神剑进阶后才能设置五神赋。</cyn>');
+        if (skill.enable_skill !== 'parry' && !(skill as any).parry) {
+            return me.send('<cyn>请先将衡山五神剑装备为招架。</cyn>');
+        }
+        me.set_temp('hswj_wsf_god', arg);
+        me.send('<cyn>你的五神赋将召唤' + arg + '（' + godProps[arg] + '）。</cyn>');
+    }
 }

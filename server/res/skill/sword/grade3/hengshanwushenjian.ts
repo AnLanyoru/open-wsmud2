@@ -33,7 +33,7 @@ export default class extends SKILL {
             prop: 'wsj_ts',
             value: (lv: number) => 10,
             format: (val: number) =>
-                '五神剑出招时，每剑分别附加五神的特殊效果(攻击，破防，命中，不可躲闪，不可招架)',
+                '五神剑出招时，每剑分别附加五神的特殊效果(攻击，命中，破防，不可招架，不可躲闪)',
         },
     ];
 
@@ -56,16 +56,23 @@ export default class extends SKILL {
         wu: {
             name: '五神剑',
             distime: 13000,
-            enable_skill: 'sword',
+            enable_skill: 'parry',
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = calcWSJPer(lv);
                 var msgs = [
-                    _tmpl('<HIM>紫盖</HIM>\n$N剑光如紫盖凝霞，绚烂夺目！'),
+                    _tmpl('<HIR>祝融</HIR>\n$N剑光如火祝融焚天，炽烈霸道！'),
                     _tmpl('<HIG>芙蓉</HIG>\n$N剑势如芙蓉出水，清丽脱俗！'),
                     _tmpl('<HIY>石廪</HIY>\n$N剑劲如山石廪耸立，沉稳凝重！'),
-                    _tmpl('<HIR>祝融</HIR>\n$N剑光如火祝融焚天，炽烈霸道！'),
                     _tmpl('<HIC>天柱</HIC>\n$N剑意如天柱擎天，势不可挡！'),
+                    _tmpl('<HIM>紫盖</HIM>\n$N剑光如紫盖横云，身随剑走，飘逸灵动！'),
+                ];
+                var effects = [
+                    { gj: (me.gj * per * 2) / 100 },
+                    { mz: me.mz * 2 },
+                    { diff_fy: 100 },
+                    { no_parry: true },
+                    { no_dodge: true },
                 ];
                 me.send_room(
                     '<HIM>$N剑势忽变，以五峰之势施出衡山绝技「五神剑」，五道剑光先后射向$n！</HIM>',
@@ -76,6 +83,7 @@ export default class extends SKILL {
                         target: target,
                         gj: (me.gj * per) / 100,
                         mz: me.mz,
+                        ...effects[i],
                         attack_msg: i < 5 ? msgs[i] : undefined,
                     });
                 }
@@ -89,15 +97,16 @@ export default class extends SKILL {
         fu: {
             name: '五神赋',
             distime: 30000,
-            enable_skill: 'sword',
+            enable_skill: 'parry',
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var duration = calcWSFDuration(lv);
                 var per = calcWSFPer(lv);
-                var gods = ['祝融', '石廪', '芙蓉', '鹤翔', '天柱'];
-                var god = gods[int(Math.random() * gods.length)];
-                var props = ['gj_per', 'mz_per', 'fy_per', 'ds_per', 'bj_per'];
-                var prop = props[int(Math.random() * props.length)];
+                var gods = ['祝融', '芙蓉', '石廪', '天柱', '紫盖'];
+                var selected = me.query_temp('hswj_wsf_god');
+                var god = gods.includes(String(selected)) ? String(selected) : gods[int(Math.random() * gods.length)];
+                var props: Record<string, string> = { 祝融: 'gj_per', 芙蓉: 'mz_per', 石廪: 'fy_per', 天柱: 'zj_per', 紫盖: 'ds_per' };
+                var prop = props[god];
                 var propMap: any = {};
                 propMap[prop] = per;
                 me.send_room(
@@ -120,7 +129,7 @@ export default class extends SKILL {
                 var duration = calcWSFDuration(lv);
                 var per = calcWSFPer(lv);
                 return (
-                    '召唤祝融，石廪，芙蓉，鹤翔，天柱之一，' +
+                    '召唤祝融、芙蓉、石廪、天柱、紫盖之一，' +
                     toSec(int(duration)) +
                     '秒内随机增加你的某项战斗属性' +
                     per +
