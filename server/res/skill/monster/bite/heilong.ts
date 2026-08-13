@@ -48,7 +48,7 @@ export default class extends SKILL {
                 if (sh) {
                     target.add_status(
                         {
-                            id: 'frozen',
+                            id: 'faint',
                             is_faint: true,
                             duration: 10000,
                             name: '冻结',

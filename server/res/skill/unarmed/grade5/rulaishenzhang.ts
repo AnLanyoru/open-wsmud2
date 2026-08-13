@@ -100,7 +100,7 @@ export default class extends SKILL {
                 if (sh) {
                     target.add_status(
                         {
-                            id: 'rulai_faint',
+                            id: 'faint',
                             name: '昏迷',
                             duration: time,
                             is_faint: true,

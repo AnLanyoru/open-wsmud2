@@ -67,7 +67,7 @@ export default class extends SKILL {
                 if (sh && !is_parried) {
                     target.add_status(
                         {
-                            id: 'liumai_faint',
+                            id: 'faint',
                             name: '昏迷',
                             duration: time,
                             is_faint: true,

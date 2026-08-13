@@ -104,7 +104,7 @@ export default class extends SKILL {
                     );
                     target.add_status(
                         {
-                            id: 'riyue_faint',
+                            id: 'faint',
                             name: '昏迷',
                             duration: 8000,
                             is_faint: true,
