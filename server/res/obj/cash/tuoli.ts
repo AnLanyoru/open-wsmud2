@@ -44,7 +44,13 @@ export default class extends OBJ {
         if (me.query_temp('tuoli')) {
             var sum = 0;
             for (var i = 0; i < list.length; i++) {
-                var needpot = list[i].query_needexp(me.skills.get(list[i].id)!.level, me);
+                const skillData = me.skills.get(list[i].id)!;
+                // query_needexp() only covers completed levels above 100. Keep the
+                // unfinished progress as well; it is potential that has already
+                // been spent and would otherwise be lost when the skill is removed.
+                var needpot =
+                    list[i].query_needexp(skillData.level, me) +
+                    (skillData.level >= 100 ? (skillData.exp ?? 0) : 0);
                 if (me.remove_skill(list[i].id)) {
                     if (needpot) sum += needpot;
                     me.notify('{type:"dialog",dialog:"skills",remove:"' + list[i].id + '"}');
