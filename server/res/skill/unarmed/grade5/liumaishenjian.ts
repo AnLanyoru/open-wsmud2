@@ -41,6 +41,39 @@ export default class extends SKILL {
         };
     }
 
+    // 六脉神剑被动：命中敌人后对附近一名敌人产生溅射伤害
+    on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
+        if (par.is_dodged) return;
+        if (!(sh > 0) || !target || target.hp <= 0) return;
+        const enemies = me.get_nearby_enemies();
+        if (!enemies.length) return;
+        // 选取附近除当前目标外的一名敌人承受溅射
+        const candidates: CHARACTER[] = [];
+        for (let i = 0; i < enemies.length; i++) {
+            if (enemies[i] !== target && enemies[i].hp > 0) {
+                candidates.push(enemies[i]);
+            }
+        }
+        if (!candidates.length) return;
+        const splashTarget = candidates[me.random(candidates.length)];
+        const lv = me.query_skill('liumaishenjian', 0);
+        const per = liumaiSplashPer(lv);
+        const splashDmg = Math.floor((sh * per) / 100);
+        if (!(splashDmg > 0)) return;
+        me.send_combat(
+            '<hir>$N的剑气不减，蓦地调转方向朝$n而去</hir>',
+            splashTarget,
+        );
+        me.do_attack({
+            target: splashTarget,
+            gj: splashDmg,
+            mz: me.mz,
+            no_append: true,
+            no_append_before: true
+        });
+        me.end_attack(splashTarget);
+    }
+
     pfm_set: PerformData = {
         qi: {
             name: '无形剑气',
@@ -155,6 +188,13 @@ export default class extends SKILL {
 
 function wuxingFaintTime(lv: number): number {
     return Math.min(8000,2000 + lv * 5);
+}
+
+/** 溅射伤害百分比 */
+function liumaiSplashPer(lv: number): number {
+    var per = 50 + Math.floor(lv / 40);
+    if (per > 100) per = 100;
+    return per;
 }
 
 function liumaiMzReduce(lv: number): number {
