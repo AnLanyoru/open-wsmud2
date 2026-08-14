@@ -8,7 +8,7 @@ export default class extends COMMAND {
     allow_faint = true;
     allow_state = true;
     allow_busy = true;
-    regex = /(\w+)(?:\s+(\w+))?/;
+    regex = /(\S+)(?:\s+(\S+))?/;
 
     /**
      * @param {CHARACTER} me - 执行命令的角色
@@ -50,7 +50,7 @@ export default class extends COMMAND {
             );
         }
         const skill = me.skills?.get('hengshanwushenjian');
-        if (!skill?.addin?.length) return me.send('<cyn>衡山五神剑进阶后才能设置五神赋。</cyn>');
+        if (!skill?.addin?.includes(500)) return me.send('<cyn>衡山五神剑进阶五神赋词条后才能设置。</cyn>');
         if (skill.enable_skill !== 'parry' && !(skill as any).parry) {
             return me.send('<cyn>请先将衡山五神剑装备为招架。</cyn>');
         }

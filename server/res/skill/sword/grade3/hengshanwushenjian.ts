@@ -27,7 +27,7 @@ export default class extends SKILL {
         {
             prop: 'wsf_hz',
             value: (lv: number) => 10,
-            format: (val: number) => '每次装备为招架时可设置五神赋召唤目标',
+            format: (val: number) => '装备为招架时可定向召唤五神赋',
         },
         {
             prop: 'wsj_ts',
@@ -36,6 +36,20 @@ export default class extends SKILL {
                 '五神剑出招时，每剑分别附加五神的特殊效果(攻击，命中，破防，不可招架，不可躲闪)',
         },
     ];
+
+    on_enable(me: CHARACTER, type: string): boolean | void {
+        if (type !== 'parry') return;
+        const skillData = me.skills?.get(this.id);
+        if (!skillData?.addin?.includes(500)) return;
+        me.send(
+            '<cyn>五神赋已进阶并装备为招架，请选择定向召唤：' +
+                "<span cmd='spfm hswj 祝融'>祝融（攻击）</span>、" +
+                "<span cmd='spfm hswj 芙蓉'>芙蓉（命中）</span>、" +
+                "<span cmd='spfm hswj 石廪'>石廪（防御）</span>、" +
+                "<span cmd='spfm hswj 天柱'>天柱（招架）</span>、" +
+                "<span cmd='spfm hswj 紫盖'>紫盖（闪避）</span>。</cyn>",
+        );
+    }
 
     query_enable_prop(lv: number): EnablePropMap {
         return {
@@ -56,7 +70,7 @@ export default class extends SKILL {
         wu: {
             name: '五神剑',
             distime: 13000,
-            enable_skill: 'parry',
+            enable_skill: 'sword',
             mp: 20,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = calcWSJPer(lv);
@@ -67,13 +81,16 @@ export default class extends SKILL {
                     _tmpl('<HIC>天柱</HIC>\n$N剑意如天柱擎天，势不可挡！'),
                     _tmpl('<HIM>紫盖</HIM>\n$N剑光如紫盖横云，身随剑走，飘逸灵动！'),
                 ];
-                var effects = [
+                var effects: any[] = [
                     { gj: (me.gj * per * 2) / 100 },
                     { mz: me.mz * 2 },
                     { diff_fy: 100 },
                     { no_parry: true },
                     { no_dodge: true },
                 ];
+                // 五剑强化效果由第二条进阶词条开启，未进阶时仅保留基础五连击。
+                var skillData = me.skills?.get('hengshanwushenjian');
+                if (!skillData?.addin?.includes(501)) effects = [{}, {}, {}, {}, {}];
                 me.send_room(
                     '<HIM>$N剑势忽变，以五峰之势施出衡山绝技「五神剑」，五道剑光先后射向$n！</HIM>',
                     target,
@@ -128,10 +145,12 @@ export default class extends SKILL {
             query_desc: function (me: CHARACTER, lv: number) {
                 var duration = calcWSFDuration(lv);
                 var per = calcWSFPer(lv);
+                var selected = me.query_temp('hswj_wsf_god');
+                var targetDesc = selected ? `当前定向召唤：${selected}` : '当前随机召唤五峰之一';
                 return (
-                    '召唤祝融、芙蓉、石廪、天柱、紫盖之一，' +
+                    targetDesc + '。' +
                     toSec(int(duration)) +
-                    '秒内随机增加你的某项战斗属性' +
+                    '秒内增加对应战斗属性' +
                     per +
                     '%'
                 );
@@ -139,6 +158,7 @@ export default class extends SKILL {
         },
     };
 }
+
 
 function calcWSJPer(lv: number): number {
     return 70 + int(lv / 20);
