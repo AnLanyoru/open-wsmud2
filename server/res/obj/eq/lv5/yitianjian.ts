@@ -1,6 +1,7 @@
 import { EQUIPMENT } from '../../../../core/item/equipment.js';
 import { EQUIP_TYPE, WEAPON_TYPE } from '../../../../core/const.js';
 import type { PropMap } from '../../../../types/props.js';
+import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
 export default class extends EQUIPMENT {
     unit = '把';
@@ -17,5 +18,8 @@ export default class extends EQUIPMENT {
         add_sh_per: 6,
         bj_per: 4,
     };
-    // Special effects: 攻击时有几率无视对方防御
+    do_attack(_me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
+        if (!par.no_weapon && Math.random() < 0.05) par.diff_fy = 100;
+        return 0;
+    }
 }

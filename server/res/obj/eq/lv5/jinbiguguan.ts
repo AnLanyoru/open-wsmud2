@@ -5,7 +5,7 @@ import type { PropMap } from '../../../../types/props.js';
 export default class extends EQUIPMENT {
     unit = '顶';
     name = '金狴骨冠';
-    desc = '似乎是金狴的头骨所制，看上去有些吓人。';
+    desc = '似乎是金狴的头骨所制，看上去有些吓人';
     value = 1000000;
     grade = 5;
     hole_count = 4;

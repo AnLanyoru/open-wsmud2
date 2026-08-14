@@ -17,6 +17,6 @@ export default class extends EQUIPMENT {
         mz: 150,
         mz_per: 10,
         diff_fy_per: 10,
-    };
-    // Special effects: 明玉功+100级
+        skill: { mingyugong: 100 },
+    } as PropMap;
 }

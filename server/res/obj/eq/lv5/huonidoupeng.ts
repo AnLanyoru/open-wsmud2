@@ -5,7 +5,7 @@ import type { PropMap } from '../../../../types/props.js';
 export default class extends EQUIPMENT {
     unit = '件';
     name = '火猊斗篷';
-    desc = '火红的火猊皮毛所制的斗篷，防风御寒。';
+    desc = '火红的火猊皮毛所制的斗篷，防风御寒';
     value = 1000000;
     grade = 5;
     hole_count = 4;

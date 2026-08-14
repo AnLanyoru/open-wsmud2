@@ -15,6 +15,6 @@ export default class extends EQUIPMENT {
         int: 150,
         diff_sh: 2000,
         hp_per: 10,
+        diff_bj: 1000,
     };
-    // Special effects: 免疫暴击
 }

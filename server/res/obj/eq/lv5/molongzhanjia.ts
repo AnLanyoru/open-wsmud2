@@ -5,7 +5,7 @@ import type { PropMap } from '../../../../types/props.js';
 export default class extends EQUIPMENT {
     unit = '件';
     name = '魔龙战甲';
-    desc = '魔龙皮所制的甲胄，防御力惊人。';
+    desc = '魔龙皮所制的甲胄，防御力惊人';
     value = 1000000;
     grade = 5;
     hole_count = 4;

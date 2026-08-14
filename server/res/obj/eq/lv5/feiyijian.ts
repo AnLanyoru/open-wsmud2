@@ -5,7 +5,7 @@ import type { PropMap } from '../../../../types/props.js';
 export default class extends EQUIPMENT {
     unit = '把';
     name = '飞翼剑';
-    desc = '身无彩凤双飞翼，心有灵犀一点通。';
+    desc = '身无彩凤双飞翼，心有灵犀一点通';
     value = 1000000;
     grade = 5;
     hole_count = 4;

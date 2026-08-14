@@ -5,7 +5,7 @@ import type { PropMap } from '../../../../types/props.js';
 export default class extends EQUIPMENT {
     unit = '根';
     name = '金刚伏魔杖';
-    desc = '佛家神器。';
+    desc = '佛家神器';
     value = 1000000;
     grade = 5;
     hole_count = 4;

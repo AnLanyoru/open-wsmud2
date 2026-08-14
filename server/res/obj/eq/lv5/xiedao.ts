@@ -1,6 +1,7 @@
 import { EQUIPMENT } from '../../../../core/item/equipment.js';
 import { EQUIP_TYPE, WEAPON_TYPE } from '../../../../core/const.js';
 import type { PropMap } from '../../../../types/props.js';
+import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
 export default class extends EQUIPMENT {
     unit = '把';
@@ -17,5 +18,18 @@ export default class extends EQUIPMENT {
         mz: 400,
         add_sh_per: 5,
     };
-    // Special effects: 当你攻击命中后吸取敌人鲜血强化自身
+    do_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
+        if (par.no_weapon) return 0;
+        const attack = 700 + Math.max(0, this.level - 1) * 300;
+        me.add_status({
+            id: 'eq/xiedao',
+            name: '血魔',
+            desc: '血刀吸取敌人鲜血，强化自身攻击',
+            duration: 10000,
+            prop: { gj: attack },
+            override: 2,
+            only_combat: true,
+        });
+        return 0;
+    }
 }

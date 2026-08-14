@@ -1,6 +1,7 @@
 import { EQUIPMENT } from '../../../../core/item/equipment.js';
 import { EQUIP_TYPE, WEAPON_TYPE } from '../../../../core/const.js';
 import type { PropMap } from '../../../../types/props.js';
+import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
 
 export default class extends EQUIPMENT {
     unit = '把';
@@ -17,5 +18,9 @@ export default class extends EQUIPMENT {
         con: 40,
         add_sh_per: 5,
     };
-    // Special effects: 当攻击命中后有几率产生双倍伤害
+    do_attack(me: CHARACTER, _target: CHARACTER, par: DoAttackPar): number {
+        if (par.no_weapon || Math.random() >= 0.05) return 0;
+        me.send_room('<hir>$N手中的$W发出一声龙吟，这一击威力陡然倍增！</hir>');
+        return par.gj ?? me.gj;
+    }
 }

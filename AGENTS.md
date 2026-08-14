@@ -20,3 +20,18 @@
 ## Version control
 
 - Write commit message content in Chinese.
+
+## Investigation before modification
+
+- Before changing behavior, fully trace the relevant runtime path, configuration, scheduling cadence, and existing domain implementation. Do not add cooldowns, guards, timers, or compatibility layers until the current mechanism has been verified end to end.
+- Prefer the smallest domain-local implementation that follows existing project conventions. For example, skill-specific behavior belongs in that skill rather than in shared combat or property infrastructure.
+
+## Framework change approval
+
+- Do not modify shared framework or core infrastructure merely to complete a resource, equipment, skill, or content task.
+- If the requested behavior cannot be implemented correctly without a framework/core change, stop before editing those shared files. Report the limitation, present the proposed framework change and its impact to the user, and wait for explicit approval.
+
+## Source descriptions
+
+- When a reference document supplies an item introduction or description, copy that text verbatim into the item's `desc`. Do not polish, paraphrase, expand, or shorten it.
+- Put implementation notes, interpretation, or more detailed background in adjacent code comments rather than changing the source description.

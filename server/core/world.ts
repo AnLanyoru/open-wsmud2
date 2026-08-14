@@ -751,7 +751,7 @@ class World {
     // ========== 配置 ==========
     status: number = -1;
     heart_beat_service: ReturnType<typeof setInterval> | null = null;
-    heartbeat_interval: number = 1000;
+    heartbeat_interval: number = 5000;
     SERVER: ServerConfig | null = null;
     DEFAULT_COMMAND: COMMAND | null = null;
 

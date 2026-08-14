@@ -104,6 +104,7 @@ export default class extends SKILL {
                     id: 'weapon',
                     name: '滚刀术',
                     duration: duration,
+                    is_busy: true,
                     ig_control: true,
                     prop: prop,
                     start_msg: '<HIR>$N刀势如狂，滚刀术施展之下，攻势连绵不绝！</HIR>',
@@ -113,10 +114,13 @@ export default class extends SKILL {
                     },
                     on_expire: function (p: CHARACTER): void {
                         p.remove_temp('sd_gs');
+                        // change_buff 会在 on_expire 返回后清除忙乱，下一轮事件循环再恢复普通攻击。
+                        p.call_out(() => p.reauto_attack(), 0);
                     },
                 });
 
-                me.reauto_attack();
+                // 滚刀术在自身忙乱期内使用独立攻击循环，不改变全局普通攻击下限。
+                run_gundao_attack(me, query_gundao_interval(me));
             },
             query_desc: function (_me: CHARACTER, lv: number): string {
                 const duration = query_guodao_duration(lv);
@@ -149,4 +153,37 @@ function query_guodao_duration(lv: number): number {
 /** 滚刀术：攻速提升百分比 */
 function query_guodao_speed(lv: number): number {
     return 30 + Math.floor(lv / 100);
+}
+
+/**
+ * 查询滚刀术自身循环间隔。
+ * 绣春刀天然允许达到250ms；进阶词条允许其他刀具获得相同效果。
+ */
+function query_gundao_interval(me: CHARACTER): number {
+    const weapon = me.query_weapon();
+    const canBreakLimit =
+        weapon?.path === 'eq/lv5/xiuchundao' || me.query_prop('sd_gs_limit') > 0;
+    const limit = canBreakLimit ? 250 : 500;
+    let interval = 4000 - me.query_prop('gjsd');
+    interval -= (interval * me.query_prop('gjsd_per')) / 100;
+    return Math.max(limit, Math.floor(interval));
+}
+
+/** 滚刀术专属攻击循环；状态结束后恢复角色原有的自动攻击循环。 */
+function run_gundao_attack(me: CHARACTER, interval: number): void {
+    if (!me.query_temp('sd_gs') || me.hp <= 0 || !me.fight_type) return;
+    const target = me.query_enemy();
+    if (!target) {
+        me.remove_status('weapon');
+        return;
+    }
+
+    if (!me.is_faint && target.fight_type) {
+        me.do_attack({ target, gj: me.gj, mz: me.mz });
+        me.end_attack(target);
+    }
+
+    if (me.query_temp('sd_gs') && me.hp > 0 && me.fight_type) {
+        me.call_out(() => run_gundao_attack(me, interval), interval);
+    }
 }
