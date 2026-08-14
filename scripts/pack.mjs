@@ -357,7 +357,7 @@ if (IS_BINARY) {
     // 上下文已精确匹配，不依赖 $/^ 内容过滤：
     //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
     //   2. DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
-    //   3. _to_b 后缀变量赋值（模板字符串优化标记）
+    //   3. _to_b 后缀变量赋值（单个字符串或一维字符串数组）
     //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
     // ============================================================
 
@@ -365,6 +365,7 @@ if (IS_BINARY) {
     const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
     const PAR_PROP_RE_C = /(?:attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
     const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
+    const TO_B_ARR_RE_C = /(\w+_to_b\s*=\s*\[)([\s\S]*?)(\])/g;
     const MSG_ARR_RE_C = /((?:const\s+)?(?:status_msg|WINNER_MSG|catch_hunt_msg|guard_msg|DIE_MSG|ask_dunno|look_str|rollDesc)\s*[=:]\s*\[)([\s\S]*?)(\];?)/g;
 
     console.log('[pack]   Pass 1.5: scanning context string literals...');
@@ -403,10 +404,18 @@ if (IS_BINARY) {
                     collectCtxStr(unescapeJS(m[2], m[1]));
                 }
 
-                // 3) _to_b 后缀变量赋值
+                // 3) _to_b 后缀变量赋值（单个字符串或一维字符串数组）
                 TO_B_RE_C.lastIndex = 0;
                 while ((m = TO_B_RE_C.exec(content)) !== null) {
                     collectCtxStr(unescapeJS(m[3], m[2]));
+                }
+                TO_B_ARR_RE_C.lastIndex = 0;
+                while ((m = TO_B_ARR_RE_C.exec(content)) !== null) {
+                    let sm;
+                    STR_LIT_RE.lastIndex = 0;
+                    while ((sm = STR_LIT_RE.exec(m[2])) !== null) {
+                        collectCtxStr(unescapeJS(sm[2], sm[1]));
+                    }
                 }
 
                 // 4) status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
@@ -680,7 +689,7 @@ ${serverLines.join('\n')}
                 //   3. _DMG_FALLBACK 值
                 //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
                 //   5. DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
-                //   6. _to_b 后缀变量赋值（模板字符串优化标记）
+                //   6. _to_b 后缀变量赋值（单个字符串或一维字符串数组）
                 // ============================================================
 
                 /** 在已知数组/对象上下文中替换已注册的字符串字面量 */
@@ -741,7 +750,7 @@ ${serverLines.join('\n')}
                     return _;
                 });
 
-                // 6) _to_b 后缀变量赋值（模板字符串优化标记）
+                // 6) _to_b 后缀变量赋值（单个字符串或一维字符串数组）
                 const TO_B_RE = /(\w+_to_b\s*=\s*)(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
                 content = content.replace(TO_B_RE, (_, prefix, quote, rawStr) => {
                     const literal = unescapeJS(rawStr, quote);
@@ -750,6 +759,10 @@ ${serverLines.join('\n')}
                         return prefix + String(templateMap.get(literal));
                     }
                     return _;
+                });
+                const TO_B_ARR_RE = /(\w+_to_b\s*=\s*\[)([\s\S]*?)(\])/g;
+                content = content.replace(TO_B_ARR_RE, (_, prefix, body, suffix) => {
+                    return prefix + body.replace(STR_RE, replaceStr) + suffix;
                 });
 
                 // 7) moveto/do_enter/do_leave/item_changed 调用中的字符串参数 → 模板 ID
