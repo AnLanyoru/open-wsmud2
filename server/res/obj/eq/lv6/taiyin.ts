@@ -7,7 +7,7 @@ export default class extends EQUIPMENT {
     unit = '柄';
     name = '太阴';
     desc = '一柄通体暗紫的小剑，剑身上处处布满碎痕，弥漫着阵阵寒意，似乎冻结着周围的时间。';
-    grade = 5;
+    grade = 6;
     hole_count = 4;
     eq_type = EQUIP_TYPE.THROWING;
     weapon_type = WEAPON_TYPE.THROWING;
