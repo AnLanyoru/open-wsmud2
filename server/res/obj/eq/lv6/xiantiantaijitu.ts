@@ -18,6 +18,7 @@ export default class extends EQUIPMENT {
         diff_sh_per: 10,
         fy_per: 10,
         zj_per: 10,
+        desc: '激活后8秒内无视伤害',
     };
 
     on_use(me: CHARACTER): boolean {

@@ -16,5 +16,6 @@ export default class extends EQUIPMENT {
         diff_sh: 2000,
         hp_per: 10,
         diff_bj: 1000,
+        desc: '免疫暴击（暴击抵抗+1000%）',
     };
 }

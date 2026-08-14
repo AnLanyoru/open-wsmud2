@@ -13,7 +13,7 @@ export default class extends EQUIPMENT {
     weapon_type = WEAPON_TYPE.THROWING;
     distime = 60000;
     prop: PropMap = {
-        desc: '激活太阴蕴含的力量，使敌人不可抵抗地减缓攻速和绝招冷却',
+        desc: '激活太阴蕴含力量使敌人不可抵抗的减缓攻速和冷却时间',
     };
 
     on_use(me: CHARACTER): boolean {

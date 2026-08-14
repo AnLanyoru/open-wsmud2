@@ -35,6 +35,7 @@
 
 - When a reference document supplies an item introduction or description, copy that text verbatim into the item's `desc`. Do not polish, paraphrase, expand, or shorten it.
 - Put implementation notes, interpretation, or more detailed background in adjacent code comments rather than changing the source description.
+- Apply the same verbatim rule to equipment `prop.desc`: copy the documented effect text exactly, including punctuation and level-specific wording.
 
 ## Status IDs
 

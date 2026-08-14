@@ -18,6 +18,7 @@ export default class extends EQUIPMENT {
         dex: 100,
         diff_busy_per: 20,
         ds_per: 10,
+        desc: '激活后清除自身异常状态，10秒内免疫控制',
     };
 
     on_use(me: CHARACTER): boolean {

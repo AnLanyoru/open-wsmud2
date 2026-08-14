@@ -19,7 +19,7 @@ export default class extends EQUIPMENT {
         mz_per: 20,
         add_sh_per: 12,
         diff_fy_per: 12,
-        desc: '命中后增加你的全部战斗属性10%，可叠加10层',
+        desc: '命中后增加你的战斗属性10%，可叠加10层',
     };
 
     // 分型配置（on_create 时按 #N 直接挂载，攻击时直接读取，不另行判断）
@@ -41,18 +41,18 @@ export default class extends EQUIPMENT {
             this.eff_per = 20;
             this.max_count = 5;
             this.no_clear = false;
-            this.prop.desc = '命中后增加你的全部战斗属性20%，可叠加5层';
+            this.prop.desc = '命中后增加你的战斗属性20%，可叠加5层';
         } else if (n === 3) {
             this.eff_per = 20;
             this.max_count = 5;
             this.no_clear = true;
-            this.prop.desc = '命中后增加你的全部战斗属性20%，可叠加5层，且该状态不可被清除';
+            this.prop.desc = '命中后增加你的战斗属性20%，可叠加5层(战斗中不可被驱除)';
         } else {
             // 无# / #1：默认 10%/10层
             this.eff_per = 10;
             this.max_count = 10;
             this.no_clear = false;
-            this.prop.desc = '命中后增加你的全部战斗属性10%，可叠加10层';
+            this.prop.desc = '命中后增加你的战斗属性10%，可叠加10层';
         }
         EQUIPMENT.prototype.on_create.apply(this);
     }

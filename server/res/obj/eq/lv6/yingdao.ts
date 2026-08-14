@@ -18,7 +18,7 @@ export default class extends EQUIPMENT {
         add_bjsh_per: 30,
         add_sh_per: 12,
         diff_fy_per: 10,
-        desc: '沟通天地之力攻击你附近敌人，命中后昏迷3秒',
+        desc: '命中敌人后使对方昏迷3秒，冷却15秒',
     };
     /** 特效冷却（毫秒）。 */
     cd = 15000;
@@ -32,12 +32,15 @@ export default class extends EQUIPMENT {
         if (level === 2) {
             this.cd = 20000;
             this.no_diff = true;
+            this.prop.desc = '命中敌人后使对方昏迷3秒，冷却20秒(不可抵抗)';
         } else if (level === 3) {
             this.cd = 15000;
             this.no_diff = true;
+            this.prop.desc = '命中敌人后使对方昏迷3秒，冷却15秒(不可抵抗)';
         } else {
             this.cd = 15000;
             this.no_diff = false;
+            this.prop.desc = '命中敌人后使对方昏迷3秒，冷却15秒';
         }
         EQUIPMENT.prototype.on_create.apply(this);
     }

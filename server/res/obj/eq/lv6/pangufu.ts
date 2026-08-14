@@ -19,7 +19,7 @@ export default class extends EQUIPMENT {
         diff_fy_per: 20,
         add_bjsh_per: 50,
         gjsd: -1000,
-        desc: '命中后使敌人陷入残缺，降低攻击、攻速、绝招冷却、破防和免伤',
+        desc: '命中后降低对方战斗属性30%',
     };
 
     /** 融合等级：1=不计算负抗，2=每10点负抗降低5%效果，3=每10点负抗降低1%效果。 */
@@ -28,6 +28,9 @@ export default class extends EQUIPMENT {
     on_create(path?: string, par?: string): void {
         const level = par ? parseInt(par.slice(1), 10) : 1;
         this.fusion_level = level >= 1 && level <= 3 ? level : 1;
+        if (this.fusion_level === 2) this.prop.desc = '命中后降低对方战斗属性，每10点负面抵抗降低5%效果';
+        else if (this.fusion_level === 3) this.prop.desc = '命中后降低对方战斗属性，每10点负面抵抗降低1%效果';
+        else this.prop.desc = '命中后降低对方战斗属性30%';
         EQUIPMENT.prototype.on_create.apply(this);
     }
 

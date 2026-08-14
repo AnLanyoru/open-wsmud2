@@ -18,7 +18,7 @@ export default class extends EQUIPMENT {
         per: 10,
         hp_per: 10,
         fy_per: 10,
-        desc: '受到致命一击时不会立即死亡，冷却10分钟',
+        desc: '当你受到致命一击时不会立即死亡，冷却10分钟',
     };
 
     on_eq(me: CHARACTER): void {
