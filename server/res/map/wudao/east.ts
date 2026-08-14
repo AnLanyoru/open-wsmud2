@@ -17,7 +17,5 @@ export default class extends ROOM {
         if (me.check_player()) cleanup_wudao_trial(this, me);
     }
 
-    on_user_die(me, _killer) { cleanup_wudao_trial(this, me); }
-    on_user_quit(me) { cleanup_wudao_trial(this, me); }
     on_heart_beat(dt) { wudao_trial_heartbeat(this, dt); }
 }

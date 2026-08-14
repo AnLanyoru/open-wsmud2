@@ -30,6 +30,11 @@ function adjustProp(npc: WudaoTrialBeast, key: string, target: number): void {
     npc.add_prop(key, target - npc.query_prop(key));
 }
 
+function adjustPanelProp(npc: WudaoTrialBeast, key: string, target: number): void {
+    const multiplier = Math.max((100 + npc.query_prop(key + '_per')) / 100, 0.01);
+    npc.add_prop(key, (target - Number((npc as any)[key])) / multiplier);
+}
+
 function calibratePanel(npc: WudaoTrialBeast, target: number): void {
     const percentage: Record<string, string> = {
         gj: 'gj_per',
@@ -65,6 +70,7 @@ export default class WudaoTrialBeast extends NPC {
             ['unarmed', 5000],
             ['dodge', 5000],
             ['parry', 5000],
+            ['wudaoshenshou', 5000, ['unarmed', 'dodge']],
         );
     }
 
@@ -104,42 +110,30 @@ export default class WudaoTrialBeast extends NPC {
         return super.add_status(buff, from);
     }
 
-    resolve_attack_avoidance(target: CHARACTER, _par: DoAttackPar) {
-        if (this.trial_type !== 1 || target.id !== this.trial_owner) return;
-        const round = Math.max(1, Number(target.query_temp(ROUND, 1)));
-        const threshold = Math.ceil((420_000 * round) / 49);
-        const dodged = target.ds >= threshold;
-        return { is_dodged: dodged, is_parried: !dodged && target.zj >= threshold };
-    }
-
-    resolve_defense_avoidance(attacker: CHARACTER, _par: DoAttackPar) {
-        if (this.trial_type !== 0 || attacker.id !== this.trial_owner) return;
-        const round = Math.max(1, Number(attacker.query_temp(ROUND, 1)));
-        const threshold = 10_000 * round;
-        if (attacker.mz >= threshold) return { is_dodged: false, is_parried: false };
-        return { is_dodged: true, is_parried: false };
-    }
-
     do_attack(par: DoAttackPar): number {
-        const damage = super.do_attack(par);
         const target = par.target;
-        if (
-            this.trial_type === 1 &&
-            target?.id === this.trial_owner &&
-            (par.is_dodged || par.is_parried)
-        ) {
-            target.set_temp(DEFENSE_OK, true);
+        if (this.trial_type === 1 && target?.id === this.trial_owner) {
+            const round = Math.max(1, Number(target.query_temp(ROUND, 1)));
+            const threshold = Math.ceil((420_000 * round) / 49);
+            if (!par.no_dodge && target.ds >= threshold) {
+                // 交给普通攻击公式产生确定闪避，并禁止同时出现招架。
+                par.mz = Number.MIN_SAFE_INTEGER;
+                par.no_parry = true;
+            } else if (
+                !par.no_parry &&
+                !target.is_busy &&
+                !target.is_faint &&
+                target.zj >= threshold
+            ) {
+                // 跳过闪避，以极低命中值交给普通公式产生确定招架。
+                par.no_dodge = true;
+                par.mz = Number.MIN_SAFE_INTEGER;
+            } else {
+                par.no_dodge = true;
+                par.no_parry = true;
+            }
         }
-        return damage;
-    }
-
-    on_attack_result(attacker: CHARACTER, par: DoAttackPar, damage: number): void {
-        if (!attacker.is_player || attacker.id !== this.trial_owner) return;
-        if (this.trial_type === 0 && !par.is_dodged && !par.is_parried) {
-            attacker.set_temp(HIT_OK, true);
-        } else if (this.trial_type === 2 && damage > 0) {
-            attacker.set_temp(DAMAGE_OK, true);
-        }
+        return super.do_attack(par);
     }
 
     auto_attack(): void {
@@ -149,6 +143,11 @@ export default class WudaoTrialBeast extends NPC {
     }
 
     set_round(round: number): void {
+        if (this.trial_type === 0) {
+            // 先确保普通公式落入实际绑定轻功的 on_dodge，再由技能按本轮阈值归一结果。
+            adjustPanelProp(this, 'ds', 0);
+            adjustPanelProp(this, 'zj', 0);
+        }
         if (this.trial_type === 2) adjustProp(this, 'diff_sh', 100_000 * round);
         if (this.trial_type === 3) {
             adjustProp(this, 'diff_fy_per2', 2 * round);
@@ -195,6 +194,8 @@ export function enter_wudao_trial(room: ROOM, player: USER, type: number): void 
     room.set_temp(OWNER, player.id);
     room.set_temp(DONE, false);
     npc.init_from(player, type);
+    player.remove_event('on_attack_result', recordTrialAttackResult);
+    player.add_event('on_attack_result', recordTrialAttackResult);
     room.item_changed(npc, true);
     npc.do_kill(player);
 }
@@ -223,6 +224,23 @@ function set_trial_status(player: USER, round: number): void {
     });
 }
 
+function recordTrialAttackResult(
+    this: CHARACTER,
+    target: CHARACTER,
+    par: DoAttackPar,
+    damage: number,
+): void {
+    if (!this.is_player || target.path !== 'pub/wudao_ss') return;
+    const beast = target as WudaoTrialBeast;
+    const type = Number(this.query_temp(TYPE, -1));
+    if (beast.trial_owner !== this.id || beast.trial_type !== type) return;
+    if (type === 0 && !par.is_dodged && !par.is_parried) {
+        this.set_temp(HIT_OK, true);
+    } else if (type === 2 && damage > 0) {
+        this.set_temp(DAMAGE_OK, true);
+    }
+}
+
 export function finish_wudao_trial(room: ROOM, player?: USER, _failed = false): void {
     if (room.query_temp(DONE, false)) return;
     room.set_temp(DONE, true);
@@ -239,6 +257,7 @@ export function finish_wudao_trial(room: ROOM, player?: USER, _failed = false): 
         }
     }
     if (player) {
+        player.remove_event('on_attack_result', recordTrialAttackResult);
         player.remove_status(TRIAL_STATUS);
         for (const key of [TYPE, ROUND, DEFENSE_OK, HIT_OK, DAMAGE_OK]) player.remove_temp(key);
         player.end_fight();

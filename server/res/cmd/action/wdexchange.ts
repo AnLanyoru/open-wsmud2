@@ -70,9 +70,10 @@ function targetCategory(inputKey: string): CustomPropCategory | undefined {
 }
 
 function showInputs(me: USER, npcId: string): void {
-    const choices: CmdAndText[] = [];
+    let hasChoices = false;
+    me.notify('请选择你要用于兑换的词条：');
     for (const category of CATEGORIES) {
-        let first = true;
+        const choices: CmdAndText[] = [];
         for (const [key, def] of Object.entries(CUSTOM_PROPS)) {
             if (def.category !== category) continue;
             const material = queryMaterial(me, key);
@@ -80,16 +81,14 @@ function showInputs(me: USER, npcId: string): void {
             choices.push([
                 'wdexchange ' + npcId + ' input ' + key,
                 material.sample.unit_name(material.count),
-                undefined,
-                false,
-                first ? CATEGORY_NAMES[category] : undefined,
             ]);
-            first = false;
         }
+        if (!choices.length) continue;
+        hasChoices = true;
+        me.notify(CATEGORY_NAMES[category] + '：');
+        me.send_cmd_and_text(...choices);
     }
-    if (!choices.length) return me.notify('你背包内暂无可兑换的词条材料。');
-    me.notify('请选择你要用于兑换的词条：');
-    me.send_cmd_and_text(...choices);
+    if (!hasChoices) me.notify('你背包内暂无可兑换的词条材料。');
 }
 
 function showTargets(me: USER, npcId: string, inputKey: string): void {

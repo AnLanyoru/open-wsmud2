@@ -74,13 +74,7 @@ export interface StudyingBook {
     max_level: number;
 }
 
-export type CmdAndText = [
-    cmd: string,
-    name: string,
-    text?: string,
-    br?: boolean,
-    group?: string,
-];
+export type CmdAndText = [cmd: string, name: string, text?: string, br?: boolean];
 
 /** 玩家状态对象（打坐/练功/闭关等） */
 export interface UserState {
@@ -378,11 +372,10 @@ export class USER extends CHARACTER {
         const str: string[] = ['{type:"cmds",items:['];
         for (let i = 0; i < args.length; i++) {
             if (i > 0) str.push(',');
-            const [cmd, name, text, br, group] = args[i];
+            const [cmd, name, text, br] = args[i];
             str.push('{cmd:"', cmd, '",name:"', name, '"');
             if (text) str.push(',text:"', text, '"');
             if (br) str.push(',br:1');
-            if (group) str.push(',group:"', group, '"');
             str.push('}');
         }
         str.push(']}');
@@ -474,7 +467,6 @@ export class USER extends CHARACTER {
     quit(): void {
         const rm = this.environment;
         if (rm) {
-            rm.on_user_quit?.(this);
             this.team_out('离开了游戏，自动退出队伍');
             rm.item_changed(this, false, '$N离开了游戏。');
             this.environment = rm;
@@ -804,7 +796,6 @@ export class USER extends CHARACTER {
             this.hp = 1;
             return false;
         }
-        this.environment?.on_user_die?.(this, killer);
         this.clear_status();
 
         this.hp = 0;
