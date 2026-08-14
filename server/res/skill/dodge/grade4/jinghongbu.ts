@@ -72,16 +72,23 @@ export default class extends SKILL {
         },
     };
 
-    /** 掠过：普通闪避判定失败后触发掠影，攻击结算完成时扣除次数 */
-    on_dodge_over(target: CHARACTER, _me: CHARACTER, par: DoAttackPar): void {
-        if (!par.jhb_dodged) return;
+    /** 掠影：普通闪避失败后，由当前实际绑定的轻功技能强制闪避并立即扣除次数。 */
+    on_dodge(target: CHARACTER, attacker: CHARACTER, par: DoAttackPar): void {
         const remaining = target.query_temp('jhb_ly', 0);
-        if (remaining > 0) {
-            target.set_temp('jhb_ly', remaining - 1);
-            if (remaining <= 1) {
-                target.remove_status('jhb_ly');
-            }
-        }
+        if (
+            remaining <= 0 ||
+            attacker.is_miss ||
+            attacker.is_shadow ||
+            par.no_dodge ||
+            target.is_miss ||
+            target.is_rash ||
+            target.is_faint
+        )
+            return;
+        par.is_dodged = true;
+        par.is_parried = false;
+        target.set_temp('jhb_ly', remaining - 1);
+        if (remaining <= 1) target.remove_status('jhb_ly');
     }
 
     query_enable_prop(lv: number): EnablePropMap {
