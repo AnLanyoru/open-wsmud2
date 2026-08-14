@@ -35,3 +35,7 @@
 
 - When a reference document supplies an item introduction or description, copy that text verbatim into the item's `desc`. Do not polish, paraphrase, expand, or shorten it.
 - Put implementation notes, interpretation, or more detailed background in adjacent code comments rather than changing the source description.
+
+## Status IDs
+
+- Any status whose purpose is the framework's standard busy/忙乱 state must use the fixed ID `busy` together with `is_busy: true`; do not create equipment- or skill-specific busy IDs.

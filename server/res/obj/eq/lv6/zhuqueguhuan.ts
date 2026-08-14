@@ -12,10 +12,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WRIST;
     distime = 30000;
     prop: PropMap = {
-        desc: '释放积蓄在手环中的朱雀神力，对附近敌人造成已损失气血百分比的伤害',
+        desc: '释放积蓄在手环中的朱雀神力',
     };
 
     on_use(me: CHARACTER): boolean {
+        // 文档原文只作为面板描述；伤害规则在此处实现。
         const enemies = me.get_nearby_enemies();
         if (!enemies.length) return me.notify_fail('附近没有可以承受朱雀神力的敌人。');
         const percent = 10 + this.level;

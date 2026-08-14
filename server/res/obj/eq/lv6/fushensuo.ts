@@ -21,8 +21,8 @@ export default class extends EQUIPMENT {
         me.send_room('<hiy>$N抖开缚神索，万千金光如游龙般缠向四周敌人！</hiy>');
         for (const enemy of enemies) {
             enemy.add_status({
-                id: 'eq/fushensuo',
-                name: '束缚',
+                id: 'busy',
+                name: '忙乱',
                 desc: '你被缚神索牢牢束缚',
                 duration: 10000,
                 is_busy: true,

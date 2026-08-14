@@ -101,7 +101,7 @@ export default class extends SKILL {
                 }
 
                 me.add_status({
-                    id: 'weapon',
+                    id: 'busy',
                     name: '滚刀术',
                     duration: duration,
                     is_busy: true,
@@ -174,7 +174,7 @@ function run_gundao_attack(me: CHARACTER, interval: number): void {
     if (!me.query_temp('sd_gs') || me.hp <= 0 || !me.fight_type) return;
     const target = me.query_enemy();
     if (!target) {
-        me.remove_status('weapon');
+        me.remove_status('busy');
         return;
     }
 
