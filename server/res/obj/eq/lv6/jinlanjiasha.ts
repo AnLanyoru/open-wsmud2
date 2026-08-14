@@ -15,7 +15,7 @@ export default class extends EQUIPMENT {
         int: 150,
         diff_sh: 2000,
         hp_per: 10,
-        diff_bj: 1000,
+        ig_bj: 1,
         desc: '免疫暴击',
     };
 }

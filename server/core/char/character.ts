@@ -3483,7 +3483,9 @@ export class CHARACTER extends ITEM {
      */
     crit(target: CHARACTER, part: AttackPart | null, bj_per: number): boolean {
         if (this.random(100) < bj_per + (part ? part.crit : 0) - target.query_prop('diff_bj')) {
-            return true;
+            // ig_bj only participates in the ordinary critical-hit decision;
+            // callers that force a critical hit do not pass through this method.
+            return target.query_prop('ig_bj') <= 0;
         }
         return false;
     }

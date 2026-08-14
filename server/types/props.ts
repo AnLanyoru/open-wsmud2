@@ -118,6 +118,8 @@ export interface PropMap {
     /** 炼药效率加成数值 */ lianyao1?: number;
 
     // ===== 没用属性 =====
+    /** 暴击判定拦截标记（仅在普通暴击判定成功后生效） */
+    ig_bj?: number;
     /** 无效果的介绍 */ desc?: string;
 
     /** 允许自定义属性 */
