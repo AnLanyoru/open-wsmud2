@@ -97,10 +97,14 @@ export default class extends SKILL {
                 var mz_reduce = liumaiMzReduce(lv);
                 var count = liumaiCount(lv);
                 var gj = Math.floor(me.gj * 0.8);
-                me.send_room(
-                    '<hiy>$N双指齐出，六脉剑气纵横交错，少商、商阳、中冲、关冲、少冲、少泽六道剑气如狂风暴雨般席卷而出！</hiy>',
-                    target,
-                );
+                var atk_msg_to_b = [
+                    '<hic>$N食指连弹，一式「<HIC>少商剑</HIC>」剑气纵横，凌厉无匹地射向$n的$l！</hic>',
+                    '<hic>$N轻抬食指，一道「<HIC>商阳剑</HIC>」剑气破空而出，巧妙无比地刺向$n的$l！</hic>',
+                    '<hic>$N屈指一弹，中冲剑诀运起，「<HIC>中冲剑</HIC>」大开大阖，气势雄迈地涌向$n的$l！</hic>',
+                    '<hic>$N无名指轻轻一挑，「<HIC>关冲剑</HIC>」剑气拙扑古拙，却暗藏杀机地袭向$n的$l！</hic>',
+                    '<hic>$N小指轻挥，「<HIC>少冲剑</HIC>」轻灵迅捷，变幻莫测地刺向$n的$l！</hic>',
+                    '<hic>$N右手小指一捺，「<HIC>少泽剑</HIC>」剑气忽来忽去，变化精微地射向$n的$l！</hic>',
+                ];
                 for (var i = 0; i < count; i++) {
                     var now_target = me.query_enemy();
                     if (!now_target || now_target.hp <= 0) break;
@@ -112,7 +116,7 @@ export default class extends SKILL {
                         target: now_target,
                         gj: gj,
                         mz: me.mz,
-                        attack_before: '<hic>第' + (i + 1) + '剑：</hic>',
+                        attack_before: atk_msg_to_b[i],
                         no_append: true,
                     });
                     if (hit) {
@@ -150,7 +154,7 @@ export default class extends SKILL {
 }
 
 function wuxingFaintTime(lv: number): number {
-    return 2000 + lv * 5;
+    return Math.min(8000,2000 + lv * 5);
 }
 
 function liumaiMzReduce(lv: number): number {
