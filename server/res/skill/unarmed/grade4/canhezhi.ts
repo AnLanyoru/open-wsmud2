@@ -87,7 +87,7 @@ export default class extends SKILL {
                 var faint_need = 4;
                 if (max_chz) faint_need = 5;
                 me.send_room(
-                    '<HIM>$N食指微抬，一缕若有若无的指风在指尖萦绕，正是慕容家不世绝学——参合指！</HIM>',
+                    '<HIM>$N食指微抬，一缕若有若无的指风在指尖萦绕！</HIM>',
                     target,
                 );
                 var sh = me.do_attack({

@@ -9,7 +9,7 @@ export default class extends SKILL {
     name = '圆月弯刀';
     id = 'yuanyuewandao';
     grade = 4;
-
+    is_hidden = true;
     desc = '「魔教」的一项神奇、精妙的刀法，刀法虽然能带给人无穷的力量，却也能带给人不祥和灾祸';
     can_enables = ['blade'];
     attack_actions = [
@@ -130,7 +130,7 @@ export default class extends SKILL {
                 const bonus = query_yywd_rumo_bonus(lv);
 
                 me.send_room(
-                    '<hiz>$N双目赤红，浑身魔气翻涌，发出一声凄厉长啸——已然入魔！\n刀意自生，人刀易位，再无「我」与「刀」之分。</hiz>',
+                    '<hiz>$N双目赤红，浑身魔气翻涌，发出一声凄厉长啸\n刀意自生，人刀易位，再无「我」与「刀」之分。</hiz>',
                     target,
                 );
 
@@ -189,7 +189,7 @@ export default class extends SKILL {
                 }
 
                 me.send_room(
-                    '<hio>$N将内力尽数灌注$W之中，霎时刀身魔焰冲天，血光映红半天——$N狂啸一声，$W化作一轮血月向$n斩去！</hio>',
+                    '<hio>$N将内力尽数灌注$W之中，霎时刀身魔焰冲天，血光映红半天，$W化作一轮血月向$n斩去！</hio>',
                     target,
                 );
                 let totalDamage = 0;
@@ -208,7 +208,7 @@ export default class extends SKILL {
                             i === 0
                                 ? '<hio>$N的魔刀挟毁天灭地之势斩落，$n但觉眼前一片血芒，避无可避！</hio>'
                                 : undefined,
-                        attack_before: i > 0 ? _tmpl('<hio>刀势未尽，紧跟着</hio>\n') : undefined,
+                        attack_before: i > 0 ? _tmpl('<hio>刀势未尽，紧跟着</hio>') : undefined,
                     });
                     totalDamage += sh;
                 }

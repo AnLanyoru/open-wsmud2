@@ -38,7 +38,7 @@ export default class extends SKILL {
                 me.send_room(
                     '<HIY>$N长啸一声：武林至尊、宝刀屠龙。号令天下，莫敢不从。倚天不出，谁与争锋 ！</hiy>\n <HIR>顿时风云变色，$N手中舞出漫天剑光........ \n<HIR>',
                 );
-                var str = [
+                var str_to_b = [
                     '<HIC>-----拔云见日!----- </HIC>\n',
                     '<BLU>-----星河在天!-----</BLU> \n',
                     '<HIY>-----倚天不出!----- </HIY>\n',
@@ -51,7 +51,7 @@ export default class extends SKILL {
                     if (
                         me.do_attack({
                             target: target,
-                            attack_before: str[i],
+                            attack_before: str_to_b[i],
                             gj: gj,
                         })
                     ) {

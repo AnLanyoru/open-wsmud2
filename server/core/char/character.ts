@@ -3512,11 +3512,11 @@ export class CHARACTER extends ITEM {
                 const tmplText = get(attack_msg as any);
                 if (tmplText) {
                     this.send_combat(
-                        (par.attack_before as string) + format_msg(this, tmplText, target),
+                        par.attack_before + format_msg(this, tmplText, target),
                         target,
                     );
                 } else {
-                    this.send_combat(par.attack_before as string, target);
+                    this.send_combat(par.attack_before, target);
                 }
             } else {
                 this.send_combat(par.attack_before + attack_msg, target);

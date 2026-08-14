@@ -52,7 +52,7 @@ export default class extends SKILL {
                 var duration = calcSJHBDuration(lv);
                 var per = calcSJHBPer(lv);
                 me.send_room(
-                    '<HIW>$N左手玉女剑，右手全真剑，双剑交错，剑光交织如虹，正是玉女素心剑法的最高境界——双剑合璧！</HIW>',
+                    '<HIW>$N左手玉女剑，右手全真剑，双剑交错，剑光交织如虹</HIW>',
                     target,
                 );
                 me.add_status(

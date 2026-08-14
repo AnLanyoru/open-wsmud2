@@ -112,7 +112,7 @@ export default class extends SKILL {
                         target: now_target,
                         gj: gj,
                         mz: me.mz,
-                        attack_before: '<hic>第' + (i + 1) + '剑——</hic>',
+                        attack_before: '<hic>第' + (i + 1) + '剑：</hic>',
                         no_append: true,
                     });
                     if (hit) {
@@ -138,11 +138,11 @@ export default class extends SKILL {
                 var mz_reduce = liumaiMzReduce(lv);
                 var count = liumaiCount(lv);
                 return (
-                    '六脉齐射，随机攻击你的敌人，连续' +
+                    '催动六脉剑气，在敌阵中随机连续攻击' +
                     count +
-                    '次攻击，命中一次减少对方' +
+                    '次。每次命中使目标防御降低' +
                     mz_reduce +
-                    '%防御，持续10秒'
+                    '%，效果可叠加并持续10秒。'
                 );
             },
         },

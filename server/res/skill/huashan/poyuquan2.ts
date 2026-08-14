@@ -60,7 +60,7 @@ export default class extends SKILL {
                 const zx_lv: number = me.query_skill('zixiashengong', 0);
                 const zx_gj: number = zx_lv * 2;
                 me.send_room(
-                    '<HIY>$N沉喝一声，拳锋之上紫气暴涨，凝聚毕生功力——破玉一击，石破天惊！</HIY>',
+                    '<HIY>$N沉喝一声，拳锋之上紫气暴涨</HIY>',
                     target,
                 );
                 me.do_attack({

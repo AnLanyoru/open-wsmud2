@@ -46,7 +46,7 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number): void {
                 const time: number = shenpan_time(lv);
                 me.send_room(
-                    '<ord>$N双目微阖，双手结印，朗声道：「天谕在上，代天行法——审判！」</ord>\n<ord>霎时间，九天之上雷云翻涌，一道金光破空而下，将$n笼罩其中！</ord>\n',
+                    '<ord>$N双目微阖，双手结印，霎时间，九天之上雷云翻涌，一道金光破空而下，将$n笼罩其中！</ord>\n',
                     target,
                 );
                 me.do_attack({
@@ -88,7 +88,7 @@ export default class extends SKILL {
                 const extra_gj: number = tianfa_extra_gj(lv, is_shenpan);
                 if (is_shenpan) {
                     me.send_room(
-                        '<ord>$N仰天长啸，双手指天——「天谕既出，天罚当至！」</ord>\n<ord>九天之上雷云骤聚，万道紫雷如怒龙般狂啸而下！</ord>\n',
+                        '<ord>$N仰天长啸，双手指天，「天谕既出，天罚当至！」</ord>\n<ord>九天之上雷云骤聚，万道紫雷如怒龙般狂啸而下！</ord>\n',
                         target,
                     );
                 } else {

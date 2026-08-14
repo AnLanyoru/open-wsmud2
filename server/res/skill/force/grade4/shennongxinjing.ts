@@ -9,7 +9,7 @@ export default class extends SKILL {
     id = 'shennongxinjing';
     grade = 4;
     force_rad = 0.85;
-
+    is_hidden = true;
     desc = '药王谷内功，传自神农尝百草之术，既能固本培元，亦能御毒抗邪。';
     can_enables = ['force'];
 

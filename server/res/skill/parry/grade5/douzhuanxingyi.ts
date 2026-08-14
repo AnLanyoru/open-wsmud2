@@ -86,7 +86,7 @@ export default class extends SKILL {
                 }
 
                 me.send_room(
-                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟以彼之道还施彼身——「${pfm.name}」之势反卷而回！</HIO>`,
+                    `<HIO>$N眸光一闪，已窥破$n武学关窍，竟以彼之道还施彼身</HIO>`,
                     target,
                 );
                 const effectLv = int((lv * get_douzhuan_effect_per(lv)) / 100);

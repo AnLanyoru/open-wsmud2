@@ -98,7 +98,7 @@ export default class extends SKILL {
                     gj: Math.floor((me.gj * dmgPer) / 100),
                     mz: me.mz * 2,
                     attack_msg:
-                        '<hiy>$N双目无神，神情呆滞，却于一瞬间拍出惊天动地的一掌——黯然销魂掌之「<HIC>呆若木鸡</HIC>」！</hiy>',
+                        '<hiy>$N双目无神，神情呆滞，却于一瞬间拍出惊天动地的一掌</hiy>',
                     miss_msg: '<cyn>$n被$N这一掌的气势所慑，于间不容发之际拼命闪开！</cyn>',
                     damage_msg: '<hir>$n被$N一掌印在胸口，整个人如遭雷击，呆立当场！</hir>',
                 });

@@ -101,7 +101,7 @@ export default class extends SKILL {
                 const duration = 15000;
 
                 me.send_room(
-                    '<him>$N施展凌波微步，动无常则，若危若安，进止难期，若往若还——$n眼前唯见幻影万千，无可着力！</him>',
+                    '<him>$N施展凌波微步，动无常则，若危若安，进止难期，若往若还，$n眼前唯见幻影万千，无可着力！</him>',
                     target,
                 );
 

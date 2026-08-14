@@ -9,7 +9,7 @@ export default class extends SKILL {
     id = 'nitiandao';
     grade = 6;
     force_rad = 1.5;
-
+    is_hidden = true;
     desc = '岁月轮回，逆天而行';
     can_enables = ['force'];
     attack_actions = [

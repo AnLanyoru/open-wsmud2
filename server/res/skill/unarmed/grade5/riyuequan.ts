@@ -82,16 +82,16 @@ export default class extends SKILL {
                 );
                 for (var i = 0; i < total_hits; i++) {
                     if (!target || target.hp <= 0) break;
-                    var msgs = [
-                        '<hiy>第一击——「<HIC>旭日初升</HIC>」</hiy>',
-                        '<hiy>第二击——「<HIC>月映寒潭</HIC>」</hiy>',
-                        '<hiy>第三击——「<HIC>日月交辉</HIC>」</hiy>',
+                    var str_to_b = [
+                        '<hiy>「<HIC>旭日初升</HIC>」</hiy>',
+                        '<hiy>「<HIC>月映寒潭</HIC>」</hiy>',
+                        '<hiy>「<HIC>日月交辉</HIC>」</hiy>',
                     ];
                     var hit = me.do_attack({
                         target: target,
                         gj: me.gj,
                         mz: me.mz,
-                        attack_before: msgs[i],
+                        attack_before: str_to_b[i],
                         no_append: true,
                     });
                     if (hit) hit_count++;

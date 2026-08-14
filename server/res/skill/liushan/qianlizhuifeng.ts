@@ -62,7 +62,7 @@ export default class extends SKILL {
                 const gjsdReduce = query_zhui_speed(lv) + me.query_prop('qlzf_gjsd');
 
                 me.send_room(
-                    '<HIC>$N深吸一口气，足下生风，身形陡然加快，正是六扇门轻功绝技——「追风」！</HIC>',
+                    '<HIC>$N深吸一口气，足下生风，身形陡然加快</HIC>',
                     target,
                 );
 

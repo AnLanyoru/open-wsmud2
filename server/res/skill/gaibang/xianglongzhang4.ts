@@ -76,7 +76,7 @@ export default class extends SKILL {
                     no_dodge: hasXlz ? true : false,
                     no_parry: hasXlz ? true : false,
                     attack_msg:
-                        '<ord>$N龙行虎步，掌随身走，周身真气如烈焰翻腾，猛然一掌拍出——掌风中隐现龙形，昂首怒啸，直贯$n而去！</ord>',
+                        '<ord>$N龙行虎步，掌随身走，周身真气如烈焰翻腾，猛然一掌拍出，掌风中隐现龙形，昂首怒啸，直贯$n而去！</ord>',
                     damage_msg:
                         '<ored>只听一声惊天动地的龙吟，$N掌力已印在$n身上，劲力如怒潮般一浪接一浪涌入$n体内！</ored>',
                     miss_msg:

@@ -157,7 +157,7 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var time = 5000 + int(lv / 2000) * 1000;
                 me.send_room(
-                    '<mag>$N身形一散，化作无数道鬼影在空间中穿梭不定，真身与残影已无从分辨——「<MAG>鬼影</MAG>」！</mag>',
+                    '<mag>$N身形一散，化作无数道鬼影在空间中穿梭不定，真身与残影已无从分辨</mag>',
                     target,
                 );
                 me.add_status({
@@ -227,7 +227,7 @@ export default class extends SKILL {
                 if (time > 25000) time = 25000;
                 var zj_bonus = 10 + Math.floor(lv / 100);
                 me.send_room(
-                    '<mag>$N双手结出玄奥法印，魔气与天地元气共鸣，施展出天魔策至高秘术——「<MAG>补天道</MAG>」！一道无形的天道法则环绕周身！</mag>',
+                    '<mag>$N双手结出玄奥法印，魔气与天地元气共鸣，一道无形的天道法则环绕周身！</mag>',
                     target,
                 );
                 me.add_status({

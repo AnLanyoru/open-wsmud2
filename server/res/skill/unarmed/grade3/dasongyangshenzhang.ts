@@ -64,7 +64,7 @@ export default class extends SKILL {
                 var sh = me.do_attack({
                     target: target,
                     attack_msg:
-                        '<hiy>$N身形如风，双掌化作漫天掌影，虚实难辨，正是大嵩阳神掌的绝技——无影掌！</hiy>',
+                        '<hiy>$N身形如风，双掌化作漫天掌影，虚实难辨</hiy>',
                     damage_msg:
                         '<hir>$n被$N神出鬼没的一掌击中，只觉一股雄浑掌力透体而入，五脏六腑如翻江倒海</hir>',
                     miss_msg:

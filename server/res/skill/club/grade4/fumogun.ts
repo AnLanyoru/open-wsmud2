@@ -46,7 +46,7 @@ export default class extends SKILL {
                 const busyTime = query_fmg_busy_time(lv);
 
                 me.send_room(
-                    '<hiy>$N面露金刚怒目之色，手中$W棍势如山，挟雷霆万钧之力向$n当头劈落，正是净念禅院绝学——「金刚伏魔」！</hiy>',
+                    '<hiy>$N面露金刚怒目之色，手中$W棍势如山，挟雷霆万钧之力向$n当头劈落！</hiy>',
                     target,
                 );
 

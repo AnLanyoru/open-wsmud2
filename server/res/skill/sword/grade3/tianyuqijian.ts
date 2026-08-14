@@ -80,7 +80,7 @@ export default class extends SKILL {
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
                 var per = calcTYJPer(lv);
                 me.send_room(
-                    '<HIM>$N清啸一声，施出天羽四奇剑——梅兰竹菊四剑齐出，剑气纵横交错，天地为之变色！</HIM>',
+                    '<HIM>$N清啸一声，施出天羽四奇剑，梅兰竹菊四剑齐出，剑气纵横交错，天地为之变色！</HIM>',
                     target,
                 );
                 var swords = [

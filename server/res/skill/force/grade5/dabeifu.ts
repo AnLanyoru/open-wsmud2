@@ -7,7 +7,7 @@ export default class extends SKILL {
     id = 'dabeifu';
     grade = 5;
     force_rad = 1.0;
-
+    is_hidden = true;
     desc =
         '阴邪诡异的绝学，相传融汇天地间至阴至邪之力，' +
         '修炼者需断情绝欲，引天地交征之力入体，化阴阳为杀伐。' +

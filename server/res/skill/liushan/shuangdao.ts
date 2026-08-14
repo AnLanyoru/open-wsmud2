@@ -57,7 +57,7 @@ export default class extends SKILL {
                 const gjBonus = query_tuodao_gj_bonus(lv);
 
                 me.send_room(
-                    '<HIY>$N佯作不敌，拖刀便走，$n正欲追击——不料$N猛然回身，刀光如练，当头劈落！</HIY>',
+                    '<HIY>$N佯作不敌，拖刀便走，$n正欲追击，不料$N猛然回身，刀光如练，当头劈落！</HIY>',
                     target,
                 );
 

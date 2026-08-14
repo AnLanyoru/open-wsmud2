@@ -8,7 +8,7 @@ export default class extends SKILL {
     id = 'qingxinzhou';
     grade = 4;
     force_rad = 0.82;
-
+    is_hidden = true;
     desc = '以心为器、以气为弦，音藏于息、韵生于神。可定心神，清邪祟';
     can_enables = ['force'];
     slots = [

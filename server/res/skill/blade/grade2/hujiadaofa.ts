@@ -81,7 +81,7 @@ export default class extends SKILL {
                             target: now_target,
                             gj: gj,
                             mz: mz,
-                            attack_before: '<hiw>紧跟着</hiw>\n',
+                            attack_before: '<hiw>紧跟着</hiw>',
                             no_append: true,
                         });
                         if (!me.end_attack(now_target)) {

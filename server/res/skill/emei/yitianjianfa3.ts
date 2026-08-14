@@ -69,7 +69,7 @@ export default class extends SKILL {
                 const dmgPer = 130 + Math.floor(lv / 50);
                 const enemies = me.enemy?.length ? [...me.enemy] : [target];
                 let gj = me.gj;
-                const str = [
+                const str_to_b = [
                     '<HIC>-----拔云见日!----- </HIC>\n',
                     '<BLU>-----星河在天!-----</BLU> \n',
                     '<HIY>-----倚天不出!----- </HIY>\n',
@@ -86,7 +86,7 @@ export default class extends SKILL {
                         if (
                             me.do_attack({
                                 target: enemy,
-                                attack_before: str[i],
+                                attack_before: str_to_b[i],
                                 gj: gj,
                                 mz: Math.floor((me.mz * (100 + mzBonus)) / 100),
                             })

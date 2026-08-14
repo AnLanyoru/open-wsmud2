@@ -53,7 +53,7 @@ export default class extends SKILL {
                 const damagePer = 100 + me.query_prop('tldw_xd_damage');
 
                 me.send_room(
-                    '<HIR>$N手腕一抖，一道血光破空而出，正是六扇门暗器绝技——「血滴子」！直取$n首级！</HIR>',
+                    '<HIR>$N手腕一抖，一道血光破空而出，直取$n首级！</HIR>',
                     target,
                 );
 

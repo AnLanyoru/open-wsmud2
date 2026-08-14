@@ -37,6 +37,10 @@
 - Put implementation notes, interpretation, or more detailed background in adjacent code comments rather than changing the source description.
 - Apply the same verbatim rule to equipment `prop.desc`: copy the documented effect text exactly, including punctuation and level-specific wording.
 
+## Skill file style
+
+- Do not use the Chinese double-em-dash sequence (`——`) in skill files.
+
 ## Status IDs
 
 - Any status whose purpose is the framework's standard busy/忙乱 state must use the fixed ID `busy` together with `is_busy: true`; do not create equipment- or skill-specific busy IDs.

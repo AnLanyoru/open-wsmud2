@@ -55,7 +55,7 @@ export default class extends SKILL {
                 const dmgMulti = 1.5 + kunSh / 100;
 
                 me.send_room(
-                    '<HIC>$N神色凛然，一指点出，正是大理段氏不传之秘——一指乾坤！指力所及，乾坤倒转！</HIC>',
+                    '<HIC>$N神色凛然，一指点出，指力所及，乾坤倒转！</HIC>',
                     target,
                 );
                 me.do_attack({

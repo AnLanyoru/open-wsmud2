@@ -6,7 +6,7 @@ export default class extends SKILL {
     name = '修罗刀';
     id = 'xiuluodao';
     grade = 6;
-
+    is_hidden = true;
     desc = '舍刀之外，再无他物';
     can_enables = ['blade'];
     attack_actions = [
@@ -90,7 +90,7 @@ export default class extends SKILL {
                         target: target,
                         gj: me.gj + extraDmg,
                         mz: me.mz,
-                        attack_before: i > 0 ? _tmpl('<hiw>紧跟着</hiw>\n') : undefined,
+                        attack_before: i > 0 ? _tmpl('<hiw>紧跟着</hiw>') : undefined,
                     });
                     if (target.hp <= 0) {
                         killed = true;

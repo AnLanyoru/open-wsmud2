@@ -10,7 +10,7 @@ export default class extends SKILL {
     name = '惊鸿步';
     id = 'jinghongbu';
     grade = 4;
-
+    is_hidden = true;
     desc = '传说是已经消失的清音阁的轻功身法，其形如惊鸿，身如游龙';
     can_enables = ['dodge'];
 
@@ -87,6 +87,10 @@ export default class extends SKILL {
             return;
         par.is_dodged = true;
         par.is_parried = false;
+        target.send_room(
+            '<HIC>$N身形如惊鸿掠影，翩翩而散</HIC>',
+            attacker,
+        );
         target.set_temp('jhb_ly', remaining - 1);
         if (remaining <= 1) target.remove_status('jhb_ly');
     }

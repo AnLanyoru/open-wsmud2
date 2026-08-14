@@ -10,6 +10,7 @@ export default class extends SKILL {
     id = 'mojian';
     grade = 6;
 
+    family = FAMILIES.MONSTER;
     // 原始描述：剑魔独孤求败以剑入魔后使用的剑法，剑势狂暴霸道，有我无敌，一剑既出，万魔臣服。
     desc = '剑魔独孤求败以剑入魔后使用的剑法';
     can_enables = ['sword', 'parry'];

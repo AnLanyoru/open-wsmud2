@@ -57,7 +57,7 @@ export default class extends SKILL {
                     gj: me.gj,
                     mz: me.mz,
                     attack_msg:
-                        '<HIM>$N闭目凝神，双手虚抱成圆——左掌阴、右掌阳，太极之力如江河倒悬，滔滔不绝地向$n涌去！</HIM>',
+                        '<HIM>$N闭目凝神，双手虚抱成圆，左掌阴、右掌阳，太极之力如江河倒悬，滔滔不绝地向$n涌去！</HIM>',
                     damage_msg:
                         '<HIR>$n被阴阳二气透体而过，经脉中真气乱窜，刹那间手忙脚乱、招式难续！</HIR>',
                 });
@@ -171,9 +171,9 @@ export default class extends SKILL {
             available_pfms[me.random(available_pfms.length)];
         if (chosen) {
             const sanqing_names: string[] = [
-                '<HIW>一道清气自$N泥丸宫冲出，化为人形——其状混沌未分，鸿蒙未判，正是元始天尊一缕真意！</HIW>',
-                '<HIO>一道清气自$N丹田升起，化为人形——浩浩荡荡，无量无边，恰似灵宝天尊降临凡尘！</HIO>',
-                '<HIJ>一道清气自$N绛宫飞出，化为人形——自然空玄，无形无象，宛若道德天尊现身说法！</HIJ>',
+                '<HIW>一道清气自$N泥丸宫冲出，化为人形，其状混沌未分，鸿蒙未判，正是元始天尊一缕真意！</HIW>',
+                '<HIO>一道清气自$N丹田升起，化为人形，浩浩荡荡，无量无边，恰似灵宝天尊降临凡尘！</HIO>',
+                '<HIJ>一道清气自$N绛宫飞出，化为人形，自然空玄，无形无象，宛若道德天尊现身说法！</HIJ>',
             ];
             const name: string = sanqing_names[me.random(sanqing_names.length)];
             me.send_room(name, now_target);
