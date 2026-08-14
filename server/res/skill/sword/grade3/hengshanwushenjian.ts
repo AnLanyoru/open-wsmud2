@@ -2,6 +2,7 @@ import { SKILL, PERFORM } from '../../../../core/skill/skill.js';
 import { SKILL_TYPES, WEAPON_TYPE } from '../../../../core/const.js';
 import type { PerformData, EnablePropMap } from '../../../../core/skill/skill.js';
 import type { CHARACTER, DoAttackPar } from '../../../../core/char/character.js';
+import type { USER } from '../../../../core/char/user.js';
 
 /** 完成度 50 */
 export default class extends SKILL {
@@ -41,13 +42,14 @@ export default class extends SKILL {
         if (type !== 'parry') return;
         const skillData = me.skills?.get(this.id);
         if (!skillData?.addin?.includes(500)) return;
-        me.send(
-            '<cyn>五神赋已进阶并装备为招架，请选择定向召唤：' +
-                "<span cmd='spfm hswj 祝融'>祝融（攻击）</span>、" +
-                "<span cmd='spfm hswj 芙蓉'>芙蓉（命中）</span>、" +
-                "<span cmd='spfm hswj 石廪'>石廪（防御）</span>、" +
-                "<span cmd='spfm hswj 天柱'>天柱（招架）</span>、" +
-                "<span cmd='spfm hswj 紫盖'>紫盖（闪避）</span>。</cyn>",
+        if (!me.is_player) return;
+        me.send('<cyn>五神赋已进阶并装备为招架，请选择定向召唤：</cyn>');
+        (me as USER).send_cmd_and_text(
+            ['spfm hswj 祝融', '祝融', '攻击', true],
+            ['spfm hswj 芙蓉', '芙蓉', '命中', true],
+            ['spfm hswj 石廪', '石廪', '防御', true],
+            ['spfm hswj 天柱', '天柱', '招架', true],
+            ['spfm hswj 紫盖', '紫盖', '闪避', true],
         );
     }
 
