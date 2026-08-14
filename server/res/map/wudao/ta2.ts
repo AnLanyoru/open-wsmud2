@@ -17,6 +17,7 @@ const WUDAO_TITLES: readonly string[] = [
     '武道塔主',
 ];
 const WUDAO_TITLE_TYPE = 'wudao_tower';
+const ORANGE_GEMS = ['st/st_red#4', 'st/st_blu#4', 'st/st_gre#4', 'st/st_yel#4'];
 
 export default class extends ROOM {
     name = '武道塔';
@@ -32,6 +33,10 @@ export default class extends ROOM {
         if (level < 100 || level > 105) return;
         me.clear_combat_prop();
         me.clear_status();
+        if (me.is_enable_skill('changshengjue', 'force')) {
+            // 百层以上禁用长生诀“不灭”：无时限 temp 标记使其永久视为已经触发。
+            me.set_temp('csj_bm', 1);
+        }
         const npc = NPC.CLONE('pub/wudao_boss');
 
         const room = this;
@@ -87,18 +92,22 @@ export default class extends ROOM {
 
     on_reward(me: CHARACTER, lv: number) {
         if (lv < 100 || lv > 105) return;
-        const title = WUDAO_TITLES[lv - 100];
-        me.add_title?.(title, WUDAO_TITLE_TYPE);
-        me.notify('你获得了称号【' + title + '】。');
-
-        const potential = lv === 100 ? 500_000 : (lv - 100) * 1_000_000;
+        const potential = (lv - 99) * 1_000_000;
         me.add_exp(undefined, potential);
 
-        const items = [{ obj: 'st/yuanjing', count: 1 }, wudao_fragment(6)];
+        const items = [
+            { obj: 'st/yuanjing', count: 1 },
+            wudao_fragment(6),
+            { obj: ORANGE_GEMS, count: 1 },
+        ];
         for (const created of OBJ.create_by_odds(items)) {
             const item = me.add_obj(created);
             if (item) me.send('你获得了' + item.unit_name(created.count) + '。');
         }
+
+        const title = '<hio>' + WUDAO_TITLES[lv - 100] + '</hio>';
+        me.add_title?.(title, WUDAO_TITLE_TYPE);
+        me.notify('你获得了称号【' + title + '】。');
     }
 
     on_leave(me: CHARACTER, dir: string) {

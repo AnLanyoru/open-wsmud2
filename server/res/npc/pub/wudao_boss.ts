@@ -108,7 +108,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
     {
         title: '武道统领者',
         name: '秦雅南',
-        hp: 45_000_000,
+        hp: 50_000_000,
         panel: 300_000,
         downsideResistance: 120,
         crit: 40,
@@ -136,7 +136,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
     {
         title: '武道领主',
         name: '暗淡',
-        hp: 50_000_000,
+        hp: 60_000_000,
         panel: 350_000,
         downsideResistance: 140,
         crit: 50,
@@ -156,7 +156,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['changshengjue', 5000, 'force'],
             ['rulaishenzhang', 5000, 'unarmed'],
             ['dugujiujian2', 5000, 'parry'],
-            ['xuanxubu', 5000, 'dodge'],
+            ['zhutianbu2', 5000, 'dodge'],
             ['lingboweibu2', 5000],
         ],
         performs: ['lingboweibu2/lingbo'],
@@ -164,7 +164,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
     {
         title: '武道塔主',
         name: '黑暗',
-        hp: 60_000_000,
+        hp: 80_000_000,
         panel: 400_000,
         downsideResistance: 160,
         crit: 60,
