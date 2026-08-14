@@ -1,6 +1,7 @@
 import * as Util from './utils/util.js';
 import Setting from './setting.js';
 import { ProcessBinary } from './process.js';
+import { reloadIfUpdated } from './templates.js';
 
 let IsConnecting = false;
 let ReconnectTimer = null;
@@ -38,8 +39,16 @@ export function connectServer(server, pid, isRetry = false) {
             showLoader("<strong>连接失败：</strong>" + err + "");
         }
     }
-    client.OnConnect = () => {
+    client.OnConnect = async () => {
         if (GameClient !== client) return;
+        if (isRetry) {
+            try {
+                if (await reloadIfUpdated()) return;
+            } catch (err) {
+                console.warn('检查客户端更新失败，继续重新连线', err);
+            }
+            if (GameClient !== client) return;
+        }
         IsConnecting = false;
         if (!pid && !Process.player) {
             showLoader('正在获取角色列表...');

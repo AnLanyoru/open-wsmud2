@@ -18,6 +18,7 @@ const MaskTable = {};
 const PartsTable = [[], []];
 let Version = 0;
 let _ready = false;
+let CurrentHash = null;
 
 const LS_HASH_KEY = 'tmpl_hash';
 const LS_DATA_KEY = 'tmpl_data';
@@ -52,7 +53,7 @@ function loadIntoTables(data) {
 export const ready = (async () => {
     try {
         // 1. 获取服务器最新哈希
-        const hashResp = await fetch('/tmpl-hash.json');
+        const hashResp = await fetch('/tmpl-hash.json', { cache: 'no-store' });
         if (!hashResp.ok) throw new Error('hash fetch failed');
         const { hash, file } = await hashResp.json();
 
@@ -63,6 +64,7 @@ export const ready = (async () => {
         if (hash === cachedHash && cachedData) {
             // 哈希一致，直接用缓存
             loadIntoTables(JSON.parse(cachedData));
+            CurrentHash = hash;
         } else {
             // 3. 哈希不一致，下载压缩包
             const gzResp = await fetch('/' + file);
@@ -70,6 +72,7 @@ export const ready = (async () => {
             const gzBlob = await gzResp.blob();
             const data = await decompressGzipToJson(gzBlob);
             loadIntoTables(data);
+            CurrentHash = hash;
             // 4. 写入 localStorage 缓存
             try {
                 localStorage.setItem(LS_HASH_KEY, hash);
@@ -85,6 +88,55 @@ export const ready = (async () => {
     }
     _ready = true;
 })();
+
+/**
+ * 重连成功后检查客户端版本。模板版本变化时，先重新获取当前页面使用的
+ * 同源 JS/CSS 和新模板文件，再用版本化 URL 重新载入页面。
+ * Cookie、localStorage 和 sessionStorage 均不会被清除。
+ */
+export async function reloadIfUpdated() {
+    await ready;
+    if (!CurrentHash) return false;
+
+    const hashResp = await fetch('/tmpl-hash.json', { cache: 'no-store' });
+    if (!hashResp.ok) throw new Error('hash fetch failed');
+
+    const manifest = await hashResp.json();
+    if (!manifest.hash || manifest.hash === CurrentHash) return false;
+
+    const resources = new Set();
+    for (const script of document.querySelectorAll('script[src]')) {
+        resources.add(script.src);
+    }
+    for (const stylesheet of document.querySelectorAll('link[rel="stylesheet"][href]')) {
+        resources.add(stylesheet.href);
+    }
+    for (const entry of performance.getEntriesByType('resource')) {
+        try {
+            const resourceUrl = new URL(entry.name, location.href);
+            if (/\.(?:js|css)$/.test(resourceUrl.pathname)) resources.add(resourceUrl.href);
+        } catch (_) {
+            // Ignore malformed third-party resource URLs.
+        }
+    }
+    if (manifest.file) resources.add(new URL('/' + manifest.file, location.origin).href);
+
+    const sameOriginResources = [...resources].filter(url => {
+        try {
+            return new URL(url, location.href).origin === location.origin;
+        } catch (_) {
+            return false;
+        }
+    });
+    await Promise.allSettled(
+        sameOriginResources.map(url => fetch(url, { cache: 'reload', credentials: 'same-origin' })),
+    );
+
+    const reloadUrl = new URL(location.href);
+    reloadUrl.searchParams.set('__client_version', manifest.hash);
+    location.replace(reloadUrl.href);
+    return true;
+}
 
 function isReady() { return _ready; }
 
