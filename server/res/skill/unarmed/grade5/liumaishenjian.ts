@@ -27,23 +27,16 @@ export default class extends SKILL {
             unarmed: {
                 gj: 5 + lv * 2,
                 mz: 10 + lv * 2,
-                add_sh_per: 4,
-                diff_fy_per: 4,
+                add_sh_per: 1 + Math.floor(lv / 250),
+                diff_fy_per: 1 + Math.floor(lv / 250),
                 desc: '当你命中敌人后会对附近一名敌人产生溅射伤害',
             },
         };
     }
 
-    query_prop(lv: number, me: CHARACTER): PropMap {
-        return {
-            add_sh_per: 1 + Math.floor(lv / 250),
-            diff_fy_per: 1 + Math.floor(lv / 250),
-        };
-    }
-
     // 六脉神剑被动：命中敌人后对附近一名敌人产生溅射伤害
     on_attack_over(me: CHARACTER, target: CHARACTER, par: DoAttackPar, sh: number): void {
-        if (par.is_dodged) return;
+        if (par.is_dodged || !par.no_weapon) return;
         if (!(sh > 0) || !target || target.hp <= 0) return;
         const enemies = me.get_nearby_enemies();
         if (!enemies.length) return;
@@ -187,7 +180,7 @@ export default class extends SKILL {
 }
 
 function wuxingFaintTime(lv: number): number {
-    return Math.min(8000,2000 + lv * 5);
+    return Math.min(8000, 2000 + lv * 5);
 }
 
 /** 溅射伤害百分比 */
