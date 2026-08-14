@@ -47,7 +47,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['taixuangong', 5000, 'force'],
             ['shenxingbaibian', 5000, 'dodge'],
             ['liumaishenjian', 5000, 'unarmed'],
-            ['taijiquan2', 5000, 'parry'],
+            ['qiankundanuoyi', 5000, 'parry'],
         ],
         performs: ['jiuyangshengong/huti'],
     },
@@ -73,7 +73,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['xuantiejianfa', 5000, 'sword'],
             ['jiuyangshengong', 5000, 'force'],
             ['anranxiaohun', 5000, 'unarmed'],
-            ['taijiquan2', 5000, 'parry'],
+            ['qiankundanuoyi', 5000, 'parry'],
             ['zhutianbu2', 5000, 'dodge'],
         ],
         performs: ['jiuyangshengong/huti', 'jiuyangshengong/zhenyan'],
@@ -127,7 +127,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['xuantiejianfa', 5000, 'sword'],
             ['changshengjue', 5000, 'force'],
             ['liumaishenjian', 5000, 'unarmed'],
-            ['dugujiujian2', 5000, 'parry'],
+            ['qiankundanuoyi', 5000, 'parry'],
             ['xuanxubu', 5000, 'dodge'],
             ['lingboweibu2', 5000],
         ],
@@ -155,7 +155,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['fuyujianfa', 5000, 'sword'],
             ['changshengjue', 5000, 'force'],
             ['rulaishenzhang', 5000, 'unarmed'],
-            ['dugujiujian2', 5000, 'parry'],
+            ['qiankundanuoyi', 5000, 'parry'],
             ['zhutianbu2', 5000, 'dodge'],
             ['lingboweibu2', 5000],
         ],
@@ -180,7 +180,7 @@ const GUARDIANS: readonly GuardianConfig[] = [
             ['unarmed', 5000],
             ['parry', 5000],
             ['dodge', 5000],
-            ['fuyujianfa', 5000, 'parry'],
+            ['qiankundanuoyi', 5000, 'parry'],
             ['changshengjue', 5000, 'force'],
             ['liumaishenjian', 5000, 'unarmed'],
             ['dugujiujian2', 5000, 'sword'],
@@ -269,7 +269,7 @@ export default class WuDaoBoss extends NPC {
     ): void {
         for (let i = 0; i < 3 && this[prop] !== target; i++) {
             const multiplier = Math.max((100 + this.query_prop(percentageProp)) / 100, 0.01);
-            this.add_prop(prop, (target - this[prop]) / multiplier);
+            this.add_prop(prop, int((target - this[prop]) / multiplier));
             this.recount();
         }
     }

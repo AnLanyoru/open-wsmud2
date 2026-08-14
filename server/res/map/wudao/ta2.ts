@@ -20,7 +20,7 @@ const WUDAO_TITLE_TYPE = 'wudao_tower';
 const ORANGE_GEMS = ['st/st_red#4', 'st/st_blu#4', 'st/st_gre#4', 'st/st_yel#4'];
 
 export default class extends ROOM {
-    name = '武道塔';
+    name = '上层';
     desc =
         '这里是武道塔的内部，塔身已经石迹斑驳，但是仍然耸立挺拔。四周都是坚固的石壁，不知道什么原因留下一些横七竖八的刀刻剑痕，你想细看却觉得眼睛被刺得发疼。';
     exits = { up: 'wudao/up', out: 'wudao/ding' };
