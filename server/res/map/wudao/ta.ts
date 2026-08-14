@@ -186,9 +186,9 @@ export default class extends ROOM {
     }
 }
 
-/** 武道塔层数对应的技能品质：1~19绿，20~39蓝，……，80~99橙。 */
+/** 武道塔普通残页品质：1~19绿，20~39蓝，……，80层以上橙。 */
 export function wudao_grade(level: number): number {
-    return Math.max(1, Math.min(6, Math.floor((level - 1) / 20) + 1));
+    return Math.max(1, Math.min(5, Math.floor(level / 20) + 1));
 }
 
 export function wudao_fragment(grade: number, odds?: number): any {

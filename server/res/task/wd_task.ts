@@ -3,6 +3,44 @@ import { OBJ } from '../../core/item/obj.js';
 import type { OddsEntry } from '../../core/item/obj.js';
 import { wudao_fragment, wudao_grade } from '../map/wudao/ta.js';
 
+export interface WudaoDailyFragmentSlot {
+    grade: number;
+    odds: number;
+    fall_grade?: number;
+}
+
+/**
+ * 每日秘籍残页槽位。
+ *
+ * 100 层以下当前品质必掉一份并有 50% 概率额外掉落；低品质各有 50% 概率。
+ * 100 层起固定两份橙色槽位，每份独立按层数概率替换为红色；替换率达到 100% 后
+ * 另有 50% 概率额外掉落一份橙色残页。
+ */
+export function wudao_daily_fragment_slots(lv: number): WudaoDailyFragmentSlot[] {
+    if (lv < 100) {
+        const currentGrade = wudao_grade(lv);
+        const slots: WudaoDailyFragmentSlot[] = [];
+        for (let grade = 1; grade <= currentGrade; grade++) {
+            slots.push({ grade, odds: grade === currentGrade ? 10000 : 5000 });
+        }
+        slots.push({ grade: currentGrade, odds: 5000 });
+        return slots;
+    }
+
+    const slots: WudaoDailyFragmentSlot[] = [];
+    for (let grade = 1; grade < 5; grade++) {
+        slots.push({ grade, odds: 5000 });
+    }
+
+    const redOdds = Math.min(10000, (lv - 99) * 2000);
+    slots.push(
+        { grade: 6, odds: redOdds, fall_grade: 5 },
+        { grade: 6, odds: redOdds, fall_grade: 5 },
+    );
+    if (redOdds === 10000) slots.push({ grade: 5, odds: 5000 });
+    return slots;
+}
+
 export default class extends USERTASK {
     id = 'wudao';
 
@@ -111,14 +149,15 @@ export default class extends USERTASK {
             me.add_temp('wds', wd_count);
         }
 
-        // 每日奖励按最高通关层数解锁品质：每20层增加一个品质槽位。
-        // 当前层品质必掉，其余已解锁品质各有50%概率掉落；当前品质另有50%概率额外掉落。
-        const currentGrade = wudao_grade(lv);
-        const maxGrade = Math.min(5, currentGrade);
-        for (let grade = 1; grade <= maxGrade; grade++) {
-            items.push(wudao_fragment(grade, grade === currentGrade ? 10000 : 5000));
+        for (const slot of wudao_daily_fragment_slots(lv)) {
+            const fragment = wudao_fragment(slot.grade, slot.odds);
+            if (slot.fall_grade === undefined) {
+                items.push(fragment);
+                continue;
+            }
+            const fallback = wudao_fragment(slot.fall_grade);
+            items.push({ ...fragment, fall_obj: fallback.obj });
         }
-        items.push(wudao_fragment(currentGrade, 5000));
 
         const created = OBJ.create_by_odds(items);
         for (var i = 0; i < created.length; i++) {
