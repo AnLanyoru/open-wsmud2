@@ -12,8 +12,8 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WRIST;
     prop: PropMap = {
         fy: 200,
-        str: 100,
-        mz: 160,
-        diff_fy_per: 10,
+        gj: 200,
+        mz: 200,
+        diff_fy_per: 14,
     };
 }

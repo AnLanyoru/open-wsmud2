@@ -13,11 +13,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.BLADE;
     prop: PropMap = {
-        gj: 870,
-        gj_per: 10,
-        add_bjsh_per: 30,
-        add_sh_per: 12,
-        diff_fy_per: 10,
+        gj: 880,
+        dex: 200,
+        gj_per: 13,
+        bj_per: 13,
+        diff_fy_per: 15,
         desc: '命中敌人后使对方昏迷3秒，冷却15秒',
     };
     /** 特效冷却（毫秒）。 */

@@ -11,6 +11,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.STAFF;
     prop: PropMap = {
+        gj: 990,
+        str: 220,
+        gj_per: 13,
+        add_sh_per: 13,
+        diff_fy_per: 15,
         desc: '碎骨：暴击后附加敌人2%气血的伤害（词条尚未开放）',
     };
 }

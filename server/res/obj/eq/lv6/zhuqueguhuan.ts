@@ -12,6 +12,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WRIST;
     distime = 30000;
     prop: PropMap = {
+        int: 200,
+        diff_fy_per: 14,
+        mz_per: 14,
+        expend_mp_per: -10,
+        add_sh_per: 10,
         desc: '释放积蓄在手环中的朱雀神力',
     };
 

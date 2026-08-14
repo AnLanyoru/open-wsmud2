@@ -12,9 +12,10 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.CLOTH;
     prop: PropMap = {
         fy: 650,
-        int: 150,
-        diff_sh: 2000,
-        hp_per: 10,
+        int: 200,
+        diff_sh: 10000,
+        fy_per: 15,
+        hp_per: 15,
         ig_bj: 1,
         desc: '免疫暴击',
     };

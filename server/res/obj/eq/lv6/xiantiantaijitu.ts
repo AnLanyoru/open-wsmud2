@@ -13,11 +13,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.CLOTH;
     distime = 60000;
     prop: PropMap = {
-        fy: 780,
-        con: 150,
+        fy: 880,
+        con: 200,
         diff_sh_per: 10,
         fy_per: 10,
-        zj_per: 10,
+        zj_per: 13,
         desc: '激活后8秒内无视伤害',
     };
 

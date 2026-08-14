@@ -12,6 +12,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WAIST;
     distime = 60000;
     prop: PropMap = {
+        fy: 580,
+        gj: 580,
+        str: 200,
+        gj_per: 10,
+        busy_per: 13,
         desc: '使用后束缚附近敌人10秒',
     };
 

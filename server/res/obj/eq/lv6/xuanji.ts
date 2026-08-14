@@ -12,12 +12,12 @@ export default class extends EQUIPMENT {
     hole_count = 5;
     eq_type = EQUIP_TYPE.NECKLACE;
     prop: PropMap = {
-        str: 80,
-        con: 80,
-        dex: 80,
+        str: 200,
+        con: 200,
+        dex: 200,
+        int: 200,
         per: 10,
-        hp_per: 10,
-        fy_per: 10,
+        hp_per: 20,
         desc: '当你受到致命一击时不会立即死亡，冷却10分钟',
     };
 

@@ -11,8 +11,10 @@ export default class extends EQUIPMENT {
     hole_count = 4;
     eq_type = EQUIP_TYPE.WAIST;
     prop: PropMap = {
-        fy: 5,
+        fy: 220,
         dex: 100,
         hp_per: 5,
+        fy_per: 5,
+        dazuo_per: 10,
     };
 }

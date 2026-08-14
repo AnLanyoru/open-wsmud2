@@ -12,6 +12,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.NONE;
     prop: PropMap = {
+        gj: 880,
+        str: 150,
+        mz_per: 13,
+        gjsd_per: 13,
+        distime_per: 15,
         desc: '战意：命中后增加5%破防和最终伤害',
     };
 

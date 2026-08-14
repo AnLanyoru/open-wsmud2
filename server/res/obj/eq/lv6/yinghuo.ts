@@ -13,6 +13,11 @@ export default class extends EQUIPMENT {
     weapon_type = WEAPON_TYPE.BLADE;
     distime = 60000;
     prop: PropMap = {
+        gj: 900,
+        str: 150,
+        bj_per: 15,
+        diff_fy_per: 13,
+        add_bjsh_per: 23,
         desc: '激活后5秒内将对敌人造成的伤害吸收为自身气血内力',
     };
 

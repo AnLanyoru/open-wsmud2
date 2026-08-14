@@ -13,11 +13,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.SHOES;
     distime = 60000;
     prop: PropMap = {
-        fy: 380,
-        str: 100,
-        dex: 100,
-        diff_busy_per: 20,
-        ds_per: 10,
+        fy: 680,
+        dex: 200,
+        diff_downside_per: 10,
+        gjsd_per: 10,
+        add_sh_per: 10,
         desc: '激活后清除自身异常状态，10秒内免疫控制',
     };
 

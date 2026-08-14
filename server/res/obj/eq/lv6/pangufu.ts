@@ -13,11 +13,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.STAFF;
     prop: PropMap = {
-        gj: 910,
-        str: 250,
-        add_sh_per: 12,
-        diff_fy_per: 20,
-        add_bjsh_per: 50,
+        gj: 890,
+        str: 200,
+        add_sh_per: 15,
+        diff_fy_per: 13,
+        add_bjsh_per: 40,
         gjsd: -1000,
         desc: '命中后降低对方战斗属性30%',
     };

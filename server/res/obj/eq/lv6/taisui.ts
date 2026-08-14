@@ -12,6 +12,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {
+        gj: 900,
+        str: 150,
+        gj_per: 13,
+        gjsd_per: 20,
+        diff_fy_per: 15,
         desc: '兵解：自身气血内力归一，对敌人造成相应伤害',
     };
 

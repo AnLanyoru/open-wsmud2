@@ -13,7 +13,8 @@ export default class extends EQUIPMENT {
     prop: PropMap = {
         fy: 380,
         ds: 200,
-        ds_per: 3,
+        dex: 50,
+        ds_per: 5,
         diff_busy_per: 10,
     };
 }

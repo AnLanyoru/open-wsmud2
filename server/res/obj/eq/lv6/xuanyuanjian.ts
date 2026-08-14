@@ -14,11 +14,11 @@ export default class extends EQUIPMENT {
     eq_type = EQUIP_TYPE.WEAPON;
     weapon_type = WEAPON_TYPE.SWORD;
     prop: PropMap = {
-        gj: 780,
-        str: 150,
-        mz_per: 20,
-        add_sh_per: 12,
-        diff_fy_per: 12,
+        gj: 880,
+        str: 200,
+        mz_per: 13,
+        add_sh_per: 13,
+        distime_per: 15,
         desc: '命中后增加你的战斗属性10%，可叠加10层',
     };
 

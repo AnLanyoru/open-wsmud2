@@ -18,6 +18,7 @@ export default class extends EQUIPMENT {
         dazuo_per: 40,
         hp_per: 20,
         con: 200,
+        int: 200,
         desc: '使用后复活附近所有的玩家，冷却30分',
     };
 

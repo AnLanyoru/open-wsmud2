@@ -14,6 +14,6 @@ export default class extends EQUIPMENT {
         fy: 450,
         dex: 30,
         diff_sh_per: 5,
-    };
-    // Special effects: 减少伤害+7%
+        skill: { dodge: 100 },
+    } as PropMap;
 }

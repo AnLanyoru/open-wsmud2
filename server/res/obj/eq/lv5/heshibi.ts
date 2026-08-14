@@ -11,7 +11,13 @@ export default class extends EQUIPMENT {
     hole_count = 4;
     eq_type = EQUIP_TYPE.JEWELS;
     distime = 60000;
-    prop: PropMap = { desc: '激发和氏璧蕴含的能量减少敌人攻击' };
+    prop: PropMap = {
+        gj_per: 5,
+        fy_per: 5,
+        mz_per: 5,
+        zj_per: 5,
+        desc: '激发和氏璧蕴含的能量减少敌人攻击',
+    };
 
     on_use(me: CHARACTER): boolean {
         const target = me.query_enemy();
