@@ -3505,11 +3505,18 @@ export class CHARACTER extends ITEM {
         }
         if (par.attack_before && attack_msg) {
             if (typeof (par.attack_before as any) === 'number') {
-                this.send_combat(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
+                if (typeof (attack_msg as any) === 'number') {
+                    this.send_combat(_TMPL_CONCAT2, target, [par.attack_before], [attack_msg]);
+                } else {
+                    // 只有模板 ID 才能包装成 TplRef；动态文本误包装后会被位运算转换成模板 0。
+                    // 展开已编译的 before，并回退到文本路径完成占位符替换。
+                    const beforeText = get((par.attack_before as any) & 0xffff);
+                    this.send_combat((beforeText ?? '') + attack_msg, target);
+                }
             } else if (typeof (attack_msg as any) === 'number') {
                 // attack_before 是动态字符串，attack_msg 是模板 ID
                 // 文本路径：展开模板为文本后拼接，format_msg 正确替换 $ 占位符
-                const tmplText = get(attack_msg as any);
+                const tmplText = get((attack_msg as any) & 0xffff);
                 if (tmplText) {
                     this.send_combat(
                         par.attack_before + format_msg(this, tmplText, target),

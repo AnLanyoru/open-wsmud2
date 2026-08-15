@@ -630,6 +630,17 @@ function buildSparseFromCache(fieldMask, aId, tId) {
     return sparse;
 }
 
+/** 按当前玩家视角转换模板中的攻击者/目标名称。每层模板展开后分别调用，避免嵌套模板漏转“你”。 */
+function applyMessagePerspective(text, fieldMask, sparse, aId, tId) {
+    if (!text) return text;
+    // 名字为空字符串时禁止 split('')，否则会在每个字符之间插入“你”
+    const aName = (fieldMask & 0x01) ? sparse[popcntBelow(fieldMask, 0x01)] : '';
+    const tName = (fieldMask & 0x20) ? sparse[popcntBelow(fieldMask, 0x20)] : '';
+    if (aId && aId === Process.player && aName) text = text.split(aName).join('你');
+    if (tId && tId === Process.player && tName) text = text.split(tName).join('你');
+    return text;
+}
+
 /** 读取嵌套模板引用，递归 format 返回展开字符串 */
 function readTplRef(data, pos, aId, tId, dv, hurtPart) {
     const refTid = (data[pos] << 8) | data[pos + 1]; pos += 2;
@@ -656,7 +667,11 @@ function readTplRef(data, pos, aId, tId, dv, hurtPart) {
     // 嵌套模板用自己的 fieldMask 从缓存构建 sparse（缓存有全部字段），复用父级 hurtPart
     const refFieldMask = getMask(refTid);
     const refSparse = buildSparseFromCache(refFieldMask, aId, tId);
-    return { str: format(refTid, refFieldMask, refSparse, refArgs, hurtPart), next: pos };
+    const refText = format(refTid, refFieldMask, refSparse, refArgs, hurtPart);
+    return {
+        str: applyMessagePerspective(refText, refFieldMask, refSparse, aId, tId),
+        next: pos
+    };
 }
 
 // ============================================================
@@ -807,17 +822,17 @@ export function ProcessBinary(data) {
                 }
 
                 // 模板还原 + 视角转换（用 ID 比较，无名字碰撞风险）
-                let text = format(tid, fieldMask, sparse, args, hurtPart);
+                let text = applyMessagePerspective(
+                    format(tid, fieldMask, sparse, args, hurtPart),
+                    fieldMask,
+                    sparse,
+                    aId,
+                    tId
+                );
                 if (text) {
                     // excludeSelf / no_mcmsg：用 A_ID 比较
                     if (excludeSelf && aId === Process.player) break;
                     if (aId === Process.player && Setting.no_mcmsg) break;
-                    // 视角转换：玩家是 A 或 T 时替换名字为"你"
-                    // 注意：名字为空字符串时禁止 split('')，否则会把每个字符之间都插入"你"
-                    const aName = (fieldMask & 0x01) ? sparse[popcntBelow(fieldMask, 0x01)] : '';
-                    const tName = (fieldMask & 0x20) ? sparse[popcntBelow(fieldMask, 0x20)] : '';
-                    if (aId && aId === Process.player && aName) text = text.split(aName).join('你');
-                    if (tId && tId === Process.player && tName) text = text.split(tName).join('你');
                     if (Setting.show_binary) {
                         // 调试输出：字段值来自 cur_room.items 缓存（非帧内下发），帧仅携带 idMask + 7B ID
                         const FIELD_NAMES = ['A_NAME', 'A_WEAPON', 'A_CALL3', 'T_WEAPON', 'A_THROW', 'T_NAME', '(reserved)', 'T_CALL3'];
