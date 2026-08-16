@@ -52,6 +52,7 @@ export default class extends SKILL {
                     gj: gj,
                     mz: me.mz,
                     attack_msg: '<hiy>$N默运内力，积蓄力量，企图在攻击的瞬间以内力震伤$n</hiy>',
+                    no_weapon: true,
                 });
                 me.end_attack(target);
             },

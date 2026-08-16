@@ -56,6 +56,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj * 3,
                     mz: Math.floor((me.mz * mz_bonus) / 100),
+                    no_weapon: true,
                     attack_msg:
                         '<hiy>$N沉肩落胯，右拳凝聚全身之力，一式「<HIC>击破</HIC>」如流星赶月般轰向$n！</hiy>',
                     miss_msg: '<cyn>$n见$N拳势刚猛无俦，不敢樱其锋，当即抽身疾退！</cyn>',
@@ -93,6 +94,7 @@ export default class extends SKILL {
                         mz: me.mz,
                         attack_before: str_to_b[i],
                         no_append: true,
+                        no_weapon: true,
                     });
                     if (hit) hit_count++;
                     me.end_attack(target);

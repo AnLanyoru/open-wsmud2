@@ -135,6 +135,7 @@ export default class extends SKILL {
                         target,
                         gj: Math.floor(me.gj * dmgBonus),
                         mz: Math.floor(me.mz * (1 + mzBonus)),
+                        no_weapon: true,
                     });
                 }
                 me.end_attack(target);

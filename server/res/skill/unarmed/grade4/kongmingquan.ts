@@ -78,6 +78,7 @@ export default class extends SKILL {
                         gj: me.gj,
                         mz: me.mz,
                         attack_msg: dirMsgs[i],
+                        no_weapon: true,
                     };
                     me.do_attack(par);
                     if (par.is_dodged || par.is_parried) {
@@ -90,6 +91,7 @@ export default class extends SKILL {
                     gj: me.gj,
                     mz: me.mz,
                     attack_msg: finalMsg,
+                    no_weapon: true,
                 };
                 if (allHit) {
                     lastPar.diff_fy = diffFyPer;

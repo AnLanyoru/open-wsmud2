@@ -82,6 +82,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
+                    no_weapon: true,
                     attack_msg: '<mag>$N一掌拍出，魔气凝成一道黑色符印，直印$n丹田！</mag>',
                     miss_msg:
                         '<cyn>$n察觉到$N这一掌暗藏诡异，强行提气后撤，避开了这夺命一击。</cyn>',
@@ -192,6 +193,7 @@ export default class extends SKILL {
                     target: target,
                     gj: Math.floor(me.gj * (1 + lv / 1000)),
                     mz: me.mz,
+                    no_weapon: true,
                     attack_msg: '<mag>$N拳罡化作一道黑色光柱，带着毁天灭地之势轰向$n！</mag>',
                     miss_msg: '<cyn>$n被这惊天一拳所慑，拼尽全力向旁闪开！</cyn>',
                     damage_msg:

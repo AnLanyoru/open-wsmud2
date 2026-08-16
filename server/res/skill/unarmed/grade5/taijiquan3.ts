@@ -77,6 +77,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj + mp_damage,
                     mz: Math.floor((me.mz * (100 + mz_bonus_pct)) / 100),
+                    no_weapon: true,
                     attack_msg: '<hiy>$N掌力一吐，一股醇厚无比的太极内劲透过虚空直击$n！</hiy>',
                     miss_msg: '<cyn>$n察觉到这股暗劲袭来，急忙侧身闪避。</cyn>',
                     damage_msg: '<hir>$n被太极震劲透体而入，五脏六腑如遭重锤，一口鲜血喷出！</hir>',

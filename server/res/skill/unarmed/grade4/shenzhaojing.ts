@@ -120,6 +120,7 @@ export default class extends SKILL {
                     target,
                     gj: Math.floor(me.gj * 0.01) + strDmg,
                     mz: me.mz,
+                    no_weapon: true,
                 });
 
                 if (target.hp > 0) {
