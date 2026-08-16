@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-const desvi = __CONFIG.DESIV;
+const authKey = __CONFIG.DESIV;
 const md5add = __CONFIG.MD5;
 const SessionKey = 'u';
 const SessionToken = 'p';
@@ -24,13 +24,12 @@ class Apibase {
 
     signIn(id, uname, pwd, level) {
         if (!(id > 0)) return null;
-        const sessionKey = this.sessionKey();
         let key = this.req.cookies[SessionKey];
-        if (typeof key !== 'string' || key !== sessionKey) {
-            key = sessionKey;
+        if (!key) {
+            key = this.sessionKey();
             this.res.cookie(SessionKey, key, CookieOptions);
         }
-        let cert = this.encryptUser(id, uname, pwd, key, level);
+        let cert = this.encryptUser(id, uname, pwd, level);
         if (!cert) return null;
         this.res.cookie(SessionToken, cert, CookieOptions);
         return cert;
@@ -49,41 +48,45 @@ class Apibase {
         }
         let str = this.req.cookies[SessionToken];
         if (!str) return;
-        this.loginUser = this.deEncryptUser(key, str);
+        this.loginUser = this.deEncryptUser(str);
         return this.loginUser;
     }
 
-    deEncryptUser(key, cert) {
-        const txt = this.deEncrypt(key, cert);
+    deEncryptUser(cert) {
+        const txt = this.deEncrypt(cert);
         if (!txt) return null;
         const str = txt.split("%");
         if (str.length !== 5) return null;
-        const id = parseInt(str[0]);
+        const id = parseInt(str[1]);
         const time = parseInt(str[3]);
         const age = Date.now() - time;
         if (id > 0 && Number.isFinite(time) && age >= 0 && age <= SessionMaxAge)
             return {
                 id: id,
-                name: str[1],
-                pwd: str[2],
+                name: str[2],
+                pwd: str[0],
                 time: time,
                 level: str[4],
             };
         return null;
     }
 
-    deEncrypt(key, str) {
-
-        if (!key || !str) return;
+    deEncrypt(str) {
+        if (!str) return null;
         try {
-            if (key.length > 16) key = key.slice(0, 16);
-            key = Buffer.from(key, 'utf8');
-            let decipher = crypto.createDecipheriv('aes-128-cbc', key, desvi);
-            let txt = decipher.update(str, 'base64', 'utf8');
-            txt += decipher.final('utf8');
-            return txt;
+            const data = Buffer.from(str, 'base64');
+            const nonce = data.subarray(0, 12);
+            const tag = data.subarray(data.length - 16);
+            const ciphertext = data.subarray(12, data.length - 16);
+
+            const decipher = crypto.createDecipheriv('aes-128-gcm', authKey, nonce);
+            decipher.setAuthTag(tag);
+
+            let plain = decipher.update(ciphertext);
+            plain = Buffer.concat([plain, decipher.final()]);
+            return plain.toString('utf8');
         } catch (e) {
-            return;
+            return null;
         }
     }
 
@@ -94,23 +97,19 @@ class Apibase {
         return result.toUpperCase();
     }
 
-    encrypt(str, key) {
-        if (!key || !str) return;
-        if (key.length > 16) key = key.slice(0, 16);
-        key = Buffer.from(key, 'utf8');
-        let decipher = crypto.createCipheriv('aes-128-cbc', key, desvi);
-
-        // decipher.setAutoPadding(true);
-
-        let txt = decipher.update(str, 'utf8', 'base64');
-
-        txt += decipher.final('base64');
-        return txt;
+    encrypt(str) {
+        if (!str) return;
+        const nonce = crypto.randomBytes(12);
+        const cipher = crypto.createCipheriv('aes-128-gcm', authKey, nonce);
+        let encrypted = cipher.update(str, 'utf8');
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        const tag = cipher.getAuthTag();
+        return Buffer.concat([nonce, encrypted, tag]).toString('base64');
     }
 
-    encryptUser(id, uname, pwd, key, level) {
-        return this.encrypt([id, uname, pwd,
-            Date.now(), level].join('%'), key);
+    encryptUser(id, uname, pwd, level) {
+        return this.encrypt([pwd, id, uname,
+            Date.now(), level].join('%'));
     }
 
     setSession(key, value) {

@@ -70,28 +70,30 @@ const USERLOGIN = {
     },
 
     /**
-     * 解密用户会话信息
-     * @param key - 加密密钥 (截取前 16 位)
-     * @param session - Base64 编码的加密会话数据
-     * @returns 解密后的会话数据，失败返回 null
+     * 解密 Web 端签发的 AES-GCM 登录凭证。
+     * key 参数保留在首帧协议中，用于兼容现有的 `u p [角色]` 格式。
      */
     encryptUser(key: string, session: string): DecryptedSession | null {
         if (!key || !session) return null;
-        if (key.length >= 16) key = key.slice(0, 16);
         try {
-            const keyBuf = Buffer.from(key, 'utf8');
-            const decipher = crypto.createDecipheriv('aes-128-cbc', keyBuf, __CONFIG.DESIV);
-            let txt = decipher.update(session, 'base64', 'utf8');
-            txt += decipher.final('utf8');
+            const data = Buffer.from(session, 'base64');
+            const nonce = data.subarray(0, 12);
+            const tag = data.subarray(data.length - 16);
+            const ciphertext = data.subarray(12, data.length - 16);
+            const decipher = crypto.createDecipheriv('aes-128-gcm', __CONFIG.DESIV, nonce);
+            decipher.setAuthTag(tag);
+            let plain = decipher.update(ciphertext);
+            plain = Buffer.concat([plain, decipher.final()]);
+            const txt = plain.toString('utf8');
             const str = txt.split('%');
             if (str.length !== 5) return null;
-            const id = parseInt(str[0]);
+            const id = parseInt(str[1]);
             const loginTime = parseInt(str[3]);
             if (id > 0 && Number.isFinite(loginTime)) {
                 return {
                     id: id,
-                    name: str[1],
-                    pwd: str[2],
+                    name: str[2],
+                    pwd: str[0],
                     loginTime: loginTime,
                     level: parseInt(str[4]),
                 };
