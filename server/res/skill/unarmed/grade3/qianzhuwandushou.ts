@@ -58,6 +58,7 @@ export default class extends SKILL {
                         damage_msg: '<hir>只见一缕黑气从$N的指尖透出，只一闪就没入$n的眉心！</hir>',
                         miss_msg: '<hig>可是$n早有准备，一个懒驴打滚，堪堪躲过了这一招。</hig>',
                         parry_msg: '<hig>可是$n早有准备，一个懒驴打滚，堪堪躲过了这一招。</hig>',
+                        no_weapon: true,
                     })
                 ) {
                     var gj = parseInt((me.gj * (lv / 300)) / 3);

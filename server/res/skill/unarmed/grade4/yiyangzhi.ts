@@ -63,6 +63,7 @@ export default class extends SKILL {
                     gj: Math.floor(me.gj * dmgMulti),
                     mz: me.mz,
                     no_parry: true,
+                    no_weapon: true,
                 });
                 me.end_attack(target);
             },
@@ -81,7 +82,7 @@ export default class extends SKILL {
                 const hmDuration = me.query_prop('yyz_xue_hm');
 
                 me.send_room('<HIC>$N运起一阳指神功，食指疾出，精准地点向$n的穴道！</HIC>', target);
-                me.do_attack({ target, gj: me.gj, mz: me.mz });
+                me.do_attack({ target, gj: me.gj, mz: me.mz, no_weapon: true });
 
                 if (target.hp > 0) {
                     target.add_status(

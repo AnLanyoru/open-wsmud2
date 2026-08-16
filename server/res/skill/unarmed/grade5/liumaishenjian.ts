@@ -62,7 +62,8 @@ export default class extends SKILL {
             gj: splashDmg,
             mz: me.mz,
             no_append: true,
-            no_append_before: true
+            no_append_before: true,
+            no_weapon: true,
         });
         me.end_attack(splashTarget);
     }
@@ -80,6 +81,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj,
                     mz: me.mz,
+                    no_weapon: true,
                     attack_msg:
                         '<hib>$N深吸一口气，内力自丹田澎湃而出，尽数贯注指尖，一道凌厉绝伦的「<HIC>无形剑气</HIC>」破空激射！</hib>',
                     miss_msg: '<cyn>$n见$N指尖剑气纵横，不敢硬接，足尖一点倒纵出数丈之外！</cyn>',
@@ -144,6 +146,7 @@ export default class extends SKILL {
                         mz: me.mz,
                         attack_before: atk_msg_to_b[i],
                         no_append: true,
+                        no_weapon: true,
                     });
                     if (hit) {
                         now_target.add_status(

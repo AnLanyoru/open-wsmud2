@@ -52,6 +52,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj,
                     no_append: true,
+                    no_weapon: true,
                     damage_msg:
                         '<hir>结果只听扑的一声，$p被$P一掌拍中，只觉得全身暖洋洋的，感到有点轻飘无力。</hir>',
                 });

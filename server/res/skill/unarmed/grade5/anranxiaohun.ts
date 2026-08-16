@@ -47,6 +47,7 @@ export default class extends SKILL {
                     target: target,
                     gj: Math.floor((me.gj * dmgPer) / 100),
                     mz: me.mz,
+                    no_weapon: true,
                     attack_msg:
                         '<hiy>$N黯然长叹，双掌似有似无地缓缓推出，正是黯然销魂掌中最诡异的「<HIC>无中生有</HIC>」！</hiy>',
                     miss_msg: '<cyn>$n心头一凛，于千钧一发之际堪堪避过这无形无迹的一掌。</cyn>',
@@ -97,6 +98,7 @@ export default class extends SKILL {
                     target: target,
                     gj: Math.floor((me.gj * dmgPer) / 100),
                     mz: me.mz * 2,
+                    no_weapon: true,
                     attack_msg:
                         '<hiy>$N双目无神，神情呆滞，却于一瞬间拍出惊天动地的一掌</hiy>',
                     miss_msg: '<cyn>$n被$N这一掌的气势所慑，于间不容发之际拼命闪开！</cyn>',

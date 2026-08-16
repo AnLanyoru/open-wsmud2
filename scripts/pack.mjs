@@ -355,14 +355,14 @@ if (IS_BINARY) {
     // ============================================================
     // Pass 1.5: 收集已知安全上下文中的字符串字面量
     // 上下文已精确匹配，不依赖 $/^ 内容过滤：
-    //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
+    //   1. action 数组: attack_actions* / attack_msgs / parry_msg* / dodge_actions / parry_actions / ..._vs_..._actions
     //   2. DoAttackPar 属性值: attack_msg / miss_msg / parry_msg / damage_msg / attack_before
     //   3. _to_b 后缀变量赋值（单个字符串或一维字符串数组）
     //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
     // ============================================================
 
     const STR_LIT_RE = /(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
-    const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
+    const ACTION_ARR_RE_C = /((?:this\.)?(?:attack_actions\w*|attack_msgs|parry_msg\w*|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
     const PAR_PROP_RE_C = /(?:attack_msg|miss_msg|parry_msg|damage_msg|attack_before)\s*:\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\1(?!\s*\+)/g;
     const TO_B_RE_C = /(\w+_to_b)\s*=\s*(["'])((?:[^"'\\\n\r]|\\.)*?)\2(?!\s*\+)/g;
     const TO_B_ARR_RE_C = /(\w+_to_b\s*=\s*\[)([\s\S]*?)(\])/g;
@@ -388,7 +388,7 @@ if (IS_BINARY) {
                 const content = fs.readFileSync(full, 'utf8');
                 let m;
 
-                // 1) action 数组
+                // 1) action / attack message 数组
                 ACTION_ARR_RE_C.lastIndex = 0;
                 while ((m = ACTION_ARR_RE_C.exec(content)) !== null) {
                     let sm;
@@ -684,7 +684,7 @@ ${serverLines.join('\n')}
                 // ============================================================
                 // 替换已知安全上下文中的字符串字面量
                 // 上下文已精确匹配，不依赖 $/^ 内容过滤：
-                //   1. action 数组: attack_actions / dodge_actions / parry_actions / ..._vs_..._actions
+                //   1. action 数组: attack_actions* / attack_msgs / parry_msg* / dodge_actions / parry_actions / ..._vs_..._actions
                 //   2. _DMG_TMPL 的 tmpl 值
                 //   3. _DMG_FALLBACK 值
                 //   4. status_msg / WINNER_MSG / catch_hunt_msg / guard_msg 数组
@@ -705,8 +705,8 @@ ${serverLines.join('\n')}
 
                 const preContent = content;
 
-                // 1) action 数组: attack_actions: ["...", ...]
-                const ACTION_ARR_RE = /((?:this\.)?(?:attack_actions|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
+                // 1) action / attack message 数组
+                const ACTION_ARR_RE = /((?:this\.)?(?:attack_actions\w*|attack_msgs|parry_msg\w*|dodge_actions|parry_actions|weapon_vs_weapon_actions|weapon_vs_unarmed_actions|unarmed_vs_weapon_actions)\s*[=:]\s*\[)([\s\S]*?)(\])/g;
                 content = content.replace(ACTION_ARR_RE, (_, prefix, body, suffix) => {
                     return prefix + body.replace(STR_RE, replaceStr) + suffix;
                 });

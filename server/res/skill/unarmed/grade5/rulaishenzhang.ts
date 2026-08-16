@@ -55,6 +55,7 @@ export default class extends SKILL {
                         target: enemy,
                         gj: Math.floor(me.gj * 0.5),
                         mz: me.mz,
+                        no_weapon: true,
                         attack_msg: '<hiy>一道佛影自虚空中浮现，一掌拍向$n！</hiy>',
                         miss_msg: '<cyn>$n被佛光所慑，拼命闪避。</cyn>',
                         damage_msg: '<hir>$n被佛掌击中，闷哼一声，气血翻涌！</hir>',
@@ -92,6 +93,7 @@ export default class extends SKILL {
                     target: target,
                     gj: me.gj + fy_bonus,
                     mz: me.mz + fy_bonus,
+                    no_weapon: true,
                     attack_msg: '<hiy>$N掌挟万钧之势，如流星坠地般朝$n当头拍下！</hiy>',
                     miss_msg: '<cyn>$n见这一掌威势无双，哪敢硬接，连滚带爬地向旁闪去！</cyn>',
                     damage_msg:

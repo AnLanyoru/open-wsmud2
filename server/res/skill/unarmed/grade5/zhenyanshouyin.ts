@@ -51,6 +51,7 @@ export default class extends SKILL {
                     target: target,
                     gj: Math.floor((me.gj * (100 + idx * 10)) / 100),
                     mz: me.mz,
+                    no_weapon: true,
                     attack_msg:
                         '<hiy>「<HIC>' +
                         word +

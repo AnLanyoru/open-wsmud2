@@ -65,7 +65,12 @@ export default class extends SKILL {
                     '<HIW>$N食指扣在拇指之下，猛地弹出，只听一声尖锐破空，一道惊雷般的指风直射$n！</HIW>',
                     target,
                 );
-                me.do_attack({ target, gj: Math.floor(me.gj * dmgMulti), mz: me.mz });
+                me.do_attack({
+                    target,
+                    gj: Math.floor(me.gj * dmgMulti),
+                    mz: me.mz,
+                    no_weapon: true,
+                });
 
                 if (target.hp > 0 && neiliDrain > 0) {
                     target.send_room('<HIR>$n的内力被弹指神通的真气打散，流失了一部分！</HIR>', me);
@@ -86,7 +91,12 @@ export default class extends SKILL {
                 var busyDuration = dianxueBusy(lv);
                 const xueNl = me.query_prop('tzsg_xue_nl');
 
-                const par: DoAttackPar = { target, gj: me.gj, mz: me.mz };
+                const par: DoAttackPar = {
+                    target,
+                    gj: me.gj,
+                    mz: me.mz,
+                    no_weapon: true,
+                };
                 if (xueNl > 0) {
                     par.gj = me.gj + Math.floor((me.mp * xueNl) / 100);
                 }

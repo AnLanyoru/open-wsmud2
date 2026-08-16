@@ -131,6 +131,7 @@ export default class extends SKILL {
                         target: enemy,
                         gj: Math.floor((me.gj * (100 + extra_dmg)) / 100),
                         mz: me.mz,
+                        no_weapon: true,
                         attack_msg: '<hiy>一股狂暴无匹的气劲以$N为中心向四周横扫而出！</hiy>',
                         miss_msg: '<cyn>$n被这股气浪震得连连后退，幸好未被正面击中。</cyn>',
                         damage_msg: '<hir>$n被这股毁灭性的力量击中，狂喷鲜血，倒飞出去！</hir>',

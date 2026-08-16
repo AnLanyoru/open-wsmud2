@@ -29,6 +29,7 @@
 ## Framework change approval
 
 - Do not modify shared framework or core infrastructure merely to complete a resource, equipment, skill, or content task.
+- For resource, equipment, skill, or content behavior, prioritize a resource-file or other domain-local implementation first, even when a shared implementation appears more convenient or would reduce duplication.
 - If the requested behavior cannot be implemented correctly without a framework/core change, stop before editing those shared files. Report the limitation, present the proposed framework change and its impact to the user, and wait for explicit approval.
 
 ## Source descriptions
