@@ -23,6 +23,8 @@ const Process = {
     clear: function () {
         Dialog.pack.items = null;
         Dialog.skills.items = null;
+        Dialog.skills.skills = null;
+        Dialog.skills.playerSkills = Object.create(null);
 
         this.state(null);
     },
@@ -143,8 +145,9 @@ const Process = {
         }
         Process.player = x.id;
         Process.level = x.level;
-        Process.name = x.name;
-        document.title = x.name + " - 飘渺江湖";
+        // 兼容 login 消息携带 name（部分服/跨服可能下发）；否则置空占位，房间 items（含玩家自己）到达时在 items() 补全
+        Process.name = x.name || "";
+        document.title = x.name ? x.name + " - 飘渺江湖" : "飘渺江湖";
         Setting.load(x.setting);
         onLogin();
         //var panel = $(".player-panel").html(CreateHeadPanel(x));
@@ -238,6 +241,11 @@ const Process = {
             var item = room.items[i];
             if (!item) continue;
             item.player = item.p;
+            // 房间全量 items 必含玩家自己：登录后随玩家数据一次补齐 Process.name 与标题（login 消息不含 name）
+            if (item.p && item.id === Process.player && item.name && item.name !== Process.name) {
+                Process.name = item.name;
+                document.title = item.name + " - 飘渺江湖";
+            }
             if (item.m) {
                 item.type = '师父';
                 item.master = 1;

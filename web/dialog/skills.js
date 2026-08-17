@@ -7,12 +7,27 @@ export default {
     isShow: false,
     selectItem: ".dialog-skills",
     cacheWhenHidden: true,
+    // Keep the player's own skills independent from the dialog DOM/state.  The
+    // skills dialog can be closed while incremental skill notifications still
+    // arrive (for example while the master dialog is open).
+    playerSkills: Object.create(null),
     hasCachedSnapshot: function (cache) {
         return cache.some(function (data) {
             return Array.isArray(data.items);
         });
     },
     onBackgroundData: function (data) {
+        // Messages without a master/follower origin belong to the player.  Do
+        // not forward them to the master dialog, otherwise an own-skill update
+        // is silently discarded by Dialog.master.onData().
+        if ((data.book || data.books) && Dialog.master.isShow) {
+            Dialog.master.onData(data);
+            return true;
+        }
+        if (!data.from && !data.master && !data.follower) {
+            this.onData(data);
+            return true;
+        }
         if (!Dialog.master.isShow) return false;
         Dialog.master.onData(data);
         return true;
@@ -124,11 +139,15 @@ export default {
         if (group >= 0) SendCommand('skgroup ' + group);
     },
     updateSkill: function (data) {
+        if (this === Dialog.skills && data && data.id) {
+            const cached = this.playerSkills[data.id] || {id: data.id};
+            Object.assign(cached, data);
+            this.playerSkills[data.id] = cached;
+        }
         if (!this.skills) return;
         var item = this.skills[data.id];
         if (!item) {
-
-            return this.addSkill(item);
+            return this.addSkill(data);
         }
         if (data.name)
             item.name = data.name;
@@ -178,8 +197,16 @@ export default {
         }
     },
     addSkill: function (item) {
-
-        if (!this.items || !item) return;
+        if (!item) return;
+        if (this === Dialog.skills) {
+            const cached = this.playerSkills[item.id] || item;
+            Object.assign(cached, item);
+            this.playerSkills[item.id] = cached;
+            item = cached;
+        }
+        // The complete snapshot may not have arrived yet.  Retain the item in
+        // the player cache and let the snapshot/show path render it later.
+        if (!this.items) return;
         if (this.skills[item.id]) {
             return this.updateSkill(item);
         }
@@ -200,6 +227,10 @@ export default {
         return books;
     },
     onData: function (data) {
+        if (data.items && !data.master && !data.follower) {
+            this.playerSkills = Object.create(null);
+            for (const item of data.items) this.playerSkills[item.id] = item;
+        }
         if (data.book) {
             if (!this.books) return;
             this.books.push({name: data.book[0], grade: data.book[1], id: data.book[2]});
@@ -221,9 +252,6 @@ export default {
             return this.updateSkill(data);
         }
         if (data.item) {
-            if (Dialog.master.isShow && Dialog.master.is_follower) {
-                return this.addSkill.call(Dialog.master, data.item);
-            }
             return this.addSkill(data.item);
         }
         if (!this.isShow) {
@@ -237,8 +265,10 @@ export default {
         }
 
 
-        if (data.remove && this.items) {
+        if (data.remove) {
             if (data.from && data.from !== Process.player) return;
+            delete this.playerSkills[data.remove];
+            if (!this.items) return;
             this.items.Remove(this.skills[data.remove]);
 
             for (var i = 0; i < this.items.length; i++) {
@@ -292,6 +322,11 @@ export default {
         this.element.appendTo(Dialog.contentElement);
         //this.container.appendTo(Dialog.contentElement);
         this.element.removeClass("hide-item");
+        if (!this.items && Object.keys(this.playerSkills).length) {
+            this.items = Object.values(this.playerSkills);
+            this.skills = Object.create(null);
+            for (const item of this.items) this.skills[item.id] = item;
+        }
         if (!this.items) {
             if (!useCachedData) SendCommand("cha");
         }
