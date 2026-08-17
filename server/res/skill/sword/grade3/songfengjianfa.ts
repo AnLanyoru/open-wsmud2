@@ -26,7 +26,7 @@ export default class extends SKILL {
     slots = [
         {
             prop: 'sywx_sf',
-            value: (lv: number) => 10,
+            value: (lv: number) => 1,
             format: (val: number) => '松月无影出招后保留松风状态，脱战后消失',
         },
         {
@@ -42,6 +42,7 @@ export default class extends SKILL {
                 gj: 20 + Math.floor(lv * 1.5),
                 mz: 20 + Math.floor(lv * 1.4),
                 dex: Math.floor(lv * 0.127),
+                desc: "你的每次攻击都会增加攻速"
             },
             parry: {
                 zj: 10 + Math.floor(lv * 1.4),
@@ -49,6 +50,31 @@ export default class extends SKILL {
                 dex: Math.floor(lv * 0.127),
             },
         };
+    }
+
+    /**
+     * 松风被动 —— 命中叠加：每次命中积累一层「松风」，
+     * 每层增加1%攻击速度；上限初始5层，每100级增加一层。
+     * 松风为战斗状态，脱战后消失。
+     */
+    on_attack(me: CHARACTER, _target: CHARACTER, _par: DoAttackPar): number {
+        const lv = me.query_skill('songfengjianfa', 0);
+        if (lv <= 0) return 0;
+        const firstLayer = me.query_status('weapon') === 0;
+        me.add_status({
+            id: 'weapon',
+            name: '松风',
+            desc: '松风鼓荡，出招愈发迅捷',
+            duration: 0,
+            only_combat: me.query_prop('sywx_sf') > 0,
+            override: 1,
+            max_count: query_songfeng_max_layers(lv),
+            prop: { gjsd_per: 1 },
+        });
+        if (firstLayer) {
+            me.send_room('<HIG>$N剑势如松间清风拂过，身形愈发迅捷。</HIG>');
+        }
+        return 0;
     }
 
     pfm_set: PerformData = {
@@ -59,26 +85,34 @@ export default class extends SKILL {
             mp: 20,
             release_time: 0,
             use: function (me: CHARACTER, target: CHARACTER, lv: number) {
-                var stacks: number = me.query_temp('songfeng', 0);
-                var count = 1 + stacks;
+                let count: number = me.query_status('weapon');
+                if (!count) count = 1;
+                if (count > 13) count = 13;
                 me.send_room(
                     '<HIG>$N深吸一口气，$W倏然刺出，剑影如松间明月，<HIG>无声无息</HIG>却又迅疾无伦！</HIG>',
                     target,
                 );
-                for (var i = 0; i < count; i++) {
+                const mz = me.mz + (me.mz * count * me.query_prop('sywx_mz') / 100)
+                for (let i = 0; i < count; i++) {
                     me.do_attack({
                         target: target,
                         gj: me.gj,
-                        mz: me.mz,
+                        mz,
                         attack_before: i > 0 ? _tmpl('<HIG>松风未止，紧跟着又是一剑</HIG>\n') : undefined,
                     });
                 }
-                me.set_temp('songfeng', 0);
                 me.end_attack(target);
+                if (!me.query_prop('sywx_sf')) 
+                    me.remove_status('weapon', true);
             },
             query_desc: function (me: CHARACTER, lv: number) {
                 return '消耗你积累的速度，瞬间出剑，每层松风增加你一次攻击次数';
             },
         },
     };
+}
+
+/** 松风叠加层数上限：初始5层，每100级增加一层 */
+function query_songfeng_max_layers(lv: number): number {
+    return 5 + Math.floor(lv / 100);
 }
